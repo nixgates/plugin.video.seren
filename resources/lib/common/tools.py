@@ -296,8 +296,8 @@ def remove_duplicate_dicts(src_lst, ignored_keys):
     return dst_lst
 
 def closeBusyDialog():
-    if int(kodiVersion) > 18:
-        execute('Dialog.Close(busydialognoancel')
+    if int(kodiVersion) > 17:
+        execute('Dialog.Close(busydialognocancel')
     else:
         execute('Dialog.Close(all,true)')
 
