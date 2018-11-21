@@ -1,0 +1,184 @@
+# Kodi Media Center language file
+# Addon Name: Seren
+# Addon id: plugin.video.Seren
+# Addon Provider: Nixgates
+msgid ""
+msgstr ""
+
+msgctxt "#32001"
+msgid "Discover Movies"
+msgstr ""
+
+msgctxt "#32002"
+msgid "My Movies"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Discover TV Shows"
+msgstr ""
+
+msgctxt "#32004"
+msgid "My Shows"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Auth Trakt"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Disconnect Trakt"
+msgstr ""
+
+msgctxt "#32007"
+msgid "Most Popular"
+msgstr ""
+
+msgctxt "#32008"
+msgid "Recommended For You"
+msgstr ""
+
+msgctxt "#32009"
+msgid "Trending"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Most Played"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Most Watched"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Most Collected"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Most Anticipated"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Recently Updated"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Box Office Top 10"
+msgstr ""
+
+msgctxt "#32016"
+msgid "Search..."
+msgstr ""
+
+msgctxt "#32017"
+msgid "Collection"
+msgstr ""
+
+msgctxt "#32018"
+msgid "Watchlist"
+msgstr ""
+
+msgctxt "#32019"
+msgid "Next"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Find similar"
+msgstr ""
+
+msgctxt "#32021"
+msgid ""
+msgstr "Color Picker"
+
+msgctxt "#32022"
+msgid "Getting Things Ready"
+msgstr ""
+
+msgctxt "#32023"
+msgid "Real Debrid Auth"
+msgstr ""
+
+msgctxt "#32024"
+msgid "Open this link in a browser: "
+msgstr ""
+
+msgctxt "#32025"
+msgid "Enter the code: "
+msgstr ""
+
+msgctxt "#32026"
+msgid "Authentication is completed"
+msgstr ""
+
+msgctxt "#32027"
+msgid "Highlight Color Changed to - "
+msgstr ""
+
+msgctxt "#32028"
+msgid "Error Connecting to TMDB"
+msgstr ""
+
+msgctxt "#32029"
+msgid ": Revoked Trakt Auth"
+msgstr ""
+
+msgctxt "#32030"
+msgid "Trakt Successfully Dicsonnected"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Authorize Trakt"
+msgstr ""
+
+msgctxt "#32032"
+msgid "Error while authenticating with Trakt.\nPlease try again."
+msgstr ""
+
+msgctxt "#32033"
+msgid "Failed to Authorize Trakt"
+msgstr ""
+
+msgctxt "#32034"
+msgid "Please check your Internet Connection"
+msgstr ""
+
+msgctxt "#32035"
+msgid "Unknown Error Connecting to Trakt"
+msgstr ""
+
+msgctxt "#32036"
+msgid "Release Title: "
+msgstr ""
+
+msgctxt "#32037"
+msgid "Host: "
+msgstr ""
+
+msgctxt "#32038"
+msgid "Quality: "
+msgstr ""
+
+msgctxt "#32039"
+msgid "Search Movies..."
+msgstr ""
+
+msgctxt "#32040"
+msgid "Search Shows..."
+msgstr ""
+
+msgctxt "#32041"
+msgid "Tools"
+msgstr ""
+
+msgctxt "#32042"
+msgid "Clear Cache"
+msgstr ""
+
+msgctxt "#32043"
+msgid "Are you sure you wish to clear the cache?"
+msgstr ""
+
+msgctxt "#32044"
+msgid "Mark Unwatched"
+msgstr ""
+
+

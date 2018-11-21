@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+
+    <category label="General">
+        <setting type="lsep" label="General" />
+        <setting type="sep" />
+        <setting type="enum" id="general.playstyle" label="Play Style" default="Auto Play" values="Auto Play|Source Select" />
+        <setting type="enum" id="general.sourceselect" label="Source Select View" default="List" values="Dialog|List" />
+        <setting type="lsep" label="UI Settings" />
+        <setting type="sep" />
+        <!-- I'm leaving this hidden for now, TMDB needs a fair bit of work to get back up to scratch -->
+        <setting type="enum" id="general.metalocation" default="1" label="TV Metadata location" values="TMDB|TVDB" visible="hidden" />
+        <setting id="item.limit" type="slider" label="Page Item Limit" default="40" range="10, 100" option="int" />
+        <setting id="movie.view" type="select" label="Set Movie View" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List"/>
+        <setting id="show.view" type="select" label="Set show View" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" />
+        <setting id="general.textColorSelect" type="action" label="Select Text Highlight Color..." option="close" action="RunPlugin(plugin://plugin.video.Seren/?action=colorPicker)" />
+        <setting type="text" label="Current Color" enable="false" id="general.displayColor" default="None" />
+        <setting type="lsep" label="Smart Play Settings" />
+        <setting type="sep" />
+        <setting type="bool" id="smartplay.upnext" default="false" label="Enabled Up Next Addon Integration" />
+        <setting type="slider" id="smartplay.upnexttime" enable="eq(-1,true)" visible="eq(-1,true)" default="60" label="    Up Next Notifaction Time" option="int" range="10,60" />
+        <setting id="smartplay.playlistcreate" type="bool" label="Auto Playlist Creation" default="true" />
+        <setting id="smartplay.clickresume" type="bool" label="Auto Episode Resume" default="false" />
+        <setting id="smartPlay.deckresume" type="bool" label="Force Episode Resume on Continue Watching Items" default="true"  visible="eq(-1,false)"/>
+        <setting id="smartPlay.preScrape" type="bool" label="Pre-emptive Scraping" default="true"/>
+        <setting type="lsep" label="Bookmarks" />
+        <setting type="sep"/>
+        <setting id="smartPlay.traktresume" type="bool" label="Enable Trakt Bookmarks" default="true" />
+        <setting id="smartPlay.bookmarkprompt" type="bool" label="Enable Bookmark Prompt" default="false" visible="eq(-1,true)"/>
+
+                <!-- HIDDEN SETTINGS BELONG HERE -->
+        <setting id="tvdb.jw" type="text" default="" visible="hidden" />
+        <setting id="tvdb.expiry" type="text" default="0" visible="hidden"/>
+        <setting id="trakt.auth" type="text" default="" visible="hidden"/>
+        <setting id="trakt.refresh" type="text" default="" visible="hidden" />
+        <setting id="rd.auth" type="text" default="" visible="hidden" />
+        <setting id="rd.refresh" type="text" default="" visible="hidden" />
+        <setting id="rd.client_id" type="text" default="" visible="hidden" />
+        <setting id="rd.expiry" type="text" default="0" visible="hidden"/>
+        <setting id="rd.secret" type="text" default="" visible="hidden" />
+        <setting id="general.tempSilent" type="text" visible="hidden" default="false" />
+        <setting id="general.rdexpirycheck" type="text" visible="hidden" default="" />
+        <setting id="general.pmexpirycheck" type="text" visible="hidden" default="" />
+                <!-- END HIDDEN SETTINGS -->
+    </category>
+
+    <category label="Scraping">
+        <setting type="lsep" label="General" />
+        <setting type="sep" />
+        <setting id="general.torrentCache" type="bool" label="Cache Torrent Info Locally" default="true" />
+        <setting id="general.disable265" label="Hide x265 Items" type="bool" default="false" />
+        <setting type="slider" label="Timeout" id="general.timeout" default="60" range="10, 60" option="int" />
+        <setting type="lsep" label="Auto Caching Assistant"/>
+        <setting type="sep" />
+        <setting id="general.autocache" type="bool" default="true" label="Auto Add Un-Cached Sources to Debrid" />
+        <setting id="general.cacheAssistMode" type="enum" label="    Assist Mode" values="Automatic|Manual Selection" visible="eq(-1,true)" />
+        <setting id="general.cachelocation" type="enum" label="    Preferred Cloud Location" visible="eq(-2,true)" values="Premiumize|Real Debrid" />
+        <setting type="lsep" label="Source Filters"/>
+        <setting type="sep"/>
+        <setting id="general.sortsources" label="Sort Sources Method" type="enum" default="0" values="Torrents|Hosters|Resolution" />
+        <setting id="general.sizesort" label="Enable Secondary Filesize Sort" type="bool" default="true"/>
+        <setting type="lsep" label="Source Filter Settings" />
+        <setting type="sep" />
+        <setting id="general.maxResolution" type="enum" label="Max Resolution" values="4k|1080p|720p|SD" default="0" />
+        <setting type="lsep" label="Pre-emptive Termination Settings" />
+        <setting type="sep" />
+        <setting id="preem.enabled" type="bool" label="Enable Pre-emptive Termination" default="true" />
+        <setting id="preem.movieres" type="enum" label="    Movie Resolution" values="4K|1080p|720p|SD" default="1" visible="eq(-1,true)" />
+        <setting id="preem.tvres" type="enum" label="    TV Shows Resolution" values="4K|1080p|720p|SD" default="1" visible="eq(-2,true)" />
+        <setting id="preem.limit" type="slider" label="    Minimum Sources" default="2" range="0, 20" option="int" visible="eq(-3,true)"/>
+        <setting id="preem.type" type="enum" label="    Terminate on... " default="0" values="Torrents Only|Hosters Only|Torrents/Hosters" visible="eq(-4,true)" />
+    </category>
+
+    <category label="Accounts">
+        <setting type="lsep" label="General" />
+        <setting type="sep"/>
+        <setting id="general.accountNotifications" label="Enable Account Expiry Notifications" type="bool" default="true" />
+        <setting type="lsep" label="Trakt Account Settings" />
+        <setting type="sep" />
+        <setting type="text" id="trakt.username" label="Trakt Username" enable="false"/>
+        <setting type="action" label="Authorize Trakt..." option="close" action="RunPlugin(plugin://plugin.video.Seren/?action=authTrakt)" />
+        <setting type="action" label="Revoke Trakt Authentication..." option="close" action="RunPlugin(plugin://plugin.video.Seren/?action=revokeTrakt)" />
+        <setting type="lsep" label="Premiumize Account Settings" />
+        <setting type="sep" />
+        <setting id="premiumize.enabled" type="bool" default="false" label="Enable Premiumize" />
+        <setting id="premiumize.pin" type="text" default="" label="    Api Key" enable="eq(-1,true)" visible="eq(-1,true)"/>
+        <setting id="premiumize.torrents" type="bool" default="true" label="    Enable Torrents" enable="eq(-2,true)" visible="eq(-2,true)" />
+        <setting id="premiumize.hosters" type="bool" default="true" label="    Enable Hosters" enable="eq(-3,true)" visible="eq(-3,true)" />
+        <setting id="premiumize.autodelete" type="bool" default="true" label="    Automatic Cloud Removal" visible="eq(-4,true)" />
+        <setting id="premiumize.threshold" type="slider" label="        Max Fair-Use Percentage" default="50" range="20, 10, 70" option="percent" visible="eq(-5,true)"/>
+        <setting type="lsep" label="Real Debrid Account Settings" />
+        <setting type="sep" />
+        <setting id="realdebrid.enabled" type="bool" default="false" label="Enable Real Debrid" />
+        <setting id="rd.username" type="text" default="" label="Real Debrid Username" enable="false" visible="eq(-1,true)" />
+        <setting id="rd.auth_start" type="action" label="Authorize Real Debrid..." option="close" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.Seren/?action=authRealDebrid)" enable="eq(-2,true)"/>
+        <setting id="rd.torrents" type="bool" default="true" label="    Enable Torrents" enable="eq(-3,true)" visible="eq(-3,true)"/>
+        <setting id="rd.hosters" type="bool" default="true" label="    Enable Hosters" enable="eq(-4,true)" visible="eq(-4,true)"/>
+        <setting id="rd.autodelete" type="bool" default="true" label="    Auto-Delete Torrents" visible="eq(-5,true)" />
+    </category>
+
+    <category label="Providers">
+        <setting type="lsep" label="Provider Packages"/>
+        <setting type="sep" />
+        <setting type="action" label="Install From File Manager..." action="RunPlugin(plugin://plugin.video.Seren/?action=installProviders&actionArgs=0)"/>
+        <setting type="action" label="Install From Web URL..." action="RunPlugin(plugin://plugin.video.Seren/?action=installProviders&actionArgs=1)"/>
+        <setting type="action" label="Uninstall Provider Package..." action="RunPlugin(plugin://plugin.video.Seren/?action=uninstallProviders)" />
+        <setting type="lsep" label="Package Options" />
+        <setting type="sep"/>
+        <setting type="action" label="Enable Providers..." action="RunPlugin(plugin://plugin.video.Seren/?action=adjustProviders&actionArgs=disabled)" />
+        <setting type="action" label="Disable Providers..." action="RunPlugin(plugin://plugin.video.Seren/?action=adjustProviders&actionArgs=enabled)" />
+    </category>
+
+    <category label="API Keys">
+        <setting type="lsep" label="TMDB API Keys" />
+        <setting type="sep" />
+        <setting id="tmdb.apikey" label="TMDB API Key" type="text" default="" />
+        <setting type="lsep" label="Trakt API Keys" />
+        <setting type="sep" />
+        <setting id="trakt.clientid" label="Trakt Client ID" type="text" default="" />
+        <setting id="trakt.secret" label="Trakt Client Secret" type="text" default="" />
+        <setting type="lsep" label="TVDB API Keys" />
+        <setting type="sep" />
+        <setting id="tvdb.apikey" label="TVB Api Key" type="text" default="" />
+    </category>
+
+    <category label="Experimental">
+        <setting type="lsep" label="Omni Connect" />
+        <setting type="sep"/>
+        <setting type="bool" label="Enabled Omni Connect" default="false" id="general.omniconnect" enable="false"/>
+        <setting type="text" label="Omni Connect Port" default="8081" id="omni.port" enable="false"/>
+    </category>
+
+</settings>
