@@ -140,6 +140,8 @@ class Sources(tools.dialogWindow):
                 # Shuffle and start scraping threads
                 random.shuffle(self.threads)
                 for i in self.threads:
+                    i.daemon = True
+                for i in self.threads:
                     i.start()
 
                 self.setText("Scraping Sources")
@@ -172,6 +174,7 @@ class Sources(tools.dialogWindow):
                         ))
                         self.setText3(
                             "Remaining Sources: %s" % tools.colorString(len(self.remainingProviders)))
+
                     except:
                         import traceback
                         traceback.print_exc()
@@ -200,11 +203,24 @@ class Sources(tools.dialogWindow):
             # Remove Duplicate Hoster Sources
             post_dup = []
             check_list = []
+            debrid_hosts = copy.deepcopy(self.hosterSources)
+            debrid_hosts = [i for i in debrid_hosts if 'debrid_provider' in i]
+            non_debrid = copy.deepcopy(self.hosterSources)
+            non_debrid = [i for i in non_debrid if 'debrid_provider' not in i]
 
-            for i in self.hosterSources:
+            for i in debrid_hosts:
                 if not [i['url'].lower(), i['debrid_provider']] in check_list:
                     post_dup.append(i)
                     check_list.append([i['url'].lower(), i['debrid_provider']])
+                else:
+                    self.duplicates_amount += 1
+
+            check_list = []
+
+            for i in non_debrid:
+                if not i['url'].lower() in check_list:
+                    post_dup.append(i)
+                    check_list.append(i['url'].lower())
                 else:
                     self.duplicates_amount += 1
 
@@ -212,7 +228,12 @@ class Sources(tools.dialogWindow):
 
             if not self.silent:
                 if self.duplicates_amount > 0:
-                    tools.showDialog.notification(tools.addonName, '%s duplicate entries removed' % str(self.duplicates_amount))
+                    try:
+                        tools.showDialog.notification(tools.addonName,
+                                                      '%s duplicate entries removed' % str(self.duplicates_amount),
+                                                      sound=False)
+                    except:
+                        pass
 
             self.build_cache_assist(self.args)
 
@@ -222,6 +243,9 @@ class Sources(tools.dialogWindow):
                     tools.playList.clear()
                 except:
                     pass
+                if self.silent:
+                    tools.showDialog.notification(tools.addonName, 'No Sources found for next item in playlist. '
+                                                                   'Clearing current playlist')
 
                 self.return_data = ([], self.args)
                 self.close()
@@ -298,12 +322,16 @@ class Sources(tools.dialogWindow):
                             if sorted_list > 0:
                                 build_list.append(sorted_list[0])
         else:
+            if self.silent is true:
+                return
             yesno = tools.showDialog.yesno('%s - Cache Assist' % tools.addonName, 'No Playable Sources were found'
                                                         '\nWould you like to attempt to cache a torrent?')
             if yesno == 0:
                 return
             display_list = ['%sS | %s | %s | %s' %
-                            (i['seeds'], i['provider'], tools.source_size_display(i['size']), i['release_title'])
+                            (i['seeds'], tools.color_quality(i['quality']),
+                             tools.source_size_display(i['size']),
+                             tools.colorString(i['release_title']))
                             for i in self.allTorrents]
             selection = tools.showDialog.select('%s - Select Torrent to Cache' % tools.addonName, display_list)
             if selection == -1:
@@ -341,10 +369,10 @@ class Sources(tools.dialogWindow):
             providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
 
             # Check to ensure that if duplicate providers exist that they do not run twice
+            # This isn't the greatest idea. I mean... Fuck it. It's staying out for now
             #provider_domain = providerModule.domain
             #if provider_domain == '' or provider_domain in self.domain_list:
             #    return
-
 
             if 'episodeInfo' in info:
 
@@ -445,9 +473,13 @@ class Sources(tools.dialogWindow):
 
             for source in sources:
                 source['type'] = 'hoster'
-                source['provider'] = provider_name.upper()
                 source['release_title'] = title
                 source['source'] = source['source'].upper().split('.')[0]
+                if 'provider' in source:
+                    source['source'] = source['provider']
+                source['provider'] = provider_name.upper()
+                source['info'] = source.get('info', [])
+                source['provider_imports'] = provider
 
             pre_dup = sources
             all_urls = [i['url'].lower() for i in self.hosterSources]
@@ -487,6 +519,18 @@ class Sources(tools.dialogWindow):
 
         return resolutions
 
+    def debrid_priority(self):
+        p = []
+
+        if tools.getSetting('premiumize.enabled') == 'true':
+            p.append({'slug': 'premiumize', 'priority': int(tools.getSetting('premiumize.priority'))})
+        if tools.getSetting('realdebrid.enabled') == 'true':
+            p.append({'slug': 'real_debrid', 'priority': int(tools.getSetting('rd.priority'))})
+
+        p = sorted(p, key=lambda i: i['priority'])
+
+        return p
+
 
     def sortSources(self, torrent_list, hoster_list):
         sort_method = int(tools.getSetting('general.sortsources'))
@@ -501,39 +545,64 @@ class Sources(tools.dialogWindow):
         else:
             random.shuffle(torrent_list)
 
+        if tools.getSetting('general.disable3d') == 'true':
+            torrent_list = [i for i in torrent_list if '3D' not in i['info']]
+            hoster_list = [i for i in hoster_list if '3D' not in i['info']]
+
+        if tools.getSetting('general.enablesizelimit') == 'true':
+            size_limit = int(tools.getSetting('general.sizelimit')) * 1024
+            torrent_list = [i for i in torrent_list if i.get('size', 0) < size_limit]
+
         random.shuffle(hoster_list)
 
+        debrid_priorities = self.debrid_priority()
 
-        for i in resolutions:
+        for resolution in resolutions:
             if sort_method == 0 or sort_method == 2:
-                for torrent in torrent_list:
-                    if torrent['quality'] == i:
-                        sortedList.append(torrent)
+                for debrid in debrid_priorities:
+                    for torrent in torrent_list:
+                        if debrid['slug'] == torrent['debrid_provider']:
+                            if torrent['quality'] == resolution:
+                                sortedList.append(torrent)
 
             if sort_method == 1 or sort_method == 2:
+                for debrid in debrid_priorities:
+                    for file in hoster_list:
+                        if 'debrid_provider' in file:
+                            if file['debrid_provider'] == debrid['slug']:
+                                if file['quality'] == resolution:
+                                    sortedList.append(file)
+
                 for file in hoster_list:
-                    if file['quality'] == i:
-                        sortedList.append(file)
+                    if 'debrid_provider' not in file:
+                        if file['quality'] == resolution:
+                            sortedList.append(file)
 
 
         if sort_method == 1:
-            for i in resolutions:
-                for torrent in torrent_list:
-                    if torrent['quality'] == i:
-                        sortedList.append(torrent)
+            for resolution in resolutions:
+                for debrid in debrid_priorities:
+                    for torrent in torrent_list:
+                        if torrent['debrid_provider'] == debrid['slug']:
+                            if torrent['quality'] == resolution:
+                                sortedList.append(torrent)
 
         if sort_method == 0:
-            for i in resolutions:
+            for resolution in resolutions:
+                for debrid in debrid_priorities:
+                    for file in hoster_list:
+                        if 'debrid_provider' in file:
+                            if file['debrid_provider'] == debrid['slug']:
+                                if file['quality'] == resolution:
+                                    sortedList.append(file)
+
                 for file in hoster_list:
-                    if file['quality'] == i:
-                        sortedList.append(file)
+                    if 'debrid_provider' not in file:
+                        if file['quality'] == resolution:
+                            sortedList.append(file)
 
         if tools.getSetting('general.disable265') == 'true':
-            preList = []
-            for i in sortedList:
-                if 'x265' not in i['info']:
-                    preList.append(i)
-            sortedList = preList
+            sortedList = [i for i in sortedList if 'x265' not in i['info']]
 
         return sortedList
 
@@ -624,9 +693,9 @@ class Sources(tools.dialogWindow):
             year = info['year']
             return imdb, title, localtitle, aliases, year
         elif type == 'sources':
-            hostprDict = [domain
+            hostprDict = [host[0]
                           for debrid in self.hosterDomains['premium'].itervalues()
-                          for domain in debrid]
+                          for host in debrid]
             hostDict = self.hosterDomains['free']
             return hostDict, hostprDict
 
@@ -638,14 +707,15 @@ class Sources(tools.dialogWindow):
         providers = [i for i in self.hosterDomains['premium'].iterkeys()]
 
         for provider in providers:
-            for domain in self.hosterDomains['premium'][provider]:
-                for file in self.hosterSources:
-                    if domain in file['url']:
+            hoster_sources = copy.deepcopy(self.hosterSources)
+            for hoster in self.hosterDomains['premium'][provider]:
+                for file in hoster_sources:
+                    if hoster[1].lower() == file['source'].lower() or hoster[0].lower() in file['url'].lower():
                         source_list.append(file)
                         source_list[-1]['debrid_provider'] = provider
 
 
-        self.hosterSources = source_list
+        self.hosterSources += source_list
 
     def prem_terminate(self):
         if 'episodeInfo' in self.args:

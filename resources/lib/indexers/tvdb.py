@@ -87,7 +87,8 @@ class TVDBAPI:
             for i in self.threads:
                 i.join()
             item = {'info': None, 'art': None}
-
+            if self.info == {}:
+                return None
             # Set Art
             art = {}
             try:
@@ -138,12 +139,13 @@ class TVDBAPI:
             except:
                 pass
             try:
-                info['tvshowtitle'] = self.info.get('seriesName')
+                info['tvshowtitle'] = self.info['seriesName']
             except:
                 pass
             try:
                 info['year'] = self.info.get('firstAired')[:4]
             except:
+                info['year'] = 0
                 pass
 
             try:
@@ -171,12 +173,18 @@ class TVDBAPI:
                     self.episode_summary['airedSeasons'].pop(0)
                 info['seasonCount'] = len(self.episode_summary['airedSeasons'])
             except:
+                info['seasonCount'] = 0
                 pass
+
             try:
-                info['episodeCount'] = self.episode_summary['airedEpisodes']
+                if 'airedEpisodes' in self.episode_summary:
+                    info['episodeCount'] = self.episode_summary['airedEpisodes']
+                else:
+                    info['episodeCount'] = trakt_object['aired_episodes']
             except:
-                info['episodeCount'] = self.episode_summary['airedEpisodes']
+                info['episodeCount'] = 0
                 pass
+
             try:
                 info['mediatype'] = 'tvshow'
             except:
@@ -186,8 +194,9 @@ class TVDBAPI:
             except:
                 pass
             try:
-                info['country'] = trakt_object['country'].upper()
+                info['country'] = trakt_object.get('country','').upper()
             except:
+                info['country'] = ''
                 pass
 
             requirements = ['country', 'tvshowtitle', 'year', 'seasonCount']
@@ -207,8 +216,6 @@ class TVDBAPI:
             else:
                 self.show_cursory = item
         except:
-            import traceback
-            traceback.print_exc()
             self.show_cursory = False
             return None
 
@@ -261,8 +268,7 @@ class TVDBAPI:
             try:
                 item['info']['plot'] = item['info']['overview'] = seasonObject['overview']
             except:
-                import traceback
-                traceback.print_exc()
+                pass
 
             try:
                 item['info']['season'] = season
@@ -305,8 +311,6 @@ class TVDBAPI:
             item['showInfo'] = showArgs
 
         except:
-            import traceback
-            traceback.print_exc()
             return None
 
         return item
@@ -416,8 +420,6 @@ class TVDBAPI:
             if airdate > currentDate:
                 info['title'] = '[I][COLOR red]%s[/COLOR][/I]' % info['title']
         except:
-            import traceback
-            traceback.print_exc()
             pass
 
         info['trailer'] = ''
@@ -432,7 +434,7 @@ class TVDBAPI:
 
         requirements = ['title', 'season', 'episode']
         for i in requirements:
-            if info[i] == None:
+            if info.get(i, None) == None:
                 return None
             if i not in info:
                 return None

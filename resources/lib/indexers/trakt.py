@@ -144,7 +144,6 @@ class TraktAPI:
             if response.status_code == 502:
                 tools.log('Trakt is currently experiencing Gateway Issues')
         except requests.exceptions.ConnectionError:
-            tools.showDialog.ok(tools.addonName, tools.lang(32034))
             return
         except not requests.exceptions.ConnectionError:
             tools.showDialog.ok(tools.addonName, tools.lang(32035))
@@ -172,10 +171,8 @@ class TraktAPI:
                 return None
 
         except requests.exceptions.ConnectionError:
-            tools.showDialog.ok(tools.addonName, tools.lang(32034))
             return
         except not requests.exceptions.ConnectionError:
-            tools.showDialog.ok(tools.addonName, tools.lang(32035))
             return
         return response.text
 
@@ -194,7 +191,7 @@ class TraktAPI:
             tools.showDialog.notification(tools.addonName, 'There may be an issue with the Trakt service, please clear cache and wait')
 
         dialog_list = ['Add to Collection', 'Remove from Collection', 'Add to Watchlist', 'Remove from Watchlist',
-                       'Mark as Watched', 'Mark as Unwatched', 'Add to List', 'Remove From List']
+                       'Mark as Watched', 'Mark as Unwatched', 'Add to List', 'Remove From List', 'Hide Item']
 
         selection = tools.showDialog.select(tools.addonName + ': Trakt Manager', dialog_list)
         thread = None
@@ -215,6 +212,8 @@ class TraktAPI:
             self.addToList(trakt_object)
         elif selection == 7:
             self.removeFromList(trakt_object)
+        elif selection == 8:
+            self.hideItem(trakt_object)
         else:
             return
 
@@ -261,6 +260,15 @@ class TraktAPI:
         selection = lists[selection]
         self.json_response('users/me/lists/%s/items/remove' % selection['ids']['trakt'], postData=trakt_object)
         tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item removed from %s' % selection['name'])
+
+    def hideItem(self, trakt_object):
+        sections = ['progress_watched', 'calendar']
+        sections_display = ['Watched Progress', 'Calendar']
+        selection = tools.showDialog.select(tools.addonName + ': Select Menu type to hide from', sections_display)
+        section = sections[selection]
+
+        tools.log(self.post_request('users/hidden/%s' % section, postData=trakt_object))
+        tools.showDialog.notification(tools.addonName, 'Item has been hidden from your %s' % sections_display[selection])
 
     def get_username(self):
         settings = json.loads(self.get_request('users/settings'))
@@ -348,7 +356,7 @@ class TraktAPI:
 
         content_type = 'tvshows'
 
-        if arguments['type'] == 'movie':
+        if media_type == 'movie':
             content_type = 'movies'
 
         if len(list_items) == int(tools.getSetting('item.limit')):
@@ -357,6 +365,35 @@ class TraktAPI:
                                    (str(page), tools.quote(json.dumps(arguments))), '', '')
         tools.closeDirectory(content_type)
         return
+
+    def get_trakt_hidden_items(self):
+
+        watched = self.json_response('users/hidden/progress_watched')
+        calendar = self.json_response('users/hidden/calendar')
+        recommendations = self.json_response('users/hidden/recommendations')
+
+        watched = {
+            'shows': [i['show']['ids']['trakt'] for i in watched if i['type'] == 'show'],
+            'movies': [i['movie']['ids']['trakt'] for i in watched if i['type'] == 'movie']
+        }
+
+        calendar = {
+            'shows': [i['show']['ids']['trakt'] for i in calendar if i['type'] == 'show'],
+            'movies': [i['movie']['ids']['trakt'] for i in calendar if i['type'] == 'movie']
+        }
+
+        recommendations = {
+            'shows': [i['show']['ids']['trakt'] for i in recommendations if i['type'] == 'show'],
+            'movies': [i['movie']['ids']['trakt'] for i in recommendations if i['type'] == 'movie']
+        }
+
+        hidden_items = {
+            'watched': watched,
+            'calendar': calendar,
+            'recommendations': recommendations,
+        }
+
+        return hidden_items
 
 
 

@@ -124,9 +124,9 @@ if action == 'getSources':
             background.show()
 
         from resources.lib.modules import getSources
-
-        source_results, args = database.get(getSources.Sources().doModal, 1, actionArgs)
-
+        sources_window = getSources
+        source_results, args = database.get(sources_window.Sources().doModal, 1, actionArgs)
+        del sources_window
         if len(source_results) > 0:
 
             if tools.getSetting('general.playstyle') == '1' or source_select == 'true':
@@ -136,10 +136,13 @@ if action == 'getSources':
 
             from resources.lib.modules import resolver
             background.setText('Starting Resolver...')
-            stream_link = database.get(resolver.Resolver().doModal, 1, source_results, args, pack_select)
+            resolver_window = resolver
+            stream_link = database.get(resolver_window.Resolver().doModal, 1, source_results, args, pack_select)
+            del resolver_window
 
             if display_background is True:
                 background.close()
+                del background
             try:
                 tools.busyDialog.create()
             except:
@@ -156,6 +159,7 @@ if action == 'getSources':
         else:
             if display_background is True:
                 background.close()
+                del background
             tools.showDialog.notification(tools.addonName, 'No playable sources found for item', time=5000)
             try:
                 tools.closeBusyDialog()
@@ -285,9 +289,7 @@ if action == 'traktManager':
     trakt.TraktAPI().traktManager(actionArgs)
 
 if action == 'test2':
-    #this was just used purely for quick testing and sly jokes to the testing crew
     pass
-
 
 if action == 'traktOnDeckHome':
     from resources.lib.gui import homeMenu
@@ -330,8 +332,6 @@ if action == 'shufflePlay':
     try:
         smart = smartPlay.SmartPlay(actionArgs).shufflePlay()
     except:
-        import traceback
-        traceback.print_exc()
         pass
 
 if action == 'resetSilent':
@@ -384,6 +384,10 @@ if action == 'providerTools':
 if action == 'adjustProviders':
     from resources.lib.modules import customProviders
     customProviders.providers().adjust_providers(actionArgs)
+
+if action == 'adjustPackage':
+    from resources.lib.modules import customProviders
+    customProviders.providers().adjust_providers(actionArgs, package_disable=True)
 
 if action == 'installProviders':
     from resources.lib.modules import providerInstaller

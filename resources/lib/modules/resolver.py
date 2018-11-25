@@ -1,4 +1,4 @@
-import sys, os, threading
+import sys, os, threading, requests
 from resources.lib.common import tools
 from resources.lib.debrid import premiumize as Premiumize
 from resources.lib.debrid import real_debrid
@@ -8,6 +8,8 @@ try:
 except:
     #Running outside Kodi Call
     pass
+
+sys.path.append(tools.dataPath)
 
 class Resolver(tools.dialogWindow):
 
@@ -97,16 +99,17 @@ class Resolver(tools.dialogWindow):
             # Begin resolving links
             tools.log('Attempting to Resolve file link', 'info')
             for i in sources:
-                tools.log('Entered Loop for %s time' % loop_count)
+                debrid_provider = i.get('debrid_provider', '')
                 loop_count += 1
                 try:
                     if self.is_canceled():
                         self.close()
                         return
-
+                    if 'size' in i:
+                        i['info'].append(tools.source_size_display(i['size']))
                     loop_count_string = "(" + str(loop_count) + " of " + str(len(sources)) + ")"
                     line1 = tools.lang(32036) + "%s - %s" % (tools.colorString(i['release_title']), loop_count_string)
-                    line2 = tools.lang(32037) + "%s | Source: %s" % (tools.colorString(i['debrid_provider'].upper()),
+                    line2 = tools.lang(32037) + "%s | Source: %s" % (tools.colorString(debrid_provider.upper()),
                                                                      tools.colorString(i['source']))
                     line3 = tools.lang(32038) + '%s | Info: %s' % (tools.colorString(i['quality']),
                                                                    tools.colorString(" ".join(i['info'])))
@@ -125,19 +128,61 @@ class Resolver(tools.dialogWindow):
                             tools.log('Failed to resolve for torrent %s' % i['release_title'])
                             continue
                         else:
-                            tools.log('Resolved file %s' % stream_link)
                             self.return_data = stream_link
                             self.close()
                             return
 
 
                     elif i['type'] == 'hoster':
+                        # Quick fallback to speed up resolving while direct and free hosters are not supported
+                        if 'debrid_provider' not in i:
+                            continue
+                        provider = i['provider_imports']
+                        providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
+                        providerModule = providerModule.source()
 
-                        if i['debrid_provider'] == 'premiumize' and tools.getSetting('premiumize.enabled') == 'true':
-                            stream_link = self.premiumizeResolve(i, args)
+                        try:
+                            i['url'] = providerModule.resolve(i['url'])
+                        except:
+                            import traceback
+                            traceback.print_exc()
+                            pass
 
-                        if i['debrid_provider'] == 'real_debrid':
-                            stream_link = self.realdebridResolve(i, args)
+                        if i['url'] is None:
+                            continue
+
+                        if 'debrid_provider' in i:
+                            if i['debrid_provider'] == 'premiumize' and tools.getSetting('premiumize.enabled') == 'true':
+                                stream_link = self.premiumizeResolve(i, args)
+                                if stream_link is None:
+                                    continue
+
+                            if i['debrid_provider'] == 'real_debrid':
+                                stream_link = self.realdebridResolve(i, args)
+                                if stream_link is None:
+                                    continue
+
+                        else:
+                            # Currently not supporting free hosters at this point in time
+                            # ResolveURL and Direct link testing needs to be tested first
+                            continue
+                            try:
+                                try:
+                                    headers = i['url'].rsplit('|', 1)[1]
+                                except:
+                                    headers = ''
+
+                                headers = tools.quote_plus(headers).replace('%3D', '=') if ' ' in headers else headers
+                                headers = dict(tools.parse_qsl(headers))
+
+                                live_check = requests.head(i['url'], headers=headers)
+
+                                if not live_check.status_code == 200:
+                                    continue
+
+                                stream_link = i['url']
+                            except:
+                                stream_link = None
 
                         if stream_link is None:
                             continue
@@ -198,7 +243,7 @@ class Resolver(tools.dialogWindow):
                 if host_list is None:
                     host_list = Premiumize.PremiumizeFunctions().updateRelevantHosters()
                 if host_list is not None:
-                    hosters['premium']['premiumize'] = host_list['directdl']
+                    hosters['premium']['premiumize'] = [(i, i.split('.')[0]) for i in host_list['directdl']]
                 else:
                     hosters['premium']['premiumize'] = []
 
@@ -207,9 +252,10 @@ class Resolver(tools.dialogWindow):
                 if host_list is None:
                     host_list = real_debrid.RealDebrid().getRelevantHosters()
                 if host_list is not None:
-                    hosters['premium']['real_debrid'] = host_list
+                    hosters['premium']['real_debrid'] = [(i, i.split('.')[0]) for i in host_list]
                 else:
                     hosters['premium']['real_debrid'] = []
+
 
             return hosters
 

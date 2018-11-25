@@ -223,8 +223,13 @@ class Menus:
                 cm = []
                 cm.append((tools.lang(32020), 'Container.Update(%s?action=moviesRelated&actionArgs=%s)' % (sysaddon, item['ids']['trakt'])))
                 cm.append(('Source Select', 'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
-                cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
-                           % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
+
+                if tools.context_addon():
+                    cm = []
+
+                if tools.getSetting('trakt.auth') != '':
+                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s&type=episode)'
+                               % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
             except:
                 continue
 

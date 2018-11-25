@@ -15,6 +15,8 @@ tmdb_semaphore = 40
 
 tmdb_sema = threading.Semaphore(tmdb_semaphore)
 
+database_sema = threading.Semaphore(1)
+
 viewTypes = {
     'Default': 50,
     'Poster': 51,
@@ -95,7 +97,7 @@ try:
 
     addonName = "Seren"
 
-    addonDir = os.path.join(xbmc.translatePath('special://home'), 'addons/plugin.video.%s' % addonName)
+    addonDir = os.path.join(xbmc.translatePath('special://home'), 'addons/plugin.video.%s' % addonName.lower())
 
     try:
         dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
@@ -150,7 +152,7 @@ try:
 
     player = xbmc.Player
 
-    kodiVersion = xbmc.getInfoLabel("System.BuildVersion")[:2]
+    kodiVersion = int(xbmc.getInfoLabel("System.BuildVersion")[:2])
 
 except:
     import traceback
@@ -158,12 +160,15 @@ except:
     pass
 
 def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=True, isFolder=True, all_fanart=None,
-                     actionArgs=False, smart_play=False, set_cast=False):
+                     actionArgs=False, smart_play=False, set_cast=False, label2=None):
 
     url = '%s?action=%s' % (sysaddon, query) if isAction == True else query
     if actionArgs is not False:
         url += '&actionArgs=%s' % actionArgs
     item = menuItem(label=name)
+    if label2 is not None:
+        item.setLabel2(label2)
+        log(label2)
     if isPlayable == True:
         item.setProperty('IsPlayable', 'true')
     if set_cast is not False and 'cast' in info:
@@ -178,6 +183,7 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
     addMenuItem(handle=syshandle, url=url, listitem=item, isFolder=isFolder)
 
 def closeDirectory(contentType, viewType='Default', sort=False):
+
     if sort == 'title':
         sortMethod(syshandle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     if sort == 'episode':
@@ -187,12 +193,27 @@ def closeDirectory(contentType, viewType='Default', sort=False):
         sortMethod(syshandle, xbmcplugin.SORT_METHOD_DATEADDED)
     if sort == False:
         sortMethod(syshandle, xbmcplugin.SORT_METHOD_NONE)
-    if viewType == '':
-        viewType = 'Default'
-    viewType = viewTypes[viewType]
+
+    viewType = get_view_type(contentType)
+
     xbmc.executebuiltin('Container.SetViewMode(%d)' % viewType)
     content(syshandle, contentType)
     endDirectory(syshandle, cacheToDisc=True)
+
+def get_view_type(contentType):
+    viewType = 'Default'
+
+    if contentType == 'tvshows':
+        viewType = getSetting('show.view')
+    if contentType == 'movies':
+        viewType = getSetting('movie.view')
+    if contentType == 'episodes':
+        viewType = getSetting('episode.view')
+    if contentType == 'seasons':
+        viewType = getSetting('season.view')
+
+    viewType = viewTypes[viewType]
+    return viewType
 
 def busy():
     return execute('ActivateWindow(busydialog)')
@@ -225,6 +246,8 @@ def colorPicker():
     for i in colorChart:
         selectList.append(colorString(i, i))
     color = showDialog.select(addonName + lang(32021), selectList)
+    if color == -1:
+        return
     setSetting('general.textColor', colorChart[color])
     setSetting('general.displayColor', colorChart[color])
     log(lang(32027) + ' %s' % colorChart[color], 'info')
@@ -275,7 +298,7 @@ def sort_list_items(threadList, originalList):
     return sortedList
 
 def metaFile():
-    return os.path.join(xbmcaddon.Addon('plugin.video.%s' % addonName).getAddonInfo('path'), 'resources', 'cache', 'meta.db')
+    return os.path.join(xbmcaddon.Addon('plugin.video.%s' % addonName.lower()).getAddonInfo('path'), 'resources', 'cache', 'meta.db')
 
 def clearCache():
     confirm = showDialog.yesno(addonName, lang(32043))
@@ -296,8 +319,8 @@ def remove_duplicate_dicts(src_lst, ignored_keys):
     return dst_lst
 
 def closeBusyDialog():
-    if int(kodiVersion) > 18:
-        execute('Dialog.Close(busydialognoancel')
+    if kodiVersion > 17:
+        execute('Dialog.Close(busydialognocancel')
     else:
         execute('Dialog.Close(all,true)')
 
@@ -372,4 +395,8 @@ def color_quality(quality):
 
     return colorString(quality, color)
 
-
+def context_addon():
+    if condVisibility('System.HasAddon(context.seren)'):
+        return True
+    else:
+        return False

@@ -1,8 +1,14 @@
 from resources.lib.common import tools
 from resources.lib.modules import resolver
 from resources.lib.modules import providerInstaller as providerInstaller
+from resources.lib.modules import database
 
 import time
+
+def cache_large_info_requests():
+    from resources.lib.indexers import trakt
+    trakt = trakt.TraktAPI()
+    database.get(trakt.json_response, .5, 'users/me/watched/shows?extended=full', limit=False)
 
 
 def refresh_apis():
@@ -26,6 +32,9 @@ def refresh_apis():
                 tvdb.TVDBAPI().newToken()
             else:
                 tvdb.TVDBAPI().renewToken()
+    else:
+        from resources.lib.indexers import tvdb
+        tvdb.TVDBAPI().newToken()
 
 
 def wipe_install():

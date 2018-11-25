@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.Seren" version="0.1.04" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.1.09" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -14,19 +14,82 @@
 	<extension point="xbmc.service" library="service.py" />
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">Seren - This Addon is currently in beta. Please be aware there may be bugs present</summary>
-		<description lang="en">Seren - This Addon is currently in beta. Please be aware there may be bugs present</description>
+		<description lang="en">
+
+Version 0.1.09 Changelog:
+Increased torrent file identification
+Extended timeout for failed cache assit attempts to 3 hours
+Changed Trkat Scrobble Object to current playing item IMDB Number
+Fixed Trakt Scrobbling with Up Next Addon Intergration
+Fixed Trakt Scrobbling when seeking
+Added increased fallbacks for TV show metadata
+
+Version 0.1.08 Changelog:
+Restructed Settings page to use subsetting attribute
+Added Support for Context Menu Addon
+
+Version 0.1.07 Changelog:
+Added automatic migration from incorrect addon ID release
+Added Notification if no sources are found during pre-scrape
+Removed manual cache dialog prompt during pre-emptive scraping
+Cache inserts now threaded
+Added Semaphore to relieve thread pressure on database
+Fixed KeyError exception in TVDB episode function
+Custom Windows are now removed from scope with del
+Removed Please Check Internet Connection Dialog
+Added Logging for RD refresh Errors
+
+Version 0.1.06 Changelog:
+Added 3D filter Setting
+Added File Size Limit
+Added View types for Seasons, Episodes and Default for Menus
+Added Debrid Priorities
+Added Install UpNext Addon Setting
+Fixed capitalised Addon ID
+Fixed issue where TVDB token was not initially created
+Added ability to hide items from trakt manager
+Adjusted Source Select to multiline string
+Increased listitem size in custom source select window
+
+Version 0.1.05 Changelog:
+Added better Hoster support
+Changed hoster domains to (domain, name) tuple
+Fixed issue where color change would set color even if cancelled
+Cleaned up logging
+Fixed Manual Caching
+Adjusted Manual Caching display string
+Fixed View Types not being set
+
+		</description>
 		<platform>all</platform>
 		<license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
 		<forum></forum>
 		<website></website>
 		<source></source>
-		<disclaimer lang="en">The author of this addon do not host any of the content which is found and have no affiliation with any of the content providers. This addon simply searches websites for content. Use at your own risk!</disclaimer>
+		<disclaimer lang="en">The author of this addon takes no responsibility for any 3rd party intergration, please ensure your use of this software abides by your local and insterstate laws.</disclaimer>
 		<assets>
 			<icon>temp-icon.png</icon>
 			<fanart>temp-fanart.png</fanart>
 		</assets>
 		<news>
+			Version 0.1.06 Changelog:
+			Added 3D filter Setting
+			Added File Size Limit
+			Added View types for Seasons, Episodes and Default for Menus
+			Added Debrid Priorities
+			Added Install UpNext Addon Setting
+			Fixed capitalised Addon ID
+			Fixed issue where TVDB token was not initially created
+			Added ability to hide items from trakt manager
 
+			Version 0.1.05 Changelog:
+			Added better Hoster support
+			Changed hoster domains to (domain, name) tuple
+			Fixed issue where color change would set color even if cancelled
+			Cleaned up logging
+			Fixed Manual Caching
+			Adjusted Manual Caching display string
+			Fixed View Types not being set
 		</news>
 	</extension>
 </addon>

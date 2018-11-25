@@ -2,30 +2,41 @@ from resources.lib.common import tools
 import os
 
 def build_display_title(source):
-    debrid_provider = tools.colorString(tools.shortened_debrid(source.get('debrid_provider', '')))
+    if 'debrid_provider' in source:
+        debrid_provider = tools.colorString(tools.shortened_debrid(source.get('debrid_provider', '')))
+        if debrid_provider != '':
+            debrid_provider = " " + debrid_provider + " |"
+        else:
+            tools.log('No Debrid Provider')
+    else:
+        debrid_provider = ''
     quality = tools.color_quality(source['quality'])
     release_title = tools.colorString(source['release_title'])
-    info = str(source['info']).replace('[','').replace(']','').replace('\'','')[1:]
-    if info == '':
-        pass
-    else:
-        info = '- %s' % info
+    info = source['info']
+    if len(info) > 0:
+        info = ' '.join(info)
+        info = '| ' + info
+
 
     if source['type'] == 'torrent':
         size = tools.colorString(tools.source_size_display(source['size']))
-        title = "%s - %s | %s - %s -%s" % (debrid_provider,
-                                           quality,
-                                           size,
-                                           source['source'].upper(),
-                                           release_title
-                                           )
+        title = "%s |%s %s | %s %s\n%s" % (
+            quality,
+            debrid_provider,
+            source['source'].upper(),
+            size,
+            info,
+            release_title
+        )
     if source['type'] == 'hoster':
-        title = "%s - %s - %s | %s - %s %s" % (debrid_provider,
-                                               quality,
-                                               source['provider'].upper(),
-                                               source['source'],
-                                               release_title,
-                                               info)
+        title = "%s |%s %s | %s %s\n%s" % (
+            quality,
+            debrid_provider,
+            source['provider'].upper(),
+            source['source'],
+            info,
+            release_title,
+        )
 
     return title
 
@@ -94,9 +105,15 @@ class source_select_list(tools.dialogWindow):
         #     label_text = '[B]%s (%s)[/B]' % (info['title'], info['year'])
         #self.dispaly_title.setLabel(label_text)
         #self.addControl(self.dispaly_title)
-        self.list = tools.listControl(60, 200, 1160, 490, buttonFocusTexture=os.path.join(tools.IMAGES_PATH, 'highlight11.png'))
+
+        # This looks ridiculous below but it's needed as the Kodi Gui modules won't accept itemHeight as a Keyword
+        self.list = tools.listControl(60, 200, 1160, 490, 'font13', '0xFFFFFFFF', '',
+                                      os.path.join(tools.IMAGES_PATH, 'highlight11.png'),
+                                      '',0,0,0,0,55
+                                      )
         #self.list = tools.listControl(60, 280, 1160, 490, buttonFocusTexture=os.path.join(tools.IMAGES_PATH, 'highlight11.png'))
         self.addControl(self.list)
+        self.list.setSpace(100)
         self.list.addItems(display_list)
         # self.thumbnail = tools.imageControl(40, 100, 100, 150, '')
         # if 'showInfo' in info:
@@ -125,6 +142,5 @@ class source_select_list(tools.dialogWindow):
 
     def doModal(self):
         tools.kodiGui.WindowDialog.doModal(self)
-        tools.log('Selected Position - %s' % self.list.getSelectedPosition())
         self.clearProperties()
         return self.position

@@ -16,7 +16,8 @@ class SmartPlay:
 
         if 'episodeInfo' not in info_dictionary:
             self.show_trakt_id = self.info_dictionary['ids']['trakt']
-            self.user_history = TraktAPI().json_response('sync/history/shows/%s' % self.show_trakt_id)
+            if tools.getSetting('trakt.auth') != '':
+                self.user_history = TraktAPI().json_response('sync/history/shows/%s' % self.show_trakt_id)
             self.poster = self.info_dictionary['art']['fanart']
         else:
             self.poster = self.info_dictionary['showInfo']['art']['fanart']
@@ -43,9 +44,8 @@ class SmartPlay:
 
         if 'episodeInfo' not in self.info_dictionary:
             if tools.getSetting('trakt.auth') == '':
-                tools.showDialog.ok(tools.addonName, 'Error: Trakt is not authorized \n\nPlease disable the Smart '
-                                                     'Episode Resume feature or alternatively '
-                                                     'authorise Trakt in the settings menu')
+                tools.showDialog.ok(tools.addonName, 'Error: Trakt is not authorized \n'
+                                                     'Please authorise Trakt in the settings menu to use this feature')
                 return
             season, episode = self.get_resume_episode()
 

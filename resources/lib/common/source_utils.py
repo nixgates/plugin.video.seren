@@ -216,10 +216,11 @@ def filterShowPack(simpleInfo, release_title):
                   '%s season s01 s%s' % (showTitle, no_seasons.zfill(2)),
                   '%s seasons s01 s%s' % (showTitle, no_seasons.zfill(2)),
                   '%s seasons s01 to s%s' % (showTitle, no_seasons.zfill(2)),
-                  '%s complete series' % showTitle,
+                  '%s series' % showTitle,
                   '%s season s%s complete' % (showTitle, season.zfill(2)),
                   '%s seasons 1 thru %s' % (showTitle, no_seasons),
                   '%s seasons 1 thru %s' % (showTitle, no_seasons.zfill(2)),
+                  '%s season %s' % (showTitle, all_seasons)
                   ]
 
     for i in stringList:
@@ -281,8 +282,8 @@ def torrentCacheStrings(args):
                       ' %s' % cleanTitle(episode_title),
                       ' ep%s' % episode_number,
                       ' ep%s' % episode_number.zfill(2),
-                      '%s%s -' % (season_number, episode_number.zfill(2)),
-                      '%s%s -' % (season_number.zfill(2), episode_number.zfill(2)),
+                      '%s%s ' % (season_number, episode_number.zfill(2)),
+                      '%s%s ' % (season_number.zfill(2), episode_number.zfill(2)),
                       '%s.%s ' % (season_number, episode_number.zfill(2)),
                       '%s.%s ' % (season_number.zfill(2), episode_number),
                       '%s.%s ' % (season_number.zfill(2), episode_number.zfill(2)),
@@ -294,7 +295,9 @@ def torrentCacheStrings(args):
     seasonStrings = ['season %s' % season_number,
                      'season %s' % season_number.zfill(2),
                      's%s' % season_number,
-                     's%s' % season_number.zfill(2)
+                     's%s' % season_number.zfill(2),
+                     'series %s' % season_number.zfill(2),
+                     'series %s' % season_number
                      ]
 
     return episodeStrings, seasonStrings
@@ -309,7 +312,5 @@ def de_string_size(size):
             size = int(size.replace('MB', '').replace(' ', '').split('.')[0])
             return size
     except:
-        import traceback
-        traceback.print_exc()
         return 0
 

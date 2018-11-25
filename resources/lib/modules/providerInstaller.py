@@ -97,7 +97,9 @@ def install_zip(install_style):
     if accept == 0:
         return
 
-    install_progress = tools.progressDialog.create(tools.addonName, 'Extracting - %s' % pack_name, 'Please Wait...')
+    install_progress = tools.progressDialog
+    install_progress.create(tools.addonName, 'Extracting - %s' % pack_name, 'Please Wait...')
+    install_progress.update(-1)
     try:
         for folder in folders:
             for zip_file in file_list:
@@ -112,8 +114,12 @@ def install_zip(install_style):
     except:
         import traceback
         traceback.print_exc()
+        install_progress.close()
         tools.showDialog.ok(tools.addonName, 'Failed to install - %s', 'Please check the log for further details')
+        return
+
     customProviders.providers().update_known_providers()
+
 
 def malformed_output():
     tools.showDialog.ok(tools.addonName, 'Failed to install - %s', 'Please check the log for further details')

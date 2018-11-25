@@ -115,7 +115,6 @@ class PremiumizeFunctions(PremiumizeBase):
     def resolveHoster(self, source):
 
         directLink = self.direct_download(source)
-
         if directLink['status'] == 'success':
             stream_link = directLink['location']
         else:
@@ -213,9 +212,9 @@ class PremiumizeFunctions(PremiumizeBase):
                 for item in folder_details:
                     if item['type'] != 'folder':
                         continue
-
                     for seasonStr in seasonStrings:
-                        if seasonStr in source_utils.cleanTitle(item['name'].lower().replace('&', ' ')):
+                        if source_utils.cleanTitle(seasonStr)\
+                                in source_utils.cleanTitle(item['name'].replace('&', ' ')):
                             sub_folder_id = item['id']
 
                 if sub_folder_id is not None:
@@ -241,7 +240,8 @@ class PremiumizeFunctions(PremiumizeBase):
     def check_episode_string(self, folder_details, episodeStrings):
         for i in folder_details:
             for epstring in episodeStrings:
-                if epstring in source_utils.cleanTitle(i['name'].lower().replace('&', ' ')):
+                if source_utils.cleanTitle(epstring) in \
+                        source_utils.cleanTitle(i['name'].replace('&', ' ')):
                     if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
                         return i['link']
         return None

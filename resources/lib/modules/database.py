@@ -15,10 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import ast
-import hashlib
-import re
-import time
+import ast, hashlib, re, time, threading
 from resources.lib.common import tools
 
 try:
@@ -59,7 +56,8 @@ def get(function, duration, *args, **kwargs):
             if cache_result:
                 return cache_result
             return None
-        cache_insert(key, fresh_result)
+        insert_thread = threading.Thread(target=cache_insert, args=(key, fresh_result))
+        insert_thread.start()
         try:
             data = ast.literal_eval(fresh_result.encode('utf-8'))
             return data
@@ -71,7 +69,6 @@ def get(function, duration, *args, **kwargs):
         import traceback
         traceback.print_exc()
         return None
-
 
 def timeout(function, *args):
     try:
@@ -91,6 +88,7 @@ def cache_get(key):
         return None
 
 def cache_insert(key, value):
+    tools.database_sema.acquire()
     try:
         # type: (str, str) -> None
         cursor = _get_connection_cursor(tools.cacheFile)
@@ -110,9 +108,12 @@ def cache_insert(key, value):
             )
 
         cursor.connection.commit()
+        tools.database_sema.release()
     except:
         import traceback
         traceback.print_exc()
+        tools.database_sema.release()
+        pass
 
 
 def cache_clear():
@@ -193,8 +194,6 @@ def torrent_cache_clear():
             except:
                 pass
     except:
-        import traceback
-        traceback.print_exc()
         pass
     tools.showDialog.notification(tools.addonName + ': Cache', 'Torrent Cache Successfully Cleared', time=5000)
 
@@ -245,8 +244,6 @@ def clear_assist_torrents():
             except:
                 pass
     except:
-        import traceback
-        traceback.print_exc()
         pass
     tools.showDialog.notification(tools.addonName + ': Cache', 'Active Torrent Database Successfully Cleared', time=5000)
 
@@ -261,8 +258,6 @@ def get_providers():
         sources = cursor.fetchall()
         return sources
     except:
-        import traceback
-        traceback.print_exc()
         pass
 
 def add_provider(provider_name, package, status, language, provider_type):
@@ -288,8 +283,6 @@ def add_provider(provider_name, package, status, language, provider_type):
             )
         cursor.connection.commit()
     except:
-        import traceback
-        traceback.print_exc()
         pass
 
 def uninstall_provider_package(package_name):
@@ -298,8 +291,7 @@ def uninstall_provider_package(package_name):
         cursor.execute("DELETE FROM providers WHERE package=?", (package_name,))
         cursor.connection.commit()
     except:
-        import traceback
-        traceback.print_exc()
+        pass
 
 def clear_providers():
     try:
@@ -312,8 +304,6 @@ def clear_providers():
             except:
                 pass
     except:
-        import traceback
-        traceback.print_exc()
         pass
 
 def get_premiumize_transfers():
@@ -326,8 +316,6 @@ def get_premiumize_transfers():
         transfers = cursor.fetchall()
         return transfers
     except:
-        import traceback
-        traceback.print_exc()
         pass
 
 def add_premiumize_transfer(transfer_id):
@@ -342,14 +330,10 @@ def add_premiumize_transfer(transfer_id):
         if update_result.rowcount is 0:
             cursor.execute("INSERT INTO transfers Values (?)", (transfer_id,))
         cursor.connection.commit()
-        tools.log('ADDED TRANSFER')
-        tools.log("CHECKING IF IT EXISTS")
         cursor.execute("SELECT * FROM transfers")
         transfers = cursor.fetchall()
 
     except:
-        import traceback
-        traceback.print_exc()
         pass
 
 def remove_premiumize_transfer(transfer_id):
@@ -358,8 +342,7 @@ def remove_premiumize_transfer(transfer_id):
         cursor.execute("DELETE FROM transfers WHERE transfer_id=?", (transfer_id,))
         cursor.connection.commit()
     except:
-        import traceback
-        traceback.print_exc()
+        pass
 
 
 def _dict_factory(cursor, row):

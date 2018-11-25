@@ -58,7 +58,7 @@ class providers:
 
         self.known_providers = database.get_providers()
 
-    def adjust_providers(self, status):
+    def adjust_providers(self, status, package_disable=False):
         if status == 'disabled':
             action = 'enabled'
         if status == 'enabled':
@@ -74,19 +74,24 @@ class providers:
 
         providers = [i for i in self.known_providers if i['package'] == packages[selection] and i['status'] == status]
 
-        display_list = ["%s - %s" % (tools.colorString(i['provider_name'].upper()), i['provider_type'].title())
-                        for i in providers if i['status'] == status]
+        if package_disable is False:
+            display_list = ["%s - %s" % (tools.colorString(i['provider_name'].upper()), i['provider_type'].title())
+                            for i in providers if i['status'] == status]
 
-        selection = tools.showDialog.multiselect("%s: %s Providers" %
-                                                 (tools.addonName, action[:-1].title()), display_list)
+            selection = tools.showDialog.multiselect("%s: %s Providers" %
+                                                     (tools.addonName, action[:-1].title()), display_list)
 
-        if selection is None:
-            return
+            if selection is None:
+                return
 
-        for i in selection:
-            provider = providers[i]
-            database.add_provider(provider['provider_name'], provider['package'], action, self.language,
-                               provider['provider_type'])
+            for i in selection:
+                provider = providers[i]
+                database.add_provider(provider['provider_name'], provider['package'], action, self.language,
+                                   provider['provider_type'])
+
+        elif package_disable is True:
+            for i in providers:
+                database.add_provider(i['provider_name'], i['package'], action, self.language, i['provider_type'])
 
     def uninstall_package(self):
         import shutil

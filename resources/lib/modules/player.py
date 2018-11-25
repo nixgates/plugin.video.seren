@@ -13,18 +13,21 @@ class serenPlayer(tools.player):
         self.trakt_api = trakt.TraktAPI()
         self.pre_cache_initiated = False
         self.play_next_triggered = False
+        self.trakt_id = None
+        self.media_type = None
+        self.offset = None
+        self.media_length = 0
+        self.current_time = 0
+        self.stopped = False
 
     def play_source(self, stream_link, args):
+        tools.log("PLAY SOURCE TRIGGERED")
         try:
             self.pre_cache_initiated = False
             if stream_link is None:
                 tools.playList.clear()
                 raise Exception
             self.args = args
-            self.offset = None
-            self.media_length = 0
-            self.current_time = 0
-            self.stopped = False
 
             if tools.checkOmniConnect():
                 port = tools.getSetting('omni.port')
@@ -43,7 +46,8 @@ class serenPlayer(tools.player):
                 item.setArt(args['art'])
                 item.setInfo(type='video', infoLabels=args['info'])
 
-            if tools.playList.getposition() == 0 and tools.getSetting('smartPlay.traktresume') == 'true':
+            if tools.playList.getposition() == 0 and tools.getSetting('smartPlay.traktresume') == 'true'\
+                    and tools.getSetting('trakt.auth') is not '':
                 tools.log('Getting Trakt Resume Point', 'info')
                 self.traktBookmark()
 
@@ -61,8 +65,14 @@ class serenPlayer(tools.player):
             traceback.print_exc()
 
     def onPlayBackSeek(self, time, seekOffset):
+        seekOffset = seekOffset / 1000
+        self.traktStartWatching(offset=seekOffset)
+        pass
+
+    def onPlayBackSeekChapter(self, chapter):
         self.traktStartWatching()
         pass
+
 
     def onPlayBackStarted(self):
         try:
@@ -81,9 +91,9 @@ class serenPlayer(tools.player):
             if 'episodeInfo' in self.args and tools.getSetting('smartplay.upnext') == 'true':
                 try:
                     next_info = self.next_info()
-                    AddonSignals.sendSignal('upnext_data', next_info, source_id='plugin.video.%s' % tools.addonName)
+                    AddonSignals.sendSignal('upnext_data', next_info, source_id='plugin.video.%s' % tools.addonName.lower())
                     AddonSignals.registerSlot('upnextprovider', 'plugin.video.%s_play_action' %
-                                              tools.addonName, self.signals_callback)
+                                              tools.addonName.lower(), self.signals_callback)
                 except:
                     import traceback
                     traceback.print_exc()
@@ -118,42 +128,54 @@ class serenPlayer(tools.player):
     def onPlayBackResumed(self):
         self.traktStartWatching()
 
-    def getWatchedPercent(self):
+    def getWatchedPercent(self, offset=None):
+        start = self.current_time
+        if offset is not None:
+            start = start + offset
+
         if self.media_length is not 0:
             try:
-                return float(self.current_time) / float(self.media_length) * 100
+                return float(start) / float(self.media_length) * 100
             except ZeroDivisionError:
                 return 0
 
-    def traktStartWatching(self):
-
-        post_data = self.buildTraktObject()
+    def traktStartWatching(self, offset=None):
+        if not self.trakt_integration():
+            return
+        post_data = self.buildTraktObject(offset=offset)
         self.trakt_api.post_request('scrobble/start', postData=post_data, limit=False)
 
     def traktStopWatching(self, finished=False):
-
-        post_data = self.buildTraktObject(finished=finished)
+        if not self.trakt_integration():
+            return
+        post_data = self.buildTraktObject(force_progress=[100,100])
         self.trakt_api.post_request('scrobble/stop', postData=post_data, limit=False)
 
     def traktPause(self):
+        if not self.trakt_integration():
+            return
         post_data = self.buildTraktObject()
         self.trakt_api.post_request('scrobble/pause', postData=post_data, limit=False)
 
-    def buildTraktObject(self, finished=False):
+    def buildTraktObject(self, offset=None):
         try:
 
+            try:
+                imdb = self.getVideoInfoTag('IMDBNumber').getIMDBNumber()
+            except:
+                tools.log('Could not locate imdb number')
+                imdb = None
+
             if self.media_type == 'episode':
-                post_data = {'episode': {'ids': {'trakt': self.trakt_id}}}
+                post_data = {'episode': {'ids': {'imdb': str(imdb)}}}
             else:
-                post_data = {'movies': {'ids': {'trakt': self.trakt_id}}}
-            if finished == True:
-                post_data['progress'] = 100
+                post_data = {'movies': {'ids': {'imdb': str(imdb)}}}
+
+            progress = int(self.getWatchedPercent(offset))
+            if progress > 0:
+                post_data['progress'] = progress
             else:
-                progress = int(self.getWatchedPercent())
-                if progress > 0:
-                    post_data['progress'] = progress
-                else:
-                    post_data['progress'] = 0
+                post_data['progress'] = 0
 
             return post_data
         except:
@@ -175,6 +197,8 @@ class serenPlayer(tools.player):
         pass
 
     def traktBookmark(self):
+        if not self.trakt_integration():
+            return
         try:
             offset = None
             if self.media_type == 'episode':
@@ -215,10 +239,18 @@ class serenPlayer(tools.player):
             requests.get(stream_link)
 
     def signals_callback(self, data):
+        tools.log('SIGNAL RECEIVED')
         if not self.play_next_triggered:
+            tools.log('STARTING PLAY NEXT')
             self.pause()
             self.playnext()
             self.play_next_triggered = True
+
+    def trakt_integration(self):
+        if tools.getSetting('trakt.auth') == '':
+            return False
+        else:
+            return True
 
     def next_info(self):
         current_info = self.args
