@@ -77,19 +77,34 @@ class SmartPlay:
         self.window.setText('Building List Items')
         self.window.setProgress(80)
 
-        playlist = tvshowMenus.Menus().episodeListBuilder(playlist, self.info_dictionary, smartPlay=True)
-        playlist = playlist[:40]
-        self.window.setText('Starting Playback')
-        self.window.setProgress(100)
+        actionArgs = {}
+        actionArgs['playlist'] = playlist
+        actionArgs['info_dictionary'] = self.info_dictionary
+        actionArgs = tools.quote(json.dumps(actionArgs))
 
-        for i in playlist:
-            tools.playList.add(url=i[0], listitem=i[1])
+        # Begin nasty Kodi 18 Skin workaround
 
-        tools.log('Begining play from Season %s Episode %s' % (season, episode), 'info')
+        tools.execute('RunPlugin(plugin://plugin.video.%s?action=buildPlaylist&actionArgs=%s)'%
+                      (tools.addonName.lower(), actionArgs))
 
         self.window.close()
 
-        tools.player().play(tools.playList)
+        # The below code has been commented out due to it breaking on Kodi 18 Widgets a workaround has been implemented
+        # above.
+        #
+        # playlist = tvshowMenus.Menus().episodeListBuilder(playlist, self.info_dictionary, smartPlay=True)
+        # self.window.setText('Starting Playback')
+        # self.window.setProgress(100)
+        #
+        # for i in playlist:
+        #     tools.playList.add(url=i[0], listitem=i[1])
+        #
+        # tools.log('Begining play from Season %s Episode %s' % (season, episode), 'info')
+        #
+        # self.window.close()
+        #
+        # tools.player().play(tools.playList)
+
 
 
     def get_resume_episode(self):

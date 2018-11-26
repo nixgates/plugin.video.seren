@@ -92,10 +92,9 @@ class RealDebrid:
         if 'access_token' in response:
             self.token = response['access_token']
         else:
-            tools.log(response, 'error')
+            pass
         if 'refresh_token' in response:
             self.refresh = response['refresh_token']
-            tools.log(response, 'error')
         tools.setSetting('rd.auth', self.token)
         tools.setSetting('rd.refresh', self.refresh)
         tools.setSetting('rd.expiry', str(time.time() + int(response['expires_in'])))

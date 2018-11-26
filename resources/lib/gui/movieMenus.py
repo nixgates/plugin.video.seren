@@ -177,7 +177,8 @@ class Menus:
         self.commonListBuilder(traktList)
         tools.addDirectoryItem('Next', 'movieGenresGet&actionArgs=%s&page=%s' % (tools.quote(genre_string), int(page)+1),
                                '', '', isFolder=True)
-        tools.closeDirectory('videos', viewType=self.viewType)
+
+        tools.closeDirectory('movies', viewType=self.viewType)
 
     ######################################################
     # MENU TOOLS

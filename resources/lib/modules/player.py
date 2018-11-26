@@ -60,6 +60,7 @@ class serenPlayer(tools.player):
             except:pass
 
             self.keepAlive()
+
         except:
             import traceback
             traceback.print_exc()
@@ -104,7 +105,7 @@ class serenPlayer(tools.player):
 
     def onPlayBackEnded(self):
         self.close_omni()
-        self.traktStopWatching(finished=True)
+        self.traktStopWatching()
         if tools.getSetting('general.smartplay') is not 'false' and self.media_type is 'episode':
             if int(tools.playList.getposition()) == -1:
                 self.next_season = smartPlay.SmartPlay(self.args).return_next_season()
@@ -129,15 +130,27 @@ class serenPlayer(tools.player):
         self.traktStartWatching()
 
     def getWatchedPercent(self, offset=None):
-        start = self.current_time
-        if offset is not None:
-            start = start + offset
+        current_position = self.current_time
+        totalLength = self.media_length
 
-        if self.media_length is not 0:
+        if int(totalLength) == 0:
             try:
-                return float(start) / float(self.media_length) * 100
-            except ZeroDivisionError:
-                return 0
+                totalLength = self.getTotalTime()
+            except:
+                pass
+
+        if offset is not None:
+            current_position = current_position + offset
+
+        if int(totalLength) is not 0:
+            try:
+                watched_percent = float(current_position) / float(totalLength) * 100
+                return watched_percent
+            except:
+                pass
+
+        return 0
+
 
     def traktStartWatching(self, offset=None):
         if not self.trakt_integration():
@@ -145,10 +158,10 @@ class serenPlayer(tools.player):
         post_data = self.buildTraktObject(offset=offset)
         self.trakt_api.post_request('scrobble/start', postData=post_data, limit=False)
 
-    def traktStopWatching(self, finished=False):
+    def traktStopWatching(self):
         if not self.trakt_integration():
             return
-        post_data = self.buildTraktObject(force_progress=[100,100])
+        post_data = self.buildTraktObject(overide_progress=100)
         self.trakt_api.post_request('scrobble/stop', postData=post_data, limit=False)
 
     def traktPause(self):
@@ -157,7 +170,7 @@ class serenPlayer(tools.player):
         post_data = self.buildTraktObject()
         self.trakt_api.post_request('scrobble/pause', postData=post_data, limit=False)
 
-    def buildTraktObject(self, offset=None):
+    def buildTraktObject(self, offset=None, overide_progress=None):
         try:
 
             try:
@@ -172,6 +185,8 @@ class serenPlayer(tools.player):
                 post_data = {'movies': {'ids': {'imdb': str(imdb)}}}
 
             progress = int(self.getWatchedPercent(offset))
+            if overide_progress is not None:
+                progress = overide_progress
             if progress > 0:
                 post_data['progress'] = progress
             else:
@@ -184,16 +199,20 @@ class serenPlayer(tools.player):
 
     def keepAlive(self):
         while not self.stopped:
-            if self.isPlaying():
-                try:
-                    self.current_time = self.getTime()
-                    if self.pre_cache_initiated is False:
-                        if self.getWatchedPercent() > 80 and tools.getSetting('smartPlay.preScrape') == 'true':
-                            self.pre_cache_initiated = True
-                            smartPlay.SmartPlay(self.args).pre_scrape()
-                except:
-                    pass
-            tools.kodi.sleep(1000)
+            try:
+                if self.isPlaying():
+                    try:
+                        self.current_time = self.getTime()
+                        if self.pre_cache_initiated is False:
+                            if self.getWatchedPercent() > 80 and tools.getSetting('smartPlay.preScrape') == 'true':
+                                self.pre_cache_initiated = True
+                                smartPlay.SmartPlay(self.args).pre_scrape()
+                    except:
+                        pass
+                tools.kodi.sleep(1000)
+            except:
+                tools.kodi.sleep(1000)
+                continue
         pass
 
     def traktBookmark(self):
@@ -239,12 +258,10 @@ class serenPlayer(tools.player):
             requests.get(stream_link)
 
     def signals_callback(self, data):
-        tools.log('SIGNAL RECEIVED')
         if not self.play_next_triggered:
-            tools.log('STARTING PLAY NEXT')
+            self.play_next_triggered = True
             self.pause()
             self.playnext()
-            self.play_next_triggered = True
 
     def trakt_integration(self):
         if tools.getSetting('trakt.auth') == '':

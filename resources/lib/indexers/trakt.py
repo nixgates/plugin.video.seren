@@ -127,7 +127,6 @@ class TraktAPI:
                 url += '&limit=%s' % limitAmount
 
         try:
-
             response = requests.get(url, headers=self.headers)
             if response.status_code == 401:
                 tools.log('Trakt OAuth Failure, %s %s' % (str(response.text), response.request.headers), 'info')
@@ -265,8 +264,6 @@ class TraktAPI:
         sections_display = ['Watched Progress', 'Calendar']
         selection = tools.showDialog.select(tools.addonName + ': Select Menu type to hide from', sections_display)
         section = sections[selection]
-
-        tools.log(self.post_request('users/hidden/%s' % section, postData=trakt_object))
         tools.showDialog.notification(tools.addonName, 'Item has been hidden from your %s' % sections_display[selection])
 
     def get_username(self):

@@ -104,17 +104,13 @@ if action == 'revokeTrakt':
 if action == 'getSources':
 
     import time
-
     start_time = time.time()
-
-    from resources.lib.modules import player
 
     try:
         if tools.playList.getposition() == 0:
             display_background = True
         else:
             display_background = False
-
 
         background = windows.persistant_background()
         background.setBackground(actionArgs)
@@ -155,6 +151,7 @@ if action == 'getSources':
                     pass
                 pass
             else:
+                from resources.lib.modules import player
                 player.serenPlayer().play_source(stream_link, args)
         else:
             if display_background is True:
@@ -408,3 +405,17 @@ if action == 'realdebridTransfers':
 if action == 'cleanInstall':
     from resources.lib.common import maintenance
     maintenance.wipe_install()
+
+if action == 'buildPlaylist':
+
+    # This is a nasty workaround for Kodi 18 Skin Widgets
+    import json
+    from resources.lib.gui import tvshowMenus
+    actionArgs = json.loads(tools.unquote(actionArgs))
+    playlist = tvshowMenus.Menus().episodeListBuilder(actionArgs['playlist'], actionArgs['info_dictionary'],
+                                                      smartPlay=True)
+
+    for i in playlist:
+        tools.playList.add(url=i[0], listitem=i[1])
+
+    tools.player().play(tools.playList)
