@@ -78,8 +78,8 @@ Fixed View Types not being set
 		<source></source>
 		<disclaimer lang="en">The author of this addon takes no responsibility for any 3rd party intergration, please ensure your use of this software abides by your local and insterstate laws.</disclaimer>
 		<assets>
-			<icon>temp-icon.png</icon>
-			<fanart>temp-fanart.png</fanart>
+			<icon>icon.png</icon>
+			<fanart>fanart.png</fanart>
 		</assets>
 		<news>
 			Version 0.1.06 Changelog:

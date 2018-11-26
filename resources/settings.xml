@@ -129,7 +129,7 @@
         <setting id="trakt.secret" label="Trakt Client Secret" type="text" default="" />
         <setting type="lsep" label="TVDB API Keys" />
         <setting type="sep" />
-        <setting id="tvdb.apikey" label="TVB Api Key" type="text" default="" />
+        <setting id="tvdb.apikey" label="TVDB Api Key" type="text" default="" />
     </category>
 
     <category label="Experimental">
