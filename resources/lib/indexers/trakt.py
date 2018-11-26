@@ -129,7 +129,8 @@ class TraktAPI:
         try:
 
             response = requests.get(url, headers=self.headers)
-
+            tools.log(response)
+            tools.log(response.text)
             if response.status_code == 401:
                 tools.log('Trakt OAuth Failure, %s %s' % (str(response.text), response.request.headers), 'info')
                 if refreshCheck == False:
@@ -160,6 +161,8 @@ class TraktAPI:
                 url += '&limit=%s' % limitAmount
         try:
             response = requests.post(url, json=postData, headers=self.headers)
+            tools.log(response)
+            tools.log(response.text)
             if response.status_code == 401:
                 if refreshCheck == False:
                     self.refreshToken()

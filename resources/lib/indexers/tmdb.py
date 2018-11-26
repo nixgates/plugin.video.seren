@@ -131,8 +131,6 @@ class TMDBAPI:
             art = {}
             try:art['poster'] = self.posterPath + str(details.get('poster_path', ''))
             except:pass
-            try:art['thumb'] = self.thumbPath + str(details.get('backdrop_path', ''))
-            except: pass
             try: art['landscape'] = self.backgroundPath + str(details.get('backdrop_path', ''))
             except: pass
             try: art['fanart'] = self.backgroundPath + str(details.get('backdrop_path', ''))

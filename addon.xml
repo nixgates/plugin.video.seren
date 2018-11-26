@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.1.09" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.1.10" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -15,6 +15,10 @@
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">Seren - This Addon is currently in beta. Please be aware there may be bugs present</summary>
 		<description lang="en">
+
+Version 0.1.10 Changelog:
+Adjusted Migration Script so it no longer broke Super Faviorates
+Adjusted TMDB movie artwork to fix issue where it would display the wrong media (removed thumbnail)
 
 Version 0.1.09 Changelog:
 Increased torrent file identification

@@ -107,9 +107,15 @@ class Menus:
         hidden_shows = self.get_hidden_shows('watched')
         self.threadList = []
         watched = database.get(trakt.json_response, .5, 'users/me/watched/shows?extended=full', limit=False)
+        for i in watched:
+            tools.log(str(i) + '\r')
         if watched is None:
             watched = trakt.json_response('users/me/watched/shows?extended=full', limit=False)
-        watched = [i for i in watched if i is not None if 'show' in i]
+        watch_list = []
+        for i in watched:
+            if i is not None:
+                watch_list.append(i)
+
         #Remove hidden items
         watched = [i for i in watched if i['show']['ids']['trakt'] not in hidden_shows]
         watched = watched[:100]
@@ -120,11 +126,17 @@ class Menus:
         next_up = self.itemList
 
         self.itemList = []
-        next_up = [i for i in next_up if i != None]
-        next_up = [i for i in next_up if i['progress']['next_episode'] is not None]
+        next_list = []
+        for i in next_up:
+            try:
+                if i['progress']['next_episode'] is not None:
+                    next_list.append(i)
+            except:
+                pass
+
         build_list = []
 
-        for i in next_up:
+        for i in next_list:
             item = {'show': i['show'], 'episode': i['progress']['next_episode']}
             build_list.append(item)
 
