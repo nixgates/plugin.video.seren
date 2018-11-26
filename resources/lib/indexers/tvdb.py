@@ -237,7 +237,6 @@ class TVDBAPI:
             details = self.info
 
             if details == None:
-                tools.log('ERROR TVDB FAILED FOR SEASON ' + str(season), 'error')
                 return None
 
             try:

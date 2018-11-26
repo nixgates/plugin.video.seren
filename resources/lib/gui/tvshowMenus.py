@@ -140,7 +140,7 @@ class Menus:
 
         self.directToEpisodeBuilder(build_list)
 
-        tools.closeDirectory('tvshows')
+        tools.closeDirectory('episodes')
 
     def myRecentEpisodes(self):
         datestring = datetime.datetime.today() - datetime.timedelta(days=7)
@@ -150,7 +150,7 @@ class Menus:
         if len(trakt_list) > 100:
             trakt_list = trakt_list[:100]
         self.directToEpisodeBuilder(trakt_list)
-        tools.closeDirectory('tvshows')
+        tools.closeDirectory('episodes')
 
     def showsPopular(self, page):
 
@@ -249,7 +249,7 @@ class Menus:
         genres = database.get(trakt.json_response, 24, 'genres/shows')
         for i in genres:
             tools.addDirectoryItem(i['name'], 'showGenresGet&actionArgs=%s' % i['slug'], '', '', isFolder=True)
-        tools.closeDirectory('tvshows')
+        tools.closeDirectory('addons')
 
     def showGenreList(self, args, page):
         if page is None:
