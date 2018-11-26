@@ -5,14 +5,6 @@ This version of Seren may be unstable and may result in some undesired behavior.
 
 Change Log:
 
-### Version 0.1.09:
-* Increased torrent file identification
-* Extended timeout for failed cache assit attempts to 3 hours
-* Changed Trkat Scrobble Object to current playing item IMDB Number
-* Fixed Trakt Scrobbling with Up Next Addon Intergration
-* Fixed Trakt Scrobbling when seeking
-* Added increased fallbacks for TV show metadata
-
 ### Version 0.1.10 Changelog:
 * Adjusted Migration Script so it no longer broke Super Faviorates
 * Adjusted TMDB movie artwork to fix issue where it would display the wrong media (removed thumbnail)
