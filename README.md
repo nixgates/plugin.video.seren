@@ -5,6 +5,12 @@ This version of Seren may be unstable and may result in some undesired behavior.
 
 Change Log:
 
+### Version 0.1.11 Changelog:
+* Added workaround for Kodi 18 Widgets
+* Increased support for Kodi 18 player
+* Fixed issue with Kodi 18 where pre-emptive scraping wouldn't occur
+* Adjusted menu content types so they now respect their content correctly
+
 ### Version 0.1.10 Changelog:
 * Adjusted Migration Script so it no longer broke Super Faviorates
 * Adjusted TMDB movie artwork to fix issue where it would display the wrong media (removed thumbnail)
