@@ -107,8 +107,6 @@ class Menus:
         hidden_shows = self.get_hidden_shows('watched')
         self.threadList = []
         watched = database.get(trakt.json_response, .5, 'users/me/watched/shows?extended=full', limit=False)
-        for i in watched:
-            tools.log(str(i) + '\r')
         if watched is None:
             watched = trakt.json_response('users/me/watched/shows?extended=full', limit=False)
         watch_list = []
@@ -251,7 +249,7 @@ class Menus:
         genres = database.get(trakt.json_response, 24, 'genres/shows')
         for i in genres:
             tools.addDirectoryItem(i['name'], 'showGenresGet&actionArgs=%s' % i['slug'], '', '', isFolder=True)
-        tools.closeDirectory('addons')
+        tools.closeDirectory('tvshows')
 
     def showGenreList(self, args, page):
         if page is None:
@@ -274,7 +272,7 @@ class Menus:
         traktList = trakt.json_response('shows/popular?genres=%s&page=%s&extended=full' % (genre_string, page))
         self.showListBuilder(traktList)
         tools.addDirectoryItem('Next', 'showGenresGet&actionArgs=%s&page=%s' % (genre_string, page+1), None, None)
-        tools.closeDirectory('addons')
+        tools.closeDirectory('tvshows')
 
     def showsRelated(self, args):
         traktList = trakt.json_response('shows/%s/related?extended=full' % args)
