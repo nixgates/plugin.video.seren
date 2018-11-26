@@ -2,5 +2,6 @@
 .DS_Store
 *.idea
 *.pyo
+*.pyc
 *.old
 addons_xml_generator.py
