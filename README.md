@@ -5,6 +5,21 @@ This version of Seren may be unstable and may result in some undesired behavior.
 
 Change Log:
 
+### Version 0.1.13 Changelog:
+* Source Select items now clickable
+* Esc Key now closes Source Select dialog
+
+### Version 0.1.12 Changelog:
+* Added premiumize transfer database cleanup to maintenance script
+* Changed scrobble ID back to Trakt as IMDB ID was unreliable causing trakt progress for some random show called pride
+* if the IMDB ID wasn't available for an episode (sorry for my testers watching origin)
+* Fixed issue with keepalive not dying causing scrobble issues and issues with Upnext
+* Added 265 priority sort
+* Some spelling mistakes
+* Changed Upnext episode IDs to Trakt ID
+* Added setUniqueIDs to tools.addDirectoryItem function
+* Hide Item in trakt manager now actually sends the trakt request (Bad nix)
+
 ### Version 0.1.11 Changelog:
 * Added workaround for Kodi 18 Widgets
 * Increased support for Kodi 18 player
