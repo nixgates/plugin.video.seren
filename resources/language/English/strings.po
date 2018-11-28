@@ -122,7 +122,7 @@ msgid ": Revoked Trakt Auth"
 msgstr ""
 
 msgctxt "#32030"
-msgid "Trakt Successfully Dicsonnected"
+msgid "Trakt Successfully Disconnected"
 msgstr ""
 
 msgctxt "#32031"

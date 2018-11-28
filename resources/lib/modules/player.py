@@ -21,7 +21,7 @@ class serenPlayer(tools.player):
         self.stopped = False
 
     def play_source(self, stream_link, args):
-        tools.log("PLAY SOURCE TRIGGERED")
+
         try:
             self.pre_cache_initiated = False
             if stream_link is None:
@@ -51,9 +51,6 @@ class serenPlayer(tools.player):
                 tools.log('Getting Trakt Resume Point', 'info')
                 self.traktBookmark()
 
-            tools.log('Self Offset is equal to %s' % self.offset, 'info')
-
-
             tools.resolvedUrl(syshandle, True, item)
 
             try:tools.busyDialog.close()
@@ -76,6 +73,7 @@ class serenPlayer(tools.player):
 
 
     def onPlayBackStarted(self):
+
         try:
             tools.execute('Dialog.Close(all,true)')
             self.current_time = self.getTime()
@@ -90,11 +88,13 @@ class serenPlayer(tools.player):
 
             self.traktStartWatching()
             if 'episodeInfo' in self.args and tools.getSetting('smartplay.upnext') == 'true':
+                source_id = 'plugin.video.%s' % tools.addonName.lower()
+                return_id = 'plugin.video.%s_play_action' % tools.addonName.lower()
+
                 try:
                     next_info = self.next_info()
-                    AddonSignals.sendSignal('upnext_data', next_info, source_id='plugin.video.%s' % tools.addonName.lower())
-                    AddonSignals.registerSlot('upnextprovider', 'plugin.video.%s_play_action' %
-                                              tools.addonName.lower(), self.signals_callback)
+                    AddonSignals.sendSignal('upnext_data', next_info, source_id=source_id)
+                    AddonSignals.registerSlot('upnextprovider', return_id, self.signals_callback)
                 except:
                     import traceback
                     traceback.print_exc()
@@ -145,7 +145,10 @@ class serenPlayer(tools.player):
         if int(totalLength) is not 0:
             try:
                 watched_percent = float(current_position) / float(totalLength) * 100
-                return watched_percent
+                if watched_percent > 100:
+                    return 100
+                else:
+                    return watched_percent
             except:
                 pass
 
@@ -173,16 +176,10 @@ class serenPlayer(tools.player):
     def buildTraktObject(self, offset=None, overide_progress=None):
         try:
 
-            try:
-                imdb = self.getVideoInfoTag('IMDBNumber').getIMDBNumber()
-            except:
-                tools.log('Could not locate imdb number')
-                imdb = None
-
             if self.media_type == 'episode':
-                post_data = {'episode': {'ids': {'imdb': str(imdb)}}}
+                post_data = {'episode': {'ids': {'trakt': self.trakt_id}}}
             else:
-                post_data = {'movies': {'ids': {'imdb': str(imdb)}}}
+                post_data = {'movies': {'ids': {'trakt': self.trakt_id}}}
 
             progress = int(self.getWatchedPercent(offset))
             if overide_progress is not None:
@@ -258,21 +255,25 @@ class serenPlayer(tools.player):
             requests.get(stream_link)
 
     def signals_callback(self, data):
+        tools.log('WE HAVE A CALLBACK')
         if not self.play_next_triggered:
+            self.stopped = True
+            self.traktStopWatching()
             self.play_next_triggered = True
-            self.pause()
-            self.playnext()
+            # Using a seek here as playnext causes Kodi gui to wig out. So we seek instead so it looks more graceful
+            self.seekTime(self.media_length)
 
     def trakt_integration(self):
         if tools.getSetting('trakt.auth') == '':
             return False
         else:
-            return True
+            if tools.getSetting('trakt.scrobbling') == 'true':
+                return True
 
     def next_info(self):
         current_info = self.args
         current_episode = {}
-        current_episode["episodeid"] = current_info['episodeInfo']['info']['imdbnumber']
+        current_episode["episodeid"] = current_info['episodeInfo']['ids']['trakt']
         current_episode["tvshowid"] = current_info['showInfo']['info']['imdbnumber']
         current_episode["title"] = current_info['episodeInfo']['info']['title']
         current_episode["art"] = {}
@@ -295,9 +296,8 @@ class serenPlayer(tools.player):
         params = dict(tools.parse_qsl(url.replace('?', '')))
         next_info = json.loads(params.get('actionArgs'))
 
-
         next_episode = {}
-        next_episode["episodeid"] = next_info['episodeInfo']['info']['imdbnumber']
+        next_episode["episodeid"] = next_info['episodeInfo']['ids']['trakt']
         next_episode["tvshowid"] = next_info['showInfo']['info']['imdbnumber']
         next_episode["title"] = next_info['episodeInfo']['info']['title']
         next_episode["art"] = {}
@@ -316,7 +316,7 @@ class serenPlayer(tools.player):
         next_episode["firstaired"] = next_info['episodeInfo']['info']['premiered']
 
         play_info = {}
-        play_info["item_id"] = current_info['episodeInfo']['info']['imdbnumber']
+        play_info["item_id"] = current_info['episodeInfo']['ids']['trakt']
 
         next_info = {
             "current_episode": current_episode,
@@ -324,5 +324,6 @@ class serenPlayer(tools.player):
             "play_info": play_info,
             "notification_time": int(tools.getSetting('smartplay.upnexttime'))
         }
+
         return next_info
 

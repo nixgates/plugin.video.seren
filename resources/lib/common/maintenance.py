@@ -73,6 +73,7 @@ def premiumize_transfer_cleanup():
     tools.log('Premiumize Fair Usage is above threshold, cleaning up Seren transfers')
     for i in seren_transfers:
         premiumize.delete_transfer(i['transfer_id'])
+        database.remove_premiumize_transfer(i['transfer_id'])
 
 
 def account_notifications():

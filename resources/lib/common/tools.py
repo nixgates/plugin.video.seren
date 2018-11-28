@@ -160,7 +160,7 @@ except:
     pass
 
 def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=True, isFolder=True, all_fanart=None,
-                     actionArgs=False, smart_play=False, set_cast=False, label2=None):
+                     actionArgs=False, smart_play=False, set_cast=False, label2=None, set_ids=None):
 
     url = '%s?action=%s' % (sysaddon, query) if isAction == True else query
     if actionArgs is not False:
@@ -173,6 +173,8 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
         item.setProperty('IsPlayable', 'true')
     if set_cast is not False and 'cast' in info:
         item.setCast(set_cast)
+    if set_ids is not None:
+        item.setUniqueIDs(set_ids)
     item.addContextMenuItems(cm)
     item.setArt(art)
     item.setInfo('video', info)

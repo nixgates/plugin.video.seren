@@ -25,7 +25,7 @@ class Menus:
         if tools.getSetting('trakt.auth') == '':
             return []
 
-        hidden_shows = database.get(trakt.get_trakt_hidden_items, 1)
+        hidden_shows = trakt.get_trakt_hidden_items()
         hidden_shows = hidden_shows[section]['shows']
 
         return hidden_shows
@@ -290,7 +290,8 @@ class Menus:
 
         for item in traktList:
 
-            if tools.getSetting('general.metalocation') == '1':
+            #if tools.getSetting('general.metalocation') == '1':
+            if 1 == 1:
                 self.threadList.append(Thread(target=self.tvdbSeasonListWorker, args=(item, showInfo)))
             else:
                 self.threadList.append(Thread(target=self.tmdbSeasonListWorker, args=(item, showInfo)))
@@ -338,33 +339,34 @@ class Menus:
 
             if smartPlay is True:
                 return args
+
+            if tools.getSetting('trakt.auth') != '':
+                cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
+                           % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
+
             if tools.context_addon():
                 cm = []
 
-            if tools.getSetting('trakt.auth') != '':
-                cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s&type=episode)'
-                           % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
-
             tools.addDirectoryItem(name, action, item['info'], item['art'], cm=cm,
-                                   isFolder=True, isPlayable=False, actionArgs=args)
+                                   isFolder=True, isPlayable=False, actionArgs=args,
+                                   set_ids=item['ids'])
 
 
     def episodeListBuilder(self, traktList, showInfo, smartPlay=False, info_only=False):
+
         self.threadList = []
         try:
             play_list = []
 
             if len(traktList) == 0: return
 
-            if len(traktList) == 1:
-                self.tmdbEpisodeWorker(traktList[0], showInfo)
-            else:
-                for item in traktList:
+            for item in traktList:
 
-                    if tools.getSetting('general.metalocation') == '1':
-                        self.threadList.append(Thread(target=self.tvdbEpisodeWorker, args=(item, showInfo)))
-                    else:
-                        self.threadList.append(Thread(target=self.tmdbEpisodeWorker, args=(item, showInfo)))
+                #if tools.getSetting('general.metalocation') == '1':
+                if 1 == 1:
+                    self.threadList.append(Thread(target=self.tvdbEpisodeWorker, args=(item, showInfo)))
+                else:
+                    self.threadList.append(Thread(target=self.tmdbEpisodeWorker, args=(item, showInfo)))
 
             self.runThreads()
             if smartPlay is False and tools.getSetting('trakt.auth') != '':
@@ -408,29 +410,33 @@ class Menus:
                     name = item['info']['title']
 
                     args = tools.quote(json.dumps(args, sort_keys=True))
-                    cm.append(('Torrent file select',
-                               'XBMC.RunPlugin(%s?action=filePicker&actionArgs=%s)' % (sysaddon, args)))
-                    cm.append(('Source Select',
-                               'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
+
                 except:
                     import traceback
                     traceback.print_exc()
                     continue
+                    
+                cm.append(('Source Select',
+                           'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
+
+                if tools.getSetting('trakt.auth') != '':
+                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
+                               % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
 
                 if tools.context_addon():
                     cm = []
 
-                if tools.getSetting('trakt.auth') != '':
-                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s&type=episode)'
-                               % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
+                if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting('premiumize.pin') != '':
+                    cm.append(('Torrent file select',
+                               'XBMC.RunPlugin(%s?action=filePicker&actionArgs=%s)' % (sysaddon, args)))
 
                 if smartPlay is False:
                     tools.addDirectoryItem(name, action, item['info'], item['art'], cm=cm,
-                                           isFolder=False, isPlayable=playable, actionArgs=args)
+                                           isFolder=False, isPlayable=playable, actionArgs=args, set_ids=item['ids'])
                 else:
                     play_list.append(tools.addDirectoryItem(name, action, item['info'],
                                                             item['art'], isFolder=False, isPlayable=playable,
-                                                            actionArgs=args, smart_play=True))
+                                                            actionArgs=args, smart_play=True, set_ids=item['ids']))
 
             if smartPlay is True:
                 return play_list
@@ -449,7 +455,8 @@ class Menus:
             if len(traktList) == 0: return
 
             for item in traktList:
-                if tools.getSetting('general.metalocation') == '1':
+                #if tools.getSetting('general.metalocation') == '1':
+                if 1==1:
                     self.threadList.append(Thread(target=self.tvdbEpisodeWorker, args=(item['episode'], item['show'])))
                 else:
                     self.threadList.append(Thread(target=self.tmdbEpisodeWorker, args=(item[0], item[1])))
@@ -493,10 +500,6 @@ class Menus:
                     except:
                         pass
 
-                cm.append(('Browse Show',
-                           'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)' %
-                           (sysaddon, tools.quote(json.dumps(item['showInfo'])))))
-
                 try:
                     args = {'showInfo': {}, 'episodeInfo': {}}
 
@@ -518,29 +521,38 @@ class Menus:
                     item['info']['title'] = item['info']['originaltitle'] = name
 
                     args = tools.quote(json.dumps(args, sort_keys=True))
-                    cm.append(('Torrent file select',
-                               'RunPlugin(%s?action=filePicker&actionArgs=%s)' % (sysaddon, args)))
+
+                    cm.append(('Browse Show',
+                               'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)' %
+                               (sysaddon, tools.quote(json.dumps(item['showInfo'])))))
+
                     cm.append(('Source Select',
                                'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
+
+                    if tools.getSetting('trakt.auth') != '':
+                        cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
+                                   % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
 
                     if tools.context_addon():
                         cm = []
 
-                    if tools.getSetting('trakt.auth') != '':
-                        cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s&type=episode)'
-                                   % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
+                    if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting('premiumize.pin') != '':
+                        cm.append(('Torrent file select',
+                                   'XBMC.RunPlugin(%s?action=filePicker&actionArgs=%s)' % (sysaddon, args)))
+
                 except:
                     import traceback
                     traceback.print_exc()
                     continue
 
                 tools.addDirectoryItem(name, action, item['info'], item['art'], cm=cm,
-                                       isFolder=False, isPlayable=playable, actionArgs=args)
+                                       isFolder=False, isPlayable=playable, actionArgs=args, set_ids=item['ids'])
         except:
             import traceback
             traceback.print_exc()
 
     def showListBuilder(self, traktList, forceResume=False, info_only=False):
+
         self.threadList = []
         try:
             if len(traktList) == 0: return
@@ -598,34 +610,37 @@ class Menus:
                 else:
                     set_cast = None
 
+                if tools.getSetting('smartplay.clickresume') == 'true' or forceResume is True:
+                    action = 'smartPlay'
+                else:
+                    action = 'showSeasons'
+
                 # Context Menu Items
 
                 cm.append(('Shuffle Play', 'XBMC.RunPlugin(%s?action=shufflePlay&actionArgs=%s)' % (sysaddon,
                                                                                                     args)))
 
-                if tools.getSetting('smartplay.clickresume') == 'true' or forceResume is True:
-                    action = 'smartPlay'
-                    cm.append(('Expand Show', 'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)'
-                               % (sysaddon, args)))
-                else:
-                    action = 'showSeasons'
-
                 cm.append((tools.lang(32020),
                            'Container.Update(%s?action=showsRelated&actionArgs=%s)' % (sysaddon, item['ids']['trakt'])))
+
+                cm.append(('Browse Show', 'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)'
+                           % (sysaddon, args)))
+
+                if tools.getSetting('trakt.auth') != '':
+                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
+                               % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
 
                 if tools.context_addon():
                     cm = []
 
-                if tools.getSetting('trakt.auth') != '':
-                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s&type=episode)'
-                               % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
             except:
                 import traceback
                 traceback.print_exc()
                 continue
 
             tools.addDirectoryItem(name, action, item['info'], item['art'], all_fanart=None, cm=cm,
-                                   isFolder=True, isPlayable=False, actionArgs=args, set_cast=set_cast)
+                                   isFolder=True, isPlayable=False, actionArgs=args, set_cast=set_cast,
+                                   set_ids=item['ids'])
 
     def tmdbAppendShowWorker(self, trakt_object):
         tools.tmdb_sema.acquire()

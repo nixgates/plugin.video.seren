@@ -285,9 +285,6 @@ if action == 'traktManager':
     from resources.lib.indexers import trakt
     trakt.TraktAPI().traktManager(actionArgs)
 
-if action == 'test2':
-    pass
-
 if action == 'traktOnDeckHome':
     from resources.lib.gui import homeMenu
     homeMenu.Menus().traktOnDeck()
@@ -419,3 +416,6 @@ if action == 'buildPlaylist':
         tools.playList.add(url=i[0], listitem=i[1])
 
     tools.player().play(tools.playList)
+
+if action == 'test2':
+    pass

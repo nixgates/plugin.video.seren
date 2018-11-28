@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.1.11" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.1.13" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -15,6 +15,32 @@
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">Seren - This Addon is currently in beta. Please be aware there may be bugs present</summary>
 		<description lang="en">
+		</description>
+		<platform>all</platform>
+		<license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
+		<forum></forum>
+		<website></website>
+		<source></source>
+		<disclaimer lang="en">The author of this addon takes no responsibility for any 3rd party intergration or modification of this software, please ensure your use of this software abides by your local and insterstate laws.</disclaimer>
+		<assets>
+			<icon>temp-icon.png</icon>
+			<fanart>temp-fanart.png</fanart>
+		</assets>
+		<news>
+Version 0.1.13 Changelog:
+Source Select items now clickable
+Esc Key now closes Source Select dialog
+
+Version 0.1.12 Changelog:
+Added premiumize transfer database cleanup to maintenance script
+Changed scrobble ID back to Trakt as IMDB ID was unreliable causing trakt progress for some random show called pride
+if the IMDB ID wasn't available for an episode (sorry for my testers watching origin)
+Fixed issue with keepalive not dying causing scrobble issues and issues with Upnext
+Added 265 priority sort
+Some spelling mistakes
+Changed Upnext episode IDs to Trakt ID
+Added setUniqueIDs to tools.addDirectoryItem function
+Hide Item in trakt manager now actually sends the trakt request (Bad nix)
 
 Version 0.1.11 Changelog:
 Added workaround for Kodi 18 Widgets
@@ -69,37 +95,6 @@ Cleaned up logging
 Fixed Manual Caching
 Adjusted Manual Caching display string
 Fixed View Types not being set
-
-		</description>
-		<platform>all</platform>
-		<license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
-		<forum></forum>
-		<website></website>
-		<source></source>
-		<disclaimer lang="en">The author of this addon takes no responsibility for any 3rd party intergration, please ensure your use of this software abides by your local and insterstate laws.</disclaimer>
-		<assets>
-			<icon>temp-icon.png</icon>
-			<fanart>temp-fanart.png</fanart>
-		</assets>
-		<news>
-			Version 0.1.06 Changelog:
-			Added 3D filter Setting
-			Added File Size Limit
-			Added View types for Seasons, Episodes and Default for Menus
-			Added Debrid Priorities
-			Added Install UpNext Addon Setting
-			Fixed capitalised Addon ID
-			Fixed issue where TVDB token was not initially created
-			Added ability to hide items from trakt manager
-
-			Version 0.1.05 Changelog:
-			Added better Hoster support
-			Changed hoster domains to (domain, name) tuple
-			Fixed issue where color change would set color even if cancelled
-			Cleaned up logging
-			Fixed Manual Caching
-			Adjusted Manual Caching display string
-			Fixed View Types not being set
 		</news>
 	</extension>
 </addon>
