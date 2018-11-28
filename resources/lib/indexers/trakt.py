@@ -264,6 +264,7 @@ class TraktAPI:
         sections_display = ['Watched Progress', 'Calendar']
         selection = tools.showDialog.select(tools.addonName + ': Select Menu type to hide from', sections_display)
         section = sections[selection]
+        self.json_response('users/hidden/%s' % section, postData=trakt_object)
         tools.showDialog.notification(tools.addonName, 'Item has been hidden from your %s' % sections_display[selection])
 
     def get_username(self):
@@ -271,13 +272,13 @@ class TraktAPI:
         return settings['user']['username']
 
     def getLists(self, username='me'):
-        lists = self.json_response('users/%s/lists' % username)
+        lists = self.json_response('users/%s/lists' % username, limit=500)
         return lists
 
     def myTraktLists(self, media_type):
 
         lists = self.getLists()
-        lists += [i['list'] for i in self.json_response('users/likes/lists', limit=False)]
+        lists += [i['list'] for i in self.json_response('users/likes/lists', limit=500)]
         for user_list in lists:
             arguments = {'trakt_id': user_list['ids']['trakt'],
                          'username': user_list['user']['username'],

@@ -553,6 +553,13 @@ class Sources(tools.dialogWindow):
             size_limit = int(tools.getSetting('general.sizelimit')) * 1024
             torrent_list = [i for i in torrent_list if i.get('size', 0) < size_limit]
 
+        if tools.getSetting('general.265sort') == 'true':
+            torrent_list = [i for i in torrent_list if 'x265' in i['info']] + \
+                           [i for i in torrent_list if 'x265' not in i['info']]
+
+            hoster_list = [i for i in hoster_list if 'x265' in i['info']] + \
+                           [i for i in hoster_list if 'x265' not in i['info']]
+
         random.shuffle(hoster_list)
 
         debrid_priorities = self.debrid_priority()
@@ -772,6 +779,7 @@ class Sources(tools.dialogWindow):
             self.silent = True
 
         thread = threading.Thread(target=self.getSources, args=(args,))
+        thread.daemon = True
         thread.start()
 
         if not self.silent:
@@ -789,9 +797,7 @@ class Sources(tools.dialogWindow):
     def onAction(self, action):
 
         id = action.getId()
-        if id == 92:
-            self.canceled = True
-        if id == 7:
+        if id == 92 or id == 10:
             self.canceled = True
 
     def setBackground(self, url):

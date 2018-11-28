@@ -52,6 +52,7 @@ class SmartPlay:
             if self.final_episode_check(season, episode) is True:
                 season = 1
                 episode = 1
+                
             season_object = TraktAPI().json_response('shows/%s/seasons?extended=full' % self.info_dictionary['ids']['trakt'])
             season_object = [x for x in season_object if x['number'] == season]
             self.info_dictionary = tvshowMenus.Menus().seasonListBuilder(season_object,

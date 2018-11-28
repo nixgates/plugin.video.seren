@@ -128,7 +128,7 @@ class source_select_list(tools.dialogWindow):
 
         print('Action = %s' % action.getId())
         id = action.getId()
-        if id == 92:
+        if id == 92 or id == 10:
             self.close()
             self.position = -1
             self.close()
@@ -144,3 +144,9 @@ class source_select_list(tools.dialogWindow):
         tools.kodiGui.WindowDialog.doModal(self)
         self.clearProperties()
         return self.position
+
+
+    def onControl(self, control):
+        if self.list.getId() == control.getId():
+            self.position = self.list.getSelectedPosition()
+            self.close()

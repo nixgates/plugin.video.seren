@@ -285,9 +285,7 @@ class Resolver(tools.dialogWindow):
     def onAction(self, action):
 
         id = action.getId()
-        if id == 92:
-            self.canceled = True
-        if id == 7:
+        if id == 92 or id == 10:
             self.canceled = True
 
     def setBackground(self, url):
