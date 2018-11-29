@@ -417,5 +417,9 @@ if action == 'buildPlaylist':
 
     tools.player().play(tools.playList)
 
+if action == 'premiumizeCleanup':
+    from resources.lib.common import maintenance
+    maintenance.premiumize_transfer_cleanup()
+
 if action == 'test2':
     pass

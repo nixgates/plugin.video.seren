@@ -16,7 +16,10 @@ def build_display_title(source):
     if len(info) > 0:
         info = ' '.join(info)
         info = '| ' + info
+    else:
+        info = ''
 
+    title = ''
 
     if source['type'] == 'torrent':
         size = tools.colorString(tools.source_size_display(source['size']))
@@ -37,6 +40,9 @@ def build_display_title(source):
             info,
             release_title,
         )
+
+    if tools.getSetting('general.sourceselectlines') == 'false':
+        title = title.replace('\n', ' | ')
 
     return title
 
@@ -107,9 +113,15 @@ class source_select_list(tools.dialogWindow):
         #self.addControl(self.dispaly_title)
 
         # This looks ridiculous below but it's needed as the Kodi Gui modules won't accept itemHeight as a Keyword
+
+        item_height = 55
+
+        if tools.getSetting('general.sourceselectlines') == 'false':
+            item_height = 30
+
         self.list = tools.listControl(60, 200, 1160, 490, 'font13', '0xFFFFFFFF', '',
                                       os.path.join(tools.IMAGES_PATH, 'highlight11.png'),
-                                      '',0,0,0,0,55
+                                      '',0,0,0,0,item_height
                                       )
         #self.list = tools.listControl(60, 280, 1160, 490, buttonFocusTexture=os.path.join(tools.IMAGES_PATH, 'highlight11.png'))
         self.addControl(self.list)

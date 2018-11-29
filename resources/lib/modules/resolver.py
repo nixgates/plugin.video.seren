@@ -198,6 +198,8 @@ class Resolver(tools.dialogWindow):
                     continue
 
             self.close()
+            if tools.getSetting('premiumize.enabled') == 'true':
+                tools.execute('RunPlugin("plugin://plugin.video.%s/?action=premiumizeCleanup")' % tools.addonName.lower())
             return
         except:
             import traceback
@@ -208,13 +210,16 @@ class Resolver(tools.dialogWindow):
     def premiumizeResolve(self, source, args, pack_select=False):
 
         stream_link = None
+        try:
 
-        premiumize = Premiumize.PremiumizeFunctions()
+            premiumize = Premiumize.PremiumizeFunctions()
 
-        if source['type'] == 'torrent':
-            stream_link = premiumize.magnetToStream(source['magnet'], args, pack_select)
-        elif source['type'] == 'hoster':
-            stream_link = premiumize.resolveHoster(source['url'])
+            if source['type'] == 'torrent':
+                stream_link = premiumize.magnetToStream(source['magnet'], args, pack_select)
+            elif source['type'] == 'hoster':
+                stream_link = premiumize.resolveHoster(source['url'])
+        except:
+            pass
         return stream_link
 
     def realdebridResolve(self, i, args):
@@ -238,24 +243,30 @@ class Resolver(tools.dialogWindow):
         from resources.lib.modules import database
         try:
             hosters = {'premium': {}, 'free': []}
-            if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting('premiumize.hosters') == 'true':
-                host_list = database.get(Premiumize.PremiumizeFunctions().updateRelevantHosters, 1)
-                if host_list is None:
-                    host_list = Premiumize.PremiumizeFunctions().updateRelevantHosters()
-                if host_list is not None:
-                    hosters['premium']['premiumize'] = [(i, i.split('.')[0]) for i in host_list['directdl']]
-                else:
-                    hosters['premium']['premiumize'] = []
+            try:
+                if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting(
+                        'premiumize.hosters') == 'true':
+                    host_list = database.get(Premiumize.PremiumizeFunctions().updateRelevantHosters, 1)
+                    if host_list is None:
+                        host_list = Premiumize.PremiumizeFunctions().updateRelevantHosters()
+                    if host_list is not None:
+                        hosters['premium']['premiumize'] = [(i, i.split('.')[0]) for i in host_list['directdl']]
+                    else:
+                        hosters['premium']['premiumize'] = []
+            except:
+                pass
 
-            if tools.getSetting('realdebrid.enabled') == 'true' and tools.getSetting('rd.hosters') == 'true':
-                host_list = database.get(real_debrid.RealDebrid().getRelevantHosters, 1)
-                if host_list is None:
-                    host_list = real_debrid.RealDebrid().getRelevantHosters()
-                if host_list is not None:
-                    hosters['premium']['real_debrid'] = [(i, i.split('.')[0]) for i in host_list]
-                else:
-                    hosters['premium']['real_debrid'] = []
-
+            try:
+                if tools.getSetting('realdebrid.enabled') == 'true' and tools.getSetting('rd.hosters') == 'true':
+                    host_list = database.get(real_debrid.RealDebrid().getRelevantHosters, 1)
+                    if host_list is None:
+                        host_list = real_debrid.RealDebrid().getRelevantHosters()
+                    if host_list is not None:
+                        hosters['premium']['real_debrid'] = [(i, i.split('.')[0]) for i in host_list]
+                    else:
+                        hosters['premium']['real_debrid'] = []
+            except:
+                pass
 
             return hosters
 

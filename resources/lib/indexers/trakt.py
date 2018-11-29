@@ -26,6 +26,9 @@ class TraktAPI:
         if not self.AccessToken is '':
             self.headers['Authorization'] = 'Bearer %s' % self.AccessToken
 
+        self.response_headers = {}
+        self.response_code = 0
+
     def revokeAuth(self):
         url = "oauth/revoke"
         postData={"token": tools.getSetting('trakt.auth')}
@@ -76,7 +79,8 @@ class TraktAPI:
                 tools.setSetting('trakt.auth', response['access_token'])
                 tools.setSetting('trakt.refresh', response['refresh_token'])
                 self.headers['Authorization'] = 'Bearer %s' % response['access_token']
-                tools.setSetting('trakt.username', self.get_username())
+                username = self.get_username()
+                tools.setSetting('trakt.username', username)
                 tools.progressDialog.close()
                 tools.showDialog.ok(tools.addonName, 'Sucessfully authenticated with Trakt')
                 break
@@ -124,10 +128,12 @@ class TraktAPI:
                     limitAmount = limitOverride
                 if not '?' in url:
                     url += '?limit=%s' % limitAmount
-                url += '&limit=%s' % limitAmount
+                else:
+                    url += '&limit=%s' % limitAmount
 
         try:
             response = requests.get(url, headers=self.headers)
+
             if response.status_code == 401:
                 tools.log('Trakt OAuth Failure, %s %s' % (str(response.text), response.request.headers), 'info')
                 if refreshCheck == False:
@@ -155,9 +161,11 @@ class TraktAPI:
                 limitAmount = tools.getSetting('item.limit')
                 if not '?' in url:
                     url += '?limit=%s' % limitAmount
-                url += '&limit=%s' % limitAmount
+                else:
+                    url += '&limit=%s' % limitAmount
         try:
             response = requests.post(url, json=postData, headers=self.headers)
+
             if response.status_code == 401:
                 if refreshCheck == False:
                     self.refreshToken()
@@ -272,13 +280,13 @@ class TraktAPI:
         return settings['user']['username']
 
     def getLists(self, username='me'):
-        lists = self.json_response('users/%s/lists' % username, limit=500)
+        lists = self.json_response('users/%s/lists' % username, limit=True, limitOverride=500)
         return lists
 
     def myTraktLists(self, media_type):
 
         lists = self.getLists()
-        lists += [i['list'] for i in self.json_response('users/likes/lists', limit=500)]
+        lists += [i['list'] for i in self.json_response('users/likes/lists', limit=True, limitOverride=500)]
         for user_list in lists:
             arguments = {'trakt_id': user_list['ids']['trakt'],
                          'username': user_list['user']['username'],
@@ -292,25 +300,9 @@ class TraktAPI:
         tools.closeDirectory('addons')
         return
 
-    def getListItems(self, arguments, page):
-
-        arguments = json.loads(tools.unquote(arguments))
-        media_type = arguments['type']
-
-        list_items = self.json_response('users/%s/lists/%s/items/%s?extended=full'
-                                        % (arguments['username'],
-                                           arguments['trakt_id'],
-                                           media_type), limit=False)
-
-        sort_by = arguments['sort_by']
+    def sort_list(self, sort_by, sort_how, list_items, media_type):
 
         supported_sorts = ['added', 'rank', 'title', 'released', 'runtime', 'popularity', 'votes', 'random']
-
-        if media_type == 'movies':
-            media_type = 'movie'
-
-        if media_type == 'shows':
-            media_type = 'show'
 
         if sort_by == 'added':
             list_items = sorted(list_items, key=lambda x: x['listed_at'])
@@ -331,23 +323,42 @@ class TraktAPI:
             list_items = random.shuffle(list_items)
 
         if sort_by not in supported_sorts:
-            list_items = sorted(list_items, key=lambda x: x['listed_at'])
+            return list_items
 
-        if arguments['sort_how'] == 'desc':
+        if sort_how == 'desc':
             list_items.reverse()
 
-        limitAmount = int(tools.getSetting('item.limit'))
-        split = (int(page) - 1) * limitAmount
-        list_items = list_items[split:]
-        list_items = list_items[:limitAmount]
+        return list_items
+
+    def getListItems(self, arguments, page):
+        from resources.lib.modules import database
+
+        arguments = json.loads(tools.unquote(arguments))
+        media_type = arguments['type']
+        list_items = database.get(self.json_response, 12, 'users/%s/lists/%s/items/%s?extended=full&page=%s'
+                                        % (arguments['username'],
+                                           arguments['trakt_id'],
+                                           media_type,
+                                           page), None, True)
+        next_page = False
+        if len(list_items) == int(tools.getSetting('item.limit')):
+            next_page = True
+
+        if media_type == 'movies':
+            media_type = 'movie'
+
+        if media_type == 'shows':
+            media_type = 'show'
+
+        list_items = self.sort_list(arguments['sort_by'], arguments['sort_how'], list_items, media_type)
 
         if media_type == 'show':
-            list_items = [i['show'] for i in list_items if i['type'] == 'show']
+            list_items = [i['show'] for i in list_items if i['type'] == 'show' and i is not None]
             from resources.lib.gui import tvshowMenus
             tvshowMenus.Menus().showListBuilder(list_items)
 
         if media_type == 'movie':
-            list_items = [i['movie'] for i in list_items if i['type'] == 'movie']
+            list_items = [i['movie'] for i in list_items if i['type'] == 'movie' and i is not None]
             from resources.lib.gui import movieMenus
             movieMenus.Menus().commonListBuilder(list_items)
 
@@ -355,11 +366,11 @@ class TraktAPI:
 
         if media_type == 'movie':
             content_type = 'movies'
-
-        if len(list_items) == int(tools.getSetting('item.limit')):
+        if next_page:
             page = int(page) + 1
             tools.addDirectoryItem('Next', 'traktList&page=%s&actionArgs=%s' %
-                                   (str(page), tools.quote(json.dumps(arguments))), '', '')
+                                   (page, tools.quote(json.dumps(arguments))),
+                                   None, None)
         tools.closeDirectory(content_type)
         return
 
@@ -369,20 +380,29 @@ class TraktAPI:
         calendar = self.json_response('users/hidden/calendar')
         recommendations = self.json_response('users/hidden/recommendations')
 
-        watched = {
-            'shows': [i['show']['ids']['trakt'] for i in watched if i['type'] == 'show'],
-            'movies': [i['movie']['ids']['trakt'] for i in watched if i['type'] == 'movie']
-        }
+        try:
+            watched = {
+                'shows': [i['show']['ids']['trakt'] for i in watched if i['type'] == 'show'],
+                'movies': [i['movie']['ids']['trakt'] for i in watched if i['type'] == 'movie']
+            }
+        except:
+            watched = []
 
-        calendar = {
-            'shows': [i['show']['ids']['trakt'] for i in calendar if i['type'] == 'show'],
-            'movies': [i['movie']['ids']['trakt'] for i in calendar if i['type'] == 'movie']
-        }
+        try:
+            calendar = {
+                'shows': [i['show']['ids']['trakt'] for i in calendar if i['type'] == 'show'],
+                'movies': [i['movie']['ids']['trakt'] for i in calendar if i['type'] == 'movie']
+            }
+        except:
+            calendar = []
 
-        recommendations = {
-            'shows': [i['show']['ids']['trakt'] for i in recommendations if i['type'] == 'show'],
-            'movies': [i['movie']['ids']['trakt'] for i in recommendations if i['type'] == 'movie']
-        }
+        try:
+            recommendations = {
+                'shows': [i['show']['ids']['trakt'] for i in recommendations if i['type'] == 'show'],
+                'movies': [i['movie']['ids']['trakt'] for i in recommendations if i['type'] == 'movie']
+            }
+        except:
+            recommendations = []
 
         hidden_items = {
             'watched': watched,

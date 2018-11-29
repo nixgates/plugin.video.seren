@@ -9,12 +9,18 @@
         <setting type="lsep" label="UI Settings" />
         <setting type="sep" />
         <!-- I'm leaving this hidden for now, TMDB needs a fair bit of work to get back up to scratch -->
+        <setting type="bool" id="general.sourceselectlines" label="Multiline Source Select" default="true" />
         <setting type="enum" id="general.metalocation" default="1" label="TV Metadata location" values="TMDB|TVDB" visible="hidden" />
         <setting id="item.limit" type="slider" label="Page Item Limit" default="40" range="10, 100" option="int" />
-        <setting id="movie.view" type="select" label="Movie View" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List"/>
-        <setting id="show.view" type="select" label="Show View" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" />
-        <setting id="episode.view" type="select" label="Episode View" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" />
-        <setting id="season.view" type="select" label="Season View" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" />
+        <setting id="general.viewidswitch" label="Use Custom View IDs (Advanced)" default="false" type="bool" visible="true"/>
+        <setting id="movie.view" type="select" subsetting="true" label="Movie View" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-1,false)" />
+        <setting id="movie.view.id" type="number" subsetting="true" label="Movie View ID" default="" visible="eq(-2,true)"/>
+        <setting id="show.view" type="select" label="Show View" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-3,false)" />
+        <setting id="show.view.id" type="number" label="Show View ID" default="" subsetting="true" visible="eq(-4,true)"/>
+        <setting id="episode.view" type="select" label="Episode View" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-5,false)" />
+        <setting id="episode.view.id" type="number" label="Episode View ID" default="" subsetting="true" visible="eq(-6,true)"/>
+        <setting id="season.view" type="select" label="Season View" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" subsetting="true" visible="eq(-7,false)"/>
+        <setting id="season.view.id" type="number" label="Season View ID" default="" visible="eq(-8,true)" subsetting="true"/>
         <setting id="general.textColorSelect" type="action" label="Select Text Highlight Color..." option="close" action="RunPlugin(plugin://plugin.video.seren/?action=colorPicker)" />
         <setting type="text" label="Current Color" enable="false" id="general.displayColor" default="None" />
         <setting type="lsep" label="Smart Play Settings" />
@@ -32,6 +38,7 @@
         <setting id="smartPlay.bookmarkprompt" type="bool" label="Enable Bookmark Prompt" default="false" visible="eq(-1,true)"/>
 
                 <!-- HIDDEN SETTINGS BELONG HERE -->
+        <setting id="migration.attempted" default="false" type="bool" visible="hidden"/>
         <setting id="tvdb.jw" type="text" default="" visible="hidden" />
         <setting id="tvdb.expiry" type="text" default="0" visible="hidden"/>
         <setting id="trakt.auth" type="text" default="" visible="hidden"/>

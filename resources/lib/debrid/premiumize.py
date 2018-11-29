@@ -235,6 +235,11 @@ class PremiumizeFunctions(PremiumizeBase):
             database.remove_premiumize_transfer(transfer_id)
             return
 
+
+        if streamLink is None:
+            self.delete_transfer(transfer_id)
+            database.remove_premiumize_transfer(transfer_id)
+
         return streamLink
 
     def check_episode_string(self, folder_details, episodeStrings):

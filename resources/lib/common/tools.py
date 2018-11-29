@@ -168,7 +168,6 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
     item = menuItem(label=name)
     if label2 is not None:
         item.setLabel2(label2)
-        log(label2)
     if isPlayable == True:
         item.setProperty('IsPlayable', 'true')
     if set_cast is not False and 'cast' in info:
@@ -184,7 +183,7 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
 
     addMenuItem(handle=syshandle, url=url, listitem=item, isFolder=isFolder)
 
-def closeDirectory(contentType, viewType='Default', sort=False):
+def closeDirectory(contentType, viewType='Default', sort=False, cacheToDisc=False):
 
     if sort == 'title':
         sortMethod(syshandle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
@@ -199,8 +198,11 @@ def closeDirectory(contentType, viewType='Default', sort=False):
     viewType = get_view_type(contentType)
 
     xbmc.executebuiltin('Container.SetViewMode(%d)' % viewType)
+
     content(syshandle, contentType)
+
     endDirectory(syshandle, cacheToDisc=True)
+
 
 def get_view_type(contentType):
     viewType = 'Default'
@@ -215,6 +217,18 @@ def get_view_type(contentType):
         viewType = getSetting('season.view')
 
     viewType = viewTypes[viewType]
+
+    if getSetting('general.viewidswitch') == 'true':
+        if contentType == 'tvshows':
+            viewType = getSetting('show.view.id')
+        if contentType == 'movies':
+            viewType = getSetting('movie.view.id')
+        if contentType == 'episodes':
+            viewType = getSetting('episode.view.id')
+        if contentType == 'seasons':
+            viewType = getSetting('season.view.id')
+
+    viewType = int(viewType)
     return viewType
 
 def busy():
@@ -353,6 +367,8 @@ def copy2clip(txt):
 def datetime_workaround(string_date, format="%Y-%m-%d"):
     import datetime
     import time
+    if string_date == '':
+        return None
     try:
         res = datetime.datetime.strptime(string_date, format).date()
     except TypeError:

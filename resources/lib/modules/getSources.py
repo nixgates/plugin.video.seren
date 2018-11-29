@@ -125,7 +125,11 @@ class Sources(tools.dialogWindow):
             else:
                 self.trakt_id = self.args['ids']['trakt']
 
-            self.getLocalTorrentResults()
+            try:
+                self.getLocalTorrentResults()
+            except:
+                pass
+
             self.updateProgress()
 
             if not self.prem_terminate():
@@ -139,8 +143,6 @@ class Sources(tools.dialogWindow):
 
                 # Shuffle and start scraping threads
                 random.shuffle(self.threads)
-                for i in self.threads:
-                    i.daemon = True
                 for i in self.threads:
                     i.start()
 
@@ -322,7 +324,7 @@ class Sources(tools.dialogWindow):
                             if sorted_list > 0:
                                 build_list.append(sorted_list[0])
         else:
-            if self.silent is true:
+            if self.silent is True:
                 return
             yesno = tools.showDialog.yesno('%s - Cache Assist' % tools.addonName, 'No Playable Sources were found'
                                                         '\nWould you like to attempt to cache a torrent?')
@@ -373,7 +375,6 @@ class Sources(tools.dialogWindow):
             #provider_domain = providerModule.domain
             #if provider_domain == '' or provider_domain in self.domain_list:
             #    return
-
             if 'episodeInfo' in info:
 
                 simpleInfo = self.buildSimpleShowInfo(info)
@@ -385,7 +386,9 @@ class Sources(tools.dialogWindow):
             if allTorrents is None:
                 self.remainingProviders.remove(provider_name)
                 return
-
+            if self.canceled:
+                self.remainingProviders.remove(provider_name)
+                return
             if len(allTorrents) > 0:
 
                 # Begin filling in optional dictionary returns
@@ -427,6 +430,9 @@ class Sources(tools.dialogWindow):
                 start_time = time.time()
                 # Check Debrid Providers for cached copies
                 self.storeTorrentResults(self.trakt_id, allTorrents)
+                if self.canceled:
+                    self.remainingProviders.remove(provider_name)
+                    return
                 self.torrentCacheSources += TorrentCacheCheck().torrentCacheCheck(allTorrents, info)
                 self.allTorrents += allTorrents
                 tools.log('%s cache check took %s seconds' % (provider_name, time.time() - start_time))
@@ -452,16 +458,34 @@ class Sources(tools.dialogWindow):
             provider_sources = providerModule.source()
             if 'episodeInfo' in info:
                 imdb, tvdb, title, localtitle, aliases, year = self.buildHosterVariables(info, 'tvshow')
+                if self.canceled:
+                    self.remainingProviders.remove(provider_name.upper())
+                    return
                 url = provider_sources.tvshow(imdb, tvdb, title, localtitle, aliases, year)
+                if self.canceled:
+                    self.remainingProviders.remove(provider_name.upper())
+                    return
                 imdb, tvdb, title, premiered, season, episode = self.buildHosterVariables(info, 'episode')
+                if self.canceled:
+                    self.remainingProviders.remove(provider_name.upper())
+                    return
                 url = provider_sources.episode(url, imdb, tvdb, title, premiered, season, episode)
+                if self.canceled:
+                    self.remainingProviders.remove(provider_name.upper())
+                    return
             else:
 
                 imdb, title, localtitle, aliases, year = self.buildHosterVariables(info, 'movie')
                 url = provider_sources.movie(imdb, title, localtitle, aliases, year)
 
             hostDict, hostprDict = self.buildHosterVariables(info, 'sources')
+            if self.canceled:
+                self.remainingProviders.remove(provider_name.upper())
+                return
             sources = provider_sources.sources(url, hostDict, hostprDict)
+            if self.canceled:
+                self.remainingProviders.remove(provider_name.upper())
+                return
             if sources is None:
                 self.remainingProviders.remove(provider_name.upper())
                 return
@@ -495,10 +519,12 @@ class Sources(tools.dialogWindow):
             self.remainingProviders.remove(provider_name.upper())
 
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             if provider_name in self.remainingProviders:
                 self.remainingProviders.remove(provider_name)
+            try:
+                tools.log('Provider - %s, failed because %s' % (provider_name, str(e)))
+            except:
+                pass
 
             return
 
@@ -775,19 +801,23 @@ class Sources(tools.dialogWindow):
         return size
 
     def doModal(self, args):
-        if tools.getSetting('general.tempSilent') == 'true':
-            self.silent = True
+        try:
+            if tools.getSetting('general.tempSilent') == 'true':
+                self.silent = True
 
-        thread = threading.Thread(target=self.getSources, args=(args,))
-        thread.daemon = True
-        thread.start()
+            thread = threading.Thread(target=self.getSources, args=(args,))
+            thread.start()
 
-        if not self.silent:
-            tools.dialogWindow.doModal(self)
-        else:
-            thread.join()
+            if not self.silent:
+                tools.dialogWindow.doModal(self)
+            else:
+                thread.join()
 
-        return self.return_data
+            return self.return_data
+        except:
+            import traceback
+            traceback.print_exc()
+            self.close()
 
     def is_canceled(self):
         if not self.silent:
@@ -808,7 +838,6 @@ class Sources(tools.dialogWindow):
     def close(self):
         if not self.silent:
             tools.dialogWindow.close(self)
-            pass
 
     def setText(self, text):
         self.text_label.setLabel(str(text))

@@ -297,6 +297,8 @@ class TVDBAPI:
                     currentDate = datetime.datetime.today().date()
                     airdate = str(seasonObject['first_aired'][:10])
                     airdate = tools.datetime_workaround(airdate)
+                    if airdate is None:
+                        return None
                     if airdate > currentDate:
                         item['info']['season_title'] = '[I][COLOR red]%s[/COLOR][/I]' % item['info']['season_title']
             except:
@@ -416,6 +418,8 @@ class TVDBAPI:
             if airdate == '':
                 info['title'] = '[I][COLOR red]%s[/COLOR][/I]' % info['title']
             airdate = tools.datetime_workaround(airdate)
+            if airdate is None:
+                return None
             if airdate > currentDate:
                 info['title'] = '[I][COLOR red]%s[/COLOR][/I]' % info['title']
         except:
