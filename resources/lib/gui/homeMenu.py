@@ -26,12 +26,12 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32016), 'searchMenu', None, None)
         tools.addDirectoryItem(tools.lang(32041), 'toolsMenu', '', '')
         #tools.addDirectoryItem('Test2', 'test2', None, None, isFolder=True)
-        tools.closeDirectory('addons')
+        tools.closeDirectory('addons', cacheToDisc=True)
 
     def searchMenu(self):
         tools.addDirectoryItem(tools.lang(32039), 'moviesSearch', '', '')
         tools.addDirectoryItem(tools.lang(32040), 'showsSearch', '', '')
-        tools.closeDirectory('addons')
+        tools.closeDirectory('addons', cacheToDisc=True)
 
     def toolsMenu(self):
         tools.addDirectoryItem('Provider Tools', 'providerTools', None, None)
@@ -42,19 +42,19 @@ class Menus:
         #tools.addDirectoryItem('Reset Silent Scrape Setting', 'resetSilent', '', '', isFolder=False)
         tools.addDirectoryItem('Open Settings Menu', 'openSettings', '', '', isFolder=False)
         tools.addDirectoryItem('Wipe Addon Data', 'cleanInstall', None, None, isFolder=False)
-        tools.closeDirectory('addons')
+        tools.closeDirectory('addons', cacheToDisc=True)
 
     def providerMenu(self):
         tools.addDirectoryItem('Install Provider Package', 'installProviders', None, None)
         tools.addDirectoryItem('Uninstall Provider Package', 'uninstallProviders', None, None)
         tools.addDirectoryItem('Enable Providers', 'adjustProviders&actionArgs=disabled', None, None)
         tools.addDirectoryItem('Disable Providers', 'adjustProviders&actionArgs=enabled', None, None)
-        tools.closeDirectory('addons')
+        tools.closeDirectory('addons', cacheToDisc=True)
 
     def traktOnDeck(self):
         tools.addDirectoryItem('Movies', 'onDeckMovies', None, None)
         tools.addDirectoryItem('Shows', 'onDeckShows', None, None)
-        tools.closeDirectory('addons')
+        tools.closeDirectory('addons', cacheToDisc=True)
 
 def runTest():
     pass

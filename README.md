@@ -5,6 +5,28 @@ This version of Seren may be unstable and may result in some undesired behavior.
 
 Change Log:
 
+### Version 0.1.16 Changelog:
+* Fixed season items not being marked as watched
+* Added try/except clauses to catch errors with get_hidden_items
+* Adjust Info detection to better detect source information
+* Added fallback if info list was empty for Source Select
+* Added ability to show sources in source select as a single line in case of skins that do not support the multiline view
+* Simplified provider failure output
+* Added removal of unknown video keys for Kodi 18
+* Removed trakt list lengths
+* Premiumize module now removes items from account if it failed to resolve a link
+* Premiumize cleanup now occurs at end of resolving
+* Threads no longer marked as daemon as it doesn't work within Kodi
+* Forced provider threads to return if getSources canceled
+* Added fallback for gathering of hoster domains
+
+### Version 0.1.15 Changelog:
+* Fallback for DateTime ValueError
+* Changed process of list generating so window shouldn't contain random number of items
+
+### Version 0.1.14 Changelog:
+* Increased Trakt Caching
+
 ### Version 0.1.13 Changelog:
 * Source Select items now clickable
 * Esc Key now closes Source Select dialog

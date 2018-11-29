@@ -46,12 +46,13 @@ def get(function, duration, *args, **kwargs):
         if cache_result:
             if _is_cache_valid(cache_result['date'], duration):
                 try:
-                    return ast.literal_eval(cache_result['value'].encode('utf-8'))
+                    return_data = ast.literal_eval(cache_result['value'].encode('utf-8'))
+                    return return_data
                 except:
                     return ast.literal_eval(cache_result['value'])
 
         fresh_result = repr(function(*args))
-        if not fresh_result:
+        if not fresh_result or fresh_result is None:
             # If the cache is old, but we didn't get fresh result, return the old cache
             if cache_result:
                 return cache_result

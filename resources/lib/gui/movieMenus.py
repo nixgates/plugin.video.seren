@@ -46,13 +46,13 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32014), 'moviesUpdated&page=1', '', '')
         tools.addDirectoryItem('Genres', 'movieGenres&page=1', '', '')
         tools.addDirectoryItem(tools.lang(32016), 'moviesSearch', '', '')
-        tools.closeDirectory('addons')
+        tools.closeDirectory('addons', cacheToDisc=True)
 
     def myMovies(self):
         tools.addDirectoryItem(tools.lang(32017), 'moviesMyCollection', '', '')
         tools.addDirectoryItem(tools.lang(32018), 'moviesMyWatchlist', '', '')
         tools.addDirectoryItem('My Movie Lists', 'myTraktLists&actionArgs=movies', '', '')
-        tools.closeDirectory('addons', viewType=self.viewType)
+        tools.closeDirectory('addons', cacheToDisc=True)
 
     def myMovieCollection(self):
         try:
@@ -69,33 +69,33 @@ class Menus:
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesRecommended(self):
-        traktList = trakt.json_response('recommendations/movies', limit=True, limitOverride=100)
+        traktList = database.get(trakt.json_response, 12, 'recommendations/movies', limit=True, limitOverride=100)
         self.commonListBuilder(traktList)
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesPopular(self, page):
-        traktList = trakt.json_response('movies/popular?page=%s' % page)
+        traktList = database.get(trakt.json_response, 12, 'movies/popular?page=%s' % page)
 
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019), 'moviesPopular&page=%s' % (int(page) + 1), '', '', isFolder=True)
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesTrending(self, page):
-        traktList = trakt.json_response('movies/trending?page=%s' % page)
+        traktList = database.get(trakt.json_response, 12, 'movies/trending?page=%s' % page)
 
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019), 'moviesTrending&page=%s' % (int(page) + 1), '', '', isFolder=True)
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesPlayed(self, page):
-        traktList = trakt.json_response('movies/played?page=%s' % page)
+        traktList = database.get(trakt.json_response, 12, 'movies/played?page=%s' % page)
 
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019), 'moviesPlayed&page=%s' % (int(page) + 1), '', '', isFolder=True)
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesWatched(self, page):
-        traktList = trakt.json_response('movies/watched?page=%s' % page)
+        traktList = database.get(trakt.json_response, 12, 'movies/watched?page=%s' % page)
 
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019), 'moviesWatched&page=%s' % (int(page) + 1), '', '', isFolder=True)
@@ -109,14 +109,14 @@ class Menus:
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesAnticipated(self, page):
-        traktList = trakt.json_response('movies/anticipated?page=%s' % page)
+        traktList = database.get(trakt.json_response, 12, 'movies/anticipated?page=%s' % page)
 
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019), 'moviesAnticipated&page=%s' % (int(page) + 1), '', '', isFolder=True)
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesBoxOffice(self):
-        traktList = trakt.json_response('movies/boxoffice')
+        traktList = database.get(trakt.json_response, 12, 'movies/boxoffice')
 
         self.commonListBuilder(traktList)
         tools.closeDirectory('movies', viewType=self.viewType)
@@ -145,7 +145,7 @@ class Menus:
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesRelated(self, args):
-        traktList = trakt.json_response('movies/%s/related' % args)
+        traktList = database.get(trakt.json_response, 12, 'movies/%s/related' % args)
         self.commonListBuilder(traktList)
         tools.closeDirectory('movies', viewType=self.viewType)
 
@@ -154,7 +154,7 @@ class Menus:
         genres = database.get(trakt.json_response, 24, 'genres/movies')
         for i in genres:
             tools.addDirectoryItem(i['name'], 'movieGenresGet&actionArgs=%s' % i['slug'], '', '', isFolder=True)
-        tools.closeDirectory('addons')
+        tools.closeDirectory('addons', cacheToDisc=True)
 
     def movieGenresList(self, args, page):
         if page is None:

@@ -38,22 +38,22 @@ def getQuality(release_title):
 
 def getInfo(release_title):
     info = []
-    release_title = release_title.lower()
-    if any(i in release_title for i in [' x264 ', '.x264', ' h264', '.h264']):
+    release_title = cleanTitle(release_title)
+    if any(i in release_title for i in [' x264', '.x264', ' h264', 'h 264']):
         info.append('x264')
-    if any(i in release_title for i in [' 3d ', '.3d.']):
+    if any(i in release_title for i in [' 3d']):
         info.append('3D')
-    if any(i in release_title for i in [' aac', '.aac']):
+    if any(i in release_title for i in [' aac']):
         info.append('AAC')
-    if any(i in release_title for i in ['.dts', ' dts']):
+    if any(i in release_title for i in [' dts']):
         info.append('DTS')
-    if any(i in release_title for i in [' 5.1 ', '.5.1', ' 5.1ch', '.5.1ch', ' 6ch', '.6ch.', ' ddp5.1']):
-        info.append('5.1')
-    if any(i in release_title for i in ['.7.1', ' 7.1']):
+    if any(i in release_title for i in [' 5 1', ' 5 1ch', ' 6ch', ' ddp5 1']):
+        info.append('DDP5.1')
+    if any(i in release_title for i in [' 7 1']):
         info.append('7.1')
-    if any(i in release_title for i in [' x265 ', '.x265', 'hevc', ' h265', '.h265', '.h.265', 'x265']):
+    if any(i in release_title for i in ['x265', '.x265', 'hevc', ' h265', '.h265', 'x265', ' h 265']):
         info.append('x265')
-    if any(i in release_title for i in [' cam', ' camrip', '.cam.', '.camrip.', ' hdcam ', '.hd.cam.', '.hdcam.']):
+    if any(i in release_title for i in [' cam', ' camrip', ' hdcam', ' hd cam']):
         info.append('CAM')
     return info
 
