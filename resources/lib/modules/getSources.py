@@ -1,11 +1,20 @@
-import json, sys, threading, re, time, random, os, copy
+# -*- coding: utf-8 -*-
 
-from resources.lib.common import tools
+import copy
+import json
+import os
+import random
+import re
+import sys
+import threading
+import time
+
 from resources.lib.common import source_utils
-from resources.lib.modules import resolver as resolver
-from resources.lib.modules import database
+from resources.lib.common import tools
 from resources.lib.debrid import premiumize
 from resources.lib.debrid import real_debrid
+from resources.lib.modules import database
+from resources.lib.modules import resolver as resolver
 
 sysaddon = sys.argv[0]
 
@@ -13,7 +22,6 @@ approved_qualities = ['4K', '1080p', '720p', 'SD']
 
 
 class Sources(tools.dialogWindow):
-
     def __init__(self):
         self.threads = []
         self.torrentProviders = []
@@ -30,7 +38,7 @@ class Sources(tools.dialogWindow):
         self.args = None
         self.trakt_id = ''
         self.silent = False
-        self.return_data = 'Nothing'
+        self.return_data = (None, None)
         self.basic_windows = True
         self.progress = 1
         self.duplicates_amount = 0
@@ -89,7 +97,8 @@ class Sources(tools.dialogWindow):
         self.addControl(self.perc90)
         self.addControl(self.perc100)
 
-        self.text_label = tools.labelControl(0, 430, 1280, 50, str(text), font='font13', alignment=tools.XBFONT_CENTER_X)
+        self.text_label = tools.labelControl(0, 430, 1280, 50, str(text), font='font13',
+                                             alignment=tools.XBFONT_CENTER_X)
         self.text_label2 = tools.labelControl(0, 470, 1280, 50, "", font='font13', alignment=tools.XBFONT_CENTER_X)
         self.text_label3 = tools.labelControl(0, 510, 1280, 50, "", font='font13', alignment=tools.XBFONT_CENTER_X)
 
@@ -102,7 +111,6 @@ class Sources(tools.dialogWindow):
         self.addControl(self.text_label3)
 
     def getSources(self, args):
-
         try:
             # Extract arguments from url
             self.args = json.loads(tools.unquote(args))
@@ -114,7 +122,7 @@ class Sources(tools.dialogWindow):
             else:
                 background = self.args['fanart']
 
-            self.setText("Checking Local Results")
+            self.setText(tools.lang(32081).encode('utf-8'))
             self.setBackground(background)
 
             # tools.progressDialog.create(tools.addonName)
@@ -133,7 +141,7 @@ class Sources(tools.dialogWindow):
             self.updateProgress()
 
             if not self.prem_terminate():
-                self.setText('Initializing Providers')
+                self.setText(tools.lang(32082).encode('utf-8'))
                 self.initProviders()
                 # Load threads for all sources
                 for i in self.torrentProviders:
@@ -146,7 +154,7 @@ class Sources(tools.dialogWindow):
                 for i in self.threads:
                     i.start()
 
-                self.setText("Scraping Sources")
+                self.setText(tools.lang(32083).encode('utf-8'))
                 # Keep alive for gui display and threading
                 timeout = int(tools.getSetting('general.timeout'))
                 tools.log('Entering Keep Alive', 'info')
@@ -191,7 +199,7 @@ class Sources(tools.dialogWindow):
             self.debridHosterDuplicates()
 
             ##### DUPLICATE REMOVAL #####
-            #Remove Duplicate Torrent Sources
+            # Remove Duplicate Torrent Sources
             post_dup = []
             check_list = []
             for i in self.torrentCacheSources:
@@ -232,8 +240,8 @@ class Sources(tools.dialogWindow):
                 if self.duplicates_amount > 0:
                     try:
                         tools.showDialog.notification(tools.addonName,
-                                                      '%s duplicate entries removed' % str(self.duplicates_amount),
-                                                      sound=False)
+                                                      '%s ' % str(self.duplicates_amount +
+                                                                  tools.lang(32084).encode('utf-8')), sound=False)
                     except:
                         pass
 
@@ -246,8 +254,7 @@ class Sources(tools.dialogWindow):
                 except:
                     pass
                 if self.silent:
-                    tools.showDialog.notification(tools.addonName, 'No Sources found for next item in playlist. '
-                                                                   'Clearing current playlist')
+                    tools.showDialog.notification(tools.addonName, tools.lang(32085).encode('utf-8'))
 
                 self.return_data = ([], self.args)
                 self.close()
@@ -326,8 +333,7 @@ class Sources(tools.dialogWindow):
         else:
             if self.silent is True:
                 return
-            yesno = tools.showDialog.yesno('%s - Cache Assist' % tools.addonName, 'No Playable Sources were found'
-                                                        '\nWould you like to attempt to cache a torrent?')
+            yesno = tools.showDialog.yesno('%s - Cache Assist' % tools.addonName, tools.lang(32086).encode('utf-8'))
             if yesno == 0:
                 return
             display_list = ['%sS | %s | %s | %s' %
@@ -335,7 +341,8 @@ class Sources(tools.dialogWindow):
                              tools.source_size_display(i['size']),
                              tools.colorString(i['release_title']))
                             for i in self.allTorrents]
-            selection = tools.showDialog.select('%s - Select Torrent to Cache' % tools.addonName, display_list)
+            selection = tools.showDialog.select('%s - ' % tools.addonName + tools.lang(32087).encode('utf-8'),
+                                                display_list)
             if selection == -1:
                 return
             build_list.append(self.allTorrents[selection])
@@ -347,18 +354,38 @@ class Sources(tools.dialogWindow):
 
         return
 
-
     def initProviders(self):
         sys.path.append(tools.dataPath)
         import providers
         sourceList = providers.get_relevant(self.language)
         torrent_providers = sourceList[0]
         hoster_providers = sourceList[1]
+        hoster_providers, torrent_providers = self.remove_duplicate_providers(torrent_providers, hoster_providers)
         self.hosterDomains = resolver.Resolver().getHosterList()
 
         '''FILTER PROVIDERS ACCORDING TO DATABASE'''
         self.torrentProviders = torrent_providers
         self.hosterProviders = hoster_providers
+
+    def remove_duplicate_providers(self, torrent, hosters):
+
+        temp_list = []
+        filter_list = []
+        for i in torrent:
+            if not i[1] in filter_list:
+                temp_list.append(i)
+                filter_list.append(i[1])
+
+        torrent = temp_list
+        temp_list = []
+        for i in hosters:
+            if not i[1] in filter_list:
+                temp_list.append(i)
+                filter_list.append(i[1])
+
+        hosters = temp_list
+
+        return hosters, torrent
 
     def getTorrent(self, info, provider):
         # Extract provider name from Tuple
@@ -372,8 +399,8 @@ class Sources(tools.dialogWindow):
 
             # Check to ensure that if duplicate providers exist that they do not run twice
             # This isn't the greatest idea. I mean... Fuck it. It's staying out for now
-            #provider_domain = providerModule.domain
-            #if provider_domain == '' or provider_domain in self.domain_list:
+            # provider_domain = providerModule.domain
+            # if provider_domain == '' or provider_domain in self.domain_list:
             #    return
             if 'episodeInfo' in info:
 
@@ -491,7 +518,7 @@ class Sources(tools.dialogWindow):
                 return
             if 'showInfo' in info:
                 title = '%s - %s' % (info['showInfo']['info']['tvshowtitle'],
-                                                     info['episodeInfo']['info']['title'])
+                                     info['episodeInfo']['info']['title'])
             else:
                 title = '%s (%s)' % (title, year)
 
@@ -557,7 +584,6 @@ class Sources(tools.dialogWindow):
 
         return p
 
-
     def sortSources(self, torrent_list, hoster_list):
         sort_method = int(tools.getSetting('general.sortsources'))
 
@@ -584,7 +610,7 @@ class Sources(tools.dialogWindow):
                            [i for i in torrent_list if 'x265' not in i['info']]
 
             hoster_list = [i for i in hoster_list if 'x265' in i['info']] + \
-                           [i for i in hoster_list if 'x265' not in i['info']]
+                          [i for i in hoster_list if 'x265' not in i['info']]
 
         random.shuffle(hoster_list)
 
@@ -610,7 +636,6 @@ class Sources(tools.dialogWindow):
                     if 'debrid_provider' not in file:
                         if file['quality'] == resolution:
                             sortedList.append(file)
-
 
         if sort_method == 1:
             for resolution in resolutions:
@@ -666,21 +691,23 @@ class Sources(tools.dialogWindow):
         ]
         self.hosters_qual_len = list2
 
-        string1 = 'Torrents - 4K: %s | 1080: %s | 720: %s | SD: %s' % (self.colorNumber(list1[0]),
-                                                                       self.colorNumber(list1[1]),
-                                                                       self.colorNumber(list1[2]),
-                                                                       self.colorNumber(list1[3]))
+        string1 = '%s - 4K: %s | 1080: %s | 720: %s | SD: %s' % (tools.lang(32088).encode('utf-8'),
+                                                                 self.colorNumber(list1[0]),
+                                                                 self.colorNumber(list1[1]),
+                                                                 self.colorNumber(list1[2]),
+                                                                 self.colorNumber(list1[3]))
 
-        string2 = 'Hosters - 4k: %s | 1080: %s | 720: %s | SD: %s' % (self.colorNumber(list2[0]),
-                                                                       self.colorNumber(list2[1]),
-                                                                       self.colorNumber(list2[2]),
-                                                                       self.colorNumber(list2[3]))
+        string2 = '%s - 4k: %s | 1080: %s | 720: %s | SD: %s' % (tools.lang(32089).encode('utf-8'),
+                                                                 self.colorNumber(list2[0]),
+                                                                 self.colorNumber(list2[1]),
+                                                                 self.colorNumber(list2[2]),
+                                                                 self.colorNumber(list2[3]))
 
-        string4 = 'Free Hosters - 4k: 0 | 1080: 0 | 720: 0 | SD: 0'
+        string4 = '%s - 4k: 0 | 1080: 0 | 720: 0 | SD: 0' % tools.lang(32090).encode('utf-8')
         providerString = ''
         for i in self.remainingProviders:
             providerString += ', ' + tools.colorString(str(i))
-        string3 = 'Remaining Providers - %s' % providerString[2:]
+        string3 = '%s - %s' % (tools.lang(32091).encode('utf-8'), providerString[2:])
 
         return [string1, string2, string3, string4]
 
@@ -747,7 +774,6 @@ class Sources(tools.dialogWindow):
                         source_list.append(file)
                         source_list[-1]['debrid_provider'] = provider
 
-
         self.hosterSources += source_list
 
     def prem_terminate(self):
@@ -779,7 +805,7 @@ class Sources(tools.dialogWindow):
                 # Terminating on both hosters and torrents
 
                 if len([i for i in (self.torrentCacheSources + self.hosterSources)
-                       if i['quality'] in prem_resolutions]) >= limit:
+                        if i['quality'] in prem_resolutions]) >= limit:
                     return True
         except:
             pass
@@ -877,17 +903,16 @@ class Sources(tools.dialogWindow):
         self.text_label2.setLabel('')
         self.text_label.setLabel('')
 
-class HosterCacheCheck:
 
+class HosterCacheCheck:
     def __init__(self):
         return
 
-    # I broke this bad, maybe let me get my shit together and sort it out at a later date lol
-    # I Removed it, I don't even want to look at it.
+        # I broke this bad, maybe let me get my shit together and sort it out at a later date lol
+        # I Removed it, I don't even want to look at it.
 
 
 class TorrentCacheCheck:
-
     def __init__(self):
         self.premiumizeCached = []
         self.realdebridCached = []
@@ -897,7 +922,8 @@ class TorrentCacheCheck:
 
         if tools.getSetting('realdebrid.enabled') == 'true' and \
                         tools.getSetting('rd.torrents') == 'true':
-            self.threads.append(threading.Thread(target=self.realdebridWorker, args=(copy.deepcopy(torrent_list), info)))
+            self.threads.append(
+                threading.Thread(target=self.realdebridWorker, args=(copy.deepcopy(torrent_list), info)))
 
         if tools.getSetting('premiumize.enabled') == 'true' and \
                         tools.getSetting('premiumize.torrents') == 'true':
@@ -915,7 +941,7 @@ class TorrentCacheCheck:
         try:
             cache_list = []
 
-            hash_list =[i['hash'] for i in torrent_list]
+            hash_list = [i['hash'] for i in torrent_list]
 
             if len(hash_list) == 0:
                 return
@@ -935,7 +961,8 @@ class TorrentCacheCheck:
                                     filename = storage_variant[key]['filename']
                                     if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename)
                                            for episodeString in episodeStrings):
-                                        if any(filename.lower().endswith(extension) for extension in source_utils.COMMON_VIDEO_EXTENSIONS):
+                                        if any(filename.lower().endswith(extension) for extension in
+                                               source_utils.COMMON_VIDEO_EXTENSIONS):
                                             cache_list.append(i)
                                             cache_list[-1]['debrid_provider'] = 'real_debrid'
                                             break

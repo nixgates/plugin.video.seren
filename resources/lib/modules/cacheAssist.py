@@ -1,13 +1,19 @@
-import time, threading, json, xbmc
+# -*- coding: utf-8 -*-
+
+import json
+import threading
+import time
+import xbmc
+
+from resources.lib.common import tools
 from resources.lib.debrid import premiumize
 from resources.lib.debrid import real_debrid
-from resources.lib.common import tools
 from resources.lib.modules import database
 
 monitor = xbmc.Monitor()
 
-class CacheAssit:
 
+class CacheAssit:
     def __init__(self, url):
         url = json.loads(tools.unquote(url))
         args = url['args']
@@ -42,13 +48,13 @@ class CacheAssit:
 
         try:
             transfer_id = debrid.create_transfer(torrent_object['magnet'])['id']
-            tools.showDialog.notification(tools.addonName, 'Cache Assist is attempting to build a torrent source')
+            tools.showDialog.notification(tools.addonName, tools.lang(32072).encode('utf-8'))
             database.add_assist_torrent(transfer_id, 'premiumize', 'queued',
                                         torrent_object['release_title'], str(current_percent))
         except:
             tools.log('Failed to start premiumize debrid transfer', 'error')
             return
-        tools.log('TRANSFER PREMIUMIZE')
+
         timestamp = time.time()
         while not monitor.abortRequested():
             try:
@@ -64,6 +70,9 @@ class CacheAssit:
                                                       'New cached sources have been created for %s' % self.title,
                                                       time=5000)
                         debrid.delete_transfer(transfer_id)
+                        database.add_premiumize_transfer(transfer_id)
+                        from resources.lib.common import maintenance
+                        maintenance.premiumize_transfer_cleanup()
                     break
                 if current_percent == transfer_status['progress']:
                     if timestamp == (time.time() + 10800):
@@ -79,11 +88,11 @@ class CacheAssit:
                 else:
                     database.add_assist_torrent(transfer_id, 'premiumize', transfer_status['status'],
                                                 torrent_object['release_title'],
-                                             str(current_percent))
+                                                str(current_percent))
 
             except:
                 database.add_assist_torrent(transfer_id, 'premiumize', 'failed', torrent_object['release_title'],
-                                         str(current_percent))
+                                            str(current_percent))
                 debrid.delete_transfer(transfer_id)
 
                 break
@@ -92,8 +101,8 @@ class CacheAssit:
 
     def real_debrid_downloader(self, torrent_object, args):
         from resources.lib.common import source_utils
-        tools.log('REAL DEBRID CACHE ASSIST STARTING')
-        tools.showDialog.notification(tools.addonName, 'Cache Assist is attempting to build a torrent source')
+
+        tools.showDialog.notification(tools.addonName, tools.lang(32072).encode('utf-8'))
         current_percent = 0
         episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
         debrid = real_debrid.RealDebrid()
@@ -113,7 +122,6 @@ class CacheAssit:
                     file_key = key
                     break
 
-
         debrid.torrentSelect(torrent_id, file_key)
         downloading_status = ['queued', 'downloading']
         current_percent = 0
@@ -125,7 +133,7 @@ class CacheAssit:
                 info = debrid.torrentInfo(torrent_id)
                 if info['status'] == 'downloaded':
                     tools.showDialog.notification(tools.addonName + ': %s' % self.title,
-                                                  'New cached sources have been created for %s' % self.title,
+                                                  tools.lang(32072).encode('utf-8') + ' %s' % self.title,
                                                   time=5000)
                     database.add_assist_torrent(torrent_id, 'real_debrid', 'finished', torrent_object['release_title'],
                                                 str(current_percent))
@@ -146,8 +154,8 @@ class CacheAssit:
 
                     else:
                         database.add_assist_torrent(torrent_id, 'real_debrid', 'downloading',
-                                                torrent_object['release_title'],
-                                                str(current_percent))
+                                                    torrent_object['release_title'],
+                                                    str(current_percent))
                         current_percent = info['progress']
                     continue
                 else:

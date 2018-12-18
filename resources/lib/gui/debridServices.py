@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from resources.lib.modules import database
 from resources.lib.common import tools
 

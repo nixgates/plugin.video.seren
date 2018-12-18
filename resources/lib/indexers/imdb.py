@@ -1,9 +1,13 @@
-import requests, re
+# -*- coding: utf-8 -*-
+
+import re
+import requests
 from bs4 import BeautifulSoup
+
 from resources.lib.common import tools
 
-class scraper:
 
+class scraper:
     def __init__(self):
         self.base_url = 'https://www.imdb.com/'
         self.title_url = 'title/%s'
@@ -89,7 +93,7 @@ class scraper:
         except:
             pass
 
-        #Begin Scraping Artwork
+        # Begin Scraping Artwork
         art = {}
 
         try:
@@ -101,7 +105,6 @@ class scraper:
             art['fanart'] = ''
         except:
             pass
-
 
         info['mediatype'] = 'movie'
         info['mpaa'] = ''

@@ -1,7 +1,13 @@
-import requests, json
-from time import sleep
-from resources.lib.common import tools
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
+from time import sleep
+
+import json
+import requests
+
+from resources.lib.common import tools
+
 
 class TMDBAPI:
     def __init__(self):
@@ -24,9 +30,12 @@ class TMDBAPI:
             url = self.baseUrl + url
 
         try:
-            response = requests.get(url)
+            try:
+                response = requests.get(url)
+            except requests.exceptions.SSLError:
+                response = requests.get(url, verify=False)
         except requests.exceptions.ConnectionError:
-            tools.showDialog.ok(tools.addonName, tools.lang(32028))
+            tools.showDialog.ok(tools.addonName, tools.lang(32028).encode('utf-8'))
             return
 
         if '200' in str(response):

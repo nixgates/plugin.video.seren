@@ -1,8 +1,12 @@
-from time import sleep
+# -*- coding: utf-8 -*-
+
 import logging
 import random
-from requests.sessions import Session
 from copy import deepcopy
+from time import sleep
+
+from requests.sessions import Session
+
 from . import cfdecoder
 
 try:
@@ -33,11 +37,11 @@ class CloudflareScraper(Session):
         resp = super(CloudflareScraper, self).request(method, url, *args, **kwargs)
 
         # Check if Cloudflare anti-bot is on
-        if ( resp.status_code == 503
-             and resp.headers.get("Server").startswith("cloudflare")
-             and b"jschl_vc" in resp.content
-             and b"jschl_answer" in resp.content
-        ):
+        if (resp.status_code == 503
+            and resp.headers.get("Server").startswith("cloudflare")
+            and b"jschl_vc" in resp.content
+            and b"jschl_answer" in resp.content
+            ):
             return self.solve_cf_challenge(resp, **kwargs)
 
         # Otherwise, no Cloudflare anti-bot detected
@@ -66,8 +70,8 @@ class CloudflareScraper(Session):
 
     def parseJSString(self, s):
         try:
-            offset=1 if s[0]=='+' else 0
-            val = s.replace('!+[]','1').replace('!![]','1').replace('[]','0').replace('(','str(')[offset:]
+            offset = 1 if s[0] == '+' else 0
+            val = s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0').replace('(', 'str(')[offset:]
             print(val)
             val = val.replace('str', '')
             return val
@@ -75,7 +79,6 @@ class CloudflareScraper(Session):
             import traceback
             traceback.print_exc()
             pass
-
 
     @classmethod
     def create_scraper(cls, sess=None, **kwargs):
@@ -92,7 +95,6 @@ class CloudflareScraper(Session):
                     setattr(scraper, attr, val)
 
         return scraper
-
 
     ## Functions for integrating cloudflare-scrape with other applications and scripts
 
@@ -117,14 +119,15 @@ class CloudflareScraper(Session):
                 cookie_domain = d
                 break
         else:
-            raise ValueError("Unable to find Cloudflare cookies. Does the site actually have Cloudflare IUAM (\"I'm Under Attack Mode\") enabled?")
+            raise ValueError(
+                "Unable to find Cloudflare cookies. Does the site actually have Cloudflare IUAM (\"I'm Under Attack Mode\") enabled?")
 
         return ({
                     "__cfduid": scraper.cookies.get("__cfduid", "", domain=cookie_domain),
                     "cf_clearance": scraper.cookies.get("cf_clearance", "", domain=cookie_domain)
                 },
                 scraper.headers["User-Agent"]
-               )
+        )
 
     @classmethod
     def get_cookie_string(cls, url, user_agent=None, **kwargs):
@@ -133,6 +136,7 @@ class CloudflareScraper(Session):
         """
         tokens, user_agent = cls.get_tokens(url, user_agent=user_agent)
         return "; ".join("=".join(pair) for pair in tokens.items()), user_agent
+
 
 create_scraper = CloudflareScraper.create_scraper
 get_tokens = CloudflareScraper.get_tokens
