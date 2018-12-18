@@ -1,9 +1,15 @@
-import requests, json, re, time
-from resources.lib.common import tools
+# -*- coding: utf-8 -*-
+
+import json
+import re
+import requests
+import time
+
 from resources.lib.common import source_utils
+from resources.lib.common import tools
+
 
 class RealDebrid:
-
     def __init__(self):
         self.ClientID = tools.getSetting('rd.client_id')
         if self.ClientID == '':
@@ -45,9 +51,11 @@ class RealDebrid:
         url = self.OauthUrl + self.DeviceCodeUrl % url
         response = json.loads(requests.get(url).text)
         tools.copy2clip(response['user_code'])
-        tools.progressDialog.create(tools.lang(32023))
-        tools.progressDialog.update(-1, tools.lang(32024) + ' %s' % tools.colorString('https://real-debrid.com/device'),
-                                    tools.lang(32025) + ' %s' % tools.colorString(response['user_code']),
+        tools.progressDialog.create(tools.lang(32023).encode('utf-8'))
+        tools.progressDialog.update(-1, tools.lang(32024).encode('utf-8') + ' %s' % tools.colorString(
+            'https://real-debrid.com/device'),
+                                    tools.lang(32025).encode('utf-8') + ' %s' % tools.colorString(
+                                        response['user_code']),
                                     'This code has been copied to your clipboard')
         self.OauthTimeout = int(response['expires_in'])
         self.OauthTimeStep = int(response['interval'])
@@ -76,7 +84,7 @@ class RealDebrid:
         tools.setSetting('rd.expiry', str(time.time() + int(response['expires_in'])))
         username = self.get_url('user')['username']
         tools.setSetting('rd.username', username)
-        tools.showDialog.ok(tools.addonName, 'Real Debrid ' + tools.lang(32026))
+        tools.showDialog.ok(tools.addonName, 'Real Debrid ' + tools.lang(32026).encode('utf-8'))
         tools.log('Authorised Real Debrid successfully', 'info')
 
     def refreshToken(self):
@@ -103,10 +111,11 @@ class RealDebrid:
         # To be FINISHED FINISH ME
         ###############################################
 
-
     def post_url(self, url, postData, fail_check=False):
         original_url = url
         url = self.BaseUrl + url
+        if self.token == '':
+            return None
         if not fail_check:
             if '?' not in url:
                 url += "?auth_token=%s" % self.token
@@ -126,6 +135,8 @@ class RealDebrid:
     def get_url(self, url, fail_check=False):
         original_url = url
         url = self.BaseUrl + url
+        if self.token == '':
+            return None
         if not fail_check:
             if '?' not in url:
                 url += "?auth_token=%s" % self.token
@@ -139,7 +150,7 @@ class RealDebrid:
                 self.refreshToken()
                 response = self.get_url(original_url, fail_check=True)
         try:
-           return json.loads(response)
+            return json.loads(response)
         except:
             return response
 
@@ -183,6 +194,8 @@ class RealDebrid:
             return None
 
     def deleteTorrent(self, id):
+        if self.token == '':
+            return None
         url = "torrents/delete/%s&auth_token=%s" % (id, self.token)
         response = requests.delete(self.BaseUrl + url)
 
@@ -228,7 +241,8 @@ class RealDebrid:
                     key = list(storage_variant.keys())[0]
                     filename = storage_variant[key]['filename']
 
-                    if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename) for episodeString in episodeStrings):
+                    if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename) for episodeString
+                           in episodeStrings):
                         if any(filename.lower().endswith(extension) for extension in
                                source_utils.COMMON_VIDEO_EXTENSIONS):
                             file_key = key

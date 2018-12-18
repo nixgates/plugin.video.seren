@@ -1,5 +1,9 @@
-from resources.lib.common import tools
+# -*- coding: utf-8 -*-
+
 import os
+
+from resources.lib.common import tools
+
 
 def build_display_title(source):
     if 'debrid_provider' in source:
@@ -46,6 +50,7 @@ def build_display_title(source):
 
     return title
 
+
 def sourceSelect(source_list, info):
     try:
         if len(source_list) == 0:
@@ -61,7 +66,8 @@ def sourceSelect(source_list, info):
             del window
 
         elif tools.getSetting('general.sourceselect') == '0':
-            selection = tools.showDialog.select(tools.addonName + ': Source Selection', display_list)
+            selection = tools.showDialog.select(tools.addonName + ': %s' % tools.lang(32099).encode('utf-8'),
+                                                display_list)
 
     except:
         import traceback
@@ -78,8 +84,8 @@ def sourceSelect(source_list, info):
 
     return source_list[selection:]
 
-class source_select_list(tools.dialogWindow):
 
+class source_select_list(tools.dialogWindow):
     def __init__(self, display_list, info):
         self.position = -1
         texture_path = os.path.join(tools.IMAGES_PATH, 'texture.png')
@@ -102,15 +108,15 @@ class source_select_list(tools.dialogWindow):
         # When the "display_title" label is set for some reason it ends up setting the text for every other label
         # in any window while in the addon from then on, mind boggling, need to figure out why
         #
-        #self.dispaly_title = tools.labelControl(310, 100, 1000, 100,'', font='font24', textColor='0xFFFFFFFF')
-        #if 'showInfo' in info:
+        # self.dispaly_title = tools.labelControl(310, 100, 1000, 100,'', font='font24', textColor='0xFFFFFFFF')
+        # if 'showInfo' in info:
         #     label_text = '[B]%s S%sE%s[/B]' % (info['showInfo']['info']['tvshowtitle'],
         #                                 str(info['episodeInfo']['info']['season']).zfill(2),
         #                                 str(info['episodeInfo']['info']['episode']).zfill(2))
         # else:
         #     label_text = '[B]%s (%s)[/B]' % (info['title'], info['year'])
-        #self.dispaly_title.setLabel(label_text)
-        #self.addControl(self.dispaly_title)
+        # self.dispaly_title.setLabel(label_text)
+        # self.addControl(self.dispaly_title)
 
         # This looks ridiculous below but it's needed as the Kodi Gui modules won't accept itemHeight as a Keyword
 
@@ -121,9 +127,9 @@ class source_select_list(tools.dialogWindow):
 
         self.list = tools.listControl(60, 200, 1160, 490, 'font13', '0xFFFFFFFF', '',
                                       os.path.join(tools.IMAGES_PATH, 'highlight11.png'),
-                                      '',0,0,0,0,item_height
+                                      '', 0, 0, 0, 0, item_height
                                       )
-        #self.list = tools.listControl(60, 280, 1160, 490, buttonFocusTexture=os.path.join(tools.IMAGES_PATH, 'highlight11.png'))
+        # self.list = tools.listControl(60, 280, 1160, 490, buttonFocusTexture=os.path.join(tools.IMAGES_PATH, 'highlight11.png'))
         self.addControl(self.list)
         self.list.setSpace(100)
         self.list.addItems(display_list)
@@ -156,7 +162,6 @@ class source_select_list(tools.dialogWindow):
         tools.kodiGui.WindowDialog.doModal(self)
         self.clearProperties()
         return self.position
-
 
     def onControl(self, control):
         if self.list.getId() == control.getId():

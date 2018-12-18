@@ -1,20 +1,27 @@
-import re, random
+# -*- coding: utf-8 -*-
+
+import random
+import re
+
 from requests import Session
 
-COMMON_VIDEO_EXTENSIONS = ['.m4v','.mkv', '.mka', '.mp4', '.avi', '.mpeg', '.asf', '.flv', '.m4a', '.aac', '.nut', '.ogg']
+COMMON_VIDEO_EXTENSIONS = ['.m4v', '.mkv', '.mka', '.mp4', '.avi', '.mpeg', '.asf', '.flv', '.m4a', '.aac', '.nut',
+                           '.ogg']
 
-BROWSER_AGENTS = ['Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
-                 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
-                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
-                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/602.2.14 (KHTML, like Gecko) Version/10.0.1 Safari/602.2.14',
-                 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
-                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
-                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
-                 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
-                 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
-                 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0']
+BROWSER_AGENTS = [
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/602.2.14 (KHTML, like Gecko) Version/10.0.1 Safari/602.2.14',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0']
 
 exclusions = ['soundtrack', 'gesproken']
+
 
 def getQuality(release_title):
     quality = 'SD'
@@ -57,6 +64,7 @@ def getInfo(release_title):
         info.append('CAM')
     return info
 
+
 def cleanTitle(title):
     title = title.lower()
     title = title.replace('-', ' ')
@@ -71,6 +79,7 @@ def cleanTitle(title):
     title = title.replace('  ', ' ')
     return title
 
+
 def searchTitleClean(title):
     title = title.lower()
     title = title.replace('-', ' ')
@@ -78,6 +87,7 @@ def searchTitleClean(title):
     title = title.replace('.', '')
     title = title.replace('  ', ' ')
     return title
+
 
 def filterMovieTitle(release_title, movieTitle, year):
     movieTitle = cleanTitle(movieTitle.lower())
@@ -96,6 +106,7 @@ def filterMovieTitle(release_title, movieTitle, year):
             else:
                 return False
     return False
+
 
 def filterSeasonPack(simpleInfo, release_title):
     show_title, season, aliasList, year, country = \
@@ -128,7 +139,6 @@ def filterSeasonPack(simpleInfo, release_title):
     stringList.append('%s %s season %s ' % (show_title, country, seasonFill))
     stringList.append('%s %s season %s ' % (show_title, country, season))
 
-
     for i in aliasList:
         stringList.append('%s s%s' % (i, seasonFill))
         stringList.append('%s s%s' % (i, season))
@@ -147,6 +157,7 @@ def filterSeasonPack(simpleInfo, release_title):
                 return True
 
     return False
+
 
 def filterSingleEpisode(simpleInfo, release_title):
     show_title, season, episode, aliasList, year, country = \
@@ -187,15 +198,14 @@ def filterSingleEpisode(simpleInfo, release_title):
 
     return False
 
-def filterShowPack(simpleInfo, release_title):
 
+def filterShowPack(simpleInfo, release_title):
     release_title = cleanTitle(release_title.lower().replace('the complete', '').replace('complete', ''))
     season = simpleInfo['season_number']
     aliasList = [searchTitleClean(x) for x in simpleInfo['show_aliases']]
     if '.' in simpleInfo['show_title']:
         aliasList.append(cleanTitle(simpleInfo['show_title'].replace('.', '')))
     showTitle = cleanTitle(simpleInfo['show_title'])
-
 
     no_seasons = simpleInfo['no_seasons']
     all_seasons = '1'
@@ -223,6 +233,13 @@ def filterShowPack(simpleInfo, release_title):
                   '%s season %s' % (showTitle, all_seasons)
                   ]
 
+    season_count = int(season)
+
+    while int(season_count) <= int(no_seasons):
+        stringList.append('%s seasons 1 %s' % (showTitle, str(season_count)))
+        stringList.append('%s season 1 %s' % (showTitle, str(season_count)))
+        season_count = season_count + 1
+
     for i in stringList:
         append_list.append(i.replace(showTitle, '%s %s' % (showTitle, country)))
 
@@ -240,7 +257,6 @@ def filterShowPack(simpleInfo, release_title):
             append_list.append(i.replace(showTitle, alias))
 
     stringList += append_list
-    append_list = []
 
     for x in stringList:
         if '&' in x:
@@ -252,12 +268,12 @@ def filterShowPack(simpleInfo, release_title):
 
 
 class serenRequests(Session):
-
     def __init__(self, *args, **kwargs):
         super(serenRequests, self).__init__(*args, **kwargs)
         if "requests" in self.headers["User-Agent"]:
             # Spoof common and random user agent
             self.headers["User-Agent"] = random.choice(BROWSER_AGENTS)
+
 
 def torrentCacheStrings(args):
     episodeInfo = args['episodeInfo']['info']
@@ -302,6 +318,7 @@ def torrentCacheStrings(args):
 
     return episodeStrings, seasonStrings
 
+
 def de_string_size(size):
     try:
         if 'GB' in size:
@@ -313,4 +330,3 @@ def de_string_size(size):
             return size
     except:
         return 0
-

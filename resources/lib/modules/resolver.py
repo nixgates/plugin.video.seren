@@ -1,4 +1,10 @@
-import sys, os, threading, requests
+# -*- coding: utf-8 -*-
+
+import os
+import requests
+import sys
+import threading
+
 from resources.lib.common import tools
 from resources.lib.debrid import premiumize as Premiumize
 from resources.lib.debrid import real_debrid
@@ -92,7 +98,7 @@ class Resolver(tools.dialogWindow):
             else:
                 background = args['fanart']
 
-            self.setText("Begining Link Resolver")
+            self.setText(tools.lang(33000).encode('utf-8'))
             self.setBackground(background)
             stream_link = None
             loop_count = 0
@@ -108,11 +114,14 @@ class Resolver(tools.dialogWindow):
                     if 'size' in i:
                         i['info'].append(tools.source_size_display(i['size']))
                     loop_count_string = "(" + str(loop_count) + " of " + str(len(sources)) + ")"
-                    line1 = tools.lang(32036) + "%s - %s" % (tools.colorString(i['release_title']), loop_count_string)
-                    line2 = tools.lang(32037) + "%s | Source: %s" % (tools.colorString(debrid_provider.upper()),
-                                                                     tools.colorString(i['source']))
-                    line3 = tools.lang(32038) + '%s | Info: %s' % (tools.colorString(i['quality']),
-                                                                   tools.colorString(" ".join(i['info'])))
+                    line1 = "%s %s - %s" % (tools.lang(32036).encode('utf-8'),
+                                            tools.colorString(i['release_title']), loop_count_string)
+                    line2 = "%s %s | Source: %s" % (tools.lang(32037).encode('utf-8'),
+                                                    tools.colorString(debrid_provider.upper()),
+                                                    tools.colorString(i['source']))
+                    line3 = '%s %s | Info: %s' % (tools.lang(32038).encode('utf-8'),
+                                                  tools.colorString(i['quality']),
+                                                  tools.colorString(" ".join(i['info'])))
 
                     self.setText(line1)
                     self.setText2(line2)

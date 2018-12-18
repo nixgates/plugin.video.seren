@@ -5,9 +5,10 @@
 
 import re
 import time
+from decimal import Decimal
 
-from decimal import Decimal, ROUND_UP
 from resources.lib.common import tools
+
 
 class Cloudflare:
     def __init__(self, response):

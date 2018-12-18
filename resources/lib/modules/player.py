@@ -1,13 +1,20 @@
-import sys, datetime, json
+# -*- coding: utf-8 -*-
+
+import datetime
+import json
+import sys
+
+import AddonSignals
+
 from resources.lib.common import tools
 from resources.lib.indexers import trakt
 from resources.lib.modules import smartPlay
-import AddonSignals
 
-sysaddon = sys.argv[0] ; syshandle = int(sys.argv[1])
+sysaddon = sys.argv[0];
+syshandle = int(sys.argv[1])
+
 
 class serenPlayer(tools.player):
-
     def __init__(self):
         tools.player.__init__(self)
         self.trakt_api = trakt.TraktAPI()
@@ -46,15 +53,17 @@ class serenPlayer(tools.player):
                 item.setArt(args['art'])
                 item.setInfo(type='video', infoLabels=args['info'])
 
-            if tools.playList.getposition() == 0 and tools.getSetting('smartPlay.traktresume') == 'true'\
+            if tools.playList.getposition() == 0 and tools.getSetting('smartPlay.traktresume') == 'true' \
                     and tools.getSetting('trakt.auth') is not '':
                 tools.log('Getting Trakt Resume Point', 'info')
                 self.traktBookmark()
 
             tools.resolvedUrl(syshandle, True, item)
 
-            try:tools.busyDialog.close()
-            except:pass
+            try:
+                tools.busyDialog.close()
+            except:
+                pass
 
             self.keepAlive()
 
@@ -71,9 +80,20 @@ class serenPlayer(tools.player):
         self.traktStartWatching()
         pass
 
-
     def onPlayBackStarted(self):
+        if tools.kodiVersion > 17:
+            return
+        self.start_playback()
 
+    def onAVStarted(self):
+        if tools.kodiVersion < 18:
+            return
+        self.start_playback()
+
+    def onPlayBackError(self):
+        sys.exit(1)
+
+    def start_playback(self):
         try:
             tools.execute('Dialog.Close(all,true)')
             self.current_time = self.getTime()
@@ -101,7 +121,6 @@ class serenPlayer(tools.player):
                     pass
         except:
             pass
-
 
     def onPlayBackEnded(self):
         self.close_omni()
@@ -154,7 +173,6 @@ class serenPlayer(tools.player):
 
         return 0
 
-
     def traktStartWatching(self, offset=None):
         if not self.trakt_integration():
             return
@@ -179,7 +197,7 @@ class serenPlayer(tools.player):
             if self.media_type == 'episode':
                 post_data = {'episode': {'ids': {'trakt': self.trakt_id}}}
             else:
-                post_data = {'movies': {'ids': {'trakt': self.trakt_id}}}
+                post_data = {'movie': {'ids': {'trakt': self.trakt_id}}}
 
             progress = int(self.getWatchedPercent(offset))
             if overide_progress is not None:
@@ -230,11 +248,11 @@ class serenPlayer(tools.player):
                         # Calculating Offset to seconds
                         offset = int((float(i['progress'] / 100) * int(i['movie']['runtime']) * 60))
 
-
             if tools.getSetting('smartPlay.bookmarkprompt') == 'true':
                 if offset is not None and offset is not 0:
-                    prompt = tools.showDialog.yesno(tools.addonName + ': Resume', 'Resume from %s' %
-                                                    datetime.timedelta(seconds=offset),
+                    prompt = tools.showDialog.yesno(tools.addonName + ': Resume', '%s %s' %
+                                                    (tools.lang(32092).encode('utf-8'),
+                                                     datetime.timedelta(seconds=offset)),
                                                     nolabel="Resume", yeslabel="Restart")
                     if prompt == 0:
                         tools.log('Found progress, resuming from %s ' % str(offset * 60), 'error')
@@ -255,7 +273,6 @@ class serenPlayer(tools.player):
             requests.get(stream_link)
 
     def signals_callback(self, data):
-        tools.log('WE HAVE A CALLBACK')
         if not self.play_next_triggered:
             self.stopped = True
             self.traktStopWatching()
@@ -326,4 +343,3 @@ class serenPlayer(tools.player):
         }
 
         return next_info
-

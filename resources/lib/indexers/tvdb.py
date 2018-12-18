@@ -1,8 +1,15 @@
-import requests, json, threading, datetime, time
+# -*- coding: utf-8 -*-
+
+import datetime
+import json
+import requests
+import threading
+import time
+
 from resources.lib.common import tools
 
-class TVDBAPI:
 
+class TVDBAPI:
     def __init__(self):
         self.apiKey = tools.getSetting('tvdb.apikey')
         if self.apiKey == '':
@@ -70,7 +77,7 @@ class TVDBAPI:
         tools.setSetting('tvdb.jw', self.jwToken)
         self.headers['Authorization'] = self.jwToken
         tools.log('Refreshed TVDB Token')
-        tools.setSetting('tvdb.expiry', str(time.time() + (24 * (60*60))))
+        tools.setSetting('tvdb.expiry', str(time.time() + (24 * (60 * 60))))
         return response
 
     def seriesIDToListItem(self, trakt_object, info_return=True):
@@ -131,7 +138,12 @@ class TVDBAPI:
             except:
                 pass
             try:
-                info['premiered'] = self.info.get('firstAired')
+                try:
+                    info['premiered'] = trakt_object['first_aired'][:10]
+                    if len(info['premiered']) < 10:
+                        raise Exception
+                except:
+                    info['premiered'] = self.info.get('firstAired')
             except:
                 pass
             try:
@@ -194,7 +206,7 @@ class TVDBAPI:
             except:
                 pass
             try:
-                info['country'] = trakt_object.get('country','').upper()
+                info['country'] = trakt_object.get('country', '').upper()
             except:
                 info['country'] = ''
                 pass
@@ -336,10 +348,6 @@ class TVDBAPI:
 
         info = {}
         try:
-            info['dateadded'] = response['firstAired']
-        except:
-            pass
-        try:
             info['episode'] = info['sortepisode'] = int(response['airedEpisodeNumber'])
         except:
             pass
@@ -356,11 +364,16 @@ class TVDBAPI:
         except:
             pass
         try:
-            info['premiered'] = response['firstAired']
+            try:
+                info['premiered'] = trakt_object['first_aired'][:10]
+                if len(info[['premiered']]) < 10:
+                    raise Exception
+            except:
+                info['premiered'] = response['firstAired']
         except:
             pass
         try:
-            info['year'] = int(response['firstAired'][:4])
+            info['year'] = int(info['premiered'][:4])
         except:
             pass
         try:
@@ -377,7 +390,7 @@ class TVDBAPI:
             if self.show_cursory is False or self.show_cursory is None:
                 return None
             else:
-                showArgs = {'showInfo':{}}
+                showArgs = {'showInfo': {}}
                 showArgs['showInfo'] = self.show_cursory
         try:
             info['mpaa'] = showArgs['showInfo']['info']['mpaa']
@@ -409,6 +422,10 @@ class TVDBAPI:
             pass
         try:
             art['fanart'] = showArgs['showInfo']['art']['fanart']
+        except:
+            pass
+        try:
+            art['banner'] = showArgs['showInfo']['art']['banner']
         except:
             pass
 
@@ -444,6 +461,7 @@ class TVDBAPI:
         return item
 
     def getShowFanart(self, tvdbID):
+        tools.tv_sema.acquire()
         try:
             url = 'series/%s/images/query?keyType=fanart' % tvdbID
             response = self.get_request(url)['data']
@@ -455,11 +473,15 @@ class TVDBAPI:
                     continue
             image = self.baseImageUrl + image['fileName']
             self.art['fanart'] = image
+            tools.tv_sema.release()
         except:
+            tools.tv_sema.release()
             pass
 
     def getShowPoster(self, tvdbID):
+        tools.tv_sema.acquire()
         try:
+            tools.tv_sema.acquire()
             url = 'series/%s/images/query?keyType=poster' % tvdbID
             response = self.get_request(url)['data']
             image = response[0]
@@ -470,26 +492,35 @@ class TVDBAPI:
                     continue
             image = self.baseImageUrl + image['fileName']
             self.art['poster'] = image
+            tools.tv_sema.release()
         except:
+            tools.tv_sema.release()
             pass
 
     def getShowInfo(self, tvdbID):
+        tools.tv_sema.acquire()
         try:
             url = 'series/%s' % tvdbID
             response = self.get_request(url)['data']
             self.info = response
+            tools.tv_sema.release()
         except:
+            tools.tv_sema.release()
             pass
 
     def getEpisodeSummary(self, tvdbID):
+        tools.tv_sema.acquire()
         try:
             url = 'series/%s/episodes/summary' % tvdbID
             response = self.get_request(url)['data']
             self.episode_summary = response
+            tools.tv_sema.release()
         except:
+            tools.tv_sema.release()
             pass
 
     def getSeasonPoster(self, tvdbID, season):
+        tools.tv_sema.acquire()
         try:
             url = 'series/%s/images/query?keyType=season&subKey=%s' % (tvdbID, season)
             response = self.get_request(url)['data']
@@ -501,18 +532,24 @@ class TVDBAPI:
                     continue
             image = self.baseImageUrl + image['fileName']
             self.art['poster'] = image
+            tools.tv_sema.release()
         except:
+            tools.tv_sema.release()
             pass
 
     def getSeasonInfo(self, tvdbID, season):
+        tools.tv_sema.acquire()
         try:
             url = 'series/%s/episodes/query?airedSeason=%s' % (tvdbID, season)
             response = self.get_request(url)['data'][0]
             self.info = response
+            tools.tv_sema.release()
         except:
+            tools.tv_sema.release()
             pass
 
     def getSeriesCast(self, tvdbID):
+        tools.tv_sema.acquire()
         try:
             url = 'series/%s/actors' % tvdbID
             actors = self.get_request(url)['data']
@@ -520,5 +557,7 @@ class TVDBAPI:
 
             for i in actors:
                 self.cast.append({'name': i['name'], 'role': i['role'], 'image': i['image']})
+            tools.tv_sema.release()
         except:
+            tools.tv_sema.release()
             pass

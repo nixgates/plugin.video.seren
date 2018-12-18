@@ -1,4 +1,9 @@
-import requests, json
+# -*- coding: utf-8 -*-
+
+import json
+
+import requests
+
 from resources.lib.common import source_utils
 from resources.lib.common import tools
 from resources.lib.modules import database
@@ -27,17 +32,27 @@ CacheCheck = '/cache/check'
 # REQUESTS WRAPPERS
 # Returns JSON on all calls
 ##################################################
+import inspect
+
+print('caller name:', inspect.stack()[1][3])
+
 
 def get_url(url):
+    if CustomerPin == '':
+        return
     url = BaseUrl + "apikey=" + CustomerPin + url
     req = requests.get(url).text
     return json.loads(req)
 
+
 def post_url(url, data):
+    if CustomerPin == '':
+        return
     url = BaseUrl + url
     data['apikey'] = CustomerPin
     req = requests.post(url, data=data).text
     return json.loads(req)
+
 
 class PremiumizeBase():
     ##################################################
@@ -99,8 +114,8 @@ class PremiumizeBase():
         postData = {'id': id}
         return post_url(url, postData)
 
-class PremiumizeFunctions(PremiumizeBase):
 
+class PremiumizeFunctions(PremiumizeBase):
     def __init__(self):
         pass
 
@@ -171,6 +186,12 @@ class PremiumizeFunctions(PremiumizeBase):
         except:
             self.delete_transfer(id)
             return
+        if tools.getSetting('premiumize.transcoded') == 'true':
+            if selectedFile['transcode_status'] == 'finished':
+                return selectedFile['stream_link']
+            else:
+                pass
+
         return selectedFile['link']
 
     def magnetToStream(self, magnet, args, pack_select):
@@ -213,7 +234,7 @@ class PremiumizeFunctions(PremiumizeBase):
                     if item['type'] != 'folder':
                         continue
                     for seasonStr in seasonStrings:
-                        if source_utils.cleanTitle(seasonStr)\
+                        if source_utils.cleanTitle(seasonStr) \
                                 in source_utils.cleanTitle(item['name'].replace('&', ' ')):
                             sub_folder_id = item['id']
 
@@ -235,7 +256,6 @@ class PremiumizeFunctions(PremiumizeBase):
             database.remove_premiumize_transfer(transfer_id)
             return
 
-
         if streamLink is None:
             self.delete_transfer(transfer_id)
             database.remove_premiumize_transfer(transfer_id)
@@ -248,6 +268,12 @@ class PremiumizeFunctions(PremiumizeBase):
                 if source_utils.cleanTitle(epstring) in \
                         source_utils.cleanTitle(i['name'].replace('&', ' ')):
                     if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
+                        if tools.getSetting('premiumize.transcoded') == 'true':
+                            if i['transcode_status'] == 'finished':
+                                return i['stream_link']
+                            else:
+                                pass
+
                         return i['link']
         return None
 

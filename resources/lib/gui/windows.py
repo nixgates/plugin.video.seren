@@ -1,13 +1,20 @@
-import os, time, threading, json
+# -*- coding: utf-8 -*-
+
+import json
+import os
+import threading
+import time
+
 from resources.lib.common import tools
+
 
 # WINDOWS
 
 def test_method(window, text):
     window.setText(text)
 
-class persistant_background(tools.dialogWindow):
 
+class persistant_background(tools.dialogWindow):
     def __init__(self):
         texture_path = os.path.join(tools.IMAGES_PATH, 'texture.png')
         self.texture = tools.imageControl(0, 0, 1280, 720, texture_path)
@@ -37,7 +44,6 @@ class persistant_background(tools.dialogWindow):
 
 
 class smart_play_background(tools.dialogWindow):
-
     def __init__(self):
         self.return_data = 'Nothing'
 
@@ -96,7 +102,8 @@ class smart_play_background(tools.dialogWindow):
         self.addControl(self.perc90)
         self.addControl(self.perc100)
 
-        self.text_label = tools.labelControl(0, 430, 1280, 50, str(text), font='font13', alignment=tools.XBFONT_CENTER_X)
+        self.text_label = tools.labelControl(0, 430, 1280, 50, str(text), font='font13',
+                                             alignment=tools.XBFONT_CENTER_X)
         self.text_label2 = tools.labelControl(0, 470, 1280, 50, "", font='font13', alignment=tools.XBFONT_CENTER_X)
         self.text_label3 = tools.labelControl(0, 510, 1280, 50, "", font='font13', alignment=tools.XBFONT_CENTER_X)
 
@@ -169,7 +176,7 @@ class smart_play_background(tools.dialogWindow):
         return self.canceled
 
     def runFunction(self):
-        for i in range(0,5):
+        for i in range(0, 5):
             self.setText(i)
             time.sleep(1)
         self.close()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Covenant Add-on
+    Seren Add-on
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import ast, hashlib, re, time, threading
+import ast
+import hashlib
+import re
+import threading
+import time
+
 from resources.lib.common import tools
 
 try:
@@ -38,18 +43,22 @@ def get(function, duration, *args, **kwargs):
     :param args: Optional arguments for the provided function
     """
     try:
-        if 'set_key' in kwargs:
-            key = _hash_function(kwargs['set_key'])
-        else:
-            key = _hash_function(function, args)
+        tools.log(args)
+        reload = False
+        if 'seren_reload' in kwargs:
+            reload = kwargs['seren_reload']
+            kwargs.pop('seren_reload')
+
+        key = _hash_function(function, args)
         cache_result = cache_get(key)
-        if cache_result:
-            if _is_cache_valid(cache_result['date'], duration):
-                try:
-                    return_data = ast.literal_eval(cache_result['value'].encode('utf-8'))
-                    return return_data
-                except:
-                    return ast.literal_eval(cache_result['value'])
+        if not reload:
+            if cache_result:
+                if _is_cache_valid(cache_result['date'], duration):
+                    try:
+                        return_data = ast.literal_eval(cache_result['value'].encode('utf-8'))
+                        return return_data
+                    except:
+                        return ast.literal_eval(cache_result['value'])
 
         fresh_result = repr(function(*args))
         if not fresh_result or fresh_result is None:
@@ -128,7 +137,7 @@ def cache_clear():
                 cursor.connection.commit()
             except:
                 pass
-        tools.showDialog.notification(tools.addonName + ': Cache', 'All Cache Successfully Cleared', time=5000)
+        tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32078).encode('utf-8'), time=5000)
     except:
         pass
 
@@ -196,7 +205,7 @@ def torrent_cache_clear():
                 pass
     except:
         pass
-    tools.showDialog.notification(tools.addonName + ': Cache', 'Torrent Cache Successfully Cleared', time=5000)
+    tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32079).encode('utf-8'), time=5000)
 
 def get_assist_torrents():
     try:
@@ -246,7 +255,7 @@ def clear_assist_torrents():
                 pass
     except:
         pass
-    tools.showDialog.notification(tools.addonName + ': Cache', 'Active Torrent Database Successfully Cleared', time=5000)
+    tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32080).encode('utf-8'), time=5000)
 
 def get_providers():
     try:
@@ -258,6 +267,54 @@ def get_providers():
         cursor.execute("SELECT * FROM providers")
         sources = cursor.fetchall()
         return sources
+    except:
+        pass
+
+def get_provider_packages():
+    tools.log('Getting provider packages')
+    cursor = _get_connection_cursor(tools.providersDB)
+
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS packages (hash TEXT,"
+        " pack_name TEXT, author TEXT, remote_meta TEXT, version TEXT, UNIQUE(hash))"
+    )
+    cursor.execute("SELECT * FROM packages")
+    packages = cursor.fetchall()
+    return packages
+
+def add_provider_package(pack_name, author, remote_meta, version):
+    try:
+
+        hash = _hash_function('%s%s' % (pack_name, author))
+        cursor = _get_connection_cursor(tools.providersDB)
+
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS packages (hash TEXT,"
+            " pack_name TEXT, author TEXT, remote_meta TEXT, version TEXT, UNIQUE(hash))"
+        )
+
+        update_result = cursor.execute(
+            "UPDATE packages SET pack_name=?, author=?, remote_meta=?, version=? WHERE hash=?",
+            (pack_name, author, remote_meta, version, hash)
+        )
+
+        if update_result.rowcount is 0:
+            cursor.execute(
+                "INSERT INTO packages Values (?, ?, ?, ?, ?)",
+                (hash, pack_name, author, remote_meta, version)
+            )
+        cursor.connection.commit()
+    except:
+        import traceback
+        traceback.print_exc()
+        pass
+
+def remove_provider_package(pack_name):
+    try:
+        cursor = _get_connection_cursor(tools.providersDB)
+        cursor.execute("DELETE FROM packages WHERE pack_name=?", (pack_name,))
+        cursor.execute("DELETE FROM providers WHERE package=?", (pack_name,))
+        cursor.connection.commit()
     except:
         pass
 
@@ -284,9 +341,27 @@ def add_provider(provider_name, package, status, language, provider_type):
             )
         cursor.connection.commit()
     except:
+        import traceback
+        traceback.print_exc()
         pass
 
-def uninstall_provider_package(package_name):
+def remove_individual_provider(provider_name, package_name):
+    try:
+        hash = _hash_function('%s%s' % (provider_name, package_name))
+        cursor = _get_connection(tools.providersDB)
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS providers (hash TEXT,"
+            " provider_name TEXT, status TEXT, package TEXT, country TEXT, provider_type TEXT, UNIQUE(hash))"
+        )
+        cursor.execute("DELETE FROM providers WHERE hash=?", hash
+                       )
+
+        cursor.connection.commit()
+    except:
+        pass
+
+
+def remove_package_providers(package_name):
     try:
         cursor = _get_connection_cursor(tools.providersDB)
         cursor.execute("DELETE FROM providers WHERE package=?", (package_name,))
@@ -300,6 +375,9 @@ def clear_providers():
         for t in [cache_table, 'rel_list', 'rel_lib']:
             try:
                 cursor.execute("DROP TABLE IF EXISTS providers")
+                cursor.execute("VACCUM")
+                cursor.connection.commit()
+                cursor.execute("DROP TABLE IF EXISTS packages")
                 cursor.execute("VACUUM")
                 cursor.connection.commit()
             except:
