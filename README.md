@@ -9,6 +9,7 @@ Change Log:
 ### Version 0.1.22 Changelog:
 * Re-installation and updating of provider packages now honors previous settings
 * Fixed Hidden items error if no connection to Trakt could be made.
+* Added re-scrape context menu item (allows user to force cache refresh on scrape results)
 
 ### Version 0.1.21 Changelog:
 * Added onAVStarted for Kodi 18+ due to issues with offset
