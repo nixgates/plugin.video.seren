@@ -13,7 +13,7 @@ except:
     from urllib.parse import parse_qsl, urlencode, quote_plus, parse_qs, quote, unquote, urlparse
 
 try:
-    sysaddon = sys.argv[0];
+    sysaddon = sys.argv[0]
     syshandle = int(sys.argv[1])
 except:
     pass
@@ -144,8 +144,6 @@ try:
     execute = xbmc.executebuiltin
 
     getSetting = xbmcaddon.Addon().getSetting
-
-    setSetting = xbmcaddon.Addon().setSetting
 
     showDialog = xbmcgui.Dialog()
 
@@ -482,3 +480,6 @@ def paginate_list(item_list, page, limit):
     item_list = item_list[-limit:]
 
     return item_list
+
+def setSetting(setting_name, value):
+    xbmcaddon.Addon().setSetting(setting_name, value)

@@ -78,6 +78,15 @@ class Menus:
 
     def myMovieWatchlist(self):
         traktList = trakt.json_response('users/me/watchlist/movies', limit=False)
+        try:
+            sort_by = trakt.response_headers['X-Sort-By']
+            sort_how = trakt.response_headers['X-Sort-How']
+            traktList = trakt.sort_list(sort_by, sort_how, traktList, 'show')
+        except:
+            import traceback
+            traceback.print_exc()
+            pass
+
         self.commonListBuilder(traktList)
         tools.closeDirectory('movies', viewType=self.viewType)
 

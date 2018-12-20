@@ -508,6 +508,11 @@ msgctxt "#33000"
 msgid "Starting Link Resolver"
 msgstr ""
 
+######REAL_DEBRID.PY#########
+msgctxt "#32100"
+msgid "Authentication with Real Debrid has failed, please try again"
+msgstr ""
+
 ######SETTINGS.XML VALUES######
 msgctxt "#40001"
 msgid "General"

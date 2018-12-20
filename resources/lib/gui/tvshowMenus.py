@@ -31,6 +31,8 @@ class Menus:
     def onDeckShows(self):
         hidden_shows = trakt.get_trakt_hidden_items('watched')['shows']
         traktList = trakt.json_response('sync/playback/episodes?extended=full', limit=True)
+        if traktList is None:
+            return
         traktList = [i for i in traktList if i['show']['ids']['trakt'] not in hidden_shows]
         traktList = sorted(traktList, key=lambda i: tools.datetime_workaround(i['paused_at'][:19],
                                                                               format="%Y-%m-%dT%H:%M:%S",
@@ -81,17 +83,30 @@ class Menus:
 
     def myShowCollection(self):
         traktList = trakt.json_response('users/me/collection/shows?extended=full', limit=False)
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.closeDirectory('tvshows', sort='title')
 
     def myShowWatchlist(self):
         traktList = trakt.json_response('users/me/watchlist/shows?extended=full', limit=False)
+        if traktList is None:
+            return
+        try:
+            sort_by = trakt.response_headers['X-Sort-By']
+            sort_how = trakt.response_headers['X-Sort-How']
+            traktList = trakt.sort_list(sort_by, sort_how, traktList, 'show')
+        except:
+            tools.log('Failed to sort trakt list by response headers')
+            pass
         self.showListBuilder(traktList)
-        tools.closeDirectory('tvshows', sort='title')
+        tools.closeDirectory('tvshows')
 
     def myProgress(self):
         self.threadList = []
         collection = database.get(trakt.json_response, 12, 'users/me/collection/shows?extended=full', limit=False)
+        if collection is None:
+            return
         for i in collection:
             self.threadList.append(Thread(target=self.traktProgressWorker, args=(i,)))
         self.runThreads()
@@ -111,6 +126,8 @@ class Menus:
                                                            '&language=%s' %
                                   (datestring.strftime('%d-%m-%Y'), language_code))
 
+        if trakt_list is None:
+            return
         # For some reason trakt messes up their list and spits out tons of duplicates so we filter it
         duplicate_filter = []
         temp_list = []
@@ -132,6 +149,8 @@ class Menus:
         hidden_shows = trakt.get_trakt_hidden_items('watched')['shows']
         self.threadList = []
         watched = trakt.json_response('users/me/watched/shows?extended=full', limit=False)
+        if watched is None:
+            return
         watch_list = []
         for i in watched:
             if i is not None:
@@ -177,6 +196,8 @@ class Menus:
         datestring = datetime.datetime.today() - datetime.timedelta(days=7)
         trakt_list = database.get(trakt.json_response, 12, 'calendars/my/shows/%s/7?extended=full' %
                                   datestring.strftime('%d-%m-%Y'))
+        if trakt_list is None:
+            return
         trakt_list = [i for i in trakt_list if i['show']['ids']['trakt'] not in hidden_shows]
         self.directToEpisodeBuilder(trakt_list)
         tools.closeDirectory('episodes')
@@ -184,7 +205,8 @@ class Menus:
     def showsPopular(self, page):
 
         traktList = database.get(trakt.json_response, 12, 'shows/popular?page=%s&extended=full' % page)
-
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'showsPopular&page=%s' % (int(page) + 1), '', '')
         tools.closeDirectory('tvshows')
@@ -193,33 +215,39 @@ class Menus:
 
         traktList = database.get(trakt.json_response, 12, 'recommendations/shows?extended=full',
                                  limit=True, limitOverride=100)
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.closeDirectory('tvshows')
 
     def showsTrending(self, page):
         traktList = database.get(trakt.json_response, 12, 'shows/trending?page=%s&extended=full' % page)
-
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'showsTrending&page=%s' % (int(page) + 1), '', '')
         tools.closeDirectory('tvshows')
 
     def showsPlayed(self, page):
         traktList = database.get(trakt.json_response, 12, 'shows/played?page=%s&extended=full' % page)
-
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'showsPlayed&page=%s' % (int(page) + 1), '', '')
         tools.closeDirectory('tvshows')
 
     def showsWatched(self, page):
         traktList = database.get(trakt.json_response, 12, 'shows/watched?page=%s&extended=full' % page)
-
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'showsWatched&page=%s' % (int(page) + 1), '', '')
         tools.closeDirectory('tvshows')
 
     def showsCollected(self, page):
         traktList = database.get(trakt.json_response, 12, 'shows/collected?page=%s&extended=full' % page)
-
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'showsCollected&page=%s' % (int(page) + 1), '', '')
         tools.closeDirectory('tvshows', sort='title')
@@ -227,6 +255,8 @@ class Menus:
     def showsAnticipated(self, page):
         traktList = database.get(trakt.json_response, 12, 'shows/anticipated?page=%s&extended=full&language=%s'
                                  % (page, language_code))
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'showsAnticipated&page=%s' % (int(page) + 1), '', '')
         tools.closeDirectory('tvshows')
@@ -236,6 +266,8 @@ class Menus:
         date = datetime.date.today() - datetime.timedelta(days=31)
         date = date.strftime('%Y-%m-%d')
         traktList = database.get(trakt.json_response, 12, 'shows/updates/%s?page=%s&extended=full' % (date, page))
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'showsUpdated&page=%s' % (int(page) + 1), '', '')
         tools.closeDirectory('tvshows')
@@ -250,6 +282,8 @@ class Menus:
         query = tools.deaccentString(query)
         query = tools.quote_plus(query)
         traktList = trakt.json_response('search/show?query=%s&extended=full' % query, limit=True)
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.closeDirectory('tvshows')
 
@@ -258,6 +292,8 @@ class Menus:
         showInfo = json.loads(tools.unquote(args))
 
         traktList = database.get(trakt.json_response, 12, 'shows/%s/seasons?extended=full' % showInfo['ids']['trakt'])
+        if traktList is None:
+            return
 
         self.seasonListBuilder(traktList, showInfo)
 
@@ -270,6 +306,8 @@ class Menus:
         traktList = database.get(trakt.json_response, 6, 'shows/%s/seasons/%s?extended=full' %
                                  (args['showInfo']['ids']['trakt'],
                                   args['seasonInfo']['info']['season']))
+        if traktList is None:
+            return
 
         self.episodeListBuilder(traktList, args)
         tools.closeDirectory('episodes', sort='episode')
@@ -277,6 +315,8 @@ class Menus:
     def showGenres(self):
         tools.addDirectoryItem(tools.lang(32065).encode('utf-8'), 'showGenresGet', '', '', isFolder=True)
         genres = database.get(trakt.json_response, 24, 'genres/shows')
+        if genres is None:
+            return
         for i in genres:
             tools.addDirectoryItem(i['name'], 'showGenresGet&actionArgs=%s' % i['slug'], '', '', isFolder=True)
         tools.closeDirectory('addons', cacheToDisc=True)
@@ -301,6 +341,8 @@ class Menus:
         page = int(page)
         traktList = database.get(trakt.json_response, 12,
                                  'shows/popular?genres=%s&page=%s&extended=full' % (genre_string, page))
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'),
                                'showGenresGet&actionArgs=%s&page=%s' % (genre_string, page + 1), None, None)
@@ -308,6 +350,8 @@ class Menus:
 
     def showsRelated(self, args):
         traktList = database.get(trakt.json_response, 12, 'shows/%s/related?extended=full' % args)
+        if traktList is None:
+            return
         self.showListBuilder(traktList)
         tools.closeDirectory('tvshows')
 
