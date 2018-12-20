@@ -5,6 +5,9 @@ This version of Seren may be unstable and may result in some undesired behavior.
 
 Change Log:
 
+### Version 0.1.24 Changelog:
+* Fixed Movie Watchlist Sort to content type "Show"
+
 ### Version 0.1.23 Changelog:
 * Added Watchlist sorting
 * Added extra fallbacks for trakt outages
