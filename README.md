@@ -5,11 +5,14 @@ This version of Seren may be unstable and may result in some undesired behavior.
 
 Change Log:
 
+### Version 0.1.23 Changelog:
+* Added Watchlist sorting
+* Added extra fallbacks for trakt outages
+* Changed tools setSetting to a function so Kodi modules are not initialised if there is an exception
 
 ### Version 0.1.22 Changelog:
 * Re-installation and updating of provider packages now honors previous settings
 * Fixed Hidden items error if no connection to Trakt could be made.
-* Added re-scrape context menu item (allows user to force cache refresh on scrape results)
 
 ### Version 0.1.21 Changelog:
 * Added onAVStarted for Kodi 18+ due to issues with offset

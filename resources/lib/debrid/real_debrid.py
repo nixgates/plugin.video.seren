@@ -37,11 +37,14 @@ class RealDebrid:
         if 'error' in response:
             return
         else:
-            tools.progressDialog.close()
-            tools.setSetting('rd.client_id', response['client_id'])
-            tools.setSetting('rd.secret', response['client_secret'])
-            self.ClientSecret = response['client_secret']
-            self.ClientID = response['client_id']
+            try:
+                tools.progressDialog.close()
+                tools.setSetting('rd.client_id', response['client_id'])
+                tools.setSetting('rd.secret', response['client_secret'])
+                self.ClientSecret = response['client_secret']
+                self.ClientID = response['client_id']
+            except:
+                tools.showDialog.ok(tools.addonName, tools.lang(32100))
             return
 
     def auth(self):
