@@ -468,7 +468,7 @@ def get_language_code():
         if languageCodes.isoLangs[code]['name'].lower() == language.lower():
             language_code = code
     # Continue using en until everything is tested to accept other languages
-    language_code = 'en'
+    # language_code = 'en'
     return language_code
 
 

@@ -26,7 +26,7 @@ class Sources(tools.dialogWindow):
         self.threads = []
         self.torrentProviders = []
         self.hosterProviders = []
-        self.language = 'en'
+        self.language = tools.get_language_code()
         self.torrentCacheSources = []
         self.hosterSources = []
         self.remainingProviders = []

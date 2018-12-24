@@ -26,7 +26,7 @@ class providers:
         self.deploy_init()
         self.pre_update_collection = []
         # self.language = tools.getSetting('general.language')
-        self.language = 'en'
+        self.language = tools.get_language_code()
         #tools.progressDialog.create(tools.addonName, 'Please Wait, Building Provider List')
         self.known_providers = database.get_providers()
         self.known_packages = database.get_provider_packages()
