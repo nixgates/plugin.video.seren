@@ -1,6 +1,6 @@
 # file: ~/.gitignore
 .DS_Store
 *.idea
-*.pyo
+*.py[ocw]
 *.old
 addons_xml_generator.py
