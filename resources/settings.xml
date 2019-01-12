@@ -151,5 +151,14 @@
         <setting type="bool" label="Enabled Omni Connect" default="false" id="general.omniconnect" enable="false"/>
         <setting type="text" label="Omni Connect Port" default="8081" id="omni.port" enable="false"/>
     </category>
+    
+        <category label="Quick Clear">
+        <setting type="lsep" label="Clear Cache" />
+        <setting type="sep"/>
+        <setting type="action" label="Clear Torrent Cache" action="RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)" />
+        <setting type="action" label="Clear Cache" action="RunPlugin(plugin://plugin.video.seren/?action=clearCache)" />
+    </category>	
+    
+    
 
 </settings>
