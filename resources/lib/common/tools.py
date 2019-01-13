@@ -28,6 +28,10 @@ tv_semaphore = 300
 
 tv_sema = threading.Semaphore(tv_semaphore)
 
+tvdb_refreshing = False
+
+tvdb_refresh = ''
+
 viewTypes = {
     'Default': 50,
     'Poster': 51,
@@ -174,6 +178,7 @@ except:
 
 def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=True, isFolder=True, all_fanart=None,
                      actionArgs=False, smart_play=False, set_cast=False, label2=None, set_ids=None):
+
     url = '%s?action=%s' % (sysaddon, query) if isAction == True else query
     if actionArgs is not False:
         url += '&actionArgs=%s' % actionArgs
@@ -201,9 +206,6 @@ def closeDirectory(contentType, viewType='Default', sort=False, cacheToDisc=Fals
         sortMethod(syshandle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     if sort == 'episode':
         sortMethod(syshandle, xbmcplugin.SORT_METHOD_EPISODE)
-    if sort == 'date':
-        log('sorting by date!')
-        sortMethod(syshandle, xbmcplugin.SORT_METHOD_DATEADDED)
     if sort == False:
         sortMethod(syshandle, xbmcplugin.SORT_METHOD_NONE)
 
@@ -285,7 +287,6 @@ def colorPicker():
         return
     setSetting('general.textColor', colorChart[color])
     setSetting('general.displayColor', colorChart[color])
-    log(lang(32027) + ' %s' % colorChart[color], 'info')
 
 
 def deaccentString(text):
@@ -412,16 +413,6 @@ def datetime_workaround(string_date, format="%Y-%m-%d", date_only=True):
 
     return res
 
-
-def checkOmniConnect():
-    if condVisibility('System.HasAddon(script.module.omniconnect)'):
-        log(getSetting('general.omniconnect'))
-        if getSetting('general.omniconnect') == 'true':
-            return True
-
-    return False
-
-
 def shortened_debrid(debrid):
     debrid = debrid.lower()
     if debrid == 'premiumize':
@@ -472,14 +463,9 @@ def get_language_code():
     return language_code
 
 
-def paginate_list(item_list, page, limit):
-    page = int(page)
-    limit = int(limit)
-    upper_limit = page * limit
-    item_list = item_list[:upper_limit]
-    item_list = item_list[-limit:]
+def paginate_list(list_items, page, limit):
+    pages = [list_items[i:i+limit] for i in xrange(0, len(list_items), limit)]
+    return pages[page - 1]
 
-    return item_list
-
-def setSetting(setting_name, value):
-    xbmcaddon.Addon().setSetting(setting_name, value)
+def setSetting(id, value):
+    xbmcaddon.Addon().setSetting(id, value)

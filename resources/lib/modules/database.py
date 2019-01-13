@@ -43,6 +43,7 @@ def get(function, duration, *args, **kwargs):
     :param args: Optional arguments for the provided function
     """
     try:
+
         reload = False
         if 'seren_reload' in kwargs:
             reload = kwargs['seren_reload']

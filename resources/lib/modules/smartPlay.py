@@ -29,7 +29,7 @@ class SmartPlay:
                                              'shows/%s/seasons?extended=full' % self.show_trakt_id)
         self.window = None
 
-    def smart_play_show(self):
+    def smart_play_show(self, append_playlist=False):
 
         self.window = windows.smart_play_background()
 
@@ -41,7 +41,8 @@ class SmartPlay:
         self.window.setProgress(40)
         self.window.setText(tools.lang(32095).encode('utf-8'))
 
-        tools.playList.clear()
+        if not append_playlist:
+            tools.playList.clear()
 
         if 'episodeInfo' not in self.info_dictionary:
             if tools.getSetting('trakt.auth') == '':
@@ -76,6 +77,14 @@ class SmartPlay:
             if i['number'] < episode:
                 continue
             playlist.append(i)
+
+        if append_playlist:
+            tools.log("STARTING PLAYLIST GENERATION")
+            playlist = tvshowMenus.Menus().episodeListBuilder(playlist, self.info_dictionary, smartPlay=True)
+            for i in playlist:
+                tools.log("ADDING ITEM TO PLAYLIST")
+                tools.playList.add(url=i[0], listitem=i[1])
+            return
 
         self.window.setText(tools.lang(32097).encode('utf-8'))
         self.window.setProgress(80)
@@ -134,17 +143,16 @@ class SmartPlay:
                 return True
         return False
 
-    def return_next_season(self):
+    def append_next_season(self):
         season = self.info_dictionary['episodeInfo']['info']['season']
         episode = self.info_dictionary['episodeInfo']['info']['episode']
-
         current_season_info = [i for i in self.show_season_info if season == i['number']][0]
         if episode == current_season_info['episode_count']:
             if len([i for i in self.show_season_info if i['number'] == season + 1]) == 0:
                 return False
             self.info_dictionary['episodeInfo']['info']['episode'] = 1
             self.info_dictionary['episodeInfo']['info']['season'] += 1
-            self.smart_play_show()
+            self.smart_play_show(append_playlist=True)
         else:
             return False
 

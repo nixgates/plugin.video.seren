@@ -17,7 +17,6 @@ syshandle = int(sys.argv[1])
 trakt = TraktAPI()
 language_code = tools.get_language_code()
 
-
 class Menus:
     def __init__(self):
         self.itemList = []
@@ -48,11 +47,7 @@ class Menus:
                     sort_list.append(i['show']['ids']['trakt'])
 
         sort = {'type': 'showInfo', 'id_list': sort_list}
-        title_appends = {}
-        for i in showList:
-            title_appends[i['episode']['ids']['trakt']] = 'Paused (%s%%)' % int(i['progress'])
-
-        self.directToEpisodeBuilder(showList, sort=sort, title_appends=title_appends)
+        self.directToEpisodeBuilder(showList, sort=sort)
         tools.closeDirectory('tvshows')
 
     def discoverShows(self):
@@ -149,6 +144,10 @@ class Menus:
         hidden_shows = trakt.get_trakt_hidden_items('watched')['shows']
         self.threadList = []
         watched = trakt.json_response('users/me/watched/shows?extended=full', limit=False)
+        watched = sorted(watched, key=lambda i: tools.datetime_workaround(i['last_watched_at'][:19],
+                                                                          format="%Y-%m-%dT%H:%M:%S",
+                                                                          date_only=False), reverse=True)
+
         if watched is None:
             return
         watch_list = []
@@ -180,7 +179,7 @@ class Menus:
                     next_list.append(i)
             except:
                 pass
-
+        next_list = next_list[:50]
         build_list = []
 
         for i in next_list:
@@ -193,8 +192,8 @@ class Menus:
 
     def myRecentEpisodes(self):
         hidden_shows = trakt.get_trakt_hidden_items('calendar')['shows']
-        datestring = datetime.datetime.today() - datetime.timedelta(days=7)
-        trakt_list = database.get(trakt.json_response, 12, 'calendars/my/shows/%s/7?extended=full' %
+        datestring = datetime.datetime.today() - datetime.timedelta(days=13)
+        trakt_list = database.get(trakt.json_response, 12, 'calendars/my/shows/%s/14?extended=full' %
                                   datestring.strftime('%d-%m-%Y'))
         if trakt_list is None:
             return
@@ -272,13 +271,16 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'showsUpdated&page=%s' % (int(page) + 1), '', '')
         tools.closeDirectory('tvshows')
 
-    def showsSearch(self):
+    def showsSearch(self, actionArgs):
 
-        k = tools.showKeyboard('', tools.lang(32016).encode('utf-8'))
-        k.doModal()
-        query = (k.getText() if k.isConfirmed() else None)
-        if query == None or query == '':
-            return
+        if actionArgs == None:
+            k = tools.showKeyboard('', tools.lang(32016).encode('utf-8'))
+            k.doModal()
+            query = (k.getText() if k.isConfirmed() else None)
+            if query == None or query == '':
+                return
+        else:
+            query = actionArgs
         query = tools.deaccentString(query)
         query = tools.quote_plus(query)
         traktList = trakt.json_response('search/show?query=%s&extended=full' % query, limit=True)
@@ -519,6 +521,9 @@ class Menus:
                     traceback.print_exc()
                     continue
 
+                cm.append((tools.lang(33022).encode('utf-8'),
+                           'PlayMedia(%s?action=getSources&seren_reload=true&actionArgs=%s)' % (sysaddon, args)))
+
                 cm.append((tools.lang(32066).encode('utf-8'),
                            'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
 
@@ -548,7 +553,7 @@ class Menus:
             import traceback
             traceback.print_exc()
 
-    def directToEpisodeBuilder(self, traktList, title_appends=None, sort=None):
+    def directToEpisodeBuilder(self, traktList, sort=None):
 
         self.threadList = []
         traktWatched = trakt.json_response('sync/watched/shows')
@@ -626,15 +631,7 @@ class Menus:
                     args['episodeInfo']['info'] = item['info']
                     args['episodeInfo']['art'] = item['art']
                     args['episodeInfo']['ids'] = item['ids']
-                    name = "%s: %sx%s %s" % (tools.colorString(args['showInfo']['info']['tvshowtitle']),
-                                             str(item['info']['season']).zfill(2),
-                                             str(item['info']['episode']).zfill(2),
-                                             item['info']['title'].encode('utf-8'))
-
-                    if title_appends is not None:
-                        name = '%s - %s' % (name, title_appends[item['ids']['trakt']])
-
-                    item['info']['title'] = item['info']['originaltitle'] = name
+                    name = item['info']['title']
 
                     args = tools.quote(json.dumps(args, sort_keys=True))
 

@@ -29,6 +29,8 @@ class Menus:
 
     def onDeckMovies(self):
         traktList = trakt.json_response('sync/playback/movies', limit=True)
+        if traktList is None:
+            return
         traktList = sorted(traktList, key=lambda i: tools.datetime_workaround(i['paused_at'][:10]))
         movieList = []
         filter_list = []
@@ -37,11 +39,8 @@ class Menus:
                 if int(i['progress']) != 0:
                     movieList.append(i)
                     filter_list.append(i['movie']['ids']['trakt'])
-        title_appends = {}
-        for i in traktList:
-            title_appends[i['movie']['ids']['trakt']] = 'Paused (%s%%)' % int(i['progress'])
 
-        self.commonListBuilder(movieList, title_appends=title_appends)
+        self.commonListBuilder(movieList)
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def discoverMovies(self):
@@ -57,6 +56,7 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32015).encode('utf-8'), 'moviesBoxOffice', '', '')
         tools.addDirectoryItem(tools.lang(32014).encode('utf-8'), 'moviesUpdated&page=1', '', '')
         tools.addDirectoryItem(tools.lang(32062).encode('utf-8'), 'movieGenres&page=1', '', '')
+        #tools.addDirectoryItem('Years', 'movieYears', '', '')
         tools.addDirectoryItem(tools.lang(32016), 'moviesSearch', '', '')
         tools.closeDirectory('addons', cacheToDisc=True)
 
@@ -69,7 +69,9 @@ class Menus:
 
     def myMovieCollection(self):
         try:
-            traktList = trakt.json_response('users/me/collection/movies', limit=False)
+            traktList = trakt.json_response('users/me/collection/movies?extended=full', limit=False)
+            if traktList is None:
+                return
             self.commonListBuilder(traktList)
             tools.closeDirectory('movies', viewType=self.viewType)
         except:
@@ -77,8 +79,9 @@ class Menus:
             traceback.print_exc()
 
     def myMovieWatchlist(self):
-        traktList = trakt.json_response('users/me/watchlist/movies', limit=False)
-        tools.log(trakt.response_headers)
+        traktList = trakt.json_response('users/me/watchlist/movies?extended=full&extended=full', limit=False)
+        if traktList is None:
+            return
         try:
             sort_by = trakt.response_headers['X-Sort-By']
             sort_how = trakt.response_headers['X-Sort-How']
@@ -93,12 +96,15 @@ class Menus:
 
     def moviesRecommended(self):
         traktList = database.get(trakt.json_response, 12, 'recommendations/movies', limit=True, limitOverride=100)
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesPopular(self, page):
         traktList = database.get(trakt.json_response, 12, 'movies/popular?page=%s' % page)
-
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'moviesPopular&page=%s' % (int(page) + 1), '', '',
                                isFolder=True)
@@ -106,7 +112,8 @@ class Menus:
 
     def moviesTrending(self, page):
         traktList = database.get(trakt.json_response, 12, 'movies/trending?page=%s' % page)
-
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'moviesTrending&page=%s' % (int(page) + 1), '', '',
                                isFolder=True)
@@ -114,7 +121,8 @@ class Menus:
 
     def moviesPlayed(self, page):
         traktList = database.get(trakt.json_response, 12, 'movies/played?page=%s' % page)
-
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'moviesPlayed&page=%s' % (int(page) + 1), '', '',
                                isFolder=True)
@@ -122,7 +130,8 @@ class Menus:
 
     def moviesWatched(self, page):
         traktList = database.get(trakt.json_response, 12, 'movies/watched?page=%s' % page)
-
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'moviesWatched&page=%s' % (int(page) + 1), '', '',
                                isFolder=True)
@@ -130,7 +139,8 @@ class Menus:
 
     def moviesCollected(self, page):
         traktList = trakt.json_response('movies/collected?page=%s' % page)
-
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'moviesCollected&page=%s' % (int(page) + 1), '', '',
                                isFolder=True)
@@ -138,7 +148,8 @@ class Menus:
 
     def moviesAnticipated(self, page):
         traktList = database.get(trakt.json_response, 12, 'movies/anticipated?page=%s' % page)
-
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'moviesAnticipated&page=%s' % (int(page) + 1), '', '',
                                isFolder=True)
@@ -146,7 +157,8 @@ class Menus:
 
     def moviesBoxOffice(self):
         traktList = database.get(trakt.json_response, 12, 'movies/boxoffice')
-
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.closeDirectory('movies', viewType=self.viewType)
 
@@ -155,33 +167,54 @@ class Menus:
         date = datetime.date.today() - datetime.timedelta(days=31)
         date = date.strftime('%Y-%m-%d')
         traktList = trakt.json_response('movies/updates/%s?page=%s' % (date, page))
-
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'), 'moviesUpdated&page=%s' % (int(page) + 1), '', '',
                                isFolder=True)
         tools.closeDirectory('movies', viewType=self.viewType)
 
-    def moviesSearch(self):
+    def moviesSearch(self, actionArgs=None):
 
-        k = tools.showKeyboard('', tools.lang(32016).encode('utf-8'))
-        k.doModal()
-        query = (k.getText() if k.isConfirmed() else None)
-        if query == None or query == '':
-            return
+        if actionArgs == None:
+            k = tools.showKeyboard('', tools.lang(32016).encode('utf-8'))
+            k.doModal()
+            query = (k.getText() if k.isConfirmed() else None)
+            if query == None or query == '':
+                return
+        else:
+            query = actionArgs
         query = tools.deaccentString(query.encode('utf-8'))
         query = tools.quote_plus(query)
         traktList = trakt.json_response('search/movie?query=%s' % query)
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.closeDirectory('movies', viewType=self.viewType)
 
     def moviesRelated(self, args):
         traktList = database.get(trakt.json_response, 12, 'movies/%s/related' % args)
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.closeDirectory('movies', viewType=self.viewType)
+
+    def moviesYears(self):
+        from datetime import datetime
+        year = int(datetime.today().year)
+        years = []
+        for i in range(year-100, year+1):
+            years.append(i)
+        years = sorted(years, reverse=True)
+        for i in years:
+            tools.addDirectoryItem(str(i), '', '', '')
+        tools.closeDirectory('addons', cacheToDisc=True)
 
     def movieGenres(self):
         tools.addDirectoryItem(tools.lang(32065).encode('utf-8'), 'movieGenresGet', '', '', isFolder=True)
         genres = database.get(trakt.json_response, 24, 'genres/movies')
+        if genres is None:
+            return
         for i in genres:
             tools.addDirectoryItem(i['name'], 'movieGenresGet&actionArgs=%s' % i['slug'], '', '', isFolder=True)
         tools.closeDirectory('addons', cacheToDisc=True)
@@ -204,6 +237,8 @@ class Menus:
             genre_string = tools.unquote(args)
 
         traktList = trakt.json_response('movies/popular?genres=%s&page=%s' % (genre_string, page))
+        if traktList is None:
+            return
         self.commonListBuilder(traktList)
         tools.addDirectoryItem(tools.lang(32019).encode('utf-8'),
                                'movieGenresGet&actionArgs=%s&page=%s' % (tools.quote(genre_string), int(page) + 1),
@@ -215,7 +250,7 @@ class Menus:
     # MENU TOOLS
     ######################################################
 
-    def commonListBuilder(self, traktList, nextPath=None, title_appends=None):
+    def commonListBuilder(self, traktList, nextPath=None):
 
         if len(traktList) == 0:
             return
@@ -238,6 +273,7 @@ class Menus:
 
         for item in self.itemList:
             try:
+
                 # Add Arguments to pass with item
                 args = {}
                 args['title'] = item['info']['title']
@@ -247,9 +283,6 @@ class Menus:
                 args['info'] = item['info']
                 args['art'] = item['art']
                 name = item['info']['title']
-
-                if title_appends is not None:
-                    name = '%s - %s' % (name, title_appends[item['ids']['trakt']])
 
                 item['info']['title'] = item['info']['originaltitle'] = name
                 args = tools.quote(json.dumps(args))

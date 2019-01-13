@@ -5,13 +5,10 @@ import time
 from resources.lib.common import tools
 from resources.lib.modules import database
 from resources.lib.modules import customProviders
-from resources.lib.modules import resolver
-
 
 def update_provider_packages():
     if tools.getSetting('providers.autoupdates') == 'false':
         return
-
     customProviders.providers().check_for_updates(silent=True, automatic=True)
 
 
@@ -27,23 +24,29 @@ def refresh_apis():
     tvdb_token = tools.getSetting('tvdb.jw')
     tvdb_expiry = int(float(tools.getSetting('tvdb.expiry')))
 
-    if rd_token != '':
-        if time.time() > (rd_expiry - (30 * 60)):
-            from resources.lib.debrid import real_debrid
-            tools.log('Service Refreshing Real Debrid Token')
-            real_debrid.RealDebrid().refreshToken()
+    try:
+        if rd_token != '':
+            if time.time() > (rd_expiry - (30 * 60)):
+                from resources.lib.debrid import real_debrid
+                tools.log('Service Refreshing Real Debrid Token')
+                real_debrid.RealDebrid().refreshToken()
+    except:
+        pass
 
-    if tvdb_token != '':
-        if time.time() > (tvdb_expiry - (30 * 60)):
-            tools.log('Service Refreshing TVDB Token')
+    try:
+        if tvdb_token != '':
+            if time.time() > (tvdb_expiry - (30 * 60)):
+                tools.log('Service Refreshing TVDB Token')
+                from resources.lib.indexers import tvdb
+                if time.time() > tvdb_expiry:
+                    tvdb.TVDBAPI().newToken()
+                else:
+                    tvdb.TVDBAPI().renewToken()
+        else:
             from resources.lib.indexers import tvdb
-            if time.time() > tvdb_expiry:
-                tvdb.TVDBAPI().newToken()
-            else:
-                tvdb.TVDBAPI().renewToken()
-    else:
-        from resources.lib.indexers import tvdb
-        tvdb.TVDBAPI().newToken()
+            tvdb.TVDBAPI().newToken()
+    except:
+        pass
 
 
 def wipe_install():
@@ -75,7 +78,7 @@ def premiumize_transfer_cleanup():
     seren_transfers = database.get_premiumize_transfers()
 
     if len(seren_transfers) == 0:
-        tools.log('No seren transfers have been created')
+        tools.log('No Premiumize transfers have been created')
         return
     tools.log('Premiumize Fair Usage is above threshold, cleaning up Seren transfers')
     for i in seren_transfers:
@@ -105,6 +108,12 @@ def run_maintenance():
     tools.log('Performing Maintenance')
     # ADD COMMON HOUSE KEEPING ITEMS HERE #
 
+    # Refresh API tokens
+    try:
+        refresh_apis()
+    except:
+        pass
+
     # Check cloud account status and alert user if expired
 
     try:
@@ -124,21 +133,9 @@ def run_maintenance():
     except:
         pass
 
-    # Refresh API tokens
-    try:
-        refresh_apis()
-    except:
-        pass
-
     # Check Premiumize Fair Usage for cleanup
     try:
         if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting('premiumize.autodelete') == 'true':
             premiumize_transfer_cleanup()
-    except:
-        pass
-
-    # Update current resolver domains
-    try:
-        resolver.Resolver().getHosterList()
     except:
         pass
