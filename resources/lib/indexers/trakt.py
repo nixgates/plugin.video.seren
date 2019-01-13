@@ -27,7 +27,8 @@ class TraktAPI:
         self.RefreshToken = tools.getSetting('trakt.refresh')
 
         self.headers = {'trakt-api-version': '2',
-                        'trakt-api-key': self.ClientID}
+                        'trakt-api-key': self.ClientID,
+                        'content-type': 'application/json'}
 
         if not self.AccessToken is '':
             self.headers['Authorization'] = 'Bearer %s' % self.AccessToken
@@ -139,6 +140,7 @@ class TraktAPI:
 
         try:
             response = requests.get(url, headers=self.headers)
+
             self.response_headers = response.headers
             if response.status_code == 401:
                 tools.log('Trakt OAuth Failure, %s %s' % (str(response.text), response.request.headers), 'info')
@@ -357,9 +359,10 @@ class TraktAPI:
 
         lists = self.getLists()
         lists += [i['list'] for i in self.json_response('users/likes/lists', limit=True, limitOverride=500)]
+
         for user_list in lists:
-            arguments = {'trakt_id': user_list['ids']['trakt'],
-                         'username': user_list['user']['username'],
+            arguments = {'trakt_id': user_list['ids']['slug'],
+                         'username': user_list['user']['ids']['slug'],
                          'type': media_type,
                          'sort_how': user_list['sort_how'],
                          'sort_by': user_list['sort_by']
@@ -372,7 +375,6 @@ class TraktAPI:
         return
 
     def sort_list(self, sort_by, sort_how, list_items, media_type):
-
         supported_sorts = ['added', 'rank', 'title', 'released', 'runtime', 'popularity', 'votes', 'random']
 
         if sort_by == 'added':
@@ -380,11 +382,18 @@ class TraktAPI:
         if sort_by == 'rank':
             list_items = sorted(list_items, key=lambda x: x['rank'])
         if sort_by == 'title':
-            list_items = sorted(list_items, key=lambda x: x[media_type]['title'])
+            list_items = sorted(list_items, key=lambda x: x[media_type]['title'].lower().strip('the '))
         if sort_by == 'released':
-            list_items = sorted(list_items, key=lambda x: x[media_type]['released'])
+            try:
+                list_items = sorted(list_items, key=lambda x: x[media_type]['released'])
+            except:
+                list_items = sorted(list_items, key=lambda x: x[media_type]['first_aired'])
         if sort_by == 'runtime':
-            list_items = sorted(list_items, key=lambda x: x[media_type]['runtime'])
+            if 'aired_episodes' in list_items[0][media_type]:
+                list_items = sorted(list_items, key=lambda x:
+                                    (x[media_type]['runtime'] * x[media_type]['aired_episodes']))
+            else:
+                list_items = sorted(list_items, key=lambda x: x[media_type]['runtime'])
         if sort_by == 'popularity':
             list_items = sorted(list_items, key=lambda x: x[media_type]['rating'])
         if sort_by == 'votes':
@@ -407,11 +416,13 @@ class TraktAPI:
 
         arguments = json.loads(tools.unquote(arguments))
         media_type = arguments['type']
-        list_items = database.get(self.json_response, 12, 'users/%s/lists/%s/items/%s?extended=full'
-                                  % (arguments['username'],
-                                     arguments['trakt_id'],
-                                     media_type,
-                                     ), None, False)
+        username = tools.quote_plus(arguments['username'])
+        url = 'users/%s/lists/%s/items/%s?extended=full' % (username, arguments['trakt_id'],media_type)
+        list_items = database.get(self.json_response, 12, url, None, False)
+
+        if list_items is None or len(list_items) == 0:
+            return
+
         if media_type == 'movies':
             media_type = 'movie'
 
@@ -421,6 +432,7 @@ class TraktAPI:
         page_limit = int(tools.getSetting('item.limit'))
 
         list_items = self.sort_list(arguments['sort_by'], arguments['sort_how'], list_items, media_type)
+
         list_items = tools.paginate_list(list_items, page, page_limit)
 
         next = False

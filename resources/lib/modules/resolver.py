@@ -115,7 +115,8 @@ class Resolver(tools.dialogWindow):
                         i['info'].append(tools.source_size_display(i['size']))
                     loop_count_string = "(" + str(loop_count) + " of " + str(len(sources)) + ")"
                     line1 = "%s %s - %s" % (tools.lang(32036).encode('utf-8'),
-                                            tools.colorString(i['release_title']), loop_count_string)
+                                            tools.colorString(tools.deaccentString(i['release_title']).encode('utf-8')),
+                                            loop_count_string)
                     line2 = "%s %s | Source: %s" % (tools.lang(32037).encode('utf-8'),
                                                     tools.colorString(debrid_provider.upper()),
                                                     tools.colorString(i['source']))
@@ -196,6 +197,8 @@ class Resolver(tools.dialogWindow):
                         if stream_link is None:
                             continue
                         else:
+                            if stream_link.endswith('.rar'):
+                                continue
                             self.return_data = stream_link
                             self.close()
                             return

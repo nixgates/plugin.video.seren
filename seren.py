@@ -22,7 +22,7 @@ silent = params.get('silent')
 
 source_select = params.get('source_select')
 
-seren_reload = params.get('seren_reload', False)
+seren_reload = params.get('seren_reload')
 
 if seren_reload == 'true':
     seren_reload = True
@@ -91,7 +91,7 @@ if action == 'moviesRecommended':
 if action == 'moviesSearch':
     from resources.lib.gui import movieMenus
 
-    movieMenus.Menus().moviesSearch()
+    movieMenus.Menus().moviesSearch(actionArgs)
 
 if action == 'myMovies':
     from resources.lib.gui import movieMenus
@@ -182,6 +182,8 @@ if action == 'getSources':
 
                 player.serenPlayer().play_source(stream_link, args)
         else:
+            tools.closeBusyDialog()
+            tools.playList.clear()
             if display_background is True:
                 background.close()
                 del background
@@ -192,7 +194,7 @@ if action == 'getSources':
         import traceback
 
         traceback.print_exc()
-
+        tools.closeBusyDialog()
         try:
             display_background.close()
             del display_background
@@ -314,8 +316,7 @@ if action == 'showsUpdated':
 
 if action == 'showsSearch':
     from resources.lib.gui import tvshowMenus
-
-    tvshowMenus.Menus().showsSearch()
+    tvshowMenus.Menus().showsSearch(actionArgs)
 
 if action == 'showSeasons':
     from resources.lib.gui import tvshowMenus
@@ -524,3 +525,8 @@ if action == 'manualProviderUpdate':
     from resources.lib.modules import customProviders
 
     customProviders.providers().manual_update()
+
+if action == 'movieYears':
+    from resources.lib.gui import movieMenus
+    menus = movieMenus.Menus()
+    menus.moviesYears()

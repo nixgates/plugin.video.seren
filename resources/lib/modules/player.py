@@ -36,10 +36,6 @@ class serenPlayer(tools.player):
                 raise Exception
             self.args = args
 
-            if tools.checkOmniConnect():
-                port = tools.getSetting('omni.port')
-                stream_link = 'http://localhost:%s?BLASTURL=%s' % (port, stream_link)
-
             item = tools.menuItem(path=stream_link)
 
             if 'episodeInfo' in args:
@@ -119,19 +115,18 @@ class serenPlayer(tools.player):
                     import traceback
                     traceback.print_exc()
                     pass
+
+            if tools.getSetting('general.smartplay') is not 'false' and self.media_type is 'episode':
+                if int(tools.playList.getposition()) == (tools.playList.size() - 1):
+                    self.next_season = smartPlay.SmartPlay(self.args).append_next_season()
         except:
             pass
 
     def onPlayBackEnded(self):
-        self.close_omni()
         self.traktStopWatching()
-        if tools.getSetting('general.smartplay') is not 'false' and self.media_type is 'episode':
-            if int(tools.playList.getposition()) == -1:
-                self.next_season = smartPlay.SmartPlay(self.args).return_next_season()
         self.stopped = True
 
     def onPlayBackStopped(self):
-        self.close_omni()
         watched_percent = self.getWatchedPercent()
         if watched_percent < 90.00:
             self.traktPause()
@@ -213,6 +208,7 @@ class serenPlayer(tools.player):
             traceback.print_exc()
 
     def keepAlive(self):
+
         while not self.stopped:
             try:
                 if self.isPlaying():
@@ -223,9 +219,13 @@ class serenPlayer(tools.player):
                                 self.pre_cache_initiated = True
                                 smartPlay.SmartPlay(self.args).pre_scrape()
                     except:
+                        import traceback
+                        traceback.print_exc()
                         pass
                 tools.kodi.sleep(1000)
             except:
+                import traceback
+                traceback.print_exc()
                 tools.kodi.sleep(1000)
                 continue
         pass
@@ -264,13 +264,6 @@ class serenPlayer(tools.player):
         except:
             import traceback
             traceback.print_exc()
-
-    def close_omni(self):
-        if tools.checkOmniConnect():
-            import requests
-            port = tools.getSetting('omni.port')
-            stream_link = 'http://localhost:%s?BLASTURL=%s' % (port, 'close')
-            requests.get(stream_link)
 
     def signals_callback(self, data):
         if not self.play_next_triggered:

@@ -62,6 +62,8 @@ def getInfo(release_title):
         info.append('x265')
     if any(i in release_title for i in [' cam', ' camrip', ' hdcam', ' hd cam']):
         info.append('CAM')
+    if any(i in release_title for i in [' dvdscr']):
+        info.append('DVD SCREENER')
     return info
 
 
@@ -235,9 +237,20 @@ def filterShowPack(simpleInfo, release_title):
 
     season_count = int(season)
 
+    season_count = int(season)
+
     while int(season_count) <= int(no_seasons):
-        stringList.append('%s seasons 1 %s' % (showTitle, str(season_count)))
-        stringList.append('%s season 1 %s' % (showTitle, str(season_count)))
+        season = '%s seasons 1 %s' % (showTitle, str(season_count))
+        seasons = '%s season 1 %s' % (showTitle, str(season_count))
+        if release_title == season:
+            return True
+        if release_title == seasons:
+            return True
+        season_count = season_count + 1
+
+    while int(season_count) <= int(no_seasons):
+        stringList.append('%s seasons 1 %s ' % (showTitle, str(season_count)))
+        stringList.append('%s season 1 %s ' % (showTitle, str(season_count)))
         season_count = season_count + 1
 
     for i in stringList:
@@ -265,6 +278,7 @@ def filterShowPack(simpleInfo, release_title):
     for i in stringList:
         if release_title.startswith(i):
             return True
+
 
 
 class serenRequests(Session):
