@@ -174,6 +174,8 @@ if action == 'getSources':
             if stream_link is None:
                 try:
                     tools.playList.clear()
+                    tools.closeBusyDialog()
+                    tools.showDialog.notification(tools.addonName, tools.lang(32047).encode('utf-8'), time=5000)
                 except:
                     pass
                 pass
