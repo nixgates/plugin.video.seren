@@ -253,7 +253,7 @@ class Sources(tools.dialogWindow):
                     tools.playList.clear()
                 except:
                     pass
-                if self.silent:
+                if not self.silent:
                     tools.showDialog.notification(tools.addonName, tools.lang(32085).encode('utf-8'))
 
                 self.return_data = ([], self.args)
