@@ -145,5 +145,12 @@
         <setting type="sep" />
         <setting id="tvdb.apikey" label="TVDB API Key" type="text" default="" />
     </category>
-
+  
+    <category label="Quick Clear">
+        <setting type="lsep" label="Clear Cache" />
+        <setting type="sep"/>
+        <setting type="action" label="Clear Torrent Cache" action="RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)" />
+        <setting type="action" label="Clear Cache" action="RunPlugin(plugin://plugin.video.seren/?action=clearCache)" />
+    </category>	
+   
 </settings>
