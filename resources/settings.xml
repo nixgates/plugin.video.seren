@@ -8,9 +8,9 @@
         <setting type="enum" id="general.sourceselect" label="40005" default="40006" lvalues="40007|40006" />
         <setting type="lsep" label="40008" />
         <setting type="sep" />
-        <!-- I'm leaving this hidden for now, TMDB needs a fair bit of work to get back up to scratch -->
         <setting type="enum" id="nextup.sort" label="40009" default="40010" lvalues="40010|40011" />
         <setting type="bool" id="general.sourceselectlines" label="40012" default="true" />
+        <!-- I'm leaving this hidden for now, TMDB needs a fair bit of work to get back up to scratch -->
         <setting type="enum" id="general.metalocation" default="1" label="40013" values="TMDB|TVDB" visible="hidden" />
         <setting id="item.limit" type="slider" label="40014" default="40" range="10, 100" option="int" />
         <setting id="general.viewidswitch" label="40015" default="false" type="bool" visible="true"/>
@@ -51,6 +51,7 @@
         <setting id="general.tempSilent" type="text" visible="hidden" default="false" />
         <setting id="general.rdexpirycheck" type="text" visible="hidden" default="" />
         <setting id="general.pmexpirycheck" type="text" visible="hidden" default="" />
+        <setting id="general.fake" type="text" visible="hidden" default="" />
                 <!-- END HIDDEN SETTINGS -->
     </category>
 
@@ -144,21 +145,12 @@
         <setting type="sep" />
         <setting id="tvdb.apikey" label="TVDB API Key" type="text" default="" />
     </category>
-
-    <category label="Experimental">
-        <setting type="lsep" label="Omni Connect" />
-        <setting type="sep"/>
-        <setting type="bool" label="Enabled Omni Connect" default="false" id="general.omniconnect" enable="false"/>
-        <setting type="text" label="Omni Connect Port" default="8081" id="omni.port" enable="false"/>
-    </category>
-    
-        <category label="Quick Clear">
+  
+    <category label="Quick Clear">
         <setting type="lsep" label="Clear Cache" />
         <setting type="sep"/>
         <setting type="action" label="Clear Torrent Cache" action="RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)" />
         <setting type="action" label="Clear Cache" action="RunPlugin(plugin://plugin.video.seren/?action=clearCache)" />
     </category>	
-    
-    
-
+   
 </settings>

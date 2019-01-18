@@ -129,7 +129,7 @@ class RealDebrid:
         if 'bad_token' in response or 'Bad Request' in response:
             if not fail_check:
                 self.refreshToken()
-                response = self.get_url(original_url, fail_check=True)
+                response = self.post_url(original_url, postData, fail_check=True)
         try:
             return json.loads(response)
         except:

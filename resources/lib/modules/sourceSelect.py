@@ -33,7 +33,7 @@ def build_display_title(source):
             source['source'].upper(),
             size,
             info,
-            release_title
+            tools.deaccentString(release_title).encode('utf-8')
         )
     if source['type'] == 'hoster':
         title = "%s |%s %s | %s %s\n%s" % (
@@ -42,7 +42,7 @@ def build_display_title(source):
             source['provider'].upper(),
             source['source'],
             info,
-            release_title,
+            tools.deaccentString(release_title).encode('utf-8'),
         )
 
     if tools.getSetting('general.sourceselectlines') == 'false':

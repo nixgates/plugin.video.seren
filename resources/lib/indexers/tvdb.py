@@ -31,6 +31,18 @@ class TVDBAPI:
             self.newToken()
             self.headers['Authorization'] = 'Bearer %s' % self.jwToken
 
+    # I know this looks ridiculous. But this will limit TVDBAPI class instances from spawning massive amounts of
+    # Token refreshes and will also reduce the chance greatly that Kodi will drop the addon settings due to threading
+    def refresh_lock(self):
+        if not tools.tvdb_refreshing:
+            return False
+        for i in range(0,5):
+            if tools.tvdb_refresh == '':
+                time.sleep(1)
+            else:
+                self.jwToken = tools.tvdb_refresh
+                return True
+
     def post_request(self, url, postData):
         postData = json.dumps(postData)
         url = self.baseUrl + url
@@ -44,11 +56,10 @@ class TVDBAPI:
         return response
 
     def get_request(self, url):
-
         url = self.baseUrl + url
         response = requests.get(url, headers=self.headers).text
         if 'not authorized' in response.lower():
-            self.newToken()
+            self.renewToken()
             self.headers['Authorization'] = 'Bearer %s' % self.jwToken
             response = requests.get(url, headers=self.headers).text
         response = json.loads(response)
@@ -56,16 +67,32 @@ class TVDBAPI:
         return response
 
     def renewToken(self):
+
+        refresh_lock = self.refresh_lock()
+        if not refresh_lock:
+            tools.tvdb_refreshing = True
+        else:
+            return
         url = self.baseUrl + 'refresh_token'
         response = requests.post(url, headers=self.headers)
         response = json.loads(response.text)
         if 'Error' in response:
-            self.newToken()
+            self.newToken(True)
         else:
             self.jwToken = response['token']
+            tools.tvdb_refresh = self.jwToken
+            tools.setSetting('tvdb.jw', self.jwToken)
+            tools.setSetting('tvdb.expiry', str(time.time() + (24 * (60 * 60))))
         return
 
-    def newToken(self):
+    def newToken(self, ignore_lock=False):
+
+        refresh_lock = self.refresh_lock()
+        if not ignore_lock:
+            if not refresh_lock:
+                tools.tvdb_refreshing = True
+            else:
+                return
         url = self.baseUrl + "login"
         postdata = {"apikey": self.apiKey}
         postdata = json.dumps(postdata)
@@ -74,6 +101,7 @@ class TVDBAPI:
             headers.pop('Authorization')
         response = json.loads(requests.post(url, data=postdata, headers=self.headers).text)
         self.jwToken = response['token']
+        tools.tvdb_refresh = self.jwToken
         tools.setSetting('tvdb.jw', self.jwToken)
         self.headers['Authorization'] = self.jwToken
         tools.log('Refreshed TVDB Token')
@@ -116,6 +144,8 @@ class TVDBAPI:
                 pass
             try:
                 art['banner'] = self.baseImageUrl + self.info.get('banner', '')
+                if art['banner'] == self.baseImageUrl:
+                    art['banner'] = 0
             except:
                 pass
 
@@ -159,7 +189,10 @@ class TVDBAPI:
             except:
                 info['year'] = 0
                 pass
-
+            try:
+                info['studio'] = self.info.get('network')
+            except:
+                pass
             try:
                 info['originaltitle'] = self.info.get('seriesName')
             except:
@@ -250,7 +283,10 @@ class TVDBAPI:
 
             if details == None:
                 return None
-
+            try:
+                item['info']['studio'] = showArgs['info'].get('studio')
+            except:
+                pass
             try:
                 item['art']['poster'] = item['art']['thumb'] = self.art['poster']
             except:
@@ -343,6 +379,8 @@ class TVDBAPI:
 
         try:
             art['thumb'] = self.baseImageUrl + response['filename']
+            if art['thumb'] == self.baseImageUrl:
+                art['thumb'] = 0
         except:
             pass
 
@@ -366,9 +404,11 @@ class TVDBAPI:
         try:
             try:
                 info['premiered'] = trakt_object['first_aired'][:10]
-                if len(info[['premiered']]) < 10:
+                if len(info['premiered']) < 10:
                     raise Exception
             except:
+                import traceback
+                traceback.print_exc()
                 info['premiered'] = response['firstAired']
         except:
             pass
@@ -392,6 +432,10 @@ class TVDBAPI:
             else:
                 showArgs = {'showInfo': {}}
                 showArgs['showInfo'] = self.show_cursory
+        try:
+            info['studio'] = showArgs['showInfo']['info'].get('studio')
+        except:
+            pass
         try:
             info['mpaa'] = showArgs['showInfo']['info']['mpaa']
         except:
@@ -472,6 +516,8 @@ class TVDBAPI:
                 else:
                     continue
             image = self.baseImageUrl + image['fileName']
+            if image == self.baseImageUrl:
+                image = 0
             self.art['fanart'] = image
             tools.tv_sema.release()
         except:
@@ -491,6 +537,8 @@ class TVDBAPI:
                 else:
                     continue
             image = self.baseImageUrl + image['fileName']
+            if image == self.baseImageUrl:
+                image = 0
             self.art['poster'] = image
             tools.tv_sema.release()
         except:
@@ -531,6 +579,8 @@ class TVDBAPI:
                 else:
                     continue
             image = self.baseImageUrl + image['fileName']
+            if image == self.baseImageUrl:
+                image = 0
             self.art['poster'] = image
             tools.tv_sema.release()
         except:

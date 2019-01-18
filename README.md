@@ -5,6 +5,28 @@ This version of Seren may be unstable and may result in some undesired behavior.
 
 Change Log:
 
+### Changelog 0.1.25
+* Fixed setSetting argument naming (Fixes pre-emptive scraping)
+* Trakt lists sorting now ignores 'The '
+* Removed title appends to follow more closely to Kodi standards, another method of showing play percentage must be met
+* Fixed Trakt dates for episode items
+* Added Studio to metadata
+* Seren now appends next season to current playlist during playback instead of after
+* Removed references to now defunct OMNIConnect Addon
+* Added Re-scrape cm item to episode items
+* Fixed and optimised list pagination
+* Trakt Lists now use user slugs to support users with periods in their username
+* Added ability to direct search through plugin url
+* Confirmed Trakt list sorting for all types except excluded (popularity, percentage, my rating)
+* Added support to fail resolve if file ends with .rar
+* Release titles are now deaccented and encoded with utf-8 to prevent unicode errors
+* Fixed Ghost providers occuring if a provider was no longer available in a updated version of a provider package.
+* Fixed TVDB module creating an artwork URL if no artwork is available
+* Added token refresh lock to the TVDB module to stop instances of the class spawning mass refresh requests
+* Massively reduced chance Kodi will drop Seren's settings
+* Fixed Real Debrid post request making a get request after token refresh
+* Custom Provider module now uses Zfile module to accomodate zipfile module bug on Android devices
+
 ### Version 0.1.24 Changelog:
 * Fixed Movie Watchlist Sort to content type "Show"
 
