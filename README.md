@@ -1,75 +1,29 @@
-# Seren For Kodi - plugin.video.seren
-Repository for Seren Development
+# FAQ
+> ### What is Seren?
 
-This version of Seren may be unstable and may result in some undesired behavior. Use is at own risk
+Seren is a multi-source addon for Kodi with the added ability to install custom provider modules. Unlike other Kodi addons which are generally built for a single service use, Seren allows users to connect to multiple online/offline services at once for their viewing with a single click.
 
-Change Log:
+> ### How do I install a new provider?
 
-### Changelog 0.1.25
-* Fixed setSetting argument naming (Fixes pre-emptive scraping)
-* Trakt lists sorting now ignores 'The '
-* Removed title appends to follow more closely to Kodi standards, another method of showing play percentage must be met
-* Fixed Trakt dates for episode items
-* Added Studio to metadata
-* Seren now appends next season to current playlist during playback instead of after
-* Removed references to now defunct OMNIConnect Addon
-* Added Re-scrape cm item to episode items
-* Fixed and optimised list pagination
-* Trakt Lists now use user slugs to support users with periods in their username
-* Added ability to direct search through plugin url
-* Confirmed Trakt list sorting for all types except excluded (popularity, percentage, my rating)
-* Added support to fail resolve if file ends with .rar
-* Release titles are now deaccented and encoded with utf-8 to prevent unicode errors
-* Fixed Ghost providers occuring if a provider was no longer available in a updated version of a provider package.
-* Fixed TVDB module creating an artwork URL if no artwork is available
-* Added token refresh lock to the TVDB module to stop instances of the class spawning mass refresh requests
-* Massively reduced chance Kodi will drop Seren's settings
-* Fixed Real Debrid post request making a get request after token refresh
-* Custom Provider module now uses Zfile module to accomodate zipfile module bug on Android devices
+In the settings menu of Seren you will find a providers tab. Inside this tab you will find the install provider package option.
 
-### Version 0.1.24 Changelog:
-* Fixed Movie Watchlist Sort to content type "Show"
+> ### How do manage my providers?
 
-### Version 0.1.23 Changelog:
-* Added Watchlist sorting
-* Added extra fallbacks for trakt outages
-* Changed tools setSetting to a function so Kodi modules are not initialised if there is an exception
+Within Seren's settings, you will find the providers tab. Within this tab you can disable/enable single providers inside provide packs, enable/disable entire provider packages, enable/ disable automatic provider updates and manually for a update check for your providers.
 
-### Version 0.1.22 Changelog:
-* Re-installation and updating of provider packages now honors previous settings
-* Fixed Hidden items error if no connection to Trakt could be made.
+> ### Seren won't show me season or episode lists and instead begins playing automatically?
 
-### Version 0.1.21 Changelog:
-* Added onAVStarted for Kodi 18+ due to issues with offset
-* Re-factored code and cleaned up imports
+Please disable the Auto Episode Resume setting in the general tab of Seren's settings.
 
-### Version 0.1.20 Changelog:
-* Provider installer re-write
-* Provider packages can now update automatically or manually
-* Fixed Trakt Movie Scrobbling
-* Fixed Finish Watching Movies
-* Added Remove (movie/episode) Progress to Trakt Manager
+> ### My Settings reset? What happened?
+This is a known bug that is generally caused by a setting being set to often by threads in Seren. This issue should be addressed within the Beta update 0.1.25. Please ensure you are on a version on/above this.
+If you continue to have issues, please provide a kodi log in this github issue -> https://github.com/nixgates/plugin.video.seren/issues/18
 
-### Version 0.1.19 Changelog:
-* Fixed Hidden Items (Possibly - please check)
-* Trakt Lists now paginated and sorted
-* Silent Scraper setting now reset on startup incase of Kodi crash
-* New Shows and recently updated shows now filtered by Kodi Languge
-* Corrected some typos
-* Extended relevant show pack identification
-* Un-aired episodes now removed from automatic playlist generator
-* Premiumize autocache now runs premiumize cleanup instead of deleting transfer
-* Added option to allow premiumize users to utilize transcoded files
-* Added Banner image to episode objects
-* Seasons now sorted by season number and not title
-* Added basic duplicate provider filtering (provider name only)
-* Show premiered dates now retrieved from Trakt and not TVDB
+> ### I'm experiencing an issue whilst using Seren. Where can I get help?
+You can often find help from users in the Addons4Kodi subreddit or you are always welcome to log a github issue and I will contact you directly to investigate the issue.
 
-### Version 0.1.18 Changelog:
-* Added fallback from TMDB SSL certificate issues
+> ### Can I use Seren to illegally view copyrighted material?
 
-### Version 0.1.17 Changelog:
-* Removed Trakt Lists pagination (Fixed List Sorting)
-* Complete work over of TV show continue watching display
-* Added Sort Options for Next Up
-* Renamed and moved Continue Watching Menu items to "Finish Watching" and added to their respective folders
+I will not, and nor will I condone the use of Seren or any custom providers to view illegal copyright content. No assistance will be given to any user that I identify to be using Seren for illegal purposes. Please respect copyrighted work and any laws applicable to yourself whilst using Seren.
+
+
