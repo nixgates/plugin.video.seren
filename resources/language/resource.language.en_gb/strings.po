@@ -845,3 +845,7 @@ msgstr ""
 msgctxt "#40083"
 msgid "Manage Provider Packages"
 msgstr ""
+
+msgctxt "#40084"
+msgid "Force view types on menus"
+msgstr ""

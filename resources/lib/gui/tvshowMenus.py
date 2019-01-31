@@ -62,7 +62,8 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32012).encode('utf-8'), 'showsCollected&page=1', '', '')
         tools.addDirectoryItem(tools.lang(32013).encode('utf-8'), 'showsAnticipated&page=1', '', '')
         tools.addDirectoryItem(tools.lang(32014).encode('utf-8'), 'showsUpdated&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32062).encode('utf-8'), 'showGenres', '', '')
+        tools.addDirectoryItem(tools.lang(32062).encode('utf-8'), 'tvGenres', '', '')
+        # show genres is now labeled as tvGenres to support genre icons in skins
         tools.addDirectoryItem(tools.lang(32016).encode('utf-8'), 'showsSearch', '', '')
         tools.closeDirectory('addons', cacheToDisc=True)
 

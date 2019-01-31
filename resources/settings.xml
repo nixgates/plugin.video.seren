@@ -13,15 +13,16 @@
         <!-- I'm leaving this hidden for now, TMDB needs a fair bit of work to get back up to scratch -->
         <setting type="enum" id="general.metalocation" default="1" label="40013" values="TMDB|TVDB" visible="hidden" />
         <setting id="item.limit" type="slider" label="40014" default="40" range="10, 100" option="int" />
-        <setting id="general.viewidswitch" label="40015" default="false" type="bool" visible="true"/>
-        <setting id="movie.view" type="select" subsetting="true" label="40016" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-1,false)" />
-        <setting id="movie.view.id" type="number" subsetting="true" label="40017" default="" visible="eq(-2,true)"/>
-        <setting id="show.view" type="select" label="40018" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-3,false)" />
-        <setting id="show.view.id" type="number" label="40019" default="" subsetting="true" visible="eq(-4,true)"/>
-        <setting id="episode.view" type="select" label="40020" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-5,false)" />
-        <setting id="episode.view.id" type="number" label="40021" default="" subsetting="true" visible="eq(-6,true)"/>
-        <setting id="season.view" type="select" label="40022" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" subsetting="true" visible="eq(-7,false)"/>
-        <setting id="season.view.id" type="number" label="40023" default="" visible="eq(-8,true)" subsetting="true"/>
+        <setting id="general.setViews" type="bool" label="40084" default="true" />
+        <setting id="general.viewidswitch" subsetting='true' label="40015" default="false" type="bool" visible="eq(-1,true)"/>
+        <setting id="movie.view" type="select" subsetting="true" label="40016" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-1,false) + eq(-2,true)" />
+        <setting id="movie.view.id" type="number" subsetting="true" label="40017" default="" visible="eq(-2,true) + eq(-3,true)"/>
+        <setting id="show.view" type="select" label="40018" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-3,false) + eq(-4,true)" />
+        <setting id="show.view.id" type="number" label="40019" default="" subsetting="true" visible="eq(-4,true) + eq(-5,true)"/>
+        <setting id="episode.view" type="select" label="40020" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-5,false) + eq(-6,true)" />
+        <setting id="episode.view.id" type="number" label="40021" default="" subsetting="true" visible="eq(-6,true) + eq(-7,true)"/>
+        <setting id="season.view" type="select" label="40022" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" subsetting="true" visible="eq(-7,false) + eq(-8,true)"/>
+        <setting id="season.view.id" type="number" label="40023" default="" visible="eq(-8,true) + eq(-9,true)" subsetting="true"/>
         <setting id="general.textColorSelect" type="action" label="40024" option="close" action="RunPlugin(plugin://plugin.video.seren/?action=colorPicker)" />
         <setting type="text" label="40025" enable="false" id="general.displayColor" default="None" />
         <setting type="lsep" label="40026" />
@@ -145,12 +146,5 @@
         <setting type="sep" />
         <setting id="tvdb.apikey" label="TVDB API Key" type="text" default="" />
     </category>
-  
-    <category label="Quick Clear">
-        <setting type="lsep" label="Clear Cache" />
-        <setting type="sep"/>
-        <setting type="action" label="Clear Torrent Cache" action="RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)" />
-        <setting type="action" label="Clear Cache" action="RunPlugin(plugin://plugin.video.seren/?action=clearCache)" />
-    </category>	
-   
+
 </settings>

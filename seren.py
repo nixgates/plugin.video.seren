@@ -127,7 +127,6 @@ if action == 'revokeTrakt':
     trakt.TraktAPI().revokeAuth()
 
 if action == 'getSources':
-
     try:
         if tools.playList.getposition() == 0:
             display_background = True
@@ -172,11 +171,15 @@ if action == 'getSources':
                 del background
 
             if stream_link is None:
+                tools.closeBusyDialog()
                 try:
                     tools.playList.clear()
+                    tools.closeOkDialog()
+                    tools.showDialog.notification(tools.addonName, tools.lang(32047).encode('utf-8'), time=5000)
                 except:
                     pass
                 pass
+
             else:
                 from resources.lib.modules import player
 
@@ -184,6 +187,7 @@ if action == 'getSources':
         else:
             tools.closeBusyDialog()
             tools.playList.clear()
+            tools.closeOkDialog()
             if display_background is True:
                 background.close()
                 del background
@@ -191,13 +195,14 @@ if action == 'getSources':
 
     except:
         # Perform cleanup and make sure all open windows close and playlist is cleared
+        tools.closeBusyDialog()
+
         import traceback
 
         traceback.print_exc()
-        tools.closeBusyDialog()
         try:
-            display_background.close()
-            del display_background
+            background.close()
+            del background
         except:
             pass
 
@@ -215,6 +220,7 @@ if action == 'getSources':
 
         try:
             tools.playList.clear()
+            tools.closeOkDialog()
         except:
             pass
 
@@ -373,7 +379,7 @@ if action == 'cacheAssist':
 
     cacheAssist.CacheAssit(actionArgs)
 
-if action == 'showGenres':
+if action == 'tvGenres':
     from resources.lib.gui import tvshowMenus
 
     tvshowMenus.Menus().showGenres()
@@ -505,10 +511,21 @@ if action == 'buildPlaylist':
     from resources.lib.gui import tvshowMenus
 
     actionArgs = json.loads(tools.unquote(actionArgs))
+    episode = actionArgs['info_dictionary']['episodeInfo']['info']['episode']
     playlist = tvshowMenus.Menus().episodeListBuilder(actionArgs['playlist'], actionArgs['info_dictionary'],
                                                       smartPlay=True, hide_unaired=True)
 
     for i in playlist:
+        # Confirm that the episode meta we have received from TVDB are for the correct episodes
+        # If trakt provides the incorrect TVDB ID it's possible to begin play from the incorrect episode
+        params = dict(tools.parse_qsl(i[0].replace('?', '')))
+        actionArgs = json.loads(params.get('actionArgs'))
+        tools.log(actionArgs)
+        if actionArgs['episodeInfo']['info']['episode'] < episode:
+            continue
+
+        # If the episode is confirmed ok, add it to our playlist.
+        tools.log("ADDING ITEM TO PLAYLIST")
         tools.playList.add(url=i[0], listitem=i[1])
 
     tools.player().play(tools.playList)

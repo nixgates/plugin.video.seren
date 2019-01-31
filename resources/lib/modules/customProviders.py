@@ -19,21 +19,20 @@ import xbmc
 from resources.lib.common import tools
 from resources.lib.modules import database
 
-
-from resources.lib.modules import zfile as zipfile
+if tools.kodiVersion > 17:
+    from resources.lib.modules import zfile as zipfile
+else:
+    import zipfile
 
 
 class providers:
     def __init__(self):
         self.deploy_init()
         self.pre_update_collection = []
-        # self.language = tools.getSetting('general.language')
         self.language = 'en'
-        #tools.progressDialog.create(tools.addonName, 'Please Wait, Building Provider List')
         self.known_providers = database.get_providers()
         self.known_packages = database.get_provider_packages()
         self.update_known_providers()
-        #tools.progressDialog.close()
         self.providers_path = os.path.join(tools.dataPath, 'providers')
         self.modules_path = os.path.join(tools.dataPath, 'providerModules')
         self.meta_path = os.path.join(tools.dataPath, 'providerMeta')
@@ -320,16 +319,22 @@ class providers:
                 pass
 
             if not silent:
-                install_progress.close()
+                try:
+                    install_progress.close()
+                except:
+                    pass
             if not silent:
                 tools.showDialog.ok(tools.addonName, '%s - %s' % (tools.lang(33010).encode('utf-8'), pack_name))
         except:
             import traceback
             traceback.print_exc()
             if not silent:
-                install_progress.close()
-                tools.showDialog.ok(tools.addonName, '%s - %s' % (tools.lang(33012).encode('utf-8'), pack_name),
+                try:
+                    install_progress.close()
+                    tools.showDialog.ok(tools.addonName, '%s - %s' % (tools.lang(33012).encode('utf-8'), pack_name),
                                     tools.lang(33011).encode('utf-8'))
+                except:
+                    pass
             return
 
         if os.path.exists('%s.temp' % meta_output_location):
@@ -474,7 +479,10 @@ class providers:
                 self.update(meta_file, silent)
 
         if not silent:
-            update_dialog.close()
+            try:
+                update_dialog.close()
+            except:
+                pass
 
         if not automatic:
             return updates
@@ -508,21 +516,21 @@ class providers:
         return False
 
     def manual_update(self):
-        updateable = self.check_for_updates()
+        update = self.check_for_updates()
 
         # If there are no available updates return
-        if len(updateable) == 0:
+        if len(update) == 0:
             tools.showDialog.ok(tools.addonName, tools.lang(33018).encode('utf-8'))
             return
 
         # Display available packages to update
-        display_list = ['%s - %s' % (i['name'], i['version']) for i in updateable]
+        display_list = ['%s - %s' % (i['name'], i['version']) for i in update]
         selection = tools.showDialog.select(tools.addonName, display_list)
 
         if selection == -1:
             return
 
-        selection = updateable[selection]
+        selection = update[selection]
 
         self.update(selection)
 
