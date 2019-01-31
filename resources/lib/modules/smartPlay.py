@@ -36,7 +36,8 @@ class SmartPlay:
         self.window.setBackground(self.poster)
 
         self.window.setText(tools.lang(32094).encode('utf-8'))
-        self.window.show()
+        if not append_playlist:
+            self.window.show()
         self.window.setProgress(0)
         self.window.setProgress(40)
         self.window.setText(tools.lang(32095).encode('utf-8'))
@@ -82,6 +83,14 @@ class SmartPlay:
             tools.log("STARTING PLAYLIST GENERATION")
             playlist = tvshowMenus.Menus().episodeListBuilder(playlist, self.info_dictionary, smartPlay=True)
             for i in playlist:
+                # Confirm that the episode meta we have received from TVDB are for the correct episodes
+                # If trakt provides the incorrect TVDB ID it's possible to begin play from the incorrect episode
+                params = dict(tools.parse_qsl(i[0].replace('?', '')))
+                actionArgs = json.loads(params.get('actionArgs'))
+                if actionArgs['episodeInfo']['info']['episode'] < episode:
+                    continue
+
+                # If the episode is confirmed ok, add it to our playlist.
                 tools.log("ADDING ITEM TO PLAYLIST")
                 tools.playList.add(url=i[0], listitem=i[1])
             return

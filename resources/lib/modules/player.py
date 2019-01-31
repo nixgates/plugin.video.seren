@@ -3,14 +3,14 @@
 import datetime
 import json
 import sys
-
+import threading
 import AddonSignals
 
 from resources.lib.common import tools
 from resources.lib.indexers import trakt
 from resources.lib.modules import smartPlay
 
-sysaddon = sys.argv[0];
+sysaddon = sys.argv[0]
 syshandle = int(sys.argv[1])
 
 
@@ -26,6 +26,8 @@ class serenPlayer(tools.player):
         self.media_length = 0
         self.current_time = 0
         self.stopped = False
+        self.args = {}
+        self.playback_started = False
 
     def play_source(self, stream_link, args):
 
@@ -56,12 +58,12 @@ class serenPlayer(tools.player):
 
             tools.resolvedUrl(syshandle, True, item)
 
+            self.keepAlive()
+
             try:
-                tools.busyDialog.close()
+                tools.closeBusyDialog()
             except:
                 pass
-
-            self.keepAlive()
 
         except:
             import traceback
@@ -119,14 +121,17 @@ class serenPlayer(tools.player):
             if tools.getSetting('general.smartplay') is not 'false' and self.media_type is 'episode':
                 if int(tools.playList.getposition()) == (tools.playList.size() - 1):
                     self.next_season = smartPlay.SmartPlay(self.args).append_next_season()
+
+            self.playback_started = True
         except:
             pass
 
     def onPlayBackEnded(self):
-        self.traktStopWatching()
         self.stopped = True
+        self.traktStopWatching()
 
     def onPlayBackStopped(self):
+        self.stopped = True
         watched_percent = self.getWatchedPercent()
         if watched_percent < 90.00:
             self.traktPause()
@@ -134,8 +139,6 @@ class serenPlayer(tools.player):
             self.traktStopWatching()
 
         tools.playList.clear()
-
-        self.stopped = True
 
     def onPlayBackPaused(self):
         self.traktPause()
@@ -146,6 +149,7 @@ class serenPlayer(tools.player):
     def getWatchedPercent(self, offset=None):
         current_position = self.current_time
         totalLength = self.media_length
+        watched_percent = 0
 
         if int(totalLength) == 0:
             try:
@@ -160,13 +164,11 @@ class serenPlayer(tools.player):
             try:
                 watched_percent = float(current_position) / float(totalLength) * 100
                 if watched_percent > 100:
-                    return 100
-                else:
-                    return watched_percent
+                    watched_percent = 100
             except:
                 pass
 
-        return 0
+        return watched_percent
 
     def traktStartWatching(self, offset=None):
         if not self.trakt_integration():
@@ -208,27 +210,31 @@ class serenPlayer(tools.player):
             traceback.print_exc()
 
     def keepAlive(self):
+        for i in range(0, 240):
+            if self.isPlayingVideo(): break
+            tools.kodi.sleep(1000)
 
-        while not self.stopped:
+        while self.isPlaying():
             try:
-                if self.isPlaying():
+                try:self.current_time = self.getTime()
+                except: pass
+                if self.pre_cache_initiated is False:
                     try:
-                        self.current_time = self.getTime()
-                        if self.pre_cache_initiated is False:
-                            if self.getWatchedPercent() > 80 and tools.getSetting('smartPlay.preScrape') == 'true':
-                                self.pre_cache_initiated = True
-                                smartPlay.SmartPlay(self.args).pre_scrape()
+                        if not self.playback_started:
+                            tools.kodi.sleep(5000)
+                            continue
+                        if self.getWatchedPercent() > 80 and tools.getSetting('smartPlay.preScrape') == 'true':
+                            self.pre_cache_initiated = True
+                            smartPlay.SmartPlay(self.args).pre_scrape()
                     except:
-                        import traceback
-                        traceback.print_exc()
                         pass
-                tools.kodi.sleep(1000)
             except:
                 import traceback
                 traceback.print_exc()
-                tools.kodi.sleep(1000)
+                tools.kodi.sleep(5000)
                 continue
-        pass
+
+            tools.kodi.sleep(5000)
 
     def traktBookmark(self):
         if not self.trakt_integration():

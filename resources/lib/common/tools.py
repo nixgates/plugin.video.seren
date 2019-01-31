@@ -151,8 +151,6 @@ try:
 
     showDialog = xbmcgui.Dialog()
 
-    busyDialog = xbmcgui.DialogBusy()
-
     progressDialog = xbmcgui.DialogProgress()
 
     resolvedUrl = xbmcplugin.setResolvedUrl
@@ -211,11 +209,14 @@ def closeDirectory(contentType, viewType='Default', sort=False, cacheToDisc=Fals
 
     viewType = get_view_type(contentType)
 
-    xbmc.executebuiltin('Container.SetViewMode(%d)' % viewType)
-
     content(syshandle, contentType)
 
     endDirectory(syshandle, cacheToDisc=True)
+    xbmc.sleep(200)
+
+    if getSetting('general.setViews') == 'true':
+        xbmc.executebuiltin('Container.SetViewMode(%s)' % str(viewType))
+
 
 
 def get_view_type(contentType):
@@ -245,13 +246,12 @@ def get_view_type(contentType):
     viewType = int(viewType)
     return viewType
 
+def closeOkDialog():
+    execute('Dialog.Close(okdialog, true)')
 
-def busy():
-    return execute('ActivateWindow(busydialog)')
 
-
-def idle():
-    return execute('Dialog.Close(busydialog)')
+def closeBusyDialog():
+    execute('Dialog.Close(busydialog)')
 
 
 def safeStr(obj):
@@ -360,13 +360,6 @@ def remove_duplicate_dicts(src_lst, ignored_keys):
     filtered = {tuple((k, d[k]) for k in sorted(d) if k not in ignored_keys): d for d in src_lst}
     dst_lst = list(filtered.values())
     return dst_lst
-
-
-def closeBusyDialog():
-    if kodiVersion > 17:
-        execute('Dialog.Close(busydialognocancel')
-    else:
-        execute('Dialog.Close(all,true)')
 
 
 import subprocess
