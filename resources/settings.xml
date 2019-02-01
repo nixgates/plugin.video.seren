@@ -24,6 +24,7 @@
         <setting id="season.view" type="select" label="40022" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" subsetting="true" visible="eq(-7,false) + eq(-8,true)"/>
         <setting id="season.view.id" type="number" label="40023" default="" visible="eq(-8,true) + eq(-9,true)" subsetting="true"/>
         <setting id="general.textColorSelect" type="action" label="40024" option="close" action="RunPlugin(plugin://plugin.video.seren/?action=colorPicker)" />
+        <setting id="general.appendtitles" type="bool" label="40086" default="true" />
         <setting type="text" label="40025" enable="false" id="general.displayColor" default="None" />
         <setting type="lsep" label="40026" />
         <setting type="sep" />
@@ -147,4 +148,10 @@
         <setting id="tvdb.apikey" label="TVDB API Key" type="text" default="" />
     </category>
 
+    <category label="40085">
+        <setting type="lsep" label="32042" />
+        <setting type="sep"/>
+        <setting type="action" label="32055" action="RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)" />
+        <setting type="action" label="32042" action="RunPlugin(plugin://plugin.video.seren/?action=clearCache)" />
+    </category>
 </settings>

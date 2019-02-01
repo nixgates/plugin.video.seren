@@ -22,6 +22,7 @@ class Menus:
         self.itemList = []
         self.threadList = []
         self.direct_episode_threads = []
+        self.title_appends = tools.getSetting('general.appendtitles')
 
     ######################################################
     # MENUS
@@ -634,7 +635,15 @@ class Menus:
                     args['episodeInfo']['ids'] = item['ids']
                     name = item['info']['title']
 
+                    if self.title_appends == 'true':
+                        name = "%s: %sx%s %s" % (tools.colorString(args['showInfo']['info']['tvshowtitle']),
+                                                 str(item['info']['season']).zfill(2),
+                                                 str(item['info']['episode']).zfill(2),
+                                                 item['info']['title'].encode('utf-8'))
+
                     args = tools.quote(json.dumps(args, sort_keys=True))
+
+                    item['info']['title'] = item['info']['originaltitle'] = name
 
                     cm.append((tools.lang(32069).encode('utf-8'),
                                'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)' %
