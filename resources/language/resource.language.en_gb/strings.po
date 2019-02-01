@@ -849,3 +849,12 @@ msgstr ""
 msgctxt "#40084"
 msgid "Force view types on menus"
 msgstr ""
+
+msgctxt "#40085"
+msgid "Shortcuts"
+msgstr ""
+
+msgctxt "#40086"
+msgid "Append show info to mixed episode lists"
+msgstr ""
+

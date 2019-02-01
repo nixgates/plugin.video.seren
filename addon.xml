@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.1.28" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.1.29" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -27,6 +27,11 @@
 			<fanart>temp-fanart.png</fanart>
 		</assets>
 		<news>
+
+Changelog 0.1.29
+Reverted changes to mixed episode lists
+Added option to disable title overwrites for episode lists
+
 Changelog 0.1.28
 Added try except in zfile module to handle file as already provided bytes
 
