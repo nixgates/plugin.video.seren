@@ -626,7 +626,10 @@ class ZipFile(object):
         self._comment = ''
                 #FTG mod for Kodi 18
         if platform() == 'android':
-            file = io.FileIO(file,mode)
+            try:
+                file = io.FileIO(file,mode)
+            except:
+                pass
         if isinstance(file, basestring):
             self._filePassed = 0
             self.filename = file
