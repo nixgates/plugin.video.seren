@@ -251,6 +251,7 @@ class Sources(tools.dialogWindow):
             if len(self.torrentCacheSources) + len(self.hosterSources) == 0:
                 try:
                     tools.playList.clear()
+                    tools.closeOkDialog()
                 except:
                     pass
                 if self.silent:
@@ -601,6 +602,10 @@ class Sources(tools.dialogWindow):
             torrent_list = [i for i in torrent_list if '3D' not in i['info']]
             hoster_list = [i for i in hoster_list if '3D' not in i['info']]
 
+        if tools.getSetting('general.disablelowQuality') == 'true':
+            torrent_list = [i for i in torrent_list if 'CAM' not in i['info']]
+            hoster_list = [i for i in hoster_list if 'CAM' not in i['info']]
+
         if tools.getSetting('general.enablesizelimit') == 'true':
             size_limit = int(tools.getSetting('general.sizelimit')) * 1024
             torrent_list = [i for i in torrent_list if i.get('size', 0) < size_limit]
@@ -611,6 +616,13 @@ class Sources(tools.dialogWindow):
 
             hoster_list = [i for i in hoster_list if 'x265' in i['info']] + \
                           [i for i in hoster_list if 'x265' not in i['info']]
+
+        if tools.getSetting('general.lowQualitysort') == 'true':
+            torrent_list = [i for i in torrent_list if 'CAM' not in i['info']] + \
+                           [i for i in torrent_list if 'CAM' in i['info']]
+
+            hoster_list = [i for i in hoster_list if 'CAM' not in i['info']] + \
+                          [i for i in hoster_list if 'CAM' in i['info']]
 
         random.shuffle(hoster_list)
 
