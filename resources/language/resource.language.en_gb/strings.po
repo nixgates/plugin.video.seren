@@ -858,3 +858,102 @@ msgctxt "#40086"
 msgid "Append show info to mixed episode lists"
 msgstr ""
 
+msgctxt "#40087"
+msgid "TMDB API Key"
+msgstr ""
+
+msgctxt "#40088"
+msgid "Trakt API Keys"
+msgstr ""
+
+msgctxt "#40089"
+msgid "Trakt Client ID"
+msgstr ""
+
+msgctxt "#40090"
+msgid "Trakt Client Secret"
+msgstr ""
+
+msgctxt "#40091"
+msgid "TVDB API Keys"
+msgstr ""
+
+msgctxt "#40092"
+msgid "TVDB API Key"
+msgstr ""
+
+msgctxt "#40093"
+msgid "Sort & Filter"
+msgstr ""
+
+msgctxt "#40094"
+msgid "Hide 3D Items"
+msgstr ""
+
+msgctxt "#40095"
+msgid "Source Sorting"
+msgstr ""
+
+msgctxt "#40096"
+msgid "Authorize Real Debrid..."
+msgstr ""
+
+msgctxt "#40097"
+msgid "Real Debrid Username"
+msgstr ""
+
+msgctxt "#40098"
+msgid "Enable Real Debrid"
+msgstr ""
+
+msgctxt "#40099"
+msgid "Real Debrid Priority"
+msgstr ""
+
+msgctxt "#40100"
+msgid "Enable Torrents"
+msgstr ""
+
+msgctxt "#40101"
+msgid "Enable Hosters"
+msgstr ""
+
+msgctxt "#40102"
+msgid "Auto-Delete Torrents"
+msgstr ""
+
+msgctxt "#40103"
+msgid "Max Fair-Use Percentage Before Deletion"
+msgstr ""
+
+msgctxt "#40104"
+msgid "Automatic Cloud Removal"
+msgstr ""
+
+msgctxt "#40105"
+msgid "Prefer Transcoded Files"
+msgstr ""
+
+msgctxt "#40106"
+msgid "Api Key"
+msgstr ""
+
+msgctxt "#40107"
+msgid "Premiumize Priority"
+msgstr ""
+
+msgctxt "#40108"
+msgid "Enable Premiumize"
+msgstr ""
+
+msgctxt "#40109"
+msgid "Hide Low Quality Items"
+msgstr ""
+
+msgctxt "#40110"
+msgid "Enable Quaternary Low Quality Sort Preference"
+msgstr ""
+
+msgctxt "#40111"
+msgid "TMDB API Keys"
+msgstr ""
