@@ -216,13 +216,21 @@ class providers:
             if i.startswith('/') or '..' in i:
                 raise Exception
 
+        zip_root_dir = ''
+        if file_list[0].endswith('/'):
+            zip_root_dir = file_list[0]
+            for i, v in enumerate(file_list):
+                file_list[i] = file_list[i].replace(zip_root_dir, '')
+            file_list = file_list[1:]
+
         meta_file = None
         for i in file_list:
             if i.startswith('meta.json'):
                 meta_file = i
+                break
 
         if meta_file is not None:
-            meta = zip_file.open(meta_file)
+            meta = zip_file.open(zip_root_dir + meta_file)
             meta = meta.readlines()
             meta = ''.join(meta)
             meta = meta.replace(' ', '').replace('\r', '').replace('\n', '')
@@ -303,7 +311,21 @@ class providers:
                         os.rename(folder_path, '%s.temp' % folder_path)
                     for file in file_list:
                         if file.startswith(folder):
-                            zip_file.extract(file, tools.dataPath)
+                            memberpath = os.path.join(zip_root_dir, file)
+                            targetpath = os.path.join(tools.dataPath, file)
+
+                            upperdirs = os.path.dirname(targetpath)
+                            if upperdirs and not os.path.exists(upperdirs):
+                                os.makedirs(upperdirs)
+
+                            if memberpath[-1] == '/':
+                                if not os.path.isdir(targetpath):
+                                    os.mkdir(targetpath)
+                                continue
+
+                            with zip_file.open(memberpath) as source, \
+                                          open(targetpath, "wb") as target:
+                                shutil.copyfileobj(source, target)
 
                 except:
                     tools.log('Failed to extract to folder - %s' % folder)
