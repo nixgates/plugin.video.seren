@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import sys, os, xbmc
 from resources.lib.common import tools
 from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.indexers.tmdb import TMDBAPI
@@ -20,14 +20,13 @@ class Menus:
         else:
             trakt = False
 
-        tools.addDirectoryItem(tools.lang(32001).encode('utf-8'), 'moviesHome', None, None)
-        tools.addDirectoryItem(tools.lang(32003).encode('utf-8'), 'showsHome', None, None)
+        tools.addDirectoryItem(tools.lang(32001).encode('utf-8'), 'moviesHome', None, os.path.join(tools.IMAGES_PATH, "movies.png"))
+        tools.addDirectoryItem(tools.lang(32003).encode('utf-8'), 'showsHome', None, os.path.join(tools.IMAGES_PATH, "tvshows.png"))
         if trakt:
-            tools.addDirectoryItem(tools.lang(32002).encode('utf-8'), 'myMovies', None, None)
-        if trakt:
-            tools.addDirectoryItem(tools.lang(32004).encode('utf-8'), 'myShows', None, None)
-        tools.addDirectoryItem(tools.lang(32016).encode('utf-8'), 'searchMenu', None, None)
-        tools.addDirectoryItem(tools.lang(32041).encode('utf-8'), 'toolsMenu', '', '')
+            tools.addDirectoryItem(tools.lang(32002).encode('utf-8'), 'myMovies', None, os.path.join(tools.IMAGES_PATH, "trakt.png"))
+            tools.addDirectoryItem(tools.lang(32004).encode('utf-8'), 'myShows', None, os.path.join(tools.IMAGES_PATH, "trakt.png"))
+        tools.addDirectoryItem(tools.lang(32016).encode('utf-8'), 'searchMenu', None, os.path.join(tools.IMAGES_PATH, "search.png"))
+        tools.addDirectoryItem(tools.lang(32041).encode('utf-8'), 'toolsMenu', '', os.path.join(tools.IMAGES_PATH, "tools.png"))
         #tools.addDirectoryItem('Test2', 'test2', None, None, isFolder=True)
         tools.closeDirectory('addons', cacheToDisc=True)
 
@@ -48,10 +47,13 @@ class Menus:
         tools.closeDirectory('addons', cacheToDisc=True)
 
     def providerMenu(self):
-        tools.addDirectoryItem(tools.lang(32058).encode('utf-8'), 'installProviders', None, None)
-        tools.addDirectoryItem(tools.lang(32059).encode('utf-8'), 'uninstallProviders', None, None)
-        tools.addDirectoryItem(tools.lang(32060).encode('utf-8'), 'adjustProviders&actionArgs=disabled', None, None)
-        tools.addDirectoryItem(tools.lang(32061).encode('utf-8'), 'adjustProviders&actionArgs=enabled', None, None)
+        tools.addDirectoryItem(tools.lang(40082).encode('utf-8'), 'manualProviderUpdate', None, None)
+        tools.addDirectoryItem(tools.lang(40071).encode('utf-8'), 'installProviders', None, None)
+        tools.addDirectoryItem(tools.lang(40072).encode('utf-8'), 'uninstallProviders', None, None)
+        tools.addDirectoryItem(tools.lang(40073).encode('utf-8'), 'adjustPackage&actionArgs=disabled', None, None)
+        tools.addDirectoryItem(tools.lang(40074).encode('utf-8'), 'adjustPackage&actionArgs=enabled', None, None)
+        tools.addDirectoryItem(tools.lang(40076).encode('utf-8'), 'adjustProviders&actionArgs=disabled', None, None)
+        tools.addDirectoryItem(tools.lang(40077).encode('utf-8'), 'adjustProviders&actionArgs=enabled', None, None)
         tools.closeDirectory('addons', cacheToDisc=True)
 
 
