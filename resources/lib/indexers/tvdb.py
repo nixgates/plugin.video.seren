@@ -7,7 +7,7 @@ import threading
 import time
 
 from resources.lib.common import tools
-
+from resources.lib.indexers import fanarttv
 
 class TVDBAPI:
     def __init__(self):
@@ -24,6 +24,9 @@ class TVDBAPI:
         self.baseImageUrl = 'https://www.thetvdb.com/banners/'
         self.threads = []
         self.show_cursory = None
+
+        if tools.fanart_api_key == '': self.fanart_support = False
+        else: self.fanart_support = True
 
         if self.jwToken is not '':
             self.headers['Authorization'] = 'Bearer %s' % self.jwToken
@@ -111,9 +114,13 @@ class TVDBAPI:
     def seriesIDToListItem(self, trakt_object, info_return=True):
         try:
             tvdbID = trakt_object['ids']['tvdb']
+            if self.fanart_support:
+                self.threads.append(threading.Thread(target=self.getFanartTV, args=(tvdbID,)))
+
             self.threads.append(threading.Thread(target=self.getShowFanart, args=(tvdbID,)))
-            self.threads.append(threading.Thread(target=self.getShowInfo, args=(tvdbID,)))
             self.threads.append(threading.Thread(target=self.getShowPoster, args=(tvdbID,)))
+
+            self.threads.append(threading.Thread(target=self.getShowInfo, args=(tvdbID,)))
             self.threads.append(threading.Thread(target=self.getEpisodeSummary, args=(tvdbID,)))
             self.threads.append(threading.Thread(target=self.getSeriesCast, args=(tvdbID,)))
 
@@ -121,11 +128,19 @@ class TVDBAPI:
                 i.start()
             for i in self.threads:
                 i.join()
+
             item = {'info': None, 'art': None}
             if self.info == {}:
                 return None
             # Set Art
             art = {}
+            try:
+                if self.fanart_support:
+                    art['landscape'] = self.art.get('landscape')
+                if art['landscape'] == '':
+                    art['landscape'] = self.art.get('fanart')
+            except:
+                pass
             try:
                 art['poster'] = self.art.get('poster')
             except:
@@ -135,13 +150,18 @@ class TVDBAPI:
             except:
                 pass
             try:
-                art['landscape'] = self.art.get('fanart')
-            except:
-                pass
-            try:
                 art['fanart'] = self.art.get('fanart')
             except:
                 pass
+            try:
+                art['clearart'] = self.art.get('clearart')
+            except:
+                pass
+            try:
+                art['clearlogo'] = self.art.get('clearlogo')
+            except:
+                pass
+
             try:
                 art['banner'] = self.baseImageUrl + self.info.get('banner', '')
                 if art['banner'] == self.baseImageUrl:
@@ -215,7 +235,7 @@ class TVDBAPI:
                 pass
             try:
                 if '0' in self.episode_summary['airedSeasons']:
-                    self.episode_summary['airedSeasons'].pop(0)
+                    self.episode_summary['airedSeasons'].remove('0')
                 info['seasonCount'] = len(self.episode_summary['airedSeasons'])
             except:
                 info['seasonCount'] = 0
@@ -267,13 +287,13 @@ class TVDBAPI:
     def seasonIDToListItem(self, seasonObject, showArgs):
 
         try:
-            arb = seasonObject['number']
             item = {'info': showArgs['info'], 'art': showArgs['art']}
             tvdbID = showArgs['ids']['tvdb']
             season = seasonObject['number']
 
             self.threads.append(threading.Thread(target=self.getSeasonInfo, args=(tvdbID, season)))
             self.threads.append(threading.Thread(target=self.getSeasonPoster, args=(tvdbID, season)))
+
             for i in self.threads:
                 i.start()
             for i in self.threads:
@@ -336,6 +356,8 @@ class TVDBAPI:
             except:
                 pass
             if item['info']['season_title'] == '':
+                import traceback
+                traceback.print_exc()
                 return None
 
             try:
@@ -350,6 +372,8 @@ class TVDBAPI:
                     if airdate > currentDate:
                         item['info']['season_title'] = '[I][COLOR red]%s[/COLOR][/I]' % item['info']['season_title']
             except:
+                import traceback
+                traceback.print_exc()
                 return None
                 pass
 
@@ -360,6 +384,8 @@ class TVDBAPI:
             item['showInfo'] = showArgs
 
         except:
+            import traceback
+            traceback.print_exc()
             return None
 
         return item
@@ -394,7 +420,9 @@ class TVDBAPI:
         except:
             pass
         try:
-            info['title'] = info['originaltitle'] = response['episodeName']
+            info['title'] = info['originaltitle'] = response.get('episodeName')
+            if info['title'] is None:
+                return None
         except:
             pass
         try:
@@ -403,13 +431,16 @@ class TVDBAPI:
             pass
         try:
             try:
-                info['premiered'] = trakt_object['first_aired'][:10]
-                if len(info['premiered']) < 10:
-                    raise Exception
+                release = tools.datetime_workaround(trakt_object['first_aired'],
+                                                    '%Y-%m-%dT%H:%M:%S.000Z', date_only=False)
+                release = tools.utc_to_local_datetime(release)
+                info['premiered'] = release.date().strftime('%Y-%m-%d')
+                info['aired'] = release.date().strftime('%Y-%m-%d')
             except:
                 import traceback
                 traceback.print_exc()
                 info['premiered'] = response['firstAired']
+                info['aired'] = response['firstAired']
         except:
             pass
         try:
@@ -441,7 +472,7 @@ class TVDBAPI:
         except:
             pass
         try:
-            art['poster'] = showArgs['showInfo']['art']['poster']
+            art = showArgs['showInfo']['art']
         except:
             pass
         try:
@@ -462,14 +493,6 @@ class TVDBAPI:
             pass
         try:
             art['landscape'] = art['thumb']
-        except:
-            pass
-        try:
-            art['fanart'] = showArgs['showInfo']['art']['fanart']
-        except:
-            pass
-        try:
-            art['banner'] = showArgs['showInfo']['art']['banner']
         except:
             pass
 
@@ -519,10 +542,10 @@ class TVDBAPI:
             if image == self.baseImageUrl:
                 image = 0
             self.art['fanart'] = image
-            tools.tv_sema.release()
         except:
-            tools.tv_sema.release()
             pass
+
+        tools.tv_sema.release()
 
     def getShowPoster(self, tvdbID):
         tools.tv_sema.acquire()
@@ -540,10 +563,10 @@ class TVDBAPI:
             if image == self.baseImageUrl:
                 image = 0
             self.art['poster'] = image
-            tools.tv_sema.release()
         except:
-            tools.tv_sema.release()
             pass
+
+        tools.tv_sema.release()
 
     def getShowInfo(self, tvdbID):
         tools.tv_sema.acquire()
@@ -551,10 +574,10 @@ class TVDBAPI:
             url = 'series/%s' % tvdbID
             response = self.get_request(url)['data']
             self.info = response
-            tools.tv_sema.release()
         except:
-            tools.tv_sema.release()
             pass
+
+        tools.tv_sema.release()
 
     def getEpisodeSummary(self, tvdbID):
         tools.tv_sema.acquire()
@@ -562,10 +585,10 @@ class TVDBAPI:
             url = 'series/%s/episodes/summary' % tvdbID
             response = self.get_request(url)['data']
             self.episode_summary = response
-            tools.tv_sema.release()
         except:
-            tools.tv_sema.release()
             pass
+
+        tools.tv_sema.release()
 
     def getSeasonPoster(self, tvdbID, season):
         tools.tv_sema.acquire()
@@ -582,10 +605,12 @@ class TVDBAPI:
             if image == self.baseImageUrl:
                 image = 0
             self.art['poster'] = image
-            tools.tv_sema.release()
         except:
-            tools.tv_sema.release()
+            import traceback
+            traceback.print_exc()
             pass
+
+        tools.tv_sema.release()
 
     def getSeasonInfo(self, tvdbID, season):
         tools.tv_sema.acquire()
@@ -593,10 +618,12 @@ class TVDBAPI:
             url = 'series/%s/episodes/query?airedSeason=%s' % (tvdbID, season)
             response = self.get_request(url)['data'][0]
             self.info = response
-            tools.tv_sema.release()
         except:
-            tools.tv_sema.release()
+            import traceback
+            traceback.print_exc()
             pass
+
+        tools.tv_sema.release()
 
     def getSeriesCast(self, tvdbID):
         tools.tv_sema.acquire()
@@ -607,7 +634,22 @@ class TVDBAPI:
 
             for i in actors:
                 self.cast.append({'name': i['name'], 'role': i['role'], 'image': i['image']})
-            tools.tv_sema.release()
         except:
-            tools.tv_sema.release()
             pass
+
+        tools.tv_sema.release()
+
+    def getFanartTV(self, imdb_id):
+        tools.tv_sema.acquire()
+        try:
+            artwork = fanarttv.get(imdb_id, 'tv')
+            artwork.pop('poster')
+            artwork.pop('fanart')
+            artwork.pop('banner')
+            self.art.update(artwork)
+        except:
+            import traceback
+            traceback.print_exc()
+            pass
+
+        tools.tv_sema.release()

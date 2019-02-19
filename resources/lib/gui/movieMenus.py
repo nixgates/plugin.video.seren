@@ -10,8 +10,13 @@ from resources.lib.indexers.tmdb import TMDBAPI
 from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.modules import database
 
-sysaddon = sys.argv[0]
-syshandle = int(sys.argv[1])
+try:
+    sysaddon = sys.argv[0]
+    syshandle = int(sys.argv[1])
+except:
+    sysaddon = ''
+    syshandle = ''
+
 trakt = TraktAPI()
 tmdbAPI = TMDBAPI()
 imdb_scraper = imdb_scraper()
@@ -31,7 +36,10 @@ class Menus:
         traktList = trakt.json_response('sync/playback/movies', limit=True)
         if traktList is None:
             return
-        trakt_list = sorted(traktList, key=lambda i: tools.datetime_workaround(i['paused_at'][:10]))
+
+        trakt_list = sorted(traktList, key=lambda i: tools.datetime_workaround(i['paused_at'][:19],
+                                                                              format="%Y-%m-%dT%H:%M:%S",
+                                                                              date_only=False), reverse=True)
         movie_list = []
         filter_list = []
         for i in trakt_list:
@@ -57,7 +65,10 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32014).encode('utf-8'), 'moviesUpdated&page=1', '', '')
         tools.addDirectoryItem(tools.lang(32062).encode('utf-8'), 'movieGenres&page=1', '', '')
         #tools.addDirectoryItem('Years', 'movieYears', '', '')
-        tools.addDirectoryItem(tools.lang(32016), 'moviesSearch', '', '')
+        if tools.getSetting('searchHistory') == 'false':
+            tools.addDirectoryItem(tools.lang(32016), 'moviesSearch', '', '')
+        else:
+            tools.addDirectoryItem(tools.lang(32016), 'moviesSearchHistory', '', '')
         tools.closeDirectory('addons', cacheToDisc=True)
 
     def myMovies(self):
@@ -174,6 +185,16 @@ class Menus:
                                isFolder=True)
         tools.closeDirectory('movies', viewType=self.viewType)
 
+    def moviesSearchHistory(self):
+        history = database.getSearchHistory('movie')
+        tools.addDirectoryItem('New Movie Search...', 'moviesSearch', '', '')
+        tools.addDirectoryItem('Clear Search History...', 'clearSearchHistory', '', '', isFolder=False)
+
+        for i in history:
+            tools.addDirectoryItem(i, 'moviesSearch&actionArgs=%s' % i, '', '')
+        tools.closeDirectory('addon')
+
+
     def moviesSearch(self, actionArgs=None):
 
         if actionArgs == None:
@@ -184,6 +205,8 @@ class Menus:
                 return
         else:
             query = actionArgs
+
+        database.addSearchHistory(query, 'movie')
         query = tools.deaccentString(query.encode('utf-8'))
         query = tools.quote_plus(query)
         trakt_list = trakt.json_response('search/movie?query=%s' % query)
@@ -283,6 +306,11 @@ class Menus:
                 args['fanart'] = item['art']['fanart']
                 args['info'] = item['info']
                 args['art'] = item['art']
+                args['imdb'] = item['info']['imdbnumber']
+                args['tagline'] = item['info']['tagline']
+                args['plot'] = item['info']['plot']
+                args['rating'] = item['info']['rating']
+                args['duration'] = item['info']['duration']
                 name = item['info']['title']
 
                 item['info']['title'] = item['info']['originaltitle'] = name
@@ -306,6 +334,8 @@ class Menus:
                     cm = []
 
             except:
+                import traceback
+                traceback.print_exc()
                 continue
 
             if item is None: continue
@@ -314,7 +344,7 @@ class Menus:
 
     def tmdbListWorker(self, trakt_object):
         tools.tmdb_sema.acquire()
-        listItem = database.get(tmdbAPI.movieToListItem, 24, trakt_object)
+        listItem = database.get(TMDBAPI().movieToListItem, 24, trakt_object)
         # Tried to use IMDB as a scraper source. Fuck it was slow
         # listItem = database.get(imdb_scraper.trakt_movie_to_list_item, '24', trakt_object)
         self.itemList.append(listItem)

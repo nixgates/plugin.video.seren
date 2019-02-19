@@ -1,12 +1,47 @@
 # -*- coding: utf-8 -*-
 
-
 # Below is the contents of the providers/__init__.py base64 encoded
 # If you update this init file you will need to update this base64 as well to ensure it is deployed on the users machine
 # If you change the init file without updating this it will be overwritten with the old one!!
 
-init_contents = 'aW1wb3J0IG9zCmZyb20gcmVzb3VyY2VzLmxpYi5jb21tb24gaW1wb3J0IHRvb2xzCmZyb20gcmVzb3VyY2VzLmxpYi5tb2R1bGVzIGltcG9ydCBkYXRhYmFzZQoKZGF0YV9wYXRoID0gb3MucGF0aC5qb2luKHRvb2xzLmRhdGFQYXRoLCAncHJvdmlkZXJzJykKaG9zdGVyX3NvdXJjZXMgPSBbXQp0b3JyZW50X3NvdXJjZXMgPSBbXQoKZGVmIGdldF9yZWxldmFudChsYW5ndWFnZSk6CiAgICBwcm92aWRlcl9wYWNrYWdlcyA9IFtuYW1lIGZvciBuYW1lIGluIG9zLmxpc3RkaXIoZGF0YV9wYXRoKSBpZiBvcy5wYXRoLmlzZGlyKG9zLnBhdGguam9pbihkYXRhX3BhdGgsIG5hbWUpKV0KICAgICMgR2V0IHJlbGV2YW50IGFuZCBlbmFibGVkIHByb3ZpZGVyIGVudHJpZXMgZnJvbSB0aGUgZGF0YWJhc2UKICAgIHByb3ZpZGVyX3N0YXR1cyA9IFtpIGZvciBpIGluIGRhdGFiYXNlLmdldF9wcm92aWRlcnMoKSBpZiBpWydjb3VudHJ5J10gPT0gbGFuZ3VhZ2VdCiAgICBwcm92aWRlcl9zdGF0dXMgPSBbaSBmb3IgaSBpbiBwcm92aWRlcl9zdGF0dXMgaWYgaVsnc3RhdHVzJ10gPT0gJ2VuYWJsZWQnXQoKICAgIGZvciBwYWNrYWdlIGluIHByb3ZpZGVyX3BhY2thZ2VzOgogICAgICAgIHRyeToKICAgICAgICAgICAgcHJvdmlkZXJzX3BhdGggPSAncHJvdmlkZXJzLiVzLiVzJyAlIChwYWNrYWdlLCBsYW5ndWFnZSkKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgcHJvdmlkZXJfbGlzdCA9IF9faW1wb3J0X18ocHJvdmlkZXJzX3BhdGgsIGZyb21saXN0PVsnJ10pCiAgICAgICAgICAgIGV4Y2VwdDoKICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAgICAgICAgICAgIHRyeToKICAgICAgICAgICAgICAgIGZvciBpIGluIHByb3ZpZGVyX2xpc3QuZ2V0X2hvc3RlcnMoKToKICAgICAgICAgICAgICAgICAgICBmb3Igc3RhdHVzIGluIHByb3ZpZGVyX3N0YXR1czoKICAgICAgICAgICAgICAgICAgICAgICAgaWYgaSA9PSBzdGF0dXNbJ3Byb3ZpZGVyX25hbWUnXToKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmIHBhY2thZ2UgPT0gc3RhdHVzWydwYWNrYWdlJ106CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIyBBZGQgaW1wb3J0IHBhdGggYW5kIG5hbWUgdG8gaG9zdGVyX3Byb3ZpZGVycwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGhvc3Rlcl9zb3VyY2VzLmFwcGVuZCgoJyVzLmhvc3RlcnMnICUgcHJvdmlkZXJzX3BhdGgsIGksIHBhY2thZ2UpKQogICAgICAgICAgICBleGNlcHQ6CiAgICAgICAgICAgICAgICBwYXNzCiAgICAgICAgICAgIAogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBmb3IgaSBpbiBwcm92aWRlcl9saXN0LmdldF90b3JyZW50KCk6CiAgICAgICAgICAgICAgICAgICAgZm9yIHN0YXR1cyBpbiBwcm92aWRlcl9zdGF0dXM6CiAgICAgICAgICAgICAgICAgICAgICAgIGlmIGkgPT0gc3RhdHVzWydwcm92aWRlcl9uYW1lJ106CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZiBwYWNrYWdlID09IHN0YXR1c1sncGFja2FnZSddOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICMgQWRkIGltcG9ydCBwYXRoIGFuZCBuYW1lIHRvIHRvcnJlbnRfcHJvdmlkZXJzCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdG9ycmVudF9zb3VyY2VzLmFwcGVuZCgoJyVzLnRvcnJlbnQnICUgcHJvdmlkZXJzX3BhdGgsIGksIHBhY2thZ2UpKQogICAgICAgICAgICBleGNlcHQ6CiAgICAgICAgICAgICAgICBwYXNzCiAgICAgICAgZXhjZXB0OgogICAgICAgICAgICBpbXBvcnQgdHJhY2ViYWNrCiAgICAgICAgICAgIHRyYWNlYmFjay5wcmludF9leGMoKQogICAgICAgICAgICBjb250aW51ZQoKICAgIHJldHVybiAodG9ycmVudF9zb3VyY2VzLCBob3N0ZXJfc291cmNlcykKCmRlZiBnZXRfYWxsKGxhbmd1YWdlKToKICAgIHByb3ZpZGVyX3BhY2thZ2VzID0gW25hbWUgZm9yIG5hbWUgaW4gb3MubGlzdGRpcihkYXRhX3BhdGgpIGlmIG9zLnBhdGguaXNkaXIob3MucGF0aC5qb2luKGRhdGFfcGF0aCwgbmFtZSkpXQogICAgZm9yIHBhY2thZ2UgaW4gcHJvdmlkZXJfcGFja2FnZXM6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBwcm92aWRlcnNfcGF0aCA9ICdwcm92aWRlcnMuJXMuJXMnICUgKHBhY2thZ2UsIGxhbmd1YWdlKQogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBwcm92aWRlcl9saXN0ID0gX19pbXBvcnRfXyhwcm92aWRlcnNfcGF0aCwgZnJvbWxpc3Q9WycnXSkKICAgICAgICAgICAgZXhjZXB0OgogICAgICAgICAgICAgICAgY29udGludWUKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgZm9yIGkgaW4gcHJvdmlkZXJfbGlzdC5nZXRfaG9zdGVycygpOgogICAgICAgICAgICAgICAgICAgIGhvc3Rlcl9zb3VyY2VzLmFwcGVuZCgoJyVzLmhvc3RlcnMnICUgcHJvdmlkZXJzX3BhdGgsIGksIHBhY2thZ2UpKQogICAgICAgICAgICBleGNlcHQ6CiAgICAgICAgICAgICAgICBwYXNzCgogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBmb3IgaSBpbiBwcm92aWRlcl9saXN0LmdldF90b3JyZW50KCk6CiAgICAgICAgICAgICAgICAgICAgdG9ycmVudF9zb3VyY2VzLmFwcGVuZCgoJyVzLnRvcnJlbnQnICUgcHJvdmlkZXJzX3BhdGgsIGksIHBhY2thZ2UpKQogICAgICAgICAgICBleGNlcHQ6CiAgICAgICAgICAgICAgICBwYXNzCgogICAgICAgIGV4Y2VwdDoKICAgICAgICAgICAgaW1wb3J0IHRyYWNlYmFjawogICAgICAgICAgICB0cmFjZWJhY2sucHJpbnRfZXhjKCkKICAgICAgICAgICAgY29udGludWUKCiAgICByZXR1cm4gKHRvcnJlbnRfc291cmNlcywgaG9zdGVyX3NvdXJjZXMpCg=='
-
+init_contents = 'aW1wb3J0IG9zCmZyb20gcmVzb3VyY2VzLmxpYi5jb21tb24gaW1wb3J0IHRvb2xzCmZyb20gcmVzb3VyY2VzLmxpYi5tb2R1bG' \
+                'VzIGltcG9ydCBkYXRhYmFzZQoKZGF0YV9wYXRoID0gb3MucGF0aC5qb2luKHRvb2xzLmRhdGFQYXRoLCAncHJvdmlkZXJzJykKa' \
+                'G9zdGVyX3NvdXJjZXMgPSBbXQp0b3JyZW50X3NvdXJjZXMgPSBbXQoKZGVmIGdldF9yZWxldmFudChsYW5ndWFnZSk6CiAgICBw' \
+                'cm92aWRlcl9wYWNrYWdlcyA9IFtuYW1lIGZvciBuYW1lIGluIG9zLmxpc3RkaXIoZGF0YV9wYXRoKSBpZiBvcy5wYXRoLmlzZGly' \
+                'KG9zLnBhdGguam9pbihkYXRhX3BhdGgsIG5hbWUpKV0KICAgICMgR2V0IHJlbGV2YW50IGFuZCBlbmFibGVkIHByb3ZpZGVyIGVu' \
+                'dHJpZXMgZnJvbSB0aGUgZGF0YWJhc2UKICAgIHByb3ZpZGVyX3N0YXR1cyA9IFtpIGZvciBpIGluIGRhdGFiYXNlLmdldF9wcm92' \
+                'aWRlcnMoKSBpZiBpWydjb3VudHJ5J10gPT0gbGFuZ3VhZ2VdCiAgICBwcm92aWRlcl9zdGF0dXMgPSBbaSBmb3IgaSBpbiBwcm92' \
+                'aWRlcl9zdGF0dXMgaWYgaVsnc3RhdHVzJ10gPT0gJ2VuYWJsZWQnXQoKICAgIGZvciBwYWNrYWdlIGluIHByb3ZpZGVyX3BhY2th' \
+                'Z2VzOgogICAgICAgIHRyeToKICAgICAgICAgICAgcHJvdmlkZXJzX3BhdGggPSAncHJvdmlkZXJzLiVzLiVzJyAlIChwYWNrYWdl' \
+                'LCBsYW5ndWFnZSkKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgcHJvdmlkZXJfbGlzdCA9IF9faW1wb3J0X18ocHJv' \
+                'dmlkZXJzX3BhdGgsIGZyb21saXN0PVsnJ10pCiAgICAgICAgICAgIGV4Y2VwdDoKICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAg' \
+                'ICAgICAgICAgIHRyeToKICAgICAgICAgICAgICAgIGZvciBpIGluIHByb3ZpZGVyX2xpc3QuZ2V0X2hvc3RlcnMoKToKICAgICAg' \
+                'ICAgICAgICAgICAgICBmb3Igc3RhdHVzIGluIHByb3ZpZGVyX3N0YXR1czoKICAgICAgICAgICAgICAgICAgICAgICAgaWYgaSA9' \
+                'PSBzdGF0dXNbJ3Byb3ZpZGVyX25hbWUnXToKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmIHBhY2thZ2UgPT0gc3RhdHVz' \
+                'WydwYWNrYWdlJ106CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIyBBZGQgaW1wb3J0IHBhdGggYW5kIG5hbWUgdG8g' \
+                'aG9zdGVyX3Byb3ZpZGVycwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGhvc3Rlcl9zb3VyY2VzLmFwcGVuZCgoJyVz' \
+                'Lmhvc3RlcnMnICUgcHJvdmlkZXJzX3BhdGgsIGksIHBhY2thZ2UpKQogICAgICAgICAgICBleGNlcHQ6CiAgICAgICAgICAgICAg' \
+                'ICBwYXNzCiAgICAgICAgICAgIAogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBmb3IgaSBpbiBwcm92aWRlcl9saXN0' \
+                'LmdldF90b3JyZW50KCk6CiAgICAgICAgICAgICAgICAgICAgZm9yIHN0YXR1cyBpbiBwcm92aWRlcl9zdGF0dXM6CiAgICAgICAg' \
+                'ICAgICAgICAgICAgICAgIGlmIGkgPT0gc3RhdHVzWydwcm92aWRlcl9uYW1lJ106CiAgICAgICAgICAgICAgICAgICAgICAgICAg' \
+                'ICBpZiBwYWNrYWdlID09IHN0YXR1c1sncGFja2FnZSddOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICMgQWRkIGlt' \
+                'cG9ydCBwYXRoIGFuZCBuYW1lIHRvIHRvcnJlbnRfcHJvdmlkZXJzCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdG9y' \
+                'cmVudF9zb3VyY2VzLmFwcGVuZCgoJyVzLnRvcnJlbnQnICUgcHJvdmlkZXJzX3BhdGgsIGksIHBhY2thZ2UpKQogICAgICAgICAg' \
+                'ICBleGNlcHQ6CiAgICAgICAgICAgICAgICBwYXNzCiAgICAgICAgZXhjZXB0OgogICAgICAgICAgICBpbXBvcnQgdHJhY2ViYWNr' \
+                'CiAgICAgICAgICAgIHRyYWNlYmFjay5wcmludF9leGMoKQogICAgICAgICAgICBjb250aW51ZQoKICAgIHJldHVybiAodG9ycmVu' \
+                'dF9zb3VyY2VzLCBob3N0ZXJfc291cmNlcykKCmRlZiBnZXRfYWxsKGxhbmd1YWdlKToKICAgIHByb3ZpZGVyX3BhY2thZ2VzID0g' \
+                'W25hbWUgZm9yIG5hbWUgaW4gb3MubGlzdGRpcihkYXRhX3BhdGgpIGlmIG9zLnBhdGguaXNkaXIob3MucGF0aC5qb2luKGRhdGFf' \
+                'cGF0aCwgbmFtZSkpXQogICAgZm9yIHBhY2thZ2UgaW4gcHJvdmlkZXJfcGFja2FnZXM6CiAgICAgICAgdHJ5OgogICAgICAgICAg' \
+                'ICBwcm92aWRlcnNfcGF0aCA9ICdwcm92aWRlcnMuJXMuJXMnICUgKHBhY2thZ2UsIGxhbmd1YWdlKQogICAgICAgICAgICB0cnk6' \
+                'CiAgICAgICAgICAgICAgICBwcm92aWRlcl9saXN0ID0gX19pbXBvcnRfXyhwcm92aWRlcnNfcGF0aCwgZnJvbWxpc3Q9WycnXSkK' \
+                'ICAgICAgICAgICAgZXhjZXB0OgogICAgICAgICAgICAgICAgY29udGludWUKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAg' \
+                'ICAgZm9yIGkgaW4gcHJvdmlkZXJfbGlzdC5nZXRfaG9zdGVycygpOgogICAgICAgICAgICAgICAgICAgIGhvc3Rlcl9zb3VyY2Vz' \
+                'LmFwcGVuZCgoJyVzLmhvc3RlcnMnICUgcHJvdmlkZXJzX3BhdGgsIGksIHBhY2thZ2UpKQogICAgICAgICAgICBleGNlcHQ6CiAg' \
+                'ICAgICAgICAgICAgICBwYXNzCgogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBmb3IgaSBpbiBwcm92aWRlcl9saXN0' \
+                'LmdldF90b3JyZW50KCk6CiAgICAgICAgICAgICAgICAgICAgdG9ycmVudF9zb3VyY2VzLmFwcGVuZCgoJyVzLnRvcnJlbnQnICUg' \
+                'cHJvdmlkZXJzX3BhdGgsIGksIHBhY2thZ2UpKQogICAgICAgICAgICBleGNlcHQ6CiAgICAgICAgICAgICAgICBwYXNzCgogICAg' \
+                'ICAgIGV4Y2VwdDoKICAgICAgICAgICAgaW1wb3J0IHRyYWNlYmFjawogICAgICAgICAgICB0cmFjZWJhY2sucHJpbnRfZXhjKCkK' \
+                'ICAgICAgICAgICAgY29udGludWUKCiAgICByZXR1cm4gKHRvcnJlbnRfc291cmNlcywgaG9zdGVyX3NvdXJjZXMpCg=='
 
 import os
 import sys
@@ -324,7 +359,7 @@ class providers:
                                 continue
 
                             with zip_file.open(memberpath) as source, \
-                                          open(targetpath, "wb") as target:
+                                    open(targetpath, "wb") as target:
                                 shutil.copyfileobj(source, target)
 
                 except:
@@ -490,6 +525,7 @@ class providers:
                 continue
 
             meta_file = json.loads(meta_file.text)
+
             if not meta_file['name'] == package['pack_name']:
                 tools.log('Pack name check failure')
                 continue

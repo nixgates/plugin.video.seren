@@ -8,6 +8,7 @@ import re
 import sys
 import threading
 import time
+import traceback
 
 from resources.lib.common import source_utils
 from resources.lib.common import tools
@@ -23,7 +24,8 @@ approved_qualities = ['4K', '1080p', '720p', 'SD']
 
 class Sources(tools.dialogWindow):
     def __init__(self):
-        self.threads = []
+        self.torrent_threads = []
+        self.hoster_threads = []
         self.torrentProviders = []
         self.hosterProviders = []
         self.language = 'en'
@@ -119,19 +121,13 @@ class Sources(tools.dialogWindow):
 
             if 'showInfo' in self.args:
                 background = self.args['showInfo']['art']['fanart']
+                self.trakt_id = self.args['showInfo']['ids']['trakt']
             else:
+                self.trakt_id = self.args['ids']['trakt']
                 background = self.args['fanart']
 
             self.setText(tools.lang(32081).encode('utf-8'))
             self.setBackground(background)
-
-            # tools.progressDialog.create(tools.addonName)
-            # tools.progressDialog.update(100, tools.lang(32022))
-
-            if 'showInfo' in self.args:
-                self.trakt_id = self.args['showInfo']['ids']['trakt']
-            else:
-                self.trakt_id = self.args['ids']['trakt']
 
             try:
                 self.getLocalTorrentResults()
@@ -145,24 +141,32 @@ class Sources(tools.dialogWindow):
                 self.initProviders()
                 # Load threads for all sources
                 for i in self.torrentProviders:
-                    self.threads.append(threading.Thread(target=self.getTorrent, args=(self.args, i)))
+                    self.torrent_threads.append(threading.Thread(target=self.getTorrent, args=(self.args, i)))
                 for i in self.hosterProviders:
-                    self.threads.append(threading.Thread(target=self.getHosters, args=(self.args, i)))
+                    self.hoster_threads.append(threading.Thread(target=self.getHosters, args=(self.args, i)))
 
                 # Shuffle and start scraping threads
-                random.shuffle(self.threads)
-                for i in self.threads:
+                random.shuffle(self.torrent_threads)
+                random.shuffle(self.hoster_threads)
+                for i in self.torrent_threads:
+                    i.start()
+                time.sleep(2)
+                for i in self.hoster_threads:
                     i.start()
 
                 self.setText(tools.lang(32083).encode('utf-8'))
+
                 # Keep alive for gui display and threading
                 timeout = int(tools.getSetting('general.timeout'))
                 tools.log('Entering Keep Alive', 'info')
                 runtime = 0
+
                 while self.progress < 100:
+
                     tools.log('Remainin Providers %s' % self.remainingProviders)
                     if self.prem_terminate() is True or len(self.remainingProviders) == 0:
-                        break
+                        if runtime > 5:
+                            break
 
                     if self.canceled:
                         break
@@ -219,18 +223,18 @@ class Sources(tools.dialogWindow):
             non_debrid = [i for i in non_debrid if 'debrid_provider' not in i]
 
             for i in debrid_hosts:
-                if not [i['url'].lower(), i['debrid_provider']] in check_list:
+                if not [str(i['url']).lower(), i['debrid_provider']] in check_list:
                     post_dup.append(i)
-                    check_list.append([i['url'].lower(), i['debrid_provider']])
+                    check_list.append([str(i['url']).lower(), i['debrid_provider']])
                 else:
                     self.duplicates_amount += 1
 
             check_list = []
 
             for i in non_debrid:
-                if not i['url'].lower() in check_list:
+                if not str(i['url']).lower() in check_list:
                     post_dup.append(i)
-                    check_list.append(i['url'].lower())
+                    check_list.append(str(i['url']).lower())
                 else:
                     self.duplicates_amount += 1
 
@@ -321,8 +325,6 @@ class Sources(tools.dialogWindow):
                         packtype_filter = [i for i in quality_filter if
                                            i['package'] == 'show' or i['package'] == 'season']
                         sorted_list = sorted(packtype_filter, key=lambda k: k['seeds'], reverse=True)
-                        for i in sorted_list:
-                            print(i)
                         if len(sorted_list) > 0:
                             build_list.append(sorted_list[0])
                             break
@@ -404,12 +406,14 @@ class Sources(tools.dialogWindow):
             # if provider_domain == '' or provider_domain in self.domain_list:
             #    return
             if 'episodeInfo' in info:
-
                 simpleInfo = self.buildSimpleShowInfo(info)
                 allTorrents = providerModule.sources().episode(simpleInfo, info)
 
             else:
-                allTorrents = providerModule.sources().movie(info['title'], info['year'])
+                try:
+                    allTorrents = providerModule.sources().movie(info['title'], info['year'], info['imdb'])
+                except:
+                    allTorrents = providerModule.sources().movie(info['title'], info['year'])
 
             if allTorrents is None:
                 self.remainingProviders.remove(provider_name)
@@ -534,11 +538,11 @@ class Sources(tools.dialogWindow):
                 source['provider_imports'] = provider
 
             pre_dup = sources
-            all_urls = [i['url'].lower() for i in self.hosterSources]
+            all_urls = [str(i['url']).lower() for i in self.hosterSources]
             sources = []
 
             for hoster in pre_dup:
-                if hoster['url'].lower() in all_urls:
+                if str(hoster['url']).lower() in all_urls:
                     self.duplicates_amount += 1
                 else:
                     sources.append(hoster)
@@ -733,6 +737,8 @@ class Sources(tools.dialogWindow):
         simpleInfo['season_number'] = str(info['episodeInfo']['info']['season'])
         simpleInfo['episode_number'] = str(info['episodeInfo']['info']['episode'])
         simpleInfo['show_aliases'] = info['showInfo']['info']['showaliases']
+        if '.' in simpleInfo['show_title']:
+            simpleInfo['show_aliases'].append(source_utils.cleanTitle(simpleInfo['show_title'].replace('.', '')))
         simpleInfo['country'] = info['showInfo']['info']['country']
         simpleInfo['no_seasons'] = str(info['showInfo']['info']['seasonCount'])
 
@@ -745,7 +751,9 @@ class Sources(tools.dialogWindow):
             tvdb = info['showInfo']['ids']['tvdb']
             title = info['showInfo']['info']['tvshowtitle']
             localtitle = ''
-            aliases = []
+            aliases = info['showInfo']['info']['showaliases']
+            if '.' in title:
+                aliases.append(source_utils.cleanTitle(title.replace('.', '')))
             year = info['showInfo']['info']['year']
             return imdb, tvdb, title, localtitle, aliases, year
 
@@ -782,7 +790,7 @@ class Sources(tools.dialogWindow):
             hoster_sources = copy.deepcopy(self.hosterSources)
             for hoster in self.hosterDomains['premium'][provider]:
                 for file in hoster_sources:
-                    if hoster[1].lower() == file['source'].lower() or hoster[0].lower() in file['url'].lower():
+                    if hoster[1].lower() == file['source'].lower() or hoster[0].lower() in str(file['url']).lower():
                         source_list.append(file)
                         source_list[-1]['debrid_provider'] = provider
 
@@ -966,10 +974,8 @@ class TorrentCacheCheck:
                         if 'episodeInfo' in info:
                             episodeStrings, seasonStrings = source_utils.torrentCacheStrings(info)
                             for storage_variant in realDebridCache[i['hash']]['rd']:
-                                if len(storage_variant) > 1:
-                                    continue
-                                else:
-                                    key = list(storage_variant.keys())[0]
+                                keys = list(storage_variant.keys())
+                                for key in keys:
                                     filename = storage_variant[key]['filename']
                                     if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename)
                                            for episodeString in episodeStrings):

@@ -35,7 +35,6 @@ class Cloudflare:
             self.js_data["op"] = re.compile(var + "([\+|\-|\*|\/])=([^;]+)", re.MULTILINE).findall(response["data"])
             self.js_data["wait"] = int(re.compile("\}, ([\d]+)\);", re.MULTILINE).findall(response["data"])[0]) / 1000
         except Exception as e:
-            print(e)
             self.js_data = {}
 
         if "refresh" in response["headers"]:
@@ -45,7 +44,6 @@ class Cloudflare:
                 self.header_data["params"] = {}
                 self.header_data["params"]["pass"] = response["headers"]["refresh"].split("=")[2]
             except Exception as e:
-                print(e)
                 self.header_data = {}
 
     @property

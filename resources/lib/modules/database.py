@@ -154,6 +154,41 @@ def _get_connection(filepath):
     conn.row_factory = _dict_factory
     return conn
 
+def getSearchHistory(media_type):
+    try:
+        cursor = _get_connection_cursor(tools.searchHistoryDB)
+        cursor.execute("CREATE TABLE IF NOT EXISTS %s (value TEXT, media_type TEXT)" % "history")
+        cursor.execute("SELECT * FROM history WHERE media_type = ?", [media_type])
+        history = cursor.fetchall()
+
+        return [i['value'] for i in history][:50]
+    except:
+        import traceback
+        traceback.print_exc()
+        return []
+
+def addSearchHistory(search_string, media_type):
+    cursor = _get_connection_cursor(tools.searchHistoryDB)
+    cursor.execute('CREATE TABLE IF NOT EXISTS %s (value TEXT, media_type TEXT)' % "history")
+
+    cursor.execute(
+        "INSERT INTO %s Values (?, ?)"
+        % "history", (search_string, str(media_type))
+    )
+
+    cursor.connection.commit()
+
+def clearSearchHistory():
+
+    cursor = _get_connection_cursor(tools.searchHistoryDB)
+    cursor.execute("DROP TABLE IF EXISTS history")
+    try:
+        cursor.execute("VACCUM")
+    except:
+        pass
+    cursor.connection.commit()
+
+
 def getTorrents(trakt_id):
     if tools.getSetting('general.torrentCache') == 'false':
         return []
@@ -376,12 +411,16 @@ def clear_providers():
             try:
                 cursor.execute("DROP TABLE IF EXISTS providers")
                 cursor.execute("VACCUM")
-                cursor.connection.commit()
-                cursor.execute("DROP TABLE IF EXISTS packages")
-                cursor.execute("VACUUM")
-                cursor.connection.commit()
             except:
                 pass
+
+            try:
+                cursor.execute("DROP TABLE IF EXISTS packages")
+                cursor.execute("VACUUM")
+            except:
+                pass
+
+        cursor.connection.commit()
     except:
         pass
 

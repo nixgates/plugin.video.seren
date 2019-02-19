@@ -2,12 +2,11 @@
 
 from datetime import datetime
 from time import sleep
+from resources.lib.common import tools
 
 import json
 import requests
-
-from resources.lib.common import tools
-
+import threading
 
 class TMDBAPI:
     def __init__(self):
@@ -18,6 +17,9 @@ class TMDBAPI:
         self.posterPath = "https://image.tmdb.org/t/p/w500"
         self.thumbPath = "https://image.tmdb.org/t/p/w500"
         self.backgroundPath = "https://image.tmdb.org/t/p/w1280"
+
+        if not tools.fanart_api_key == '': self.fanarttv = True
+        else: self.fanarttv = False
 
     def get_request(self, url):
         if '?' not in url:
@@ -128,7 +130,13 @@ class TMDBAPI:
             if trakt_object['ids']['tmdb'] is None:
                 return None
 
-            url = 'movie/%s?&append_to_response=credits,videos' % str(trakt_object['ids']['tmdb'])
+            url = 'movie/%s?&append_to_response=credits,videos,release_dates' % str(trakt_object['ids']['tmdb'])
+
+            fanart_thread = threading.Thread
+            fanart_thread = fanart_thread(target=self.get_fanarttv_art, args=(trakt_object['ids']['imdb'],))
+            if self.fanarttv:
+                fanart_thread.run()
+
             details = self.get_request(url)
             if details == None:
                 tools.log('ERROR TMDB FAILED FOR MOVIEID ' + str(trakt_object['ids']['tmdb']), 'error')
@@ -138,12 +146,24 @@ class TMDBAPI:
 
             # Set Art
             art = {}
-            try:art['poster'] = self.posterPath + str(details.get('poster_path', ''))
-            except:pass
-            try: art['landscape'] = self.backgroundPath + str(details.get('backdrop_path', ''))
-            except: pass
-            try: art['fanart'] = self.backgroundPath + str(details.get('backdrop_path', ''))
-            except: pass
+            if self.fanarttv:
+                import time
+                while fanart_thread.is_alive():
+                    time.sleep(.2)
+                art = self.fanarttv
+            else:
+                try:
+                    art['landscape'] = self.backgroundPath + str(details.get('backdrop_path', ''))
+                except:
+                    pass
+            try:
+                art['poster'] = self.posterPath + str(details.get('poster_path', ''))
+            except:
+                pass
+            try:
+                art['fanart'] = self.backgroundPath + str(details.get('backdrop_path', ''))
+            except:
+                pass
 
             # Set Info
             info = {}
@@ -154,6 +174,13 @@ class TMDBAPI:
                     for i in details['genres']:
                         info['genre'].append(i.get('name'))
             except: pass
+            try:
+                mpaa = details.get('release_dates')['results']
+                mpaa = [i for i in mpaa if i['iso_3166_1'] == 'US']
+                mpaa = mpaa[0].get('release_dates')[0].get('certification')
+                info['mpaa'] = str(mpaa).encode('utf-8')
+            except:
+                pass
 
             try:info['rating'] = float(details.get('vote_average'))
             except: pass
@@ -164,12 +191,10 @@ class TMDBAPI:
             try:info['year'] = details.get('release_date')[:4]
             except:return None
 
-            try:info['duration'] = details.get('runtime')
-            except:pass
-
-            if info['duration'] is not None:
+            try:
+                info['duration'] = details.get('runtime')
                 info['duration'] = int(info['duration']) * 60
-            else:
+            except:
                 info['duration'] = 0
 
             try:info['originaltitle'] = details.get('original_title')
@@ -197,7 +222,6 @@ class TMDBAPI:
             except:pass
 
             info['mediatype'] = 'movie'
-            info['mpaa'] = ''
 
             # Set Crew/Cast Info
             director = None
@@ -472,3 +496,6 @@ class TMDBAPI:
 
         return episode_info
 
+    def get_fanarttv_art(self, imdb):
+        from resources.lib.indexers import fanarttv
+        self.fanarttv = fanarttv.get(imdb, 'movies')

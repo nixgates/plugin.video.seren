@@ -957,3 +957,19 @@ msgstr ""
 msgctxt "#40111"
 msgid "TMDB API Keys"
 msgstr ""
+
+msgctxt "#40112"
+msgid "Enable search history"
+msgstr ""
+
+msgctxt "#40113"
+msgid "Unable to contact Trakt.\nPlease check Trakts outage status at:\nhttp://status.trakt.tv"
+msgstr ""
+
+msgctxt "#40114"
+msgid "Fanart.tv API Key"
+msgstr ""
+
+msgctxt "#40115"
+msgid "Fanart.tv"
+msgstr ""
