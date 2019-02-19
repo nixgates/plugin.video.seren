@@ -28,10 +28,12 @@ class serenPlayer(tools.player):
         self.stopped = False
         self.args = {}
         self.playback_started = False
+        self.init_scrobble = False
 
     def play_source(self, stream_link, args):
 
         try:
+            self.init_scrobble = False
             self.pre_cache_initiated = False
             if stream_link is None:
                 tools.playList.clear()
@@ -93,6 +95,7 @@ class serenPlayer(tools.player):
 
     def start_playback(self):
         try:
+
             tools.execute('Dialog.Close(all,true)')
             self.current_time = self.getTime()
             self.media_length = self.getTotalTime()
@@ -104,7 +107,7 @@ class serenPlayer(tools.player):
             else:
                 tools.log("No seeking applied")
 
-            self.traktStartWatching()
+
             if 'episodeInfo' in self.args and tools.getSetting('smartplay.upnext') == 'true':
                 source_id = 'plugin.video.%s' % tools.addonName.lower()
                 return_id = 'plugin.video.%s_play_action' % tools.addonName.lower()
@@ -123,6 +126,8 @@ class serenPlayer(tools.player):
                     self.next_season = smartPlay.SmartPlay(self.args).append_next_season()
 
             self.playback_started = True
+            post_data = self.buildTraktObject(overide_progress=0)
+            self.trakt_api.post_request('scrobble/start', postData=post_data, limit=False)
         except:
             pass
 
@@ -216,6 +221,9 @@ class serenPlayer(tools.player):
 
         while self.isPlaying():
             try:
+                if not self.init_scrobble:
+                    self.traktStartWatching()
+                    self.init_scrobble = True
                 try:self.current_time = self.getTime()
                 except: pass
                 if self.pre_cache_initiated is False:

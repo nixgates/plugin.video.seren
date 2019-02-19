@@ -72,7 +72,6 @@ class CloudflareScraper(Session):
         try:
             offset = 1 if s[0] == '+' else 0
             val = s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0').replace('(', 'str(')[offset:]
-            print(val)
             val = val.replace('str', '')
             return val
         except:

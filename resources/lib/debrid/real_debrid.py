@@ -139,6 +139,7 @@ class RealDebrid:
         original_url = url
         url = self.BaseUrl + url
         if self.token == '':
+            tools.log('No Real Debrid Token Found')
             return None
         if not fail_check:
             if '?' not in url:
@@ -147,6 +148,7 @@ class RealDebrid:
                 url += "&auth_token=%s" % self.token
 
         response = requests.get(url).text
+
         if 'bad_token' in response or 'Bad Request' in response:
             tools.log('Refreshing RD Token')
             if not fail_check:
@@ -158,14 +160,24 @@ class RealDebrid:
             return response
 
     def checkHash(self, hashList):
-        hashString = ''
+
         if isinstance(hashList, list):
-            for i in hashList:
-                hashString += '/%s' % i
+            cache_result = {}
+            hashList = [hashList[x:x+100] for x in range(0, len(hashList), 100)]
+
+            for section in hashList:
+                hashString = ''
+                for i in section:
+                    hashString += '/%s' % i
+
+                response = self.get_url("torrents/instantAvailability" + hashString)
+                response.update(cache_result)
+                cache_result = response
+            return cache_result
         else:
             hashString = "/" + hashList
+            return self.get_url("torrents/instantAvailability" + hashString)
 
-        return self.get_url("torrents/instantAvailability" + hashString)
 
     def addMagnet(self, magnet):
         postData = {'magnet': magnet}
@@ -236,28 +248,52 @@ class RealDebrid:
             hashCheck = self.checkHash(hash)
             torrent = self.addMagnet(torrent['magnet'])
             episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
-            file_key = None
+            key_list = []
             for storage_variant in hashCheck[hash]['rd']:
-                if len(storage_variant) > 1:
+                file_inside = False
+                key_list = []
+                bad_storage = False
+
+                for key, value in storage_variant.items():
+                    filename = storage_variant[key]['filename']
+                    if not any(filename.endswith(extension) for extension in
+                               source_utils.COMMON_VIDEO_EXTENSIONS):
+                        bad_storage = True
+                        continue
+                    else:
+                        key_list.append(key)
+                        if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename) for
+                               episodeString in episodeStrings):
+                            file_inside = True
+
+                if file_inside is False or bad_storage is True:
                     continue
                 else:
-                    key = list(storage_variant.keys())[0]
-                    filename = storage_variant[key]['filename']
+                    break
 
-                    if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename) for episodeString
-                           in episodeStrings):
-                        if any(filename.lower().endswith(extension) for extension in
-                               source_utils.COMMON_VIDEO_EXTENSIONS):
-                            file_key = key
-                            break
-            if file_key == None:
+            if len(key_list) == 0:
                 self.deleteTorrent(torrent['id'])
                 return None
 
-            self.torrentSelect(torrent['id'], file_key)
+            key_list = ','.join(key_list)
+
+            self.torrentSelect(torrent['id'], key_list)
 
             link = self.torrentInfo(torrent['id'])
-            link = self.unrestrict_link(link['links'][0])
+
+            file_index = None
+            for idx, i in enumerate([i for i in link['files'] if i['selected'] == 1]):
+                if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(i['path'].split('/')[-1]) for
+                       episodeString in episodeStrings):
+                        file_index = idx
+
+            if file_index is None:
+                self.deleteTorrent(torrent['id'])
+                return None
+
+            link = link['links'][file_index]
+            link = self.unrestrict_link(link)
+
             if link.endswith('rar'):
                 link = None
 

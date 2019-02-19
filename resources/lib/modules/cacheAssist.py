@@ -109,9 +109,11 @@ class CacheAssit:
         magnet = debrid.addMagnet(torrent_object['magnet'])
         info = debrid.torrentInfo(magnet['id'])
         torrent_id = info['id']
-        file_key = None
         database.add_assist_torrent(torrent_id, 'real_debrid', 'queued', torrent_object['release_title'],
                                     str(current_percent))
+
+        key_list = []
+
         for file in info['files']:
             filename = file['path']
             key = file['id']
@@ -119,18 +121,21 @@ class CacheAssit:
                    episodeStrings):
                 if any(filename.lower().endswith(extension) for extension in
                        source_utils.COMMON_VIDEO_EXTENSIONS):
-                    file_key = key
+                    key_list.append(key)
                     break
 
-        debrid.torrentSelect(torrent_id, file_key)
+        debrid.torrentSelect(torrent_id, ','.join(key_list))
         downloading_status = ['queued', 'downloading']
         current_percent = 0
         timestamp = time.time()
+
         while not monitor.abortRequested():
             if monitor.waitForAbort(120):
                 break
             try:
+
                 info = debrid.torrentInfo(torrent_id)
+
                 if info['status'] == 'downloaded':
                     tools.showDialog.notification(tools.addonName + ': %s' % self.title,
                                                   tools.lang(32072).encode('utf-8') + ' %s' % self.title,
@@ -139,6 +144,7 @@ class CacheAssit:
                                                 str(current_percent))
                     debrid.deleteTorrent(torrent_id)
                     break
+
                 if info['status'] in downloading_status:
                     if info['progress'] == current_percent:
                         if timestamp == (time.time() + 10800):
