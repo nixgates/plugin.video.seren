@@ -2,7 +2,9 @@
 
 import random
 import re
+import copy
 
+from difflib import SequenceMatcher
 from requests import Session
 
 COMMON_VIDEO_EXTENSIONS = ['.m4v', '.mkv', '.mka', '.mp4', '.avi', '.mpeg', '.asf', '.flv', '.m4a', '.aac', '.nut',
@@ -22,10 +24,45 @@ BROWSER_AGENTS = [
 
 exclusions = ['soundtrack', 'gesproken']
 
+common_info_tags = ['1080p', '720p', '480p', '300mb', 'HEVC', 'x265', 'x264', '4k', '2180p', 'DDP', 'WEBDL', 'AMZN',
+                    'BRRIP', 'DVDRIP', 'WEB', 'SCR', 'TC', 'DVDscr', 'Retail Dvd', 'tvrip', 'HDTV', 'PDTV', 'SDTV',
+                    'PROPER', 'LIMITED', 'INTERNAL', 'STV', 'festival', 'DC', 'FS', 'WS', 'rated', 'unrated', 'recode',
+                    'repack', 'unsubbed', 'subbed', 'custom.subbed', 'dubbed', 'readnfo', 'dupe', 'nuked', 'nfo', 'cam',
+                    'telesync', 'ts', 'telecine', 'tc', 'bluray']
+
+def simularity_compare(check_list, compare_list):
+    simularity = []
+
+    check_list = copy.copy(compare_list)
+    top_result = 0
+    top_idx = None
+    results = []
+
+    try:
+        for compare_title in check_list:
+            title = cleanTitle(title)
+            for tag in common_info_tags:
+                if tag not in title:
+                    compare_title = compare_title.replace(tag, '')
+            for ext in COMMON_VIDEO_EXTENSIONS:
+                if ext not in title:
+                    compare_title = compare_title.replace(ext, '')
+            match = SequenceMatcher(None, title, cleanTitle(compare_title))
+            simularity.append(match.quick_ratio())
+        for idx, ratio in enumerate(simularity):
+            if ratio > top_result:
+                top_result = ratio
+                top_idx = idx
+
+        results.append((top_result, top_idx))
+    except:
+        import traceback
+        traceback.print_exc()
+        return None
 
 def getQuality(release_title):
     quality = 'SD'
-    if '4K' in release_title:
+    if ' 4K' in release_title:
         quality = '4K'
     if '2160p' in release_title:
         quality = '4K'
@@ -98,6 +135,7 @@ def filterMovieTitle(release_title, movieTitle, year):
     string_list.append('%s (%s)' % (movieTitle, year))
     string_list.append('%s %s' % (movieTitle, year))
     string_list.append('%s.%s' % (movieTitle.replace(' ', '.'), year))
+    string_list.append('%s [%s]' % (movieTitle.replace(' ', '.'), year))
 
     if any(i in release_title for i in string_list):
         if any(i in release_title for i in exclusions):
@@ -289,7 +327,7 @@ class serenRequests(Session):
             self.headers["User-Agent"] = random.choice(BROWSER_AGENTS)
 
 
-def torrentCacheStrings(args):
+def torrentCacheStrings(args, strict=False):
     episodeInfo = args['episodeInfo']['info']
     episode_title = cleanTitle(episodeInfo['title'])
     season_number = str(episodeInfo['season'])
@@ -298,8 +336,6 @@ def torrentCacheStrings(args):
                       's%se%s ' % (season_number, episode_number.zfill(2)),
                       's%se%s ' % (season_number.zfill(2), episode_number),
                       's%se%s ' % (season_number, episode_number),
-                      'episode %s ' % episode_number.zfill(2),
-                      'episode %s ' % episode_number,
                       '%sx%s ' % (season_number, episode_number),
                       '%sx%s ' % (season_number.zfill(2), episode_number.zfill(2)),
                       '%sx%s ' % (season_number, episode_number.zfill(2)),
@@ -310,14 +346,20 @@ def torrentCacheStrings(args):
                       '[%sx%s]' % (season_number, episode_number.zfill(2)),
                       '[%sx%s]' % (season_number, episode_number),
                       ' %s' % cleanTitle(episode_title),
-                      ' ep%s' % episode_number,
-                      ' ep%s' % episode_number.zfill(2),
                       '%s%s ' % (season_number, episode_number.zfill(2)),
                       '%s%s ' % (season_number.zfill(2), episode_number.zfill(2)),
                       '%s.%s ' % (season_number, episode_number.zfill(2)),
                       '%s.%s ' % (season_number.zfill(2), episode_number),
                       '%s.%s ' % (season_number.zfill(2), episode_number.zfill(2)),
                       ]
+    if strict == False:
+        relaxed_strings = [
+            'episode %s ' % episode_number.zfill(2),
+            'episode %s ' % episode_number,
+            ' ep%s' % episode_number,
+            ' ep%s' % episode_number.zfill(2),
+        ]
+        episodeStrings += relaxed_strings
 
     if episode_number == '1' and season_number == '1':
         episodeStrings.append('pilot')

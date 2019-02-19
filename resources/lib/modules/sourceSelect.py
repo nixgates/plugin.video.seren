@@ -4,7 +4,6 @@ import os
 
 from resources.lib.common import tools
 
-
 def build_display_title(source):
     if 'debrid_provider' in source:
         debrid_provider = tools.colorString(tools.shortened_debrid(source.get('debrid_provider', '')))
@@ -86,65 +85,89 @@ def sourceSelect(source_list, info):
 
 
 class source_select_list(tools.dialogWindow):
+
     def __init__(self, display_list, info):
         self.position = -1
+
         texture_path = os.path.join(tools.IMAGES_PATH, 'texture.png')
         self.texture = tools.imageControl(0, 0, 1280, 720, texture_path)
         self.addControl(self.texture)
+
         self.background = tools.imageControl(0, 0, 1280, 720, '')
         background_diffuse = '0x1FFFFFFF'
         self.background.setColorDiffuse(background_diffuse)
-        self.boxImage = tools.imageControl(40, 180, 1200, 500, os.path.join(tools.IMAGES_PATH, 'box2.jpg'))
-        self.boxImage.setColorDiffuse('0x1FFFFFFF')
         self.addControl(self.background)
-        self.addControl(self.boxImage)
-        if 'showInfo' in info:
-            self.background.setImage(info['showInfo']['art']['fanart'])
-        else:
-            self.background.setImage(info['fanart'])
-        self.panda_logo = tools.imageControl(605, 20, 70, 60, tools.PANDA_LOGO_PATH)
-        self.addControl(self.panda_logo)
-        #
-        # When the "display_title" label is set for some reason it ends up setting the text for every other label
-        # in any window while in the addon from then on, mind boggling, need to figure out why
-        #
-        # self.dispaly_title = tools.labelControl(310, 100, 1000, 100,'', font='font24', textColor='0xFFFFFFFF')
-        # if 'showInfo' in info:
-        #     label_text = '[B]%s S%sE%s[/B]' % (info['showInfo']['info']['tvshowtitle'],
-        #                                 str(info['episodeInfo']['info']['season']).zfill(2),
-        #                                 str(info['episodeInfo']['info']['episode']).zfill(2))
-        # else:
-        #     label_text = '[B]%s (%s)[/B]' % (info['title'], info['year'])
-        # self.dispaly_title.setLabel(label_text)
-        # self.addControl(self.dispaly_title)
-
-        # This looks ridiculous below but it's needed as the Kodi Gui modules won't accept itemHeight as a Keyword
-
-        item_height = 55
 
         if tools.getSetting('general.sourceselectlines') == 'false':
             item_height = 30
+        else:
+            item_height = 55
 
-        self.list = tools.listControl(60, 200, 1160, 490, 'font13', '0xFFFFFFFF', '',
-                                      os.path.join(tools.IMAGES_PATH, 'highlight11.png'),
-                                      '', 0, 0, 0, 0, item_height
-                                      )
-        # self.list = tools.listControl(60, 280, 1160, 490, buttonFocusTexture=os.path.join(tools.IMAGES_PATH, 'highlight11.png'))
-        self.addControl(self.list)
-        self.list.setSpace(100)
-        self.list.addItems(display_list)
-        # self.thumbnail = tools.imageControl(40, 100, 100, 150, '')
-        # if 'showInfo' in info:
-        #     self.thumbnail.setImage(info['episodeInfo']['art']['poster'])
-        # else:
-        #     self.thumbnail.setImage(info['art']['poster'])
-        # self.addControl(self.thumbnail)
-        self.setFocus(self.list)
+        self.source_list = tools.listControl(20, 130, 760, 640, 'font12', '0xFFFFFFFF', '',
+                                             os.path.join(tools.IMAGES_PATH, 'highlight11.png'),
+                                             '', 0, 0, 0, 0, item_height)
+        self.addControl(self.source_list)
+        self.source_list.addItems(display_list)
+
+        self.boxImage = tools.imageControl(20, 100, 760, 680, os.path.join(tools.IMAGES_PATH, 'box2.jpg'))
+        self.boxImage.setColorDiffuse('0x1FFFFFFF')
+        self.addControl(self.boxImage)
+
+        self.poster = tools.imageControl(890, 140, 280, 400, '')
+        self.addControl(self.poster)
+
+        info_label = tools.labelControl(800, 555, 460, 180, "", font="font10", alignment=tools.XBFONT_CENTER_X)
+        self.addControl(info_label)
+        info_label_string = '%s: %s | %s: %s | %s: %s mins'
+
+        if 'showInfo' in info:
+            self.background.setImage(info['showInfo']['art']['fanart'])
+            self.poster.setImage(info['showInfo']['art']['poster'])
+
+            info_label_string %= (tools.colorString('RATING'),
+                                  info['episodeInfo']['info']['rating'],
+                                  tools.colorString('DATE'),
+                                  info['episodeInfo']['info']['premiered'],
+                                  tools.colorString('DURATION'),
+                                  str(int(info['episodeInfo']['info']['duration']) / 60))
+
+            season_string = tools.labelControl(810, 100, 430, 50, "", font='font27_narrow', alignment=tools.XBFONT_CENTER_X)
+            self.addControl(season_string)
+            season_string.setLabel('%s - %s' % ('Season %s' %
+                                                (tools.colorString(info['episodeInfo']['info']['season'])),
+                                                'Episode %s' %
+                                                (tools.colorString(info['episodeInfo']['info']['episode']))))
+
+            plot_outline = tools.multi_text(830, 580, 430, 100, font='font12')
+            self.addControl(plot_outline)
+            plot_outline.setText(info['episodeInfo']['info']['plot'])
+
+        else:
+
+            info_label_string %= (tools.colorString('RATING'),
+                                  info['rating'],
+                                  tools.colorString('YEAR'),
+                                  info['year'],
+                                  tools.colorString('DURATION'),
+                                  str(int(info['duration']) / 60))
+
+            self.background.setImage(info['fanart'])
+            self.poster.setImage(info['art']['poster'])
+
+            plot_outline = tools.multi_text(830, 580, 430, 100, font='font12')
+            self.addControl(plot_outline)
+            plot_outline.setText(info['plot'])
+
+        info_label.setLabel('[B]%s[/B]' % info_label_string)
+
+        self.panda_logo = tools.imageControl(605, 20, 70, 60, tools.PANDA_LOGO_PATH)
+        self.addControl(self.panda_logo)
+
+        self.setFocus(self.source_list)
         self.canceled = False
 
     def onAction(self, action):
 
-        print('Action = %s' % action.getId())
         id = action.getId()
         if id == 92 or id == 10:
             self.close()
@@ -152,7 +175,7 @@ class source_select_list(tools.dialogWindow):
             self.close()
 
         if id == 7:
-            self.position = self.list.getSelectedPosition()
+            self.position = self.source_list.getSelectedPosition()
             self.close()
 
         if id == 0:
@@ -164,6 +187,6 @@ class source_select_list(tools.dialogWindow):
         return self.position
 
     def onControl(self, control):
-        if self.list.getId() == control.getId():
-            self.position = self.list.getSelectedPosition()
+        if self.source_list.getId() == control.getId():
+            self.position = self.source_list.getSelectedPosition()
             self.close()

@@ -5,7 +5,10 @@ from resources.lib.common import tools
 from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.indexers.tmdb import TMDBAPI
 
-sysaddon = sys.argv[0] ; syshandle = int(sys.argv[1])
+try:
+    sysaddon = sys.argv[0] ; syshandle = int(sys.argv[1])
+except:
+    pass
 trakt = TraktAPI()
 tmdbAPI = TMDBAPI()
 

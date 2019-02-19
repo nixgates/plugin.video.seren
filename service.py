@@ -2,6 +2,8 @@
 
 import os
 import xbmc
+import AddonSignals
+import time
 
 from resources.lib.common import maintenance
 from resources.lib.common import tools
@@ -36,3 +38,5 @@ while not monitor.abortRequested():
         tools.execute('RunPlugin("plugin://plugin.video.%s/?action=runMaintenance")' % tools.addonName.lower())
     except:
         continue
+
+

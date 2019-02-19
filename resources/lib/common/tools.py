@@ -5,6 +5,11 @@ import os
 import sys
 import threading
 import unicodedata
+import re
+import datetime
+#Import _strptime to workaround python 2 bug with threads
+import _strptime
+import time
 
 try:
     from urlparse import parse_qsl, parse_qs, unquote, urlparse
@@ -16,6 +21,8 @@ try:
     sysaddon = sys.argv[0]
     syshandle = int(sys.argv[1])
 except:
+    sysaddon = ''
+    syshandle = '1'
     pass
 
 tmdb_semaphore = 40
@@ -24,7 +31,7 @@ tmdb_sema = threading.Semaphore(tmdb_semaphore)
 
 database_sema = threading.Semaphore(1)
 
-tv_semaphore = 300
+tv_semaphore = 100
 
 tv_sema = threading.Semaphore(tv_semaphore)
 
@@ -63,15 +70,13 @@ colorChart = ['black', 'white', 'whitesmoke', 'gainsboro', 'lightgray', 'silver'
               'sandybrown', 'peru', 'chocolate', 'orange', 'darkorange', 'tomato', 'orangered', 'red', 'crimson',
               'salmon', 'coral', 'firebrick', 'brown', 'darkred', 'tan', 'rosybrown', 'sienna', 'saddlebrown']
 
+addonName = "Seren"
+
 try:
 
     import xbmcaddon, xbmc, xbmcgui, xbmcplugin, xbmcvfs
 
-    youtube_url = 'plugin://plugin.video.youtube/play/?video_id=%s'
-
-    kodiGui = xbmcgui
-
-    kodi = xbmc
+    addonInfo = xbmcaddon.Addon().getAddonInfo
 
     # GLOBAL VARIABLES
     try:
@@ -94,32 +99,14 @@ try:
     multi_text = xbmcgui.ControlTextBox
     PANDA_LOGO_PATH = os.path.join(IMAGES_PATH, 'panda.png')
 
-    language = xbmc.getLanguage()
-
-    dialogWindow = kodiGui.WindowDialog
-
-    addon = xbmcaddon.Addon
-
-    addonInfo = xbmcaddon.Addon().getAddonInfo
-
-    openFile = xbmcvfs.File
-
-    makeFile = xbmcvfs.mkdir
-
-    deleteFile = xbmcvfs.delete
-
-    deleteDir = xbmcvfs.rmdir
-
-    listDir = xbmcvfs.listdir
-
-    addonName = "Seren"
-
     addonDir = os.path.join(xbmc.translatePath('special://home'), 'addons/plugin.video.%s' % addonName.lower())
 
     try:
         dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
     except:
         dataPath = xbmc.translatePath(addonInfo('profile'))
+
+    SETTINGS_PATH = os.path.join(dataPath, 'settings.xml')
 
     cacheFile = os.path.join(dataPath, 'cache.db')
 
@@ -131,49 +118,141 @@ try:
 
     premiumizeDB = os.path.join(dataPath, 'premiumize.db')
 
-    condVisibility = xbmc.getCondVisibility
-
-    lang = xbmcaddon.Addon().getLocalizedString
-
-    addMenuItem = xbmcplugin.addDirectoryItem
-
-    menuItem = xbmcgui.ListItem
-
-    langString = xbmcaddon.Addon().getLocalizedString
-
-    endDirectory = xbmcplugin.endOfDirectory
-
-    content = xbmcplugin.setContent
-
-    execute = xbmc.executebuiltin
-
-    getSetting = xbmcaddon.Addon().getSetting
-
-    showDialog = xbmcgui.Dialog()
-
-    busyDialog = xbmcgui.DialogBusy()
-
-    progressDialog = xbmcgui.DialogProgress()
-
-    resolvedUrl = xbmcplugin.setResolvedUrl
-
-    showKeyboard = xbmc.Keyboard
-
-    fileBrowser = showDialog.browse
-
-    sortMethod = xbmcplugin.addSortMethod
-
-    playList = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-
-    player = xbmc.Player
+    searchHistoryDB = os.path.join(dataPath, 'search.db')
 
     kodiVersion = int(xbmc.getInfoLabel("System.BuildVersion")[:2])
 
-except:
-    import traceback
+    openFile = xbmcvfs.File
 
-    traceback.print_exc()
-    pass
+    makeFile = xbmcvfs.mkdir
+
+    deleteFile = xbmcvfs.delete
+
+    deleteDir = xbmcvfs.rmdir
+
+    listDir = xbmcvfs.listdir
+
+    execute = xbmc.executebuiltin
+
+    console_mode = False
+
+except:
+
+    sys.path.append(os.path.join(os.curdir, 'mock_kodi'))
+
+    console_mode = True
+
+    import xbmcaddon, xbmc, xbmcgui, xbmcplugin
+
+    try:
+        ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path').decode('utf-8')
+    except:
+        ADDON_PATH = os.getcwd()
+    GUI_PATH = os.path.join(ADDON_PATH, 'resources', 'lib', 'gui')
+    IMAGES_PATH = os.path.join(GUI_PATH, 'images')
+    XML_PATH = os.path.join(GUI_PATH, 'xml')
+
+    XBFONT_LEFT = 0x00000000
+    XBFONT_RIGHT = 0x00000001
+    XBFONT_CENTER_X = 0x00000002
+    XBFONT_CENTER_Y = 0x00000004
+    XBFONT_TRUNCATED = 0x00000008
+    imageControl = xbmcgui.ControlImage
+    labelControl = xbmcgui.ControlLabel
+    buttonControl = xbmcgui.ControlButton
+    listControl = xbmcgui.ControlList
+    multi_text = xbmcgui.ControlTextBox
+    PANDA_LOGO_PATH = os.path.join(IMAGES_PATH, 'panda.png')
+
+    addonInfo = xbmcaddon.Addon().getAddonInfo
+
+    kodiVersion = 18
+
+    kodi_base_directory = os.path.abspath(os.path.join(os.getcwd(), '../../'))
+
+    addonDir = os.path.join(kodi_base_directory, 'addons/plugin.video.%s' % addonName.lower())
+
+    try:
+        dataPath = os.path.join(kodi_base_directory, 'userdata', 'addon_data',   'plugin.video.%s' % addonName.lower())
+    except:
+        dataPath = xbmc.translatePath(addonInfo('profile'))
+
+    SETTINGS_PATH = os.path.join(dataPath, 'settings.xml')
+
+    cacheFile = os.path.join(dataPath, 'cache.db')
+
+    torrentScrapeCacheFile = os.path.join(dataPath, 'torrentScrape.db')
+
+    activeTorrentsDBFile = os.path.join(dataPath, 'activeTorrents.db')
+
+    providersDB = os.path.join(dataPath, 'providers.db')
+
+    premiumizeDB = os.path.join(dataPath, 'premiumize.db')
+
+    searchHistoryDB = os.path.join(dataPath, 'search.db')
+
+    def execute(url):
+        if 'Dialog' in url:
+            return
+        import re
+        url = re.findall(r'.*?\((.*?)\)', url)
+        sys.argv[1] = (None,None,url)
+        execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
+
+    def makeFile(path):
+        try:
+            file = open(path, 'a+')
+            file.close()
+        except:
+            pass
+
+youtube_url = 'plugin://plugin.video.youtube/play/?video_id=%s'
+
+kodiGui = xbmcgui
+
+kodi = xbmc
+
+language = xbmc.getLanguage()
+
+dialogWindow = kodiGui.WindowDialog
+
+addon = xbmcaddon.Addon
+
+progressDialog = xbmcgui.DialogProgress()
+
+showDialog = xbmcgui.Dialog
+
+endDirectory = xbmcplugin.endOfDirectory
+
+condVisibility = xbmc.getCondVisibility
+
+lang = xbmcaddon.Addon().getLocalizedString
+
+addMenuItem = xbmcplugin.addDirectoryItem
+
+menuItem = xbmcgui.ListItem
+
+langString = xbmcaddon.Addon().getLocalizedString
+
+endDirectory = xbmcplugin.endOfDirectory
+
+content = xbmcplugin.setContent
+
+showDialog = xbmcgui.Dialog()
+
+progressDialog = xbmcgui.DialogProgress()
+
+resolvedUrl = xbmcplugin.setResolvedUrl
+
+showKeyboard = xbmc.Keyboard
+
+fileBrowser = showDialog.browse
+
+sortMethod = xbmcplugin.addSortMethod
+
+playList = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+
+player = xbmc.Player
 
 
 def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=True, isFolder=True, all_fanart=None,
@@ -187,7 +266,7 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
         item.setLabel2(label2)
     if isPlayable == True:
         item.setProperty('IsPlayable', 'true')
-    if set_cast is not False and 'cast' in info:
+    if set_cast is not False:
         item.setCast(set_cast)
     if set_ids is not None:
         item.setUniqueIDs(set_ids)
@@ -211,11 +290,13 @@ def closeDirectory(contentType, viewType='Default', sort=False, cacheToDisc=Fals
 
     viewType = get_view_type(contentType)
 
-    xbmc.executebuiltin('Container.SetViewMode(%d)' % viewType)
-
     content(syshandle, contentType)
 
     endDirectory(syshandle, cacheToDisc=True)
+    xbmc.sleep(200)
+
+    if getSetting('general.setViews') == 'true':
+        xbmc.executebuiltin('Container.SetViewMode(%s)' % str(viewType))
 
 
 def get_view_type(contentType):
@@ -245,13 +326,12 @@ def get_view_type(contentType):
     viewType = int(viewType)
     return viewType
 
+def closeOkDialog():
+    execute('Dialog.Close(okdialog, true)')
 
-def busy():
-    return execute('ActivateWindow(busydialog)')
 
-
-def idle():
-    return execute('Dialog.Close(busydialog)')
+def closeBusyDialog():
+    execute('Dialog.Close(busydialog)')
 
 
 def safeStr(obj):
@@ -264,6 +344,8 @@ def safeStr(obj):
 
 
 def log(msg, level='info'):
+    import inspect
+
     msg = safeStr(msg)
     msg = addonName.upper() + ': ' + msg
     if level == 'error':
@@ -362,13 +444,6 @@ def remove_duplicate_dicts(src_lst, ignored_keys):
     return dst_lst
 
 
-def closeBusyDialog():
-    if kodiVersion > 17:
-        execute('Dialog.Close(busydialognocancel')
-    else:
-        execute('Dialog.Close(all,true)')
-
-
 import subprocess
 
 
@@ -394,10 +469,18 @@ def copy2clip(txt):
         pass
     pass
 
+EPOCH_DATETIME = datetime.datetime(1970, 1, 1)
+SECONDS_PER_DAY = 24*60*60
+
+def utc_to_local_datetime(utc_datetime):
+    delta = utc_datetime - EPOCH_DATETIME
+    utc_epoch = SECONDS_PER_DAY * delta.days + delta.seconds
+    time_struct = time.localtime(utc_epoch)
+    dt_args = time_struct[:6] + (delta.microseconds,)
+    return datetime.datetime(*dt_args)
 
 def datetime_workaround(string_date, format="%Y-%m-%d", date_only=True):
-    import datetime
-    import time
+
     if string_date == '':
         return None
     try:
@@ -468,4 +551,65 @@ def paginate_list(list_items, page, limit):
     return pages[page - 1]
 
 def setSetting(id, value):
-    xbmcaddon.Addon().setSetting(id, value)
+    if not console_mode:
+        return xbmcaddon.Addon().setSetting(id, value)
+
+    loaded = False
+
+    while loaded == False:
+        #Pull information from settings file
+        settings_file = open(SETTINGS_PATH, mode='r')
+        lines = settings_file.readlines()
+        settings_file.close()
+        join_lines = ''.join(lines)
+        #Make sure the information is complete before loading it
+        if len(lines) > 0 and "</settings>" in join_lines and \
+                len(re.findall(r'<settings version="2">|<settings>', join_lines)) > 0:
+            loaded = True
+
+    edited = False
+    #Begin Making Edits
+    while edited == False:
+        try:
+            settings_file = open(SETTINGS_PATH, mode='w')
+            update = []
+            for i in lines:
+                if 'id="%s"' % id in i:
+                    if '<settings version="2"' in join_lines:
+                        update.append(re.sub(r'><|>.*?<', '>%s<' % value, i))
+                    else:
+                        update.append(re.sub(r'value=".*?"', 'value="%s"' % value, i))
+                else:
+                    update.append(i)
+            settings_file.writelines(update)
+            settings_file.flush()
+            settings_file.close()
+            edited = True
+
+        except:
+            #Something went wrong with editing the file
+            #Try again after a brief timeout
+            import random
+            import time
+            time.sleep(float(random.randint(50, 100) / 100))
+
+def getSetting(id):
+    if not console_mode:
+        return xbmcaddon.Addon().getSetting(id)
+
+    try:
+        settings = open(SETTINGS_PATH, 'r')
+        value = ' '.join(settings.readlines())
+        value.strip('\n')
+        settings.close()
+        try:
+            value = re.findall(r'id="%s".*?>(.*?)<' % id, value)[0]
+        except:
+            value = re.findall(r'id=\"%s\" value=\"(.*?)\" />' % id, value)[0]
+        return value
+    except:
+        import traceback
+        traceback.print_exc()
+        return ''
+
+fanart_api_key = getSetting('fanart.apikey')

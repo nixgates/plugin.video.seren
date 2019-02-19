@@ -34,9 +34,6 @@ CacheCheck = '/cache/check'
 ##################################################
 import inspect
 
-print('caller name:', inspect.stack()[1][3])
-
-
 def get_url(url):
     if CustomerPin == '':
         return
@@ -164,28 +161,15 @@ class PremiumizeFunctions(PremiumizeBase):
         transfer = self.create_transfer(magnet)
 
         id = transfer['id']
-        database.add_premiumize_transfer(id)
-        transfers = self.list_transfers()
-        folder_id = None
-        try:
-            for i in transfers['transfers']:
-                if i['id'] == id:
-                    folder_id = i['folder_id']
 
-            if folder_id is None: raise Exception
+        folder_details = self.direct_download(magnet)['content']
+        folder_details = sorted(folder_details, key=lambda i: int(i['size']), reverse=True)
+        for file in folder_details:
+            if source_utils.filterMovieTitle(file['path'], args['title'], args['year']):
+                if any(file['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
+                    selectedFile = file
+                    break
 
-            folder_details = self.list_folder(folder_id)
-            selectedFile = folder_details[0]
-
-            for file in folder_details:
-                if file['type'] == 'file':
-                    if source_utils.filterMovieTitle(file['name'], args['title'], args['year']):
-                        if any(file['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
-                            selectedFile = file
-
-        except:
-            self.delete_transfer(id)
-            return
         if tools.getSetting('premiumize.transcoded') == 'true':
             if selectedFile['transcode_status'] == 'finished':
                 return selectedFile['stream_link']
@@ -201,64 +185,21 @@ class PremiumizeFunctions(PremiumizeBase):
 
         episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
         showInfo = args['showInfo']['info']
-        showTitle = showInfo['tvshowtitle']
 
-        transfer = self.create_transfer(magnet)
-        transfer_id = transfer['id']
-        database.add_premiumize_transfer(transfer_id)
-        transfers = self.list_transfers()
-        folder_id = None
-        sub_folder_id = None
         try:
-            for i in transfers['transfers']:
-                if i['id'] == transfer_id:
-                    folder_id = i['folder_id']
-            if folder_id is None: raise Exception
 
-            folder_details = self.list_folder(folder_id)
+            folder_details = self.direct_download(magnet)['content']
 
             if pack_select is not False and pack_select is not None:
-                streamLink = self.user_select(folder_details, transfer_id)
+                streamLink = self.user_select(folder_details)
                 return streamLink
 
             streamLink = self.check_episode_string(folder_details, episodeStrings)
 
-            if streamLink is None:
-
-                for item in folder_details:
-                    # Check for old Usenet standards
-                    if source_utils.cleanTitle(item['name']) == source_utils.cleanTitle(showTitle):
-                        folder_details = self.list_folder(item['id'])
-
-                for item in folder_details:
-                    if item['type'] != 'folder':
-                        continue
-                    for seasonStr in seasonStrings:
-                        if source_utils.cleanTitle(seasonStr) \
-                                in source_utils.cleanTitle(item['name'].replace('&', ' ')):
-                            sub_folder_id = item['id']
-
-                if sub_folder_id is not None:
-                    folder_details = self.list_folder(sub_folder_id)
-                    if not pack_select == "True":
-                        streamLink = self.check_episode_string(folder_details, episodeStrings)
-                    else:
-                        name_list = [file['name'] for file in folder_details]
-                        selection = tools.showDialog.select(tools.addonName + ": Select Episode", name_list)
-                        streamLink = folder_details[selection]['link']
-                else:
-                    pass
-
         except:
             import traceback
             traceback.print_exc()
-            self.delete_transfer(transfer_id)
-            database.remove_premiumize_transfer(transfer_id)
             return
-
-        if streamLink is None:
-            self.delete_transfer(transfer_id)
-            database.remove_premiumize_transfer(transfer_id)
 
         return streamLink
 
@@ -266,7 +207,7 @@ class PremiumizeFunctions(PremiumizeBase):
         for i in folder_details:
             for epstring in episodeStrings:
                 if source_utils.cleanTitle(epstring) in \
-                        source_utils.cleanTitle(i['name'].replace('&', ' ')):
+                        source_utils.cleanTitle(i['path'].replace('&', ' ')):
                     if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
                         if tools.getSetting('premiumize.transcoded') == 'true':
                             if i['transcode_status'] == 'finished':
@@ -277,16 +218,24 @@ class PremiumizeFunctions(PremiumizeBase):
                         return i['link']
         return None
 
-    def user_select(self, folder_details, transfer_id):
-        display_list = [tools.colorString(i['name']) for i in folder_details]
-        selection = tools.showDialog.select(tools.addonName + ": Torrent File Picker", display_list)
+    def user_select(self, content):
+        display_list = []
+        for i in content:
+            if any(i['path'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
+                display_list.append(i)
+
+        selection = tools.showDialog.select(tools.addonName + ": Torrent File Picker",
+                                            [i['path'] for i in display_list])
         if selection == -1:
             return None
-        selection = folder_details[selection]
-        if selection['type'] != 'folder':
-            streamlink = selection['link']
-        else:
-            folder_details = self.list_folder(selection['id'])
-            streamlink = self.user_select(folder_details, transfer_id)
 
-        return streamlink
+        selection = content[selection]
+
+        if tools.getSetting('premiumize.transcoded') == 'true':
+            if selection['transcode_status'] == 'finished':
+                return selection['stream_link']
+            else:
+                pass
+
+        return selection['link']
+

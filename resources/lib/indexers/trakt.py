@@ -14,14 +14,17 @@ class TraktAPI:
 
         self.ApiUrl = 'https://api.trakt.tv/'
         self.BaseUrl = 'https://trakt.tv'
+
         self.ClientID = ''
         self.ClientID = tools.getSetting('trakt.clientid')
         if self.ClientID == '':
             self.ClientID = '4dd60d1ccb4b5c79aba64313467f6fefbda570605a927639549e8668558ce37e'
+
         self.ClientSecret = ''
         self.ClientSecret = tools.getSetting('trakt.secret')
         if self.ClientSecret == '':
             self.ClientSecret = 'd4dd35c0c1b0ec21b7b0cc7085011833c32bc28a0a62b454f4777d745aea07aa'
+
         self.RedirectUri = 'urn:ietf:wg:oauth:2.0:oob'
         self.AccessToken = tools.getSetting('trakt.auth')
         self.RefreshToken = tools.getSetting('trakt.refresh')
@@ -39,17 +42,20 @@ class TraktAPI:
     def revokeAuth(self):
         url = "oauth/revoke"
         postData = {"token": tools.getSetting('trakt.auth')}
-        response = self.post_request(url, postData, limit=False)
+        self.post_request(url, postData, limit=False)
         tools.setSetting('trakt.auth', '')
         tools.setSetting('trakt.refresh', '')
         tools.setSetting('trakt.username', '')
         tools.showDialog.ok(tools.addonName, tools.lang(32030).encode('utf-8'))
 
     def auth(self):
-        user_code = ''
+
         url = 'https://api.trakt.tv/oauth/device/code'
         postData = {'client_id': self.ClientID}
         response = requests.post(url, data=postData)
+        if not response.ok:
+            tools.showDialog.ok(tools.addonName, tools.lang(40113).encode('utf-8'))
+            return
         response = json.loads(response.text)
         try:
             user_code = response['user_code']
@@ -59,7 +65,6 @@ class TraktAPI:
         except:
             tools.showDialog.ok(tools.addonName, tools.lang(32032).encode('utf-8'))
             return
-
         currentTime = 0
         tools.copy2clip(user_code)
         tools.progressDialog.create(tools.addonName + ': ' + tools.lang(32031).encode('utf-8'),
@@ -382,7 +387,7 @@ class TraktAPI:
         if sort_by == 'rank':
             list_items = sorted(list_items, key=lambda x: x['rank'])
         if sort_by == 'title':
-            list_items = sorted(list_items, key=lambda x: x[media_type]['title'].lower().strip('the '))
+            list_items = sorted(list_items, key=lambda x: x[media_type]['title'].lower().replace('the ', ''))
         if sort_by == 'released':
             try:
                 list_items = sorted(list_items, key=lambda x: x[media_type]['released'])

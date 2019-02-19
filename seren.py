@@ -1,31 +1,57 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 
 from resources.lib.common import tools
 from resources.lib.gui import windows
 from resources.lib.modules import database
 
-params = dict(tools.parse_qsl(sys.argv[2].replace('?', '')))
+try:
+    params = dict(tools.parse_qsl(sys.argv[2].replace('?', '')))
 
-url = params.get('url')
+    url = params.get('url')
 
-action = params.get('action')
+    action = params.get('action')
+    print(action)
+    page = params.get('page')
 
-page = params.get('page')
+    actionArgs = params.get('actionArgs')
 
-actionArgs = params.get('actionArgs')
+    pack_select = params.get('packSelect')
 
-pack_select = params.get('packSelect')
+    silent = params.get('silent')
 
-silent = params.get('silent')
+    source_select = params.get('source_select')
 
-source_select = params.get('source_select')
+    seren_reload = params.get('seren_reload')
 
-seren_reload = params.get('seren_reload')
+    if seren_reload == 'true':
+        seren_reload = True
 
-if seren_reload == 'true':
-    seren_reload = True
+except:
+
+    print('Welcome to console mode')
+    print('Command Help:')
+    print('   - Menu Number: opens the relevant menu page')
+    print('   - shell: opens a interactive python shell within Seren')
+    print('   - action xxx: run a custom Seren URL argument')
+
+    url = ''
+
+    action = None
+
+    page = ''
+
+    actionArgs = ''
+
+    pack_select = ''
+
+    silent = ''
+
+    source_select = ''
+
+    seren_reload = ''
 
 if action == None:
     from resources.lib.gui import homeMenu
@@ -93,6 +119,11 @@ if action == 'moviesSearch':
 
     movieMenus.Menus().moviesSearch(actionArgs)
 
+if action == 'moviesSearchHistory':
+    from resources.lib.gui import movieMenus
+
+    movieMenus.Menus().moviesSearchHistory()
+
 if action == 'myMovies':
     from resources.lib.gui import movieMenus
 
@@ -127,7 +158,6 @@ if action == 'revokeTrakt':
     trakt.TraktAPI().revokeAuth()
 
 if action == 'getSources':
-
     try:
         if tools.playList.getposition() == 0:
             display_background = True
@@ -172,11 +202,15 @@ if action == 'getSources':
                 del background
 
             if stream_link is None:
+                tools.closeBusyDialog()
                 try:
                     tools.playList.clear()
+                    tools.closeOkDialog()
+                    tools.showDialog.notification(tools.addonName, tools.lang(32047).encode('utf-8'), time=5000)
                 except:
                     pass
                 pass
+
             else:
                 from resources.lib.modules import player
 
@@ -184,6 +218,7 @@ if action == 'getSources':
         else:
             tools.closeBusyDialog()
             tools.playList.clear()
+            tools.closeOkDialog()
             if display_background is True:
                 background.close()
                 del background
@@ -191,13 +226,14 @@ if action == 'getSources':
 
     except:
         # Perform cleanup and make sure all open windows close and playlist is cleared
+        tools.closeBusyDialog()
+
         import traceback
 
         traceback.print_exc()
-        tools.closeBusyDialog()
         try:
-            display_background.close()
-            del display_background
+            background.close()
+            del background
         except:
             pass
 
@@ -215,6 +251,7 @@ if action == 'getSources':
 
         try:
             tools.playList.clear()
+            tools.closeOkDialog()
         except:
             pass
 
@@ -318,6 +355,10 @@ if action == 'showsSearch':
     from resources.lib.gui import tvshowMenus
     tvshowMenus.Menus().showsSearch(actionArgs)
 
+if action == 'showsSearchHistory':
+    from resources.lib.gui import tvshowMenus
+    tvshowMenus.Menus().showSearchHistory()
+
 if action == 'showSeasons':
     from resources.lib.gui import tvshowMenus
 
@@ -373,7 +414,7 @@ if action == 'cacheAssist':
 
     cacheAssist.CacheAssit(actionArgs)
 
-if action == 'showGenres':
+if action == 'tvGenres':
     from resources.lib.gui import tvshowMenus
 
     tvshowMenus.Menus().showGenres()
@@ -505,10 +546,25 @@ if action == 'buildPlaylist':
     from resources.lib.gui import tvshowMenus
 
     actionArgs = json.loads(tools.unquote(actionArgs))
+
+    try:
+        episode = actionArgs['info_dictionary']['episodeInfo']['info']['episode']
+    except:
+        episode = actionArgs['playlist'][0]['number']
+
     playlist = tvshowMenus.Menus().episodeListBuilder(actionArgs['playlist'], actionArgs['info_dictionary'],
                                                       smartPlay=True, hide_unaired=True)
 
     for i in playlist:
+        # Confirm that the episode meta we have received from TVDB are for the correct episodes
+        # If trakt provides the incorrect TVDB ID it's possible to begin play from the incorrect episode
+        params = dict(tools.parse_qsl(i[0].replace('?', '')))
+        actionArgs = json.loads(params.get('actionArgs'))
+        if actionArgs['episodeInfo']['info']['episode'] < episode:
+            continue
+
+        # If the episode is confirmed ok, add it to our playlist.
+        tools.log("ADDING ITEM TO PLAYLIST")
         tools.playList.add(url=i[0], listitem=i[1])
 
     tools.player().play(tools.playList)
@@ -530,3 +586,8 @@ if action == 'movieYears':
     from resources.lib.gui import movieMenus
     menus = movieMenus.Menus()
     menus.moviesYears()
+
+if action == 'clearSearchHistory':
+    from resources.lib.modules import database
+    database.clearSearchHistory()
+    tools.showDialog.ok(tools.addonName, 'Search History has been cleared')
