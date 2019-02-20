@@ -5,7 +5,7 @@ import tempfile
 import time
 import warnings
 from threading import Thread, Lock
-
+from Tkinter import Tk, Label
 #=====================================================================================================================
 # API Constants
 #=====================================================================================================================
@@ -76,8 +76,13 @@ def executebuiltin(function, *args):
 
     """Execute a built in Kodi function"""
     try:
-        print("EXECUTE BUILTIN: {0} => {1}".format(function, *args))
+        print('Executing built in command')
+        if '?' in function:
+            sys.argv = [None, None, function.split('?')[1]]
+        execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
     except:
+        import traceback
+        traceback.print_exc()
         pass
 
 def executescript(script):
@@ -246,12 +251,15 @@ def validatePath(path):
 # API Classes
 #=====================================================================================================================
 class Keyboard(object):
+    input_text = ''
+
     def __init__(self, default='', heading='', hidden=False):
         pass
     def doModal(self, autoclose=False):
+        self.input_text = raw_input('Input Text')
         pass
     def getText(self):
-        return ""
+        return self.input_text
     def isConfirmed(self):
         return True
     def setDefault(self, default):
@@ -333,10 +341,13 @@ class Player(object):
     def stop(self):
         pass
 
-class PlayList:
+class PlayList(list):
 
     def __init__(self, video):
         pass
 
     def getposition(self):
         return 0
+
+    def clear(self):
+        pass

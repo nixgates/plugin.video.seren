@@ -4,14 +4,20 @@ import datetime
 import json
 import sys
 import threading
-import AddonSignals
+try:
+    import AddonSignals
+except:
+    pass
 
 from resources.lib.common import tools
 from resources.lib.indexers import trakt
 from resources.lib.modules import smartPlay
 
-sysaddon = sys.argv[0]
-syshandle = int(sys.argv[1])
+try:
+    sysaddon = sys.argv[0]
+    syshandle = int(sys.argv[1])
+except:
+    pass
 
 
 class serenPlayer(tools.player):
