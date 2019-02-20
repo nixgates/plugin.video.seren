@@ -120,11 +120,11 @@ class Sources(tools.dialogWindow):
             tools.log('Starting Scraping', 'debug')
 
             if 'showInfo' in self.args:
-                background = self.args['showInfo']['art']['fanart']
+                background = self.args['showInfo']['art'].get('fanart', '')
                 self.trakt_id = self.args['showInfo']['ids']['trakt']
             else:
                 self.trakt_id = self.args['ids']['trakt']
-                background = self.args['fanart']
+                background = self.args['art'].get('fanart')
 
             self.setText(tools.lang(32081).encode('utf-8'))
             self.setBackground(background)
@@ -400,11 +400,6 @@ class Sources(tools.dialogWindow):
             self.remainingProviders.append(provider_name)
             providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
 
-            # Check to ensure that if duplicate providers exist that they do not run twice
-            # This isn't the greatest idea. I mean... Fuck it. It's staying out for now
-            # provider_domain = providerModule.domain
-            # if provider_domain == '' or provider_domain in self.domain_list:
-            #    return
             if 'episodeInfo' in info:
                 simpleInfo = self.buildSimpleShowInfo(info)
                 allTorrents = providerModule.sources().episode(simpleInfo, info)
@@ -418,9 +413,9 @@ class Sources(tools.dialogWindow):
             if allTorrents is None:
                 self.remainingProviders.remove(provider_name)
                 return
-            if self.canceled:
-                self.remainingProviders.remove(provider_name)
-                return
+
+            if self.canceled: raise Exception
+
             if len(allTorrents) > 0:
 
                 # Begin filling in optional dictionary returns
@@ -460,14 +455,17 @@ class Sources(tools.dialogWindow):
                         self.duplicates_amount += 1
                 tools.log('%s scrape took %s seconds' % (provider_name, time.time() - start_time))
                 start_time = time.time()
+
                 # Check Debrid Providers for cached copies
                 self.storeTorrentResults(self.trakt_id, allTorrents)
-                if self.canceled:
-                    self.remainingProviders.remove(provider_name)
-                    return
+
+                if self.canceled: raise Exception
+
                 self.torrentCacheSources += TorrentCacheCheck().torrentCacheCheck(allTorrents, info)
                 self.allTorrents += allTorrents
+
                 tools.log('%s cache check took %s seconds' % (provider_name, time.time() - start_time))
+
             self.remainingProviders.remove(provider_name)
 
             return
@@ -490,37 +488,36 @@ class Sources(tools.dialogWindow):
             provider_sources = providerModule.source()
             if 'episodeInfo' in info:
                 imdb, tvdb, title, localtitle, aliases, year = self.buildHosterVariables(info, 'tvshow')
-                if self.canceled:
-                    self.remainingProviders.remove(provider_name.upper())
-                    return
+
+                if self.canceled: raise Exception
+
                 url = provider_sources.tvshow(imdb, tvdb, title, localtitle, aliases, year)
-                if self.canceled:
-                    self.remainingProviders.remove(provider_name.upper())
-                    return
+
+                if self.canceled: raise Exception
+
                 imdb, tvdb, title, premiered, season, episode = self.buildHosterVariables(info, 'episode')
-                if self.canceled:
-                    self.remainingProviders.remove(provider_name.upper())
-                    return
+
+                if self.canceled: raise Exception
+
                 url = provider_sources.episode(url, imdb, tvdb, title, premiered, season, episode)
-                if self.canceled:
-                    self.remainingProviders.remove(provider_name.upper())
-                    return
+
+                if self.canceled: raise Exception
+
             else:
 
                 imdb, title, localtitle, aliases, year = self.buildHosterVariables(info, 'movie')
                 url = provider_sources.movie(imdb, title, localtitle, aliases, year)
 
             hostDict, hostprDict = self.buildHosterVariables(info, 'sources')
-            if self.canceled:
-                self.remainingProviders.remove(provider_name.upper())
-                return
+
+            if self.canceled: raise Exception
+
             sources = provider_sources.sources(url, hostDict, hostprDict)
-            if self.canceled:
-                self.remainingProviders.remove(provider_name.upper())
-                return
-            if sources is None:
-                self.remainingProviders.remove(provider_name.upper())
-                return
+
+            if self.canceled: raise Exception
+
+            if sources is None: raise Exception
+
             if 'showInfo' in info:
                 title = '%s - %s' % (info['showInfo']['info']['tvshowtitle'],
                                      info['episodeInfo']['info']['title'])
@@ -546,6 +543,12 @@ class Sources(tools.dialogWindow):
                     self.duplicates_amount += 1
                 else:
                     sources.append(hoster)
+
+            hosts = [host[1].lower() for provider in self.hosterDomains['premium'].iterkeys()
+                     for host in self.hosterDomains['premium'][provider]]
+            hosts = set(hosts)
+
+            sources = [i for i in sources if i['source'].lower() in hosts or i['direct']]
 
             self.hosterSources += sources
             self.remainingProviders.remove(provider_name.upper())
@@ -671,9 +674,12 @@ class Sources(tools.dialogWindow):
                                     sortedList.append(file)
 
                 for file in hoster_list:
-                    if 'debrid_provider' not in file:
-                        if file['quality'] == resolution:
-                            sortedList.append(file)
+                    try:
+                        if 'debrid_provider' not in file and file['direct'] is True:
+                            if file['quality'] == resolution:
+                                sortedList.append(file)
+                    except:
+                        continue
 
         if tools.getSetting('general.disable265') == 'true':
             sortedList = [i for i in sortedList if 'x265' not in i['info']]

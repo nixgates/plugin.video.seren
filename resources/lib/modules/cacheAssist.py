@@ -18,15 +18,14 @@ class CacheAssit:
         url = json.loads(tools.unquote(url))
         args = url['args']
         torrent_list = url['torrent_list']
-
-        # HARDCODED FOR NOW
+        
         if 'showInfo' in args:
             self.title = args['showInfo']['info']['originaltitle']
         else:
             self.title = args['title']
 
         cache_location = int(tools.getSetting('general.cachelocation'))
-
+        cache_location = 1
         threads = []
         self.notified = False
 
@@ -34,7 +33,7 @@ class CacheAssit:
             threads.append(threading.Thread(target=self.premiumize_downloader, args=(torrent_list[0],)))
 
         if cache_location == 1 and tools.getSetting('realdebrid.enabled') == 'true':
-            threads.append(threading.Thread(target=self.real_debrid_downloader(torrent_list[0], args)))
+            threads.append(threading.Thread(target=self.real_debrid_downloader(torrent_list[0])))
             pass
 
         for i in threads:
@@ -99,12 +98,11 @@ class CacheAssit:
 
         return
 
-    def real_debrid_downloader(self, torrent_object, args):
+    def real_debrid_downloader(self, torrent_object):
         from resources.lib.common import source_utils
 
         tools.showDialog.notification(tools.addonName, tools.lang(32072).encode('utf-8'))
         current_percent = 0
-        episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
         debrid = real_debrid.RealDebrid()
         magnet = debrid.addMagnet(torrent_object['magnet'])
         info = debrid.torrentInfo(magnet['id'])
@@ -117,12 +115,10 @@ class CacheAssit:
         for file in info['files']:
             filename = file['path']
             key = file['id']
-            if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename) for episodeString in
-                   episodeStrings):
-                if any(filename.lower().endswith(extension) for extension in
-                       source_utils.COMMON_VIDEO_EXTENSIONS):
-                    key_list.append(key)
-                    break
+            if any(filename.lower().endswith(extension) for extension in
+                   source_utils.COMMON_VIDEO_EXTENSIONS):
+                key_list.append(key)
+                break
 
         debrid.torrentSelect(torrent_id, ','.join(key_list))
         downloading_status = ['queued', 'downloading']

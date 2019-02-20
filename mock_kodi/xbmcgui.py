@@ -585,7 +585,7 @@ class WindowDialog:
 
     def doModal(self, *args, **kwargs):
         self.info.append(args + (kwargs,))
-        self.show()
+        self.console_show()
         pass
 
     def addControl(self, *args, **kwargs):
@@ -593,7 +593,7 @@ class WindowDialog:
         pass
 
     def show(self, *args, **kwargs):
-        threading.Thread(target=self.console_show).start()
+        thread = threading.Thread(target=self.console_show)
 
     def console_show(self):
         while not self.stop_display:

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.1.34" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.1.35" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -27,6 +27,10 @@
 			<fanart>temp-fanart.png</fanart>
 		</assets>
 		<news>
+Changelog 0.1.35
+Fixed scrape error caused by missing artwork
+Sources that are not compatible are now hidden from users
+Fixed landscape image issue for episode items
 
 Changelog 0.1.34
 Fanart now also supplies landscape images

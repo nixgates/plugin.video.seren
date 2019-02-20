@@ -73,18 +73,18 @@ class directory:
                 print('')
                 print("Enter Action Number")
                 action = raw_input()
-                sys.argv = [None,None, None]
+                sys.argv = ['', 0, None]
                 try:
                     action = int(action) - 1
                     if action == -2:
                         if len(self.history) > 0:
-                            sys.argv = [None, None, self.history.pop(-1)]
+                            sys.argv = ['', 0, self.history.pop(-1)]
                             self.last_action = ''
                         return
                     elif action == -1:
-                        sys.argv = [None, None, '']
+                        sys.argv = ['', 0, '']
                     else:
-                        sys.argv = [None, None, self.items[action][1]]
+                        sys.argv = ['', 0, self.items[action][1]]
 
                 except:
                     action = str(action)
@@ -93,7 +93,7 @@ class directory:
                     if action.startswith('action'):
                         try:
                             action = re.findall(r'action (.*?)$', action)[0]
-                            sys.argv = [None, None, action]
+                            sys.argv = ['', 0, action]
                         except:
                             print('failed')
 

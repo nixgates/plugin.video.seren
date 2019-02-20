@@ -403,13 +403,6 @@ class TVDBAPI:
 
         art = {}
 
-        try:
-            art['thumb'] = self.baseImageUrl + response['filename']
-            if art['thumb'] == self.baseImageUrl:
-                art['thumb'] = 0
-        except:
-            pass
-
         info = {}
         try:
             info['episode'] = info['sortepisode'] = int(response['airedEpisodeNumber'])
@@ -476,6 +469,12 @@ class TVDBAPI:
         except:
             pass
         try:
+            art['thumb'] = self.baseImageUrl + response['filename']
+            if art['thumb'] == self.baseImageUrl:
+                art['thumb'] = art['fanart']
+        except:
+            pass
+        try:
             info['castandrole'] = showArgs['showInfo']['info']['castandrole']
         except:
             pass
@@ -511,7 +510,6 @@ class TVDBAPI:
 
         info['trailer'] = ''
         info['mediatype'] = 'episode'
-
         item['ids'] = trakt_object['ids']
         item['info'] = info
         item['art'] = art

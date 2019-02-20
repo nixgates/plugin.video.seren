@@ -145,8 +145,7 @@ class Resolver(tools.dialogWindow):
 
                     elif i['type'] == 'hoster':
                         # Quick fallback to speed up resolving while direct and free hosters are not supported
-                        if 'debrid_provider' not in i:
-                            continue
+
                         provider = i['provider_imports']
                         providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
                         providerModule = providerModule.source()
@@ -175,17 +174,23 @@ class Resolver(tools.dialogWindow):
                         else:
                             # Currently not supporting free hosters at this point in time
                             # ResolveURL and Direct link testing needs to be tested first
-                            continue
                             try:
+                                ext = i['url'].split('?')[0].split('&')[0].split('|')[0].rsplit('.')[-1].replace('/',
+                                                                                                            '').lower()
+                                if ext == 'rar': raise Exception()
                                 try:
                                     headers = i['url'].rsplit('|', 1)[1]
                                 except:
                                     headers = ''
 
+                                try:
+                                    headers = i['url'].rsplit('|', 1)[1]
+                                except:
+                                    headers = ''
                                 headers = tools.quote_plus(headers).replace('%3D', '=') if ' ' in headers else headers
                                 headers = dict(tools.parse_qsl(headers))
 
-                                live_check = requests.head(i['url'], headers=headers)
+                                live_check = requests.head(i['url'], headers=headers, timeout=10)
 
                                 if not live_check.status_code == 200:
                                     continue

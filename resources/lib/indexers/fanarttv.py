@@ -62,5 +62,4 @@ def get(remote_id, query):
                 'clearlogo': get_query_lang(art.get('hdtvlogo', []) + art.get('clearlogo', [])),
                 'landscape': get_query(art.get('tvthumb'))}
 
-        tools.log(meta['clearlogo'])
     return meta

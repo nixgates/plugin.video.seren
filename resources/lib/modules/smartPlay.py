@@ -20,9 +20,9 @@ class SmartPlay:
             self.show_trakt_id = self.info_dictionary['ids']['trakt']
             if tools.getSetting('trakt.auth') != '':
                 self.user_history = TraktAPI().json_response('sync/history/shows/%s' % self.show_trakt_id)
-            self.poster = self.info_dictionary['art']['fanart']
+            self.poster = self.info_dictionary['art'].get('fanart', '')
         else:
-            self.poster = self.info_dictionary['showInfo']['art']['fanart']
+            self.poster = self.info_dictionary['showInfo']['art'].get('fanart', '')
             self.show_trakt_id = self.info_dictionary['showInfo']['ids']['trakt']
 
         self.show_season_info = database.get(TraktAPI().json_response, 12,

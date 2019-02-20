@@ -13,7 +13,7 @@ try:
     url = params.get('url')
 
     action = params.get('action')
-    print(action)
+
     page = params.get('page')
 
     actionArgs = params.get('actionArgs')

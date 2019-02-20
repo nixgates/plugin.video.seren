@@ -121,8 +121,8 @@ class source_select_list(tools.dialogWindow):
         info_label_string = '%s: %s | %s: %s | %s: %s mins'
 
         if 'showInfo' in info:
-            self.background.setImage(info['showInfo']['art']['fanart'])
-            self.poster.setImage(info['showInfo']['art']['poster'])
+            self.background.setImage(info['showInfo']['art'].get('fanart', ''))
+            self.poster.setImage(info['showInfo']['art'].get('poster', ''))
 
             info_label_string %= (tools.colorString('RATING'),
                                   info['episodeInfo']['info']['rating'],
@@ -151,8 +151,8 @@ class source_select_list(tools.dialogWindow):
                                   tools.colorString('DURATION'),
                                   str(int(info['duration']) / 60))
 
-            self.background.setImage(info['fanart'])
-            self.poster.setImage(info['art']['poster'])
+            self.background.setImage(info['art'].get('fanart', ''))
+            self.poster.setImage(info['art'].get('poster', ''))
 
             plot_outline = tools.multi_text(830, 580, 430, 100, font='font12')
             self.addControl(plot_outline)

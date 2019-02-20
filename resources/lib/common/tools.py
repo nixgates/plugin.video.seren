@@ -196,7 +196,8 @@ except:
             return
         import re
         url = re.findall(r'.*?\((.*?)\)', url)
-        sys.argv[1] = (None,None,url)
+        print(url)
+        sys.argv = [None, None, url]
         execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
 
     def makeFile(path):
@@ -344,7 +345,6 @@ def safeStr(obj):
 
 
 def log(msg, level='info'):
-    import inspect
 
     msg = safeStr(msg)
     msg = addonName.upper() + ': ' + msg
@@ -605,9 +605,10 @@ def getSetting(id):
         try:
             value = re.findall(r'id="%s".*?>(.*?)<' % id, value)[0]
         except:
-            value = re.findall(r'id=\"%s\" value=\"(.*?)\" />' % id, value)[0]
+            value = re.findall(r'id=\"%s\" value=\"(.*?)\" \/>' % id, value)[0]
         return value
     except:
+        print(id)
         import traceback
         traceback.print_exc()
         return ''
