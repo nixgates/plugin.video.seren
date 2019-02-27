@@ -229,7 +229,7 @@ msgid "Premium Services"
 msgstr ""
 
 msgctxt "#32055"
-msgid "Clear Local Torrent cache"
+msgid "Clear Local Result Cache"
 msgstr ""
 
 msgctxt "#32056"
@@ -416,7 +416,7 @@ msgid "All Cache Successfully Cleared"
 msgstr ""
 
 msgctxt "#32079"
-msgid "Torrent Cache Successfully Cleared"
+msgid "Local Result Cache Successfully Cleared"
 msgstr ""
 
 msgctxt "#32080"
@@ -627,7 +627,7 @@ msgid "Enabled Up Next Addon Integration"
 msgstr ""
 
 msgctxt "#40029"
-msgid "    Up Next Notifaction Time"
+msgid "    Up Next Notification Time"
 msgstr ""
 
 msgctxt "#40030"
