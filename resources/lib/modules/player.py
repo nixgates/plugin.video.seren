@@ -32,7 +32,6 @@ class serenPlayer(tools.player):
         self.offset = None
         self.media_length = 0
         self.current_time = 0
-        self.set_watched_percent = 90.00
         self.stopped = False
         self.args = {}
         self.playback_started = False
@@ -249,7 +248,7 @@ class serenPlayer(tools.player):
             tools.kodi.sleep(5000)
  
     def checkIfWatched(self, offset=0):
-        if self.scrobble is True and self.getWatchedPercent(offset=offset) >= self.set_watched_percent:
+        if self.scrobble is True and self.getWatchedPercent(offset=offset) >= 90:
             self.scrobble = False
             self.traktStopWatching()
             return True
