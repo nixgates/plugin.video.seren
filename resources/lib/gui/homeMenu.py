@@ -48,10 +48,13 @@ class Menus:
         tools.closeDirectory('addons', cacheToDisc=True)
 
     def providerMenu(self):
-        tools.addDirectoryItem(tools.lang(32058).encode('utf-8'), 'installProviders', None, None)
-        tools.addDirectoryItem(tools.lang(32059).encode('utf-8'), 'uninstallProviders', None, None)
-        tools.addDirectoryItem(tools.lang(32060).encode('utf-8'), 'adjustProviders&actionArgs=disabled', None, None)
-        tools.addDirectoryItem(tools.lang(32061).encode('utf-8'), 'adjustProviders&actionArgs=enabled', None, None)
+        tools.addDirectoryItem(tools.lang(40082).encode('utf-8'), 'manualProviderUpdate', None, None)
+        tools.addDirectoryItem(tools.lang(40071).encode('utf-8'), 'installProviders', None, None)
+        tools.addDirectoryItem(tools.lang(40072).encode('utf-8'), 'uninstallProviders', None, None)
+        tools.addDirectoryItem(tools.lang(40073).encode('utf-8'), 'adjustPackage&actionArgs=disabled', None, None)
+        tools.addDirectoryItem(tools.lang(40074).encode('utf-8'), 'adjustPackage&actionArgs=enabled', None, None)
+        tools.addDirectoryItem(tools.lang(40076).encode('utf-8'), 'adjustProviders&actionArgs=disabled', None, None)
+        tools.addDirectoryItem(tools.lang(40077).encode('utf-8'), 'adjustProviders&actionArgs=enabled', None, None)
         tools.closeDirectory('addons', cacheToDisc=True)
 
 
