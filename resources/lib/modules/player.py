@@ -26,6 +26,7 @@ class serenPlayer(tools.player):
         self.trakt_api = trakt.TraktAPI()
         self.pre_cache_initiated = False
         self.play_next_triggered = False
+        self.scrobble = True
         self.trakt_id = None
         self.media_type = None
         self.offset = None
@@ -79,8 +80,9 @@ class serenPlayer(tools.player):
 
     def onPlayBackSeek(self, time, seekOffset):
         seekOffset = seekOffset / 1000
-        self.traktStartWatching(offset=seekOffset)
-        pass
+        if not self.checkIfWatched(offset=seekOffset):
+            self.traktStartWatching(offset=seekOffset)
+            pass
 
     def onPlayBackSeekChapter(self, chapter):
         self.traktStartWatching()
@@ -101,7 +103,6 @@ class serenPlayer(tools.player):
 
     def start_playback(self):
         try:
-
             tools.execute('Dialog.Close(all,true)')
             self.current_time = self.getTime()
             self.media_length = self.getTotalTime()
@@ -112,7 +113,6 @@ class serenPlayer(tools.player):
                 self.offset = None
             else:
                 tools.log("No seeking applied")
-
 
             if 'episodeInfo' in self.args and tools.getSetting('smartplay.upnext') == 'true':
                 source_id = 'plugin.video.%s' % tools.addonName.lower()
@@ -130,7 +130,7 @@ class serenPlayer(tools.player):
             if tools.getSetting('general.smartplay') is not 'false' and self.media_type is 'episode':
                 if int(tools.playList.getposition()) == (tools.playList.size() - 1):
                     self.next_season = smartPlay.SmartPlay(self.args).append_next_season()
-
+            
             self.playback_started = True
             post_data = self.buildTraktObject(overide_progress=0)
             self.trakt_api.post_request('scrobble/start', postData=post_data, limit=False)
@@ -139,16 +139,12 @@ class serenPlayer(tools.player):
 
     def onPlayBackEnded(self):
         self.stopped = True
-        self.traktStopWatching()
+        #self.traktStopWatching()
 
     def onPlayBackStopped(self):
         self.stopped = True
-        watched_percent = self.getWatchedPercent()
-        if watched_percent < 90.00:
+        if self.scrobble:
             self.traktPause()
-        else:
-            self.traktStopWatching()
-
         tools.playList.clear()
 
     def onPlayBackPaused(self):
@@ -182,7 +178,7 @@ class serenPlayer(tools.player):
         return watched_percent
 
     def traktStartWatching(self, offset=None):
-        if not self.trakt_integration():
+        if not self.trakt_integration() or not self.scrobble:
             return
         post_data = self.buildTraktObject(offset=offset)
         self.trakt_api.post_request('scrobble/start', postData=post_data, limit=False)
@@ -194,14 +190,13 @@ class serenPlayer(tools.player):
         self.trakt_api.post_request('scrobble/stop', postData=post_data, limit=False)
 
     def traktPause(self):
-        if not self.trakt_integration():
+        if not self.trakt_integration() or not self.scrobble:
             return
         post_data = self.buildTraktObject()
         self.trakt_api.post_request('scrobble/pause', postData=post_data, limit=False)
 
     def buildTraktObject(self, offset=None, overide_progress=None):
         try:
-
             if self.media_type == 'episode':
                 post_data = {'episode': {'ids': {'trakt': self.trakt_id}}}
             else:
@@ -242,6 +237,8 @@ class serenPlayer(tools.player):
                             smartPlay.SmartPlay(self.args).pre_scrape()
                     except:
                         pass
+                self.checkIfWatched()
+                        
             except:
                 import traceback
                 traceback.print_exc()
@@ -249,7 +246,13 @@ class serenPlayer(tools.player):
                 continue
 
             tools.kodi.sleep(5000)
-
+ 
+    def checkIfWatched(self, offset=0):
+        if self.scrobble is True and self.getWatchedPercent(offset=offset) >= 90:
+            self.scrobble = False
+            self.traktStopWatching()
+            return True
+    
     def traktBookmark(self):
         if not self.trakt_integration():
             return
@@ -288,7 +291,7 @@ class serenPlayer(tools.player):
     def signals_callback(self, data):
         if not self.play_next_triggered:
             self.stopped = True
-            self.traktStopWatching()
+            #self.traktStopWatching()
             self.play_next_triggered = True
             # Using a seek here as playnext causes Kodi gui to wig out. So we seek instead so it looks more graceful
             self.seekTime(self.media_length)
