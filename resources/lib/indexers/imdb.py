@@ -36,7 +36,7 @@ class scraper:
         try:
             title = details.find('div', {'class': 'title_wrapper'}).find('h1').text
             title = tools.unquote(title).split('(')[0]
-            info['title'] = info['originaltitle'] = title.encode('utf-8')
+            info['title'] = info['originaltitle'] = title
         except:
             return None
 
@@ -58,7 +58,7 @@ class scraper:
         try:
             tag = details.find('div', {'id': 'titleStoryLine'}).find('div', {'class': 'txt-block'}).text
             tag = tag.split('\n')[2]
-            info['tagline'] = tag.encode('utf-8')
+            info['tagline'] = tag
         except:
             pass
 

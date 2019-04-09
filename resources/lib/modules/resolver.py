@@ -98,14 +98,14 @@ class Resolver(tools.dialogWindow):
             else:
                 background = args['fanart']
 
-            self.setText(tools.lang(33000).encode('utf-8'))
+            self.setText(tools.lang(33000))
             self.setBackground(background)
             stream_link = None
             loop_count = 0
             # Begin resolving links
             tools.log('Attempting to Resolve file link', 'info')
             for i in sources:
-                debrid_provider = i.get('debrid_provider', '')
+                debrid_provider = i.get('debrid_provider', 'None').replace('_', ' ')
                 loop_count += 1
                 try:
                     if self.is_canceled():
@@ -114,13 +114,13 @@ class Resolver(tools.dialogWindow):
                     if 'size' in i:
                         i['info'].append(tools.source_size_display(i['size']))
                     loop_count_string = "(" + str(loop_count) + " of " + str(len(sources)) + ")"
-                    line1 = "%s %s - %s" % (tools.lang(32036).encode('utf-8'),
-                                            tools.colorString(tools.deaccentString(i['release_title']).encode('utf-8')),
+                    line1 = "%s %s - %s" % (tools.lang(32036),
+                                            tools.colorString(tools.display_string(i['release_title'])),
                                             loop_count_string)
-                    line2 = "%s %s | Source: %s" % (tools.lang(32037).encode('utf-8'),
+                    line2 = "%s %s | Source: %s" % (tools.lang(32037),
                                                     tools.colorString(debrid_provider.upper()),
                                                     tools.colorString(i['source']))
-                    line3 = '%s %s | Info: %s' % (tools.lang(32038).encode('utf-8'),
+                    line3 = '%s %s | Info: %s' % (tools.lang(32038),
                                                   tools.colorString(i['quality']),
                                                   tools.colorString(" ".join(i['info'])))
 

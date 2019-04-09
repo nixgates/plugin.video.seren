@@ -491,7 +491,7 @@ msgid "Building Playlist"
 msgstr ""
 
 msgctxt "#32097"
-msgid "'Building List Items'"
+msgid "Building List Items"
 msgstr ""
 
 msgctxt "#32098"
@@ -972,4 +972,64 @@ msgstr ""
 
 msgctxt "#40115"
 msgid "Fanart.tv"
+msgstr ""
+
+msgctxt "#40116"
+msgid "Delay Release Dates by a day"
+msgstr ""
+
+msgctxt "#40117"
+msgid "Another addon is attempting to install a provider into Seren\nDo you wish to allow this?"
+msgstr ""
+
+msgctxt "#40118"
+msgid "%s failed to uninstall the package: %s\nThis may require manual removal"
+msgstr ""
+
+msgctxt "#40119"
+msgid "Another addon is attempting to uninstall the %s provider from Seren\nDo you wish to allow this?"
+msgstr ""
+
+msgctxt "#40120"
+msgid "Hide SD quality sources"
+msgstr ""
+
+msgctxt "#40121"
+msgid "Networks"
+msgstr ""
+
+msgctxt "#40122"
+msgid "Hide Un-Aired Episodes"
+msgstr ""
+
+msgctxt "#40123"
+msgid "Years"
+msgstr ""
+
+msgctxt "#40124"
+msgid "Trending Lists"
+msgstr ""
+
+msgctxt "#40125"
+msgid "Hide Specials"
+msgstr ""
+
+msgctxt "#40126"
+msgid "My Files"
+msgstr ""
+
+msgctxt "#40127"
+msgid "Scraper Display Style"
+msgstr ""
+
+msgctxt "#40128"
+msgid "Resolve Display Style"
+msgstr ""
+
+msgctxt "#40129"
+msgid "Fancy"
+msgstr ""
+
+msgctxt "#40130"
+msgid "Background Task"
 msgstr ""

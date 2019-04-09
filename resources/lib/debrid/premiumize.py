@@ -158,17 +158,25 @@ class PremiumizeFunctions(PremiumizeBase):
         return returnFolders
 
     def movieMagnetToStream(self, magnet, args):
-        transfer = self.create_transfer(magnet)
 
-        id = transfer['id']
-
+        selectedFile = None
         folder_details = self.direct_download(magnet)['content']
         folder_details = sorted(folder_details, key=lambda i: int(i['size']), reverse=True)
-        for file in folder_details:
-            if source_utils.filterMovieTitle(file['path'], args['title'], args['year']):
-                if any(file['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
-                    selectedFile = file
-                    break
+        folder_details = [tfile for tfile in folder_details
+                          if any(tfile['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
+        for torrent_file in folder_details:
+            if source_utils.filterMovieTitle(torrent_file['path'].split('/')[-1], args['title'], args['year']):
+                selectedFile = torrent_file
+                break
+
+        if selectedFile is None:
+            folder_details = [tfile for tfile in folder_details if 'sample' not in tfile['path'].lower()]
+            folder_details = [tfile for tfile in folder_details if source_utils.cleanTitle(args['title'])
+                              in source_utils.cleanTitle(tfile['path'].lower())]
+            if len(folder_details) == 1:
+                selectedFile = folder_details[0]
+            else:
+                return
 
         if tools.getSetting('premiumize.transcoded') == 'true':
             if selectedFile['transcode_status'] == 'finished':

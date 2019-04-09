@@ -39,7 +39,7 @@ class TVDBAPI:
     def refresh_lock(self):
         if not tools.tvdb_refreshing:
             return False
-        for i in range(0,5):
+        for i in range(0, 5):
             if tools.tvdb_refresh == '':
                 time.sleep(1)
             else:
@@ -176,7 +176,7 @@ class TVDBAPI:
             except:
                 pass
             try:
-                info['genre'] = self.info.get('genre')
+                info['genre'] = [genre for genre in trakt_object['genres']]
             except:
                 pass
             try:
@@ -242,10 +242,7 @@ class TVDBAPI:
                 pass
 
             try:
-                if 'airedEpisodes' in self.episode_summary:
-                    info['episodeCount'] = self.episode_summary['airedEpisodes']
-                else:
-                    info['episodeCount'] = trakt_object['aired_episodes']
+                info['episodeCount'] = trakt_object['aired_episodes']
             except:
                 info['episodeCount'] = 0
                 pass
@@ -308,7 +305,9 @@ class TVDBAPI:
             except:
                 pass
             try:
-                item['art']['poster'] = item['art']['thumb'] = self.art['poster']
+                item['art']['poster'] = item['art']['thumb'] = self.art.get('poster', '')
+                if item['art']['poster'] == '' or item['art']['poster'] is None:
+                    item['art']['poster'] = item['art']['thumb'] = showArgs['art']['poster']
             except:
                 item['art']['poster'] = item['art']['thumb'] = ''
 
@@ -318,6 +317,10 @@ class TVDBAPI:
                 pass
             try:
                 item['info']['aired'] = seasonObject['first_aired'][:10]
+            except:
+                pass
+            try:
+                item['info']['episode_count'] = seasonObject['aired_episodes']
             except:
                 pass
             try:
@@ -370,10 +373,9 @@ class TVDBAPI:
                     if airdate is None:
                         return None
                     if airdate > currentDate:
-                        item['info']['season_title'] = '[I][COLOR red]%s[/COLOR][/I]' % item['info']['season_title']
+                        item['info']['season_title'] = '[I][COLOR red]%s[/COLOR][/I]' % \
+                                                       item['info']['season_title']
             except:
-                import traceback
-                traceback.print_exc()
                 return None
                 pass
 
@@ -409,6 +411,10 @@ class TVDBAPI:
         except:
             pass
         try:
+            info['absoluteNumber'] = int(response['absoluteNumber'])
+        except:
+            pass
+        try:
             info['season'] = info['sortseason'] = int(response['airedSeason'])
         except:
             pass
@@ -430,8 +436,9 @@ class TVDBAPI:
                 info['premiered'] = release.date().strftime('%Y-%m-%d')
                 info['aired'] = release.date().strftime('%Y-%m-%d')
             except:
-                import traceback
-                traceback.print_exc()
+                release = tools.datetime_workaround(release['firstAired'],
+                                                    '%Y-%m-%dT%H:%M:%S.000Z', date_only=False)
+                release = tools.utc_to_local_datetime(release)
                 info['premiered'] = response['firstAired']
                 info['aired'] = response['firstAired']
         except:
@@ -499,11 +506,15 @@ class TVDBAPI:
             currentDate = datetime.datetime.today().date()
             airdate = str(response['firstAired'])
             if airdate == '':
+                if tools.getSetting('general.hideUnAired') == 'true':
+                    return None
                 info['title'] = '[I][COLOR red]%s[/COLOR][/I]' % info['title']
             airdate = tools.datetime_workaround(airdate)
             if airdate is None:
                 return None
             if airdate > currentDate:
+                if tools.getSetting('general.hideUnAired') == 'true':
+                    return None
                 info['title'] = '[I][COLOR red]%s[/COLOR][/I]' % info['title']
         except:
             pass
@@ -530,8 +541,11 @@ class TVDBAPI:
         try:
             url = 'series/%s/images/query?keyType=fanart' % tvdbID
             response = self.get_request(url)['data']
-            image = response[0]
-            for i in response:
+            try:
+                image = [i for i in response if i['languageId'] == 7][0]
+            except:
+                image = response[0]
+            for i in [k for k in response if k['languageId'] == 7]:
                 if float(i['ratingsInfo']['average']) > float(image['ratingsInfo']['average']):
                     image = i
                 else:
@@ -548,11 +562,13 @@ class TVDBAPI:
     def getShowPoster(self, tvdbID):
         tools.tv_sema.acquire()
         try:
-            tools.tv_sema.acquire()
             url = 'series/%s/images/query?keyType=poster' % tvdbID
             response = self.get_request(url)['data']
-            image = response[0]
-            for i in response:
+            try:
+                image = [i for i in response if i['languageId'] == 7][0]
+            except:
+                image = response[0]
+            for i in [k for k in response if k['languageId'] == 7]:
                 if float(i['ratingsInfo']['average']) > float(image['ratingsInfo']['average']):
                     image = i
                 else:
@@ -593,8 +609,11 @@ class TVDBAPI:
         try:
             url = 'series/%s/images/query?keyType=season&subKey=%s' % (tvdbID, season)
             response = self.get_request(url)['data']
-            image = response[0]
-            for i in response:
+            try:
+                image = [i for i in response if i['languageId'] == 7][0]
+            except:
+                image = response[0]
+            for i in [k for k in response if k['languageId'] == 7]:
                 if float(i['ratingsInfo']['average']) > float(image['ratingsInfo']['average']):
                     image = i
                 else:

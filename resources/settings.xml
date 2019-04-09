@@ -5,9 +5,14 @@
 		<setting type="lsep" label="40001" />
 		<setting type="sep" />
 		<setting type="enum" id="general.playstyle" label="40002" default="40003" lvalues="40003|40004" />
+		<setting type="enum" id="general.scrapedisplay" label="40127" default="40129" lvalues="40129|40130" />
+		<!--<setting type="enum" id="general.resolvedisplay" label="40128" default="40129" lvalues="40129|40130" /> -->
 		<setting type="enum" id="general.sourceselect" label="40005" default="40006" lvalues="40007|40006" />
+		<setting type="bool" id="general.datedelay" label="40116" default="true" />
 		<setting type="lsep" label="40008" />
 		<setting type="sep" />
+		<setting type="bool" id="general.hideSpecials" label="40125" default="false" />
+		<setting type="bool" id="general.hideUnAired" label="40122" default="false" />
         <setting type="bool" id="searchHistory" label="40112" default="false" />
 		<setting type="enum" id="nextup.sort" label="40009" default="40010" lvalues="40010|40011" />
 		<setting type="bool" id="general.sourceselectlines" label="40012" default="true" />
@@ -138,6 +143,7 @@
 		<setting id="general.disable3d" label="40094" type="bool" default="true" />
 		<setting id="general.disable265" label="40039" type="bool" default="false" />
 		<setting id="general.disablelowQuality" label="40109" type="bool" default="false" />
+		<setting id="general.hidesd" label="40120" type="bool" default="false" />
 		<setting type="lsep" label="40095"/>
 		<setting type="sep"/>
 		<setting id="general.sortsources" label="40049" type="enum" default="0" values="Torrents|Hosters|Resolution" />

@@ -18,21 +18,21 @@ class CacheAssit:
         url = json.loads(tools.unquote(url))
         args = url['args']
         torrent_list = url['torrent_list']
-        
+
         if 'showInfo' in args:
             self.title = args['showInfo']['info']['originaltitle']
         else:
             self.title = args['title']
 
         cache_location = int(tools.getSetting('general.cachelocation'))
-        cache_location = 1
+
         threads = []
         self.notified = False
 
         if cache_location == 0 and tools.getSetting('premiumize.enabled') == 'true':
             threads.append(threading.Thread(target=self.premiumize_downloader, args=(torrent_list[0],)))
 
-        if cache_location == 1 and tools.getSetting('realdebrid.enabled') == 'true':
+        elif cache_location == 1 and tools.getSetting('realdebrid.enabled') == 'true':
             threads.append(threading.Thread(target=self.real_debrid_downloader(torrent_list[0])))
             pass
 
@@ -47,10 +47,12 @@ class CacheAssit:
 
         try:
             transfer_id = debrid.create_transfer(torrent_object['magnet'])['id']
-            tools.showDialog.notification(tools.addonName, tools.lang(32072).encode('utf-8'))
+            tools.showDialog.notification(tools.addonName, tools.lang(32072))
             database.add_assist_torrent(transfer_id, 'premiumize', 'queued',
                                         torrent_object['release_title'], str(current_percent))
         except:
+            import traceback
+            traceback.print_exc()
             tools.log('Failed to start premiumize debrid transfer', 'error')
             return
 
@@ -101,7 +103,7 @@ class CacheAssit:
     def real_debrid_downloader(self, torrent_object):
         from resources.lib.common import source_utils
 
-        tools.showDialog.notification(tools.addonName, tools.lang(32072).encode('utf-8'))
+        tools.showDialog.notification(tools.addonName, tools.lang(32072))
         current_percent = 0
         debrid = real_debrid.RealDebrid()
         magnet = debrid.addMagnet(torrent_object['magnet'])
@@ -117,7 +119,7 @@ class CacheAssit:
             key = file['id']
             if any(filename.lower().endswith(extension) for extension in
                    source_utils.COMMON_VIDEO_EXTENSIONS):
-                key_list.append(key)
+                key_list.append(str(key))
                 break
 
         debrid.torrentSelect(torrent_id, ','.join(key_list))
@@ -134,7 +136,7 @@ class CacheAssit:
 
                 if info['status'] == 'downloaded':
                     tools.showDialog.notification(tools.addonName + ': %s' % self.title,
-                                                  tools.lang(32072).encode('utf-8') + ' %s' % self.title,
+                                                  tools.lang(32072) + ' %s' % self.title,
                                                   time=5000)
                     database.add_assist_torrent(torrent_id, 'real_debrid', 'finished', torrent_object['release_title'],
                                                 str(current_percent))

@@ -6,6 +6,7 @@ import copy
 
 from difflib import SequenceMatcher
 from requests import Session
+from resources.lib.common import tools
 
 COMMON_VIDEO_EXTENSIONS = ['.m4v', '.mkv', '.mka', '.mp4', '.avi', '.mpeg', '.asf', '.flv', '.m4a', '.aac', '.nut',
                            '.ogg']
@@ -29,6 +30,7 @@ common_info_tags = ['1080p', '720p', '480p', '300mb', 'HEVC', 'x265', 'x264', '4
                     'PROPER', 'LIMITED', 'INTERNAL', 'STV', 'festival', 'DC', 'FS', 'WS', 'rated', 'unrated', 'recode',
                     'repack', 'unsubbed', 'subbed', 'custom.subbed', 'dubbed', 'readnfo', 'dupe', 'nuked', 'nfo', 'cam',
                     'telesync', 'ts', 'telecine', 'tc', 'bluray']
+
 
 def simularity_compare(check_list, compare_list):
     simularity = []
@@ -59,6 +61,7 @@ def simularity_compare(check_list, compare_list):
         import traceback
         traceback.print_exc()
         return None
+
 
 def getQuality(release_title):
     quality = 'SD'
@@ -105,6 +108,7 @@ def getInfo(release_title):
 
 
 def cleanTitle(title):
+    title = tools.deaccentString(title)
     title = title.lower()
     title = title.replace('-', ' ')
     title = re.sub(r'\:|\\|\/|\,|\!|\(|\)|\'', '', title)
@@ -149,6 +153,8 @@ def filterMovieTitle(release_title, movieTitle, year):
 
 
 def filterSeasonPack(simpleInfo, release_title):
+    if any(x in i for i in info['showInfo']['info'].get('genre', []) for x in ['Anime', 'Animation']):
+        simpleInfo['isanime'] = True
     show_title, season, aliasList, year, country = \
         simpleInfo['show_title'], \
         simpleInfo['season_number'], \
@@ -223,10 +229,16 @@ def filterSingleEpisode(simpleInfo, release_title):
     stringList.append('%s %s s%se%s' % (show_title, year, seasonFill, episodeFill))
     stringList.append('%s %s s%se%s' % (show_title, country, seasonFill, episodeFill))
 
+    if simpleInfo['isanime']:
+        stringList.append('%s - %s' % (show_title, simpleInfo['absolute_number']))
+
     for i in aliasList:
         stringList.append('%s s%se%s' % (cleanTitle(i), seasonFill, episodeFill))
         stringList.append('%s %s s%se%s' % (cleanTitle(i), year, seasonFill, episodeFill))
         stringList.append('%s %s s%se%s' % (cleanTitle(i), country, seasonFill, episodeFill))
+
+        if simpleInfo['isanime']:
+            stringList.append('%s - %s' % (cleanTitle(i), simpleInfo['absolute_number']))
 
     for x in stringList:
         if '&' in x:
@@ -275,8 +287,6 @@ def filterShowPack(simpleInfo, release_title):
 
     season_count = int(season)
 
-    season_count = int(season)
-
     while int(season_count) <= int(no_seasons):
         season = '%s seasons 1 %s' % (showTitle, str(season_count))
         seasons = '%s season 1 %s' % (showTitle, str(season_count))
@@ -318,7 +328,6 @@ def filterShowPack(simpleInfo, release_title):
             return True
 
 
-
 class serenRequests(Session):
     def __init__(self, *args, **kwargs):
         super(serenRequests, self).__init__(*args, **kwargs)
@@ -328,6 +337,7 @@ class serenRequests(Session):
 
 
 def torrentCacheStrings(args, strict=False):
+
     episodeInfo = args['episodeInfo']['info']
     episode_title = cleanTitle(episodeInfo['title'])
     season_number = str(episodeInfo['season'])
@@ -358,8 +368,11 @@ def torrentCacheStrings(args, strict=False):
             'episode %s ' % episode_number,
             ' ep%s' % episode_number,
             ' ep%s' % episode_number.zfill(2),
-        ]
+            ]
         episodeStrings += relaxed_strings
+
+    if any(x in i for i in args['showInfo']['info'].get('genre', []) for x in ['anime', 'animation']):
+        episodeStrings.append(' %s ' % args['episodeInfo']['info']['absoluteNumber'])
 
     if episode_number == '1' and season_number == '1':
         episodeStrings.append('pilot')
@@ -377,6 +390,13 @@ def torrentCacheStrings(args, strict=False):
 
 def de_string_size(size):
     try:
+        if 'Mib' in size:
+            size = int(size.replace('MB', '').replace(' ', '').split('.')[0])
+            return size
+        if 'GiB' in size:
+            size = float(size.replace('GiB', ''))
+            size = int(size * 1024)
+            return size
         if 'GB' in size:
             size = float(size.replace('GB', ''))
             size = int(size * 1024)

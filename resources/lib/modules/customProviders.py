@@ -142,19 +142,21 @@ class providers:
         self.known_providers = database.get_providers()
 
     def adjust_providers(self, status, package_disable=False):
+
         if status == 'disabled':
             action = 'enabled'
         if status == 'enabled':
             action = 'disabled'
         if len(self.known_providers) == 0:
             self.known_providers = database.get_providers()
-
-        packages = list(set([pack['pack_name'] for pack in self.known_packages]))
+        known_packages = self.known_packages
+        packages = list(set(['%s' % pack['pack_name'] for pack in known_packages]))
+        package_display = list(set(['%s - %s' % (pack['pack_name'], pack['version']) for pack in known_packages]))
         if len(packages) == 0:
-            tools.showDialog.ok(tools.addonName, tools.lang(32074).encode('utf-8'))
+            tools.showDialog.ok(tools.addonName, tools.lang(32074))
             return
         selection = tools.showDialog.select("%s: %s Providers" %
-                                            (tools.addonName, action[:-1].title()), packages)
+                                            (tools.addonName, action[:-1].title()), package_display)
 
         if selection == -1:
             return
@@ -183,61 +185,72 @@ class providers:
             for i in providers:
                 database.add_provider(i['provider_name'], i['package'], action, self.language, i['provider_type'])
 
-
-    def uninstall_package(self):
+    def uninstall_package(self, package=None, silent=False):
         import shutil
         packages = [i['pack_name'] for i in self.known_packages]
-        if len(packages) == 0:
-            tools.showDialog.ok(tools.addonName, tools.lang(32074).encode('utf-8'))
-            return
-        selection = tools.showDialog.select("%s: %s Providers" %
-                                            (tools.addonName, tools.lang(32075).encode('utf-8')), packages)
-        if selection == -1:
-            return
-        package_name = packages[selection]
-        confirm = tools.showDialog.yesno(tools.addonName, tools.lang(32076).encode('utf-8') + " %s" % package_name)
-        if confirm == 0:
-            return
+        if package is None:
+            if len(packages) == 0:
+                tools.showDialog.ok(tools.addonName, tools.lang(32074))
+                return
+            selection = tools.showDialog.select("%s: %s Providers" %
+                                                (tools.addonName, tools.lang(32075)), packages)
+            if selection == -1:
+                return
+            package_name = packages[selection]
+            confirm = tools.showDialog.yesno(tools.addonName, tools.lang(32076) + " %s" % package_name)
+            if confirm == 0:
+                return
+        else:
+            package_name = package
 
-        provider_path = os.path.join(self.providers_path, package_name)
-        modules_path = os.path.join(self.modules_path, package_name)
-        meta_path = os.path.join(self.meta_path, '%s.json' % package_name)
-        if os.path.exists(provider_path):
-            shutil.rmtree(provider_path)
-        if os.path.exists(modules_path):
-            shutil.rmtree(modules_path)
-        if os.path.exists(meta_path):
-            os.remove(meta_path)
+        try:
+            provider_path = os.path.join(self.providers_path, package_name)
+            modules_path = os.path.join(self.modules_path, package_name)
+            meta_path = os.path.join(self.meta_path, '%s.json' % package_name)
+            if os.path.exists(provider_path):
+                shutil.rmtree(provider_path)
+            if os.path.exists(modules_path):
+                shutil.rmtree(modules_path)
+            if os.path.exists(meta_path):
+                os.remove(meta_path)
 
-        database.remove_package_providers(package_name)
-        database.remove_provider_package(package_name)
-        tools.showDialog.ok(tools.addonName, '%s ' % package_name + tools.lang(32077).encode('utf-8'))
+            database.remove_package_providers(package_name)
+            database.remove_provider_package(package_name)
+            if not silent:
+                tools.showDialog.ok(tools.addonName, '%s ' % package_name + tools.lang(32077))
+        except:
+            tools.showDialog.ok(tools.addonName,
+                                tools.language(40118).enocde('utf-8') % (tools.addonName, package_name))
 
-    # -*- coding: utf-8 -*-
-
-    def install_package(self, install_style):
+    def install_package(self, install_style, url=None):
         self.deploy_init()
 
-        if install_style == None:
+        if url is None:
+            if install_style == None:
+                install_style = tools.showDialog.select(tools.addonName, ['Browse...', 'Web Location...'])
+            else:
+                install_style = int(install_style)
 
-            install_style = tools.showDialog.select(tools.addonName, ['Browse...', 'Web Location...'])
-
-        else:
-            install_style = int(install_style)
-
-        if install_style == 0:
-            zip_location = tools.fileBrowser(1, 'Locate Provider Zip', 'files', '.zip', True, False)
-        elif install_style == 1:
-            zip_location = tools.showKeyboard('', '%s: Enter Zip URL' % tools.addonName)
-            zip_location.doModal()
-            if zip_location.isConfirmed() and zip_location.getText() != '':
-                zip_location = zip_location.getText()
+            if install_style == 0:
+                zip_location = tools.fileBrowser(1, 'Locate Provider Zip', 'files', '.zip', True, False)
+            elif install_style == 1:
+                zip_location = tools.showKeyboard('', '%s: Enter Zip URL' % tools.addonName)
+                zip_location.doModal()
+                if zip_location.isConfirmed() and zip_location.getText() != '':
+                    zip_location = zip_location.getText()
+                else:
+                    return
             else:
                 return
         else:
-            return
+            zip_location = url
 
-        zip_file = self.get_zip_file(zip_location)
+        if url is not None:
+            zip_file = self.get_zip_file(zip_location, True)
+        else:
+            zip_file = self.get_zip_file(zip_location, False)
+
+
 
         if zip_file is None:
             return
@@ -290,16 +303,16 @@ class providers:
             raise Exception
 
         if remote_meta == '':
-            tools.showDialog.ok(tools.addonName, tools.lang(33016).encode('utf-8'))
+            tools.showDialog.ok(tools.addonName, tools.lang(33016))
 
-        line1 = tools.colorString(tools.lang(33001).encode('utf-8')) + " %s - v%s" % (pack_name, version)
-        line2 = tools.colorString(tools.lang(33002).encode('utf-8')) + "%s" % author
-        line3 = tools.lang(33003).encode('utf-8')
+        line1 = tools.colorString(tools.lang(33001)) + " %s - v%s" % (pack_name, version)
+        line2 = tools.colorString(tools.lang(33002)) + "%s" % author
+        line3 = tools.lang(33003)
 
         if not silent:
-            accept = tools.showDialog.yesno(tools.addonName + " - %s" % tools.lang(33004).encode('utf-8'),
-                                            line1, line2, line3, tools.lang(33005).encode('utf-8'),
-                                            tools.lang(33006).encode('utf-8'))
+            accept = tools.showDialog.yesno(tools.addonName + " - %s" % tools.lang(33004),
+                                            line1, line2, line3, tools.lang(33005),
+                                            tools.lang(33006))
             if accept == 0:
                 return
 
@@ -311,13 +324,15 @@ class providers:
         meta_output_location = os.path.join(tools.dataPath, 'providerMeta', '%s.json' % pack_name)
 
         if os.path.isfile(meta_output_location):
+            if os.path.isfile(meta_output_location + '.temp'):
+                os.remove(meta_output_location + '.temp')
             try:
                 os.rename(meta_output_location, '%s.temp' % meta_output_location)
             except Exception as e:
                 self.failure_cleanup(meta_output_location, pack_name, folders)
                 tools.log('Failed to create temporary meta file')
                 if not silent:
-                    tools.showDialog.ok(tools.addonName, tools.lang(33007).encode('utf-8'))
+                    tools.showDialog.ok(tools.addonName, tools.lang(33007))
                 return
 
             try:
@@ -334,17 +349,20 @@ class providers:
 
         if not silent:
             install_progress = tools.progressDialog
-            install_progress.create(tools.addonName, '%s - %s' % (pack_name, tools.lang(33008).encode('utf-8')),
-                                    tools.lang(33009).encode('utf-8'))
+            install_progress.create(tools.addonName, '%s - %s' % (pack_name, tools.lang(33008)),
+                                    tools.lang(33009))
             install_progress.update(-1)
-
         try:
             for folder in folders:
                 try:
                     folder_path = os.path.join(tools.dataPath, folder.strip('/'), pack_name)
                     if os.path.exists(folder_path):
+                        if os.path.exists('%s.temp' % folder_path):
+                            shutil.rmtree('%s.temp' % folder_path)
                         os.rename(folder_path, '%s.temp' % folder_path)
                     for file in file_list:
+                        if file == 'providers/__init__.py':
+                            continue
                         if file.startswith(folder):
                             memberpath = os.path.join(zip_root_dir, file)
                             targetpath = os.path.join(tools.dataPath, file)
@@ -381,15 +399,15 @@ class providers:
                 except:
                     pass
             if not silent:
-                tools.showDialog.ok(tools.addonName, '%s - %s' % (tools.lang(33010).encode('utf-8'), pack_name))
+                tools.showDialog.ok(tools.addonName, '%s - %s' % (tools.lang(33010), pack_name))
         except:
             import traceback
             traceback.print_exc()
             if not silent:
                 try:
                     install_progress.close()
-                    tools.showDialog.ok(tools.addonName, '%s - %s' % (tools.lang(33012).encode('utf-8'), pack_name),
-                                    tools.lang(33011).encode('utf-8'))
+                    tools.showDialog.ok(tools.addonName, '%s - %s' % (tools.lang(33012), pack_name),
+                                    tools.lang(33011))
                 except:
                     pass
             return
@@ -408,7 +426,7 @@ class providers:
         return True
 
     def failed_prompt(self):
-        tools.showDialog.ok(tools.addonName, tools.lang(33013).encode('utf-8'), tools.lang(33011).encode('utf-8'))
+        tools.showDialog.ok(tools.addonName, tools.lang(33013), tools.lang(33011))
 
     def deploy_init(self):
         folders = ['providerModules/', 'providers/']
@@ -424,7 +442,10 @@ class providers:
                 os.makedirs(folder_path)
             open(os.path.join(folder_path, '__init__.py'), 'a').close()
         provider_init = open(os.path.join(tools.dataPath, 'providers', '__init__.py'), 'w+')
-        provider_init.write(base64.b64decode(init_contents))
+        try:
+            provider_init.write(base64.b64decode(init_contents))
+        except:
+            provider_init.write(base64.b64decode(init_contents).decode('utf-8'))
 
     def output_meta(self, meta):
         try:
@@ -457,13 +478,13 @@ class providers:
 
         if zip_location.startswith('smb'):
             if not silent:
-                tools.showDialog.ok(tools.addonName, tools.lang(33014).encode('utf-8'))
+                tools.showDialog.ok(tools.addonName, tools.lang(33014))
             return
 
         if zip_location.startswith('http'):
             response = requests.get(zip_location, stream=True)
             if not response.ok and not silent:
-                tools.showDialog.ok(tools.addonName, tools.lang(33015).encode('utf-8'))
+                tools.showDialog.ok(tools.addonName, tools.lang(33015))
                 return
             else:
                 pass
@@ -506,7 +527,7 @@ class providers:
 
         if not silent:
             update_dialog = tools.progressDialog
-            update_dialog.create(tools.addonName, tools.lang(33019).encode('utf-8'))
+            update_dialog.create(tools.addonName, tools.lang(33019))
             update_dialog.update(-1)
 
         updates = []
@@ -557,7 +578,7 @@ class providers:
             return
         result = self.install_zip(zip_file, silent=silent)
         if result is not None:
-            tools.showDialog.notification(tools.addonName, tools.lang(33017).encode('utf-8') % package_name)
+            tools.showDialog.notification(tools.addonName, tools.lang(33017) % package_name)
 
     def check_version_numbers(self, current, new):
         # Compares version numbers and return True if version is newer
@@ -578,7 +599,7 @@ class providers:
 
         # If there are no available updates return
         if len(update) == 0:
-            tools.showDialog.ok(tools.addonName, tools.lang(33018).encode('utf-8'))
+            tools.showDialog.ok(tools.addonName, tools.lang(33018))
             return
 
         # Display available packages to update
