@@ -1,3 +1,14 @@
+Changelog 0.2.2:
+Maintenance cycle timeout reduced to 15 minutes
+Reduced concurrent tasks for background trakt syncs
+Added more fallbacks for menus with items that can't be built
+
+Changelog 0.2.1:
+Fixed issue if Kodi meta was unable to be filled for mixed episode list record
+
+Changelog 0.2.0:
+Added removal of None items for next up list.
+
 Changelog 0.1.50:
 Fixed UnWatchedEpisodes list item property for seasons
 

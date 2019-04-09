@@ -32,10 +32,11 @@ class TraktSyncDatabase:
 
         self.item_list = []
         self.threads = []
-        self.task_queue = Queue(40)
+        self.task_queue = Queue(20)
         self.queue_finished = False
         self.task_len = 0
         self.base_date = '1970-01-01T00:00:00'
+        self.number_of_threads = 20
 
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM activities WHERE sync_id=1')
@@ -144,7 +145,7 @@ class TraktSyncDatabase:
 
         self.queue_finished = False
 
-        for i in range(40):
+        for i in range(self.number_of_threads):
             self.threads.append(threading.Thread(target=self._queue_worker))
 
         for i in self.threads:

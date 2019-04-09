@@ -6,7 +6,6 @@ from datetime import datetime
 from resources.lib.modules import trakt_sync
 from resources.lib.indexers import trakt
 from resources.lib.indexers import tvdb
-from resources.lib.common import tools
 
 # threading.stack_size(64 * 1024)
 
@@ -123,10 +122,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         try:
             if len([i for i in seasons if int(i['season']) != 0]) == season_count:
+                seasons = [i for i in seasons if i['kodi_meta'] != '{}']
+                if len(seasons) == 0:
+                    raise Exception
                 seasons = [ast.literal_eval(season['kodi_meta']) for season in seasons]
                 seasons = [self.get_season_watch_info(season) for season in seasons]
                 return seasons
-        except KeyError:
+        except:
             # We likely haven't built the meta information yet
             pass
 
@@ -272,12 +274,16 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         meta_list = []
 
         for episode in episode_list:
-            episode['kodi_meta'] = ast.literal_eval(episode['kodi_meta'])
-            episode['kodi_meta'].update({'showInfo': [i for i in show_list
-                                                      if i['ids']['trakt'] == episode['show_id']][0]})
-            episode['kodi_meta'] = self.clean_episode_showinfo(episode['kodi_meta'])
-            episode = self.update_episode_playcount(episode)
-            meta_list.append(episode['kodi_meta'])
+            try:
+                episode['kodi_meta'] = ast.literal_eval(episode['kodi_meta'])
+                if 'info' not in episode['kodi_meta']: continue
+                episode['kodi_meta'].update({'showInfo': [i for i in show_list
+                                                          if i['ids']['trakt'] == episode['show_id']][0]})
+                episode['kodi_meta'] = self.clean_episode_showinfo(episode['kodi_meta'])
+                episode = self.update_episode_playcount(episode)
+                meta_list.append(episode['kodi_meta'])
+            except:
+                pass
 
         return meta_list
 
@@ -370,10 +376,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def get_show_watched_info(self, show_meta):
 
-        episodes = self._get_show_episodes(show_meta['ids']['trakt'])
-
         play_count = 0
         try:
+            episodes = self._get_show_episodes(show_meta['ids']['trakt'])
             aired_episodes = int(show_meta['info']['episodeCount'])
 
             play_count = len([episode for episode in episodes if int(episode['season']) != 0
@@ -452,7 +457,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             season_meta['info']['UnWatchedEpisodes'] = int(season_meta['info']['episode_count']) - len(episodes)
             return season_meta
         except:
-            season_meta['info']['playcount'] = 0
             return season_meta
 
     def get_single_episode(self, show_id, season, episode, list_mode=False, get_meta=True,
@@ -521,13 +525,18 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def update_episode_playcount(self, item):
 
-        if item is None:
-            return item
+        try:
+            if item is None:
+                return item
+            if item['kodi_meta'] == {}:
+                return item
 
-        if item['watched'] == 1:
-            item['kodi_meta']['info']['playcount'] = 1
-        else:
-            item['kodi_meta']['info']['playcount'] = 0
+            if item['watched'] == 1:
+                item['kodi_meta']['info']['playcount'] = 1
+            else:
+                item['kodi_meta']['info']['playcount'] = 0
+        except:
+            pass
 
         return item
 

@@ -19,10 +19,10 @@ TraktSyncDatabase().sync_activities()
 
 while not monitor.abortRequested():
     try:
-        if monitor.waitForAbort(60 * 30):
+        if monitor.waitForAbort(60 * 15):
             break
-        TraktSyncDatabase().sync_activities()
         tools.execute('RunPlugin("plugin://plugin.video.%s/?action=runMaintenance")' % tools.addonName.lower())
+        TraktSyncDatabase().sync_activities()
     except:
         continue
 

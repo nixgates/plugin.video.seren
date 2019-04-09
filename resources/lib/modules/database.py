@@ -28,10 +28,6 @@ try:
 except ImportError:
     from pysqlite2 import dbapi2 as db, OperationalError
 
-"""
-This module is used to get/set cache for every action done in the system
-"""
-
 cache_table = 'cache'
 
 def get(function, duration, *args, **kwargs):
@@ -68,12 +64,9 @@ def get(function, duration, *args, **kwargs):
             return None
         insert_thread = threading.Thread(target=cache_insert, args=(key, fresh_result))
         insert_thread.start()
-        try:
-            data = ast.literal_eval(fresh_result)
-            return data
-        except:
-            data = ast.literal_eval(fresh_result)
-            return data
+
+        data = ast.literal_eval(fresh_result)
+        return data
 
     except Exception:
         import traceback

@@ -12,6 +12,11 @@ from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
 from resources.lib.modules.trakt_sync.hidden import TraktSyncDatabase as HiddenDatabase
 from resources.lib.common import maintenance
 
+try:
+    from Queue import Queue
+except:
+    from queue import Queue
+
 sysaddon = sys.argv[0]
 try:
     syshandle = int(sys.argv[1])
@@ -27,6 +32,7 @@ class Menus:
         self.threadList = []
         self.direct_episode_threads = []
         self.title_appends = tools.getSetting('general.appendtitles')
+        self.task_queue = Queue(40)
 
     ######################################################
     # MENUS
@@ -168,14 +174,16 @@ class Menus:
         watched = [i['trakt_id'] for i in watched]
         watched = [i for i in watched if i not in hidden_shows]
 
-        self.threadList = []
-
+        self._start_queue_workers()
         for i in watched:
-            self.threadList.append(Thread(target=self.traktProgressWorker, args=(i,)))
-        self.runThreads()
+            self.task_queue.put((self.traktProgressWorker, (i,)), True)
+        self._finish_queue_workers()
+
         self.threadList = []
         next_up = self.itemList
-
+        next_up = [i for i in next_up if i is not None]
+        if len(next_up) == 0:
+            return
         self.itemList = []
         next_list = []
 
@@ -436,7 +444,7 @@ class Menus:
 
         self.itemList = TraktSyncDatabase().get_season_list(show_id)
 
-        self.itemList = [x for x in self.itemList if x is not None]
+        self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
 
         self.itemList = sorted(self.itemList, key=lambda k: k['info']['season'])
 
@@ -491,7 +499,7 @@ class Menus:
             item_list = []
 
             self.itemList = TraktSyncDatabase().get_season_episodes(show_id, season_number)
-            self.itemList = [x for x in self.itemList if x is not None]
+            self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
 
             try:
                 self.itemList = sorted(self.itemList, key=lambda k: k['info']['episode'])
@@ -565,7 +573,7 @@ class Menus:
 
             self.itemList = TraktSyncDatabase().get_episode_list(trakt_list)
 
-            self.itemList = [i for i in self.itemList if i is not None]
+            self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
             self.itemList = [i for i in self.itemList if 'info' in i and i['info'].get('premiered', None) is not None]
             if sort is None:
                 self.itemList = sorted(self.itemList, key=lambda i: tools.datetime_workaround(i['info']['premiered']),
@@ -687,7 +695,7 @@ class Menus:
         show_ids = [i['ids']['trakt'] for i in trakt_list]
 
         self.itemList = TraktSyncDatabase().get_show_list(show_ids)
-        self.itemList = [i for i in self.itemList if i is not None]
+        self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
         self.itemList = tools.sort_list_items(self.itemList, trakt_list)
 
         item_list = []
@@ -764,3 +772,33 @@ class Menus:
         if join == True:
             for thread in self.threadList:
                 thread.join()
+
+    def _start_queue_workers(self):
+
+        self.queue_finished = False
+
+        for i in range(40):
+            self.threadList.append(Thread(target=self._queue_worker))
+
+        for i in self.threadList:
+            i.start()
+
+    def _finish_queue_workers(self):
+
+        self.queue_finished = True
+
+        for i in self.threadList:
+            i.join()
+
+        self.threadList = []
+
+    def _queue_worker(self):
+        while not self.task_queue.empty() or not self.queue_finished:
+            try:
+                target = self.task_queue.get(timeout=3)
+            except:
+                continue
+            try:
+                target[0](*target[1])
+            except:
+                pass

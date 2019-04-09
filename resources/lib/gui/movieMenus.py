@@ -299,7 +299,7 @@ class Menus:
         self.itemList = TraktSyncDatabase().get_movie_list(trakt_list)
 
         self.runThreads()
-
+        self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
         self.itemList = tools.sort_list_items(self.itemList, trakt_list)
 
         list_items = []

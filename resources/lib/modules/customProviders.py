@@ -136,7 +136,6 @@ class providers:
                             tools.log('Adding Provider %s' % provider[1])
                             database.add_provider(provider[1], provider[2], 'enabled', self.language,
                                                   provider_types[i])
-                            check = False
 
 
         self.known_providers = database.get_providers()
