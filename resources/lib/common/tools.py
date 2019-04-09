@@ -281,7 +281,7 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
             item.setProperty('UnWatchedEpisodes', str(info['UnWatchedEpisodes']))
         if 'episodeCount' in info:
             item.setProperty('TotalEpisodes', str(info['episodeCount']))
-        elif 'episode_count' in info:
+        if 'episode_count' in info:
             item.setProperty('TotalEpisodes', str(info['episode_count']))
         if 'WatchedEpisodes' in info:
             item.setProperty('WatchedEpisodes', str(info['WatchedEpisodes']))
@@ -308,7 +308,7 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
 
 def clean_info_keys(info_dict):
 
-    keys_to_pop = ['UnwatchedEpisodes', 'episode_count', 'unwatchedepisodes', 'WatchedEpisodes',
+    keys_to_pop = ['UnWatchedEpisodes', 'episode_count', 'unwatchedepisodes', 'WatchedEpisodes',
                    'seasonCount', 'episodeCount', 'showaliases', 'absoluteNumber', 'no_seasons', 'season_title',
                    'overview']
 

@@ -6,6 +6,7 @@ from datetime import datetime
 from resources.lib.modules import trakt_sync
 from resources.lib.indexers import trakt
 from resources.lib.indexers import tvdb
+from resources.lib.common import tools
 
 # threading.stack_size(64 * 1024)
 
@@ -448,7 +449,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
             season_meta['info']['playcount'] = play_count
             season_meta['info']['WatchedEpisodes'] = len(episodes)
-            season_meta['info']['UnwatchedEpisodes'] = int(season_meta['info']['episode_count']) - len(episodes)
+            season_meta['info']['UnWatchedEpisodes'] = int(season_meta['info']['episode_count']) - len(episodes)
             return season_meta
         except:
             season_meta['info']['playcount'] = 0

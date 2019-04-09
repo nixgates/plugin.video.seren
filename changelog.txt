@@ -1,3 +1,10 @@
+Changelog 0.1.50:
+Fixed UnWatchedEpisodes list item property for seasons
+
+Changelog 0.1.49:
+Fixed Movie Collection Sorting
+Fixed shows get_season_episodes falling back to episode update
+
 Changelog 0.1.48:
 Fixed Marking As Watched not updating local trakt records
 Meta requests now run in a queue to throttle thread creation

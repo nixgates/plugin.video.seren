@@ -750,9 +750,12 @@ class Menus:
 
 
     def traktProgressWorker(self, show_id):
-        progress = TraktAPI().json_response('shows/%s/progress/watched?extended=full' % show_id)
-        progress.update({'show': {'ids': {'trakt': show_id}}})
-        self.itemList.append(progress)
+        try:
+            progress = TraktAPI().json_response('shows/%s/progress/watched?extended=full' % show_id)
+            progress.update({'show': {'ids': {'trakt': show_id}}})
+            self.itemList.append(progress)
+        except:
+            self.itemList.append(None)
 
     def runThreads(self, join=True):
         for thread in self.threadList:
