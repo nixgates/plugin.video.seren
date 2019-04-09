@@ -296,19 +296,23 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
             season_episode_count = ast.literal_eval(season_object['kodi_meta'])['info']['episode_count']
 
-            if len(season_episodes) < season_episode_count:
+            if len(season_episodes) < int(season_episode_count):
                 raise Exception
 
-            season_episodes = [ast.literal_eval(episode['kodi_meta']) for episode in season_episodes]
-            if season_episodes[0] == {}:
+            for episode in season_episodes:
+                episode['kodi_meta'] = ast.literal_eval(episode['kodi_meta'])
+
+            if season_episodes[0]['kodi_meta'] == {}:
                 raise Exception
+
             for episode in season_episodes:
                 episode = self.update_episode_playcount(episode)
-                episode.update({'showInfo': show_object})
+                episode['kodi_meta'].update({'showInfo': show_object})
 
-            return season_episodes
+            return [episode['kodi_meta'] for episode in season_episodes]
 
         except:
+
             trakt_list = trakt.TraktAPI().json_response('shows/%s/seasons/%s' % (show_id, season))
 
             self._start_queue_workers()
