@@ -84,7 +84,7 @@ class Menus:
             trakt_list = TraktSyncDatabase().get_collected_movies()
             trakt_list = [{'ids': {'trakt': i['trakt_id']}} for i in trakt_list]
             self.commonListBuilder(trakt_list)
-            tools.closeDirectory('movies')
+            tools.closeDirectory('movies', sort='title')
         except:
             import traceback
             traceback.print_exc()
