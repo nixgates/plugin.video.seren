@@ -29,7 +29,9 @@ class persistant_background(tools.dialogWindow):
         self.addControl(self.text_label)
 
     def setBackground(self, info):
+
         info = json.loads(tools.unquote(info))
+
         if 'showInfo' in info:
             background = info['showInfo']['art']['fanart']
         elif 'fanart' in info:
@@ -50,7 +52,6 @@ class smart_play_background(tools.dialogWindow):
         tools.closeBusyDialog()
         self.canceled = False
         text = ''
-        background_image = ''
 
         background_image = os.path.join(tools.IMAGES_PATH, 'background.png')
 
@@ -137,8 +138,10 @@ class smart_play_background(tools.dialogWindow):
             self.canceled = True
 
     def setBackground(self, url):
-        self.background.setImage(url)
-        pass
+        try:
+            self.background.setImage(url)
+        except:
+            pass
 
     def setText(self, text):
         self.text_label.setLabel(str(text))

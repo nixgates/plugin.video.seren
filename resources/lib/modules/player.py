@@ -3,7 +3,8 @@
 import datetime
 import json
 import sys
-import threading
+import xmlrpclib
+
 try:
     import AddonSignals
 except:
@@ -26,21 +27,18 @@ class serenPlayer(tools.player):
         self.trakt_api = trakt.TraktAPI()
         self.pre_cache_initiated = False
         self.play_next_triggered = False
-        self.scrobble = True
         self.trakt_id = None
         self.media_type = None
         self.offset = None
         self.media_length = 0
         self.current_time = 0
-        self.stopped = False
         self.args = {}
         self.playback_started = False
-        self.init_scrobble = False
+        self.scrobbled = False
 
     def play_source(self, stream_link, args):
 
         try:
-            self.init_scrobble = False
             self.pre_cache_initiated = False
             if stream_link is None:
                 tools.playList.clear()
@@ -79,40 +77,36 @@ class serenPlayer(tools.player):
             traceback.print_exc()
 
     def onPlayBackSeek(self, time, seekOffset):
-        seekOffset = seekOffset / 1000
-        if not self.checkIfWatched(offset=seekOffset):
-            self.traktStartWatching(offset=seekOffset)
-            pass
+
+        seekOffset /= 1000
+        self.traktStartWatching(offset=seekOffset)
 
     def onPlayBackSeekChapter(self, chapter):
+
         self.traktStartWatching()
         pass
 
     def onPlayBackStarted(self):
-        if tools.kodiVersion > 17:
-            return
         self.start_playback()
+        pass
 
     def onAVStarted(self):
-        if tools.kodiVersion < 18:
-            return
         self.start_playback()
+        pass
 
     def onPlayBackError(self):
+
         sys.exit(1)
 
     def start_playback(self):
+
         try:
+            if self.playback_started:
+                return
+            self.playback_started = True
             tools.execute('Dialog.Close(all,true)')
             self.current_time = self.getTime()
             self.media_length = self.getTotalTime()
-
-            if self.offset is not None and int(self.offset) != 0:
-                tools.log("Seeking %s seconds" % self.offset, 'info')
-                self.seekTime(self.offset)
-                self.offset = None
-            else:
-                tools.log("No seeking applied")
 
             if 'episodeInfo' in self.args and tools.getSetting('smartplay.upnext') == 'true':
                 source_id = 'plugin.video.%s' % tools.addonName.lower()
@@ -130,72 +124,112 @@ class serenPlayer(tools.player):
             if tools.getSetting('general.smartplay') is not 'false' and self.media_type is 'episode':
                 if int(tools.playList.getposition()) == (tools.playList.size() - 1):
                     self.next_season = smartPlay.SmartPlay(self.args).append_next_season()
-            
-            self.playback_started = True
-            post_data = self.buildTraktObject(overide_progress=0)
-            self.trakt_api.post_request('scrobble/start', postData=post_data, limit=False)
+
+            self.traktStartWatching()
+
         except:
+            import traceback
+            traceback.print_exc()
             pass
 
     def onPlayBackEnded(self):
-        self.stopped = True
-        #self.traktStopWatching()
+        pass
 
     def onPlayBackStopped(self):
-        self.stopped = True
-        if self.scrobble:
-            self.traktPause()
+        self.traktStopWatching()
+        self.scrobbled = True
+
         tools.playList.clear()
 
     def onPlayBackPaused(self):
+
         self.traktPause()
 
     def onPlayBackResumed(self):
+
         self.traktStartWatching()
 
     def getWatchedPercent(self, offset=None):
+
+        try:
+            position = self.getTime()
+            if position is not 0:
+                self.current_time = position
+            total_length = self.getTotalTime()
+            if total_length is not 0:
+                self.media_length = total_length
+        except:
+            pass
+
         current_position = self.current_time
-        totalLength = self.media_length
+        total_length = self.media_length
         watched_percent = 0
 
-        if int(totalLength) == 0:
+        if int(total_length) == 0:
             try:
-                totalLength = self.getTotalTime()
+                total_length = self.getTotalTime()
+            except:
+                return
+
+        if offset is not None:
+            try:
+                current_position += offset
             except:
                 pass
 
-        if offset is not None:
-            current_position = current_position + offset
-
-        if int(totalLength) is not 0:
+        if int(total_length) is not 0:
             try:
-                watched_percent = float(current_position) / float(totalLength) * 100
+                watched_percent = float(current_position) / float(total_length) * 100
                 if watched_percent > 100:
                     watched_percent = 100
             except:
+                import traceback
+                traceback.print_exc()
                 pass
 
         return watched_percent
 
     def traktStartWatching(self, offset=None):
-        if not self.trakt_integration() or not self.scrobble:
+
+        if not self.trakt_integration() or self.scrobbled:
             return
+
         post_data = self.buildTraktObject(offset=offset)
+
         self.trakt_api.post_request('scrobble/start', postData=post_data, limit=False)
 
-    def traktStopWatching(self):
-        if not self.trakt_integration():
+    def traktStopWatching(self, override_progress=None):
+
+        if not self.trakt_integration() or self.scrobbled:
             return
-        post_data = self.buildTraktObject(overide_progress=100)
+
+        post_data = self.buildTraktObject(override_progress=override_progress)
+
         self.trakt_api.post_request('scrobble/stop', postData=post_data, limit=False)
 
+        try:
+            if post_data['progress'] > 90:
+                if self.media_type == 'episode':
+                    from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
+                    TraktSyncDatabase().mark_episode_watched(self.args['showInfo']['ids']['trakt'],
+                                                             self.args['info']['season'], self.args['info']['episode'])
+                if self.media_type == 'movie':
+                    from resources.lib.modules.trakt_sync.movies import TraktSyncDatabase
+                    TraktSyncDatabase().mark_movie_watched(self.trakt_id)
+        except:
+            pass
+
     def traktPause(self):
-        if not self.trakt_integration() or not self.scrobble:
+
+        if not self.trakt_integration():
             return
+
         post_data = self.buildTraktObject()
+
         self.trakt_api.post_request('scrobble/pause', postData=post_data, limit=False)
 
-    def buildTraktObject(self, offset=None, overide_progress=None):
+    def buildTraktObject(self, offset=None, override_progress=None):
+
         try:
             if self.media_type == 'episode':
                 post_data = {'episode': {'ids': {'trakt': self.trakt_id}}}
@@ -203,8 +237,9 @@ class serenPlayer(tools.player):
                 post_data = {'movie': {'ids': {'trakt': self.trakt_id}}}
 
             progress = int(self.getWatchedPercent(offset))
-            if overide_progress is not None:
-                progress = overide_progress
+
+            if override_progress is not None:
+                progress = override_progress
             if progress > 0:
                 post_data['progress'] = progress
             else:
@@ -216,44 +251,58 @@ class serenPlayer(tools.player):
             traceback.print_exc()
 
     def keepAlive(self):
+
         for i in range(0, 240):
             if self.isPlayingVideo(): break
             tools.kodi.sleep(1000)
 
         while self.isPlaying():
             try:
-                if not self.init_scrobble:
-                    self.traktStartWatching()
-                    self.init_scrobble = True
-                try:self.current_time = self.getTime()
-                except: pass
+                if not self.playback_started:
+                    tools.kodi.sleep(5000)
+                    continue
+                if not self.playback_started:
+                    self.start_playback()
+
+                if self.offset is not None and int(self.offset) != 0:
+                    tools.log("Seeking %s seconds" % self.offset, 'info')
+                    self.seekTime(self.offset)
+                    self.offset = None
+                else:
+                    tools.log("No seeking applied", 'info')
+                try:
+                    position = self.getTime()
+                    self.current_time = position
+                    total_length = self.getTotalTime()
+                    self.media_length = total_length
+                except:
+                    pass
                 if self.pre_cache_initiated is False:
                     try:
-                        if not self.playback_started:
-                            tools.kodi.sleep(5000)
-                            continue
                         if self.getWatchedPercent() > 80 and tools.getSetting('smartPlay.preScrape') == 'true':
                             self.pre_cache_initiated = True
                             smartPlay.SmartPlay(self.args).pre_scrape()
                     except:
                         pass
-                self.checkIfWatched()
-                        
+
+                # We manually check an signal this as Kodi always calls the playbackEnded call after a new player
+                # class is created, marking the wrong episode watched
+                if self.getWatchedPercent() > 90 and not self.scrobbled:
+                    self.traktStopWatching()
+                    self.scrobbled = True
+
             except:
                 import traceback
                 traceback.print_exc()
-                tools.kodi.sleep(5000)
+                tools.kodi.sleep(1000)
                 continue
 
-            tools.kodi.sleep(5000)
- 
-    def checkIfWatched(self, offset=0):
-        if self.scrobble is True and self.getWatchedPercent(offset=offset) >= 90:
-            self.scrobble = False
-            self.traktStopWatching()
-            return True
-    
+            tools.kodi.sleep(1000)
+
+        self.traktStopWatching()
+
     def traktBookmark(self):
+
         if not self.trakt_integration():
             return
         try:
@@ -274,11 +323,10 @@ class serenPlayer(tools.player):
             if tools.getSetting('smartPlay.bookmarkprompt') == 'true':
                 if offset is not None and offset is not 0:
                     prompt = tools.showDialog.yesno(tools.addonName + ': Resume', '%s %s' %
-                                                    (tools.lang(32092).encode('utf-8'),
+                                                    (tools.lang(32092),
                                                      datetime.timedelta(seconds=offset)),
                                                     nolabel="Resume", yeslabel="Restart")
                     if prompt == 0:
-                        tools.log('Found progress, resuming from %s ' % str(offset * 60), 'error')
                         self.offset = offset
                     else:
                         return
@@ -289,14 +337,20 @@ class serenPlayer(tools.player):
             traceback.print_exc()
 
     def signals_callback(self, data):
+
         if not self.play_next_triggered:
-            self.stopped = True
-            #self.traktStopWatching()
+            if not self.scrobbled:
+                try:
+                    self.traktStopWatching()
+                    self.scrobbled = True
+                except:
+                    pass
             self.play_next_triggered = True
             # Using a seek here as playnext causes Kodi gui to wig out. So we seek instead so it looks more graceful
             self.seekTime(self.media_length)
 
     def trakt_integration(self):
+
         if tools.getSetting('trakt.auth') == '':
             return False
         else:
@@ -304,6 +358,7 @@ class serenPlayer(tools.player):
                 return True
 
     def next_info(self):
+
         current_info = self.args
         current_episode = {}
         current_episode["episodeid"] = current_info['episodeInfo']['ids']['trakt']
@@ -359,3 +414,4 @@ class serenPlayer(tools.player):
         }
 
         return next_info
+

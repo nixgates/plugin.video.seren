@@ -37,7 +37,7 @@ class TMDBAPI:
             except requests.exceptions.SSLError:
                 response = requests.get(url, verify=False)
         except requests.exceptions.ConnectionError:
-            tools.showDialog.ok(tools.addonName, tools.lang(32028).encode('utf-8'))
+            tools.showDialog.ok(tools.addonName, tools.lang(32028))
             return
 
         if '200' in str(response):
@@ -63,7 +63,6 @@ class TMDBAPI:
             details = self.get_request(url)
 
             if details == None:
-                tools.log('ERROR TMDB FAILED FOR SEASON ID ' + str(seasonObject['tmdb']), 'error')
                 return None
             try:
                 currentDate = datetime.today().date()
@@ -138,8 +137,8 @@ class TMDBAPI:
                 fanart_thread.run()
 
             details = self.get_request(url)
+
             if details == None:
-                tools.log('ERROR TMDB FAILED FOR MOVIEID ' + str(trakt_object['ids']['tmdb']), 'error')
                 return None
 
             item = {'info': None, 'art': None}
@@ -178,7 +177,7 @@ class TMDBAPI:
                 mpaa = details.get('release_dates')['results']
                 mpaa = [i for i in mpaa if i['iso_3166_1'] == 'US']
                 mpaa = mpaa[0].get('release_dates')[0].get('certification')
-                info['mpaa'] = str(mpaa).encode('utf-8')
+                info['mpaa'] = str(mpaa)
             except:
                 pass
 
@@ -221,6 +220,9 @@ class TMDBAPI:
             try:info['castandrole'] = [(i['name'],i['character']) for i in details['credits']['cast']]
             except:pass
 
+            try:info['aliases'] = [i['title'] for i in details['alternative_titles']['titles']]
+            except: info['aliases'] = []
+
             info['mediatype'] = 'movie'
 
             # Set Crew/Cast Info
@@ -243,6 +245,8 @@ class TMDBAPI:
             return item
 
         except:
+            import traceback
+            traceback.print_exc()
             return None
 
     def showToListItem(self, traktItem):

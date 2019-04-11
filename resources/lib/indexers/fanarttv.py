@@ -11,12 +11,11 @@ language = tools.get_language_code()
 def get_query_lang(art):
     if art is None: return ''
     try:
-        result = [(x['url'], x['likes']) for x in art if x.get('lang') == language] + \
-                 [(x['url'], x['likes']) for x in art if x.get('lang') == '00']
+        result = [(x['url'], x['likes']) for x in art if x.get('lang') == language]
         result = [(x[0], x[1]) for x in result]
         result = sorted(result, key=lambda x: int(x[1]), reverse=True)
         result = [x[0] for x in result][0]
-        result = result.encode('utf-8')
+        result = result
 
     except:
         result = ''
@@ -43,23 +42,24 @@ def get(remote_id, query):
 
     art = base_url % (query, remote_id)
     headers = {'client-key': client_key, 'api-key': api_key}
+
     art = requests.get(art, headers=headers).json()
 
     if query == 'movies':
 
         meta = {'poster': get_query_lang(art.get('movieposter')),
-                'fanart': get_query(art.get('moviebackground')),
+                'fanart': get_query_lang(art.get('moviebackground')),
                 'banner': get_query_lang(art.get('moviebanner')),
                 'clearlogo': get_query_lang(art.get('movielogo', []) + art.get('hdmovielogo', [])),
-                'landscape': get_query(art.get('moviethumb'))}
+                'landscape': get_query_lang(art.get('moviethumb'))}
 
     else:
 
         meta = {'poster': get_query_lang(art.get('tvposter')),
-                'fanart': get_query(art.get('showbackground')),
+                'fanart': get_query_lang(art.get('showbackground')),
                 'banner': get_query_lang(art.get('tvbanner')),
                 'clearart': get_query_lang(art.get('clearart', []) + art.get('hdclearart', [])),
                 'clearlogo': get_query_lang(art.get('hdtvlogo', []) + art.get('clearlogo', [])),
-                'landscape': get_query(art.get('tvthumb'))}
+                'landscape': get_query_lang(art.get('tvthumb'))}
 
     return meta
