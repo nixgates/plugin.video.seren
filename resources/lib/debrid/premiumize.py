@@ -215,7 +215,7 @@ class PremiumizeFunctions(PremiumizeBase):
         for i in folder_details:
             for epstring in episodeStrings:
                 if source_utils.cleanTitle(epstring) in \
-                        source_utils.cleanTitle(i['path'].replace('&', ' ')):
+                        source_utils.cleanTitle(i['path'].replace('&', ' ').lower()):
                     if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
                         if tools.getSetting('premiumize.transcoded') == 'true':
                             if i['transcode_status'] == 'finished':

@@ -229,6 +229,8 @@ bgProgressDialog = xbmcgui.DialogProgressBG
 
 showDialog = xbmcgui.Dialog()
 
+showBusyDialog = xbmcgui.DialogBusy
+
 endDirectory = xbmcplugin.endOfDirectory
 
 condVisibility = xbmc.getCondVisibility
@@ -521,8 +523,6 @@ SECONDS_PER_DAY = 24 * 60 * 60
 def utc_to_local_datetime(utc_datetime):
     delta = utc_datetime - EPOCH_DATETIME
     utc_epoch = SECONDS_PER_DAY * delta.days + delta.seconds
-    if getSetting('general.datedelay') == 'true':
-        utc_epoch += SECONDS_PER_DAY
     time_struct = time.localtime(utc_epoch)
     dt_args = time_struct[:6] + (delta.microseconds,)
     return datetime.datetime(*dt_args)

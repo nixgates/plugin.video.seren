@@ -7,8 +7,6 @@ from resources.lib.modules import trakt_sync
 from resources.lib.indexers import trakt
 from resources.lib.indexers import tvdb
 
-# threading.stack_size(64 * 1024)
-
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
@@ -309,7 +307,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             for episode in season_episodes:
                 episode['kodi_meta'] = ast.literal_eval(episode['kodi_meta'])
 
-            if season_episodes[0]['kodi_meta'] == {}:
+            if len([i for i in season_episodes if i['kodi_meta'] == {}]) > 0:
                 raise Exception
 
             for episode in season_episodes:

@@ -125,7 +125,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         cursor.close()
 
         if item is None:
+
             movie_object = trakt.TraktAPI().json_response('/movies/%s?extended=full' % trakt_id)
+
             if movie_object is None:
                 return
 
@@ -170,6 +172,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         pass
 
     def _update_movie(self, trakt_object, get_meta=True):
+
         movie_id = trakt_object['ids']['trakt']
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         cursor = self._get_cursor()

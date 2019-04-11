@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import threading
 
 from resources.lib.common import tools
 
@@ -87,6 +88,7 @@ def sourceSelect(source_list, info):
 class source_select_list(tools.dialogWindow):
 
     def __init__(self, display_list, info):
+        self.closed = False
         self.position = -1
 
         texture_path = os.path.join(tools.IMAGES_PATH, 'texture.png')
@@ -166,17 +168,18 @@ class source_select_list(tools.dialogWindow):
         self.setFocus(self.source_list)
         self.canceled = False
 
+
     def onAction(self, action):
 
         id = action.getId()
         if id == 92 or id == 10:
-            self.close()
+            self.close_window()
             self.position = -1
-            self.close()
+            self.close_window()
 
         if id == 7:
             self.position = self.source_list.getSelectedPosition()
-            self.close()
+            self.close_window()
 
         if id == 0:
             pass
@@ -189,4 +192,8 @@ class source_select_list(tools.dialogWindow):
     def onControl(self, control):
         if self.source_list.getId() == control.getId():
             self.position = self.source_list.getSelectedPosition()
-            self.close()
+            self.close_window()
+
+    def close_window(self):
+        self.closed = True
+        self.close()

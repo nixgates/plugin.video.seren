@@ -7,6 +7,7 @@ from resources.lib.gui import windows
 from resources.lib.modules import database
 from resources.lib.common import maintenance
 
+
 try:
     maintenance.refresh_apis()
 except:
@@ -192,6 +193,8 @@ if action == 'getSources':
         if len(source_results) > 0:
 
             if tools.getSetting('general.playstyle') == '1' or source_select == 'true':
+                if display_background:
+                    background.setText(tools.lang(40135))
                 from resources.lib.modules import sourceSelect
 
                 source_results = sourceSelect.sourceSelect(source_results, args)
@@ -584,7 +587,9 @@ if action == 'premiumizeCleanup':
     maintenance.premiumize_transfer_cleanup()
 
 if action == 'test2':
+    from resources.lib.gui import random_movie
 
+    random_movie.Dialog().doModal()
     pass
 
 if action == 'manualProviderUpdate':

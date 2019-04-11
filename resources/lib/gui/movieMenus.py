@@ -3,6 +3,7 @@
 import json
 import sys
 
+import datetime
 from resources.lib.common import tools
 from resources.lib.indexers.tmdb import TMDBAPI
 from resources.lib.indexers.trakt import TraktAPI
@@ -289,7 +290,7 @@ class Menus:
     # MENU TOOLS
     ######################################################
 
-    def commonListBuilder(self, trakt_list, nextPath=None):
+    def commonListBuilder(self, trakt_list, info_return=False):
 
         if len(trakt_list) == 0:
             return
@@ -297,8 +298,7 @@ class Menus:
             trakt_list = [i['movie'] for i in trakt_list]
 
         self.itemList = TraktSyncDatabase().get_movie_list(trakt_list)
-
-        self.runThreads()
+        print(self.itemList)
         self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
         self.itemList = tools.sort_list_items(self.itemList, trakt_list)
 
@@ -306,6 +306,8 @@ class Menus:
 
         for item in self.itemList:
             try:
+                if self.date_delay(item['info']):
+                    continue
 
                 # Add Arguments to pass with item
                 args = {}
@@ -356,6 +358,9 @@ class Menus:
                                                      isFolder=False, isPlayable=True, actionArgs=args,
                                                      set_ids=item['ids'], bulk_add=True))
 
+        if info_return:
+            return list_items
+
         tools.addMenuItems(syshandle, list_items, len(list_items))
 
     def tmdbListWorker(self, trakt_object):
@@ -373,3 +378,18 @@ class Menus:
         if join == True:
             for thread in self.threadList:
                 thread.join()
+
+    def date_delay(self, info):
+        try:
+            if tools.getSetting('general.datedelay') == 'true':
+                air_date = info['premiered']
+                air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)
+                air_date += datetime.timedelta(days=1)
+                if air_date > datetime.date.today():
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        except:
+            return False

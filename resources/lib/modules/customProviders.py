@@ -215,6 +215,8 @@ class providers:
 
             database.remove_package_providers(package_name)
             database.remove_provider_package(package_name)
+            import time
+            time.sleep(2)
             if not silent:
                 tools.showDialog.ok(tools.addonName, '%s ' % package_name + tools.lang(32077))
         except:

@@ -338,7 +338,6 @@ class Sources(tools.dialogWindow):
         hoster_providers = sourceList[1]
         hoster_providers, torrent_providers = self.remove_duplicate_providers(torrent_providers, hoster_providers)
         self.hosterDomains = resolver.Resolver().getHosterList()
-
         self.torrentProviders = torrent_providers
         self.hosterProviders = hoster_providers
 
@@ -366,19 +365,32 @@ class Sources(tools.dialogWindow):
         # Extract provider name from Tuple
         provider_name = provider[1].upper()
         # Begin Scraping Torrent Sources
-        start_time = time.time()
+
+        def exit_thread():
+            if provider_name in self.remainingProviders:
+                self.remainingProviders.remove(provider_name)
+
         try:
+            print()
             self.remainingProviders.append(provider_name)
             providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
+            provider_source = providerModule.sources()
+
             if 'episodeInfo' in info:
+                if not getattr(provider_source, 'episode', None):
+                    exit_thread()
+                    return
                 simpleInfo = self.buildSimpleShowInfo(info)
-                torrent_results = providerModule.sources().episode(simpleInfo, info)
+                torrent_results = provider_source.episode(simpleInfo, info)
 
             else:
+                if not getattr(provider_source, 'movie', None):
+                    exit_thread()
+                    return
                 try:
-                    torrent_results = providerModule.sources().movie(info['title'], info['year'], info['imdb'])
+                    torrent_results = provider_source.movie(info['title'], info['year'], info['imdb'])
                 except:
-                    torrent_results = providerModule.sources().movie(info['title'], info['year'])
+                    torrent_results = provider_source.movie(info['title'], info['year'])
 
             if torrent_results is None:
                 self.remainingProviders.remove(provider_name)
@@ -462,40 +474,65 @@ class Sources(tools.dialogWindow):
         provider_name = provider[1].upper()
         self.remainingProviders.append(provider_name.upper())
 
+        def exit_thread():
+            if provider_name in self.remainingProviders:
+                self.remainingProviders.remove(provider_name)
+
         try:
             providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
             provider_sources = providerModule.source()
+
             if 'episodeInfo' in info:
+                if not getattr(provider_sources, 'tvshow', None):
+                    exit_thread()
+                    return
                 imdb, tvdb, title, localtitle, aliases, year = self.buildHosterVariables(info, 'tvshow')
 
-                if self.canceled: raise Exception
+                if self.canceled:
+                    exit_thread()
+                    return
 
                 url = provider_sources.tvshow(imdb, tvdb, title, localtitle, aliases, year)
 
-                if self.canceled: raise Exception
+                if self.canceled:
+                    exit_thread()
+                    return
 
                 imdb, tvdb, title, premiered, season, episode = self.buildHosterVariables(info, 'episode')
 
-                if self.canceled: raise Exception
+                if self.canceled:
+                    exit_thread()
+                    return
 
                 url = provider_sources.episode(url, imdb, tvdb, title, premiered, season, episode)
 
-                if self.canceled: raise Exception
+                if self.canceled:
+                    exit_thread()
+                    return
 
             else:
-
+                if not getattr(provider_sources, 'movie'):
+                    exit_thread()
+                    return
                 imdb, title, localtitle, aliases, year = self.buildHosterVariables(info, 'movie')
                 url = provider_sources.movie(imdb, title, localtitle, aliases, year)
 
             hostDict, hostprDict = self.buildHosterVariables(info, 'sources')
 
-            if self.canceled: raise Exception
+            if self.canceled:
+                exit_thread()
+                return
 
             sources = provider_sources.sources(url, hostDict, hostprDict)
 
-            if self.canceled: raise Exception
+            if self.canceled:
+                exit_thread()
+                return
 
-            if sources is None: raise Exception
+            if sources is None:
+                tools.log('%s: Found No Sources' % provider_name, 'info')
+                exit_thread()
+                return
 
             if 'showInfo' in info:
                 title = '%s - %s' % (info['showInfo']['info']['tvshowtitle'],
@@ -519,20 +556,26 @@ class Sources(tools.dialogWindow):
                 source['info'] = source.get('info', [])
                 source['provider_imports'] = provider
 
-            hosts = [host[1].lower() for provider in self.hosterDomains['premium'].iterkeys()
+            host_domains = [host[0].lower() for provider in self.hosterDomains['premium'].iterkeys()
                      for host in self.hosterDomains['premium'][provider]]
-            hosts = set(hosts)
+            host_names = [host[1].lower() for provider in self.hosterDomains['premium'].iterkeys()
+                     for host in self.hosterDomains['premium'][provider]]
 
-            sources = [i for i in sources if i['source'].lower() in hosts or i['direct']]
+            host_names = list(set(host_names))
+            host_domains = list(set(host_domains))
+
+            sources1 = [i for i in sources for host in host_domains if host in i['url']]
+            sources2 = [i for i in sources if i['source'].lower() in host_names or i['direct']]
+
+            sources = sources1 + sources2
 
             for hoster in sources:
-                self.hosterSources.update({hoster['url'].lower(): hoster})
+                self.hosterSources.update({str(hoster['url']): hoster})
 
             self.remainingProviders.remove(provider_name.upper())
 
         except Exception as e:
-            if provider_name in self.remainingProviders:
-                self.remainingProviders.remove(provider_name)
+            exit_thread()
             import traceback
             traceback.print_exc()
             return

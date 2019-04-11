@@ -8,6 +8,8 @@
 		<setting type="enum" id="general.scrapedisplay" label="40127" default="40129" lvalues="40129|40130" />
 		<!--<setting type="enum" id="general.resolvedisplay" label="40128" default="40129" lvalues="40129|40130" /> -->
 		<setting type="enum" id="general.sourceselect" label="40005" default="40006" lvalues="40007|40006" />
+		<!--<setting type="bool" subsetting="true" id="general.autoselect" label="40131" defaul="false" />-->
+		<!--<setting type="slider" id="general.autoselectTime" option="int" default="10" range="1,1,20" subsetting="true" label="40132" visible="eq(-1,true)" />-->
 		<setting type="bool" id="general.datedelay" label="40116" default="true" />
 		<setting type="lsep" label="40008" />
 		<setting type="sep" />
@@ -47,7 +49,7 @@
 
 		<!-- HIDDEN SETTINGS BELONG HERE -->
 		<setting id="migration.attempted" default="false" type="bool" visible="hidden"/>
-					<setting id="tvdb.jw" type="text" default="" visible="hidden" />
+		<setting id="tvdb.jw" type="text" default="" visible="hidden" />
 		<setting id="tvdb.expiry" type="text" default="0" visible="hidden"/>
 		<setting id="trakt.auth" type="text" default="" visible="hidden"/>
 		<setting id="trakt.refresh" type="text" default="" visible="hidden" />
@@ -89,7 +91,6 @@
 		<setting type="lsep" label="40061" />
 		<setting type="sep" />
 		<setting type="text" id="trakt.username" label="40062" enable="false"/>
-		<setting id="trakt.auth" type="text" default="" visible="hidden"/>
 		<setting type="action" label="40063" option="close" action="RunPlugin(plugin://plugin.video.seren/?action=authTrakt)" />
 		<setting id="trakt.scrobbling" type="bool" label="40064" default="true" visible="!eq(-2,)" />
 		<setting type="action" label="40065" action="RunPlugin(plugin://plugin.video.seren/?action=revokeTrakt)" visible="!eq(-3,)" />

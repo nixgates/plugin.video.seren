@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.2.2" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.2.4" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -27,6 +27,19 @@
 			<fanart>temp-fanart.png</fanart>
 		</assets>
 		<news>
+Changelog 0.2.4:
+Added ability to delay Trakt Sync
+Added notice for Initial Trakt Sync with warning about delaying
+Added further information to the Trakt Sync background progress dialog
+Increased item filtering accuracy
+Improvements to Premiumize torrent link identification
+
+Changelog 0.2.3:
+Removed unused show thread for TVDB modoule episodeIDToListItem
+Rework of 24 hour release delay setting
+Fixed issue with some seasons not showing episodes
+Hoster scrape threads exit more gracefully now
+
 Changelog 0.2.2:
 Maintenance cycle timeout reduced to 15 minutes
 Reduced concurrent tasks for background trakt syncs

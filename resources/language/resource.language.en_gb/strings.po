@@ -1033,3 +1033,23 @@ msgstr ""
 msgctxt "#40130"
 msgid "Background Task"
 msgstr ""
+
+msgctxt "#40131"
+msgid "Auto-Select after (x) Seconds"
+msgstr ""
+
+msgctxt "#40132"
+msgid "Auto Select Delay"
+msgstr ""
+
+msgctxt "#40133"
+msgid "[COLOR yellow]Please Note: [/COLOR] Seren v0.2 requires an initial synchronization with trakt.\n\nThis synchronization assists to speed up Seren's menus and will allow usage of certain menus in the event Trakt experiences server issues. \n\nYou may choose to delay this process for now, although it is highly recommended that you don't. Should you choose to delay this process, it should be noted that some menus and information will not be available. \n\nIf you choose to skip this process, you will be reminded again."
+msgstr ""
+
+msgctxt "#40134"
+msgid "Would you like to perform the initial sync now?"
+msgstr ""
+
+msgctxt "#40135"
+msgid "Starting Source Select"
+msgstr ""

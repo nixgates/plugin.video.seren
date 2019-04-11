@@ -1,3 +1,16 @@
+Changelog 0.2.4:
+Added ability to delay Trakt Sync
+Added notice for Initial Trakt Sync with warning about delaying
+Added further information to the Trakt Sync background progress dialog
+Increased item filtering accuracy
+Improvements to Premiumize torrent link identification
+
+Changelog 0.2.3:
+Removed unused show thread for TVDB modoule episodeIDToListItem
+Rework of 24 hour release delay setting
+Fixed issue with some seasons not showing episodes
+Hoster scrape threads exit more gracefully now
+
 Changelog 0.2.2:
 Maintenance cycle timeout reduced to 15 minutes
 Reduced concurrent tasks for background trakt syncs

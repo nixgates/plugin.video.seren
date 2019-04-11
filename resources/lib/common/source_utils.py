@@ -108,19 +108,28 @@ def getInfo(release_title):
 
 
 def cleanTitle(title):
-    title = tools.deaccentString(title)
-    title = title.lower()
-    title = title.replace('-', ' ')
-    title = re.sub(r'\:|\\|\/|\,|\!|\(|\)|\'', '', title)
-    title = title.replace('_', ' ')
-    title = title.replace('?', '')
-    title = title.replace('!', '')
-    title = title.replace('.', ' ')
-    title = title.replace(',', ' ')
-    title = title.replace('  ', ' ')
-    title = title.replace('  ', ' ')
-    title = title.replace('  ', ' ')
+    clean_title(title)
     return title
+
+def clean_title(title, broken=None):
+    title = title.lower()
+
+    if broken is None:
+        apostrophe_replacement = 's'
+    elif broken == 1:
+        apostrophe_replacement = ''
+    elif broken == 2:
+        apostrophe_replacement = ' s'
+
+    title = title.replace("\\'s", apostrophe_replacement)
+    title = title.replace("'s", apostrophe_replacement)
+    title = title.replace("&#039;s", apostrophe_replacement)
+    title = title.replace(" 039 s", apostrophe_replacement)
+
+    title = re.sub(r'\:|\\|\/|\,|\!|\?|\(|\)|\'|\"|\\|\[|\]|\-|\_|\.', ' ', title)
+    title = re.sub(r'\s+', ' ', title)
+    title = re.sub(r'\&', 'and', title)
+    return title.strip()
 
 
 def searchTitleClean(title):
@@ -132,137 +141,162 @@ def searchTitleClean(title):
     return title
 
 
-def filterMovieTitle(release_title, movieTitle, year):
-    movieTitle = cleanTitle(movieTitle.lower())
-    release_title = cleanTitle(release_title.lower())
-    string_list = []
-    string_list.append('%s (%s)' % (movieTitle, year))
-    string_list.append('%s %s' % (movieTitle, year))
-    string_list.append('%s.%s' % (movieTitle.replace(' ', '.'), year))
-    string_list.append('%s [%s]' % (movieTitle.replace(' ', '.'), year))
+def remove_from_title(title, target):
+    if target == '':
+        return title
 
-    if any(i in release_title for i in string_list):
-        if any(i in release_title for i in exclusions):
-            return False
-        else:
-            if release_title.startswith(movieTitle.split(' ')[0]):
-                return True
-            else:
-                return False
-    return False
+    title = title.replace(' %s ' % target.lower(), ' ')
+    title = clean_title(title) + ' '
+    return title
 
+def check_title_match(title_parts, release_title, simple_info):
+    title = clean_title(' '.join(title_parts)) + ' '
+    release_title = clean_title(release_title) + ' '
 
-def filterSeasonPack(simpleInfo, release_title):
-    if any(x in i for i in info['showInfo']['info'].get('genre', []) for x in ['Anime', 'Animation']):
-        simpleInfo['isanime'] = True
-    show_title, season, aliasList, year, country = \
-        simpleInfo['show_title'], \
-        simpleInfo['season_number'], \
-        simpleInfo['show_aliases'], \
-        simpleInfo['year'], \
-        simpleInfo['country']
+    if release_title.startswith(title):
+        return True
 
-    stringList = []
-    release_title = cleanTitle(release_title)
-    if '.' in show_title:
-        aliasList.append(cleanTitle(show_title.replace('.', '')))
-    show_title = cleanTitle(show_title)
-    seasonFill = season.zfill(2)
-    aliasList = [searchTitleClean(x) for x in aliasList]
+    release_title = remove_from_title(release_title, get_quality(release_title))
+    if release_title.startswith(title):
+        return True
 
-    if '&' in release_title: release_title = release_title.replace('&', 'and')
+    year = simple_info.get('year', '')
+    release_title = remove_from_title(release_title, year)
+    if release_title.startswith(title):
+        return True
 
-    stringList.append('%s s%s ' % (show_title, seasonFill))
-    stringList.append('%s s%s ' % (show_title, season))
-    stringList.append('%s season %s ' % (show_title, seasonFill))
-    stringList.append('%s season %s ' % (show_title, season))
-    stringList.append('%s %s s%s' % (show_title, year, seasonFill))
-    stringList.append('%s %s s%s' % (show_title, year, season))
-    stringList.append('%s %s season %s ' % (show_title, year, seasonFill))
-    stringList.append('%s %s season %s ' % (show_title, year, season))
-    stringList.append('%s %s s%s' % (show_title, country, seasonFill))
-    stringList.append('%s %s s%s' % (show_title, country, season))
-    stringList.append('%s %s season %s ' % (show_title, country, seasonFill))
-    stringList.append('%s %s season %s ' % (show_title, country, season))
+    country = simple_info.get('country', '')
+    release_title = remove_from_title(release_title, country)
+    if release_title.startswith(title):
+        return True
 
-    for i in aliasList:
-        stringList.append('%s s%s' % (i, seasonFill))
-        stringList.append('%s s%s' % (i, season))
-        stringList.append('%s season %s ' % (i, seasonFill))
-        stringList.append('%s season %s ' % (i, season))
-
-    for x in stringList:
-        if '&' in x:
-            stringList.append(x.replace('&', 'and'))
-
-    for i in stringList:
-        if release_title.startswith(i):
-            try:
-                temp = re.findall(r'(s\d+e\d+ )', release_title)[0]
-            except:
-                return True
-
-    return False
-
-
-def filterSingleEpisode(simpleInfo, release_title):
-    show_title, season, episode, aliasList, year, country = \
-        simpleInfo['show_title'], \
-        simpleInfo['season_number'], \
-        simpleInfo['episode_number'], \
-        simpleInfo['show_aliases'], \
-        simpleInfo['year'], \
-        simpleInfo['country']
-    stringList = []
-    if '.' in show_title:
-        aliasList.append(cleanTitle(show_title.replace('.', '')))
-    release_title = cleanTitle(release_title)
-    show_title = cleanTitle(show_title)
-    seasonFill = season.zfill(2)
-    episodeFill = episode.zfill(2)
-    aliasList = [searchTitleClean(x) for x in aliasList]
-    for x in aliasList:
-        if '&' in x:
-            aliasList.append(x.replace('&', 'and'))
-
-    stringList.append('%s s%se%s' % (show_title, seasonFill, episodeFill))
-    stringList.append('%s %s s%se%s' % (show_title, year, seasonFill, episodeFill))
-    stringList.append('%s %s s%se%s' % (show_title, country, seasonFill, episodeFill))
-
-    if simpleInfo['isanime']:
-        stringList.append('%s - %s' % (show_title, simpleInfo['absolute_number']))
-
-    for i in aliasList:
-        stringList.append('%s s%se%s' % (cleanTitle(i), seasonFill, episodeFill))
-        stringList.append('%s %s s%se%s' % (cleanTitle(i), year, seasonFill, episodeFill))
-        stringList.append('%s %s s%se%s' % (cleanTitle(i), country, seasonFill, episodeFill))
-
-        if simpleInfo['isanime']:
-            stringList.append('%s - %s' % (cleanTitle(i), simpleInfo['absolute_number']))
-
-    for x in stringList:
-        if '&' in x:
-            stringList.append(x.replace('&', 'and'))
-
-    for i in stringList:
-        if release_title.startswith(cleanTitle(i)):
+    if simple_info.get('episode_title', None) is not None:
+        show_title = clean_title(title_parts[0]) + ' '
+        show_title = remove_from_title(show_title, year)
+        episode_title = clean_title(simple_info['episode_title'])
+        if release_title.startswith(show_title) and episode_title in release_title:
             return True
 
     return False
 
+def filter_movie_title(release_title, movie_title, year):
+    release_title = release_title.lower()
 
-def filterShowPack(simpleInfo, release_title):
-    release_title = cleanTitle(release_title.lower().replace('the complete', '').replace('complete', ''))
-    season = simpleInfo['season_number']
-    aliasList = [searchTitleClean(x) for x in simpleInfo['show_aliases']]
-    if '.' in simpleInfo['show_title']:
-        aliasList.append(cleanTitle(simpleInfo['show_title'].replace('.', '')))
-    showTitle = cleanTitle(simpleInfo['show_title'])
+    title = clean_title(movie_title)
+    title_broken_1 = clean_title(movie_title, broken=1)
+    title_broken_2 = clean_title(movie_title, broken=2)
+    simple_info =  { 'year': year }
 
-    no_seasons = simpleInfo['no_seasons']
+    if not check_title_match([title], release_title, simple_info) and not check_title_match([title_broken_1], release_title, simple_info) and not check_title_match([title_broken_2], release_title, simple_info):
+        #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+        return False
+
+    if any(i in release_title for i in exclusions):
+        #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+        return False
+
+    if year not in release_title:
+        #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+        return False
+
+    if 'xxx' in release_title and 'xxx' not in title:
+        #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+        return False
+
+    return True
+
+def filter_season_pack(simple_info, release_title):
+    show_title, season, alias_list = \
+        simple_info['show_title'], \
+        simple_info['season_number'], \
+        simple_info['show_aliases']
+
+    titles = list(alias_list)
+    titles.insert(0, show_title)
+
+    season_fill = season.zfill(2)
+    season_check = 's%s' % season
+    season_fill_check = 's%s' % season_fill
+    season_full_check = 'season %s' % season
+    season_full_fill_check = 'season %s' % season_fill
+
+    string_list = []
+    for title in titles:
+        string_list.append([title, season_check])
+        string_list.append([title, season_fill_check])
+        string_list.append([title, season_full_check])
+        string_list.append([title, season_full_fill_check])
+
+    episode_number_match = len(re.findall(r'(s\d+ *e\d+ )', release_title.lower())) > 0
+    if episode_number_match:
+        #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+        return False
+
+    episode_number_match = len(re.findall(r'(season \d+ episode \d+)', release_title.lower())) > 0
+    if episode_number_match:
+        #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+        return False
+
+    for title_parts in string_list:
+        if check_title_match(title_parts, release_title, simple_info):
+            return True
+
+    #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+    return False
+
+def filter_single_special_episode(simple_info, release_title):
+    if check_title_match([simple_info['episode_title']], release_title, simple_info):
+        return True
+    #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+    return False
+
+def filter_single_episode(simple_info, release_title):
+    show_title, season, episode, alias_list = \
+        simple_info['show_title'], \
+        simple_info['season_number'], \
+        simple_info['episode_number'], \
+        simple_info['show_aliases']
+
+    titles = list(alias_list)
+    titles.insert(0, show_title)
+
+    season_episode_check = 's%se%s' % (season, episode)
+    season_episode_fill_check = 's%se%s' % (season, episode.zfill(2))
+    season_fill_episode_fill_check = 's%se%s' % (season.zfill(2), episode.zfill(2))
+    season_episode_full_check = 'season %s episode %s' % (season, episode)
+    season_episode_fill_full_check = 'season %s episode %s' % (season, episode.zfill(2))
+    season_fill_episode_fill_full_check = 'season %s episode %s' % (season.zfill(2), episode.zfill(2))
+
+    string_list = []
+    for title in titles:
+        string_list.append([title, season_episode_check])
+        string_list.append([title, season_episode_fill_check])
+        string_list.append([title, season_fill_episode_fill_check])
+        string_list.append([title, season_episode_full_check])
+        string_list.append([title, season_episode_fill_full_check])
+        string_list.append([title, season_fill_episode_fill_full_check])
+
+    for title_parts in string_list:
+        if check_title_match(title_parts, release_title, simple_info):
+            return True
+
+    #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+    return False
+
+
+def filter_show_pack(simple_info, release_title):
+    release_title = clean_title(release_title.lower().replace('the complete', '').replace('complete', ''))
+    season = simple_info['season_number']
+    alias_list = [clean_title(x) for x in simple_info['show_aliases']]
+    alias_list = list(alias_list)
+    if '.' in simple_info['show_title']:
+        alias_list.append(clean_title(simple_info['show_title'].replace('.', '')))
+    show_title = clean_title(simple_info['show_title'])
+
+    no_seasons = simple_info['no_seasons']
     all_seasons = '1'
-    country = simpleInfo['country']
-    year = simpleInfo['year']
+    country = simple_info['country']
+    year = simple_info['year']
     season_count = 1
     append_list = []
 
@@ -270,26 +304,26 @@ def filterShowPack(simpleInfo, release_title):
         season_count += 1
         all_seasons += ' %s' % str(season_count)
 
-    stringList = ['%s season %s' % (showTitle, all_seasons),
-                  '%s %s' % (showTitle, all_seasons),
-                  '%s season 1 %s ' % (showTitle, no_seasons),
-                  '%s seasons 1 %s ' % (showTitle, no_seasons),
-                  '%s seasons 1 to %s' % (showTitle, no_seasons),
-                  '%s season s01 s%s' % (showTitle, no_seasons.zfill(2)),
-                  '%s seasons s01 s%s' % (showTitle, no_seasons.zfill(2)),
-                  '%s seasons s01 to s%s' % (showTitle, no_seasons.zfill(2)),
-                  '%s series' % showTitle,
-                  '%s season s%s complete' % (showTitle, season.zfill(2)),
-                  '%s seasons 1 thru %s' % (showTitle, no_seasons),
-                  '%s seasons 1 thru %s' % (showTitle, no_seasons.zfill(2)),
-                  '%s season %s' % (showTitle, all_seasons)
+    string_list = ['%s season %s' % (show_title, all_seasons),
+                  '%s %s' % (show_title, all_seasons),
+                  '%s season 1 %s ' % (show_title, no_seasons),
+                  '%s seasons 1 %s ' % (show_title, no_seasons),
+                  '%s seasons 1 to %s' % (show_title, no_seasons),
+                  '%s season s01 s%s' % (show_title, no_seasons.zfill(2)),
+                  '%s seasons s01 s%s' % (show_title, no_seasons.zfill(2)),
+                  '%s seasons s01 to s%s' % (show_title, no_seasons.zfill(2)),
+                  '%s series' % show_title,
+                  '%s season s%s complete' % (show_title, season.zfill(2)),
+                  '%s seasons 1 thru %s' % (show_title, no_seasons),
+                  '%s seasons 1 thru %s' % (show_title, no_seasons.zfill(2)),
+                  '%s season %s' % (show_title, all_seasons)
                   ]
 
     season_count = int(season)
 
     while int(season_count) <= int(no_seasons):
-        season = '%s seasons 1 %s' % (showTitle, str(season_count))
-        seasons = '%s season 1 %s' % (showTitle, str(season_count))
+        season = '%s seasons 1 %s' % (show_title, str(season_count))
+        seasons = '%s season 1 %s' % (show_title, str(season_count))
         if release_title == season:
             return True
         if release_title == seasons:
@@ -297,35 +331,38 @@ def filterShowPack(simpleInfo, release_title):
         season_count = season_count + 1
 
     while int(season_count) <= int(no_seasons):
-        stringList.append('%s seasons 1 %s ' % (showTitle, str(season_count)))
-        stringList.append('%s season 1 %s ' % (showTitle, str(season_count)))
+        string_list.append('%s seasons 1 %s ' % (show_title, str(season_count)))
+        string_list.append('%s season 1 %s ' % (show_title, str(season_count)))
         season_count = season_count + 1
 
-    for i in stringList:
-        append_list.append(i.replace(showTitle, '%s %s' % (showTitle, country)))
+    for i in string_list:
+        append_list.append(i.replace(show_title, '%s %s' % (show_title, country)))
 
-    stringList += append_list
+    string_list += append_list
     append_list = []
 
-    for i in stringList:
-        append_list.append(i.replace(showTitle, '%s %s' % (showTitle, year)))
+    for i in string_list:
+        append_list.append(i.replace(show_title, '%s %s' % (show_title, year)))
 
-    stringList += append_list
+    string_list += append_list
     append_list = []
 
-    for i in stringList:
-        for alias in aliasList:
-            append_list.append(i.replace(showTitle, alias))
+    for i in string_list:
+        for alias in alias_list:
+            append_list.append(i.replace(show_title, alias))
 
-    stringList += append_list
+    string_list += append_list
 
-    for x in stringList:
+    for x in string_list:
         if '&' in x:
-            stringList.append(x.replace('&', 'and'))
+            string_list.append(x.replace('&', 'and'))
 
-    for i in stringList:
+    for i in string_list:
         if release_title.startswith(i):
             return True
+
+    #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
+    return False
 
 
 class serenRequests(Session):
@@ -355,7 +392,7 @@ def torrentCacheStrings(args, strict=False):
                       '[%sx%s]' % (season_number.zfill(2), episode_number),
                       '[%sx%s]' % (season_number, episode_number.zfill(2)),
                       '[%sx%s]' % (season_number, episode_number),
-                      ' %s' % cleanTitle(episode_title),
+                      '%s' % clean_title(episode_title),
                       '%s%s ' % (season_number, episode_number.zfill(2)),
                       '%s%s ' % (season_number.zfill(2), episode_number.zfill(2)),
                       '%s.%s ' % (season_number, episode_number.zfill(2)),

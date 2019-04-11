@@ -5,6 +5,8 @@ from datetime import datetime
 import json
 
 from resources.lib.common import tools
+from resources.lib.gui import seren_dialog
+
 try:
     from Queue import Queue
 except:
@@ -259,3 +261,13 @@ def _get_connection():
     conn = db.connect(database_path, timeout=60.0)
     conn.row_factory = _dict_factory
     return conn
+
+class sync_notification(seren_dialog.Dialog):
+
+    def __init__(self):
+        seren_dialog.Dialog.__init__(self)
+
+        self.text_box = tools.multi_text(self.window_width / 2 + 30, self.window_height - 90,
+                                         self.window_width - 60, self.window_height - 125, font='font12')
+        self.addControl(self.text_box)
+        self.text_box.setText(tools.lang(40133))

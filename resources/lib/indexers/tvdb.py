@@ -23,7 +23,6 @@ class TVDBAPI:
         self.cast = []
         self.baseImageUrl = 'https://www.thetvdb.com/banners/'
         self.threads = []
-        self.show_cursory = None
 
         if tools.fanart_api_key == '': self.fanart_support = False
         else: self.fanart_support = True
@@ -111,7 +110,7 @@ class TVDBAPI:
         tools.setSetting('tvdb.expiry', str(time.time() + (24 * (60 * 60))))
         return response
 
-    def seriesIDToListItem(self, trakt_object, info_return=True):
+    def seriesIDToListItem(self, trakt_object):
         try:
             tvdbID = trakt_object['ids']['tvdb']
             if self.fanart_support:
@@ -202,6 +201,7 @@ class TVDBAPI:
                 pass
             try:
                 info['tvshowtitle'] = self.info['seriesName']
+
             except:
                 pass
             try:
@@ -273,12 +273,9 @@ class TVDBAPI:
             item['trakt_object'] = {}
             item['trakt_object']['shows'] = [trakt_object]
 
-            if info_return is True:
-                return item
-            else:
-                self.show_cursory = item
+
+            return item
         except:
-            self.show_cursory = False
             return None
 
     def seasonIDToListItem(self, seasonObject, showArgs):
@@ -393,10 +390,6 @@ class TVDBAPI:
         return item
 
     def episodeIDToListItem(self, trakt_object, showArgs):
-        if 'showInfo' not in showArgs:
-            show_thread = threading.Thread(target=self.seriesIDToListItem, args=(showArgs, False))
-            show_thread.daemon = True
-            show_thread.start()
 
         url = "episodes/%s" % trakt_object['ids']['tvdb']
         response = self.get_request(url)['data']
@@ -436,11 +429,13 @@ class TVDBAPI:
                 info['premiered'] = release.date().strftime('%Y-%m-%d')
                 info['aired'] = release.date().strftime('%Y-%m-%d')
             except:
-                release = tools.datetime_workaround(release['firstAired'],
-                                                    '%Y-%m-%dT%H:%M:%S.000Z', date_only=False)
+                release = response.get('firstAired', None)
+                if release is None:
+                    return
+                release = tools.datetime_workaround(release, '%Y-%m-%dT%H:%M:%S.000Z', date_only=False)
                 release = tools.utc_to_local_datetime(release)
-                info['premiered'] = response['firstAired']
-                info['aired'] = response['firstAired']
+                info['premiered'] = release.date().strftime('%Y-%m-%d')
+                info['aired'] = release.date().strftime('%Y-%m-%d')
         except:
             pass
         try:
@@ -455,14 +450,6 @@ class TVDBAPI:
             info['imdbnumber'] = response['imdbId']
         except:
             pass
-        if 'showInfo' not in showArgs:
-            if show_thread.is_alive():
-                show_thread.join()
-            if self.show_cursory is False or self.show_cursory is None:
-                return None
-            else:
-                showArgs = {'showInfo': {}}
-                showArgs['showInfo'] = self.show_cursory
         try:
             info['studio'] = showArgs['showInfo']['info'].get('studio')
         except:

@@ -236,6 +236,8 @@ class Resolver(tools.dialogWindow):
             elif source['type'] == 'hoster':
                 stream_link = premiumize.resolveHoster(source['url'])
         except:
+            import traceback
+            traceback.print_exc()
             pass
         return stream_link
 

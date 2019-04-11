@@ -14,8 +14,6 @@ class SmartPlay:
         try:
             self.info_dictionary = json.loads(tools.unquote(info_dictionary))
         except:
-            import traceback
-            traceback.print_exc()
             self.info_dictionary = info_dictionary
 
         if type(self.info_dictionary) is not dict:

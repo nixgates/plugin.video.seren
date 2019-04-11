@@ -461,6 +461,9 @@ class Menus:
                 if hide_specials and int(item['info']['season']) == 0:
                     continue
 
+                if self.date_delay(item['info']):
+                    continue
+
                 args = {'showInfo': {}, 'seasonInfo': {}}
 
                 action = 'seasonEpisodes'
@@ -519,6 +522,9 @@ class Menus:
                     else:
                         playable = True
                         action = 'getSources'
+
+                    if self.date_delay(item['info']):
+                        continue
 
                     args['showInfo'] = item['showInfo']
                     args['episodeInfo']['info'] = item['info']
@@ -610,6 +616,9 @@ class Menus:
                     continue
 
                 if hide_watched and item['info']['playcount'] != 0:
+                    continue
+
+                if self.date_delay(item['info']):
                     continue
 
                 cm = []
@@ -716,6 +725,9 @@ class Menus:
                 if info_only == True:
                     return args
 
+                if self.date_delay(item['info']):
+                    continue
+
                 if 'setCast' in item:
                     set_cast = item['setCast']
                 else:
@@ -802,3 +814,19 @@ class Menus:
                 target[0](*target[1])
             except:
                 pass
+
+    def date_delay(self, info):
+        try:
+            if tools.getSetting('general.datedelay') == 'true':
+                air_date = info['aired']
+                air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)
+                air_date += datetime.timedelta(days=1)
+                if air_date > datetime.date.today():
+                    print('Skipping %s - %s.%s' % (info['tvshowtitle'], info['season'], info['episode']))
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        except:
+            return False
