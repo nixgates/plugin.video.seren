@@ -3,19 +3,13 @@
 import time
 
 from resources.lib.common import tools
-from resources.lib.modules import database
 from resources.lib.modules import customProviders
+
 
 def update_provider_packages():
     if tools.getSetting('providers.autoupdates') == 'false':
         return
     customProviders.providers().check_for_updates(silent=True, automatic=True)
-
-
-def cache_large_info_requests():
-    from resources.lib.indexers import trakt
-    trakt = trakt.TraktAPI()
-    database.get(trakt.json_response, .5, 'users/me/watched/shows?extended=full', limit=False)
 
 
 def refresh_apis():
@@ -50,16 +44,18 @@ def refresh_apis():
 
 
 def wipe_install():
-    confirm = tools.showDialog.yesno(tools.addonName, tools.lang(33021).encode('utf-8'))
+    confirm = tools.showDialog.yesno(tools.addonName, tools.lang(33021))
     if confirm == 0:
         return
 
-    confirm = tools.showDialog.yesno(tools.addonName, tools.lang(32049).encode('utf-8') +
-                                     '%s' % tools.colorString(tools.lang(32050).encode('utf-8')))
+    confirm = tools.showDialog.yesno(tools.addonName, tools.lang(32049) +
+                                     '%s' % tools.colorString(tools.lang(32050)))
     if confirm == 0:
         return
 
-    import shutil, os
+    import shutil
+    import os
+
     if os.path.exists(tools.dataPath):
         shutil.rmtree(tools.dataPath)
     os.mkdir(tools.dataPath)
@@ -68,6 +64,7 @@ def wipe_install():
 def premiumize_transfer_cleanup():
     from resources.lib.debrid import premiumize
     from resources.lib.modules import database
+
     premiumize = premiumize.PremiumizeBase()
     fair_usage = int(premiumize.account_info()['limit_used'] * 100)
     threshold = int(tools.getSetting('premiumize.threshold'))
@@ -95,16 +92,17 @@ def account_notifications():
         premium_status = real_debrid.RealDebrid().get_url('user')['type']
         if premium_status == 'free':
             tools.showDialog.notification('%s: Real Debrid' % tools.addonName,
-                                          tools.lang(32051).encode('utf-8'))
+                                          tools.lang(32051))
 
     if tools.getSetting('premiumize.enabled') == 'true':
         premium_status = premiumize.PremiumizeBase().account_info()['premium_until']
         if time.time() > premium_status:
             tools.showDialog.notification('%s: Premiumize' % tools.addonName,
-                                          tools.lang(32052).encode('utf-8'))
+                                          tools.lang(32052))
 
 
 def run_maintenance():
+
     tools.log('Performing Maintenance')
     # ADD COMMON HOUSE KEEPING ITEMS HERE #
 
@@ -115,7 +113,6 @@ def run_maintenance():
         pass
 
     # Check cloud account status and alert user if expired
-
     try:
         if tools.getSetting('general.accountNotifications') == 'true':
             account_notifications()

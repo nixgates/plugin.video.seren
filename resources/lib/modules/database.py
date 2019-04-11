@@ -28,10 +28,6 @@ try:
 except ImportError:
     from pysqlite2 import dbapi2 as db, OperationalError
 
-"""
-This module is used to get/set cache for every action done in the system
-"""
-
 cache_table = 'cache'
 
 def get(function, duration, *args, **kwargs):
@@ -55,7 +51,7 @@ def get(function, duration, *args, **kwargs):
             if cache_result:
                 if _is_cache_valid(cache_result['date'], duration):
                     try:
-                        return_data = ast.literal_eval(cache_result['value'].encode('utf-8'))
+                        return_data = ast.literal_eval(cache_result['value'])
                         return return_data
                     except:
                         return ast.literal_eval(cache_result['value'])
@@ -68,12 +64,9 @@ def get(function, duration, *args, **kwargs):
             return None
         insert_thread = threading.Thread(target=cache_insert, args=(key, fresh_result))
         insert_thread.start()
-        try:
-            data = ast.literal_eval(fresh_result.encode('utf-8'))
-            return data
-        except:
-            data = ast.literal_eval(fresh_result)
-            return data
+
+        data = ast.literal_eval(fresh_result)
+        return data
 
     except Exception:
         import traceback
@@ -137,7 +130,7 @@ def cache_clear():
                 cursor.connection.commit()
             except:
                 pass
-        tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32078).encode('utf-8'), time=5000)
+        tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32078), time=5000)
     except:
         pass
 
@@ -160,7 +153,7 @@ def getSearchHistory(media_type):
         cursor.execute("CREATE TABLE IF NOT EXISTS %s (value TEXT, media_type TEXT)" % "history")
         cursor.execute("SELECT * FROM history WHERE media_type = ?", [media_type])
         history = cursor.fetchall()
-
+        history.reverse()
         return [i['value'] for i in history][:50]
     except:
         import traceback
@@ -240,7 +233,7 @@ def torrent_cache_clear():
                 pass
     except:
         pass
-    tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32079).encode('utf-8'), time=5000)
+    tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32079), time=5000)
 
 def get_assist_torrents():
     try:
@@ -290,7 +283,7 @@ def clear_assist_torrents():
                 pass
     except:
         pass
-    tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32080).encode('utf-8'), time=5000)
+    tools.showDialog.notification(tools.addonName + ': Cache', tools.lang(32080), time=5000)
 
 def get_providers():
     try:
@@ -462,7 +455,6 @@ def remove_premiumize_transfer(transfer_id):
     except:
         pass
 
-
 def _dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -514,3 +506,4 @@ def _find_cache_version():
             return True
         else: return False
     except: return False
+

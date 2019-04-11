@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import xbmcgui
 
 #======================================================================================================================
 # API Constants
@@ -72,9 +73,13 @@ class directory:
             try:
                 print('')
                 print("Enter Action Number")
-                action = raw_input()
+                try:
+                    action = raw_input()
+                except:
+                    action = input()
                 sys.argv = ['', 0, None]
                 try:
+                    print(action)
                     action = int(action) - 1
                     if action == -2:
                         if len(self.history) > 0:
@@ -84,10 +89,20 @@ class directory:
                     elif action == -1:
                         sys.argv = ['', 0, '']
                     else:
+                        print(self.items[action][1])
                         sys.argv = ['', 0, self.items[action][1]]
 
                 except:
                     action = str(action)
+                    get_context_check = re.findall(r'c(\d*)', action)
+
+                    if len(get_context_check) == 1:
+                        item = self.items[int(get_context_check[0]) -1]
+                        self.items = []
+                        for context_item in item[0].cm:
+                            self.items.append((context_item[0], re.findall(r'.*?\((.*?)\)', context_item[1])[0]))
+                        continue
+
                     print('STRING ACTION')
                     print(action)
                     if action.startswith('action'):
@@ -138,6 +153,9 @@ def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=0):
     pass
 
 def addDirectoryItems(handle, items, totalItems=0):
+    global DIRECTORY_ITEMS
+    for i in items:
+        DIRECTORY.items.append((i[1], i[0], i[2]))
     pass
 
 def addSortMethod(handle, sortMethod, label2Mask="D"):
@@ -163,6 +181,7 @@ def setProperty(handle, key, value):
     pass
 
 def setResolvedUrl(handle, succeeded, listitem):
+    print()
     pass
 
 def setSetting(handle, id, value):

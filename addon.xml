@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.1.35" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.2.4" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -27,6 +27,121 @@
 			<fanart>temp-fanart.png</fanart>
 		</assets>
 		<news>
+Changelog 0.2.4:
+Added ability to delay Trakt Sync
+Added notice for Initial Trakt Sync with warning about delaying
+Added further information to the Trakt Sync background progress dialog
+Increased item filtering accuracy
+Improvements to Premiumize torrent link identification
+
+Changelog 0.2.3:
+Removed unused show thread for TVDB modoule episodeIDToListItem
+Rework of 24 hour release delay setting
+Fixed issue with some seasons not showing episodes
+Hoster scrape threads exit more gracefully now
+
+Changelog 0.2.2:
+Maintenance cycle timeout reduced to 15 minutes
+Reduced concurrent tasks for background trakt syncs
+Added more fallbacks for menus with items that can't be built
+
+Changelog 0.2.1:
+Fixed issue if Kodi meta was unable to be filled for mixed episode list record
+
+Changelog 0.2.0:
+Added removal of None items for next up list.
+
+Changelog 0.1.50:
+Fixed UnWatchedEpisodes list item property for seasons
+
+Changelog 0.1.49:
+Fixed Movie Collection Sorting
+Fixed shows get_season_episodes falling back to episode update
+
+Changelog 0.1.48:
+Fixed Marking As Watched not updating local trakt records
+Meta requests now run in a queue to throttle thread creation
+Fixed season_count not being checked in local trakt database
+Added more info label cleanups
+Added TotalSeasons to item properties
+Fixed spelling of UnWatchedEpisodes item property
+
+Changelog 0.1.47:
+Removed thread stack size changes (possibly causing Kodi crashes)
+
+Changelog 0.1.46:
+Fixed Movies not correctly marked as watched
+Movies Collection now pulled from local database instead of Trakt call
+
+Changelog 0.1.45:
+Added Years menu item to shows
+Added Background Task Style scrape display option
+Fixed source utils deaccent function
+Added Re-Build Trakt Datbase menu item
+
+Changelog 0.1.44:
+Trakt Sync Database now integrated
+Duplicate source removal now performed using dictionary of hashes and urls
+Real Debrid cache checks are now threaded to increase cache check speeds
+Fixed Hide SD causing only SD to show
+Torrents from local database now show original provider name
+Fixed temporary provider files not being cleaned up on zip install
+Added new My Files menu, allows browsing and playback of cloud stored files
+Fixed Trakt Bookmarks
+
+Changelog 0.1.43:
+Fixed trakt scrobbling on item start
+Slowest 5 providers now show their names on scraping screen
+Missing season posters now fall back to show poster
+
+Changelog 0.1.42
+Fixed issue with movies creating transfer requests for premiumize users
+Fixed lists throwing error when no liked lists were found
+Fixed watched episodes showing in Next Up
+Fixed issue with trakt scrobbling on item finish
+
+Changelog 0.1.41
+Fixed Fanart pulling items with wrong language
+Fixed Scrobbling (again)
+
+Changelog 0.1.40:
+Fixed My Movies List Menu Item
+Fixed display of individual providers in dialog
+Increased Premiumize movie detection
+Fixed Trakt Scrobbling
+Fixed issue error caused on player skip
+Fixed Search History not showing from main menu search
+Fixed Search History sorting
+Fixed error on torrent sizes if size is 0
+Fixed spelling issue on Movies Years Menu
+
+Changelog 0.1.39:
+Removed duplicate semaphore acquisition which caused large show menus to stall forever
+
+Changelog 0.1.38:
+Provider versions are now shown in the disable/enable windows
+
+Changelog 0.1.37:
+Fixed issue with scraping caused by absolute numbering
+
+Changelog 0.1.36
+Torrent Sources now receive two new keys in the simpleInfo dictionary "isanime, absolute_number"
+absolute_number is the relevant episode number in the series
+Adjust custom providers so installs can be requested from external addons (with user approval)
+Added Hide SD quality option to settings
+TVDB images now filter by language code (statically set to english for the interim)
+Multiple Language String Fixes
+Added fix for Seren scrobbling items twice
+Added ability for providers to override provider display names
+Next Up now filters items if they are the first episode in the series and have previously been completed
+Added Show Networks to Discover TV Shows
+Added Hide Un-Aired Episodes to Settings options
+Added Movie Years to Menu
+Added Networks to TV Shows Menu
+Fixed Real Debrid Cache Assist
+Real Debrid Cache Assist should now properly cache entire season packs
+Fixed issue where providers/__init__.py could be overwritten with malformed provider package
+
 Changelog 0.1.35
 Fixed scrape error caused by missing artwork
 Sources that are not compatible are now hidden from users

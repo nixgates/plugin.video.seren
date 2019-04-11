@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import warnings
 import time
 import threading
 
-#======================================================================================================================
+# ======================================================================================================================
 # API Constants
-#======================================================================================================================
+# ======================================================================================================================
 ACTION_ANALOG_FORWARD = 113
 ACTION_ANALOG_MOVE = 49
 ACTION_ANALOG_MOVE_X = 601
@@ -310,29 +312,41 @@ __date__ = 'Sat Oct 24 10:35:41 BST 2015'
 __platform__ = 'ALL'
 __version__ = '2.23.0'
 
-#=====================================================================================================================
+
+# =====================================================================================================================
 # API Methods
-#=====================================================================================================================
+# =====================================================================================================================
 def getCurrentWindowDialogId():
     return 0
+
 
 def getCurrentWindowId():
     return 10000
 
-#=====================================================================================================================
+
+# =====================================================================================================================
 # API Classes
-#=====================================================================================================================
+# =====================================================================================================================
 class Dialog(object):
-    def browse(self, dtype, heading, shares, mask="", useThumbs=False, treatAsFolder=False, default="", enableMultiple=False):
+    def browse(self, dtype, heading, shares, mask="", useThumbs=False, treatAsFolder=False, default="",
+               enableMultiple=False):
+        if default is '':
+            print('Enter File Path')
+            default = raw_input()
         return default
+
     def browseMultiple(self, dtype, heading, shares, mask="", useThumbs=False, treatAsFolder=False, default=""):
         return default
+
     def browseSingle(self, dtype, heading, shares, mask="", useThumbs=False, treatAsFolder=False, default=""):
         return default
+
     def input(self, heading, default="", dtype=INPUT_ALPHANUM, option=0, autoclose=False):
         return default
+
     def multiselect(self, heading, list, autoclose=False):
         return [0]
+
     def notification(self, heading, message, icon=NOTIFICATION_INFO, time=5000, sound=True):
         if icon == NOTIFICATION_WARNING:
             prefix = "[WARNING]"
@@ -341,21 +355,40 @@ class Dialog(object):
         else:
             prefix = "[INFO]"
         print(u"NOTIFICATION: {0} {1}: {2}".format(prefix, heading, message))
+
     def numeric(self, dtype, heading, default=0):
         return default
+
     def ok(self, heading, *lines):
         output = ""
         print(heading)
         for line in lines:
             print(line)
             output = output + line + "\n"
-        tkMessageBox.showinfo(heading, output)
         return True
+
     def select(self, heading, list, autoclose=False, preselect=None, useDetails=False):
-        """preselect and useDetails added in v17.0"""
-        return 0
+        print(heading)
+        action = None
+        for idx, i in enumerate(list):
+            print('%s) %s' % (idx, i))
+        while True:
+            try:
+                try:
+                    action = int(raw_input())
+                except:
+                    action = int(input())
+                break
+            except:
+                break
+        if action == None:
+            raise Exception
+        print(action)
+        return action
+
     def textviewer(self, heading, text):
         tkMessageBox.showinfo(heading, text)
+
     def yesno(self, heading, line1, line2="", line3="", nolabel="No", yeslabel="Yes", autoclose=False):
         print('')
         print(heading)
@@ -365,9 +398,11 @@ class Dialog(object):
         print('1) %s/ 0) %s' % (yeslabel, nolabel))
         action = raw_input()
         return action
+
     def info(self, listitem):
         """Shows the info window for the passed in listitem. Added in v17.0"""
         pass
+
     def contextmenu(self, list):
         """Shows a context menu of items and returns the selected index, or -1 if cancelled. Added in v17.0"""
         return -1
@@ -375,14 +410,19 @@ class Dialog(object):
 
 class DialogBusy(object):
     """Show/Hide the progress indicator. Added in v17.0"""
+
     def create(self):
         print(u"[BUSY] show")
+
     def update(self, percent):
         print(u"[BUSY] update: {0}".format(percent))
+
     def close(self):
         print(u"[BUSY] close")
+
     def iscanceled(self):
         return False
+
 
 class DialogProgress:
     canceled = False
@@ -403,21 +443,25 @@ class DialogProgress:
     def close(self):
         print('Dialog Closed')
 
+
 class DialogProgressBG(object):
     def __init__(self):
         self._created = False
         self._heading = ""
         self._message = ""
         self._percent = 0
+
     def create(self, heading, message=""):
         self._created = True
         self._heading = heading
         self._message = message
         self._percent = 0
         print(u"[BACKGROUND] {0}: {1} - {2}%".format(self._heading, self._message, self._percent))
+
     def close(self):
         self._created = False
         print(u"[BACKGROUND] closing")
+
     def update(self, percent=None, heading=None, message=None):
         if percent is not None:
             self._percent = percent
@@ -426,12 +470,16 @@ class DialogProgressBG(object):
         if message is not None:
             self._message = message
         print(u"[BACKGROUND] {0}: {1} - {2}%".format(self._heading, self._message, self._percent))
+
     def isFinished(self):
         return not self._created
 
 
 class ListItem(object):
     def __init__(self, label="", label2="", iconImage="", thumbnailImage="", path=""):
+        from resources.lib.common.tools import safeStr
+        label = safeStr(label)
+        label2 = safeStr(label2)
         self._label = label
         self._label2 = label2
         self._icon = iconImage
@@ -450,132 +498,176 @@ class ListItem(object):
         for i in list:
             self.cm.append(i)
         pass
+
     def addStreamInfo(self, streamtype, values):
         pass
+
     def getLabel(self):
         return self._label
+
     def getLabel2(self):
         return self._label2
+
     def getMusicInfoTag(self):
         pass
+
     def getProperty(self, key):
         key = key.lower()
         if key in self._props:
             return self._props[key]
         return ""
+
     def getVideoInfoTag(self):
         pass
+
     def getdescription(self):
         warnings.warn("getdescription deprecated in v17.0.", category=DeprecationWarning)
         return self._label
+
     def getduration(self):
         warnings.warn("getduration deprecated in v17.0. Use InfoTagMusic instead", category=DeprecationWarning)
         return "0"
+
     def getfilename(self):
         warnings.warn("getfilename deprecated in v17.0.", category=DeprecationWarning)
         return self._path
+
     def isSelected(self):
         return self._selected
+
     def select(self, selected):
         self._selected = selected
+
     def setArt(self, values):
         if values == None:
             return
         self.art.update(values)
         pass
+
     def setContentLookup(self, enable):
         pass
+
     def setIconImage(self, value):
         self._icon = value
-    def setInfo(self, infotype, infoLabels):
-        if infotype is None or infoLabels is None:
+
+    def setInfo(self, type, infoLabels):
+        if type is None or infoLabels is None:
             return
-        self.info_type = infotype
+        self.info_type = type
         self.info.update(infoLabels)
         pass
+
     def setLabel(self, label):
         self._label = label
+
     def setLabel2(self, label):
         self._label2 = label
+
     def setMimeType(self, mimetype):
         pass
+
     def setProperty(self, key, value):
         key = key.lower()
         self._props[key] = value
+
     def setSubtitles(self, list):
         warnings.warn("setSubtitles deprecated in v17.0", category=DeprecationWarning)
+
     def setThumbnailImage(self, value):
         self._thumb = value
 
     def getArt(self, key):
         """Returns a listitem art path as a string, similar to infolabel. Added in v17.0"""
         return ""
+
     def getPath(self):
         """Returns the path of this listitem. Added in v17.0"""
         return self._path
+
     def setCast(self, actors):
         """Set cast including thumbnails. Added in v17.0"""
         pass
+
     def setUniqueIDs(self, ids):
         self.uniqueIDs.update(ids)
         pass
 
     def __str__(self):
-        return self._label.encode('utf-8')
+        from resources.lib.common.tools import display_string
+        return display_string(self._label)
+
 
 class Window(object):
     "The window class allows creating a window, or can be used for quick messages and notifications"
-    def __init__(self, windowId = 0):
+
+    def __init__(self, windowId=0):
         self._props = {}
 
     def addControl(self, Control):
         pass
+
     def addControls(self, List):
         pass
+
     def clearProperties(self):
         self._props.clear()
+
     def clearProperty(self, key):
         key = key.lower()
         if key in self._props:
             del self._props[key]
+
     def close(self):
         pass
+
     def doModal(self):
         pass
+
     def getControl(self, controlId):
         pass
+
     def getFocus(self):
         pass
+
     def getHeight(self):
         return 0
+
     def getProperty(self, key):
         key = key.lower()
         if key in self._props:
             return self._props[key]
         return ""
+
     def getResolution(self):
         return 0
+
     def getWidth(self):
         return 0
+
     def removeControl(self, Control):
         pass
+
     def removeControls(self, List):
         pass
+
     def setCoordinateResolution(self, resolution):
         pass
+
     def setFocus(self, Focus):
         pass
+
     def setFocusId(self, id):
         pass
+
     def setProperty(self, key, value):
         key = key.lower()
         self._props[key] = value
+
     def show(self):
         pass
 
 
 class WindowDialog:
-
     stop_display = False
     info = []
 
@@ -603,8 +695,8 @@ class WindowDialog:
     def close(self):
         self.stop_display = True
 
-class ControlImage:
 
+class ControlImage:
     def __init__(self, *args, **kwargs):
         pass
 
@@ -631,18 +723,17 @@ class ControlLabel:
     def __str__(self):
         return str(self.label)
 
-class ControlButton:
 
+class ControlButton:
     def __init__(self, *args, **kwargs):
         pass
+
 
 class ControlList:
-
     def __init__(self, *args, **kwargs):
         pass
+
 
 class ControlTextBox:
-
     def __init__(self, *args, **kwargs):
         pass
-
