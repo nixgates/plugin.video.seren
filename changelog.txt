@@ -1,3 +1,6 @@
+Changelog 0.2.5:
+Fixed issue with clean_title not applying to old version of function
+
 Changelog 0.2.4:
 Added ability to delay Trakt Sync
 Added notice for Initial Trakt Sync with warning about delaying

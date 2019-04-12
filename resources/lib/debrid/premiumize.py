@@ -214,6 +214,7 @@ class PremiumizeFunctions(PremiumizeBase):
     def check_episode_string(self, folder_details, episodeStrings):
         for i in folder_details:
             for epstring in episodeStrings:
+                # print('Test: %s - Path: %s' % (epstring, source_utils.cleanTitle(i['path'].replace('&', ' ').lower())))
                 if source_utils.cleanTitle(epstring) in \
                         source_utils.cleanTitle(i['path'].replace('&', ' ').lower()):
                     if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
