@@ -259,11 +259,11 @@ class Sources(tools.dialogWindow):
         if 'showInfo' in self.args:
             simple_info = self.buildSimpleShowInfo(self.args)
             for torrent in local_storage:
-                if source_utils.filterSingleEpisode(simple_info, torrent['release_title']):
+                if source_utils.filter_single_episode(simple_info, torrent['release_title']):
                     relevant_torrents.append(torrent)
-                elif source_utils.filterSeasonPack(simple_info, torrent['release_title']):
+                elif source_utils.filter_season_pack(simple_info, torrent['release_title']):
                     relevant_torrents.append(torrent)
-                elif source_utils.filterShowPack(simple_info, torrent['release_title']):
+                elif source_utils.filter_show_pack(simple_info, torrent['release_title']):
                     relevant_torrents.append(torrent)
         else:
             relevant_torrents = local_storage

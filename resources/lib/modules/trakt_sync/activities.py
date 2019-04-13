@@ -37,7 +37,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         trakt_activities = Trakt.TraktAPI().json_response('sync/last_activities')
 
-        if str(self.activites['all_activities']) == self.base_date:
+        if str(self.activites['all_activities']) == self.base_date and tools.getSetting('trakt.auth') != '':
             # Increase the amount of concurrent tasks running during initial and Force Sync processes to speed up task
             from Queue import Queue
             self.task_queue = Queue(40)
