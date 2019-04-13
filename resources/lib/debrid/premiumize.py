@@ -165,7 +165,7 @@ class PremiumizeFunctions(PremiumizeBase):
         folder_details = [tfile for tfile in folder_details
                           if any(tfile['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
         for torrent_file in folder_details:
-            if source_utils.filterMovieTitle(torrent_file['path'].split('/')[-1], args['title'], args['year']):
+            if source_utils.filter_movie_title(torrent_file['path'].split('/')[-1], args['title'], args['year']):
                 selectedFile = torrent_file
                 break
 
@@ -214,6 +214,7 @@ class PremiumizeFunctions(PremiumizeBase):
     def check_episode_string(self, folder_details, episodeStrings):
         for i in folder_details:
             for epstring in episodeStrings:
+                # print('Test: %s - Path: %s' % (epstring, source_utils.cleanTitle(i['path'].replace('&', ' ').lower())))
                 if source_utils.cleanTitle(epstring) in \
                         source_utils.cleanTitle(i['path'].replace('&', ' ').lower()):
                     if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):

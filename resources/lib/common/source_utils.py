@@ -108,7 +108,7 @@ def getInfo(release_title):
 
 
 def cleanTitle(title):
-    clean_title(title)
+    title = clean_title(title)
     return title
 
 def clean_title(title, broken=None):
