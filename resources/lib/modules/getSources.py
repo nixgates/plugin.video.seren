@@ -211,9 +211,6 @@ class Sources(tools.dialogWindow):
 
                 tools.log('Exited Keep Alive', 'info')
 
-            try:self.hosterSources = [value for key, value in self.hosterSources.iteritems()]
-            except:self.hosterSources = [value for key, value in self.hosterSources.items()]
-
             self.debridHosterDuplicates()
 
             try:self.torrentCacheSources = [value for key, value in self.torrentCacheSources.iteritems()]
@@ -838,12 +835,15 @@ class Sources(tools.dialogWindow):
 
         for provider in providers:
             hoster_sources = copy.deepcopy(self.hosterSources)
+            try: hoster_sources = [value for key, value in hoster_sources.iteritems()]
+            except: hoster_sources = [value for key, value in hoster_sources.items()]
             for hoster in self.hosterDomains['premium'][provider]:
                 for file in hoster_sources:
                     if hoster[1].lower() == file['source'].lower() or hoster[0].lower() in str(file['url']).lower():
                         source_list.append(file)
                         source_list[-1]['debrid_provider'] = provider
-
+        try: self.hosterSources = [value for key, value in self.hosterSources.iteritems()]
+        except: self.hosterSources = [value for key, value in self.hosterSources.items()]
         self.hosterSources += source_list
 
     def prem_terminate(self):
@@ -863,19 +863,31 @@ class Sources(tools.dialogWindow):
         type = int(tools.getSetting('preem.type'))
         try:
             if type == 0:
+                try: sources = [value for key, value in self.torrentCacheSources.iteritems()]
+                except: sources = [value for key, value in self.torrentCacheSources.items()]
+
                 # Terminating on Torrents only
-                if len([i for i in self.torrentCacheSources if i['quality'] in prem_resolutions]) >= limit:
+                if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
                     tools.log('Pre-emptively Terminated', 'info')
                     return True
             if type == 1:
+                try: sources = [value for key, value in self.hosterSources.iteritems()]
+                except: sources = [value for key, value in self.hosterSources.items()]
                 # Terminating on Hosters only
-                if len([i for i in self.hosterSources if i['quality'] in prem_resolutions]) >= limit:
+                if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
+                    tools.log('Pre-emptively Terminated', 'info')
                     return True
             if type == 2:
                 # Terminating on both hosters and torrents
+                try:
+                    sources = [value for key, value in self.hosterSources.iteritems()]
+                    sources += [value for key, value in self.torrentCacheSources.iteritems()]
+                except:
+                    sources = [value for key, value in self.hosterSources.items()]
+                    sources += [value for key, value in self.torrentCacheSources.items()]
 
-                if len([i for i in (self.torrentCacheSources + self.hosterSources)
-                        if i['quality'] in prem_resolutions]) >= limit:
+                if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
+                    tools.log('Pre-emptively Terminated', 'info')
                     return True
         except:
             pass

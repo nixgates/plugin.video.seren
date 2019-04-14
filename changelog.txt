@@ -1,3 +1,9 @@
+Changelog 0.2.8:
+Fixed issue with getDebridDuplicates sources crashing getSources Module
+Fixed Pre-emptive termination
+Fixed extra information crashing trakt sync
+Reduced number of threads for initial sync to lessen imapct on device
+
 Changelog 0.2.7:
 Fixed filter function naming
 

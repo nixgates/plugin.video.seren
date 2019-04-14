@@ -39,9 +39,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if str(self.activites['all_activities']) == self.base_date and tools.getSetting('trakt.auth') != '':
             # Increase the amount of concurrent tasks running during initial and Force Sync processes to speed up task
-            from Queue import Queue
-            self.task_queue = Queue(40)
-            self.number_of_threads = 40
             tools.showDialog.textviewer(tools.addonName, tools.lang(40133))
             confirmation = tools.showDialog.yesno(tools.addonName, tools.lang(40134))
 
@@ -249,7 +246,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         insert_list = []
 
-        self.progress_dialog.update(-1, 'Fetching Watched Movies')
+        if not self.silent:
+            self.progress_dialog.update(-1, 'Fetching Watched Movies')
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         trakt_watched = Trakt.TraktAPI().json_response('/sync/watched/movies')
 
@@ -290,7 +288,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def _sync_watched_episodes(self):
 
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
-        self.progress_dialog.update(-1, 'Fetching Watched Episodes')
+        if not self.silent:
+            self.progress_dialog.update(-1, 'Fetching Watched Episodes')
         trakt_watched = Trakt.TraktAPI().json_response('/sync/watched/shows')
         trakt_watched = ['%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
                          for show in trakt_watched for season in show['seasons'] for episode
@@ -305,13 +304,15 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def _sync_unwatched(self):
 
-        self.progress_dialog.update(-1, 'Fetching Unwatched Movies')
+        if not self.silent:
+            self.progress_dialog.update(-1, 'Fetching Unwatched Movies')
         trakt_watched_movies = Trakt.TraktAPI().json_response('sync/watched/movies')
         trakt_watched_movies = [i['movie']['ids']['trakt'] for i in trakt_watched_movies]
         local_watched_movies = movie_sync.get_watched_movies()
         local_watched_movies = [i['trakt_id'] for i in local_watched_movies]
 
-        self.progress_dialog.update(-1, 'Fetching Unwatched Episodes')
+        if not self.silent:
+            self.progress_dialog.update(-1, 'Fetching Unwatched Episodes')
         trakt_watched_episodes = Trakt.TraktAPI().json_response('sync/watched/shows')
         trakt_watched_episodes = ['%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
                                   for show in trakt_watched_episodes for season in show['seasons'] for episode
@@ -331,7 +332,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def _sync_collection_movies(self):
 
         insert_list = []
-        self.progress_dialog.update(01, 'Fetching Collected Movies')
+        if not self.silent:
+            self.progress_dialog.update(01, 'Fetching Collected Movies')
         local_collection = [i['trakt_id'] for i in movie_sync.get_collected_movies()]
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         trakt_collecton = [i['movie']['ids']['trakt'] for i in Trakt.TraktAPI().json_response('sync/collection/movies')]
@@ -358,7 +360,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                             for i in show_sync.get_collected_episodes()]
 
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
-        self.progress_dialog.update(0, 'Fetching Collected Episdoes')
+        if not self.silent:
+            self.progress_dialog.update(0, 'Fetching Collected Episdoes')
         trakt_collection = Trakt.TraktAPI().json_response('sync/collection/shows')
         trakt_collection = ['%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
                             for show in trakt_collection for season in show['seasons'] for episode
@@ -370,13 +373,15 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def _sync_uncollected(self):
 
-        self.progress_dialog.update(0, 'Fetching Uncollected Movies')
+        if not self.silent:
+            self.progress_dialog.update(0, 'Fetching Uncollected Movies')
         trakt_watched_movies = Trakt.TraktAPI().json_response('sync/collected/movies')
         trakt_watched_movies = [i['movie']['ids']['trakt'] for i in trakt_watched_movies]
         local_watched_movies = movie_sync.get_collected_movies()
         local_watched_movies = [i['trakt_id'] for i in local_watched_movies]
 
-        self.progress_dialog.update(0, 'Fetching Uncollected Episodes')
+        if not self.silent:
+            self.progress_dialog.update(0, 'Fetching Uncollected Episodes')
         trakt_watched_episodes = Trakt.TraktAPI().json_response('sync/collected/shows')
         trakt_watched_episodes = ['%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
                                   for show in trakt_watched_episodes for season in show['seasons'] for episode
