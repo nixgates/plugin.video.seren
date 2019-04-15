@@ -7,11 +7,11 @@ from resources.lib.gui import windows
 from resources.lib.modules import database
 from resources.lib.common import maintenance
 
-
 try:
     maintenance.refresh_apis()
 except:
     pass
+
 
 try:
     params = dict(tools.parse_qsl(sys.argv[2].replace('?', '')))
@@ -268,7 +268,6 @@ if action == 'getSources':
             pass
 
 if action == 'preScrape':
-    tools.log('Started Pre-scraping')
     try:
         from resources.lib.modules import getSources
 
@@ -552,31 +551,36 @@ if action == 'cleanInstall':
 
     maintenance.wipe_install()
 
-if action == 'buildPlaylist':
+if action == 'buildPlaylistWorkaround':
 
-    # This is a nasty workaround for Kodi 18 Skin Widgets
+    def get_episode_number(list_item):
+        episode_number = dict(tools.parse_qsl(list_item[0].replace('?', '')))
+        episode_number = int(json.loads(tools.unquote(episode_number['actionArgs']))['episodeInfo']['info']['episode'])
+        return episode_number
+
+    # This is a nasty workaround for Kodi 18 Skins
     import json
     from resources.lib.gui import tvshowMenus
 
     actionArgs = json.loads(tools.unquote(actionArgs))
 
-    try:
-        episode = actionArgs['info_dictionary']['episodeInfo']['info']['episode']
-    except:
-        episode = actionArgs['playlist'][0]['number']
+    season = actionArgs['season']
+    episode = int(actionArgs['episode'])
+    show_id = actionArgs['show_id']
 
-    playlist = tvshowMenus.Menus().episodeListBuilder(actionArgs['playlist'], actionArgs['info_dictionary'],
-                                                      smartPlay=True)
+    season_episodes = tvshowMenus.Menus().episodeListBuilder(show_id, season, smartPlay=True)
+    play_list = []
 
-    for i in playlist:
-        # Confirm that the episode meta we have received from TVDB are for the correct episodes
-        # If trakt provides the incorrect TVDB ID it's possible to begin play from the incorrect episode
-        params = dict(tools.parse_qsl(i[0].replace('?', '')))
-        actionArgs = json.loads(params.get('actionArgs'))
-        if actionArgs['episodeInfo']['info']['episode'] < episode:
-            continue
+    for ep in season_episodes:
+        ep_no = get_episode_number(ep)
+        if ep_no >= episode:
+            play_list.append(ep)
 
         # If the episode is confirmed ok, add it to our playlist.
+    play_list = sorted(play_list, key=lambda i: get_episode_number(i))
+
+    for i in play_list:
+        tools.log(get_episode_number(i))
         tools.playList.add(url=i[0], listitem=i[1])
 
     tools.player().play(tools.playList)

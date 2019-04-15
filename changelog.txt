@@ -1,3 +1,15 @@
+Changelog 0.2.11:
+Fixed Playable flag for mixedEpisodeList
+Fixed Context menu not showing on mixed episode lists
+
+Changelog 0.2.10:
+Fixed issue with incorrect episode playing.
+
+Changelog 0.2.9:
+Added try except for AttributeError on getTorrents/getHoster functions to account for change of variable type
+Fixed Attribute Issue causing cache assist to fail
+Re-added smartplay workaround (fixes playback failed message even when playback was successful)
+
 Changelog 0.2.8:
 Fixed issue with getDebridDuplicates sources crashing getSources Module
 Fixed Pre-emptive termination
