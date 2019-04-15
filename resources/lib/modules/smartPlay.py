@@ -82,46 +82,36 @@ class SmartPlay:
                 tools.playList.add(url=i[0], listitem=i[1])
             return
 
-        season_episodes = tvshowMenus.Menus().episodeListBuilder(self.show_trakt_id, season, smartPlay=True)
-        playlist = []
+        tvshowMenus.Menus().episodeListBuilder(self.show_trakt_id, season, smartPlay=True)
 
         self.window.setText(tools.lang(32097))
         self.window.setProgress(80)
 
-        for ep in season_episodes:
-            path_arguments = dict(tools.parse_qsl(ep[0].replace('?', '')))
-            episode_args = json.loads(tools.unquote(path_arguments['actionArgs']))
-            ep_no = int(episode_args['episodeInfo']['info']['episode'])
-            if ep_no >= episode:
-                playlist.append(ep)
+        actionArgs = tools.quote(json.dumps({'show_id': self.show_trakt_id, 'episode': episode, 'season': season}))
 
-        # actionArgs = {}
-        # actionArgs['playlist'] = playlist
-        # actionArgs['info_dictionary'] = self.info_dictionary
-        # actionArgs = tools.quote(json.dumps(actionArgs))
+        tools.execute('RunPlugin(plugin://plugin.video.%s?action=buildPlaylistWorkaround&actionArgs=%s)' %
+                      (tools.addonName.lower(), actionArgs))
 
-        # # Begin nasty Kodi 18 Skin workaround
         #
-        # tools.execute('RunPlugin(plugin://plugin.video.%s?action=buildPlaylist&actionArgs=%s)' %
-        #               (tools.addonName.lower(), actionArgs))
+        # for ep in season_episodes:
+        #     path_arguments = dict(tools.parse_qsl(ep[0].replace('?', '')))
+        #     episode_args = json.loads(tools.unquote(path_arguments['actionArgs']))
+        #     ep_no = int(episode_args['episodeInfo']['info']['episode'])
+        #     if ep_no >= episode:
+        #         playlist.append(ep)
+        #
+        #
+        # self.window.setText('Starting Playback')
+        # self.window.setProgress(100)
+        #
+        # for i in playlist:
+        #     tools.playList.add(url=i[0], listitem=i[1])
+        #
+        # tools.log('Begining play from Season %s Episode %s' % (season, episode), 'info')
         #
         # self.window.close()
         #
-        # The below code has been commented out due to it breaking on Kodi 18 Widgets a workaround has been implemented
-        # above.
-
-        # playlist = tvshowMenus.Menus().episodeListBuilder(playlist, self.info_dictionary, smartPlay=True)
-        self.window.setText('Starting Playback')
-        self.window.setProgress(100)
-
-        for i in playlist:
-            tools.playList.add(url=i[0], listitem=i[1])
-
-        tools.log('Begining play from Season %s Episode %s' % (season, episode), 'info')
-
-        self.window.close()
-
-        tools.player().play(tools.playList)
+        # tools.player().play(tools.playList)
 
     def get_resume_episode(self):
 

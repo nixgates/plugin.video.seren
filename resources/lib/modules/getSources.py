@@ -213,10 +213,12 @@ class Sources(tools.dialogWindow):
 
             self.debridHosterDuplicates()
 
-            try:self.torrentCacheSources = [value for key, value in self.torrentCacheSources.iteritems()]
+            try: self.torrentCacheSources = [value for key, value in self.torrentCacheSources.iteritems()]
             except: self.torrentCacheSources = [value for key, value in self.torrentCacheSources.items()]
+            try: self.allTorrents = [value for key, value in self.allTorrents.iteritems()]
+            except: self.allTorrents = [value for key, value in self.allTorrents.items()]
 
-            self.build_cache_assist(self.args)
+            self.build_cache_assist()
 
             # Returns empty list if no sources are found, otherwise sort sources
             if len(self.torrentCacheSources) + len(self.hosterSources) == 0:
@@ -274,7 +276,8 @@ class Sources(tools.dialogWindow):
             for torrent in cached_torrents:
                 self.torrentCacheSources.update({torrent['hash']: torrent})
 
-    def build_cache_assist(self, args):
+    def build_cache_assist(self):
+        args = self.args
         if tools.getSetting('general.autocache') == 'false':
             return
         if len(self.allTorrents) == 0:
@@ -289,20 +292,19 @@ class Sources(tools.dialogWindow):
 
             for quality in quality_list:
                 if len(build_list) > 0: break
-                if len([i for i in self.torrentCacheSources if i['quality'] == quality]) == 0:
-                    quality_filter = [i for i in self.allTorrents if i['quality'] == quality]
-                    if len(quality_filter) > 0:
-                        packtype_filter = [i for i in quality_filter if
-                                           i['package'] == 'show' or i['package'] == 'season']
-                        sorted_list = sorted(packtype_filter, key=lambda k: k['seeds'], reverse=True)
-                        if len(sorted_list) > 0:
+                quality_filter = [i for i in self.allTorrents if i['quality'] == quality]
+                if len(quality_filter) > 0:
+                    packtype_filter = [i for i in quality_filter if
+                                       i['package'] == 'show' or i['package'] == 'season']
+                    sorted_list = sorted(packtype_filter, key=lambda k: k['seeds'], reverse=True)
+                    if len(sorted_list) > 0:
+                        build_list.append(sorted_list[0])
+                        break
+                    else:
+                        package_type_list = [i for i in quality_filter if i['package'] == 'single']
+                        sorted_list = sorted(package_type_list, key=lambda k: k['seeds'], reverse=True)
+                        if sorted_list > 0:
                             build_list.append(sorted_list[0])
-                            break
-                        else:
-                            package_type_list = [i for i in quality_filter if i['package'] == 'single']
-                            sorted_list = sorted(package_type_list, key=lambda k: k['seeds'], reverse=True)
-                            if sorted_list > 0:
-                                build_list.append(sorted_list[0])
         else:
             if self.silent is True:
                 return
@@ -446,10 +448,16 @@ class Sources(tools.dialogWindow):
                 cached = TorrentCacheCheck().torrentCacheCheck(torrent_results, info)
 
                 for torrent in cached:
-                    self.torrentCacheSources.update({torrent['hash']: torrent})
+                    try:
+                        self.torrentCacheSources.update({torrent['hash']: torrent})
+                    except AttributeError:
+                        break
 
                 for torrent in torrent_results:
-                    self.allTorrents.update({torrent['hash']: torrent})
+                    try:
+                        self.allTorrents.update({torrent['hash']: torrent})
+                    except AttributeError:
+                        break
 
                 tools.log('%s cache check took %s seconds' % (provider_name, time.time() - start_time))
 
@@ -567,7 +575,10 @@ class Sources(tools.dialogWindow):
             sources = sources1 + sources2
 
             for hoster in sources:
-                self.hosterSources.update({str(hoster['url']): hoster})
+                try:
+                    self.hosterSources.update({str(hoster['url']): hoster})
+                except AttributeError:
+                    break
 
             self.remainingProviders.remove(provider_name.upper())
 

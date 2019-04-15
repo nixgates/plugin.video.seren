@@ -35,6 +35,7 @@ class serenPlayer(tools.player):
         self.args = {}
         self.playback_started = False
         self.scrobbled = False
+        self.playback_resumed = False
 
     def play_source(self, stream_link, args):
 
@@ -264,12 +265,14 @@ class serenPlayer(tools.player):
                 if not self.playback_started:
                     self.start_playback()
 
-                if self.offset is not None and int(self.offset) != 0:
+                if self.offset is not None and int(self.offset) != 0 and self.playback_resumed is False:
                     tools.log("Seeking %s seconds" % self.offset, 'info')
                     self.seekTime(self.offset)
                     self.offset = None
+                    self.playback_resumed = True
                 else:
-                    tools.log("No seeking applied", 'info')
+                    self.playback_resumed = True
+
                 try:
                     position = self.getTime()
                     self.current_time = position

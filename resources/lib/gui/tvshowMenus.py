@@ -662,8 +662,8 @@ class Menus:
                         cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
                                    % (sysaddon, tools.quote(json.dumps(str(item['trakt_object']))))))
 
-                    # if tools.context_addon():
-                    #     cm = []
+                    if tools.context_addon():
+                        cm = []
 
                     if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting('premiumize.pin') != '':
                         cm.append((tools.lang(32068),
@@ -673,7 +673,7 @@ class Menus:
 
                     item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], isFolder=False,
                                                             isPlayable=playable, actionArgs=args, bulk_add=True,
-                                                            set_ids=item['ids']))
+                                                            set_ids=item['ids'], cm=cm))
 
 
                 except:
