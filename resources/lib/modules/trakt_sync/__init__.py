@@ -2,7 +2,6 @@
 
 import threading
 from datetime import datetime
-import json
 
 from resources.lib.common import tools
 from resources.lib.gui import seren_dialog
@@ -181,8 +180,7 @@ class TraktSyncDatabase:
         cursor.close()
 
     def clear_all_meta(self):
-        confirm = tools.showDialog.yesno(tools.addonName, '[COLOR red]WARNING[/COLOR]'
-                                                          '/nThis will reset all meta, are you sure?')
+        confirm = tools.showDialog.yesno(tools.addonName, tools.lang(40139))
         if confirm == 0:
             return
 
@@ -195,9 +193,43 @@ class TraktSyncDatabase:
         cursor.connection.commit()
         cursor.close()
 
+    def clear_specific_meta(self, trakt_object):
+
+        if 'seasons' in trakt_object:
+            show_id = trakt_object['show_id']
+            season_no = trakt_object['seasons'][0]['number']
+            cursor = self._get_cursor()
+            cursor.execute('UPDATE episodes SET kodi_meta=? WHERE show_id=? AND season=?', ('{}', show_id, season_no))
+            cursor.execute('UPDATE seasons SET kodi_meta=? WHERE show_id=? AND season=?', ('{}', show_id, season_no))
+            cursor.connection.commit()
+            cursor.close()
+
+        elif 'shows' in trakt_object:
+            show_id = trakt_object['shows'][0]['ids']['trakt']
+            cursor = self._get_cursor()
+            cursor.execute('UPDATE shows SET kodi_meta=? WHERE trakt_id=?', ('{}', show_id))
+            cursor.execute('UPDATE episodes SET kodi_meta=? WHERE show_id=? ', ('{}', show_id))
+            cursor.execute('UPDATE seasons SET kodi_meta=? WHERE show_id=? ', ('{}', show_id))
+            cursor.connection.commit()
+            cursor.close()
+
+        elif 'episodes' in trakt_object:
+            trakt_id = trakt_object['episodes'][0]['ids']['trakt']
+            cursor = self._get_cursor()
+            cursor.execute('UPDATE episodes SET kodi_meta=? WHERE trakt_id=? ', ('{}', trakt_id))
+            cursor.connection.commit()
+            cursor.close()
+
+        elif 'movies' in trakt_object:
+            trakt_id = trakt_object['movies'][0]['ids']['trakt']
+            cursor = self._get_cursor()
+            cursor.execute('UPDATE movies SET kodi_meta=? WHERE trakt_id=? ', ('{}', trakt_id))
+            cursor.connection.commit()
+            cursor.close()
+
+
     def re_build_database(self):
-        confirm = tools.showDialog.yesno(tools.addonName, '[COLOR red]WARNING[/COLOR]'
-                                                          '/nThis will reset all meta, are you sure?')
+        confirm = tools.showDialog.yesno(tools.addonName, tools.lang(40139))
         if confirm == 0:
             return
 

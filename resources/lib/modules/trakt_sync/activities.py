@@ -88,6 +88,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 traceback.print_exc()
                 pass
 
+            if tools.getSetting('trakt.auth') == '':
+                return
+
             if trakt_sync._requires_update(trakt_activities['all'], self.activites['all_activities']):
 
                 if str(self.activites['all_activities']) != self.base_date:

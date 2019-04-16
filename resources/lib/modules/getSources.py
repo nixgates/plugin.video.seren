@@ -795,7 +795,7 @@ class Sources(tools.dialogWindow):
         simpleInfo['absolute_number'] = str(info['episodeInfo']['info'].get('absoluteNumber', ''))
         simpleInfo['isanime'] = False
 
-        if any(x in i for i in info['showInfo']['info'].get('genre', []) for x in ['anime', 'animation']):
+        if any(x in i.lower() for i in info['showInfo']['info'].get('genre', ['']) for x in ['anime', 'animation']):
             simpleInfo['isanime'] = True
 
         return simpleInfo

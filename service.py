@@ -11,6 +11,8 @@ tools.log('##################  STARTING SERVICE  ######################')
 
 tools.setSetting('general.tempSilent', 'false')
 tools.log('Checking Common API Tokens for refresh')
+if tools.getSetting('general.checkAddonUpdates') == 'true':
+    maintenance.check_for_addon_update()
 maintenance.run_maintenance()
 tools.log('Initial API Checks have completed succesfully')
 monitor = xbmc.Monitor()

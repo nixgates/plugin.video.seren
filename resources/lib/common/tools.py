@@ -673,4 +673,22 @@ def real_debrid_enabled():
     else:
         return False
 
+def italic_string(text):
+    return "[I]%s[/I]" % text
+
 fanart_api_key = getSetting('fanart.apikey')
+
+
+def check_version_numbers(current, new):
+    # Compares version numbers and return True if version is newer
+    current = current.split('.')
+    new = new.split('.')
+    step = 0
+    for i in current:
+        if int(new[step]) > int(i):
+            return True
+        if int(i) == int(new[step]):
+            step += 1
+            continue
+
+    return False

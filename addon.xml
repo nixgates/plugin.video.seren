@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.2.11" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.2.15" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -27,6 +27,25 @@
 			<fanart>temp-fanart.png</fanart>
 		</assets>
 		<news>
+Changelog 0.2.15:
+Fixed genre capitalization
+Fixed clear meta dialog text
+
+Changelog 0.2.14:
+Added ability to clear metadata for individual items using Trakt Manager
+
+Changelog 0.2.13:
+Fixed Movies being marked as un-aired
+Fixed Movie Release Date Meta Information
+Fixed Unaired episodes showing as aired
+
+Changelog 0.2.12:
+Fixed Next menu item for show Years
+Re-added ability for Seren to display un-aired episodes if Hide Unaired is unchecked
+Added automatic checks and prompt for Seren updates
+Force check for episodes in season episode menus if hide unaired is disabled
+Stopped trakt sync from attempting to update user information if user is not authorised with trakt
+
 Changelog 0.2.11:
 Fixed Playable flag for mixedEpisodeList
 Fixed Context menu not showing on mixed episode lists

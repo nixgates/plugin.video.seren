@@ -84,9 +84,15 @@ class TMDBAPI:
                     item['info']['plot'] = item['info']['plotoutline'] = details.get('overview', '')
             except:pass
             try:item['info']['aired'] = details.get('air_date', '')
-            except:pass
+            except:
+                import traceback
+                traceback.print_exc()
+                pass
             try:item['info']['premiered'] = details.get('air_date', '')
-            except:pass
+            except:
+                import traceback
+                traceback.print_exc()
+                pass
             try:item['info']['year'] = int(details.get('air_date','0000')[:4])
             except:pass
             try:item['info']['sortseason'] = str(details.get('season_number', ''))
@@ -202,10 +208,10 @@ class TMDBAPI:
             try:info['tagline'] = details.get('tagline')
             except:pass
 
-            try:info['aired'] = details.get('first_air_date', '')
+            try:info['aired'] = details.get('release_date', '')
             except:pass
 
-            try:info['premiered'] = details.get('first_air_date', '')
+            try:info['premiered'] = details.get('release_date', '')
             except:pass
 
             try:info['plot'] = details.get('overview')
@@ -299,7 +305,7 @@ class TMDBAPI:
             try:info['trailer'] = tools.youtube_url % [i for i in details['videos']['results'] if i['site'] == 'YouTube'][0]['key']
             except:pass
 
-            try:info['genre'] = [str(i['name']) for i in details.get('genres', [])]
+            try:info['genre'] = [str(i['name']).title() for i in details.get('genres', [])]
             except:pass
 
             try:info['duration'] = int(details.get('episode_run_time', '')[0]) * 60

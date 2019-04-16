@@ -6,6 +6,7 @@ from datetime import datetime
 from resources.lib.modules import trakt_sync
 from resources.lib.indexers import trakt
 from resources.lib.indexers import tvdb
+from resources.lib.common import tools
 
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
@@ -119,9 +120,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         season_count = int(show_meta['info']['seasonCount'])
 
         try:
+            if len([i for i in seasons if i['kodi_meta'] == '{}']) > 0:
+                raise Exception
             if len([i for i in seasons if int(i['season']) != 0]) == season_count:
                 seasons = [i for i in seasons if i['kodi_meta'] != '{}']
-                if len(seasons) == 0:
+                if len(seasons) == 0 or len(seasons) != season_count:
                     raise Exception
                 seasons = [ast.literal_eval(season['kodi_meta']) for season in seasons]
                 seasons = [self.get_season_watch_info(season) for season in seasons]
@@ -288,6 +291,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def get_season_episodes(self, show_id, season):
 
         try:
+            if tools.getSetting('general.hideUnAired') == 'false':
+                raise Exception
+
             cursor = self._get_cursor()
             cursor.execute('SELECT * FROM shows WHERE trakt_id=?', (show_id,))
             show_object = cursor.fetchone()
@@ -300,6 +306,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             show_object = ast.literal_eval(show_object['kodi_meta'])
 
             season_episode_count = ast.literal_eval(season_object['kodi_meta'])['info']['episode_count']
+
+            if int(season_episode_count) == 0:
+                raise Exception
 
             if len(season_episodes) < int(season_episode_count):
                 raise Exception

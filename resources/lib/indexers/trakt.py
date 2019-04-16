@@ -235,12 +235,15 @@ class TraktAPI:
         trakt_object = json.loads(tools.unquote(trakt_object))
 
         type = 'Episode'
-
+        tools.log(trakt_object)
         if 'movies' in trakt_object:
             type = 'Movie'
 
         if 'shows' in trakt_object:
             type = 'Show'
+
+        if 'seasons' in trakt_object:
+            type = 'Season'
 
         if trakt_object == None:
             tools.showDialog.notification(tools.addonName,
@@ -248,14 +251,14 @@ class TraktAPI:
 
         dialog_list = ['Add to Collection', 'Remove from Collection', 'Add to Watchlist', 'Remove from Watchlist',
                        'Mark as Watched', 'Mark as Unwatched', 'Add to List', 'Remove From List', 'Hide %s' % type,
-                       'Remove %s Progress' % type]
+                       'Refresh %s Information' % type, 'Remove %s Progress' % type,  ]
 
-        if type == 'Show':
-            dialog_list.pop(9)
+        if type in ['Show', 'Season']:
+            dialog_list.pop(10)
 
         selection = tools.showDialog.select(tools.addonName + ': Trakt Manager', dialog_list)
         thread = None
-
+        tools.log(selection)
         if selection == 0:
             thread = threading.Thread(target=self.addToCollection, args=(trakt_object,))
         elif selection == 1:
@@ -275,6 +278,8 @@ class TraktAPI:
         elif selection == 8:
             self.hideItem(trakt_object)
         elif selection == 9:
+            self.refresh_meta_information(trakt_object)
+        elif selection == 10:
             self.removePlaybackHistory(trakt_object)
         else:
             return
@@ -283,6 +288,11 @@ class TraktAPI:
             thread.start()
 
         return
+
+    def refresh_meta_information(self, trakt_object):
+        from resources.lib.modules import trakt_sync
+        trakt_sync.TraktSyncDatabase().clear_specific_meta(trakt_object)
+        tools.execute('Container.Refresh')
 
     def markWatched(self, trakt_object):
         self.post_request('sync/history', postData=trakt_object)
@@ -300,7 +310,6 @@ class TraktAPI:
             from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
             trakt_object = trakt_object['episodes'][0]
             TraktSyncDatabase().mark_episode_watched_by_id(trakt_object['ids']['trakt'])
-
         if 'movies' in trakt_object:
             from resources.lib.modules.trakt_sync.movies import TraktSyncDatabase
             trakt_object = trakt_object['movies'][0]

@@ -1053,3 +1053,19 @@ msgstr ""
 msgctxt "#40135"
 msgid "Starting Source Select"
 msgstr ""
+
+msgctxt "#40136"
+msgid "A new verison of Seren is available from the repository. Please consider updating to v%s"
+msgstr ""
+
+msgctxt "#40137"
+msgid "Check for Seren updates"
+msgstr ""
+
+msgctxt "#40138"
+msgid "Refresh item's meta information"
+msgstr ""
+
+msgctxt "#40139"
+msgid "[COLOR red]WARNING[/COLOR]\nThis will reset all meta infomration, are you sure?"
+msgstr ""

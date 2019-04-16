@@ -1,9 +1,27 @@
 # -*- coding: utf-8 -*-
 
 import time
+import requests
+import re
+import xbmcaddon
 
 from resources.lib.common import tools
 from resources.lib.modules import customProviders
+
+
+def check_for_addon_update():
+    try:
+        if tools.getSetting('general.checkAddonUpdates') == 'false':
+            return
+        repo_xml = requests.get('https://raw.githubusercontent.com/nixgates/nixgates/master/packages/addons.xml')
+        if not repo_xml.status_code == 200:
+            return
+        repo_version = re.findall(r'<addon id=\"plugin.video.seren\" version=\"(\d*.\d*.\d*)\"', repo_xml.text)[0]
+        local_verison = xbmcaddon.Addon().getAddonInfo('version')
+        if tools.check_version_numbers(local_verison, repo_version):
+            tools.showDialog.ok(tools.addonName, tools.lang(40136) % repo_version)
+    except:
+        pass
 
 
 def update_provider_packages():
