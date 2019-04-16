@@ -175,7 +175,7 @@ class TVDBAPI:
             except:
                 pass
             try:
-                info['genre'] = [genre for genre in trakt_object['genres']]
+                info['genre'] = [genre.title() for genre in trakt_object['genres']]
             except:
                 pass
             try:
@@ -369,9 +369,6 @@ class TVDBAPI:
                     airdate = tools.datetime_workaround(airdate)
                     if airdate is None:
                         return None
-                    if airdate > currentDate:
-                        item['info']['season_title'] = '[I][COLOR red]%s[/COLOR][/I]' % \
-                                                       item['info']['season_title']
             except:
                 return None
                 pass
@@ -486,23 +483,6 @@ class TVDBAPI:
             pass
         try:
             art['landscape'] = art['thumb']
-        except:
-            pass
-
-        try:
-            currentDate = datetime.datetime.today().date()
-            airdate = str(response['firstAired'])
-            if airdate == '':
-                if tools.getSetting('general.hideUnAired') == 'true':
-                    return None
-                info['title'] = '[I][COLOR red]%s[/COLOR][/I]' % info['title']
-            airdate = tools.datetime_workaround(airdate)
-            if airdate is None:
-                return None
-            if airdate > currentDate:
-                if tools.getSetting('general.hideUnAired') == 'true':
-                    return None
-                info['title'] = '[I][COLOR red]%s[/COLOR][/I]' % info['title']
         except:
             pass
 

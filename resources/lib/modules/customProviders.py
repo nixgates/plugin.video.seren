@@ -582,18 +582,7 @@ class providers:
             tools.showDialog.notification(tools.addonName, tools.lang(33017) % package_name)
 
     def check_version_numbers(self, current, new):
-        # Compares version numbers and return True if version is newer
-        current = current.split('.')
-        new = new.split('.')
-        step = 0
-        for i in current:
-            if int(new[step]) > int(i):
-                return True
-            if int(i) == int(new[step]):
-                step += 1
-                continue
-
-        return False
+        return tools.check_version_numbers(current, new)
 
     def manual_update(self):
         update = self.check_for_updates()

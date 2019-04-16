@@ -4,6 +4,7 @@
 	<category label="40001">
 		<setting type="lsep" label="40001" />
 		<setting type="sep" />
+		<setting type="bool" id="general.checkAddonUpdates" default="true" label="40137" />
 		<setting type="enum" id="general.playstyle" label="40002" default="40003" lvalues="40003|40004" />
 		<setting type="enum" id="general.scrapedisplay" label="40127" default="40129" lvalues="40129|40130" />
 		<!--<setting type="enum" id="general.resolvedisplay" label="40128" default="40129" lvalues="40129|40130" /> -->

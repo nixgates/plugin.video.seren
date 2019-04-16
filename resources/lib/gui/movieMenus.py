@@ -298,7 +298,7 @@ class Menus:
             trakt_list = [i['movie'] for i in trakt_list]
 
         self.itemList = TraktSyncDatabase().get_movie_list(trakt_list)
-        print(self.itemList)
+
         self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
         self.itemList = tools.sort_list_items(self.itemList, trakt_list)
 
@@ -306,8 +306,6 @@ class Menus:
 
         for item in self.itemList:
             try:
-                if self.date_delay(item['info']):
-                    continue
 
                 # Add Arguments to pass with item
                 args = {}
@@ -324,6 +322,10 @@ class Menus:
                 args['duration'] = item['info']['duration']
 
                 name = tools.display_string(item['info']['title'])
+
+                if not self.is_aired(item['info']):
+                    name = tools.colorString(name, 'red')
+                    name = tools.italic_string(name)
 
                 args = tools.quote(json.dumps(args))
 
@@ -379,17 +381,22 @@ class Menus:
             for thread in self.threadList:
                 thread.join()
 
-    def date_delay(self, info):
+    def is_aired(self, info):
         try:
+            try:air_date = info['aired']
+            except: air_date = info['premiered']
+
             if tools.getSetting('general.datedelay') == 'true':
-                air_date = info['premiered']
                 air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)
                 air_date += datetime.timedelta(days=1)
-                if air_date > datetime.date.today():
-                    return True
-                else:
-                    return False
             else:
+                air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)
+
+            if air_date > datetime.date.today():
                 return False
+
+            else:
+                return True
         except:
-            return False
+            # Assume an item is aired if we do not have any information on it
+            return True

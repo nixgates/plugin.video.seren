@@ -12,7 +12,6 @@ try:
 except:
     pass
 
-
 try:
     params = dict(tools.parse_qsl(sys.argv[2].replace('?', '')))
 

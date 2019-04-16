@@ -66,6 +66,7 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32007), 'showsPopular&page=1', '', '')
         if tools.getSetting('trakt.auth') is not '':
             tools.addDirectoryItem(tools.lang(32008), 'showsRecommended', '', '')
+        # tools.addDirectoryItem('This Years Most Popular', '', '', '')
         tools.addDirectoryItem(tools.lang(32009), 'showsTrending&page=1', '', '')
         tools.addDirectoryItem(tools.lang(32067), 'showsNew', '', '')
         tools.addDirectoryItem(tools.lang(32010), 'showsPlayed&page=1', '', '')
@@ -432,7 +433,7 @@ class Menus:
             trakt_list = trakt.json_response('shows/popular?years=%s&page=%s' % (year, page))
             self.showListBuilder(trakt_list)
             tools.addDirectoryItem(tools.lang(32019),
-                                   'showYears&actionArgs=%s&page=%s' % (year, page + 1), None, None)
+                                   'showYears&actionArgs=%s&page=%s' % (year, int(page) + 1), None, None)
             tools.closeDirectory('tvshows')
 
 
@@ -461,9 +462,6 @@ class Menus:
                 if hide_specials and int(item['info']['season']) == 0:
                     continue
 
-                if self.date_delay(item['info']):
-                    continue
-
                 args = {'showInfo': {}, 'seasonInfo': {}}
 
                 action = 'seasonEpisodes'
@@ -473,6 +471,11 @@ class Menus:
                 args['seasonInfo']['ids'] = item['ids']
                 item['trakt_object']['show_id'] = item['showInfo']['ids']['trakt']
                 name = item['info']['season_title']
+
+                if not self.is_aired(item['info']):
+                    name = tools.colorString(name, 'red')
+                    name = tools.italic_string(name)
+
                 args = tools.quote(json.dumps(args, sort_keys=True))
             except:
                 import traceback
@@ -523,14 +526,18 @@ class Menus:
                         playable = True
                         action = 'getSources'
 
-                    if self.date_delay(item['info']):
-                        continue
-
                     args['showInfo'] = item['showInfo']
                     args['episodeInfo']['info'] = item['info']
                     args['episodeInfo']['art'] = item['art']
                     args['episodeInfo']['ids'] = item['ids']
                     name = item['info']['title']
+
+                    if not self.is_aired(item['info']):
+                        if tools.getSetting('general.hideUnAired') == 'true':
+                            continue
+                        else:
+                            name = tools.colorString(name, 'red')
+                            name = tools.italic_string(name)
 
                     args = tools.quote(json.dumps(args, sort_keys=True))
 
@@ -618,9 +625,6 @@ class Menus:
                 if hide_watched and item['info']['playcount'] != 0:
                     continue
 
-                if self.date_delay(item['info']):
-                    continue
-
                 cm = []
 
                 try:
@@ -637,6 +641,9 @@ class Menus:
                     args['episodeInfo']['info'] = item['info']
                     args['episodeInfo']['art'] = item['art']
                     args['episodeInfo']['ids'] = item['ids']
+
+                    if not self.is_aired(item['info']):
+                        continue
 
                     name = tools.display_string(item['info']['title'])
 
@@ -725,8 +732,9 @@ class Menus:
                 if info_only == True:
                     return args
 
-                if self.date_delay(item['info']):
-                    continue
+                if not self.is_aired(item['info']):
+                    name = tools.colorString(name, 'red')
+                    name = tools.italic_string(name)
 
                 if 'setCast' in item:
                     set_cast = item['setCast']
@@ -815,18 +823,22 @@ class Menus:
             except:
                 pass
 
-    def date_delay(self, info):
+    def is_aired(self, info):
         try:
+            try:air_date = info['aired']
+            except: air_date = info['premiered']
+
             if tools.getSetting('general.datedelay') == 'true':
-                air_date = info['aired']
                 air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)
                 air_date += datetime.timedelta(days=1)
-                if air_date > datetime.date.today():
-                    print('Skipping %s - %s.%s' % (info['tvshowtitle'], info['season'], info['episode']))
-                    return True
-                else:
-                    return False
             else:
+                air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)
+
+            if air_date > datetime.date.today():
                 return False
+
+            else:
+                return True
         except:
+            # Assume an item is aired if we do not have any information on it or fail to check
             return False
