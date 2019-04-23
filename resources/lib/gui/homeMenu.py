@@ -72,10 +72,10 @@ class Menus:
         tools.closeDirectory('addons')
 
     def traktSyncTools(self):
-        tools.addDirectoryItem('Flush activities', 'flushTraktActivities', None, None, isFolder=False)
-        tools.addDirectoryItem('Force Sync Activites', 'forceTraktSync', None, None, isFolder=False)
-        tools.addDirectoryItem('Clear all meta', 'flushTraktDBMeta', None, None, isFolder=False)
-        tools.addDirectoryItem('Re-Build Database', 'rebuildTraktDatabase', None, None, isFolder=False)
+        tools.addDirectoryItem('Flush Activities', 'flushTraktActivities', None, None, isFolder=False)
+        tools.addDirectoryItem('Force Sync Activities', 'forceTraktSync', None, None, isFolder=False)
+        tools.addDirectoryItem('Clear All Metadata', 'flushTraktDBMeta', None, None, isFolder=False)
+        tools.addDirectoryItem('Rebuild Database', 'rebuildTraktDatabase', None, None, isFolder=False)
         tools.closeDirectory('addons')
 
 
