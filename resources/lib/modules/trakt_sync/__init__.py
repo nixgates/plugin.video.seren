@@ -43,15 +43,63 @@ class TraktSyncDatabase:
         cursor.execute('SELECT * FROM activities WHERE sync_id=1')
         self.activites = cursor.fetchone()
         if self.activites is None:
+            meta = '{}'
+            cursor.execute("UPDATE shows SET kodi_meta=?", (meta,))
+            cursor.execute("UPDATE seasons SET kodi_meta=?", (meta,))
+            cursor.execute("UPDATE episodes SET kodi_meta=?", (meta,))
+            cursor.execute("UPDATE movies SET kodi_meta=?", (meta,))
+
             cursor.execute('INSERT INTO activities(sync_id, all_activities, shows_watched, movies_watched,'
-                           ' movies_collected, shows_collected, hidden_sync, shows_meta_update, movies_meta_update) '
-                           'VALUES(1, ?, ?, ?, ?, ?, ?, ?, ?)',
+                           ' movies_collected, shows_collected, hidden_sync, shows_meta_update, movies_meta_update,'
+                           'seren_version) '
+                           'VALUES(1, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                            (self.base_date, self.base_date, self.base_date, self.base_date, self.base_date,
-                            self.base_date, self.base_date, self.base_date))
+                            self.base_date, self.base_date, self.base_date, tools.addonVersion))
             cursor.connection.commit()
             cursor.execute('SELECT * FROM activities WHERE sync_id=1')
             self.activites = cursor.fetchone()
         cursor.close()
+
+        if self.activites is not None:
+            self._check_database_version()
+
+    def _check_database_version(self):
+
+        # If we are updating from a database prior to database versioning, we must clear the meta data
+
+        if 'seren_version' not in self.activites:
+            tools.log('Upgrading Trakt Sync Database Version')
+            self.clear_all_meta(False)
+            cursor = self._get_cursor()
+            cursor.execute('ALTER TABLE activities ADD COLUMN seren_version TEXT')
+            cursor.execute('UPDATE activities SET seren_version = ?', (tools.addonVersion,))
+            cursor.connection.commit()
+            cursor.close()
+            return
+
+        # If you make changes to the required meta in any indexer that is cached in this database
+        # You will need to update the below version number to match the new addon version
+        # This will ensure that the metadata required for operations is available
+
+        last_meta_update = '0.2.19'
+
+        if tools.check_version_numbers(self.activites['seren_version'], last_meta_update):
+            tools.log('Upgrading Trakt Sync Database Version')
+            self.clear_all_meta(False)
+            cursor = self._get_cursor()
+            cursor.execute('UPDATE activities SET seren_version=?', (tools.addonVersion,))
+            cursor.connection.commit()
+            cursor.close()
+            return
+
+        if tools.check_version_numbers(tools.addonVersion, self.activites['seren_version']):
+            tools.log('Downgrading Trakt Sync Database Version')
+            self.clear_all_meta(False)
+            cursor = self._get_cursor()
+            cursor.execute('UPDATE activities SET seren_version=?', (tools.addonVersion,))
+            cursor.connection.commit()
+            cursor.close()
+            return
 
     def _build_show_table(self):
         cursor = self._get_cursor()
@@ -124,7 +172,8 @@ class TraktSyncDatabase:
                        'movies_collected TEXT NOT NULL, '
                        'hidden_sync TEXT NOT NULL,'
                        'shows_meta_update TEXT NOT NULL,'
-                       'movies_meta_update TEXT NOT NULL) '
+                       'movies_meta_update TEXT NOT NULL,'
+                       'seren_version TEXT NOT NULL) '
                        )
         cursor.connection.commit()
         cursor.close()
@@ -174,15 +223,17 @@ class TraktSyncDatabase:
             self.task_len -= 1
 
     def flush_activities(self):
+        self.clear_all_meta()
         cursor = self._get_cursor()
         cursor.execute('DROP TABLE activities')
         cursor.connection.commit()
         cursor.close()
 
-    def clear_all_meta(self):
-        confirm = tools.showDialog.yesno(tools.addonName, tools.lang(40139))
-        if confirm == 0:
-            return
+    def clear_all_meta(self, notify=True):
+        if notify:
+            confirm = tools.showDialog.yesno(tools.addonName, tools.lang(40139))
+            if confirm == 0:
+                return
 
         meta = '{}'
         cursor = self._get_cursor()
@@ -236,7 +287,7 @@ class TraktSyncDatabase:
         cursor = self._get_cursor()
         cursor.execute('DROP TABLE shows')
         cursor.execute('DROP TABLE seasons')
-        cursor.execute('DROP TABLE sepisodes')
+        cursor.execute('DROP TABLE episodes')
         cursor.execute('DROP TABLE movies')
         cursor.execute('DROP TABLE activities')
         cursor.execute('DROP TABLE hidden')
@@ -262,7 +313,7 @@ def _bring_out_your_dead(population):
 
 def _utc_now_as_trakt_string():
     date = datetime.utcnow()
-    return date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+    return date.strftime(tools.trakt_gmt_format)
 
 
 def _strf_local_date(datetime_object):
@@ -270,11 +321,11 @@ def _strf_local_date(datetime_object):
 
 
 def _parse_local_date_format(datestring):
-    return tools.datetime_workaround(datestring, '%Y-%m-%dT%H:%M:%S', date_only=False)
+    return tools.datetime_workaround(datestring, tools.trakt_gmt_format.strip('.000Z'), date_only=False)
 
 
 def _requires_update(new_date, old_date):
-    if tools.datetime_workaround(new_date, '%Y-%m-%dT%H:%M:%S.000Z', False) > \
+    if tools.datetime_workaround(new_date, tools.trakt_gmt_format, False) > \
             tools.datetime_workaround(old_date, '%Y-%m-%dT%H:%M:%S', False):
         return True
     else:

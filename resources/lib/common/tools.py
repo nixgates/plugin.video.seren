@@ -11,6 +11,7 @@ import datetime
 import _strptime
 import time
 import ast
+from dateutil import tz
 
 try:
     from urlparse import parse_qsl, parse_qs, unquote, urlparse
@@ -39,6 +40,8 @@ tv_sema = threading.Semaphore(tv_semaphore)
 tvdb_refreshing = False
 
 tvdb_refresh = ''
+
+trakt_gmt_format = '%Y-%m-%dT%H:%M:%S.000Z'
 
 viewTypes = {
     'Default': 50,
@@ -223,6 +226,8 @@ dialogWindow = kodiGui.WindowDialog
 
 addon = xbmcaddon.Addon
 
+addonVersion = addon().getAddonInfo('version')
+
 progressDialog = xbmcgui.DialogProgress()
 
 bgProgressDialog = xbmcgui.DialogProgressBG
@@ -287,8 +292,8 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
             item.setProperty('TotalEpisodes', str(info['episode_count']))
         if 'WatchedEpisodes' in info:
             item.setProperty('WatchedEpisodes', str(info['WatchedEpisodes']))
-        if 'seasonCount' in info:
-            item.setProperty('TotalSeasons', str(info['seasonCount']))
+        if 'season_count' in info:
+            item.setProperty('TotalSeasons', str(info['season_count']))
     except:
         pass
 
@@ -312,7 +317,7 @@ def clean_info_keys(info_dict):
 
     keys_to_pop = ['UnWatchedEpisodes', 'episode_count', 'unwatchedepisodes', 'WatchedEpisodes',
                    'seasonCount', 'episodeCount', 'showaliases', 'absoluteNumber', 'no_seasons', 'season_title',
-                   'overview']
+                   'overview', 'aired_episodes', 'season_count', 'aliases']
 
     for i in keys_to_pop:
         try:
@@ -346,6 +351,8 @@ def get_view_type(contentType):
     viewType = 'Default'
 
     try:
+        if contentType == 'addons':
+            viewType = getSetting('addon.view')
         if contentType == 'tvshows':
             viewType = getSetting('show.view')
         if contentType == 'movies':
@@ -358,6 +365,8 @@ def get_view_type(contentType):
         viewType = viewTypes[viewType]
 
         if getSetting('general.viewidswitch') == 'true':
+            if contentType == 'addons':
+                viewType = getSetting('addon.view.id')
             if contentType == 'tvshows':
                 viewType = getSetting('show.view.id')
             if contentType == 'movies':
@@ -430,7 +439,7 @@ def colorString(text, color=None):
 
     if color is 'default' or color is '' or color is None:
         color = getSetting('general.textColor')
-        if color is '':
+        if color == '' or color == 'None':
             color = 'deepskyblue'
 
     return '[COLOR %s]%s[/COLOR]' % (color, text)
@@ -519,13 +528,13 @@ def copy2clip(txt):
 EPOCH_DATETIME = datetime.datetime(1970, 1, 1)
 SECONDS_PER_DAY = 24 * 60 * 60
 
-
-def utc_to_local_datetime(utc_datetime):
-    delta = utc_datetime - EPOCH_DATETIME
-    utc_epoch = SECONDS_PER_DAY * delta.days + delta.seconds
-    time_struct = time.localtime(utc_epoch)
-    dt_args = time_struct[:6] + (delta.microseconds,)
-    return datetime.datetime(*dt_args)
+#
+# def utc_to_local_datetime(utc_datetime):
+#     delta = utc_datetime - EPOCH_DATETIME
+#     utc_epoch = SECONDS_PER_DAY * delta.days + delta.seconds
+#     time_struct = time.localtime(utc_epoch)
+#     dt_args = time_struct[:6] + (delta.microseconds,)
+#     return datetime.datetime(*dt_args)
 
 
 def datetime_workaround(string_date, format="%Y-%m-%d", date_only=True):
@@ -543,6 +552,38 @@ def datetime_workaround(string_date, format="%Y-%m-%d", date_only=True):
             res = datetime.datetime(*(time.strptime(string_date, format)[0:6]))
 
     return res
+
+def gmt_to_local(gmt_string, format=None, date_only=False):
+
+    local_timezone = tz.tzlocal()
+    gmt_timezone = tz.gettz('GMT')
+    if format is None:
+        format = trakt_gmt_format
+    GMT = datetime_workaround(gmt_string, format, date_only)
+    GMT = GMT.replace(tzinfo=gmt_timezone)
+    GMT = GMT.astimezone(local_timezone)
+    return GMT.strftime(format)
+
+def clean_air_dates(info):
+
+    try:
+        air_date = info.get('premiered')
+        if air_date != '' and air_date is not None:
+            info['aired'] = gmt_to_local(info['aired'])[:10]
+    except KeyError:
+        pass
+    except:
+        info['aired'] = info['aired'][:10]
+    try:
+        air_date = info.get('premiered')
+        if air_date != '' and air_date is not None:
+            info['premiered'] = gmt_to_local(info['premiered'])[:10]
+    except KeyError:
+        pass
+    except:
+        info['premiered'] = info['premiered'][:10]
+
+    return info
 
 
 def shortened_debrid(debrid):
@@ -680,7 +721,7 @@ fanart_api_key = getSetting('fanart.apikey')
 
 
 def check_version_numbers(current, new):
-    # Compares version numbers and return True if version is newer
+    # Compares version numbers and return True if new version is newer
     current = current.split('.')
     new = new.split('.')
     step = 0
@@ -692,3 +733,4 @@ def check_version_numbers(current, new):
             continue
 
     return False
+

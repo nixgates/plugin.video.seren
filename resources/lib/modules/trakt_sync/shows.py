@@ -89,7 +89,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         watched_show_ids = list(set([episode['show_id'] for episode in cursor.fetchall()]))
         shows = []
         for i in watched_show_ids:
-            shows.append(cursor.execute('SELECT * FROM shows WHERE trakt_id=?', (i,)).fetchone())
+            show = cursor.execute('SELECT * FROM shows WHERE trakt_id=?', (i,)).fetchone()
+            show['kodi_meta'] = ast.literal_eval(show['kodi_meta'])
+            shows.append(show)
 
         return shows
 
@@ -117,7 +119,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         cursor.execute('SELECT* FROM seasons WHERE show_id = ?', (show_id,))
         seasons = cursor.fetchall()
         cursor.close()
-        season_count = int(show_meta['info']['seasonCount'])
+        season_count = int(show_meta['info']['season_count'])
 
         try:
             if len([i for i in seasons if i['kodi_meta'] == '{}']) > 0:
@@ -133,7 +135,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             # We likely haven't built the meta information yet
             pass
 
-        for season in range(int(show_meta['info']['seasonCount']) + 1):
+        for season in range(int(show_meta['info']['season_count']) + 1):
             self.threads.append(threading.Thread(target=self.get_single_season, args=(show_meta['ids']['trakt'],
                                                                                       season, True)))
 
@@ -304,20 +306,21 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             cursor.close()
 
             show_object = ast.literal_eval(show_object['kodi_meta'])
-
-            season_episode_count = ast.literal_eval(season_object['kodi_meta'])['info']['episode_count']
+            season_meta = ast.literal_eval(season_object['kodi_meta'])
+            season_episode_count = season_meta['info']['episode_count']
+            season_aired_count = season_meta['info']['aired_episodes']
 
             if int(season_episode_count) == 0:
                 raise Exception
 
-            if len(season_episodes) < int(season_episode_count):
+            if len(season_episodes) < int(season_aired_count):
+                raise Exception
+
+            if len([i for i in season_episodes if i['kodi_meta'] == '{}']) > 0:
                 raise Exception
 
             for episode in season_episodes:
                 episode['kodi_meta'] = ast.literal_eval(episode['kodi_meta'])
-
-            if len([i for i in season_episodes if i['kodi_meta'] == {}]) > 0:
-                raise Exception
 
             for episode in season_episodes:
                 episode = self.update_episode_playcount(episode)
@@ -383,15 +386,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def get_show_watched_info(self, show_meta):
 
-        play_count = 0
         try:
             episodes = self._get_show_episodes(show_meta['ids']['trakt'])
-            aired_episodes = int(show_meta['info']['episodeCount'])
+            aired_episodes = int(show_meta['info']['episode_count'])
 
             play_count = len([episode for episode in episodes if int(episode['season']) != 0
                               and episode['watched'] == 1])
             show_meta['info']['WatchedEpisodes'] = play_count
-            show_meta['info']['UnWatchedEpisodes'] = int(show_meta['info']['episodeCount']) - play_count
+            show_meta['info']['UnWatchedEpisodes'] = int(show_meta['info']['episode_count']) - play_count
             if play_count < aired_episodes:
                 play_count = 0
             else:
@@ -442,28 +444,48 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def get_season_watch_info(self, season_meta):
 
         try:
-            play_count = 0
-            if int(season_meta['info']['episode_count']) == 0:
-                season_meta['info']['playcount'] = play_count
-                return season_meta
-
-            show_id = season_meta['showInfo']['ids']['trakt']
-            season_no = season_meta['info']['season']
-            cursor = self._get_cursor()
-            cursor.execute('SELECT * FROM episodes WHERE watched=1 AND season=? AND show_id=?',
-                           (season_no, show_id))
-            episodes = cursor.fetchall()
-
-            if len(episodes) < int(season_meta['info']['episode_count']):
+            if int(season_meta['info']['aired_episodes']) != 0:
                 play_count = 0
-            else:
-                play_count = 1
+                if int(season_meta['info']['episode_count']) == 0:
+                    season_meta['info']['playcount'] = play_count
+                    season_meta['info']['WatchedEpisodes'] = 0
+                    season_meta['info']['UnWatchedEpisodes'] = 0
+                    return season_meta
 
-            season_meta['info']['playcount'] = play_count
-            season_meta['info']['WatchedEpisodes'] = len(episodes)
-            season_meta['info']['UnWatchedEpisodes'] = int(season_meta['info']['episode_count']) - len(episodes)
+                show_id = season_meta['showInfo']['ids']['trakt']
+                season_no = season_meta['info']['season']
+                cursor = self._get_cursor()
+                cursor.execute('SELECT * FROM episodes WHERE watched=1 AND season=? AND show_id=?',
+                               (season_no, show_id))
+                episodes = cursor.fetchall()
+                cursor.close()
+
+                tools.log('Show ID: %s - Season: %s - Aired Episodes: %s - Total Episodes: %s - Watched: %s' %
+                          (show_id,
+                           season_meta['info']['season_title'],
+                           season_meta['info']['aired_episodes'],
+                           season_meta['info']['episode_count'],
+                           len(episodes)))
+
+                if len(episodes) < int(season_meta['info']['aired_episodes']):
+                    play_count = 0
+                else:
+                    play_count = 1
+
+                season_meta['info']['playcount'] = play_count
+                season_meta['info']['WatchedEpisodes'] = len(episodes)
+                season_meta['info']['UnWatchedEpisodes'] = int(season_meta['info']['aired_episodes']) - len(episodes)
+            else:
+                season_meta['info']['playcount'] = 0
+                season_meta['info']['WatchedEpisodes'] = 0
+                season_meta['info']['UnWatchedEpisodes'] = 0
+
             return season_meta
         except:
+            if 'info' in season_meta:
+                season_meta['info']['playcount'] = 0
+                season_meta['info']['WatchedEpisodes'] = 0
+                season_meta['info']['UnWatchedEpisodes'] = 0
             return season_meta
 
     def get_single_episode(self, show_id, season, episode, list_mode=False, get_meta=True,

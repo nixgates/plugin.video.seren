@@ -50,6 +50,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return
         try:
 
+            if str(self.activites['all_activities']) != self.base_date:
+                self.silent = True
+
+            if not self.silent:
+                self.progress_dialog = tools.bgProgressDialog()
+                self.progress_dialog.create(tools.addonName + 'Sync', 'Seren: Trakt Sync')
+
             ############################################################################################################
             # CHECK FOR META REFRESH
             ############################################################################################################
@@ -61,7 +68,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     self._update_activity_record('shows_meta_update', update_time)
                 else:
                     local_date = trakt_sync._parse_local_date_format(self.activites['shows_meta_update'])
-                    local_date = local_date + timedelta(hours=12)
+                    local_date = local_date + timedelta(hours=2)
                     now = trakt_sync._utc_now_as_trakt_string()
                     local_date = trakt_sync._strf_local_date(local_date)
                     if trakt_sync._requires_update(now, local_date):
@@ -77,7 +84,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     self._update_activity_record('movies_meta_update', update_time)
                 else:
                     local_date = trakt_sync._parse_local_date_format(self.activites['movies_meta_update'])
-                    local_date = local_date + timedelta(hours=12)
+                    local_date = local_date + timedelta(hours=2)
                     now = trakt_sync._utc_now_as_trakt_string()
                     local_date = trakt_sync._strf_local_date(local_date)
                     if trakt_sync._requires_update(now, local_date):
@@ -93,12 +100,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
             if trakt_sync._requires_update(trakt_activities['all'], self.activites['all_activities']):
 
-                if str(self.activites['all_activities']) != self.base_date:
-                    self.silent = True
 
-                if not self.silent:
-                    self.progress_dialog = tools.bgProgressDialog()
-                    self.progress_dialog.create(tools.addonName + 'Sync', 'Seren: Trakt Sync')
                 ########################################################################################################
                 # SYNC HIDDEN ITEMS
                 ########################################################################################################
@@ -180,9 +182,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
                 self._update_activity_record('all_activities', update_time)
 
-                if self.progress_dialog is not None:
-                    self.progress_dialog.close()
-                    self.progress_dialog = None
+            if self.progress_dialog is not None:
+                self.progress_dialog.close()
+                self.progress_dialog = None
         except:
             try:
                 if self.progress_dialog is not None:
@@ -266,6 +268,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         movie_tasks = len(insert_list)
 
         if movie_tasks == 0:
+            self._update_activity_record('movies_watched', update_time)
             return
 
         inserted_tasks = 0
@@ -408,7 +411,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         trakt_api = Trakt.TraktAPI()
         updated_item = []
         url = '%s/updates/%s?page=%s'
-
+        if not self.silent:
+            self.progress_dialog.update(0, 'Clearing Outdated %s Metadata' % type[:-1].title())
         updates = trakt_api.json_response(url % (type, last_update[:10], 1), limitOverride=500, limit=True)
 
         for item in updates:
@@ -418,6 +422,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             updated_item.append(item_id)
 
         for i in range(2, int(trakt_api.response_headers['X-Pagination-Page-Count']) + 1):
+            progress = (i / (int(trakt_api.response_headers['X-Pagination-Page-Count']) + 1)) * 100
+            self.progress_dialog.update(progress)
             updates = trakt_api.json_response(url % (type, last_update[:10], i), limitOverride=500, limit=True)
             for item in updates:
                 if not trakt_sync._requires_update(item['updated_at'], last_update):

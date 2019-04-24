@@ -235,7 +235,7 @@ class TraktAPI:
         trakt_object = json.loads(tools.unquote(trakt_object))
 
         type = 'Episode'
-        tools.log(trakt_object)
+
         if 'movies' in trakt_object:
             type = 'Movie'
 
@@ -245,20 +245,25 @@ class TraktAPI:
         if 'seasons' in trakt_object:
             type = 'Season'
 
+        hide_type = 'Show'
+
+        if type == 'Movie':
+            hide_type == 'Movie'
+
         if trakt_object == None:
             tools.showDialog.notification(tools.addonName,
                                           'There may be an issue with the Trakt service, please clear cache and wait')
 
         dialog_list = ['Add to Collection', 'Remove from Collection', 'Add to Watchlist', 'Remove from Watchlist',
-                       'Mark as Watched', 'Mark as Unwatched', 'Add to List', 'Remove From List', 'Hide %s' % type,
-                       'Refresh %s Information' % type, 'Remove %s Progress' % type,  ]
+                       'Mark as Watched', 'Mark as Unwatched', 'Add to List', 'Remove From List', 'Hide %s' % hide_type,
+                       'Refresh %s Metadata' % type, 'Remove %s Progress' % type]
 
         if type in ['Show', 'Season']:
             dialog_list.pop(10)
 
         selection = tools.showDialog.select(tools.addonName + ': Trakt Manager', dialog_list)
         thread = None
-        tools.log(selection)
+
         if selection == 0:
             thread = threading.Thread(target=self.addToCollection, args=(trakt_object,))
         elif selection == 1:
@@ -417,9 +422,10 @@ class TraktAPI:
         self.json_response('users/hidden/%s' % section, postData=trakt_object)
 
         if 'movies' in trakt_object:
-            TraktSyncDatabase().add_hidden_item(trakt_object['movies']['ids']['trakt'], 'movie', section)
+            TraktSyncDatabase().add_hidden_item(trakt_object['movies'][0]['ids']['trakt'], 'movie', section)
         if 'shows' in trakt_object:
-            TraktSyncDatabase().add_hidden_item(trakt_object['shows']['ids']['trakt'], 'show', section)
+            TraktSyncDatabase().add_hidden_item(trakt_object['shows'][0]['ids']['trakt'], 'show', section)
+
         tools.showDialog.notification(tools.addonName,
                                       'Item has been hidden from your %s' % sections_display[selection])
 
@@ -523,7 +529,7 @@ class TraktAPI:
         arguments = json.loads(tools.unquote(arguments))
         media_type = arguments['type']
         username = tools.quote_plus(arguments['username'])
-        url = 'users/%s/lists/%s/items/%s?extended=full' % (username, arguments['trakt_id'], media_type)
+        url = 'users/%s/lists/%s/items/%s' % (username, arguments['trakt_id'], media_type)
         list_items = database.get(self.json_response, 12, url, None, False)
 
         if list_items is None or len(list_items) == 0:

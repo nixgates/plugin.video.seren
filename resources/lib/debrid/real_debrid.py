@@ -271,7 +271,7 @@ class RealDebrid:
                         continue
                     else:
                         key_list.append(key)
-                        if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename) for
+                        if any(episodeString in source_utils.cleanTitle(filename) for
                                episodeString in episodeStrings):
                             file_inside = True
 

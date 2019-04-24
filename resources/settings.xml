@@ -11,7 +11,7 @@
 		<setting type="enum" id="general.sourceselect" label="40005" default="40006" lvalues="40007|40006" />
 		<!--<setting type="bool" subsetting="true" id="general.autoselect" label="40131" defaul="false" />-->
 		<!--<setting type="slider" id="general.autoselectTime" option="int" default="10" range="1,1,20" subsetting="true" label="40132" visible="eq(-1,true)" />-->
-		<setting type="bool" id="general.datedelay" label="40116" default="true" />
+		<setting type="bool" id="general.datedelay" label="40116" default="false" />
 		<setting type="lsep" label="40008" />
 		<setting type="sep" />
 		<setting type="bool" id="general.hideSpecials" label="40125" default="false" />
@@ -24,14 +24,16 @@
 		<setting id="item.limit" type="slider" label="40014" default="40" range="10, 100" option="int" />
         <setting id="general.setViews" type="bool" label="40084" default="true" />
         <setting id="general.viewidswitch" subsetting='true' label="40015" default="false" type="bool" visible="eq(-1,true)"/>
-        <setting id="movie.view" type="select" subsetting="true" label="40016" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-1,false) + eq(-2,true)" />
-        <setting id="movie.view.id" type="number" subsetting="true" label="40017" default="" visible="eq(-2,true) + eq(-3,true)"/>
-        <setting id="show.view" type="select" label="40018" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-3,false) + eq(-4,true)" />
-        <setting id="show.view.id" type="number" label="40019" default="" subsetting="true" visible="eq(-4,true) + eq(-5,true)"/>
-        <setting id="episode.view" type="select" label="40020" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-5,false) + eq(-6,true)" />
-        <setting id="episode.view.id" type="number" label="40021" default="" subsetting="true" visible="eq(-6,true) + eq(-7,true)"/>
-        <setting id="season.view" type="select" label="40022" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" subsetting="true" visible="eq(-7,false) + eq(-8,true)"/>
-        <setting id="season.view.id" type="number" label="40023" default="" visible="eq(-8,true) + eq(-9,true)" subsetting="true"/>
+		<setting id="addon.view" type="select" subsetting="true" label="40144" default="Wide List" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' visible="eq(-1,false) + eq(-2,true)" />
+		<setting id="addon.view.id" type="number" subsetting="true" label="40145" default="" visible="eq(-2,true) + eq(-3,true)"/>
+		<setting id="movie.view" type="select" subsetting="true" label="40016" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-3,false) + eq(-4,true)" />
+        <setting id="movie.view.id" type="number" subsetting="true" label="40017" default="" visible="eq(-4,true) + eq(-5,true)"/>
+        <setting id="show.view" type="select" label="40018" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-5,false) + eq(-6,true)" />
+        <setting id="show.view.id" type="number" label="40019" default="" subsetting="true" visible="eq(-6,true) + eq(-7,true)"/>
+        <setting id="episode.view" type="select" label="40020" subsetting="true" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" visible="eq(-7,false) + eq(-8,true)" />
+        <setting id="episode.view.id" type="number" label="40021" default="" subsetting="true" visible="eq(-8,true) + eq(-9,true)"/>
+        <setting id="season.view" type="select" label="40022" values='Default|Poster|Icon Wall|Shift|Info Wall|Wide List|Wall|Banner|Fanart' default="Wide List" subsetting="true" visible="eq(-9,false) + eq(-10,true)"/>
+        <setting id="season.view.id" type="number" label="40023" default="" visible="eq(-10,true) + eq(-11,true)" subsetting="true"/>
         <setting id="general.textColorSelect" type="action" label="40024" option="close" action="RunPlugin(plugin://plugin.video.seren/?action=colorPicker)" />
         <setting id="general.appendtitles" type="bool" label="40086" default="true" />
 		<setting type="text" label="40025" enable="false" id="general.displayColor" default="None" />
@@ -62,6 +64,7 @@
 		<setting id="general.tempSilent" type="text" visible="hidden" default="false" />
 		<setting id="general.rdexpirycheck" type="text" visible="hidden" default="" />
 		<setting id="general.pmexpirycheck" type="text" visible="hidden" default="" />
+		<setting id="general.textColor" type="text" default="" visible="false" />
 		<setting id="general.fake" type="text" visible="hidden" default="" />
 		<!-- END HIDDEN SETTINGS -->
 	</category>
@@ -102,8 +105,9 @@
 		<setting id="premiumize.pin" type="text" default="" subsetting="true" label="40106"  visible="eq(-2,true)"/>
 		<setting id="premiumize.transcoded" type="bool" default="false" subsetting="true" label="40105" visible="eq(-3,true)" />
 		<setting id="premiumize.torrents" type="bool" default="true" subsetting="true" label="40100" visible="eq(-4,true)" />
-		<setting id="premiumize.hosters" type="bool" default="true" subsetting="true" label="40101" visible="eq(-5,true)" />
-		<setting id="premiumize.autodelete" type="bool" default="true" subsetting="true" label="40104" visible="eq(-6,true)" />
+		<setting id="premiumize.addToCloud" type="bool" default="false" subsetting="true" label="40143" visible="eq(-1,true)" />
+		<setting id="premiumize.hosters" type="bool" default="true" subsetting="true" label="40101" visible="eq(-6,true)" />
+		<setting id="premiumize.autodelete" type="bool" default="true" subsetting="true" label="40104" visible="eq(-7,true)" />
 		<setting id="premiumize.threshold" type="slider" subsetting="true" label="40103" default="50" range="20, 10, 70" option="percent" visible="eq(-7,true)"/>
 		<setting type="lsep" label="40067" />
 		<setting type="sep" />

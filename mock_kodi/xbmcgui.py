@@ -387,7 +387,8 @@ class Dialog(object):
         return action
 
     def textviewer(self, heading, text):
-        tkMessageBox.showinfo(heading, text)
+        print(heading)
+        print(text)
 
     def yesno(self, heading, line1, line2="", line3="", nolabel="No", yeslabel="Yes", autoclose=False):
         print('')
@@ -689,7 +690,7 @@ class WindowDialog:
 
     def console_show(self):
         while not self.stop_display:
-            print([k for i in self.info for k in i])
+            print([k for i in self.info for k in i if 'xbmcgui' not in str(k)])
             time.sleep(1)
 
     def close(self):

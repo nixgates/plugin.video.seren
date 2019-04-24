@@ -349,7 +349,7 @@ class TMDBAPI:
             try:info['mpaa'] = [i['rating'] for i in details['content_ratings']['results'] if i['iso_3166_1'] == 'US'][0]
             except:pass
 
-            try:info['seasonCount'] = details.get('number_of_seasons', '')
+            try:info['season_count'] = details.get('number_of_seasons', '')
             except:return None
 
             try:info['tag'] = [i['name'] for i in details['keywords']['results']]

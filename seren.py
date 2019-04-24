@@ -164,6 +164,10 @@ if action == 'revokeTrakt':
 
 if action == 'getSources':
     try:
+        if tools.playList.getposition() == 0 and not tools.premiumize_enabled() and not tools.real_debrid_enabled():
+            tools.showDialog.ok(tools.addonName, tools.lang(40146), tools.lang(40147))
+            sys.exit()
+
         if tools.playList.getposition() == 0 and tools.getSetting('general.scrapedisplay') == '0':
             display_background = True
         else:
@@ -552,14 +556,15 @@ if action == 'cleanInstall':
 
 if action == 'buildPlaylistWorkaround':
 
+    import json
+    from resources.lib.gui import tvshowMenus
+
     def get_episode_number(list_item):
         episode_number = dict(tools.parse_qsl(list_item[0].replace('?', '')))
         episode_number = int(json.loads(tools.unquote(episode_number['actionArgs']))['episodeInfo']['info']['episode'])
         return episode_number
 
     # This is a nasty workaround for Kodi 18 Skins
-    import json
-    from resources.lib.gui import tvshowMenus
 
     actionArgs = json.loads(tools.unquote(actionArgs))
 
@@ -567,19 +572,19 @@ if action == 'buildPlaylistWorkaround':
     episode = int(actionArgs['episode'])
     show_id = actionArgs['show_id']
 
-    season_episodes = tvshowMenus.Menus().episodeListBuilder(show_id, season, smartPlay=True)
+    season_episodes = tvshowMenus.Menus().episodeListBuilder(show_id, season, smartPlay=True, hide_unaired=True)
     play_list = []
 
     for ep in season_episodes:
         ep_no = get_episode_number(ep)
         if ep_no >= episode:
+            tools.log(ep_no)
             play_list.append(ep)
 
         # If the episode is confirmed ok, add it to our playlist.
     play_list = sorted(play_list, key=lambda i: get_episode_number(i))
 
     for i in play_list:
-        tools.log(get_episode_number(i))
         tools.playList.add(url=i[0], listitem=i[1])
 
     tools.player().play(tools.playList)

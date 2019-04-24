@@ -47,7 +47,8 @@ def post_url(url, data):
         return
     url = BaseUrl + url
     data['apikey'] = CustomerPin
-    req = requests.post(url, data=data).text
+    req = requests.post(url, data=data)
+    req = req.text
     return json.loads(req)
 
 
@@ -180,10 +181,21 @@ class PremiumizeFunctions(PremiumizeBase):
 
         if tools.getSetting('premiumize.transcoded') == 'true':
             if selectedFile['transcode_status'] == 'finished':
+                try:
+                    if selectedFile['stream_link'] is not None and tools.getSetting('premiumize.addToCloud') == 'true':
+                        transfer = self.create_transfer(magnet)
+                        database.add_premiumize_transfer(transfer['id'])
+                except:
+                    pass
                 return selectedFile['stream_link']
             else:
                 pass
-
+        try:
+            if selectedFile['link'] is not None and tools.getSetting('premiumize.addToCloud') == 'true':
+                transfer = self.create_transfer(magnet)
+                database.add_premiumize_transfer(transfer['id'])
+        except:
+            pass
         return selectedFile['link']
 
     def magnetToStream(self, magnet, args, pack_select):
@@ -192,7 +204,6 @@ class PremiumizeFunctions(PremiumizeBase):
             return self.movieMagnetToStream(magnet, args)
 
         episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
-        showInfo = args['showInfo']['info']
 
         try:
 
@@ -209,14 +220,20 @@ class PremiumizeFunctions(PremiumizeBase):
             traceback.print_exc()
             return
 
+        try:
+            if streamLink is not None and tools.getSetting('premiumize.addToCloud') == 'true':
+                transfer = self.create_transfer(magnet)
+                database.add_premiumize_transfer(transfer['id'])
+        except:
+            pass
+
         return streamLink
 
     def check_episode_string(self, folder_details, episodeStrings):
         for i in folder_details:
             for epstring in episodeStrings:
                 # print('Test: %s - Path: %s' % (epstring, source_utils.cleanTitle(i['path'].replace('&', ' ').lower())))
-                if source_utils.cleanTitle(epstring) in \
-                        source_utils.cleanTitle(i['path'].replace('&', ' ').lower()):
+                if epstring in source_utils.cleanTitle(i['path'].replace('&', ' ').lower()):
                     if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
                         if tools.getSetting('premiumize.transcoded') == 'true':
                             if i['transcode_status'] == 'finished':
@@ -242,6 +259,7 @@ class PremiumizeFunctions(PremiumizeBase):
 
         if tools.getSetting('premiumize.transcoded') == 'true':
             if selection['transcode_status'] == 'finished':
+
                 return selection['stream_link']
             else:
                 pass

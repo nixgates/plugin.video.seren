@@ -54,6 +54,7 @@ class Menus:
             tools.addDirectoryItem(tools.lang(32054), 'debridServices', None, None)
         tools.addDirectoryItem(tools.lang(32042), 'clearCache', '', '', isFolder=False)
         tools.addDirectoryItem(tools.lang(32055), 'clearTorrentCache', '', '', isFolder=False)
+        tools.addDirectoryItem(tools.lang(40140), 'clearSearchHistory', '', '', isFolder=False)
         # tools.addDirectoryItem('Reset Silent Scrape Setting', 'resetSilent', '', '', isFolder=False)
         tools.addDirectoryItem(tools.lang(32056), 'openSettings', '', '', isFolder=False)
         tools.addDirectoryItem(tools.lang(32057), 'cleanInstall', None, None, isFolder=False)
@@ -72,12 +73,11 @@ class Menus:
         tools.closeDirectory('addons')
 
     def traktSyncTools(self):
-        tools.addDirectoryItem('Flush activities', 'flushTraktActivities', None, None, isFolder=False)
-        tools.addDirectoryItem('Force Sync Activites', 'forceTraktSync', None, None, isFolder=False)
-        tools.addDirectoryItem('Clear all meta', 'flushTraktDBMeta', None, None, isFolder=False)
-        tools.addDirectoryItem('Re-Build Database', 'rebuildTraktDatabase', None, None, isFolder=False)
+        tools.addDirectoryItem('Flush Activities', 'flushTraktActivities', None, None, isFolder=False)
+        tools.addDirectoryItem('Force Sync Activities', 'forceTraktSync', None, None, isFolder=False)
+        tools.addDirectoryItem('Clear All Metadata', 'flushTraktDBMeta', None, None, isFolder=False)
+        tools.addDirectoryItem('Rebuild Database', 'rebuildTraktDatabase', None, None, isFolder=False)
         tools.closeDirectory('addons')
-
 
 
 def runTest():
