@@ -10,7 +10,6 @@ from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.modules import database
 from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
 from resources.lib.modules.trakt_sync.hidden import TraktSyncDatabase as HiddenDatabase
-from resources.lib.common import maintenance
 
 try:
     from Queue import Queue
@@ -40,7 +39,7 @@ class Menus:
 
     def onDeckShows(self):
         hidden_shows = HiddenDatabase().get_hidden_items('progress_watched', 'shows')
-        trakt_list = trakt.json_response('sync/playback/episodes?extended=full', limit=True)
+        trakt_list = trakt.json_response('sync/playback/episodes', limit=True)
         if trakt_list is None:
             return
         trakt_list = [i for i in trakt_list if i['show']['ids']['trakt'] not in hidden_shows]
@@ -106,7 +105,7 @@ class Menus:
         tools.closeDirectory('tvshows', sort='title')
 
     def myShowWatchlist(self):
-        trakt_list = trakt.json_response('users/me/watchlist/shows?extended=full', limit=False)
+        trakt_list = trakt.json_response('users/me/watchlist/shows', limit=False)
         if trakt_list is None:
             return
         try:
@@ -123,18 +122,19 @@ class Menus:
 
         collected_episodes = TraktSyncDatabase().get_collected_episodes()
         collection = list(set([i['show_id'] for i in collected_episodes]))
-
-        unfinished = []
-        watched_episodes = TraktSyncDatabase().get_watched_episodes()
-
         if len(collection) == 0:
             return
 
-        for show_id in collection:
-            collected_episodes = [i for i in collected_episodes if i['show_id'] == show_id]
-            show_watched_episodes = [i for i in watched_episodes if i['show_id'] == show_id]
-            if len(show_watched_episodes) >= len(collected_episodes):
-                unfinished.append({'ids': {'trakt': show_id}})
+        show_dicts = []
+        for i in collection:
+            show_dicts.append({'show': {'ids': {'trakt': i}}})
+
+        show_meta_list = TraktSyncDatabase().get_show_list(show_dicts)
+        unfinished = []
+
+        for show in show_meta_list:
+            if show['info']['playcount'] == 0:
+                unfinished.append(show)
 
         self.showListBuilder(unfinished)
         tools.closeDirectory('tvshows', sort='title')
@@ -143,9 +143,7 @@ class Menus:
 
         hidden = HiddenDatabase().get_hidden_items('recommendations', 'shows')
         datestring = datetime.datetime.today() - datetime.timedelta(days=29)
-        trakt_list = database.get(trakt.json_response, 12, 'calendars/all/shows/new/%s/30?'
-                                                           'extended=full'
-                                                           '&language=%s' %
+        trakt_list = database.get(trakt.json_response, 12, 'calendars/all/shows/new/%s/30?languages=%s' %
                                   (datestring.strftime('%d-%m-%Y'), language_code))
 
         if trakt_list is None:
@@ -169,49 +167,69 @@ class Menus:
 
     def myNextUp(self, ):
 
+        tv_database = TraktSyncDatabase()
+        watched_shows = tv_database.get_watched_shows()
         hidden_shows = HiddenDatabase().get_hidden_items('progress_watched', 'shows')
 
-        watched = TraktSyncDatabase().get_watched_shows()
-        watched = [i['trakt_id'] for i in watched]
-        watched = [i for i in watched if i not in hidden_shows]
+        watched_shows = [i for i in watched_shows if i['trakt_id'] not in hidden_shows]
+        watched_episodes = TraktSyncDatabase().get_watched_episodes()
 
         self._start_queue_workers()
-        for i in watched:
-            self.task_queue.put((self.traktProgressWorker, (i,)), True)
+
+        for show in watched_shows:
+            self.task_queue.put((self._get_next_episode_to_watch, (show, watched_episodes)), block=True)
+
         self._finish_queue_workers()
 
-        self.threadList = []
-        next_up = self.itemList
-        next_up = [i for i in next_up if i is not None]
-        if len(next_up) == 0:
-            return
-        self.itemList = []
-        next_list = []
-
         if tools.getSetting('nextup.sort') == '1':
-            next_up = sorted(next_up, key=lambda k: k['last_watched_at'], reverse=True)
-            sort = {'type': 'showInfo', 'id_list': [i['show']['ids']['trakt'] for i in next_up]}
+            watched_list = trakt.json_response('users/me/watched/shows')
+            watched_list = sorted(watched_list, key=lambda i: i['last_watched_at'], reverse=True)
+            watched_list = [i['show']['ids']['trakt'] for i in watched_list]
+            sort = {'type': 'showInfo', 'id_list': watched_list}
         else:
             sort = None
 
-        for i in next_up:
-            try:
-                next_episode = i['next_episode']
-                if next_episode is None:
-                    continue
-                next_list.append({'show': i['show'], 'episode': i['next_episode']})
-            except:
-                import traceback
-                traceback.print_exc()
-                pass
+        episodes = self.itemList
+        self.itemList = []
 
-        self.mixedEpisodeBuilder(next_list, sort=sort, hide_watched=True)
+        self.mixedEpisodeBuilder(episodes, sort=sort, hide_watched=True)
+
         tools.closeDirectory('episodes')
+
+    def _get_next_episode_to_watch(self, show_db_dict, watched_episodes):
+        try:
+            show_id = show_db_dict['trakt_id']
+
+            watched_episodes = [i for i in watched_episodes if i['show_id'] == show_id]
+            watched_episodes = sorted(watched_episodes, key=lambda episode: episode['season'], reverse=True)
+
+            season = watched_episodes[0]['season']
+            season_meta = TraktSyncDatabase().get_single_season(show_id, season)
+
+            watched_episodes = [i for i in watched_episodes if i['season'] == season]
+            watched_episodes = sorted(watched_episodes, key=lambda episode: episode['number'], reverse=True)
+            last_watched_episode = watched_episodes[0]['number']
+            next_episode = int(watched_episodes[0]['number']) + 1
+
+            if season_meta['info']['episode_count'] == len(watched_episodes) \
+                    or season_meta['info']['episode_count'] == last_watched_episode:
+                if int(show_db_dict['kodi_meta']['info']['season_count']) > season:
+                    season += 1
+                    next_episode = 1
+                else:
+                    return
+
+            episode_dict = {'show': {'ids': {'trakt': show_id}},
+                            'episode': {'season': season, 'number': next_episode}}
+
+            self.itemList.append(episode_dict)
+        except:
+            pass
 
     def myRecentEpisodes(self):
         hidden_shows = HiddenDatabase().get_hidden_items('calendar', 'shows')
         datestring = datetime.datetime.today() - datetime.timedelta(days=13)
-        trakt_list = database.get(trakt.json_response, 12, 'calendars/my/shows/%s/14?extended=full' %
+        trakt_list = database.get(trakt.json_response, 12, 'calendars/my/shows/%s/14' %
                                   datestring.strftime('%d-%m-%Y'))
         if trakt_list is None:
             return
@@ -233,7 +251,7 @@ class Menus:
 
     def showsNetworkShows(self, network, page):
 
-        trakt_list = database.get(trakt.json_response, 24, 'shows/trending?networks=%s&page=%s' % (network, page))
+        trakt_list = database.get(trakt.json_response, 24, 'shows/popular?networks=%s&page=%s' % (network, page))
 
         if trakt_list is None:
             return
@@ -247,7 +265,7 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def showsPopular(self, page):
-        trakt_list = database.get(trakt.json_response, 12, 'shows/popular?page=%s&extended=full' % page)
+        trakt_list = database.get(trakt.json_response, 12, 'shows/popular?page=%s' % page)
 
         if trakt_list is None:
             return
@@ -257,7 +275,7 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def showsRecommended(self):
-        trakt_list = database.get(trakt.json_response, 12, 'recommendations/shows?extended=full',
+        trakt_list = database.get(trakt.json_response, 12, 'recommendations/shows?ignore_collected=true',
                                   limit=True, limitOverride=100)
         if trakt_list is None:
             return
@@ -265,7 +283,7 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def showsTrending(self, page):
-        trakt_list = database.get(trakt.json_response, 12, 'shows/trending?page=%s&extended=full' % page)
+        trakt_list = database.get(trakt.json_response, 12, 'shows/trending?page=%s' % page)
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
@@ -273,7 +291,7 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def showsPlayed(self, page):
-        trakt_list = database.get(trakt.json_response, 12, 'shows/played?page=%s&extended=full' % page)
+        trakt_list = database.get(trakt.json_response, 12, 'shows/played?page=%s' % page)
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
@@ -281,7 +299,7 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def showsWatched(self, page):
-        trakt_list = database.get(trakt.json_response, 12, 'shows/watched?page=%s&extended=full' % page)
+        trakt_list = database.get(trakt.json_response, 12, 'shows/watched?page=%s' % page)
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
@@ -289,7 +307,7 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def showsCollected(self, page):
-        trakt_list = database.get(trakt.json_response, 12, 'shows/collected?page=%s&extended=full' % page)
+        trakt_list = database.get(trakt.json_response, 12, 'shows/collected?page=%s' % page)
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
@@ -297,7 +315,7 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def showsAnticipated(self, page):
-        trakt_list = database.get(trakt.json_response, 12, 'shows/anticipated?page=%s&extended=full&language=%s'
+        trakt_list = database.get(trakt.json_response, 12, 'shows/anticipated?page=%s&language=%s'
                                   % (page, language_code))
         if trakt_list is None:
             return
@@ -309,7 +327,7 @@ class Menus:
         import datetime
         date = datetime.date.today() - datetime.timedelta(days=31)
         date = date.strftime('%Y-%m-%d')
-        trakt_list = database.get(trakt.json_response, 12, 'shows/updates/%s?page=%s&extended=full' % (date, page))
+        trakt_list = database.get(trakt.json_response, 12, 'shows/updates/%s?page=%s' % (date, page))
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
@@ -318,11 +336,11 @@ class Menus:
 
     def showSearchHistory(self):
         history = database.getSearchHistory('show')
-        tools.addDirectoryItem('New Show Search...', 'showsSearch', '', '')
-        tools.addDirectoryItem('Clear Search History...', 'clearSearchHistory', '', '', isFolder=True)
+        tools.addDirectoryItem(tools.lang(40142), 'showsSearch', '', '')
+        tools.addDirectoryItem(tools.lang(40140), 'clearSearchHistory', '', '', isFolder=False)
 
         for i in history:
-            tools.addDirectoryItem(i, 'showsSearch&actionArgs=%s' % i, '', '')
+            tools.addDirectoryItem(i, 'showsSearch&actionArgs=%s' % tools.quote(i), '', '')
         tools.closeDirectory('addon')
 
     def showsSearch(self, actionArgs):
@@ -334,13 +352,13 @@ class Menus:
             if query == None or query == '':
                 return
         else:
-            query = actionArgs
+            query = tools.unquote(actionArgs)
 
         database.addSearchHistory(query, 'show')
         query = tools.deaccentString(query)
         query = tools.quote_plus(query)
 
-        trakt_list = trakt.json_response('search/show?query=%s&extended=full' % query, limit=True)
+        trakt_list = trakt.json_response('search/show?query=%s&extended=full&type=show&field=title' % query, limit=True)
         if trakt_list is None:
             return
 
@@ -399,7 +417,7 @@ class Menus:
 
         page = int(page)
         trakt_list = database.get(trakt.json_response, 12,
-                                  'shows/popular?genres=%s&page=%s&extended=full' % (genre_string, page))
+                                  'shows/popular?genres=%s&page=%s' % (genre_string, page))
         if trakt_list is None:
             return
 
@@ -409,7 +427,7 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def showsRelated(self, args):
-        trakt_list = database.get(trakt.json_response, 12, 'shows/%s/related?extended=full' % args)
+        trakt_list = database.get(trakt.json_response, 12, 'shows/%s/related' % args)
         if trakt_list is None:
             return
 
@@ -472,9 +490,12 @@ class Menus:
                 item['trakt_object']['show_id'] = item['showInfo']['ids']['trakt']
                 name = item['info']['season_title']
 
-                if not self.is_aired(item['info']):
+                if not self.is_aired(item['info']) or 'aired' not in item['info']:
                     name = tools.colorString(name, 'red')
                     name = tools.italic_string(name)
+                    item['info']['title'] = name
+
+                item['info'] = tools.clean_air_dates(item['info'])
 
                 args = tools.quote(json.dumps(args, sort_keys=True))
             except:
@@ -499,7 +520,7 @@ class Menus:
 
         tools.addMenuItems(syshandle, item_list, len(item_list))
 
-    def episodeListBuilder(self, show_id, season_number, smartPlay=False):
+    def episodeListBuilder(self, show_id, season_number, smartPlay=False, hide_unaired=False):
 
         try:
             item_list = []
@@ -533,11 +554,14 @@ class Menus:
                     name = item['info']['title']
 
                     if not self.is_aired(item['info']):
-                        if tools.getSetting('general.hideUnAired') == 'true':
+                        if tools.getSetting('general.hideUnAired') == 'true' or hide_unaired:
                             continue
                         else:
                             name = tools.colorString(name, 'red')
                             name = tools.italic_string(name)
+                            item['info']['title'] = name
+
+                    item['info'] = tools.clean_air_dates(item['info'])
 
                     args = tools.quote(json.dumps(args, sort_keys=True))
 
@@ -589,7 +613,9 @@ class Menus:
             self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
             self.itemList = [i for i in self.itemList if 'info' in i and i['info'].get('premiered', None) is not None]
             if sort is None:
-                self.itemList = sorted(self.itemList, key=lambda i: tools.datetime_workaround(i['info']['premiered']),
+                self.itemList = sorted(self.itemList,
+                                       key=lambda i: tools.datetime_workaround(i['info']['premiered'],
+                                                                               tools.trakt_gmt_format, False),
                                        reverse=True)
             elif sort is not False:
                 sort_list = []
@@ -606,18 +632,6 @@ class Menus:
             for item in self.itemList:
                 if item is None:
                     continue
-                try:
-                    currentDate = datetime.datetime.today().date()
-                    airdate = item['info']['premiered']
-                    if airdate == '':
-                        continue
-                    airdate = tools.datetime_workaround(airdate)
-                    if airdate > currentDate:
-                        continue
-                except:
-                    import traceback
-                    traceback.print_exc()
-                    pass
 
                 if item['info'].get('title', '') == '':
                     continue
@@ -628,6 +642,11 @@ class Menus:
                 cm = []
 
                 try:
+                    if not self.is_aired(item['info']):
+                        continue
+
+                    item['info'] = tools.clean_air_dates(item['info'])
+
                     args = {'showInfo': {}, 'episodeInfo': {}}
 
                     if tools.getSetting('smartplay.playlistcreate') == 'true' and not smartPlay:
@@ -642,8 +661,6 @@ class Menus:
                     args['episodeInfo']['art'] = item['art']
                     args['episodeInfo']['ids'] = item['ids']
 
-                    if not self.is_aired(item['info']):
-                        continue
 
                     name = tools.display_string(item['info']['title'])
 
@@ -727,6 +744,7 @@ class Menus:
                 args['art'] = item['art']
 
                 name = tools.display_string(item['info']['tvshowtitle'])
+
                 args = tools.quote(json.dumps(args, sort_keys=True))
 
                 if info_only == True:
@@ -735,6 +753,8 @@ class Menus:
                 if not self.is_aired(item['info']):
                     name = tools.colorString(name, 'red')
                     name = tools.italic_string(name)
+
+                item['info'] = tools.clean_air_dates(item['info'])
 
                 if 'setCast' in item:
                     set_cast = item['setCast']
@@ -776,14 +796,14 @@ class Menus:
 
         tools.addMenuItems(syshandle, item_list, len(item_list))
 
-
-    def traktProgressWorker(self, show_id):
-        try:
-            progress = TraktAPI().json_response('shows/%s/progress/watched?extended=full' % show_id)
-            progress.update({'show': {'ids': {'trakt': show_id}}})
-            self.itemList.append(progress)
-        except:
-            self.itemList.append(None)
+    #
+    # def traktProgressWorker(self, show_id):
+    #     try:
+    #         progress = TraktAPI().json_response('shows/%s/progress/watched?extended=full' % show_id)
+    #         progress.update({'show': {'ids': {'trakt': show_id}}})
+    #         self.itemList.append(progress)
+    #     except:
+    #         self.itemList.append(None)
 
     def runThreads(self, join=True):
         for thread in self.threadList:
@@ -826,19 +846,25 @@ class Menus:
     def is_aired(self, info):
         try:
             try:air_date = info['aired']
-            except: air_date = info['premiered']
+            except: air_date = info.get('premiered')
+            if air_date == '' or air_date is None:
+                return False
+            if int(air_date[:4]) < 1970:
+                return True
+            air_date = tools.gmt_to_local(air_date)
 
             if tools.getSetting('general.datedelay') == 'true':
-                air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)
+                air_date = tools.datetime_workaround(air_date, tools.trakt_gmt_format, False)
                 air_date += datetime.timedelta(days=1)
             else:
-                air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)
+                air_date = tools.datetime_workaround(air_date, tools.trakt_gmt_format, False)
 
-            if air_date > datetime.date.today():
+            if air_date > datetime.datetime.now():
                 return False
-
             else:
                 return True
         except:
-            # Assume an item is aired if we do not have any information on it or fail to check
+            import traceback
+            traceback.print_exc()
+            # Assume an item is not aired if we do not have any information on it or fail to identify
             return False

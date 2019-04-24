@@ -122,15 +122,21 @@ class TVDBAPI:
             try:
                 if '0' in self.episode_summary['airedSeasons']:
                     self.episode_summary['airedSeasons'].pop(0)
-                info['seasonCount'] = len(self.episode_summary['airedSeasons'])
+                info['season_count'] = len(self.episode_summary['airedSeasons'])
             except:
                 info['seasonCount'] = 0
                 pass
 
             try:
-                info['episodeCount'] = trakt_object['aired_episodes']
+                info['episode_count'] = trakt_object['episode_count']
             except:
-                info['episodeCount'] = 0
+                info['episode_count'] = 0
+                pass
+
+            try:
+                info['aired_episodes'] = trakt_object['aired_episodes']
+            except:
+                info['aired_episodes'] = 0
                 pass
 
             try:

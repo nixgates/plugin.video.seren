@@ -370,7 +370,6 @@ class Sources(tools.dialogWindow):
                 self.remainingProviders.remove(provider_name)
 
         try:
-            print()
             self.remainingProviders.append(provider_name)
             providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
             provider_source = providerModule.sources()
@@ -791,7 +790,7 @@ class Sources(tools.dialogWindow):
         if '.' in simpleInfo['show_title']:
             simpleInfo['show_aliases'].append(source_utils.cleanTitle(simpleInfo['show_title'].replace('.', '')))
         simpleInfo['country'] = info['showInfo']['info']['country']
-        simpleInfo['no_seasons'] = str(info['showInfo']['info']['seasonCount'])
+        simpleInfo['no_seasons'] = str(info['showInfo']['info']['season_count'])
         simpleInfo['absolute_number'] = str(info['episodeInfo']['info'].get('absoluteNumber', ''))
         simpleInfo['isanime'] = False
 
@@ -914,9 +913,9 @@ class Sources(tools.dialogWindow):
             if size == 0:
                 return size
             if torrent['package'] == 'show':
-                size = size / int(info['showInfo']['info']['episodeCount'])
+                size = size / int(info['showInfo']['info']['episode_count'])
             if torrent['package'] == 'season':
-                episodes = int(info['showInfo']['info']['episodeCount']) / int(info['showInfo']['info']['seasonCount'])
+                episodes = int(info['showInfo']['info']['episode_count']) / int(info['showInfo']['info']['season_count'])
                 size = size / episodes
         except:
             size = 0

@@ -154,7 +154,13 @@ def getSearchHistory(media_type):
         cursor.execute("SELECT * FROM history WHERE media_type = ?", [media_type])
         history = cursor.fetchall()
         history.reverse()
-        return [i['value'] for i in history][:50]
+        history = history[:50]
+        filter = []
+        for i in history:
+            if i['value'] not in filter:
+                filter.append(i['value'])
+
+        return filter
     except:
         import traceback
         traceback.print_exc()

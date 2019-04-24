@@ -29,7 +29,7 @@ class SmartPlay:
             self.show_trakt_id = self.info_dictionary['showInfo']['ids']['trakt']
 
         self.show_season_info = database.get(TraktAPI().json_response, 12,
-                                             'shows/%s/seasons?extended=full' % self.show_trakt_id)
+                                             'shows/%s/seasons' % self.show_trakt_id)
         self.window = None
 
     def smart_play_show(self, append_playlist=False):
@@ -69,7 +69,8 @@ class SmartPlay:
         if append_playlist:
             # Add next seasons episodes to the currently playing playlist and then finish up
 
-            playlist = tvshowMenus.Menus().episodeListBuilder(self.show_trakt_id, season, smartPlay=True)
+            playlist = tvshowMenus.Menus().episodeListBuilder(self.show_trakt_id, season,
+                                                              hide_unaired=True, smartPlay=True)
             for i in playlist:
                 # Confirm that the episode meta we have received from TVDB are for the correct episodes
                 # If trakt provides the incorrect TVDB ID it's possible to begin play from the incorrect episode
@@ -133,7 +134,7 @@ class SmartPlay:
 
     def final_episode_check(self, season, episode):
 
-        last_aired = TraktAPI().json_response('shows/%s/last_episode?extended=full' % self.show_trakt_id)
+        last_aired = TraktAPI().json_response('shows/%s/last_episode' % self.show_trakt_id)
         if str(season) == str(last_aired['season']):
             if str(episode) == str(last_aired['number']):
                 return True
@@ -174,9 +175,9 @@ class SmartPlay:
         season = info['episodeInfo']['info']['season']
         show_id = info['showInfo']['ids']['trakt']
         trakt_object = TraktAPI().json_response(
-            'shows/%s/seasons/%s/episodes/%s?extended=full' % (show_id, season, episode))
+            'shows/%s/seasons/%s/episodes/%s' % (show_id, season, episode))
 
-        list_item = tvshowMenus.Menus().episodeListBuilder([trakt_object], info, smartPlay=True)[0]
+        list_item = tvshowMenus.Menus().episodeListBuilder([trakt_object], info, hide_unaired=True, smartPlay=True)[0]
         url = list_item[0] + "&packSelect=true"
         tools.playList.add(url=url, listitem=list_item[1])
         tools.player().play(tools.playList)

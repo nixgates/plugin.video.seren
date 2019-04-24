@@ -1069,3 +1069,35 @@ msgstr ""
 msgctxt "#40139"
 msgid "[COLOR red]WARNING[/COLOR]\nThis will reset all meta infomration, are you sure?"
 msgstr ""
+
+msgctxt "#40140"
+msgid "Clear Search History"
+msgstr ""
+
+msgctxt "#40141"
+msgid "New Movie Search..."
+msgstr ""
+
+msgctxt "#40142"
+msgid "New Show Search..."
+msgstr ""
+
+msgctxt "#40143"
+msgid "Store resolved items in cloud"
+msgstr ""
+
+msgctxt "#40144"
+msgid "General Menu View"
+msgstr ""
+
+msgctxt "#40145"
+msgid "General Menu View ID"
+msgstr ""
+
+msgctxt "#40146"
+msgid "[COLOR red]Error:[/COLOR] No Debrid accounts were identified."
+msgstr ""
+
+msgctxt "#40147"
+msgid "Please setup your accounts in the settings menu before attempting to play an item"
+msgstr ""

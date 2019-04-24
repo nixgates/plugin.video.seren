@@ -15,9 +15,10 @@ def check_for_addon_update():
             return
         repo_xml = requests.get('https://raw.githubusercontent.com/nixgates/nixgates/master/packages/addons.xml')
         if not repo_xml.status_code == 200:
+            tools.log('Could not connect to repo XML, status: %s' % repo_xml.status_code, 'error')
             return
         repo_version = re.findall(r'<addon id=\"plugin.video.seren\" version=\"(\d*.\d*.\d*)\"', repo_xml.text)[0]
-        local_verison = xbmcaddon.Addon().getAddonInfo('version')
+        local_verison = tools.addonVersion
         if tools.check_version_numbers(local_verison, repo_version):
             tools.showDialog.ok(tools.addonName, tools.lang(40136) % repo_version)
     except:
@@ -38,7 +39,7 @@ def refresh_apis():
 
     try:
         if rd_token != '':
-            if time.time() > (rd_expiry - (30 * 60)):
+            if time.time() > (rd_expiry - (10 * 60)):
                 from resources.lib.debrid import real_debrid
                 tools.log('Service Refreshing Real Debrid Token')
                 real_debrid.RealDebrid().refreshToken()

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.2.15" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.2.22" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -27,6 +27,57 @@
 			<fanart>temp-fanart.png</fanart>
 		</assets>
 		<news>
+Changelog 0.2.22:
+Re-added ability for next-up to be sorted by Recently Played
+Added error message when attempting to play an item with no debrid accounts setup
+Added clearart/clearlogo to upnext meta data
+Fixed issue with menu "Unfinished Show In Collection" showing finished shows
+Removed requests for extended info for tvshowMenus trakt requests
+Further removal of un-aired items from SmartPlay Lists
+Added argument "ignore_collected" to recommended shows
+Added argument "ignore_collected" to recommended movies
+Removed remaining requests for extended info for movie menus
+Cleaned up logging
+
+Changelog 0.2.21:
+Fixed datetime error on playlist building
+
+Changelog 0.2.20:
+Date delay setting now set to false by default
+Fixed datetime format for mixed episode lists
+Fixed general.textColor not applying if no value has been set
+
+Changelog 0.2.19:
+Release times are now measured to exact date/time provided from trakt
+Added fallback to Trakt title if TVDB does not supply title
+Trakt Databases upgraded to version 0.2.19
+Duplicate search queries now removed from search history
+Search queries are now URL quoted
+Clear Search history added to tools menu
+Language strings added for New show/movie search, clear search history
+Added option to add item to user's cloud on successful resolving of link for premiumize users
+Fixed type in drop table requests for trakt sync database
+Re-added release filter for playlist builder
+Added ability to set addon menu view types
+Fixed aliases info key not being cleaned up
+Added general.textColor back to settings to avoid
+Added ability to resolve files containing conjoined episodes eg: 's04e01e02' identifier
+Tightended up resolving on some items being triggered by 1080p label
+Added progress dialog for the rare case that show/movie meta is updated on initial sync
+
+Changelog 0.2.18:
+Fixed season premiers not showing if the previous season was not finished
+
+Changelog 0.2.17:
+Fixed variable issue in Next Up call
+
+Changelog 0.2.16:
+Fixed language filter for New Shows menu
+Networks now utilise the Trakt shows/Popular API endpoint
+Reduced meta refresh check timeout to 2 hours
+Next Up now utilises the trakt sync database to identify the next episode to watch
+Added database versioning, database can now be flushed and upgraded/downgraded as required by Seren
+
 Changelog 0.2.15:
 Fixed genre capitalization
 Fixed clear meta dialog text

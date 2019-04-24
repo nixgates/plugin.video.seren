@@ -91,7 +91,7 @@ class Menus:
             traceback.print_exc()
 
     def myMovieWatchlist(self):
-        trakt_list = trakt.json_response('users/me/watchlist/movies?extended=full&extended=full', limit=False)
+        trakt_list = trakt.json_response('users/me/watchlist/movies', limit=False)
         if trakt_list is None:
             return
         try:
@@ -107,7 +107,8 @@ class Menus:
         tools.closeDirectory('movies')
 
     def moviesRecommended(self):
-        trakt_list = database.get(trakt.json_response, 12, 'recommendations/movies', limit=True, limitOverride=100)
+        trakt_list = database.get(trakt.json_response, 12, 'recommendations/movies?ignore_collected=true',
+                                  limit=True, limitOverride=100)
         if trakt_list is None:
             return
         self.commonListBuilder(trakt_list)
@@ -189,8 +190,8 @@ class Menus:
 
     def moviesSearchHistory(self):
         history = database.getSearchHistory('movie')
-        tools.addDirectoryItem('New Movie Search...', 'moviesSearch', '', '')
-        tools.addDirectoryItem('Clear Search History...', 'clearSearchHistory', '', '', isFolder=False)
+        tools.addDirectoryItem(tools.lang(40141), 'moviesSearch', '', '')
+        tools.addDirectoryItem(tools.lang(40140), 'clearSearchHistory', '', '', isFolder=False)
 
         for i in history:
             tools.addDirectoryItem(i, 'moviesSearch&actionArgs=%s' % i, '', '')
