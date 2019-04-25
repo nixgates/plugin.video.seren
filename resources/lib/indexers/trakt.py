@@ -529,7 +529,7 @@ class TraktAPI:
         arguments = json.loads(tools.unquote(arguments))
         media_type = arguments['type']
         username = tools.quote_plus(arguments['username'])
-        url = 'users/%s/lists/%s/items/%s' % (username, arguments['trakt_id'], media_type)
+        url = 'users/%s/lists/%s/items/%s?extended=full' % (username, arguments['trakt_id'], media_type)
         list_items = database.get(self.json_response, 12, url, None, False)
 
         if list_items is None or len(list_items) == 0:
