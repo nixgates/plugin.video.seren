@@ -24,6 +24,8 @@ database_path = tools.traktSyncDB
 class TraktSyncDatabase:
     def __init__(self):
 
+        self.activites = {}
+
         self._build_show_table()
         self._build_episode_table()
         self._build_movies_table()
@@ -82,6 +84,9 @@ class TraktSyncDatabase:
         # This will ensure that the metadata required for operations is available
 
         last_meta_update = '0.2.19'
+
+        if self.activites.get('seren_version', None) is None:
+            self.activites['seren_version'] == '0.0.0'
 
         if tools.check_version_numbers(self.activites['seren_version'], last_meta_update):
             tools.log('Upgrading Trakt Sync Database Version')

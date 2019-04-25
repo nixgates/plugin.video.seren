@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="0.2.23" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="0.2.24" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -27,6 +27,9 @@
 			<fanart>temp-fanart.png</fanart>
 		</assets>
 		<news>
+Changelog 0.2.24:
+Fixed issue with None value for seren_version entry of trakt database
+
 Changelog 0.2.23:
 Added workaround to combat file extraction error while obtaining GMT timezone information
 Fixed issue with activities failing due to no progress dialog raised
