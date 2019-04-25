@@ -18,6 +18,7 @@ CACHESIZE = 10
 
 class tzfile(tzfile):
     def __reduce__(self):
+
         return (gettz, (self._filename,))
 
 def getzoneinfofile():
@@ -25,7 +26,7 @@ def getzoneinfofile():
     filenames.sort()
     filenames.reverse()
     for entry in filenames:
-        if entry.startswith("zoneinfo") and ".tar." in entry:
+        if entry.startswith("zoneinfo") and ".tar" in entry:
             return os.path.join(os.path.dirname(__file__), entry)
     return None
 
@@ -38,8 +39,16 @@ def setcachesize(size):
     CACHESIZE = size
     del CACHE[size:]
 
+def get_gmt():
+    current_directory = os.path.dirname(__file__)
+    gmt_path = os.path.join(current_directory, 'GMT')
+    tzinfo = tzfile(gmt_path)
+    return tzinfo
+
 def gettz(name):
     tzinfo = None
+    if name == 'GMT':
+        return get_gmt()
     if ZONEINFOFILE:
         for cachedname, tzinfo in CACHE:
             if cachedname == name:
