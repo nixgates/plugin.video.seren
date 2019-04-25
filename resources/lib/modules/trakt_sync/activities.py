@@ -423,7 +423,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         for i in range(2, int(trakt_api.response_headers['X-Pagination-Page-Count']) + 1):
             progress = (i / (int(trakt_api.response_headers['X-Pagination-Page-Count']) + 1)) * 100
-            self.progress_dialog.update(progress)
+            if not self.silent:
+                self.progress_dialog.update(progress)
             updates = trakt_api.json_response(url % (type, last_update[:10], i), limitOverride=500, limit=True)
             for item in updates:
                 if not trakt_sync._requires_update(item['updated_at'], last_update):

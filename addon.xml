@@ -29,6 +29,8 @@
 		<news>
 Changelog 0.2.23:
 Added workaround to combat file extraction error while obtaining GMT timezone information
+Fixed issue with activities failing due to no progress dialog raised
+Re-added extended information argument to the list items call to fix issue with first
 
 Changelog 0.2.22:
 Re-added ability for next-up to be sorted by Recently Played
