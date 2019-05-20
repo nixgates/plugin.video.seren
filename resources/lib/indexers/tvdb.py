@@ -14,6 +14,7 @@ class TVDBAPI:
         self.apiKey = tools.getSetting('tvdb.apikey')
         if self.apiKey == '':
             self.apiKey = "43VPI0R8323FB7TI"
+
         self.baseUrl = 'https://api.thetvdb.com/'
         self.jwToken = tools.getSetting('tvdb.jw')
         self.headers = {'Content-Type': 'application/json'}
@@ -78,6 +79,7 @@ class TVDBAPI:
         url = self.baseUrl + 'refresh_token'
         response = requests.post(url, headers=self.headers)
         response = json.loads(response.text)
+
         if 'Error' in response:
             self.newToken(True)
         else:
@@ -90,11 +92,10 @@ class TVDBAPI:
     def newToken(self, ignore_lock=False):
 
         refresh_lock = self.refresh_lock()
-        if not ignore_lock:
-            if not refresh_lock:
-                tools.tvdb_refreshing = True
-            else:
-                return
+        if not refresh_lock:
+            tools.tvdb_refreshing = True
+        else:
+            return
         url = self.baseUrl + "login"
         postdata = {"apikey": self.apiKey}
         postdata = json.dumps(postdata)

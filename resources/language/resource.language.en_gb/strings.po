@@ -425,7 +425,7 @@ msgstr ""
 
 ######GETSOURCES.PY######
 msgctxt "#32081"
-msgid "Checking Local Results"
+msgid "Checking Local Database"
 msgstr ""
 
 msgctxt "#32082"
@@ -519,7 +519,7 @@ msgid "General"
 msgstr ""
 
 msgctxt "#40002"
-msgid "Play Style"
+msgid "Episode Play Style"
 msgstr ""
 
 msgctxt "#40003"
@@ -999,7 +999,7 @@ msgid "Networks"
 msgstr ""
 
 msgctxt "#40122"
-msgid "Hide Un-Aired Episodes"
+msgid "Hide Un-Aired Items"
 msgstr ""
 
 msgctxt "#40123"
@@ -1100,4 +1100,28 @@ msgstr ""
 
 msgctxt "#40147"
 msgid "Please setup your accounts in the settings menu before attempting to play an item"
+msgstr ""
+
+msgctxt "#40148"
+msgid "Terminate if cloud sources are found"
+msgstr ""
+
+msgctxt "#40149"
+msgid "Inspect Cloud Files on Scrape"
+msgstr ""
+
+msgctxt "#40150"
+msgid "Upcoming Episodes"
+msgstr ""
+
+msgctxt "#40151"
+msgid "By Actor..."
+msgstr ""
+
+msgctxt "#40152"
+msgid "Movie Play Style"
+msgstr ""
+
+msgctxt "#40153"
+msgid "Play From Random Episode"
 msgstr ""

@@ -6,6 +6,7 @@ from resources.lib.common import tools
 from resources.lib.gui import windows
 from resources.lib.modules import database
 from resources.lib.common import maintenance
+from resources.lib.common import source_utils
 
 try:
     maintenance.refresh_apis()
@@ -67,7 +68,7 @@ if action == 'smartPlay':
     from resources.lib.modules import smartPlay
 
     smart = smartPlay.SmartPlay(actionArgs)
-    smart.smart_play_show()
+    smart.workaround()
 
 if action == 'moviesHome':
     from resources.lib.gui import movieMenus
@@ -186,21 +187,24 @@ if action == 'getSources':
 
         sources_window = getSources
 
-        source_results, args = database.get(sources_window.Sources().doModal, 1, actionArgs, seren_reload=seren_reload)
-
+        uncached_sources, source_results, args = database.get(sources_window.Sources().doModal, 1, actionArgs,
+                                                              seren_reload=seren_reload)
         try:
             del sources_window
         except:
             pass
 
         if len(source_results) > 0:
-
-            if tools.getSetting('general.playstyle') == '1' or source_select == 'true':
+            if 'episodeInfo' in args:
+                source_select_style = 'Episodes'
+            else:
+                source_select_style = 'Movie'
+            if tools.getSetting('general.playstyle%s' % source_select_style) == '1' or source_select == 'true':
                 if display_background:
                     background.setText(tools.lang(40135))
                 from resources.lib.modules import sourceSelect
 
-                source_results = sourceSelect.sourceSelect(source_results, args)
+                source_results = sourceSelect.sourceSelect(uncached_sources, source_results, args)
 
             if display_background:
                 background.setText(tools.lang(32046))
@@ -274,7 +278,7 @@ if action == 'preScrape':
     try:
         from resources.lib.modules import getSources
 
-        source_results, args = database.get(getSources.Sources().doModal, 1, actionArgs)
+        uncached_sources, source_results, args = database.get(getSources.Sources().doModal, 1, actionArgs)
 
         if tools.getSetting('general.playstyle') == '0':
             from resources.lib.modules import resolver
@@ -460,6 +464,8 @@ if action == 'shufflePlay':
     try:
         smart = smartPlay.SmartPlay(actionArgs).shufflePlay()
     except:
+        import traceback
+        traceback.print_exc()
         pass
 
 if action == 'resetSilent':
@@ -555,39 +561,41 @@ if action == 'cleanInstall':
     maintenance.wipe_install()
 
 if action == 'buildPlaylistWorkaround':
+    # import json
+    # from resources.lib.gui import tvshowMenus
+    #
+    # def get_episode_number(list_item):
+    #     episode_number = dict(tools.parse_qsl(list_item[0].replace('?', '')))
+    #     episode_number = int(json.loads(tools.unquote(episode_number['actionArgs']))['episodeInfo']['info']['episode'])
+    #     return episode_number
+    #
+    # # This is a nasty workaround for Kodi 18 Skins
+    #
+    # actionArgs = json.loads(tools.unquote(actionArgs))
+    #
+    # season = actionArgs['season']
+    # episode = int(actionArgs['episode'])
+    # show_id = actionArgs['show_id']
+    #
+    # season_episodes = tvshowMenus.Menus().episodeListBuilder(show_id, season, smartPlay=True, hide_unaired=True)
+    # play_list = []
+    #
+    # for ep in season_episodes:
+    #     ep_no = get_episode_number(ep)
+    #     if ep_no >= episode:
+    #         tools.log(ep_no)
+    #         play_list.append(ep)
+    #
+    #     # If the episode is confirmed ok, add it to our playlist.
+    # play_list = sorted(play_list, key=lambda i: get_episode_number(i))
+    #
+    # for i in play_list:
+    #     tools.playList.add(url=i[0], listitem=i[1])
+    #
+    # tools.player().play(tools.playList)
 
-    import json
-    from resources.lib.gui import tvshowMenus
-
-    def get_episode_number(list_item):
-        episode_number = dict(tools.parse_qsl(list_item[0].replace('?', '')))
-        episode_number = int(json.loads(tools.unquote(episode_number['actionArgs']))['episodeInfo']['info']['episode'])
-        return episode_number
-
-    # This is a nasty workaround for Kodi 18 Skins
-
-    actionArgs = json.loads(tools.unquote(actionArgs))
-
-    season = actionArgs['season']
-    episode = int(actionArgs['episode'])
-    show_id = actionArgs['show_id']
-
-    season_episodes = tvshowMenus.Menus().episodeListBuilder(show_id, season, smartPlay=True, hide_unaired=True)
-    play_list = []
-
-    for ep in season_episodes:
-        ep_no = get_episode_number(ep)
-        if ep_no >= episode:
-            tools.log(ep_no)
-            play_list.append(ep)
-
-        # If the episode is confirmed ok, add it to our playlist.
-    play_list = sorted(play_list, key=lambda i: get_episode_number(i))
-
-    for i in play_list:
-        tools.playList.add(url=i[0], listitem=i[1])
-
-    tools.player().play(tools.playList)
+    from resources.lib.modules import smartPlay
+    smartPlay.SmartPlay(actionArgs).smart_play_show()
 
 if action == 'premiumizeCleanup':
     from resources.lib.common import maintenance
@@ -686,3 +694,19 @@ if action == 'forceTraktSync':
 if action == 'rebuildTraktDatabase':
     from resources.lib.modules.trakt_sync import TraktSyncDatabase
     TraktSyncDatabase().re_build_database()
+
+if action == 'myUpcomingEpisodes':
+    from resources.lib.gui import tvshowMenus
+    tvshowMenus.Menus().myUpcomingEpisodes()
+
+if action == 'showsByActor':
+    from resources.lib.gui import tvshowMenus
+    tvshowMenus.Menus().showsByActor(actionArgs)
+
+if action == 'movieByActor':
+    from resources.lib.gui import movieMenus
+    movieMenus.Menus().moviesByActor(actionArgs)
+
+if action == 'playFromRandomPoint':
+    from resources.lib.modules import smartPlay
+    smartPlay.SmartPlay(actionArgs).play_from_random_point()

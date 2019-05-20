@@ -3,13 +3,15 @@
 import random
 import re
 import copy
+import xbmc
 
 from difflib import SequenceMatcher
 from requests import Session
 from resources.lib.common import tools
 
-COMMON_VIDEO_EXTENSIONS = ['.m4v', '.mkv', '.mka', '.mp4', '.avi', '.mpeg', '.asf', '.flv', '.m4a', '.aac', '.nut',
-                           '.ogg']
+COMMON_VIDEO_EXTENSIONS = xbmc.getSupportedMedia('video').split('|')
+
+COMMON_VIDEO_EXTENSIONS = [i for i in COMMON_VIDEO_EXTENSIONS if i != '' and i != '.zip']
 
 BROWSER_AGENTS = [
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
@@ -32,40 +34,15 @@ common_info_tags = ['1080p', '720p', '480p', '300mb', 'HEVC', 'x265', 'x264', '4
                     'telesync', 'ts', 'telecine', 'tc', 'bluray']
 
 
-def simularity_compare(check_list, compare_list):
-    simularity = []
-
-    check_list = copy.copy(compare_list)
-    top_result = 0
-    top_idx = None
-    results = []
-
-    try:
-        for compare_title in check_list:
-            title = cleanTitle(title)
-            for tag in common_info_tags:
-                if tag not in title:
-                    compare_title = compare_title.replace(tag, '')
-            for ext in COMMON_VIDEO_EXTENSIONS:
-                if ext not in title:
-                    compare_title = compare_title.replace(ext, '')
-            match = SequenceMatcher(None, title, cleanTitle(compare_title))
-            simularity.append(match.quick_ratio())
-        for idx, ratio in enumerate(simularity):
-            if ratio > top_result:
-                top_result = ratio
-                top_idx = idx
-
-        results.append((top_result, top_idx))
-    except:
-        import traceback
-        traceback.print_exc()
-        return None
-
+# LEGACY COMPATIBILITY
 
 def getQuality(release_title):
+    return get_quality(release_title)
+
+def get_quality(release_title):
+    release_title = release_title.lower()
     quality = 'SD'
-    if ' 4K' in release_title:
+    if ' 4k' in release_title:
         quality = '4K'
     if '2160p' in release_title:
         quality = '4K'
@@ -75,13 +52,14 @@ def getQuality(release_title):
         quality = '1080p'
     if ' 720 ' in release_title:
         quality = '720p'
-    if ' HD ' in release_title:
+    if ' hd ' in release_title:
         quality = '720p'
     if '720p' in release_title:
         quality = '720p'
+    if 'cam' in release_title:
+        quality = 'CAM'
 
     return quality
-
 
 def getInfo(release_title):
     info = []
@@ -128,7 +106,9 @@ def clean_title(title, broken=None):
 
     title = re.sub(r'\:|\\|\/|\,|\!|\?|\(|\)|\'|\"|\\|\[|\]|\-|\_|\.', ' ', title)
     title = re.sub(r'\s+', ' ', title)
+    title = title.replace('  ', ' ')
     title = re.sub(r'\&', 'and', title)
+
     return title.strip()
 
 
@@ -149,9 +129,12 @@ def remove_from_title(title, target):
     title = clean_title(title) + ' '
     return title
 
-def check_title_match(title_parts, release_title, simple_info):
+def check_title_match(title_parts, release_title, simple_info, is_special=False):
     title = clean_title(' '.join(title_parts)) + ' '
     release_title = clean_title(release_title) + ' '
+
+    # print(title)
+    # print(release_title)
 
     if release_title.startswith(title):
         return True
@@ -174,7 +157,8 @@ def check_title_match(title_parts, release_title, simple_info):
         show_title = clean_title(title_parts[0]) + ' '
         show_title = remove_from_title(show_title, year)
         episode_title = clean_title(simple_info['episode_title'])
-        if release_title.startswith(show_title) and episode_title in release_title:
+        should_filter_by_title_only = len(episode_title.split(' ')) >= 3 or is_special
+        if should_filter_by_title_only and release_title.startswith(show_title) and episode_title in release_title:
             return True
 
     return False
@@ -245,7 +229,7 @@ def filter_season_pack(simple_info, release_title):
     return False
 
 def filter_single_special_episode(simple_info, release_title):
-    if check_title_match([simple_info['episode_title']], release_title, simple_info):
+    if check_title_match([simple_info['episode_title']], release_title, simple_info, is_special=True):
         return True
     #tools.log('%s - %s' % (inspect.stack()[0][3], release_title), 'notice')
     return False
@@ -407,8 +391,8 @@ def torrentCacheStrings(args, strict=False):
         relaxed_strings = [
             'episode %s ' % episode_number.zfill(2),
             'episode %s ' % episode_number,
-            ' ep%s' % episode_number,
-            ' ep%s' % episode_number.zfill(2),
+            ' ep%s ' % episode_number,
+            ' ep%s ' % episode_number.zfill(2),
             ]
         episodeStrings += relaxed_strings
 

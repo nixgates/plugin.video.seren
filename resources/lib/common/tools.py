@@ -27,6 +27,8 @@ except:
     syshandle = '1'
     pass
 
+SETTINGS_CACHE = {}
+
 tmdb_semaphore = 40
 
 tmdb_sema = threading.Semaphore(tmdb_semaphore)
@@ -74,13 +76,15 @@ colorChart = ['black', 'white', 'whitesmoke', 'gainsboro', 'lightgray', 'silver'
               'sandybrown', 'peru', 'chocolate', 'orange', 'darkorange', 'tomato', 'orangered', 'red', 'crimson',
               'salmon', 'coral', 'firebrick', 'brown', 'darkred', 'tan', 'rosybrown', 'sienna', 'saddlebrown']
 
-addonName = "Seren"
-
 try:
 
     import xbmcaddon, xbmc, xbmcgui, xbmcplugin, xbmcvfs
 
     addonInfo = xbmcaddon.Addon().getAddonInfo
+
+    addonName = addonInfo('name')
+
+    addonVersion = addonInfo('version')
 
     # GLOBAL VARIABLES
     try:
@@ -151,6 +155,11 @@ except:
 
     import xbmcaddon, xbmc, xbmcgui, xbmcplugin
 
+    addonInfo = xbmcaddon.Addon().getAddonInfo
+
+    addonName = addonInfo('name')
+
+    addonVersion = addonInfo('version')
     try:
         ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path').decode('utf-8')
     except:
@@ -214,6 +223,7 @@ except:
         except:
             pass
 
+
 youtube_url = 'plugin://plugin.video.youtube/play/?video_id=%s'
 
 kodiGui = xbmcgui
@@ -225,8 +235,6 @@ language = xbmc.getLanguage()
 dialogWindow = kodiGui.WindowDialog
 
 addon = xbmcaddon.Addon
-
-addonVersion = addon().getAddonInfo('version')
 
 progressDialog = xbmcgui.DialogProgress()
 
@@ -686,10 +694,13 @@ def setSetting(id, value):
             import time
             time.sleep(float(random.randint(50, 100) / 100))
 
-
 def getSetting(id):
+    if id in SETTINGS_CACHE:
+        return SETTINGS_CACHE[id]
+
     if not console_mode:
-        return xbmcaddon.Addon().getSetting(id)
+        setting_value = xbmcaddon.Addon().getSetting(id)
+        SETTINGS_CACHE.update({id: setting_value})
 
     try:
         settings = open(SETTINGS_PATH, 'r')

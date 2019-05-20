@@ -231,9 +231,19 @@ class RealDebrid:
             torrent = self.addMagnet(magnet)
 
             try:
-                link = self.torrentSelect(torrent['id'], fileIDString[1:])
+                self.torrentSelect(torrent['id'], fileIDString[1:])
                 link = self.torrentInfo(torrent['id'])
-                link = self.unrestrict_link(link['links'][0])
+                selected_files = [i for i in link['files'] if i['selected'] == 1]
+
+                if len(selected_files) == 1:
+                    link_index = 0
+                else:
+                    link_index = 0
+                    index_bytes = 0
+                    for idx, file in enumerate(selected_files):
+                        if file['bytes'] > index_bytes:
+                            link_index = idx
+                link = self.unrestrict_link(link['links'][link_index])
                 if tools.getSetting('rd.autodelete') == 'true':
                     self.deleteTorrent(torrent['id'])
             except:
@@ -258,6 +268,7 @@ class RealDebrid:
             torrent = self.addMagnet(torrent['magnet'])
             episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
             key_list = []
+
             for storage_variant in hashCheck[hash]['rd']:
                 file_inside = False
                 key_list = []
@@ -268,14 +279,14 @@ class RealDebrid:
                     if not any(filename.endswith(extension) for extension in
                                source_utils.COMMON_VIDEO_EXTENSIONS):
                         bad_storage = True
-                        continue
+                        break
                     else:
                         key_list.append(key)
                         if any(episodeString in source_utils.cleanTitle(filename) for
                                episodeString in episodeStrings):
                             file_inside = True
 
-                if file_inside is False or bad_storage is True:
+                if not file_inside or bad_storage:
                     continue
                 else:
                     break
@@ -291,10 +302,12 @@ class RealDebrid:
             link = self.torrentInfo(torrent['id'])
 
             file_index = None
+
             for idx, i in enumerate([i for i in link['files'] if i['selected'] == 1]):
                 if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(i['path'].split('/')[-1]) for
                        episodeString in episodeStrings):
                         file_index = idx
+                        break
 
             if file_index is None:
                 self.deleteTorrent(torrent['id'])
