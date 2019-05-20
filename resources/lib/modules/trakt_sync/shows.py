@@ -6,8 +6,7 @@ from datetime import datetime
 from resources.lib.modules import trakt_sync
 from resources.lib.indexers import trakt
 from resources.lib.indexers import tvdb
-from resources.lib.common import tools
-
+from resources.lib.modules import database
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
@@ -16,24 +15,36 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         cursor.execute('UPDATE episodes SET watched=? WHERE show_id=?', (watched, show_id,))
         cursor.connection.commit()
         cursor.close()
+        from activities import TraktSyncDatabase as activities_database
+        sync_thread = threading.Thread(target=activities_database()._sync_watched_episodes())
+        sync_thread.run()
 
     def mark_season_watched(self, show_id, season, watched):
         cursor = self._get_cursor()
         cursor.execute('UPDATE episodes SET watched=? WHERE show_id=? AND season=?', (watched, show_id, season))
         cursor.connection.commit()
         cursor.close()
+        from activities import TraktSyncDatabase as activities_database
+        sync_thread = threading.Thread(target=activities_database()._sync_watched_episodes())
+        sync_thread.run()
 
     def mark_show_collected(self, show_id, collected):
         cursor = self._get_cursor()
         cursor.execute('UPDATE episodes SET collected=? WHERE show_id=?', (collected, show_id,))
         cursor.connection.commit()
         cursor.close()
+        from activities import TraktSyncDatabase as activities_database
+        sync_thread = threading.Thread(target=activities_database()._sync_collection_shows())
+        sync_thread.run()
 
     def mark_season_collected(self, show_id, season, collected):
         cursor = self._get_cursor()
         cursor.execute('UPDATE episodes SET collected=? WHERE show_id=? AND season=?', (collected, show_id, season))
         cursor.connection.commit()
         cursor.close()
+        from activities import TraktSyncDatabase as activities_database
+        sync_thread = threading.Thread(target=activities_database()._sync_collection_shows())
+        sync_thread.run()
 
     def mark_episode_watched(self, show_id, season, number):
         self._mark_episode_record('watched', 1, show_id, season, number)
@@ -286,6 +297,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 episode = self.update_episode_playcount(episode)
                 meta_list.append(episode['kodi_meta'])
             except:
+                import traceback
+                traceback.print_exc()
                 pass
 
         return meta_list
@@ -293,8 +306,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def get_season_episodes(self, show_id, season):
 
         try:
-            if tools.getSetting('general.hideUnAired') == 'false':
-                raise Exception
 
             cursor = self._get_cursor()
             cursor.execute('SELECT * FROM shows WHERE trakt_id=?', (show_id,))
@@ -313,6 +324,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             if int(season_episode_count) == 0:
                 raise Exception
 
+            if int(season_episode_count) > int(season_aired_count):
+                # Because of trakt caching, we can not trust the information gathered on the last call if the season
+                # is not completely aired. We can limit the amount this slow down is occured by limiting it to
+                # only unfinished seasons
+                raise Exception
+
             if len(season_episodes) < int(season_aired_count):
                 raise Exception
 
@@ -329,8 +346,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return [episode['kodi_meta'] for episode in season_episodes]
 
         except:
-
-            trakt_list = trakt.TraktAPI().json_response('shows/%s/seasons/%s' % (show_id, season))
+            import traceback
+            traceback.print_exc()
+            trakt_list = database.get(trakt.TraktAPI().json_response, 24, 'shows/%s/seasons/%s' % (show_id, season))
 
             self._start_queue_workers()
 
@@ -360,14 +378,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if item is None:
             if get_meta:
-                show_item = trakt.TraktAPI().json_response('/shows/%s?extended=full' % show_id)
+                show_item = database.get(trakt.TraktAPI().json_response, 24, '/shows/%s?extended=full' % show_id)
             else:
                 show_item = None
             item = self._update_show(show_id, show_item, get_meta)
 
         else:
             if item['kodi_meta'] == '{}' and get_meta:
-                show_item = trakt.TraktAPI().json_response('/shows/%s?extended=full' % show_id)
+                show_item = database.get(trakt.TraktAPI().json_response, 24, '/shows/%s?extended=full' % show_id)
                 item = self._update_show(show_id, show_item, get_meta)
 
             else:
@@ -460,13 +478,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 episodes = cursor.fetchall()
                 cursor.close()
 
-                tools.log('Show ID: %s - Season: %s - Aired Episodes: %s - Total Episodes: %s - Watched: %s' %
-                          (show_id,
-                           season_meta['info']['season_title'],
-                           season_meta['info']['aired_episodes'],
-                           season_meta['info']['episode_count'],
-                           len(episodes)))
-
+                # \
                 if len(episodes) < int(season_meta['info']['aired_episodes']):
                     play_count = 0
                 else:
@@ -498,21 +510,22 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         item = cursor.fetchone()
         cursor.close()
 
-        show_meta = self.get_single_show(show_id, get_meta=get_meta)
+        show_meta = self.get_single_show(show_id, get_meta=get_meta, watch_info=False)
 
         if show_meta is None:
             return
 
         if item is None:
-            episode_object = trakt.TraktAPI().json_response('/shows/%s/seasons/%s/episodes/%s?extended=full' %
-                                                            (show_id, season, episode))
+            episode_object = database.get(trakt.TraktAPI().json_response, 24,
+                                          '/shows/%s/seasons/%s/episodes/%s?extended=full' % (show_id, season, episode))
             if episode_object is None:
                 return
             item = self._update_episode(show_id, episode_object, get_meta, watched, collected)
         else:
             if get_meta and item['kodi_meta'] == '{}':
-                episode_object = trakt.TraktAPI().json_response('/shows/%s/seasons/%s/episodes/%s?extended=full' %
-                                                                (show_id, season, episode))
+                episode_object = database.get(trakt.TraktAPI().json_response, 24,
+                                              '/shows/%s/seasons/%s/episodes/%s?extended=full' %
+                                              (show_id, season, episode))
                 if episode_object is None:
                     return
                 item = self._update_episode(show_id, episode_object, get_meta, watched, collected)
@@ -535,12 +548,16 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                item['kodi_meta'] = self.clean_episode_showinfo(item['kodi_meta'])
                item = self.update_episode_playcount(item)
         except:
+            import traceback
+            traceback.print_exc()
             pass
 
         if list_mode:
             try:
                 self.item_list.append(copy.deepcopy(item['kodi_meta']))
             except:
+                import traceback
+                traceback.print_exc()
                 pass
         else:
             return item['kodi_meta']
@@ -565,6 +582,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             else:
                 item['kodi_meta']['info']['playcount'] = 0
         except:
+            import traceback
+            traceback.print_exc()
             pass
 
         return item
@@ -604,6 +623,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
             return {'trakt_id': trakt_id, 'kodi_meta': kodi_meta, 'last_updated': update_time}
         except:
+            import traceback
+            traceback.print_exc()
             pass
 
     def _update_season(self, show_meta, season_meta, get_meta=True):

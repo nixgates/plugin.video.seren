@@ -8,7 +8,7 @@ import re
 import sys
 import threading
 import time
-import traceback
+import requests
 
 from resources.lib.common import source_utils
 from resources.lib.common import tools
@@ -31,6 +31,7 @@ class Sources(tools.dialogWindow):
         self.language = 'en'
         self.torrentCacheSources = {}
         self.hosterSources = {}
+        self.cloud_files = []
         self.remainingProviders = []
         self.allTorrents = {}
         self.hosterDomains = {}
@@ -136,8 +137,16 @@ class Sources(tools.dialogWindow):
                 if self.display_style == 1:
                     self.background_dialog.create('%s (%s)' % (self.args['title'], self.args['year']))
 
+                # Confirm movie year against IMDb's information
+
             self.setText(tools.lang(32081))
             self.setBackground(background)
+
+            if not 'showInfo' in self.args:
+                resp = requests.get('https://v2.sg.media-imdb.com/suggestion/t/%s.json' % self.args['ids']['imdb'])
+                year = json.loads(resp.text)['d'][0]['y']
+                if year != self.args['year']:
+                    self.args['year'] = str(year)
 
             try:
                 self.getLocalTorrentResults()
@@ -155,6 +164,10 @@ class Sources(tools.dialogWindow):
                     self.torrent_threads.append(threading.Thread(target=self.getTorrent, args=(self.args, i)))
                 for i in self.hosterProviders:
                     self.hoster_threads.append(threading.Thread(target=self.getHosters, args=(self.args, i)))
+
+                # Add the users cloud inspection to the threads to be run
+                self.hoster_threads.append(threading.Thread(target=self.user_cloud_inspection))
+
                 # Shuffle and start scraping threads
                 random.shuffle(self.torrent_threads)
                 random.shuffle(self.hoster_threads)
@@ -175,6 +188,7 @@ class Sources(tools.dialogWindow):
 
                     tools.log('Remainin Providers %s' % self.remainingProviders)
                     if self.prem_terminate() is True or len(self.remainingProviders) == 0:
+                        # Give some time for scrapers to initiate
                         if runtime > 5:
                             break
 
@@ -191,10 +205,11 @@ class Sources(tools.dialogWindow):
                             tools.colorString(self.torrents_qual_len[2] + self.hosters_qual_len[2]),
                             tools.colorString(self.torrents_qual_len[3] + self.hosters_qual_len[3]),
                         ))
-                        self.setText2("Torrents: %s | Cached: %s | Hosters: %s" % (
+                        self.setText2("Torrents: %s | Cached: %s | Hosters: %s | Cloud Files: %s" % (
                             tools.colorString(len([i for i in self.allTorrents])),
                             tools.colorString(len([i for i in self.torrentCacheSources])),
-                            tools.colorString(len([i for i in self.hosterSources]))
+                            tools.colorString(len([i for i in self.hosterSources])),
+                            tools.colorString(len([i for i in self.cloud_files]))
                         ))
                         if len(self.remainingProviders) > 5:
                             self.setText3("Remaining Providers: %s" % tools.colorString(len(self.remainingProviders)))
@@ -221,7 +236,10 @@ class Sources(tools.dialogWindow):
             self.build_cache_assist()
 
             # Returns empty list if no sources are found, otherwise sort sources
-            if len(self.torrentCacheSources) + len(self.hosterSources) == 0:
+            cached = [i['hash'] for i in self.torrentCacheSources]
+            uncached = [i for i in self.allTorrents if i['hash'] not in cached]
+
+            if len(self.torrentCacheSources) + len(self.hosterSources) + len(self.cloud_files) == 0:
                 try:
                     tools.playList.clear()
                     tools.closeOkDialog()
@@ -230,12 +248,13 @@ class Sources(tools.dialogWindow):
                 if self.silent:
                     tools.showDialog.notification(tools.addonName, tools.lang(32085))
 
-                self.return_data = ([], self.args)
+                self.return_data = (uncached, [], self.args)
                 self.close()
                 return
 
             sorted = self.sortSources(self.torrentCacheSources, self.hosterSources)
-            self.return_data = [sorted, self.args]
+
+            self.return_data = [uncached, sorted, self.args]
             self.close()
             return
 
@@ -252,6 +271,7 @@ class Sources(tools.dialogWindow):
             database.addTorrent(trakt_id, torrent)
 
     def getLocalTorrentResults(self):
+
         local_storage = database.getTorrents(self.trakt_id)
         relevant_torrents = []
 
@@ -589,6 +609,202 @@ class Sources(tools.dialogWindow):
 
         return
 
+    def user_cloud_inspection(self):
+        self.remainingProviders.append('Cloud Inspection')
+        threads = []
+
+        if tools.premiumize_enabled() and tools.getSetting('premiumize.cloudInspection') == 'true':
+            threads.append(threading.Thread(target=self.premiumize_cloud_inspection))
+
+        if tools.real_debrid_enabled() and tools.getSetting('rd.cloudInspection') == 'true':
+            threads.append(threading.Thread(target=self.rd_cloud_inspection))
+
+        for i in threads:
+            i.start()
+
+        for i in threads:
+            i.join()
+
+        self.remainingProviders.remove('Cloud Inspection')
+
+    def rd_cloud_inspection(self):
+
+        torrents = real_debrid.RealDebrid().list_torrents()
+
+        if 'episodeInfo' in self.args:
+            torrent_simple_info = self.buildSimpleShowInfo(self.args)
+            for i in torrents:
+                if self.prem_terminate():
+                    return
+                if source_utils.filter_show_pack(torrent_simple_info, i['filename']) \
+                        or source_utils.filter_season_pack(torrent_simple_info, i['filename'])\
+                        or source_utils.filter_single_episode(torrent_simple_info, i['filename']):
+
+                    torrent_info = real_debrid.RealDebrid().torrentInfo(i['id'])
+
+                    if not any(tor_file['path'].lower().endswith(extension) for extension in
+                               source_utils.COMMON_VIDEO_EXTENSIONS for tor_file in
+                               [selected for selected in torrent_info['files'] if selected['selected'] == 1]):
+                        continue
+
+                    for f_index, torrent_file in enumerate([cloud_file for cloud_file in torrent_info['files']
+                                                            if cloud_file['selected'] == 1]):
+                        name = torrent_file['path']
+                        if name.startswith('/'):
+                            name = name.split('/')[-1]
+
+                        if source_utils.filter_single_episode(torrent_simple_info, name):
+                            self.cloud_files.append(
+                                {
+                                    'source': 'Real Debrid Cloud',
+                                    'quality': source_utils.getQuality(i['filename']),
+                                    'language': self.language,
+                                    'url': torrent_info['links'][f_index],
+                                    'direct': False,
+                                    'debridonly': True,
+                                    'provider': 'Real-Debrid Cloud',
+                                    'type': 'cloud',
+                                    'release_title': i['filename'],
+                                    'info': source_utils.getInfo(i['filename']),
+                                    'debrid_provider': 'real_debrid'
+                                }
+                            )
+                            break
+
+        else:
+
+            for i in torrents:
+                if self.prem_terminate(): return
+                if source_utils.filter_movie_title(i['filename'], self.args['title'], self.args['year']):
+
+                    torrent_info = real_debrid.RealDebrid().torrentInfo(i['id'])
+
+                    if not any(tor_file['path'].lower().endswith(extension) for extension in
+                               source_utils.COMMON_VIDEO_EXTENSIONS for tor_file in
+                               [selected for selected in torrent_info['files'] if selected['selected'] == 1]):
+                        continue
+
+                    for f_index, torrent_file in enumerate([cloud_file for cloud_file in torrent_info['files']
+                                                            if cloud_file['selected'] == 1]):
+
+                            self.cloud_files.append({
+                                    'source': 'Real Debrid Cloud',
+                                    'quality': source_utils.getQuality(i['filename']),
+                                    'language': self.language,
+                                    'url': torrent_info['links'][f_index],
+                                    'direct': False,
+                                    'debridonly': True,
+                                    'provider': 'Real-Debrid Cloud',
+                                    'type': 'cloud',
+                                    'release_title': i['filename'],
+                                    'info': source_utils.getInfo(i['filename']),
+                                    'debrid_provider': 'real_debrid'
+                            })
+                            break
+                    continue
+
+    def premiumize_cloud_inspection(self):
+
+        cloud_items = premiumize.PremiumizeFunctions().list_folder('')
+
+        if 'episodeInfo' in self.args:
+            torrent_simple_info = self.buildSimpleShowInfo(self.args)
+
+        for item in cloud_items:
+            if self.prem_terminate():
+                return
+            selected_file = None
+            if item['type'] == 'file':
+                if 'episodeInfo' in self.args:
+                    if source_utils.filter_single_episode(torrent_simple_info, item['name']):
+                        selected_file = item
+                else:
+                    if source_utils.filter_movie_title(item['name'], self.args['title'], self.args['year']):
+                        selected_file = item
+
+            else:
+                if 'episodeInfo' in self.args:
+                    if not self.premiumize_folder_inspection(item, torrent_simple_info):
+                        continue
+
+                    try:
+                        selected_file = self.premiumize_folder_digger(item['id'], torrent_simple_info)
+                    except:
+                        return
+                else:
+                    if not source_utils.filter_movie_title(item['name'], self.args['title'], self.args['year']):
+                        continue
+
+                    try:
+                        selected_file = self.premiumize_folder_digger(item['id'], self.args)
+                    except:
+                        import traceback
+                        traceback.print_exc()
+                        continue
+
+            if selected_file:
+                if tools.getSetting('premiumize.transcoded') == 'true':
+                    url = selected_file['stream_link']
+                else:
+                    url = selected_file['link']
+                try:
+                    size = (int(selected_file['size']) / 1024) /1024
+                except:
+                    size = 0
+                self.cloud_files.append({
+                    'source': 'Premiumize Cloud',
+                    'quality': source_utils.getQuality(selected_file['name']),
+                    'language': self.language,
+                    'url': url,
+                    'provider': 'Premiumize Cloud',
+                    'type': 'cloud',
+                    'release_title': selected_file['name'],
+                    'info': source_utils.getInfo(selected_file['name']),
+                    'debrid_provider': 'premiumize',
+                    'size': size
+                })
+
+    def premiumize_folder_digger(self, folder_id, item_information):
+        if self.prem_terminate():
+            return
+        found_item = None
+        folder_items = premiumize.PremiumizeFunctions().list_folder(folder_id)
+
+        for folder_item in folder_items:
+            if self.prem_terminate():
+                return
+            if folder_item['type'] == 'folder':
+                folder_id = folder_item['id']
+                found_item = self.premiumize_folder_digger(folder_id, item_information)
+                if found_item is None:
+                    continue
+            else:
+                if 'show_title' in item_information:
+                    if source_utils.filter_single_episode(item_information, folder_item['name']) and \
+                            any(folder_item['name'].lower().endswith(extension) for
+                                extension in source_utils.COMMON_VIDEO_EXTENSIONS):
+                        return folder_item
+                    else:
+                        continue
+                else:
+                    if source_utils.filter_movie_title(folder_item['name'], item_information['title'],
+                                                       item_information['year']):
+                        if not any(folder_item['name'].lower().endswith(extension) for extension in
+                                   source_utils.COMMON_VIDEO_EXTENSIONS):
+                            continue
+
+                        return folder_item
+
+        return found_item
+
+    def premiumize_folder_inspection(self, folder_item, torrent_simple_info):
+        if source_utils.filter_show_pack(torrent_simple_info, folder_item['name']) or \
+            source_utils.filter_season_pack(torrent_simple_info, folder_item['name']) or \
+                source_utils.filter_single_episode(torrent_simple_info, folder_item['name']):
+            return True
+        else:
+            return False
+
     def resolutionList(self):
         resolutions = []
 
@@ -620,6 +836,10 @@ class Sources(tools.dialogWindow):
         sort_method = int(tools.getSetting('general.sortsources'))
 
         sortedList = []
+
+        for i in self.cloud_files:
+            sortedList.append(i)
+
         resolutions = self.resolutionList()
 
         resolutions.reverse()
@@ -857,6 +1077,10 @@ class Sources(tools.dialogWindow):
         self.hosterSources += source_list
 
     def prem_terminate(self):
+        if tools.getSetting('preem.cloudfiles') == 'true':
+            if len(self.cloud_files) > 0:
+                return True
+
         if 'episodeInfo' in self.args:
             prem_min = int(tools.getSetting('preem.tvres')) + 1
         else:
@@ -1073,20 +1297,28 @@ class TorrentCacheCheck:
                             episodeStrings, seasonStrings = source_utils.torrentCacheStrings(info)
                             for storage_variant in realDebridCache[i['hash']]['rd']:
                                 keys = list(storage_variant.keys())
+                                all_extensions = [storage_variant[key]['filename'] for key in keys]
+                                all_extensions = ['.' + filename.split('.')[-1] for filename in all_extensions]
+                                for ext in all_extensions:
+                                    if ext not in source_utils.COMMON_VIDEO_EXTENSIONS:
+                                        raise Exception
                                 for key in keys:
                                     filename = storage_variant[key]['filename']
                                     if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename)
                                            for episodeString in episodeStrings):
-                                        if any(filename.lower().endswith(extension) for extension in
-                                               source_utils.COMMON_VIDEO_EXTENSIONS):
-                                            cache_list.append(i)
-                                            cache_list[-1]['debrid_provider'] = 'real_debrid'
-                                            break
+                                        cache_list.append(i)
+                                        cache_list[-1]['debrid_provider'] = 'real_debrid'
+                                        break
                         else:
-                            if len(realDebridCache[i['hash']]['rd']) == 1:
-                                i['debrid_provider'] = 'real_debrid'
+                            for storage_variant in realDebridCache[i['hash']]['rd']:
+                                keys = list(storage_variant.keys())
+                                all_extensions = [storage_variant[key]['filename'] for key in keys]
+                                all_extensions = ['.' + filename.split('.')[-1] for filename in all_extensions]
+                                for ext in all_extensions:
+                                    if ext not in source_utils.COMMON_VIDEO_EXTENSIONS:
+                                        raise Exception
                                 cache_list.append(i)
-
+                                cache_list[-1]['debrid_provider'] = 'real_debrid'
                 except:
                     pass
 

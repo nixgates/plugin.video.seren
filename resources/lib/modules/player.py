@@ -52,10 +52,12 @@ class serenPlayer(tools.player):
                 self.media_type = 'episode'
                 self.trakt_id = args['episodeInfo']['ids']['trakt']
                 item.setArt(args['episodeInfo']['art'])
+                item.setUniqueIDs(args['episodeInfo']['ids'])
                 item.setInfo(type='video', infoLabels=args['episodeInfo']['info'])
             else:
                 self.media_type = 'movie'
                 self.trakt_id = args['ids']['trakt']
+                item.setUniqueIDs(args['ids'])
                 item.setArt(args['art'])
                 item.setInfo(type='video', infoLabels=args['info'])
 
@@ -124,7 +126,7 @@ class serenPlayer(tools.player):
 
             if tools.getSetting('general.smartplay') is not 'false' and self.media_type is 'episode':
                 if int(tools.playList.getposition()) == (tools.playList.size() - 1):
-                    self.next_season = smartPlay.SmartPlay(self.args).append_next_season()
+                    smartPlay.SmartPlay(self.args).append_next_season()
 
             self.traktStartWatching()
 
@@ -213,11 +215,14 @@ class serenPlayer(tools.player):
                 if self.media_type == 'episode':
                     from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
                     TraktSyncDatabase().mark_episode_watched(self.args['showInfo']['ids']['trakt'],
-                                                             self.args['info']['season'], self.args['info']['episode'])
+                                                             self.args['episodeInfo']['info']['season'],
+                                                             self.args['episodeInfo']['info']['episode'])
                 if self.media_type == 'movie':
                     from resources.lib.modules.trakt_sync.movies import TraktSyncDatabase
                     TraktSyncDatabase().mark_movie_watched(self.trakt_id)
         except:
+            import traceback
+            traceback.print_exc()
             pass
 
     def traktPause(self):
@@ -257,11 +262,12 @@ class serenPlayer(tools.player):
             if self.isPlayingVideo(): break
             tools.kodi.sleep(1000)
 
-        while self.isPlaying():
+        while self.isPlayingVideo():
             try:
                 if not self.playback_started:
-                    tools.kodi.sleep(5000)
+                    tools.kodi.sleep(1000)
                     continue
+
                 if not self.playback_started:
                     self.start_playback()
 
@@ -274,12 +280,11 @@ class serenPlayer(tools.player):
                     self.playback_resumed = True
 
                 try:
-                    position = self.getTime()
-                    self.current_time = position
-                    total_length = self.getTotalTime()
-                    self.media_length = total_length
+                    self.current_time = self.getTime()
+                    self.media_length = self.getTotalTime()
                 except:
                     pass
+
                 if self.pre_cache_initiated is False:
                     try:
                         if self.getWatchedPercent() > 80 and tools.getSetting('smartPlay.preScrape') == 'true':
@@ -288,7 +293,7 @@ class serenPlayer(tools.player):
                     except:
                         pass
 
-                # We manually check an signal this as Kodi always calls the playbackEnded call after a new player
+                # We manually check and signal this as Kodi always fires playbackEnded after a new player
                 # class is created, marking the wrong episode watched
                 if self.getWatchedPercent() > 90 and not self.scrobbled:
                     self.traktStopWatching()
@@ -300,7 +305,7 @@ class serenPlayer(tools.player):
                 tools.kodi.sleep(1000)
                 continue
 
-            tools.kodi.sleep(1000)
+            tools.kodi.sleep(3000)
 
         self.traktStopWatching()
 

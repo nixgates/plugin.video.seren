@@ -143,30 +143,31 @@ class Resolver(tools.dialogWindow):
                             return
 
 
-                    elif i['type'] == 'hoster':
+                    elif i['type'] == 'hoster' or i['type'] == 'cloud':
                         # Quick fallback to speed up resolving while direct and free hosters are not supported
 
-                        provider = i['provider_imports']
-                        providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
-                        providerModule = providerModule.source()
+                        if 'provider_imports' in i:
+                            provider = i['provider_imports']
+                            providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
+                            providerModule = providerModule.source()
 
-                        try:
-                            i['url'] = providerModule.resolve(i['url'])
-                        except:
-                            import traceback
-                            traceback.print_exc()
-                            pass
+                            try:
+                                i['url'] = providerModule.resolve(i['url'])
+                            except:
+                                import traceback
+                                traceback.print_exc()
+                                pass
 
                         if i['url'] is None:
                             continue
 
                         if 'debrid_provider' in i:
-                            if i['debrid_provider'] == 'premiumize' and tools.getSetting('premiumize.enabled') == 'true':
+                            if i['debrid_provider'] == 'premiumize' and tools.premiumize_enabled():
                                 stream_link = self.premiumizeResolve(i, args)
                                 if stream_link is None:
                                     continue
 
-                            if i['debrid_provider'] == 'real_debrid':
+                            if i['debrid_provider'] == 'real_debrid' and tools.real_debrid_enabled():
                                 stream_link = self.realdebridResolve(i, args)
                                 if stream_link is None:
                                     continue
@@ -235,6 +236,8 @@ class Resolver(tools.dialogWindow):
                 stream_link = premiumize.magnetToStream(source['magnet'], args, pack_select)
             elif source['type'] == 'hoster':
                 stream_link = premiumize.resolveHoster(source['url'])
+            elif source['type'] == 'cloud':
+                stream_link = source['url']
         except:
             import traceback
             traceback.print_exc()
@@ -250,7 +253,7 @@ class Resolver(tools.dialogWindow):
             if i['type'] == 'torrent':
                 stream_link = rd.magnetToLink(i, args)
 
-            elif i['type'] == 'hoster':
+            elif i['type'] == 'hoster' or i['type'] == 'cloud':
                 stream_link = rd.unrestrict_link(i['url'])
         except:
             import traceback

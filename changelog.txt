@@ -1,3 +1,68 @@
+Changelog 0.2.35:
+Seren now utilizes Kodi Repository dateutil package
+
+Changelog 0.2.34:
+Cleaned up logging
+
+Changelog 0.2.33:
+Premiumize Cloud Inspection now includes size for identified items
+Cloud Inspection threads now gracefully exit if pre-emptive termination limit is reached
+Increased file identification
+Fixed delay with getsources window showing
+
+Changelog 0.2.32:
+Fixed is_aired format error
+Fixed issue with hide SD removing cloud files
+
+Changelog 0.2.31:
+Fixed issue with un-aired episodes being added to playlist after smartplay speedup
+Seren now confirms TMDB year information with IMDB prior to scraping
+Fixed issues with Seren identifying sources from the users premiumize cloud
+
+Changelog 0.2.30:
+Fixed dictionary key issue for show items in smartPlay modules created with new workaround
+
+Changelog 0.2.29:
+Added removal of duplicate space characters to clean title function
+Added support for single episode folders to Premiumize cloud inspection
+
+Changelog 0.2.28:
+Fixed issue with addonName variable change
+
+Changelog 0.2.27:
+Adjusted RD cache inspection to allow multiple video files within a single movie item
+Adjust RD movie resolving to pull largest file out of torrent item
+Seren now polls Kodi for supported video containers instead of hardcoding
+Fixed key error when marking episode as watched in local database
+Added settings cache dictionary to reduce Kodi's logging of "trying to load setting definitions from old format..."
+Cleaned up addon logging
+
+Changelog 0.2.26:
+Fix Auto Episode Resume
+
+Changelog 0.2.25:
+Movie years now uses the popular API endpoint
+Added option to enable Debrid Cloud inspection during scrape
+Added Upcoming Episodes to My Shows menu
+Added By Actor search to Discover Show/Movie menus
+"Hide Un-Aired Episodes" renamed to "Hide Un-Aired Items"
+"Hide Un-Aired Items" setting now applies to movie/show/season menus as well
+Marking show/season item as watched/collected now triggers a background re-sync of relevant items
+Increased resolving restrictions
+Playstyle for Episodes and Movies are now seperate
+Fixed issue with Premiumize Torrent File Picker
+Speed Increase for playlist building
+
+
+Changelog 0.2.24:
+Fixed issue with None value for seren_version entry of trakt database
+
+Changelog 0.2.23:
+Added workaround to combat file extraction error while obtaining GMT timezone information
+Fixed issue with activities failing due to no progress dialog raised
+Re-added extended information argument to the list items call to fix issue with first
+
+
 Changelog 0.2.22:
 Re-added ability for next-up to be sorted by Recently Played
 Added error message when attempting to play an item with no debrid accounts setup

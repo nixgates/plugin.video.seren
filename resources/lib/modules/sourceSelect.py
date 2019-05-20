@@ -6,6 +6,7 @@ import threading
 from resources.lib.common import tools
 
 def build_display_title(source):
+
     if 'debrid_provider' in source:
         debrid_provider = tools.colorString(tools.shortened_debrid(source.get('debrid_provider', '')))
         if debrid_provider != '':
@@ -25,7 +26,7 @@ def build_display_title(source):
 
     title = ''
 
-    if source['type'] == 'torrent':
+    if source['type'] == 'torrent' or source['type'] == 'cloud':
         size = tools.colorString(tools.source_size_display(source['size']))
         title = "%s |%s %s | %s %s\n%s" % (
             quality,
@@ -51,7 +52,7 @@ def build_display_title(source):
     return title
 
 
-def sourceSelect(source_list, info):
+def sourceSelect(uncached_sources, source_list, info):
     try:
         if len(source_list) == 0:
             return None
@@ -61,7 +62,7 @@ def sourceSelect(source_list, info):
             display_list.append(build_display_title(source))
 
         if tools.getSetting('general.sourceselect') == '1':
-            window = source_select_list(display_list, info)
+            window = source_select_list(uncached_sources, display_list, info)
             selection = window.doModal()
             del window
 
@@ -87,7 +88,7 @@ def sourceSelect(source_list, info):
 
 class source_select_list(tools.dialogWindow):
 
-    def __init__(self, display_list, info):
+    def __init__(self, uncached_sources, display_list, info):
         self.closed = False
         self.position = -1
 

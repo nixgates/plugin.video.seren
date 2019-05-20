@@ -5,7 +5,8 @@
 		<setting type="lsep" label="40001" />
 		<setting type="sep" />
 		<setting type="bool" id="general.checkAddonUpdates" default="true" label="40137" />
-		<setting type="enum" id="general.playstyle" label="40002" default="40003" lvalues="40003|40004" />
+		<setting type="enum" id="general.playstyleMovie" label="40152" default="40003" lvalues="40003|40004" />
+		<setting type="enum" id="general.playstyleEpisodes" label="40002" default="40003" lvalues="40003|40004" />
 		<setting type="enum" id="general.scrapedisplay" label="40127" default="40129" lvalues="40129|40130" />
 		<!--<setting type="enum" id="general.resolvedisplay" label="40128" default="40129" lvalues="40129|40130" /> -->
 		<setting type="enum" id="general.sourceselect" label="40005" default="40006" lvalues="40007|40006" />
@@ -82,6 +83,7 @@
 		<setting type="lsep" label="40053" />
 		<setting type="sep" />
 		<setting id="preem.enabled" type="bool" label="40054" default="true" />
+		<setting id="preem.cloudfiles" type="bool" label="40148" default="false" />
 		<setting id="preem.movieres" type="enum" subsetting="true" label="40055" values="4K|1080p|720p|SD" default="1" visible="eq(-1,true)" />
 		<setting id="preem.tvres" type="enum" subsetting="true" label="40056" values="4K|1080p|720p|SD" default="1" visible="eq(-2,true)" />
 		<setting id="preem.limit" type="slider" subsetting="true" label="40057" default="2" range="0, 20" option="int" visible="eq(-3,true)"/>
@@ -101,13 +103,14 @@
 		<setting type="lsep" label="40066" />
 		<setting type="sep" />
 		<setting id="premiumize.enabled" type="bool" default="false" label="40108" />
+		<setting id="premiumize.pin" type="text" default="" subsetting="true" label="40106" visible="eq(-1,true)"/>
 		<setting id="premiumize.priority" type="slider" option="int" default="10" range="1,1,10" subsetting="true" label="40107" visible="eq(-1,true)" />
-		<setting id="premiumize.pin" type="text" default="" subsetting="true" label="40106"  visible="eq(-2,true)"/>
 		<setting id="premiumize.transcoded" type="bool" default="false" subsetting="true" label="40105" visible="eq(-3,true)" />
 		<setting id="premiumize.torrents" type="bool" default="true" subsetting="true" label="40100" visible="eq(-4,true)" />
 		<setting id="premiumize.addToCloud" type="bool" default="false" subsetting="true" label="40143" visible="eq(-1,true)" />
 		<setting id="premiumize.hosters" type="bool" default="true" subsetting="true" label="40101" visible="eq(-6,true)" />
 		<setting id="premiumize.autodelete" type="bool" default="true" subsetting="true" label="40104" visible="eq(-7,true)" />
+		<setting id="premiumize.cloudInspection" type="bool" default="false" subsetting="true" label="40149" visible="eq(-8,true)" />
 		<setting id="premiumize.threshold" type="slider" subsetting="true" label="40103" default="50" range="20, 10, 70" option="percent" visible="eq(-7,true)"/>
 		<setting type="lsep" label="40067" />
 		<setting type="sep" />
@@ -118,6 +121,7 @@
 		<setting id="rd.torrents" type="bool" default="true" subsetting="true" label="40100"  visible="eq(-4,true)"/>
 		<setting id="rd.hosters" type="bool" default="true" subsetting="true" label="40101" visible="eq(-5,true)"/>
 		<setting id="rd.autodelete" type="bool" default="true" subsetting="true" label="40102" visible="eq(-6,true)" />
+		<setting id="rd.cloudInspection" type="bool" default="false" subsetting="true" label="40149" visible="eq(-7,true)" />
 		<setting type="lsep" label="40115" />
 		<setting type="sep"/>
 		<setting id="fanart.apikey" label="40114" type="text" default="" />

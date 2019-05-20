@@ -202,7 +202,6 @@ class TraktAPI:
 
         try:
             response = requests.delete(url, headers=self.headers)
-
             if response.status_code == 401:
                 if refreshCheck == False:
                     self.refreshToken()
@@ -348,6 +347,9 @@ class TraktAPI:
         tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item marked as unwatched')
 
     def addToCollection(self, trakt_object):
+
+        self.post_request('sync/collection', postData=trakt_object)
+
         if 'seasons' in trakt_object:
             from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
             trakt_object = trakt_object['seasons'][0]
@@ -366,10 +368,11 @@ class TraktAPI:
             trakt_object = trakt_object['movies'][0]
             TraktSyncDatabase().mark_movie_collected(trakt_object['ids']['trakt'])
 
-        self.post_request('sync/collection', postData=trakt_object)
         tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item added to Collection')
 
     def removeFromCollection(self, trakt_object):
+        self.post_request('sync/collection/remove', postData=trakt_object)
+
         if 'seasons' in trakt_object:
             from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
             trakt_object = trakt_object['seasons'][0]
@@ -388,7 +391,6 @@ class TraktAPI:
             trakt_object = trakt_object['movies'][0]
             TraktSyncDatabase().mark_movie_uncollected(trakt_object['ids']['trakt'])
 
-        self.post_request('sync/collection/remove', postData=trakt_object)
         tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item removed from Collection')
 
     def addToWatchList(self, trakt_object):

@@ -79,6 +79,7 @@ def executebuiltin(function, *args):
         print('Executing built in command')
         if '?' in function:
             sys.argv = [None, None, function.split('?')[1]]
+        print(sys.argv)
         execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
     except:
         import traceback
@@ -296,6 +297,7 @@ class Monitor(object):
 
 class Player(object):
     def __init__(self):
+        playlist = []
         pass
     def disableSubtitles(self):
         warnings.warn("Removed in v17.0", category=DeprecationWarning)
@@ -328,6 +330,9 @@ class Player(object):
     def pause(self):
         pass
     def play(self, item="", listitem=None, windowed=False, startpos=-1):
+        print(type(item))
+        if type(item) == PlayList:
+            print('YERp')
         pass
     def playnext(self):
         pass

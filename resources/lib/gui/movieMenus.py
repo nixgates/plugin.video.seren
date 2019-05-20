@@ -64,6 +64,7 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32014), 'moviesUpdated&page=1', '', '')
         tools.addDirectoryItem(tools.lang(32062), 'movieGenres&page=1', '', '')
         tools.addDirectoryItem(tools.lang(40123), 'movieYears', '', '')
+        tools.addDirectoryItem(tools.lang(40151), 'movieByActor', '', '')
 
         # tools.addDirectoryItem('Years', 'movieYears', '', '')
         if tools.getSetting('searchHistory') == 'false':
@@ -237,7 +238,7 @@ class Menus:
 
     def movieYearsMovies(self, year, page):
 
-        trakt_list = database.get(trakt.json_response, 24, 'movies/trending?years=%s&page=%s' % (year, page))
+        trakt_list = database.get(trakt.json_response, 24, 'movies/popular?years=%s&page=%s' % (year, page))
 
         if trakt_list is None:
             return
@@ -247,6 +248,37 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32019), 'movieYearsMovies&page=%s&actionArgs=%s' %
                                (int(page) + 1, year), '', '')
         tools.closeDirectory('movies')
+
+    def moviesByActor(self, actionArgs):
+
+        if actionArgs == None:
+            k = tools.showKeyboard('', tools.lang(32016))
+            k.doModal()
+            query = (k.getText() if k.isConfirmed() else None)
+            if query == None or query == '':
+                return
+        else:
+            query = tools.unquote(actionArgs)
+
+        database.addSearchHistory(query, 'movieActor')
+        query = tools.deaccentString(query)
+        query = query.replace(' ', '-')
+        query = tools.quote_plus(query)
+
+        trakt_list = trakt.json_response('people/%s/movies' % query, limit=True)
+
+        try:
+            trakt_list = trakt_list['cast']
+        except:
+            import traceback
+            traceback.print_exc()
+            trakt_list = []
+
+        trakt_list = [i['movie'] for i in trakt_list]
+
+        self.commonListBuilder(trakt_list)
+
+        tools.closeDirectory('tvshows')
 
     def movieGenres(self):
         tools.addDirectoryItem(tools.lang(32065), 'movieGenresGet', '', '', isFolder=True)
@@ -325,6 +357,8 @@ class Menus:
                 name = tools.display_string(item['info']['title'])
 
                 if not self.is_aired(item['info']):
+                    if tools.getSetting('general.hideUnAired') == 'true':
+                        continue
                     name = tools.colorString(name, 'red')
                     name = tools.italic_string(name)
 
