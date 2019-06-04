@@ -136,12 +136,12 @@
 		<setting type="action" label="40082" action="RunPlugin(plugin://plugin.video.seren/?action=manualProviderUpdate)" />
 		<setting type="action" label="40071" action="RunPlugin(plugin://plugin.video.seren/?action=installProviders)"/>
 		<setting type="action" label="40072" action="RunPlugin(plugin://plugin.video.seren/?action=uninstallProviders)" />
-		<setting type="action" label="40073" action="RunPlugin(plugin://plugin.video.seren/?action=adjustPackage&actionArgs=disabled)" />
-		<setting type="action" label="40074" action="RunPlugin(plugin://plugin.video.seren/?action=adjustPackage&actionArgs=enabled)" />
+		<setting type="action" label="40073" action="RunPlugin(plugin://plugin.video.seren/?action=adjustPackage&amp;actionArgs=disabled)" />
+		<setting type="action" label="40074" action="RunPlugin(plugin://plugin.video.seren/?action=adjustPackage&amp;actionArgs=enabled)" />
 		<setting type="lsep" label="40075" />
 		<setting type="sep"/>
-		<setting type="action" label="40076" action="RunPlugin(plugin://plugin.video.seren/?action=adjustProviders&actionArgs=disabled)" />
-		<setting type="action" label="40077" action="RunPlugin(plugin://plugin.video.seren/?action=adjustProviders&actionArgs=enabled)"/>
+		<setting type="action" label="40076" action="RunPlugin(plugin://plugin.video.seren/?action=adjustProviders&amp;actionArgs=disabled)" />
+		<setting type="action" label="40077" action="RunPlugin(plugin://plugin.video.seren/?action=adjustProviders&amp;actionArgs=enabled)"/>
 	</category>
 
 	<category label="40093">
