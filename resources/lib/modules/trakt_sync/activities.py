@@ -33,11 +33,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 pass
 
     def sync_activities(self):
-
+        # only sync/prompt if we have a trakt account setup
+        if tools.getSetting('trakt.auth') == '':
+            return
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         trakt_activities = Trakt.TraktAPI().json_response('sync/last_activities')
 
-        if str(self.activites['all_activities']) == self.base_date and tools.getSetting('trakt.auth') != '':
+        if str(self.activites['all_activities']) == self.base_date:
             # Increase the amount of concurrent tasks running during initial and Force Sync processes to speed up task
             tools.showDialog.textviewer(tools.addonName, tools.lang(40133))
             confirmation = tools.showDialog.yesno(tools.addonName, tools.lang(40134))
