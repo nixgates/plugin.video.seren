@@ -649,6 +649,8 @@ def paginate_list(list_items, page, limit):
 
 
 def setSetting(id, value):
+    if id in SETTINGS_CACHE:
+        del SETTINGS_CACHE[id]
     if not console_mode:
         return xbmcaddon.Addon().setSetting(id, value)
 
@@ -701,6 +703,7 @@ def getSetting(id):
     if not console_mode:
         setting_value = xbmcaddon.Addon().getSetting(id)
         SETTINGS_CACHE.update({id: setting_value})
+        return setting_value
 
     try:
         settings = open(SETTINGS_PATH, 'r')
