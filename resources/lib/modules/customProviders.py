@@ -77,66 +77,74 @@ class providers:
         sys.path.append(tools.dataPath)
         import providers
 
-        providers = providers.get_all(self.language)
+        all_providers = providers.get_all(self.language)
+        all_providers = {'torrent': all_providers[0],
+                         'hosters': all_providers[1]}
 
-        if len(self.pre_update_collection) > 0:
-            pack_name = self.pre_update_collection[0]['package']
+        database_providers = database.get_providers()
 
-            hosters = providers[1]
-            torrent = providers[0]
+        for provider_type in provider_types:
 
-            for provider_type in range(len(provider_types)):
-                for i in providers[provider_type]:
-                    provider_name = i[1]
+            for provider in all_providers[provider_type]:
+                database.add_provider(provider[1], provider[2], 'enabled', self.language,
+                                      provider_type)
 
-                    # We need to check that the provider file exists after updating
-                    # For some reason lsdir still shows files as existing after the module removes them.
-                    path = os.path.join(self.providers_path, pack_name, self.language,
-                                        provider_types[provider_type], provider_name + ".py")
-
-                    if not os.path.exists(path):
-                        continue
-
-                    old_setting = [x for x in self.pre_update_collection if
-                                   x['provider_type'] == provider_types[provider_type] and
-                                   x['package'] == pack_name and
-                                   x['provider_name'] == provider_name]
-
-                    if len(old_setting) > 0:
-                        old_setting = old_setting[0]
-                        database.add_provider(old_setting['provider_name'],
-                                              old_setting['package'],
-                                              old_setting['status'],
-                                              old_setting['country'],
-                                              old_setting['provider_type'])
-                    else:
-                        database.add_provider(i[1], i[2], 'enabled', self.language, provider_types[provider_type])
-
-        else:
-            if self.known_providers is None or len(self.known_providers) == 0:
-
-                for provider in providers[0]:
-                    tools.log('Adding Provider %s' % provider[1])
-                    database.add_provider(provider[1], provider[2], 'enabled', self.language, 'torrent')
-                for provider in providers[1]:
-                    tools.log('Adding Provider %s' % provider[1])
-                    database.add_provider(provider[1], provider[2], 'enabled', self.language, 'hoster')
-
-            else:
-
-                for i in range(2):
-                    for provider in providers[i]:
-                        existing = [existing for existing in self.known_providers
-                                    if provider[2] == existing['package']\
-                                    and provider[1] == existing['provider_name']\
-                                    and existing['provider_type'] == provider_types[i]]
-
-
-                        if len(existing) == 0:
-                            tools.log('Adding Provider %s' % provider[1])
-                            database.add_provider(provider[1], provider[2], 'enabled', self.language,
-                                                  provider_types[i])
-
+        # if len(self.pre_update_collection) > 0:
+        #     pack_name = self.pre_update_collection[0]['package']
+        #
+        #     for provider_type in range(len(provider_types)):
+        #         for i in providers[provider_type]:
+        #             provider_name = i[1]
+        #             tools.log(provider_name)
+        #
+        #             # We need to check that the provider file exists after updating
+        #             # For some reason lsdir still shows files as existing after the module removes them.
+        #             path = os.path.join(self.providers_path, pack_name, self.language,
+        #                                 provider_types[provider_type], provider_name + ".py")
+        #
+        #             if not os.path.exists(path):
+        #                 continue
+        #
+        #             old_setting = [x for x in self.pre_update_collection if
+        #                            x['provider_type'] == provider_types[provider_type] and
+        #                            x['package'] == pack_name and
+        #                            x['provider_name'] == provider_name]
+        #
+        #             if len(old_setting) > 0:
+        #                 old_setting = old_setting[0]
+        #                 database.add_provider(old_setting['provider_name'],
+        #                                       old_setting['package'],
+        #                                       old_setting['status'],
+        #                                       old_setting['country'],
+        #                                       old_setting['provider_type'])
+        #             else:
+        #                 database.add_provider(i[1], i[2], 'enabled', self.language, provider_types[provider_type])
+        #
+        # else:
+        #     if self.known_providers is None or len(self.known_providers) == 0:
+        #
+        #         for provider in providers[0]:
+        #             tools.log('Adding Provider %s' % provider[1])
+        #             database.add_provider(provider[1], provider[2], 'enabled', self.language, 'torrent')
+        #         for provider in providers[1]:
+        #             tools.log('Adding Provider %s' % provider[1])
+        #             database.add_provider(provider[1], provider[2], 'enabled', self.language, 'hoster')
+        #
+        #     else:
+        #
+        #         for i in range(2):
+        #             for provider in providers[i]:
+        #                 existing = [existing for existing in self.known_providers
+        #                             if provider[2] == existing['package']\
+        #                             and provider[1] == existing['provider_name']\
+        #                             and existing['provider_type'] == provider_types[i]]
+        #
+        #
+        #                 if len(existing) == 0:
+        #                     tools.log('Adding Provider %s' % provider[1])
+        #                     database.add_provider(provider[1], provider[2], 'enabled', self.language,
+        #                                           provider_types[i])
+        #
 
         self.known_providers = database.get_providers()
 
@@ -251,8 +259,6 @@ class providers:
         else:
             zip_file = self.get_zip_file(zip_location, False)
 
-
-
         if zip_file is None:
             return
 
@@ -318,8 +324,6 @@ class providers:
                 return
 
         self.pre_update_collection = [i for i in database.get_providers() if i['package'] == pack_name]
-
-        database.remove_package_providers(pack_name)
 
         folders = ['providerModules/', 'providers/']
         meta_output_location = os.path.join(tools.dataPath, 'providerMeta', '%s.json' % pack_name)
@@ -423,7 +427,7 @@ class providers:
         tools.log('Refreshing provider database ')
         database.add_provider_package(pack_name, author, remote_meta, version)
 
-        self.update_known_providers()
+        tools.execute('RunPlugin("plugin://plugin.video.%s/?action=refreshProviders")' % tools.addonName.lower())
         return True
 
     def failed_prompt(self):

@@ -699,7 +699,7 @@ msgid "Enable File Size Limit"
 msgstr ""
 
 msgctxt "#40047"
-msgid "File Size limit (GB)"
+msgid "Episode File Size limit (GB)"
 msgstr ""
 
 msgctxt "#40048"
@@ -923,7 +923,7 @@ msgid "Auto-Delete Torrents"
 msgstr ""
 
 msgctxt "#40103"
-msgid "Max Fair-Use Percentage Before Deletion"
+msgid "Max Storage Space Used Before Deletion (GB)"
 msgstr ""
 
 msgctxt "#40104"
@@ -1124,4 +1124,20 @@ msgstr ""
 
 msgctxt "#40153"
 msgid "Play From Random Episode"
+msgstr ""
+
+msgctxt "#40154"
+msgid "Movie File Size limit (GB)"
+msgstr ""
+
+msgctxt "#40155"
+msgid "Enable Kodi Menu Caching"
+msgstr ""
+
+msgctxt "#40156"
+msgid "Please Note\nYou appear to have authorized a non-premium account and will not be able to play items using this account"
+msgstr ""
+
+msgctxt "#40157"
+msgid "Auto try next link on resolve failure (Source Select)"
 msgstr ""

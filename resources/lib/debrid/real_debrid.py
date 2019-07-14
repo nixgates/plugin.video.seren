@@ -45,6 +45,10 @@ class RealDebrid:
                 tools.setSetting('rd.secret', response['client_secret'])
                 self.ClientSecret = response['client_secret']
                 self.ClientID = response['client_id']
+                user_information = self.get_url('user')
+                tools.log(user_information)
+                if user_information['type'] != 'premium':
+                    tools.showDialog.ok(tools.addonName, tools.lang(40156))
             except:
                 tools.showDialog.ok(tools.addonName, tools.lang(32100))
             return
@@ -127,7 +131,7 @@ class RealDebrid:
             else:
                 url += "&auth_token=%s" % self.token
 
-        response = requests.post(url, data=postData).text
+        response = requests.post(url, data=postData, timeout=10).text
         if 'bad_token' in response or 'Bad Request' in response:
             if not fail_check:
                 self.refreshToken()
@@ -149,7 +153,7 @@ class RealDebrid:
             else:
                 url += "&auth_token=%s" % self.token
 
-        response = requests.get(url).text
+        response = requests.get(url, timeout=10).text
 
         if 'bad_token' in response or 'Bad Request' in response:
             tools.log('Refreshing RD Token')
@@ -229,12 +233,10 @@ class RealDebrid:
                         fileIDString += ',' + key
 
             torrent = self.addMagnet(magnet)
-
             try:
                 self.torrentSelect(torrent['id'], fileIDString[1:])
                 link = self.torrentInfo(torrent['id'])
                 selected_files = [i for i in link['files'] if i['selected'] == 1]
-
                 if len(selected_files) == 1:
                     link_index = 0
                 else:
@@ -260,7 +262,7 @@ class RealDebrid:
 
     def magnetToLink(self, torrent, args):
         try:
-            if torrent['package'] == 'single' or 'episodeInfo' not in args:
+            if torrent['package'] == 'single' or 'showInfo' not in args:
                 return self.singleMagnetToLink(torrent['magnet'])
 
             hash = str(re.findall(r'btih:(.*?)&', torrent['magnet'])[0].lower())
@@ -302,6 +304,7 @@ class RealDebrid:
             link = self.torrentInfo(torrent['id'])
 
             file_index = None
+
 
             for idx, i in enumerate([i for i in link['files'] if i['selected'] == 1]):
                 if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(i['path'].split('/')[-1]) for

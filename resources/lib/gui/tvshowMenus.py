@@ -22,7 +22,11 @@ try:
 except:
     syshandle = ''
 trakt = TraktAPI()
+
 language_code = tools.get_language_code()
+
+trakt_database = TraktSyncDatabase()
+hidden_database = HiddenDatabase()
 
 
 class Menus:
@@ -38,7 +42,7 @@ class Menus:
     ######################################################
 
     def onDeckShows(self):
-        hidden_shows = HiddenDatabase().get_hidden_items('progress_watched', 'shows')
+        hidden_shows = hidden_database.get_hidden_items('progress_watched', 'shows')
         trakt_list = trakt.json_response('sync/playback/episodes', limit=True)
 
         if trakt_list is None:
@@ -97,7 +101,7 @@ class Menus:
         tools.closeDirectory('addons')
 
     def myShowCollection(self):
-        trakt_list = TraktSyncDatabase().get_collected_episodes()
+        trakt_list = trakt_database.get_collected_episodes()
         trakt_list = [i for i in trakt_list if i is not None]
         trakt_list = list(set([i['show_id'] for i in trakt_list]))
         trakt_list = [{'ids': {'trakt': i}} for i in trakt_list]
@@ -123,7 +127,7 @@ class Menus:
 
     def myProgress(self):
 
-        collected_episodes = TraktSyncDatabase().get_collected_episodes()
+        collected_episodes = trakt_database.get_collected_episodes()
         collection = list(set([i['show_id'] for i in collected_episodes]))
         if len(collection) == 0:
             return
@@ -132,7 +136,7 @@ class Menus:
         for i in collection:
             show_dicts.append({'show': {'ids': {'trakt': i}}})
 
-        show_meta_list = TraktSyncDatabase().get_show_list(show_dicts)
+        show_meta_list = trakt_database.get_show_list(show_dicts)
         unfinished = []
 
         for show in show_meta_list:
@@ -144,7 +148,7 @@ class Menus:
 
     def newShows(self):
 
-        hidden = HiddenDatabase().get_hidden_items('recommendations', 'shows')
+        hidden = hidden_database.get_hidden_items('recommendations', 'shows')
         datestring = datetime.datetime.today() - datetime.timedelta(days=29)
         trakt_list = database.get(trakt.json_response, 12, 'calendars/all/shows/new/%s/30?languages=%s' %
                                   (datestring.strftime('%d-%m-%Y'), language_code))
@@ -170,12 +174,11 @@ class Menus:
 
     def myNextUp(self, ):
 
-        tv_database = TraktSyncDatabase()
-        watched_shows = tv_database.get_watched_shows()
-        hidden_shows = HiddenDatabase().get_hidden_items('progress_watched', 'shows')
+        watched_shows = trakt_database.get_watched_shows()
+        hidden_shows = hidden_database.get_hidden_items('progress_watched', 'shows')
 
         watched_shows = [i for i in watched_shows if i['trakt_id'] not in hidden_shows]
-        watched_episodes = TraktSyncDatabase().get_watched_episodes()
+        watched_episodes = trakt_database.get_watched_episodes()
 
         self._start_queue_workers()
 
@@ -199,43 +202,54 @@ class Menus:
 
         tools.closeDirectory('tvshows')
 
+
     def _get_next_episode_to_watch(self, show_db_dict, watched_episodes):
         try:
             show_id = show_db_dict['trakt_id']
+
+            if show_db_dict['kodi_meta'] == {}:
+                show_db_dict['kodi_meta'] = trakt_database.get_single_show(show_id)
 
             watched_episodes = [i for i in watched_episodes if i['show_id'] == show_id]
             watched_episodes = sorted(watched_episodes, key=lambda episode: episode['season'], reverse=True)
 
             season = watched_episodes[0]['season']
-            season_meta = TraktSyncDatabase().get_single_season(show_id, season)
+            season_meta = trakt_database.get_single_season(show_id, season)
 
             watched_episodes = [i for i in watched_episodes if i['season'] == season]
             watched_episodes = sorted(watched_episodes, key=lambda episode: episode['number'], reverse=True)
             last_watched_episode = watched_episodes[0]['number']
             next_episode = int(watched_episodes[0]['number']) + 1
 
+            if season_meta is None:
+                tools.log('Could not acquire season meta information for %s Season %s' % (show_id, season), 'error')
+                return
+
             if season_meta['info']['episode_count'] == len(watched_episodes) \
                     or season_meta['info']['episode_count'] == last_watched_episode:
+
                 if int(show_db_dict['kodi_meta']['info']['season_count']) > season:
                     season += 1
                     next_episode = 1
-                else:
-                    return
 
             episode_dict = {'show': {'ids': {'trakt': show_id}},
                             'episode': {'season': season, 'number': next_episode}}
 
             self.itemList.append(episode_dict)
-        except:
+        except KeyError:
             import traceback
             traceback.print_exc()
             pass
+        except:
+            import traceback
+            traceback.print_exc()
 
     def myRecentEpisodes(self):
-        hidden_shows = HiddenDatabase().get_hidden_items('calendar', 'shows')
+        hidden_shows = hidden_database.get_hidden_items('calendar', 'shows')
         datestring = datetime.datetime.today() - datetime.timedelta(days=13)
         trakt_list = database.get(trakt.json_response, 12, 'calendars/my/shows/%s/14' %
                                   datestring.strftime('%d-%m-%Y'))
+
         if trakt_list is None:
             return
         trakt_list = [i for i in trakt_list if i['show']['ids']['trakt'] not in hidden_shows]
@@ -359,7 +373,7 @@ class Menus:
             tools.addDirectoryItem(i, 'showsSearch&actionArgs=%s' % tools.quote(i), '', '')
         tools.closeDirectory('addon')
 
-    def showsSearch(self, actionArgs):
+    def showsSearch(self, actionArgs=None):
 
         if actionArgs == None:
             k = tools.showKeyboard('', tools.lang(32016))
@@ -368,16 +382,19 @@ class Menus:
             if query == None or query == '':
                 return
         else:
-            query = tools.unquote(actionArgs)
-
+            query = actionArgs
         database.addSearchHistory(query, 'show')
-        query = tools.deaccentString(query)
-        query = tools.quote_plus(query)
+        query = tools.deaccentString(tools.display_string(query))
+        tools.quote(query)
+        tools.closeAllDialogs()
+        tools.closeDirectory('tvshows')
+        tools.execute("Container.Update(%s?action=showsSearchResults&actionArgs=%s, replace)'" % (sysaddon, query))
 
-        trakt_list = trakt.json_response('search/show?query=%s&extended=full&type=show&field=title' % query, limit=True)
+    def showsSearchResults(self, query):
+        query = tools.quote_plus(tools.unquote(query))
+        trakt_list = trakt.json_response('search/show?query=%s&extended=full&type=show&field=title' % query)
         if trakt_list is None:
             return
-
         self.showListBuilder(trakt_list)
         tools.closeDirectory('tvshows')
 
@@ -414,18 +431,22 @@ class Menus:
 
     def showSeasons(self, args):
 
-        show_info = json.loads(tools.unquote(args))
+        args = tools.get_item_information(args)
 
-        self.seasonListBuilder(show_info['ids']['trakt'])
+        self.seasonListBuilder(args['ids']['trakt'])
 
         tools.closeDirectory('seasons')
 
     def seasonEpisodes(self, args):
 
-        args = json.loads(tools.unquote(args))
+        args = tools.get_item_information(args)
 
         show_id = args['showInfo']['ids']['trakt']
-        season_number = args['seasonInfo']['info']['season']
+
+        if 'seasonInfo' in args:
+            season_number = args['seasonInfo']['info']['season']
+        else:
+            season_number = args['info']['season']
 
         self.episodeListBuilder(show_id, season_number)
         tools.closeDirectory('episodes', sort='episode')
@@ -508,7 +529,7 @@ class Menus:
 
     def seasonListBuilder(self, show_id, smartPlay=False):
 
-        self.itemList = TraktSyncDatabase().get_season_list(show_id)
+        self.itemList = trakt_database.get_season_list(show_id)
 
         self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
 
@@ -531,13 +552,14 @@ class Menus:
                 if hide_specials and int(item['info']['season']) == 0:
                     continue
 
-                args = {'showInfo': {}, 'seasonInfo': {}}
-
                 action = 'seasonEpisodes'
-                args['showInfo'] = item['showInfo']
-                args['seasonInfo']['info'] = item['info']
-                args['seasonInfo']['art'] = item['art']
-                args['seasonInfo']['ids'] = item['ids']
+
+                args = {'trakt_id': item['showInfo']['ids']['trakt'],
+                        'season': item['info']['season'],
+                        'item_type': 'season'}
+
+                args = tools.quote(json.dumps(args, sort_keys=True))
+
                 item['trakt_object']['show_id'] = item['showInfo']['ids']['trakt']
                 name = item['info']['season_title']
 
@@ -550,7 +572,6 @@ class Menus:
 
                 item['info'] = tools.clean_air_dates(item['info'])
 
-                args = tools.quote(json.dumps(args, sort_keys=True))
             except:
                 import traceback
                 traceback.print_exc()
@@ -561,8 +582,7 @@ class Menus:
 
             cm = []
             if tools.getSetting('trakt.auth') != '':
-                cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
-                           % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
+                cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)' % (sysaddon, args)))
 
             if tools.context_addon():
                 cm = []
@@ -578,7 +598,7 @@ class Menus:
         try:
             item_list = []
 
-            self.itemList = TraktSyncDatabase().get_season_episodes(show_id, season_number)
+            self.itemList = trakt_database.get_season_episodes(show_id, season_number)
             self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
 
             if len(self.itemList) == 0:
@@ -595,7 +615,6 @@ class Menus:
                 cm = []
 
                 try:
-                    args = {'showInfo': {}, 'episodeInfo': {}}
 
                     if tools.getSetting('smartplay.playlistcreate') == 'true' and smartPlay is False:
                         action = 'smartPlay'
@@ -604,10 +623,13 @@ class Menus:
                         playable = True
                         action = 'getSources'
 
-                    args['showInfo'] = item['showInfo']
-                    args['episodeInfo']['info'] = item['info']
-                    args['episodeInfo']['art'] = item['art']
-                    args['episodeInfo']['ids'] = item['ids']
+                    args = {'trakt_id': item['showInfo']['ids']['trakt'],
+                            'season': item['info']['season'],
+                            'episode': item['info']['episode'],
+                            'item_type': 'episode'}
+
+                    args = tools.quote(json.dumps(args, sort_keys=True))
+
                     name = item['info']['title']
 
                     if not self.is_aired(item['info']):
@@ -620,13 +642,19 @@ class Menus:
 
                     item['info'] = tools.clean_air_dates(item['info'])
 
-                    args = tools.quote(json.dumps(args, sort_keys=True))
-
                 except:
                     import traceback
                     traceback.print_exc()
                     continue
+                cm.append((tools.lang(32070),
+                           'XBMC.PlayMedia(%s?action=shufflePlay&actionArgs=%s)' % (sysaddon, args)))
 
+                cm.append(('Browse Season',
+                           'XBMC.Container.Update(%s?action=seasonEpisodes&actionArgs=%s)' %
+                           (sysaddon,
+                            tools.quote(json.dumps({'trakt_id': item['showInfo']['ids']['trakt'],
+                                                    'season': item['info']['season'],
+                                                    'item_type': 'season'})))))
 
                 cm.append((tools.lang(33022),
                            'PlayMedia(%s?action=getSources&seren_reload=true&actionArgs=%s)' % (sysaddon, args)))
@@ -635,8 +663,7 @@ class Menus:
                            'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
 
                 if tools.getSetting('trakt.auth') != '':
-                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
-                               % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
+                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)' % (sysaddon, args)))
 
                 if tools.context_addon():
                     cm = []
@@ -668,7 +695,7 @@ class Menus:
                 tools.log('We received no titles to build a list', 'error')
                 return
 
-            self.itemList = TraktSyncDatabase().get_episode_list(trakt_list)
+            self.itemList = trakt_database.get_episode_list(trakt_list)
 
             self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
             self.itemList = [i for i in self.itemList if 'info' in i and i['info'].get('premiered', None) is not None]
@@ -719,22 +746,22 @@ class Menus:
 
                     item['info'] = tools.clean_air_dates(item['info'])
 
-                    args = {'showInfo': {}, 'episodeInfo': {}}
+                    args = {'trakt_id': item['showInfo']['ids']['trakt'],
+                            'season': item['info']['season'],
+                            'episode': item['info']['episode'],
+                            'item_type': 'episode'}
 
-                    if tools.getSetting('smartplay.playlistcreate') == 'true' and not smartPlay:
+                    args = tools.quote(json.dumps(args, sort_keys=True))
+
+                    if tools.getSetting('smartplay.playlistcreate') == 'true' and smartPlay is False:
                         action = 'smartPlay'
                         playable = False
                     else:
                         playable = True
                         action = 'getSources'
 
-                    args['showInfo'] = item['showInfo']
-                    args['episodeInfo']['info'] = item['info']
-                    args['episodeInfo']['art'] = item['art']
-                    args['episodeInfo']['ids'] = item['ids']
-
                     if self.title_appends == 'true':
-                        name = "%s: %sx%s %s" % (tools.colorString(args['showInfo']['info']['tvshowtitle']),
+                        name = "%s: %sx%s %s" % (tools.colorString(item['showInfo']['info']['tvshowtitle']),
                                                  tools.display_string(item['info']['season']).zfill(2),
                                                  tools.display_string(item['info']['episode']).zfill(2),
                                                  tools.display_string(item['info']['title']))
@@ -743,11 +770,19 @@ class Menus:
                         release_day = release_day.strftime('%d %b')
                         name = '[%s] %s' % (release_day, name)
 
-                    args = tools.quote(json.dumps(args, sort_keys=True))
-
                     cm.append((tools.lang(32069),
                                'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)' %
                                (sysaddon, tools.quote(json.dumps(str(item['showInfo']))))))
+
+                    cm.append(('Browse Season',
+                               'XBMC.Container.Update(%s?action=seasonEpisodes&actionArgs=%s)' %
+                               (sysaddon,
+                                tools.quote(json.dumps({'trakt_id': item['showInfo']['ids']['trakt'],
+                                                        'season': item['info']['season'],
+                                                        'item_type': 'season'})))))
+
+                    cm.append((tools.lang(32070),
+                               'XBMC.PlayMedia(%s?action=shufflePlay&actionArgs=%s)' % (sysaddon, args)))
 
                     cm.append((tools.lang(32066),
                                'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
@@ -757,7 +792,7 @@ class Menus:
 
                     if tools.getSetting('trakt.auth') != '':
                         cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
-                                   % (sysaddon, tools.quote(json.dumps(str(item['trakt_object']))))))
+                                   % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
 
                     if tools.context_addon():
                         cm = []
@@ -803,7 +838,7 @@ class Menus:
 
         show_ids = [i['ids']['trakt'] for i in trakt_list]
 
-        self.itemList = TraktSyncDatabase().get_show_list(show_ids)
+        self.itemList = trakt_database.get_show_list(show_ids)
         self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
         self.itemList = tools.sort_list_items(self.itemList, trakt_list)
 
@@ -811,17 +846,13 @@ class Menus:
 
         for item in self.itemList:
             try:
-                args = {}
+                # Add Arguments to pass with items
+                args = {'trakt_id': item['ids']['trakt'], 'item_type': 'show'}
+                args = tools.quote(json.dumps(args, sort_keys=True))
+
                 cm = []
 
-                # Add Arguments to pass with items
-                args['ids'] = item['ids']
-                args['info'] = item['info']
-                args['art'] = item['art']
-
                 name = tools.display_string(item['info']['tvshowtitle'])
-
-                args = tools.quote(json.dumps(args, sort_keys=True))
 
                 if info_only == True:
                     return args
@@ -840,7 +871,7 @@ class Menus:
                     set_cast = False
 
                 if tools.getSetting('smartplay.clickresume') == 'true' or forceResume is True:
-                    action = 'smartPlay'
+                    action = 'playbackResume'
                 else:
                     action = 'showSeasons'
 
@@ -856,11 +887,10 @@ class Menus:
                            'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)' % (sysaddon, args)))
 
                 if tools.getSetting('trakt.auth') != '':
-                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
-                               % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
+                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)' % (sysaddon, args)))
 
                 cm.append((tools.lang(40153),
-                           'XBMC.PlayMedia(%s?aciton=playFromRandomPoint&actionArgs=%s' % (sysaddon, args)))
+                           'XBMC.PlayMedia(%s?action=playFromRandomPoint&actionArgs=%s' % (sysaddon, args)))
 
                 if tools.context_addon():
                     cm = []

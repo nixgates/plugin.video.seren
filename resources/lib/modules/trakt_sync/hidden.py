@@ -31,6 +31,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def remove_item(self, section, trakt_id):
         cursor = self._get_cursor()
         cursor.execute('DELETE FROM hidden WHERE section=? AND trakt_id=?',
-                       (section, trakt_id))
+                       (str(section), int(trakt_id)))
         cursor.connection.commit()
         cursor.close()

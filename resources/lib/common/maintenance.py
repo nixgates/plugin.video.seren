@@ -13,14 +13,18 @@ def check_for_addon_update():
     try:
         if tools.getSetting('general.checkAddonUpdates') == 'false':
             return
-        repo_xml = requests.get('https://raw.githubusercontent.com/nixgates/nixgates/master/packages/addons.xml')
-        if not repo_xml.status_code == 200:
-            tools.log('Could not connect to repo XML, status: %s' % repo_xml.status_code, 'error')
-            return
-        repo_version = re.findall(r'<addon id=\"plugin.video.seren\" version=\"(\d*.\d*.\d*)\"', repo_xml.text)[0]
-        local_verison = tools.addonVersion
-        if tools.check_version_numbers(local_verison, repo_version):
-            tools.showDialog.ok(tools.addonName, tools.lang(40136) % repo_version)
+        update_timestamp = tools.getSetting('addon.updateCheckTimeStamp')
+
+        if time.time() > (update_timestamp - (24 * (60 * 60))):
+            repo_xml = requests.get('https://raw.githubusercontent.com/nixgates/nixgates/master/packages/addons.xml')
+            if not repo_xml.status_code == 200:
+                tools.log('Could not connect to repo XML, status: %s' % repo_xml.status_code, 'error')
+                return
+            repo_version = re.findall(r'<addon id=\"plugin.video.seren\" version=\"(\d*.\d*.\d*)\"', repo_xml.text)[0]
+            local_verison = tools.addonVersion
+            if tools.check_version_numbers(local_verison, repo_version):
+                tools.showDialog.ok(tools.addonName, tools.lang(40136) % repo_version)
+            tools.setSetting('addon.updateCheckTimeStamp', str(time.time()))
     except:
         pass
 
@@ -28,7 +32,14 @@ def check_for_addon_update():
 def update_provider_packages():
     if tools.getSetting('providers.autoupdates') == 'false':
         return
-    customProviders.providers().check_for_updates(silent=True, automatic=True)
+    try:
+        provider_check_stamp = int(tools.getSetting('provider.updateCheckTimeStamp'))
+    except:
+        provider_check_stamp = 0
+
+    if time.time() > (provider_check_stamp - (30 * 60)):
+        customProviders.providers().check_for_updates(silent=True, automatic=True)
+        tools.setSetting('provider.updateCheckTimeStamp', str(time.time()))
 
 
 def refresh_apis():
@@ -84,8 +95,8 @@ def premiumize_transfer_cleanup():
     from resources.lib.debrid import premiumize
     from resources.lib.modules import database
 
-    premiumize = premiumize.PremiumizeBase()
-    fair_usage = int(premiumize.account_info()['limit_used'] * 100)
+    premiumize = premiumize.PremiumizeFunctions()
+    fair_usage = int(premiumize.get_used_space())
     threshold = int(tools.getSetting('premiumize.threshold'))
 
     if fair_usage < threshold:

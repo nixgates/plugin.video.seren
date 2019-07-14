@@ -1,0 +1,55 @@
+<window type="dialog">
+    <defaultcontrol>2</defaultcontrol>
+    <coordinates>
+        <left>0</left>
+        <top>0</top>
+    </coordinates>
+    <controls>
+        <!-- Background Texture -->
+        <control type="image">
+            <texture>$INFO[Window().Property(texture.white)]</texture>
+            <colordiffuse>FF000000</colordiffuse>
+        </control>
+        <control type="list" id="1100">
+        </control>
+
+        <!-- Background -->
+        <control type="image">
+            <top>0</top>
+            <left>0</left>
+            <width>1920</width>
+            <height>1080</height>
+            <texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
+        </control>
+
+        <control type="image">
+            <top>0</top>
+            <left>0</left>
+            <width>1920</width>
+            <height>1080</height>
+            <texture background="true">$INFO[Window().Property(texture.white)]</texture>
+            <colordiffuse>CC000000</colordiffuse>
+        </control>
+
+
+        <!-- Seren Ico -->
+        <control type="image" id="1001">
+            <top>-50</top>
+            <left>880</left>
+            <width>150</width>
+            <aspectratio>keep</aspectratio>
+            <texture>$INFO[Window().Property(seren.logo)]</texture>
+        </control>
+
+        <control type="label">
+            <left>0</left>
+            <top>220</top>
+            <width>100%</width>
+            <font>font12</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FFDDDDDD</textcolor>
+            <label>$INFO[Window().Property(notification_text)]</label>
+        </control>
+    </controls>
+</window>

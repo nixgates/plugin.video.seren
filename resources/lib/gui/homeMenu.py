@@ -55,7 +55,6 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32042), 'clearCache', '', '', isFolder=False)
         tools.addDirectoryItem(tools.lang(32055), 'clearTorrentCache', '', '', isFolder=False)
         tools.addDirectoryItem(tools.lang(40140), 'clearSearchHistory', '', '', isFolder=False)
-        # tools.addDirectoryItem('Reset Silent Scrape Setting', 'resetSilent', '', '', isFolder=False)
         tools.addDirectoryItem(tools.lang(32056), 'openSettings', '', '', isFolder=False)
         tools.addDirectoryItem(tools.lang(32057), 'cleanInstall', None, None, isFolder=False)
         tools.addDirectoryItem('Trakt Sync Tools', 'traktSyncTools', None, None, isFolder=True)
@@ -78,10 +77,3 @@ class Menus:
         tools.addDirectoryItem('Clear All Metadata', 'flushTraktDBMeta', None, None, isFolder=False)
         tools.addDirectoryItem('Rebuild Database', 'rebuildTraktDatabase', None, None, isFolder=False)
         tools.closeDirectory('addons')
-
-
-def runTest():
-    pass
-
-
-

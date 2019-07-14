@@ -2,12 +2,10 @@
 
 import random
 import re
-import copy
-import xbmc
+try:import xbmc
+except: pass
 
-from difflib import SequenceMatcher
 from requests import Session
-from resources.lib.common import tools
 
 COMMON_VIDEO_EXTENSIONS = xbmc.getSupportedMedia('video').split('|')
 
@@ -106,11 +104,9 @@ def clean_title(title, broken=None):
 
     title = re.sub(r'\:|\\|\/|\,|\!|\?|\(|\)|\'|\"|\\|\[|\]|\-|\_|\.', ' ', title)
     title = re.sub(r'\s+', ' ', title)
-    title = title.replace('  ', ' ')
     title = re.sub(r'\&', 'and', title)
 
     return title.strip()
-
 
 def searchTitleClean(title):
     title = title.lower()
@@ -121,35 +117,80 @@ def searchTitleClean(title):
     return title
 
 
-def remove_from_title(title, target):
+def clean_tags(title):
+    title = title.lower()
+
+    if title[0] == '[':
+        title = title[title.find(']')+1:].strip()
+        return clean_tags(title)
+    if title[0] == '(':
+        title = title[title.find(')')+1:].strip()
+        return clean_tags(title)
+    if title[0] == '{':
+        title = title[title.find('}')+1:].strip()
+        return clean_tags(title)
+
+    title = re.sub(r'\(|\)|\[|\]|\{|\}', ' ', title)
+    title = re.sub(r'\s+', ' ', title)
+
+    return title
+
+def remove_sep(release_title, title):
+    def check_for_sep(t, sep):
+        if sep in t and t[t.find(sep)+1:].strip().lower().startswith(title):
+            return t[t.find(sep)+1:].strip()
+        return t
+
+    release_title = check_for_sep(release_title, '/')
+    release_title = check_for_sep(release_title, '-')
+
+    return release_title
+
+def remove_from_title(title, target, clean = True):
     if target == '':
         return title
 
     title = title.replace(' %s ' % target.lower(), ' ')
-    title = clean_title(title) + ' '
+    title = title.replace('.%s.' % target.lower(), ' ')
+    title = title.replace('+%s+' % target.lower(), ' ')
+    title = title.replace('-%s-' % target.lower(), ' ')
+    if clean:
+        title = clean_title(title) + ' '
+    else:
+        title = title + ' '
+
+    return re.sub(r'\s+', ' ', title)
+
+def remove_country(title, country, clean = True):
+    title = title.lower()
+    country = country.lower()
+
+    if country in ['gb', 'uk']:
+        title = remove_from_title(title, 'gb', clean)
+        title = remove_from_title(title, 'uk', clean)
+    else:
+        title = remove_from_title(title, country, clean)
+
     return title
 
 def check_title_match(title_parts, release_title, simple_info, is_special=False):
     title = clean_title(' '.join(title_parts)) + ' '
+    release_title = clean_tags(release_title)
+
+    country = simple_info.get('country', '')
+    title = remove_country(title, country)
+
+    release_title = remove_country(release_title, country, False)
+    release_title = remove_from_title(release_title, get_quality(release_title), False)
+    release_title = remove_sep(release_title, title)
     release_title = clean_title(release_title) + ' '
 
-    # print(title)
-    # print(release_title)
-
-    if release_title.startswith(title):
-        return True
-
-    release_title = remove_from_title(release_title, get_quality(release_title))
     if release_title.startswith(title):
         return True
 
     year = simple_info.get('year', '')
     release_title = remove_from_title(release_title, year)
-    if release_title.startswith(title):
-        return True
-
-    country = simple_info.get('country', '')
-    release_title = remove_from_title(release_title, country)
+    title = remove_from_title(title, year)
     if release_title.startswith(title):
         return True
 
@@ -306,8 +347,11 @@ def filter_show_pack(simple_info, release_title):
     season_count = int(season)
 
     while int(season_count) <= int(no_seasons):
+        s00 = '%s s01 s%s' % (show_title, str(season_count).zfill(2))
         season = '%s seasons 1 %s' % (show_title, str(season_count))
         seasons = '%s season 1 %s' % (show_title, str(season_count))
+        if release_title == s00:
+            return True
         if release_title == season:
             return True
         if release_title == seasons:
@@ -315,6 +359,7 @@ def filter_show_pack(simple_info, release_title):
         season_count = season_count + 1
 
     while int(season_count) <= int(no_seasons):
+        string_list.append('%s s01 s%s' % (show_title, str(season_count).zfill(2)))
         string_list.append('%s seasons 1 %s ' % (show_title, str(season_count)))
         string_list.append('%s season 1 %s ' % (show_title, str(season_count)))
         season_count = season_count + 1
@@ -359,7 +404,7 @@ class serenRequests(Session):
 
 def torrentCacheStrings(args, strict=False):
 
-    episodeInfo = args['episodeInfo']['info']
+    episodeInfo = args['info']
     episode_title = cleanTitle(episodeInfo['title'])
     season_number = str(episodeInfo['season'])
     episode_number = str(episodeInfo['episode'])
@@ -397,7 +442,7 @@ def torrentCacheStrings(args, strict=False):
         episodeStrings += relaxed_strings
 
     if any(x in i for i in args['showInfo']['info'].get('genre', []) for x in ['anime', 'animation']):
-        episodeStrings.append(' %s ' % args['episodeInfo']['info']['absoluteNumber'])
+        episodeStrings.append(' %s ' % args['info']['absoluteNumber'])
 
     if episode_number == '1' and season_number == '1':
         episodeStrings.append('pilot')

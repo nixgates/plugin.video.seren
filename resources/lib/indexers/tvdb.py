@@ -205,7 +205,7 @@ class TVDBAPI:
             except:
                 return None
             try:
-                info['year'] = self.info.get('firstAired')[:4]
+                info['year'] = str(trakt_object['year'])
             except:
                 info['year'] = 0
                 pass
@@ -222,7 +222,7 @@ class TVDBAPI:
             except:
                 pass
             try:
-                info['imdbnumber'] = self.info.get('imdb_id')
+                info['imdbnumber'] = self.info.get('imdbId')
             except:
                 pass
             try:
@@ -551,7 +551,8 @@ class TVDBAPI:
         tools.tv_sema.acquire()
         try:
             url = 'series/%s/images/query?keyType=season&subKey=%s' % (tvdbID, season)
-            response = self.get_request(url)['data']
+            response = self.get_request(url)
+            response = response['data']
             try:
                 image = [i for i in response if i['languageId'] == 7][0]
             except:
@@ -565,6 +566,9 @@ class TVDBAPI:
             if image == self.baseImageUrl:
                 image = 0
             self.art['poster'] = image
+
+        except KeyError:
+            return
         except:
             import traceback
             traceback.print_exc()

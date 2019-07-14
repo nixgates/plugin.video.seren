@@ -5,20 +5,22 @@
 		<setting type="lsep" label="40001" />
 		<setting type="sep" />
 		<setting type="bool" id="general.checkAddonUpdates" default="true" label="40137" />
-		<setting type="enum" id="general.playstyleMovie" label="40152" default="40003" lvalues="40003|40004" />
-		<setting type="enum" id="general.playstyleEpisodes" label="40002" default="40003" lvalues="40003|40004" />
-		<setting type="enum" id="general.scrapedisplay" label="40127" default="40129" lvalues="40129|40130" />
+		<setting type="enum" id="general.playstyleMovie" label="40152" default="0" lvalues="40003|40004" />
+		<setting type="enum" id="general.playstyleEpisodes" label="40002" default="0" lvalues="40003|40004" />
+		<setting type="enum" id="general.scrapedisplay" label="40127" default="0" lvalues="40129|40130" />
+		<setting type="bool" id="general.autotrynext" label="40157" default="true" />
 		<!--<setting type="enum" id="general.resolvedisplay" label="40128" default="40129" lvalues="40129|40130" /> -->
-		<setting type="enum" id="general.sourceselect" label="40005" default="40006" lvalues="40007|40006" />
+		<!--<setting type="enum" id="general.sourceselect" label="40005" default="1" lvalues="40007|40006" />-->
 		<!--<setting type="bool" subsetting="true" id="general.autoselect" label="40131" defaul="false" />-->
 		<!--<setting type="slider" id="general.autoselectTime" option="int" default="10" range="1,1,20" subsetting="true" label="40132" visible="eq(-1,true)" />-->
 		<setting type="bool" id="general.datedelay" label="40116" default="false" />
 		<setting type="lsep" label="40008" />
 		<setting type="sep" />
+		<setting type="bool" id="general.menucaching" label="40155" default="true" />
 		<setting type="bool" id="general.hideSpecials" label="40125" default="false" />
 		<setting type="bool" id="general.hideUnAired" label="40122" default="false" />
         <setting type="bool" id="searchHistory" label="40112" default="false" />
-		<setting type="enum" id="nextup.sort" label="40009" default="40010" lvalues="40010|40011" />
+		<setting type="enum" id="nextup.sort" label="40009" default="0" lvalues="40010|40011" />
 		<setting type="bool" id="general.sourceselectlines" label="40012" default="true" />
 		<!-- I'm leaving this hidden for now, TMDB needs a fair bit of work to get back up to scratch -->
 		<setting type="enum" id="general.metalocation" default="1" label="40013" values="TMDB|TVDB" visible="hidden" />
@@ -67,6 +69,8 @@
 		<setting id="general.pmexpirycheck" type="text" visible="hidden" default="" />
 		<setting id="general.textColor" type="text" default="" visible="false" />
 		<setting id="general.fake" type="text" visible="hidden" default="" />
+		<setting id="provider.updateCheckTimeStamp" type="text" visible="hidden" default="" />
+		<setting id="addon.updateCheckTimeStamp" type="text" visible="hidden" default="" />
 		<!-- END HIDDEN SETTINGS -->
 	</category>
 
@@ -83,11 +87,11 @@
 		<setting type="lsep" label="40053" />
 		<setting type="sep" />
 		<setting id="preem.enabled" type="bool" label="40054" default="true" />
-		<setting id="preem.cloudfiles" type="bool" label="40148" default="false" />
 		<setting id="preem.movieres" type="enum" subsetting="true" label="40055" values="4K|1080p|720p|SD" default="1" visible="eq(-1,true)" />
 		<setting id="preem.tvres" type="enum" subsetting="true" label="40056" values="4K|1080p|720p|SD" default="1" visible="eq(-2,true)" />
 		<setting id="preem.limit" type="slider" subsetting="true" label="40057" default="2" range="0, 20" option="int" visible="eq(-3,true)"/>
 		<setting id="preem.type" type="enum" subsetting="true" label="40058" default="0" values="Torrents Only|Hosters Only|Torrents/Hosters" visible="eq(-4,true)" />
+		<setting id="preem.cloudfiles" type="bool" label="40148" default="false" />
 	</category>
 
 	<category label="40059">
@@ -99,19 +103,19 @@
 		<setting type="text" id="trakt.username" label="40062" enable="false"/>
 		<setting type="action" label="40063" option="close" action="RunPlugin(plugin://plugin.video.seren/?action=authTrakt)" />
 		<setting id="trakt.scrobbling" type="bool" label="40064" default="true" visible="!eq(-2,)" />
-		<setting type="action" label="40065" action="RunPlugin(plugin://plugin.video.seren/?action=revokeTrakt)" visible="!eq(-3,)" />
+		<setting type="action" label="40065" action="RunPlugin(plugin://plugin.video.seren/?action=revokeTrakt)" option="close" visible="!eq(-3,)" />
 		<setting type="lsep" label="40066" />
 		<setting type="sep" />
 		<setting id="premiumize.enabled" type="bool" default="false" label="40108" />
 		<setting id="premiumize.pin" type="text" default="" subsetting="true" label="40106" visible="eq(-1,true)"/>
-		<setting id="premiumize.priority" type="slider" option="int" default="10" range="1,1,10" subsetting="true" label="40107" visible="eq(-1,true)" />
-		<setting id="premiumize.transcoded" type="bool" default="false" subsetting="true" label="40105" visible="eq(-3,true)" />
-		<setting id="premiumize.torrents" type="bool" default="true" subsetting="true" label="40100" visible="eq(-4,true)" />
+		<setting id="premiumize.priority" type="slider" option="int" default="10" range="1,1,10" subsetting="true" label="40107" visible="eq(-2,true)" />
+		<setting id="premiumize.cloudInspection" type="bool" default="false" subsetting="true" label="40149" visible="eq(-3,true)" />
+		<setting id="premiumize.transcoded" type="bool" default="false" subsetting="true" label="40105" visible="eq(-4,true)" />
+		<setting id="premiumize.torrents" type="bool" default="true" subsetting="true" label="40100" visible="eq(-5,true)" />
 		<setting id="premiumize.addToCloud" type="bool" default="false" subsetting="true" label="40143" visible="eq(-1,true)" />
-		<setting id="premiumize.hosters" type="bool" default="true" subsetting="true" label="40101" visible="eq(-6,true)" />
-		<setting id="premiumize.autodelete" type="bool" default="true" subsetting="true" label="40104" visible="eq(-7,true)" />
-		<setting id="premiumize.cloudInspection" type="bool" default="false" subsetting="true" label="40149" visible="eq(-8,true)" />
-		<setting id="premiumize.threshold" type="slider" subsetting="true" label="40103" default="50" range="20, 10, 70" option="percent" visible="eq(-7,true)"/>
+		<setting id="premiumize.hosters" type="bool" default="true" subsetting="true" label="40101" visible="eq(-7,true)" />
+		<setting id="premiumize.autodelete" type="bool" default="true" subsetting="true" label="40104" visible="eq(-8,true)" />
+		<setting id="premiumize.threshold" type="slider" subsetting="true" label="40103" default="50" range="50, 50, 1000" visible="eq(-1,true)"/>
 		<setting type="lsep" label="40067" />
 		<setting type="sep" />
 		<setting id="realdebrid.enabled" type="bool" default="false" label="40098" />
@@ -136,12 +140,12 @@
 		<setting type="action" label="40082" action="RunPlugin(plugin://plugin.video.seren/?action=manualProviderUpdate)" />
 		<setting type="action" label="40071" action="RunPlugin(plugin://plugin.video.seren/?action=installProviders)"/>
 		<setting type="action" label="40072" action="RunPlugin(plugin://plugin.video.seren/?action=uninstallProviders)" />
-		<setting type="action" label="40073" action="RunPlugin(plugin://plugin.video.seren/?action=adjustPackage&actionArgs=disabled)" />
-		<setting type="action" label="40074" action="RunPlugin(plugin://plugin.video.seren/?action=adjustPackage&actionArgs=enabled)" />
+		<setting type="action" label="40073" action="RunPlugin(plugin://plugin.video.seren/?action=adjustPackage&amp;actionArgs=disabled)" />
+		<setting type="action" label="40074" action="RunPlugin(plugin://plugin.video.seren/?action=adjustPackage&amp;actionArgs=enabled)" />
 		<setting type="lsep" label="40075" />
 		<setting type="sep"/>
-		<setting type="action" label="40076" action="RunPlugin(plugin://plugin.video.seren/?action=adjustProviders&actionArgs=disabled)" />
-		<setting type="action" label="40077" action="RunPlugin(plugin://plugin.video.seren/?action=adjustProviders&actionArgs=enabled)"/>
+		<setting type="action" label="40076" action="RunPlugin(plugin://plugin.video.seren/?action=adjustProviders&amp;actionArgs=disabled)" />
+		<setting type="action" label="40077" action="RunPlugin(plugin://plugin.video.seren/?action=adjustProviders&amp;actionArgs=enabled)"/>
 	</category>
 
 	<category label="40093">
@@ -149,7 +153,8 @@
 		<setting type="sep"/>
 		<setting id="general.maxResolution" type="enum" label="40052" values="4k|1080p|720p|SD" default="0" />
 		<setting id="general.enablesizelimit" label="40046" default="false" type="bool"/>
-		<setting id="general.sizelimit" subsetting="true" label="40047" type="slider" default="10" option="int" range="0,1,300" visible="eq(-1,true)"/>
+		<setting id="general.sizelimit.movie" subsetting="true" label="40154" type="slider" default="10" option="int" range="0,1,300" visible="eq(-1,true)"/>
+		<setting id="general.sizelimit.episode" subsetting="true" label="40047" type="slider" default="10" option="int" range="0,1,300" visible="eq(-2,true)"/>
 		<setting id="general.disable3d" label="40094" type="bool" default="true" />
 		<setting id="general.disable265" label="40039" type="bool" default="false" />
 		<setting id="general.disablelowQuality" label="40109" type="bool" default="false" />
