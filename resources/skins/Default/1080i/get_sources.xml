@@ -1,0 +1,295 @@
+<window type="dialog">
+    <defaultcontrol>2</defaultcontrol>
+    <coordinates>
+        <left>0</left>
+        <top>0</top>
+    </coordinates>
+
+    <controls>
+        <!-- Background Texture -->
+        <control type="image">
+            <texture>$INFO[Window().Property(texture.white)]</texture>
+            <colordiffuse>FF000000</colordiffuse>
+        </control>
+        <control type="list" id="1100">
+        </control>
+
+        <!-- Background -->
+        <control type="image">
+            <top>0</top>
+            <left>0</left>
+            <width>1920</width>
+            <height>1080</height>
+            <texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
+        </control>
+
+        <control type="image">
+            <top>0</top>
+            <left>0</left>
+            <width>1920</width>
+            <height>1080</height>
+            <texture background="true">$INFO[Window().Property(texture.white)]</texture>
+            <colordiffuse>CC000000</colordiffuse>
+        </control>
+
+        <!-- Seren Ico -->
+        <control type="image" id="1001">
+            <top>-50</top>
+            <left>880</left>
+            <width>150</width>
+            <aspectratio>keep</aspectratio>
+            <texture>$INFO[Window().Property(seren.logo)]</texture>
+        </control>
+
+        <control type="label">
+            <left>0</left>
+            <top>210</top>
+            <width>100%</width>
+            <font>font12</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FFDDDDDD</textcolor>
+            <visible>String.IsEqual(Window().Property(process_started),false)</visible>
+            <label>$INFO[Window().Property(notification_text)]</label>
+        </control>
+
+        <control type="group">
+            <visible>String.IsEqual(Window().Property(process_started),true)</visible>
+            <left>760</left>
+            <top>630</top>
+            <width>100%</width>
+
+            <!-- Progress -->
+            <control type="image">
+                <left>0</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),10)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>0</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),10)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>40</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),20)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>40</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),20)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>80</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),30)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>80</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),30)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>120</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),40)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>120</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),40)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>160</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),50)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>160</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),50)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>200</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),60)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>200</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),60)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>240</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),70)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>240</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),70)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>280</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),80)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>280</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),80)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>320</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),90)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>320</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),90)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <control type="image">
+                <left>360</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsLess(Window().Property(progress),100)</visible>
+                <colordiffuse>33FFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <left>360</left>
+                <width>30</width>
+                <height>30</height>
+                <texture>$INFO[Window().Property(texture.white)]</texture>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(progress),100)</visible>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+            </control>
+
+            <!-- Information -->
+            <control type="label">
+                <top>-300</top>
+                <left>-760</left>
+                <width>1920</width>
+                <font>font12</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <width>auto</width>
+                <textcolor>FFDDDDDD</textcolor>
+                <label>Torrents: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(total_torrents)][/COLOR] | Cached: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(cached_torrents)][/COLOR] | Hosters: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(hosters_sources)][/COLOR] | CloudFiles: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(cloud_sources)][/COLOR]</label>
+            </control>
+
+            <control type="label">
+                <top>-220</top>
+                <left>-760</left>
+                <width>1920</width>
+                <font>font12</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <width>auto</width>
+                <textcolor>FFDDDDDD</textcolor>
+                <label>4k: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(4k_sources)][/COLOR] | 1080p: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(1080p_sources)][/COLOR] | 720p: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(720p_sources)][/COLOR] | SD: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(sd_sources)][/COLOR]</label>
+            </control>
+
+            <control type="label">
+                <top>-140</top>
+                <left>-760</left>
+                <width>1920</width>
+                <font>font12</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <width>auto</width>
+                <textcolor>FFDDDDDD</textcolor>
+                <label>Remaining Providers: $INFO[Window().Property(remaining_providers_count)]</label>
+                <visible>Integer.IsGreaterOrEqual(Window().Property(remaining_providers_count),10)</visible>
+            </control>
+
+            <control type="label">
+                <top>-140</top>
+                <left>-760</left>
+                <width>1920</width>
+                <font>font12</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <width>auto</width>
+                <textcolor>FFDDDDDD</textcolor>
+                <label>$INFO[Window().Property(remaining_providers_list)]</label>
+                <visible>!Integer.IsGreaterOrEqual(Window().Property(remaining_providers_count),10)</visible>
+            </control>
+        </control>
+
+
+
+        <!--LAYOUT GRID-->
+        <!--<control type="image">-->
+        <!--<width>100%</width>-->
+        <!--<height>100%</height>-->
+        <!--<texture>$INFO[Window(13000).Property(test_pattern)]</texture>-->
+        <!--<colordiffuse>55FFFFFF</colordiffuse>-->
+        <!--</control>-->
+    </controls>
+</window>

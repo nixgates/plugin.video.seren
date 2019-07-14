@@ -9,9 +9,12 @@ import re
 import datetime
 # Import _strptime to workaround python 2 bug with threads
 import _strptime
+
 import time
-import ast
-from dateutil import tz
+try:
+    from dateutil import tz
+except:
+    pass
 
 try:
     from urlparse import parse_qsl, parse_qs, unquote, urlparse
@@ -91,21 +94,19 @@ try:
         ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path').decode('utf-8')
     except:
         ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path')
+
     GUI_PATH = os.path.join(ADDON_PATH, 'resources', 'lib', 'gui')
     IMAGES_PATH = os.path.join(GUI_PATH, 'images')
     XML_PATH = os.path.join(GUI_PATH, 'xml')
 
-    XBFONT_LEFT = 0x00000000
-    XBFONT_RIGHT = 0x00000001
-    XBFONT_CENTER_X = 0x00000002
-    XBFONT_CENTER_Y = 0x00000004
-    XBFONT_TRUNCATED = 0x00000008
     imageControl = xbmcgui.ControlImage
     labelControl = xbmcgui.ControlLabel
     buttonControl = xbmcgui.ControlButton
     listControl = xbmcgui.ControlList
     multi_text = xbmcgui.ControlTextBox
-    PANDA_LOGO_PATH = os.path.join(IMAGES_PATH, 'panda.png')
+    groupControl = xbmcgui.ControlGroup
+
+    SEREN_LOGO_PATH = os.path.join(IMAGES_PATH, 'trans-gold-fox-final.png')
 
     addonDir = os.path.join(xbmc.translatePath('special://home'), 'addons/plugin.video.%s' % addonName.lower())
 
@@ -168,17 +169,13 @@ except:
     IMAGES_PATH = os.path.join(GUI_PATH, 'images')
     XML_PATH = os.path.join(GUI_PATH, 'xml')
 
-    XBFONT_LEFT = 0x00000000
-    XBFONT_RIGHT = 0x00000001
-    XBFONT_CENTER_X = 0x00000002
-    XBFONT_CENTER_Y = 0x00000004
-    XBFONT_TRUNCATED = 0x00000008
+
     imageControl = xbmcgui.ControlImage
     labelControl = xbmcgui.ControlLabel
     buttonControl = xbmcgui.ControlButton
     listControl = xbmcgui.ControlList
     multi_text = xbmcgui.ControlTextBox
-    PANDA_LOGO_PATH = os.path.join(IMAGES_PATH, 'panda.png')
+    SEREN_LOGO_PATH = os.path.join(IMAGES_PATH, 'fox.png')
 
     addonInfo = xbmcaddon.Addon().getAddonInfo
 
@@ -224,6 +221,12 @@ except:
             pass
 
 
+XBFONT_LEFT = 0x00000000
+XBFONT_RIGHT = 0x00000001
+XBFONT_CENTER_X = 0x00000002
+XBFONT_CENTER_Y = 0x00000004
+XBFONT_TRUNCATED = 0x00000008
+
 youtube_url = 'plugin://plugin.video.youtube/play/?video_id=%s'
 
 kodiGui = xbmcgui
@@ -233,6 +236,8 @@ kodi = xbmc
 language = xbmc.getLanguage()
 
 dialogWindow = kodiGui.WindowDialog
+
+xmlWindow = kodiGui.WindowXMLDialog
 
 addon = xbmcaddon.Addon
 
@@ -272,6 +277,15 @@ playList = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
 
 player = xbmc.Player
 
+homeWindow = xbmcgui.Window(10000)
+
+UNIT_TESTS = False
+
+def enable_unit_tests():
+    xbmcplugin.UNIT_TEST_MODE = True
+    xbmcgui.UNIT_TEST_MODE = True
+    UNIT_TESTS = True
+
 def lang(language_id):
     text = getLangString(language_id)
     text = text.encode('utf-8', 'replace')
@@ -282,22 +296,30 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
                      actionArgs=False, set_cast=False, label2=None, set_ids=None, bulk_add=False):
 
     url = '%s?action=%s' % (sysaddon, query) if isAction else query
+
     if actionArgs is not False:
         url += '&actionArgs=%s' % actionArgs
+
     item = menuItem(label=name)
+
     if label2 is not None:
         item.setLabel2(label2)
+
     if isPlayable:
         item.setProperty('IsPlayable', 'true')
     else:
         item.setProperty('IsPlayable', 'false')
+
     try:
         if 'UnWatchedEpisodes' in info:
             item.setProperty('UnWatchedEpisodes', str(info['UnWatchedEpisodes']))
+
+        # Check for either to support of old versions
         if 'episodeCount' in info:
             item.setProperty('TotalEpisodes', str(info['episodeCount']))
         if 'episode_count' in info:
             item.setProperty('TotalEpisodes', str(info['episode_count']))
+
         if 'WatchedEpisodes' in info:
             item.setProperty('WatchedEpisodes', str(info['WatchedEpisodes']))
         if 'season_count' in info:
@@ -307,13 +329,23 @@ def addDirectoryItem(name, query, info, art, cm=[], isPlayable=False, isAction=T
 
     if set_cast is not False:
         item.setCast(set_cast)
+
     if set_ids is not None:
         item.setUniqueIDs(set_ids)
 
     item.addContextMenuItems(cm)
+
+    if type(art) is not dict:
+        art = {}
+
+    if art.get('fanart') is None:
+        art['fanart'] = os.path.join(IMAGES_PATH, 'fanart-fox-gold-final.png')
+
     item.setArt(art)
 
+    # Clear out keys not relevant to Kodi info labels
     info = clean_info_keys(info)
+
     item.setInfo('video', info)
 
     if bulk_add:
@@ -348,7 +380,12 @@ def closeDirectory(contentType, sort=False):
 
     content(syshandle, contentType)
 
-    endDirectory(syshandle)
+    if getSetting('general.menucaching') == 'true':
+        menu_caching = True
+    else:
+        menu_caching = False
+
+    endDirectory(syshandle, cacheToDisc=menu_caching)
     xbmc.sleep(200)
 
     if getSetting('general.setViews') == 'true':
@@ -390,14 +427,19 @@ def get_view_type(contentType):
 
     return viewType
 
+def closeAllDialogs():
+    execute('Dialog.Close(all)')
 
 def closeOkDialog():
     execute('Dialog.Close(okdialog, true)')
 
-
 def closeBusyDialog():
     execute('Dialog.Close(busydialog)')
 
+def cancelPlayback():
+    playList.clear()
+    resolvedUrl(syshandle, False, menuItem())
+    closeOkDialog()
 
 def safeStr(obj):
     try:
@@ -409,6 +451,8 @@ def safeStr(obj):
 
 
 def log(msg, level='info'):
+    if UNIT_TESTS:
+        return
     msg = safeStr(msg)
     msg = addonName.upper() + ': ' + msg
     if level == 'error':
@@ -439,6 +483,13 @@ def deaccentString(text):
     text = ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
     return text
 
+def get_user_text_color():
+
+    color = getSetting('general.textColor')
+    if color == '' or color == 'None':
+        color = 'deepskyblue'
+
+    return color
 
 def colorString(text, color=None):
 
@@ -446,9 +497,7 @@ def colorString(text, color=None):
        text = display_string(text)
 
     if color is 'default' or color is '' or color is None:
-        color = getSetting('general.textColor')
-        if color == '' or color == 'None':
-            color = 'deepskyblue'
+        color = get_user_text_color()
 
     return '[COLOR %s]%s[/COLOR]' % (color, text)
 
@@ -533,18 +582,6 @@ def copy2clip(txt):
     pass
 
 
-EPOCH_DATETIME = datetime.datetime(1970, 1, 1)
-SECONDS_PER_DAY = 24 * 60 * 60
-
-#
-# def utc_to_local_datetime(utc_datetime):
-#     delta = utc_datetime - EPOCH_DATETIME
-#     utc_epoch = SECONDS_PER_DAY * delta.days + delta.seconds
-#     time_struct = time.localtime(utc_epoch)
-#     dt_args = time_struct[:6] + (delta.microseconds,)
-#     return datetime.datetime(*dt_args)
-
-
 def datetime_workaround(string_date, format="%Y-%m-%d", date_only=True):
     if string_date == '':
         return None
@@ -563,14 +600,17 @@ def datetime_workaround(string_date, format="%Y-%m-%d", date_only=True):
 
 def gmt_to_local(gmt_string, format=None, date_only=False):
 
-    local_timezone = tz.tzlocal()
-    gmt_timezone = tz.gettz('GMT')
-    if format is None:
-        format = trakt_gmt_format
-    GMT = datetime_workaround(gmt_string, format, date_only)
-    GMT = GMT.replace(tzinfo=gmt_timezone)
-    GMT = GMT.astimezone(local_timezone)
-    return GMT.strftime(format)
+    try:
+        local_timezone = tz.tzlocal()
+        gmt_timezone = tz.gettz('GMT')
+        if format is None:
+            format = trakt_gmt_format
+        GMT = datetime_workaround(gmt_string, format, date_only)
+        GMT = GMT.replace(tzinfo=gmt_timezone)
+        GMT = GMT.astimezone(local_timezone)
+        return GMT.strftime(format)
+    except:
+        return gmt_string
 
 def clean_air_dates(info):
 
@@ -626,7 +666,7 @@ def color_quality(quality):
 
 
 def context_addon():
-    if condVisibility('System.HasAddon(context.seren)') or not console_mode:
+    if condVisibility('System.HasAddon(context.seren)'):
         return True
     else:
         return False
@@ -702,6 +742,8 @@ def getSetting(id):
         setting_value = xbmcaddon.Addon().getSetting(id)
         SETTINGS_CACHE.update({id: setting_value})
 
+        return setting_value
+
     try:
         settings = open(SETTINGS_PATH, 'r')
         value = ' '.join(settings.readlines())
@@ -745,3 +787,47 @@ def check_version_numbers(current, new):
 
     return False
 
+def trigger_widget_refresh():
+    # Force an update of widgets to occur
+    log('FORCE REFRESHING WIDGETS')
+    timestr = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    homeWindow.setProperty("widgetreload", timestr)
+    homeWindow.setProperty('widgetreload-tvshows', timestr)
+    homeWindow.setProperty('widgetreload-episodes', timestr)
+    homeWindow.setProperty('widgetreload-movies', timestr)
+
+def get_item_information(actionArgs):
+
+    actionArgs = unquote(actionArgs)
+
+    try:
+       actionArgs = json.loads(actionArgs)
+    except:
+        log('Unable to load dict')
+        return None
+
+    if actionArgs['item_type'] == 'show':
+        from resources.lib.modules.trakt_sync import shows
+        item_information = shows.TraktSyncDatabase().get_single_show(actionArgs['trakt_id'])
+        return item_information
+    if actionArgs['item_type'] == 'season':
+        from resources.lib.modules.trakt_sync import shows
+        item_information = shows.TraktSyncDatabase().get_single_season(actionArgs['trakt_id'],
+                                                                       actionArgs['season'])
+        return item_information
+    if actionArgs['item_type'] == 'episode':
+        from resources.lib.modules.trakt_sync import shows
+        item_information = shows.TraktSyncDatabase().get_single_episode(actionArgs['trakt_id'],
+                                                                        actionArgs['season'],
+                                                                        actionArgs['episode'])
+        return item_information
+    if actionArgs['item_type'] == 'movie':
+        from resources.lib.modules.trakt_sync import movies
+        item_information = movies.TraktSyncDatabase().get_movie(actionArgs['trakt_id'])
+        return item_information
+
+def premium_check():
+    if playList.getposition() == 0 and not premiumize_enabled() and not real_debrid_enabled():
+        return False
+    else:
+        return True

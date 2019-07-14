@@ -346,8 +346,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return [episode['kodi_meta'] for episode in season_episodes]
 
         except:
-            import traceback
-            traceback.print_exc()
+
             trakt_list = database.get(trakt.TraktAPI().json_response, 24, 'shows/%s/seasons/%s' % (show_id, season))
 
             self._start_queue_workers()
@@ -441,13 +440,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if item is None or (item['kodi_meta'] == '{}' and get_meta):
             try:
                 season_meta = trakt.TraktAPI().json_response('shows/%s/seasons/?extended=full' % show_id)
-                season_meta = [i for i in season_meta if i['number'] == season][0]
+                season_meta = [i for i in season_meta if i['number'] == int(season)][0]
                 item = self._update_season(show_meta, season_meta, get_meta)
                 if item is None:
                     return
             except:
-                import traceback
-                traceback.print_exc()
                 return None
         else:
             item['kodi_meta'] = ast.literal_eval(item['kodi_meta'])
@@ -623,6 +620,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
             return {'trakt_id': trakt_id, 'kodi_meta': kodi_meta, 'last_updated': update_time}
         except:
+            cursor.close()
+
             import traceback
             traceback.print_exc()
             pass
@@ -723,6 +722,27 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return {'show_id': show_id, 'season': season, 'episode_id': episode_id, 'kodi_meta': kodi_meta,
                     'update_time': update_time, 'watched': watched, 'collected': collected, 'number': number}
         except:
+            cursor.close()
+
             import traceback
             traceback.print_exc()
             pass
+
+    def _sync_insert_episode(self, show_id, episode_id, season, episode, watched=None, collected=None):
+
+        cursor = self._get_cursor()
+
+        cursor.execute('SELECT * FROM episodes WHERE show_id=? AND season=? AND number=?',
+                       (show_id, season, episode))
+        item = cursor.fetchone()
+        cursor.close()
+
+        if item is None:
+            episode_object = {'ids': {'trakt': episode_id}, 'season': season, 'number': episode}
+            self._update_episode(show_id, episode_object, False, watched, collected)
+        else:
+            if watched is not None:
+                self.mark_episode_watched_by_id(episode_id)
+            if collected is None:
+                self.mark_episode_collected(show_id, season, episode)
+

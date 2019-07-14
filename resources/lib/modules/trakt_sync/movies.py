@@ -212,6 +212,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return {'trakt_id': movie_id, 'kodi_meta': kodi_meta,
                     'update_time': update_time, 'watched': watched, 'collected': collected}
         except:
+            cursor.close()
             import traceback
             traceback.print_exc()
             pass

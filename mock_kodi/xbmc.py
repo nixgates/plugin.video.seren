@@ -76,10 +76,8 @@ def executebuiltin(function, *args):
 
     """Execute a built in Kodi function"""
     try:
-        print('Executing built in command')
         if '?' in function:
             sys.argv = [None, None, function.split('?')[1]]
-        print(sys.argv)
         execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
     except:
         import traceback

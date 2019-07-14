@@ -38,7 +38,7 @@ def get_url(url):
     if CustomerPin == '':
         return
     url = BaseUrl + "apikey=" + CustomerPin + url
-    req = requests.get(url).text
+    req = requests.get(url, timeout=10).text
     return json.loads(req)
 
 
@@ -47,7 +47,7 @@ def post_url(url, data):
         return
     url = BaseUrl + url
     data['apikey'] = CustomerPin
-    req = requests.post(url, data=data)
+    req = requests.post(url, data=data,  timeout=10)
     req = req.text
     return json.loads(req)
 
@@ -117,6 +117,11 @@ class PremiumizeFunctions(PremiumizeBase):
     def __init__(self):
         pass
 
+    def get_used_space(self):
+        info = self.account_info()
+        used_space = int(((info['space_used'] / 1024) / 1024) / 1024)
+        return used_space
+
     def hosterCacheCheck(self, source_list):
         post_data = {'items[]': source_list}
         return post_url(CacheCheck, data=post_data)
@@ -166,13 +171,15 @@ class PremiumizeFunctions(PremiumizeBase):
         folder_details = [tfile for tfile in folder_details
                           if any(tfile['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
         for torrent_file in folder_details:
-            if source_utils.filter_movie_title(torrent_file['path'].split('/')[-1], args['title'], args['year']):
+            if source_utils.filter_movie_title(torrent_file['path'].split('/')[-1],
+                                               args['info']['title'],
+                                               args['info']['year']):
                 selectedFile = torrent_file
                 break
 
         if selectedFile is None:
             folder_details = [tfile for tfile in folder_details if 'sample' not in tfile['path'].lower()]
-            folder_details = [tfile for tfile in folder_details if source_utils.cleanTitle(args['title'])
+            folder_details = [tfile for tfile in folder_details if source_utils.cleanTitle(args['info']['title'])
                               in source_utils.cleanTitle(tfile['path'].lower())]
             if len(folder_details) == 1:
                 selectedFile = folder_details[0]
@@ -200,7 +207,7 @@ class PremiumizeFunctions(PremiumizeBase):
 
     def magnetToStream(self, magnet, args, pack_select):
 
-        if 'episodeInfo' not in args:
+        if 'showInfo' not in args:
             return self.movieMagnetToStream(magnet, args)
 
         episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
@@ -232,7 +239,6 @@ class PremiumizeFunctions(PremiumizeBase):
     def check_episode_string(self, folder_details, episodeStrings):
         for i in folder_details:
             for epstring in episodeStrings:
-                # print('Test: %s - Path: %s' % (epstring, source_utils.cleanTitle(i['path'].replace('&', ' ').lower())))
                 if epstring in source_utils.cleanTitle(i['path'].replace('&', ' ').lower()):
                     if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
                         if tools.getSetting('premiumize.transcoded') == 'true':

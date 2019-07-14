@@ -12,7 +12,7 @@ class Dialog(tools.dialogWindow):
         self.window_height = (720 / 2)
         logo_x = self.window_width - 40
         logo_y = self.window_height - 165
-        logo_path = tools.PANDA_LOGO_PATH
+        logo_path = tools.SEREN_LOGO_PATH
         self.list_item = None
 
         texture_path = os.path.join(tools.IMAGES_PATH, 'texture.png')

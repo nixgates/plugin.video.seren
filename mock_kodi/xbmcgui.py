@@ -311,7 +311,7 @@ __credits__ = 'Team Kodi'
 __date__ = 'Sat Oct 24 10:35:41 BST 2015'
 __platform__ = 'ALL'
 __version__ = '2.23.0'
-
+UNIT_TEST_MODE = False
 
 # =====================================================================================================================
 # API Methods
@@ -397,7 +397,10 @@ class Dialog(object):
         print(line2)
         print(line3)
         print('1) %s/ 0) %s' % (yeslabel, nolabel))
-        action = raw_input()
+        if not UNIT_TEST_MODE:
+            action = raw_input()
+        else:
+            return 1
         return action
 
     def info(self, listitem):
@@ -738,3 +741,9 @@ class ControlList:
 class ControlTextBox:
     def __init__(self, *args, **kwargs):
         pass
+
+class WindowXML:
+    pass
+
+class WindowXMLDialog:
+    pass

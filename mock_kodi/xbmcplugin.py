@@ -53,14 +53,17 @@ __credits__ = 'Team Kodi'
 __date__ = 'Sat Oct 24 10:35:45 BST 2015'
 __platform__ = 'ALL'
 __version__ = '2.23.0'
+UNIT_TEST_MODE = False
+
 
 class directory:
-    print('Creating New Directory')
     history = []
     items = []
     last_action = ''
 
     def closeDirectory(self):
+        if UNIT_TEST_MODE:
+            return
         print('OUTER LOOP')
         while True:
             print('loop')
@@ -95,6 +98,7 @@ class directory:
                 except:
                     action = str(action)
                     get_context_check = re.findall(r'c(\d*)', action)
+                    get_context_check = [i for i in get_context_check if i != '']
 
                     if len(get_context_check) == 1:
                         item = self.items[int(get_context_check[0]) -1]
@@ -108,7 +112,8 @@ class directory:
                     if action.startswith('action'):
                         try:
                             action = re.findall(r'action (.*?)$', action)[0]
-                            sys.argv = ['', 0, action]
+                            sys.argv = ['', 0, 'action=%s' % action]
+
                         except:
                             print('failed')
 
@@ -141,6 +146,7 @@ class directory:
             self.history.append(self.last_action)
             self.last_action = sys.argv[2]
         execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
+        sys.argv = ['', 0, '']
 
 DIRECTORY = directory()
 

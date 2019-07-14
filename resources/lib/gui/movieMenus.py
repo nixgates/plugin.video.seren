@@ -20,6 +20,8 @@ except:
 trakt = TraktAPI()
 tmdbAPI = TMDBAPI()
 
+trakt_database = TraktSyncDatabase()
+
 
 class Menus:
     def __init__(self):
@@ -83,7 +85,7 @@ class Menus:
     def myMovieCollection(self):
 
         try:
-            trakt_list = TraktSyncDatabase().get_collected_movies()
+            trakt_list = trakt_database.get_collected_movies()
             trakt_list = [{'ids': {'trakt': i['trakt_id']}} for i in trakt_list]
             self.commonListBuilder(trakt_list)
             tools.closeDirectory('movies', sort='title')
@@ -208,10 +210,15 @@ class Menus:
                 return
         else:
             query = actionArgs
-
         database.addSearchHistory(query, 'movie')
         query = tools.deaccentString(tools.display_string(query))
-        query = tools.quote_plus(query)
+        tools.quote(query)
+        tools.closeAllDialogs()
+        tools.closeDirectory('movies')
+        tools.execute("Container.Update(%s?action=moviesSearchResults&actionArgs=%s, replace)'" % (sysaddon, query))
+
+    def moviesSearchResults(self, query):
+        query = tools.quote_plus(tools.unquote(query))
         trakt_list = trakt.json_response('search/movie?query=%s' % query)
         if trakt_list is None:
             return
@@ -330,7 +337,7 @@ class Menus:
         if 'movie' in trakt_list[0]:
             trakt_list = [i['movie'] for i in trakt_list]
 
-        self.itemList = TraktSyncDatabase().get_movie_list(trakt_list)
+        self.itemList = trakt_database.get_movie_list(trakt_list)
 
         self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
         self.itemList = tools.sort_list_items(self.itemList, trakt_list)
@@ -340,20 +347,6 @@ class Menus:
         for item in self.itemList:
             try:
 
-                # Add Arguments to pass with item
-                args = {}
-                args['title'] = item['info']['title']
-                args['year'] = item['info']['year']
-                args['ids'] = item['ids']
-                args['fanart'] = item['art']['fanart']
-                args['info'] = item['info']
-                args['art'] = item['art']
-                args['imdb'] = item['info']['imdbnumber']
-                args['tagline'] = item['info']['tagline']
-                args['plot'] = item['info']['plot']
-                args['rating'] = item['info']['rating']
-                args['duration'] = item['info']['duration']
-
                 name = tools.display_string(item['info']['title'])
 
                 if not self.is_aired(item['info']):
@@ -362,17 +355,20 @@ class Menus:
                     name = tools.colorString(name, 'red')
                     name = tools.italic_string(name)
 
-                args = tools.quote(json.dumps(args))
+                args = {'trakt_id': item['ids']['trakt'], 'item_type': 'movie'}
+
+                args = tools.quote(json.dumps(args, sort_keys=True))
 
                 # Begin Building Context Menu Items
                 cm = []
+
                 cm.append((tools.lang(32020),
                            'Container.Update(%s?action=moviesRelated&actionArgs=%s)' % (
                                sysaddon, item['ids']['trakt'])))
                 cm.append((tools.lang(32066),
-                           'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
+                           'PlayMedia(%s?action=getSourcesWorkaround&source_select=true&actionArgs=%s)' % (sysaddon, args)))
                 cm.append((tools.lang(33022),
-                           'PlayMedia(%s?action=getSources&seren_reload=true&actionArgs=%s)' % (sysaddon, args)))
+                           'PlayMedia(%s?action=getSourcesWorkaround&seren_reload=true&actionArgs=%s)' % (sysaddon, args)))
 
                 if tools.getSetting('trakt.auth') != '':
                     cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
