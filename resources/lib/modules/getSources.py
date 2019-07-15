@@ -564,7 +564,6 @@ class Sources(DisplayWindow):
                 title = '%s (%s)' % (title, year)
 
             for source in sources:
-                tools.log(source)
                 source['type'] = 'hoster'
                 source['release_title'] = source.get('release_title', title)
                 source['source'] = source['source'].upper().split('.')[0]

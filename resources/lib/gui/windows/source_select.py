@@ -26,8 +26,6 @@ class SourceSelect(BaseWindow):
             menu_item = tools.menuItem(label=('%s) %s' % (idx + 1, i['release_title'])))
             for info in i.keys():
                 try:
-                    tools.log(i)
-                    tools.log(info)
                     value = i[info]
                     if type(value) == list:
                         value = [str(k) for k in value]

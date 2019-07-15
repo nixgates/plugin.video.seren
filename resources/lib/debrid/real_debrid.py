@@ -46,7 +46,6 @@ class RealDebrid:
                 self.ClientSecret = response['client_secret']
                 self.ClientID = response['client_id']
                 user_information = self.get_url('user')
-                tools.log(user_information)
                 if user_information['type'] != 'premium':
                     tools.showDialog.ok(tools.addonName, tools.lang(40156))
             except:

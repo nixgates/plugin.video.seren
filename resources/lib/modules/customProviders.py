@@ -81,70 +81,11 @@ class providers:
         all_providers = {'torrent': all_providers[0],
                          'hosters': all_providers[1]}
 
-        database_providers = database.get_providers()
-
         for provider_type in provider_types:
 
             for provider in all_providers[provider_type]:
                 database.add_provider(provider[1], provider[2], 'enabled', self.language,
                                       provider_type)
-
-        # if len(self.pre_update_collection) > 0:
-        #     pack_name = self.pre_update_collection[0]['package']
-        #
-        #     for provider_type in range(len(provider_types)):
-        #         for i in providers[provider_type]:
-        #             provider_name = i[1]
-        #             tools.log(provider_name)
-        #
-        #             # We need to check that the provider file exists after updating
-        #             # For some reason lsdir still shows files as existing after the module removes them.
-        #             path = os.path.join(self.providers_path, pack_name, self.language,
-        #                                 provider_types[provider_type], provider_name + ".py")
-        #
-        #             if not os.path.exists(path):
-        #                 continue
-        #
-        #             old_setting = [x for x in self.pre_update_collection if
-        #                            x['provider_type'] == provider_types[provider_type] and
-        #                            x['package'] == pack_name and
-        #                            x['provider_name'] == provider_name]
-        #
-        #             if len(old_setting) > 0:
-        #                 old_setting = old_setting[0]
-        #                 database.add_provider(old_setting['provider_name'],
-        #                                       old_setting['package'],
-        #                                       old_setting['status'],
-        #                                       old_setting['country'],
-        #                                       old_setting['provider_type'])
-        #             else:
-        #                 database.add_provider(i[1], i[2], 'enabled', self.language, provider_types[provider_type])
-        #
-        # else:
-        #     if self.known_providers is None or len(self.known_providers) == 0:
-        #
-        #         for provider in providers[0]:
-        #             tools.log('Adding Provider %s' % provider[1])
-        #             database.add_provider(provider[1], provider[2], 'enabled', self.language, 'torrent')
-        #         for provider in providers[1]:
-        #             tools.log('Adding Provider %s' % provider[1])
-        #             database.add_provider(provider[1], provider[2], 'enabled', self.language, 'hoster')
-        #
-        #     else:
-        #
-        #         for i in range(2):
-        #             for provider in providers[i]:
-        #                 existing = [existing for existing in self.known_providers
-        #                             if provider[2] == existing['package']\
-        #                             and provider[1] == existing['provider_name']\
-        #                             and existing['provider_type'] == provider_types[i]]
-        #
-        #
-        #                 if len(existing) == 0:
-        #                     tools.log('Adding Provider %s' % provider[1])
-        #                     database.add_provider(provider[1], provider[2], 'enabled', self.language,
-        #                                           provider_types[i])
-        #
 
         self.known_providers = database.get_providers()
 
@@ -156,12 +97,15 @@ class providers:
             action = 'disabled'
         if len(self.known_providers) == 0:
             self.known_providers = database.get_providers()
-        known_packages = self.known_packages
-        packages = list(set(['%s' % pack['pack_name'] for pack in known_packages]))
+
+        known_packages = [i for i in self.known_packages]
+
         package_display = list(set(['%s - %s' % (pack['pack_name'], pack['version']) for pack in known_packages]))
-        if len(packages) == 0:
+
+        if len(known_packages) == 0:
             tools.showDialog.ok(tools.addonName, tools.lang(32074))
             return
+
         selection = tools.showDialog.select("%s: %s Providers" %
                                             (tools.addonName, action[:-1].title()), package_display)
 
@@ -169,7 +113,7 @@ class providers:
             return
 
         providers = [i for i in self.known_providers
-                     if i['package'] == packages[selection]
+                     if i['package'] == known_packages[selection]['pack_name']
                      and i['status'] == status
                      and i['country'] == self.language]
 
@@ -185,12 +129,11 @@ class providers:
 
             for i in selection:
                 provider = providers[i]
-                database.add_provider(provider['provider_name'], provider['package'], action, self.language,
-                                      provider['provider_type'])
+                database.adjust_provider_status(provider['provider_name'], provider['package'], action)
 
         elif package_disable is True:
             for i in providers:
-                database.add_provider(i['provider_name'], i['package'], action, self.language, i['provider_type'])
+                database.adjust_provider_status(i['provider_name'], i['package'], action)
 
     def uninstall_package(self, package=None, silent=False):
         import shutil
