@@ -40,6 +40,7 @@ class GetSources(BaseWindow):
 
             if not self.silent and self.display_style == 1:
                 self.background_dialog = tools.bgProgressDialog()
+                self.getSources(self.args)
 
             elif not self.silent and self.display_style == 0:
                 super(GetSources, self).doModal()

@@ -1,3 +1,6 @@
+Changelog 1.0.22:
+Fixed Background Scraping Display style
+
 Changelog 1.0.21:
 Fixed issue with Custom Providers refresh not honoring disabled status (Actually this time)
 Added try/except for property/progress updates in getSources module
