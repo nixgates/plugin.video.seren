@@ -263,7 +263,6 @@ def addTorrent(item_meta, torrent_objects):
         if 'trakt_id' not in columns:
             raise Exception
     except:
-        tools.log("WE ARE UPGRADING")
         cursor.execute("DROP TABLE IF EXISTS cache")
         cursor.execute(
             "CREATE TABLE IF NOT EXISTS %s ("
@@ -475,14 +474,12 @@ def add_provider(provider_name, package, status, language, provider_type):
 
         cursor.execute('SELECT * FROM providers WHERE hash=?', (hash,))
         current_settings = cursor.fetchall()
+
         if len(current_settings) == 0:
-            tools.log('Inserting %s' % hash)
             cursor.execute(
                 "INSERT INTO providers Values (?, ?, ?, ?, ?, ?)",
                 (hash, provider_name, status, package, language, provider_type)
             )
-        else:
-            tools.log('skipping provider')
 
         cursor.connection.commit()
         cursor.close()
@@ -492,6 +489,27 @@ def add_provider(provider_name, package, status, language, provider_type):
         import traceback
         traceback.print_exc()
         pass
+
+def adjust_provider_status(provider_name, package_name, state):
+
+    hash = _hash_function('%s%s' % (provider_name, package_name))
+    cursor = _get_connection_cursor(tools.providersDB)
+
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS providers (hash TEXT,"
+        " provider_name TEXT, status TEXT, package TEXT, country TEXT, provider_type TEXT, UNIQUE(hash))"
+    )
+    cursor.execute('SELECT * FROM providers WHERE hash=?', (hash,))
+    current_settings = cursor.fetchall()
+
+    if len(current_settings) > 0:
+        cursor.execute(
+            "UPDATE providers SET status=? WHERE hash=?",
+            (state, hash)
+        )
+
+    cursor.connection.commit()
+    cursor.close()
 
 def remove_individual_provider(provider_name, package_name):
     try:

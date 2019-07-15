@@ -295,10 +295,8 @@ class serenPlayer(tools.player):
                     pass
 
                 if self.pre_cache_initiated is False:
-                    tools.log(self.pre_cache_initiated)
                     try:
                         if self.getWatchedPercent() > 80 and tools.getSetting('smartPlay.preScrape') == 'true':
-                            tools.log(self.getWatchedPercent())
                             self.pre_cache_initiated = True
                             smartPlay.SmartPlay(self.original_action_args).pre_scrape()
                     except:
