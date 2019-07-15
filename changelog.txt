@@ -1,3 +1,10 @@
+Changelog 1.0.24:
+Fix Automatic Episode Resume
+
+Changelog 1.0.23:
+Fixed disable/enabled of providers
+Clean up some missed logging
+
 Changelog 1.0.22:
 Fixed Background Scraping Display style
 
