@@ -261,6 +261,5 @@ class SmartPlay:
         tools.player().play(tools.playList)
 
     def workaround(self):
-        actionArgs = tools.quote(json.dumps(self.info_dictionary, sort_keys=True))
         tools.execute('RunPlugin(plugin://plugin.video.%s?action=buildPlaylistWorkaround&actionArgs=%s)' %
-                      (tools.addonName.lower(), actionArgs))
+                      (tools.addonName.lower(), tools.quote(self.actionArgs)))

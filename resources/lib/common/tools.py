@@ -117,6 +117,8 @@ try:
 
     SETTINGS_PATH = os.path.join(dataPath, 'settings.xml')
 
+    SKINS_PATH = os.path.join(dataPath, 'skins')
+
     cacheFile = os.path.join(dataPath, 'cache.db')
 
     torrentScrapeCacheFile = os.path.join(dataPath, 'torrentScrape.db')
