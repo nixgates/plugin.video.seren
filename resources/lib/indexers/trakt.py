@@ -527,8 +527,8 @@ class TraktAPI:
                                       'Item\'s Progress History has been removed')
 
     def get_username(self):
-        settings = json.loads(self.get_request('users/settings'))
-        return settings['user']['username']
+        settings = json.loads(self.get_request('users/me'))
+        return settings['username']
 
     def getLists(self, username='me'):
         lists = self.json_response('users/%s/lists' % username, limit=True, limitOverride=500)
