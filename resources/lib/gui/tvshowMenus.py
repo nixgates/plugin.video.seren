@@ -772,7 +772,8 @@ class Menus:
 
                     cm.append((tools.lang(32069),
                                'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)' %
-                               (sysaddon, tools.quote(json.dumps(str(item['showInfo']))))))
+                               (sysaddon, tools.quote(json.dumps({'trakt_id': item['showInfo']['ids']['trakt'],                                                        
+                                                     'item_type': 'show'})))))
 
                     cm.append(('Browse Season',
                                'XBMC.Container.Update(%s?action=seasonEpisodes&actionArgs=%s)' %
