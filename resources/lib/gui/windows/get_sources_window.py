@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+__metaclass__ = type
 
 import os
 import threading
@@ -9,7 +10,11 @@ import copy
 class GetSources(BaseWindow):
 
     def __init__(self, xml_file, xml_location, actionArgs=None):
-        super(GetSources, self).__init__(xml_file, xml_location, actionArgs=actionArgs)
+        try:
+            super(GetSources, self).__init__(xml_file, xml_location, actionArgs=actionArgs)
+        except:
+            BaseWindow(xml_file, xml_location).__init__(xml_file, xml_location)
+
         self.setProperty('process_started', 'false')
         self.position = -1
         self.canceled = False
@@ -19,9 +24,6 @@ class GetSources(BaseWindow):
         self.progress = 0
         self.background_dialog = None
         self.setProperty('progress', '0')
-        self.setProperty('loading.ico', os.path.join(tools.IMAGES_PATH, 'loading2.gif'))
-        self.setProperty('ico.trans.upper', os.path.join(tools.IMAGES_PATH, 'trans-fox-upper.png'))
-        self.setProperty('ico.trans.lower', os.path.join(tools.IMAGES_PATH, 'trans-fox-lower.png'))
         tools.closeBusyDialog()
 
     def onInit(self):
@@ -96,24 +98,27 @@ class GetSources(BaseWindow):
 
     def update_properties(self):
 
-        # Set Resolution count properties
-        self.setProperty('4k_sources', str(self.torrents_qual_len[0] + self.hosters_qual_len[0]))
-        self.setProperty('1080p_sources', str(self.torrents_qual_len[1] + self.hosters_qual_len[1]))
-        self.setProperty('720p_sources', str(self.torrents_qual_len[2] + self.hosters_qual_len[2]))
-        self.setProperty('SD_sources', str(self.torrents_qual_len[3] + self.hosters_qual_len[3]))
+        try:
+            # Set Resolution count properties
+            self.setProperty('4k_sources', str(self.torrents_qual_len[0] + self.hosters_qual_len[0]))
+            self.setProperty('1080p_sources', str(self.torrents_qual_len[1] + self.hosters_qual_len[1]))
+            self.setProperty('720p_sources', str(self.torrents_qual_len[2] + self.hosters_qual_len[2]))
+            self.setProperty('SD_sources', str(self.torrents_qual_len[3] + self.hosters_qual_len[3]))
 
-        # Set total source type counts
-        # self.setProperty('total_torrents', str(len([i for i in self.allTorrents])))
+            # Set total source type counts
+            # self.setProperty('total_torrents', str(len([i for i in self.allTorrents])))
 
-        self.setProperty('total_torrents', str(len([i for i in self.allTorrents])))
-        self.setProperty('cached_torrents', str(len([i for i in self.torrentCacheSources])))
-        self.setProperty('hosters_sources', str(len([i for i in self.hosterSources])))
-        self.setProperty('cloud_sources', str(len([i for i in self.cloud_files])))
+            self.setProperty('total_torrents', str(len([i for i in self.allTorrents])))
+            self.setProperty('cached_torrents', str(len([i for i in self.torrentCacheSources])))
+            self.setProperty('hosters_sources', str(len([i for i in self.hosterSources])))
+            self.setProperty('cloud_sources', str(len([i for i in self.cloud_files])))
 
-        # Set remaining providers string
-        self.setProperty("remaining_providers_count", str((len(self.remainingProviders))))
-        self.setProperty("remaining_providers_list", ' | '.join([tools.colorString(i.upper())
-                                                                for i in self.remainingProviders]))
+            # Set remaining providers string
+            self.setProperty("remaining_providers_count", str((len(self.remainingProviders))))
+            self.setProperty("remaining_providers_list", ' | '.join([tools.colorString(i.upper())
+                                                                     for i in self.remainingProviders]))
+        except:
+            pass
 
     def setProgress(self):
         if not self.silent:

@@ -3,18 +3,12 @@
 import datetime
 import json
 import sys
-from threading import Thread
-
 from resources.lib.common import tools
+from resources.lib.common.worker import ThreadPool
 from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.modules import database
-from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
 from resources.lib.modules.trakt_sync.hidden import TraktSyncDatabase as HiddenDatabase
-
-try:
-    from Queue import Queue
-except:
-    from queue import Queue
+from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
 
 sysaddon = sys.argv[0]
 try:
@@ -32,10 +26,9 @@ hidden_database = HiddenDatabase()
 class Menus:
     def __init__(self):
         self.itemList = []
-        self.threadList = []
         self.direct_episode_threads = []
         self.title_appends = tools.getSetting('general.appendtitles')
-        self.task_queue = Queue(40)
+        self.task_queue = ThreadPool()
 
     ######################################################
     # MENUS
@@ -67,37 +60,37 @@ class Menus:
 
     def discoverShows(self):
 
-        tools.addDirectoryItem(tools.lang(32007), 'showsPopular&page=1', '', '')
+        tools.addDirectoryItem(tools.lang(32007), 'showsPopular&page=1')
         if tools.getSetting('trakt.auth') is not '':
-            tools.addDirectoryItem(tools.lang(32008), 'showsRecommended', '', '')
-        # tools.addDirectoryItem('This Years Most Popular', '', '', '')
-        tools.addDirectoryItem(tools.lang(32009), 'showsTrending&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32067), 'showsNew', '', '')
-        tools.addDirectoryItem(tools.lang(32010), 'showsPlayed&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32011), 'showsWatched&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32012), 'showsCollected&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32013), 'showsAnticipated&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32014), 'showsUpdated&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(40121), 'showsNetworks', '', '')
-        tools.addDirectoryItem(tools.lang(40123), 'showYears', '', '')
-        tools.addDirectoryItem(tools.lang(32062), 'tvGenres', '', '')
-        tools.addDirectoryItem(tools.lang(40151), 'showsByActor', '', '')
+            tools.addDirectoryItem(tools.lang(32008), 'showsRecommended')
+        # tools.addDirectoryItem('This Years Most Popular', '')
+        tools.addDirectoryItem(tools.lang(32009), 'showsTrending&page=1')
+        tools.addDirectoryItem(tools.lang(32067), 'showsNew')
+        tools.addDirectoryItem(tools.lang(32010), 'showsPlayed&page=1')
+        tools.addDirectoryItem(tools.lang(32011), 'showsWatched&page=1')
+        tools.addDirectoryItem(tools.lang(32012), 'showsCollected&page=1')
+        tools.addDirectoryItem(tools.lang(32013), 'showsAnticipated&page=1')
+        tools.addDirectoryItem(tools.lang(32014), 'showsUpdated&page=1')
+        tools.addDirectoryItem(tools.lang(40121), 'showsNetworks')
+        tools.addDirectoryItem(tools.lang(40123), 'showYears')
+        tools.addDirectoryItem(tools.lang(32062), 'tvGenres')
+        tools.addDirectoryItem(tools.lang(40151), 'showsByActor')
         # show genres is now labeled as tvGenres to support genre icons in skins
         if tools.getSetting('searchHistory') == 'false':
-            tools.addDirectoryItem(tools.lang(32016), 'showsSearch', '', '')
+            tools.addDirectoryItem(tools.lang(32016), 'showsSearch', isFolder=True, isPlayable=False)
         else:
-            tools.addDirectoryItem(tools.lang(32016), 'showsSearchHistory', '', '')
+            tools.addDirectoryItem(tools.lang(32016), 'showsSearchHistory')
         tools.closeDirectory('addons')
 
     def myShows(self):
-        tools.addDirectoryItem(tools.lang(32063), 'onDeckShows', None, None)
-        tools.addDirectoryItem(tools.lang(32017), 'showsMyCollection', '', '')
-        tools.addDirectoryItem(tools.lang(32018), 'showsMyWatchlist', '', '')
-        tools.addDirectoryItem('Next Up', 'showsNextUp', '', '')
-        tools.addDirectoryItem('Upcoming Episodes', 'myUpcomingEpisodes', '', '')
-        tools.addDirectoryItem('Unfinished Shows in Collection', 'showsMyProgress', '', '')
-        tools.addDirectoryItem('Recent Episodes', 'showsMyRecentEpisodes', '', '')
-        tools.addDirectoryItem('My Show Lists', 'myTraktLists&actionArgs=shows', '', '')
+        tools.addDirectoryItem(tools.lang(32063), 'onDeckShows')
+        tools.addDirectoryItem(tools.lang(32017), 'showsMyCollection')
+        tools.addDirectoryItem(tools.lang(32018), 'showsMyWatchlist')
+        tools.addDirectoryItem(tools.lang(40172), 'showsNextUp')
+        tools.addDirectoryItem(tools.lang(40173), 'myUpcomingEpisodes')
+        tools.addDirectoryItem(tools.lang(40174), 'showsMyProgress')
+        tools.addDirectoryItem(tools.lang(40175), 'showsMyRecentEpisodes')
+        tools.addDirectoryItem(tools.lang(40176), 'myTraktLists&actionArgs=shows')
         tools.closeDirectory('addons')
 
     def myShowCollection(self):
@@ -180,12 +173,10 @@ class Menus:
         watched_shows = [i for i in watched_shows if i['trakt_id'] not in hidden_shows]
         watched_episodes = trakt_database.get_watched_episodes()
 
-        self._start_queue_workers()
-
         for show in watched_shows:
-            self.task_queue.put((self._get_next_episode_to_watch, (show, watched_episodes)), block=True)
+            self.task_queue.put(self._get_next_episode_to_watch, show, watched_episodes)
 
-        self._finish_queue_workers()
+        self.task_queue.wait_completion()
 
         if tools.getSetting('nextup.sort') == '1':
             watched_list = trakt.json_response('users/me/watched/shows')
@@ -201,7 +192,6 @@ class Menus:
         self.mixedEpisodeBuilder(episodes, sort=sort, hide_watched=True)
 
         tools.closeDirectory('tvshows')
-
 
     def _get_next_episode_to_watch(self, show_db_dict, watched_episodes):
         try:
@@ -290,7 +280,7 @@ class Menus:
 
         if len(trakt_list) == int(tools.getSetting('item.limit')):
             tools.addDirectoryItem(tools.lang(32019), 'showsNetworkShows&actionArgs=%s&page=%s' %
-                                   (network, int(page) + 1), '', '')
+                                   (network, int(page) + 1))
 
         tools.closeDirectory('tvshows')
 
@@ -301,7 +291,7 @@ class Menus:
             return
 
         self.showListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'showsPopular&page=%s' % (int(page) + 1), '', '')
+        tools.addDirectoryItem(tools.lang(32019), 'showsPopular&page=%s' % (int(page) + 1))
         tools.closeDirectory('tvshows')
 
     def showsRecommended(self):
@@ -317,7 +307,7 @@ class Menus:
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'showsTrending&page=%s' % (int(page) + 1), '', '')
+        tools.addDirectoryItem(tools.lang(32019), 'showsTrending&page=%s' % (int(page) + 1))
         tools.closeDirectory('tvshows')
 
     def showsPlayed(self, page):
@@ -325,7 +315,7 @@ class Menus:
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'showsPlayed&page=%s' % (int(page) + 1), '', '')
+        tools.addDirectoryItem(tools.lang(32019), 'showsPlayed&page=%s' % (int(page) + 1))
         tools.closeDirectory('tvshows')
 
     def showsWatched(self, page):
@@ -333,7 +323,7 @@ class Menus:
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'showsWatched&page=%s' % (int(page) + 1), '', '')
+        tools.addDirectoryItem(tools.lang(32019), 'showsWatched&page=%s' % (int(page) + 1))
         tools.closeDirectory('tvshows')
 
     def showsCollected(self, page):
@@ -341,7 +331,7 @@ class Menus:
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'showsCollected&page=%s' % (int(page) + 1), '', '')
+        tools.addDirectoryItem(tools.lang(32019), 'showsCollected&page=%s' % (int(page) + 1))
         tools.closeDirectory('tvshows')
 
     def showsAnticipated(self, page):
@@ -350,7 +340,7 @@ class Menus:
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'showsAnticipated&page=%s' % (int(page) + 1), '', '')
+        tools.addDirectoryItem(tools.lang(32019), 'showsAnticipated&page=%s' % (int(page) + 1))
         tools.closeDirectory('tvshows')
 
     def showsUpdated(self, page):
@@ -361,16 +351,16 @@ class Menus:
         if trakt_list is None:
             return
         self.showListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'showsUpdated&page=%s' % (int(page) + 1), '', '')
+        tools.addDirectoryItem(tools.lang(32019), 'showsUpdated&page=%s' % (int(page) + 1))
         tools.closeDirectory('tvshows')
 
     def showSearchHistory(self):
         history = database.getSearchHistory('show')
-        tools.addDirectoryItem(tools.lang(40142), 'showsSearch', '', '')
-        tools.addDirectoryItem(tools.lang(40140), 'clearSearchHistory', '', '', isFolder=False)
+        tools.addDirectoryItem(tools.lang(40142), 'showsSearch', isFolder=True, isPlayable=False)
+        tools.addDirectoryItem(tools.lang(40140), 'clearSearchHistory', isFolder=False, isPlayable=False)
 
         for i in history:
-            tools.addDirectoryItem(i, 'showsSearch&actionArgs=%s' % tools.quote(i), '', '')
+            tools.addDirectoryItem(i, 'showsSearchResults&actionArgs=%s' % tools.quote(i))
         tools.closeDirectory('addon')
 
     def showsSearch(self, actionArgs=None):
@@ -383,23 +373,23 @@ class Menus:
                 return
         else:
             query = actionArgs
+
+        query = query.decode('utf-8')
         database.addSearchHistory(query, 'show')
         query = tools.deaccentString(tools.display_string(query))
-        tools.quote(query)
-        tools.closeAllDialogs()
-        tools.closeDirectory('tvshows')
-        tools.execute("Container.Update(%s?action=showsSearchResults&actionArgs=%s, replace)'" % (sysaddon, query))
+        query = tools.quote(query)
+        self.showsSearchResults(query)
 
     def showsSearchResults(self, query):
         query = tools.quote_plus(tools.unquote(query))
         trakt_list = trakt.json_response('search/show?query=%s&extended=full&type=show&field=title' % query)
         if trakt_list is None:
             return
-        self.showListBuilder(trakt_list)
-        tools.closeDirectory('tvshows')
+        self.showListBuilder([show for show in trakt_list if float(show['score']) > 0])
+        tools.closeAllDialogs()
+        tools.closeDirectory('tvshows', cache=False)
 
     def showsByActor(self, actionArgs):
-
         if actionArgs == None:
             k = tools.showKeyboard('', tools.lang(32016))
             k.doModal()
@@ -451,15 +441,20 @@ class Menus:
         self.episodeListBuilder(show_id, season_number)
         tools.closeDirectory('episodes', sort='episode')
 
+    def flat_episode_list(self, args):
+        args = json.loads(args)
+        self.episodeListBuilder(args['trakt_id'])
+        tools.closeDirectory('episodes')
+
     def showGenres(self):
-        tools.addDirectoryItem(tools.lang(32065), 'showGenresGet', '', '', isFolder=True)
+        tools.addDirectoryItem(tools.lang(32065), 'showGenresGet', isFolder=True)
         genres = database.get(trakt.json_response, 24, 'genres/shows')
 
         if genres is None:
             return
 
         for i in genres:
-            tools.addDirectoryItem(i['name'], 'showGenresGet&actionArgs=%s' % i['slug'], '', '', isFolder=True)
+            tools.addDirectoryItem(i['name'], 'showGenresGet&actionArgs=%s' % i['slug'], isFolder=True)
         tools.closeDirectory('addons')
 
     def showGenreList(self, args, page):
@@ -473,7 +468,7 @@ class Menus:
 
             for genre in genres:
                 genre_display_list.append(genre['name'])
-            genre_multiselect = tools.showDialog.multiselect(tools.addonName + ": Genre Selection", genre_display_list)
+            genre_multiselect = tools.showDialog.multiselect("{]: {}".format(tools.addonName, tools.lang(40298)), genre_display_list)
 
             if genre_multiselect is None: return
             for selection in genre_multiselect:
@@ -491,7 +486,7 @@ class Menus:
 
         self.showListBuilder(trakt_list)
         tools.addDirectoryItem(tools.lang(32019),
-                               'showGenresGet&actionArgs=%s&page=%s' % (genre_string, page + 1), None, None)
+                               'showGenresGet&actionArgs=%s&page=%s' % (genre_string, page + 1))
         tools.closeDirectory('tvshows')
 
     def showsRelated(self, args):
@@ -505,11 +500,10 @@ class Menus:
     def showYears(self, year=None, page=None):
         if year is None:
             current_year = int(tools.datetime_workaround(datetime.datetime.today().strftime('%Y-%m-%d')).year)
-            all_years = reversed([year for year in range(1900, current_year+1)])
+            all_years = reversed([year for year in range(1900, current_year + 1)])
             menu_items = []
             for year in all_years:
-                menu_items.append(tools.addDirectoryItem(str(year), 'showYears&actionArgs=%s' % year, '', '',
-                                  bulk_add=True))
+                menu_items.append(tools.addDirectoryItem(str(year), 'showYears&actionArgs=%s' % year, bulk_add=True))
             tools.addMenuItems(syshandle, menu_items, len(menu_items))
             tools.closeDirectory('tvshows')
         else:
@@ -519,9 +513,8 @@ class Menus:
             trakt_list = trakt.json_response('shows/popular?years=%s&page=%s' % (year, page))
             self.showListBuilder(trakt_list)
             tools.addDirectoryItem(tools.lang(32019),
-                                   'showYears&actionArgs=%s&page=%s' % (year, int(page) + 1), None, None)
+                                   'showYears&actionArgs=%s&page=%s' % (year, int(page) + 1))
             tools.closeDirectory('tvshows')
-
 
     ######################################################
     # MENU TOOLS
@@ -547,13 +540,11 @@ class Menus:
         item_list = []
 
         for item in self.itemList:
-
             try:
                 if hide_specials and int(item['info']['season']) == 0:
                     continue
 
                 action = 'seasonEpisodes'
-
                 args = {'trakt_id': item['showInfo']['ids']['trakt'],
                         'season': item['info']['season'],
                         'item_type': 'season'}
@@ -580,39 +571,44 @@ class Menus:
             if smartPlay is True:
                 return args
 
-            cm = []
-            if tools.getSetting('trakt.auth') != '':
-                cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)' % (sysaddon, args)))
-
-            if tools.context_addon():
-                cm = []
-
-            item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], cm=cm, isFolder=True,
+            item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], item['cast'], isFolder=True,
                                                     isPlayable=False, actionArgs=args, set_ids=item['ids'],
                                                     bulk_add=True))
 
         tools.addMenuItems(syshandle, item_list, len(item_list))
 
-    def episodeListBuilder(self, show_id, season_number, smartPlay=False, hide_unaired=False):
+    def episodeListBuilder(self, show_id, season_number=None, smartPlay=False, hide_unaired=False):
 
         try:
             item_list = []
 
-            self.itemList = trakt_database.get_season_episodes(show_id, season_number)
+            if season_number:
+                self.itemList = trakt_database.get_season_episodes(show_id, season_number)
+            else:
+                self.itemList = trakt_database.get_flat_episode_list(show_id)
+                if tools.getSetting('general.hideSpecials') == 'true':
+                    self.itemList = [i for i in self.itemList if i['info']['season'] != 0]
+
             self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
 
             if len(self.itemList) == 0:
                 tools.log('We received no titles to build a list', 'error')
                 return
 
-            try:
-                self.itemList = sorted(self.itemList, key=lambda k: k['info']['episode'])
-            except:
-                pass
+            if season_number:
+                # Building a list of a season, sort by episode
+                try:
+                    self.itemList = sorted(self.itemList, key=lambda k: k['info']['episode'])
+                except:
+                    pass
+            else:
+                # Building a flat list of episodes, sort by season, then episode
+                try:
+                    self.itemList = sorted(self.itemList, key=lambda k: (k['info']['season'], k['info']['episode']))
+                except:
+                    pass
 
             for item in self.itemList:
-
-                cm = []
 
                 try:
 
@@ -646,35 +642,10 @@ class Menus:
                     import traceback
                     traceback.print_exc()
                     continue
-                cm.append((tools.lang(32070),
-                           'XBMC.PlayMedia(%s?action=shufflePlay&actionArgs=%s)' % (sysaddon, args)))
-
-                cm.append(('Browse Season',
-                           'XBMC.Container.Update(%s?action=seasonEpisodes&actionArgs=%s)' %
-                           (sysaddon,
-                            tools.quote(json.dumps({'trakt_id': item['showInfo']['ids']['trakt'],
-                                                    'season': item['info']['season'],
-                                                    'item_type': 'season'})))))
-
-                cm.append((tools.lang(33022),
-                           'PlayMedia(%s?action=getSources&seren_reload=true&actionArgs=%s)' % (sysaddon, args)))
-
-                cm.append((tools.lang(32066),
-                           'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
-
-                if tools.getSetting('trakt.auth') != '':
-                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)' % (sysaddon, args)))
-
-                if tools.context_addon():
-                    cm = []
-
-                if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting('premiumize.pin') != '':
-                    cm.append((tools.lang(32068),
-                               'XBMC.RunPlugin(%s?action=filePicker&actionArgs=%s)' % (sysaddon, args)))
-
-                item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], isFolder=False,
+                
+                item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], item['cast'], isFolder=False,
                                                         isPlayable=playable, actionArgs=args, bulk_add=True,
-                                                        set_ids=item['ids'], cm=cm))
+                                                        set_ids=item['ids']))
 
             if smartPlay is True:
                 return item_list
@@ -687,8 +658,6 @@ class Menus:
 
     def mixedEpisodeBuilder(self, trakt_list, sort=None, hide_watched=False, smartPlay=False, hide_unaired=True,
                             prepend_date=False):
-
-        self.threadList = []
 
         try:
             if len(trakt_list) == 0:
@@ -732,8 +701,6 @@ class Menus:
                 if hide_watched and item['info']['playcount'] != 0:
                     continue
 
-                cm = []
-
                 try:
                     name = tools.display_string(item['info']['title'])
 
@@ -770,43 +737,11 @@ class Menus:
                         release_day = release_day.strftime('%d %b')
                         name = '[%s] %s' % (release_day, name)
 
-                    cm.append((tools.lang(32069),
-                               'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)' %
-                               (sysaddon, tools.quote(json.dumps({'trakt_id': item['showInfo']['ids']['trakt'],                                                        
-                                                     'item_type': 'show'})))))
-
-                    cm.append(('Browse Season',
-                               'XBMC.Container.Update(%s?action=seasonEpisodes&actionArgs=%s)' %
-                               (sysaddon,
-                                tools.quote(json.dumps({'trakt_id': item['showInfo']['ids']['trakt'],
-                                                        'season': item['info']['season'],
-                                                        'item_type': 'season'})))))
-
-                    cm.append((tools.lang(32070),
-                               'XBMC.PlayMedia(%s?action=shufflePlay&actionArgs=%s)' % (sysaddon, args)))
-
-                    cm.append((tools.lang(32066),
-                               'PlayMedia(%s?action=getSources&source_select=true&actionArgs=%s)' % (sysaddon, args)))
-
-                    cm.append((tools.lang(33022),
-                               'PlayMedia(%s?action=getSources&seren_reload=true&actionArgs=%s)' % (sysaddon, args)))
-
-                    if tools.getSetting('trakt.auth') != '':
-                        cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
-                                   % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
-
-                    if tools.context_addon():
-                        cm = []
-
-                    if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting('premiumize.pin') != '':
-                        cm.append((tools.lang(32068),
-                                   'XBMC.RunPlugin(%s?action=filePicker&actionArgs=%s)' % (sysaddon, args)))
-
                     item['info']['title'] = item['info']['originaltitle'] = name
 
-                    item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], isFolder=False,
+                    item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], item['cast'], isFolder=False,
                                                             isPlayable=playable, actionArgs=args, bulk_add=True,
-                                                            set_ids=item['ids'], cm=cm))
+                                                            set_ids=item['ids']))
 
 
                 except:
@@ -851,11 +786,9 @@ class Menus:
                 args = {'trakt_id': item['ids']['trakt'], 'item_type': 'show'}
                 args = tools.quote(json.dumps(args, sort_keys=True))
 
-                cm = []
-
                 name = tools.display_string(item['info']['tvshowtitle'])
 
-                if info_only == True:
+                if info_only:
                     return args
 
                 if not self.is_aired(item['info']):
@@ -866,92 +799,31 @@ class Menus:
 
                 item['info'] = tools.clean_air_dates(item['info'])
 
-                if 'setCast' in item:
-                    set_cast = item['setCast']
-                else:
-                    set_cast = False
-
                 if tools.getSetting('smartplay.clickresume') == 'true' or forceResume is True:
                     action = 'playbackResume'
                 else:
-                    action = 'showSeasons'
-
-                # Context Menu Items
-
-                cm.append((tools.lang(32070),
-                           'XBMC.PlayMedia(%s?action=shufflePlay&actionArgs=%s)' % (sysaddon, args)))
-
-                cm.append((tools.lang(32020),
-                           'Container.Update(%s?action=showsRelated&actionArgs=%s)' % (sysaddon, item['ids']['trakt'])))
-
-                cm.append((tools.lang(32069),
-                           'XBMC.Container.Update(%s?action=showSeasons&actionArgs=%s)' % (sysaddon, args)))
-
-                if tools.getSetting('trakt.auth') != '':
-                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)' % (sysaddon, args)))
-
-                cm.append((tools.lang(40153),
-                           'XBMC.PlayMedia(%s?action=playFromRandomPoint&actionArgs=%s' % (sysaddon, args)))
-
-                if tools.context_addon():
-                    cm = []
-
+                    if tools.getSetting('general.flatten.episodes') == 'true':
+                        action = 'flatEpisodes'
+                    else:
+                        action = 'showSeasons'
 
             except:
                 import traceback
                 traceback.print_exc()
                 continue
 
-            item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], cm=cm, isFolder=True,
-                                                    isPlayable=False, actionArgs=args, bulk_add=True, set_cast=set_cast,
+            item_list.append(tools.addDirectoryItem(name, action, item['info'], item['art'], item['cast'], isFolder=True,
+                                                    isPlayable=False, actionArgs=args, bulk_add=True,
                                                     set_ids=item['ids']))
 
         tools.addMenuItems(syshandle, item_list, len(item_list))
 
-    def runThreads(self, join=True):
-        for thread in self.threadList:
-            thread.start()
-
-        if join == True:
-            for thread in self.threadList:
-                thread.join()
-
-    def _start_queue_workers(self):
-
-        self.queue_finished = False
-
-        for i in range(40):
-            self.threadList.append(Thread(target=self._queue_worker))
-
-        for i in self.threadList:
-            i.start()
-
-    def _finish_queue_workers(self):
-
-        self.queue_finished = True
-
-        for i in self.threadList:
-            i.join()
-
-        self.threadList = []
-
-    def _queue_worker(self):
-        while not self.task_queue.empty() or not self.queue_finished:
-            try:
-                target = self.task_queue.get(timeout=3)
-            except:
-                continue
-            try:
-                target[0](*target[1])
-            except:
-                import traceback
-                traceback.print_exc()
-                pass
-
     def is_aired(self, info):
         try:
-            try:air_date = info['aired']
-            except: air_date = info.get('premiered')
+            try:
+                air_date = info['aired']
+            except:
+                air_date = info.get('premiered')
             if air_date == '' or air_date is None:
                 return False
             if int(air_date[:4]) < 1970:

@@ -742,8 +742,17 @@ class ControlTextBox:
     def __init__(self, *args, **kwargs):
         pass
 
+class ControlGroup:
+    def __init__(self, *args, **kwargs):
+        pass
+
+
 class WindowXML:
     pass
 
 class WindowXMLDialog:
-    pass
+    def __init__(self):
+        pass
+
+    def setProperty(self, *args, **kwargs):
+        pass

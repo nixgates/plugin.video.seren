@@ -1,3 +1,132 @@
+Changelog 1.4.6:
+Removed duplicate caching from meta provider modules
+Fixed typos
+Additional translation strings added
+Fixed potential deadlocks from occuring in the worker module
+Reduced workers for Trakt Sync operations
+
+Changelog 1.4.5:
+Inceased speed in TMDb module by threading more network requests
+
+Changelog 1.4.4:
+Fixed accidental swap of preferred source of artwork labels
+Duplicated poster value to thumb for show and season objects
+
+Changelog 1.4.3:
+Created Artwork Category in settings
+Adjusted artwork settings visibility to better represent end format
+
+Changelog 1.4.2:
+Adjust Advanced artwork strings
+Fixed Premiumize Max Storage setting visibility
+Changing highlight color now re-opens settings menu
+Adjusted getInfo to support more information tags
+
+Changelog 1.4.1:
+Created worker module and lazy threadpool
+Increased title and information identification for sources
+Added advanced settings for item artwork
+Increased network request caching
+Uninstall in provider manager now works similar to disabling providers
+Threadlocked SQL database entries
+
+Changelog 1.4.0:
+Fixed Provider Manager Default Focus
+Fixed language string spacing for Disable All Hosters
+Fixed Notification timeouts for available updates
+Added multiple fall backs for metadata information to better support outages
+Fixed Premiumize visibility equations
+Settings re-work for better flow
+Added settings to allow user to choose artwork service
+Fix setCast for items, cast items now display images
+Updated last_meta_update for trakt sync database
+
+Changelog 1.3.6:
+Fix skin_dir XML pointer
+
+Changelog 1.3.5:
+Theme Manager now uses pointer to reduce file movements
+Fixed Unicode errors on deaccentString method
+Fixed SkinManager import for Provider Manager
+Fixed type issues with tuples for view types
+
+Changelog 1.3.4:
+Fixed Cache Assist always triggering
+Fixed cache clear notification appearing if user cancels process
+Increased fall backs for TV show artwork
+Fixed series posters being served as thumbnail fallback, changed to fanart
+Removed Caching of Trakt user lists
+Increased text translation
+Added Dutch Translations
+
+Changelog 1.3.3:
+Added check to confirm folder "Default" is included in theme package
+Added new language strings
+
+Changelog 1.3.2:
+Fixed Scrobbling
+
+Changelog 1.3.1:
+Fixed delay when resuming items
+Fixed issues with missing theme variables in tools module
+Lowered RD request timeout
+Improved Seren's ability to detect moment playback has started
+Improved handeling of accented text in Premiumize resolver
+
+Changelog 1.3.0:
+Serens skins renamed to "Themes" to try avoid confusion with Kodi skins
+Fixed issue displaying show seasons where season numbering does not start from 1 eg BBC Horizon
+Added Flatten Seasons setting
+Small improvements to player module
+
+Changelog 1.2.2:
+Fixed search history results not searching
+Fixed issue with providers not displaying names correctly
+Fixed RD Cloud movie sources showing incorrect size meta
+Movies Fanart now acquired using TMDB ID
+Added redundant reset to scrobble status on playback start in player module
+Fixed and confirmed all searching related items
+
+Changelog 1.2.1:
+Fixed providers not refreshing after new dialog raised with Toolbox button in Provider Manager
+Added touch/mouse support for Provider Manager window
+Fixed Kodi crashing on playback from widgets
+Fixed Kodi playback error displaying when played from skin info dialog
+
+Changelog 1.2.0:
+Fixed arguments or Trakt Manager context item
+Fixed playlist not clearing on cancel of source select
+Re-design of provider package management
+
+Changelog 1.1.3:
+Updated hash regex to support uncommon magnets
+Fixed browse show from mixed episode lists
+Language string "32055" change to "Clear Local Torrent Cache"
+Added confirmation at clearing of torrent cache
+Added confirmation at clearing of search history
+Removed multiline source select setting as it is no longer required
+Setting "Hide Low Quality Items" renamed to "Hide Common Undesirable Items"
+Setting "Check for Seren Updates" renamed to "Notify Me About Available Updates"
+Removal of orphaned files
+Restructuring of some folders
+Fixed duplicate removal process removing debrid duplicates
+Clean up of player init method
+
+Changelog 1.1.2:
+Added fallback to hash on failure to extract from magnet in RD resolver
+
+Changelog 1.1.1:
+Added the ability to use custom images for custom window skins
+Added the window property "skin.dir", property contains the file path for the current active skin (similar to special://skin/)
+Moved RD premium check further down in auth process
+Trakt username api call changed to users/me endpoint
+
+Changelog 1.1.0:
+Added the Skin Manager Feature
+Users can now install custom XML window packages
+Users can now uninstall custom XML window packages
+Users can now switch between custom XML window packages
+
 Changelog 1.0.24:
 Fix Automatic Episode Resume
 

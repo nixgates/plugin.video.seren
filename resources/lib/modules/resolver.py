@@ -19,8 +19,11 @@ sys.path.append(tools.dataPath)
 
 class Resolver(BaseWindow):
 
-    def __init__(self, xml_file, location, actionArgs=None):
-        super(Resolver, self).__init__(xml_file, location, actionArgs=actionArgs)
+    def __init__(self, xml_file, location=None, actionArgs=None):
+        try:
+            super(Resolver, self).__init__(xml_file, location, actionArgs=actionArgs)
+        except:
+            pass
         self.return_data = None
         self.canceled = False
         self.progress = 1
@@ -30,10 +33,6 @@ class Resolver(BaseWindow):
 
     def resolve(self, sources, args, pack_select=False):
         try:
-            if 'showInfo' in args:
-                background = args['showInfo']['art']['fanart']
-            else:
-                background = args['art']['fanart']
 
             stream_link = None
             loop_count = 0
@@ -51,7 +50,7 @@ class Resolver(BaseWindow):
 
                     self.setProperty('release_title', tools.display_string(i['release_title']))
                     self.setProperty('debrid_provider', debrid_provider)
-                    self.setProperty('source_provider', i['source'])
+                    self.setProperty('source_provider', i['provider'])
                     self.setProperty('source_resolution', i['quality'])
                     self.setProperty('source_info', " ".join(i['info']))
 

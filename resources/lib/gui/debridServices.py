@@ -10,15 +10,15 @@ class Menus:
         self.view_type = 'addons'
 
     def home(self):
-        tools.addDirectoryItem('Cache Assist History', 'cacheAssistStatus', None, None)
+        tools.addDirectoryItem(tools.lang(40182), 'cacheAssistStatus', None, None)
         if tools.getSetting('premiumize.enabled') == 'true':
-            tools.addDirectoryItem('Current Premiumize Transfers', 'premiumizeTransfers', None, None)
+            tools.addDirectoryItem(tools.lang(40183), 'premiumizeTransfers', None, None)
         if tools.getSetting('realdebrid.enabled') == 'true':
-            tools.addDirectoryItem('Current Real Debrid Transfers', 'realdebridTransfers', None, None)
+            tools.addDirectoryItem(tools.lang(40184), 'realdebridTransfers', None, None)
         tools.closeDirectory(self.view_type)
 
     def get_assist_torrents(self):
-        tools.addDirectoryItem('Clear Non Active...', 'nonActiveAssistClear', None, None)
+        tools.addDirectoryItem(tools.lang(40185), 'nonActiveAssistClear', None, None)
         torrent_list = database.get_assist_torrents()
         if torrent_list is not None:
 

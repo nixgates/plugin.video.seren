@@ -39,7 +39,7 @@ class Menus:
                 action = 'myFilesPlay'
                 file['link'] = file['links'][0]
             actionArgs = json.dumps(file)
-            tools.addDirectoryItem(file['filename'], action, None, None, isPlayable=isPlayable, isFolder=isFolder,
+            tools.addDirectoryItem(file['filename'], action, isPlayable=isPlayable, isFolder=isFolder,
                                    actionArgs=actionArgs)
 
         for file in self.premiumize_files:
@@ -54,7 +54,7 @@ class Menus:
                 isFolder = False
                 action = 'myFilesPlay'
 
-            tools.addDirectoryItem(file['name'], action, None, None, isPlayable=isPlayable, isFolder=isFolder,
+            tools.addDirectoryItem(file['name'], action, isPlayable=isPlayable, isFolder=isFolder,
                                    actionArgs=actionArgs)
 
         tools.closeDirectory('addon')
@@ -98,7 +98,7 @@ class Menus:
             name = file['path']
             if name.startswith('/'):
                 name = name.split('/')[-1]
-            tools.addDirectoryItem(name, 'myFilesPlay', None, None, isPlayable=True, isFolder=False,
+            tools.addDirectoryItem(name, 'myFilesPlay', isPlayable=True, isFolder=False,
                                    actionArgs=args)
 
         tools.closeDirectory('video')
@@ -119,7 +119,7 @@ class Menus:
                 isFolder = False
                 action = 'myFilesPlay'
 
-            tools.addDirectoryItem(file['name'], action, None, None, isPlayable=isPlayable, isFolder=isFolder,
+            tools.addDirectoryItem(file['name'], action, isPlayable=isPlayable, isFolder=isFolder,
                                    actionArgs=actionArgs)
 
         tools.closeDirectory('addons')

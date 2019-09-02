@@ -75,7 +75,7 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <visible>String.IsEmpty(Window().Property(item.info.season))</visible>
-                    <label>Year: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.year)] [/COLOR] | Rating: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.rating)][/COLOR]
+                    <label>$ADDON[plugin.video.seren 40230]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.year)] [/COLOR] | $ADDON[plugin.video.seren 40231]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.rating)][/COLOR]
                     </label>
                 </control>
                 <control type="label">
@@ -86,7 +86,7 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <visible>!String.IsEmpty(Window().Property(item.info.season))</visible>
-                    <label>Aired: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.aired)] [/COLOR]</label>
+                    <label>$ADDON[plugin.video.seren 40232]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.aired)] [/COLOR]</label>
                 </control>
 
                 <control type="label">
@@ -156,7 +156,7 @@
                     <font>font10</font>
                     <textcolor>AAFFFFFF</textcolor>
                     <align>left</align>
-                    <label>Debrid: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(debrid_provider)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40233]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(debrid_provider)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -167,7 +167,7 @@
                     <font>font10</font>
                     <textcolor>AAFFFFFF</textcolor>
                     <align>left</align>
-                    <label>Size: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40234]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -177,7 +177,7 @@
                     <height>50</height>
                     <font>font10</font>
                     <textcolor>AAFFFFFF</textcolor>
-                    <label>Provider: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(scraper)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40235]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(provider)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -187,7 +187,7 @@
                     <height>50</height>
                     <font>font10</font>
                     <textcolor>AAFFFFFF</textcolor>
-                    <label>Source Type: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40236]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -199,7 +199,7 @@
                     <textcolor>AAFFFFFF</textcolor>
                     <align>left</align>
                     <font>font10</font>
-                    <label>Resolution: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40237]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -209,7 +209,7 @@
                     <height>50</height>
                     <textcolor>AAFFFFFF</textcolor>
                     <font>font10</font>
-                    <label>Info: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(info)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40238]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(info)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
             </itemlayout>
@@ -240,7 +240,7 @@
                     <font>font10</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>left</align>
-                    <label>Debrid: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(debrid_provider)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40233]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(debrid_provider)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -251,7 +251,7 @@
                     <font>font10</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>left</align>
-                    <label>Size: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40234]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -261,7 +261,7 @@
                     <height>50</height>
                     <textcolor>FFFFFFFF</textcolor>
                     <font>font10</font>
-                    <label>Provider: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(scraper)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40235]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(provider)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -271,7 +271,7 @@
                     <height>50</height>
                     <textcolor>FFFFFFFF</textcolor>
                     <font>font10</font>
-                    <label>Source Type: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40236]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -282,7 +282,7 @@
                     <font>font10</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <align>left</align>
-                    <label>Resolution: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40237]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
                 <control type="label">
@@ -292,7 +292,7 @@
                     <height>50</height>
                     <textcolor>FFFFFFFF</textcolor>
                     <font>font10</font>
-                    <label>Info: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(info)][/COLOR][/UPPERCASE]
+                    <label>$ADDON[plugin.video.seren 40238]: [UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(info)][/COLOR][/UPPERCASE]
                     </label>
                 </control>
             </focusedlayout>

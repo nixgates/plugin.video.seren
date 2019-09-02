@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+__metaclass__ = type
 
 import copy
 import json
@@ -16,6 +17,7 @@ from resources.lib.debrid import real_debrid
 from resources.lib.modules import database
 from resources.lib.modules import resolver as resolver
 from resources.lib.gui.windows.get_sources_window import GetSources as DisplayWindow
+from resources.lib.modules.skin_manager import SkinManager
 
 sysaddon = sys.argv[0]
 
@@ -26,7 +28,9 @@ class CancelProcess(Exception):
     pass
 
 def getSourcesHelper(actionArgs):
-    sources_window = Sources('get_sources.xml', tools.addonDir, actionArgs=actionArgs)
+    sources_window = Sources('get_sources.xml',
+                             SkinManager().active_skin_path,
+                             actionArgs=actionArgs)
     sources = sources_window.doModal()
     try:
         del sources_window
@@ -37,7 +41,13 @@ def getSourcesHelper(actionArgs):
 
 class Sources(DisplayWindow):
     def __init__(self, xml_file, location, actionArgs=None):
-        super(Sources, self).__init__(xml_file, location, actionArgs)
+        try:
+            super(Sources, self).__init__(xml_file, location, actionArgs)
+        except:
+            self.args = actionArgs
+            self.item_information = tools.get_item_information(actionArgs)
+            self.canceled = False
+
         self.torrent_threads = []
         self.hoster_threads = []
         self.torrentProviders = []
@@ -69,6 +79,8 @@ class Sources(DisplayWindow):
         self.line2 = ''
         self.line3 = ''
 
+        self.host_domains = []
+        self.host_names = []
 
     def getSources(self, args):
         try:
@@ -255,16 +267,18 @@ class Sources(DisplayWindow):
 
         if len(relevant_torrents) > 0:
             for torrent in relevant_torrents:
-                torrent['source'] = '%s (Local Cache)' % torrent['source']
+                torrent['provider'] = '%s (Local Cache)' % torrent['provider']
 
                 self.allTorrents.update({torrent['hash']: torrent})
 
             cached_torrents = TorrentCacheCheck().torrentCacheCheck(relevant_torrents, self.args)
             for torrent in cached_torrents:
-                self.torrentCacheSources.update({torrent['hash']: torrent})
+                self.torrentCacheSources.update({torrent['hash'] + torrent['debrid_provider']: torrent})
 
     def build_cache_assist(self):
-        args = self.args
+
+        args = self.item_information
+
         if tools.getSetting('general.autocache') == 'false':
             return
         if len(self.allTorrents) == 0:
@@ -299,7 +313,7 @@ class Sources(DisplayWindow):
             if self.silent is True:
                 return
 
-            yesno = tools.showDialog.yesno('%s - Cache Assist' % tools.addonName, tools.lang(32086))
+            yesno = tools.showDialog.yesno('%s - %s' % (tools.addonName, tools.lang(40307)), tools.lang(32086))
             if yesno == 0:
                 return
 
@@ -334,9 +348,13 @@ class Sources(DisplayWindow):
 
         hoster_providers, torrent_providers = self.remove_duplicate_providers(torrent_providers, hoster_providers)
 
-        self.hosterDomains = resolver.Resolver('resolver.xml', tools.addonDir).getHosterList()
+        self.hosterDomains = resolver.Resolver('resolver.xml', SkinManager().active_skin_path).getHosterList()
         self.torrentProviders = torrent_providers
         self.hosterProviders = hoster_providers
+        self.host_domains = list(set([host[0].lower() for provider in self.hosterDomains['premium'].iterkeys()
+                             for host in self.hosterDomains['premium'][provider]]))
+        self.host_names = list(set([host[1].lower() for provider in self.hosterDomains['premium'].iterkeys()
+                           for host in self.hosterDomains['premium'][provider]]))
 
     def remove_duplicate_providers(self, torrent, hosters):
 
@@ -414,7 +432,7 @@ class Sources(DisplayWindow):
 
                         torrent['hash'] = torrent.get('hash', '')
                         if torrent['hash'] == '':
-                            torrent['hash'] = re.findall(r'btih:(.*?)\&', torrent['magnet'])[0]
+                            torrent['hash'] = re.findall(r'btih:(.*?)(?:&|$)', torrent['magnet'])[0]
                         torrent['hash'] = torrent['hash'].lower()
 
                         torrent['size'] = torrent.get('size', '')
@@ -424,9 +442,9 @@ class Sources(DisplayWindow):
                         torrent['size'] = self.torrent_filesize(torrent, info)
 
                         if 'provider_name_override' in torrent:
-                            torrent['source'] = torrent['provider_name_override']
+                            torrent['provider'] = torrent['provider_name_override']
                         else:
-                            torrent['source'] = provider_name
+                            torrent['provider'] = provider_name
 
                     except:
                         import traceback
@@ -453,7 +471,7 @@ class Sources(DisplayWindow):
 
                 for torrent in cached:
                     try:
-                        self.torrentCacheSources.update({torrent['hash']: torrent})
+                        self.torrentCacheSources.update({torrent['hash'] + torrent['debrid_provider']: torrent})
                     except AttributeError:
                         break
 
@@ -568,28 +586,16 @@ class Sources(DisplayWindow):
                 source['release_title'] = source.get('release_title', title)
                 source['source'] = source['source'].upper().split('.')[0]
                 source['size'] = source.get('size', '0')
-                if 'provider' in source:
-                    source['source'] = source['provider']
+                source['info'] = source.get('info', [])
+                source['provider_imports'] = provider
 
                 if 'provider_name_override' in source:
                     source['provider'] = source['provider_name_override']
                 else:
                     source['provider'] = provider_name.upper()
 
-                source['info'] = source.get('info', [])
-                source['provider_imports'] = provider
-                source['scraper'] = provider_name
-
-            host_domains = [host[0].lower() for provider in self.hosterDomains['premium'].iterkeys()
-                            for host in self.hosterDomains['premium'][provider]]
-            host_names = [host[1].lower() for provider in self.hosterDomains['premium'].iterkeys()
-                          for host in self.hosterDomains['premium'][provider]]
-
-            host_names = list(set(host_names))
-            host_domains = list(set(host_domains))
-
-            sources1 = [i for i in sources for host in host_domains if host in i['url']]
-            sources2 = [i for i in sources if i['source'].lower() in host_names or i['direct']]
+            sources1 = [i for i in sources for host in self.host_domains if host in i['url']]
+            sources2 = [i for i in sources if i['source'].lower() in self.host_names or i['direct']]
 
             sources = sources1 + sources2
 
@@ -659,11 +665,10 @@ class Sources(DisplayWindow):
                         if source_utils.filter_single_episode(torrent_simple_info, name):
                             self.cloud_files.append(
                                 {
-                                    'source': 'Real Debrid Cloud',
                                     'quality': source_utils.getQuality(i['filename']),
                                     'language': self.language,
                                     'url': torrent_info['links'][f_index],
-                                    'provider': 'Real-Debrid Cloud',
+                                    'provider': 'Cloud',
                                     'type': 'cloud',
                                     'release_title': i['filename'],
                                     'info': source_utils.getInfo(i['filename']),
@@ -689,16 +694,15 @@ class Sources(DisplayWindow):
                     for f_index, torrent_file in enumerate([cloud_file for cloud_file in torrent_info['files']
                                                             if cloud_file['selected'] == 1]):
                         self.cloud_files.append({
-                            'source': 'Real Debrid Cloud',
                             'quality': source_utils.getQuality(i['filename']),
                             'language': self.language,
                             'url': torrent_info['links'][f_index],
-                            'provider': 'Real-Debrid Cloud',
+                            'provider': 'Cloud',
                             'type': 'cloud',
                             'release_title': i['filename'],
                             'info': source_utils.getInfo(i['filename']),
                             'debrid_provider': 'real_debrid',
-                            'size': (torrent_file['bytes'] * 1024) * 1024
+                            'size': (torrent_file['bytes'] / 1024) / 1024
                         })
                         break
                     continue
@@ -759,11 +763,10 @@ class Sources(DisplayWindow):
                 except:
                     size = 0
                 self.cloud_files.append({
-                    'source': 'Premiumize Cloud',
                     'quality': source_utils.getQuality(selected_file['name']),
                     'language': self.language,
                     'url': url,
-                    'provider': 'Premiumize Cloud',
+                    'provider': 'Cloud',
                     'type': 'cloud',
                     'release_title': selected_file['name'],
                     'info': source_utils.getInfo(selected_file['name']),
@@ -1060,7 +1063,7 @@ class Sources(DisplayWindow):
             imdb = info['ids']['imdb']
             title = info['info']['title']
             localtitle = info['info']['title']
-            aliases = []
+            aliases = info['info']['aliases']
             year = info['info']['year']
             return imdb, title, localtitle, aliases, year
         elif type == 'sources':
@@ -1184,6 +1187,9 @@ class TorrentCacheCheck:
         self.realdebridCached = []
         self.threads = []
 
+        self.episodeStrings = None
+        self.seasonStrings = None
+
     def torrentCacheCheck(self, torrent_list, info):
 
         if tools.getSetting('realdebrid.enabled') == 'true' and \
@@ -1203,8 +1209,28 @@ class TorrentCacheCheck:
         cachedList = self.realdebridCached + self.premiumizeCached
         return cachedList
 
+    def _real_debrid_confirm_media(self, storage_variant):
+        keys = list(storage_variant.keys())
+        all_extensions = [storage_variant[key]['filename'] for key in keys]
+        all_extensions = ['.' + filename.split('.')[-1] for filename in all_extensions]
+        for ext in all_extensions:
+            if ext not in source_utils.COMMON_VIDEO_EXTENSIONS:
+                return False
+
+        return True
+
+    def _real_debrid_check_files(self, storage_variant):
+        for key in storage_variant.keys():
+            filename = storage_variant[key]['filename']
+            if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename)
+                   for episodeString in self.episodeStrings):
+
+                return True
+
     def realdebridWorker(self, torrent_list, info):
         try:
+            if 'showInfo' in info:
+                self.episodeStrings, self.seasonStrings = source_utils.torrentCacheStrings(info)
             cache_list = []
 
             hash_list = [i['hash'] for i in torrent_list]
@@ -1216,34 +1242,28 @@ class TorrentCacheCheck:
 
             for i in torrent_list:
                 try:
+
                     if 'rd' in realDebridCache[i['hash']] and len(realDebridCache[i['hash']]['rd']) >= 1:
                         if 'showInfo' in info:
-                            episodeStrings, seasonStrings = source_utils.torrentCacheStrings(info)
                             for storage_variant in realDebridCache[i['hash']]['rd']:
-                                keys = list(storage_variant.keys())
-                                all_extensions = [storage_variant[key]['filename'] for key in keys]
-                                all_extensions = ['.' + filename.split('.')[-1] for filename in all_extensions]
-                                for ext in all_extensions:
-                                    if ext not in source_utils.COMMON_VIDEO_EXTENSIONS:
-                                        raise Exception
-                                for key in keys:
-                                    filename = storage_variant[key]['filename']
-                                    if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename)
-                                           for episodeString in episodeStrings):
-                                        cache_list.append(i)
-                                        cache_list[-1]['debrid_provider'] = 'real_debrid'
-                                        break
+
+                                if not self._real_debrid_confirm_media(storage_variant):
+                                    continue
+
+                                if self._real_debrid_check_files(storage_variant):
+                                    cache_list.append(i)
+                                    cache_list[-1]['debrid_provider'] = 'real_debrid'
+                                    break
                         else:
                             for storage_variant in realDebridCache[i['hash']]['rd']:
-                                keys = list(storage_variant.keys())
-                                all_extensions = [storage_variant[key]['filename'] for key in keys]
-                                all_extensions = ['.' + filename.split('.')[-1] for filename in all_extensions]
-                                for ext in all_extensions:
-                                    if ext not in source_utils.COMMON_VIDEO_EXTENSIONS:
-                                        raise Exception
-                                cache_list.append(i)
-                                cache_list[-1]['debrid_provider'] = 'real_debrid'
+                                if not self._real_debrid_confirm_media(storage_variant):
+                                    continue
+                                else:
+                                    cache_list.append(i)
+                                    cache_list[-1]['debrid_provider'] = 'real_debrid'
                 except:
+                    import traceback
+                    traceback.print_exc()
                     pass
 
             self.realdebridCached = cache_list

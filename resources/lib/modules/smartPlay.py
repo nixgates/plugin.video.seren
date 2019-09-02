@@ -7,10 +7,10 @@ from resources.lib.gui import tvshowMenus
 from resources.lib.gui.windows.persistent_background import PersistentBackground
 from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.modules import database
+from resources.lib.modules.skin_manager import SkinManager
 
 
 class SmartPlay:
-
     def __init__(self, actionArgs):
         self.actionArgs = actionArgs
         self.info_dictionary = tools.get_item_information(actionArgs)
@@ -31,7 +31,17 @@ class SmartPlay:
         return database.get(TraktAPI().json_response, 12, 'shows/%s/seasons?extended=full' % self.show_trakt_id)
 
     def fill_playlist(self):
-        self.window = PersistentBackground('persistent_background.xml', tools.addonDir, actionArgs=self.actionArgs)
+        try:
+            tools.cancelPlayback()
+        except:
+            import traceback
+            traceback.print_exc()
+            pass
+        tools.closeAllDialogs()
+
+        self.window = PersistentBackground('persistent_background.xml',
+                                           SkinManager().active_skin_path,
+                                           actionArgs=self.actionArgs)
         self.window.setText(tools.lang(32094))
         self.window.show()
 
@@ -48,7 +58,7 @@ class SmartPlay:
 
         self._build_playlist(season, episode)
 
-        self.window.setText('Starting Playback')
+        self.window.setText(tools.lang(40322))
 
         tools.log('Begining play from Season %s Episode %s' % (season, episode), 'info')
 
@@ -58,7 +68,8 @@ class SmartPlay:
 
     def resume_playback(self):
 
-        self.window = PersistentBackground('persistent_background.xml', tools.addonDir, actionArgs=self.actionArgs)
+        self.window = PersistentBackground('persistent_background.xml', SkinManager().active_skin_path,
+                                           actionArgs=self.actionArgs)
         self.window.show()
         self.window.setText(tools.lang(32095).encode('utf-8'))
 
@@ -195,7 +206,8 @@ class SmartPlay:
 
         import random
 
-        self.window = PersistentBackground('persistent_background.xml', tools.addonDir, actionArgs=self.actionArgs)
+        self.window = PersistentBackground('persistent_background.xml', SkinManager().active_skin_path,
+                                           actionArgs=self.actionArgs)
         self.window.show()
         self.window.setText(tools.lang(32096))
 

@@ -44,7 +44,7 @@ class RealDebrid:
                 tools.setSetting('rd.client_id', response['client_id'])
                 tools.setSetting('rd.secret', response['client_secret'])
                 self.ClientSecret = response['client_secret']
-                self.ClientID = response['client_id']                
+                self.ClientID = response['client_id']
             except:
                 tools.showDialog.ok(tools.addonName, tools.lang(32100))
             return
@@ -65,8 +65,10 @@ class RealDebrid:
         self.OauthTimeout = int(response['expires_in'])
         self.OauthTimeStep = int(response['interval'])
         self.DeviceCode = response['device_code']
+
         while self.ClientSecret == '':
             self.auth_loop()
+
         self.token_request()
 
         user_information = self.get_url('user')
@@ -131,7 +133,7 @@ class RealDebrid:
             else:
                 url += "&auth_token=%s" % self.token
 
-        response = requests.post(url, data=postData, timeout=10).text
+        response = requests.post(url, data=postData, timeout=5).text
         if 'bad_token' in response or 'Bad Request' in response:
             if not fail_check:
                 self.refreshToken()
@@ -153,7 +155,7 @@ class RealDebrid:
             else:
                 url += "&auth_token=%s" % self.token
 
-        response = requests.get(url, timeout=10).text
+        response = requests.get(url, timeout=5).text
 
         if 'bad_token' in response or 'Bad Request' in response:
             tools.log('Refreshing RD Token')
@@ -220,13 +222,21 @@ class RealDebrid:
         if self.token == '':
             return None
         url = "torrents/delete/%s&auth_token=%s" % (id, self.token)
-        response = requests.delete(self.BaseUrl + url)
+        requests.delete(self.BaseUrl + url, timeout=5)
 
-    def singleMagnetToLink(self, magnet):
+    def singleMagnetToLink(self, torrent):
         try:
-            hash = str(re.findall(r'btih:(.*?)&', magnet)[0].lower())
+            magnet = torrent['magnet']
+
+            try:
+                hash = str(re.findall(r'btih:(.*?)(?:&|$)', magnet)[0].lower())
+            except:
+                hash = torrent['hash']
+
             hashCheck = self.checkHash(hash)
+
             fileIDString = ''
+
             if hash in hashCheck:
                 if 'rd' in hashCheck[hash]:
                     for key in hashCheck[hash]['rd'][0]:
@@ -253,7 +263,6 @@ class RealDebrid:
                 traceback.print_exc()
                 self.deleteTorrent(torrent['id'])
                 return None
-
             return link
         except:
             import traceback
@@ -263,9 +272,13 @@ class RealDebrid:
     def magnetToLink(self, torrent, args):
         try:
             if torrent['package'] == 'single' or 'showInfo' not in args:
-                return self.singleMagnetToLink(torrent['magnet'])
+                return self.singleMagnetToLink(torrent)
 
-            hash = str(re.findall(r'btih:(.*?)&', torrent['magnet'])[0].lower())
+            try:
+                hash = str(re.findall(r'btih:(.*?)(?:&|$)', torrent['magnet'])[0].lower())
+            except:
+                hash = torrent['hash']
+
             hashCheck = self.checkHash(hash)
             torrent = self.addMagnet(torrent['magnet'])
             episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)

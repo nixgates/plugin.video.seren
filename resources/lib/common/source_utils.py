@@ -2,10 +2,12 @@
 
 import random
 import re
+
 try:import xbmc
 except: pass
 
 from requests import Session
+from resources.lib.common import tools
 
 COMMON_VIDEO_EXTENSIONS = xbmc.getSupportedMedia('video').split('|')
 
@@ -64,18 +66,28 @@ def getInfo(release_title):
     release_title = cleanTitle(release_title)
     if any(i in release_title for i in [' x264', '.x264', ' h264', 'h 264']):
         info.append('x264')
+    if any(i in release_title for i in ['x265', '.x265', 'hevc', ' h265', '.h265', 'x265', ' h 265']):
+        info.append('x265')
+    if any(i in release_title for i in [' remux']):
+        info.append('REMUX')
     if any(i in release_title for i in [' 3d']):
         info.append('3D')
     if any(i in release_title for i in [' aac']):
         info.append('AAC')
     if any(i in release_title for i in [' dts']):
         info.append('DTS')
-    if any(i in release_title for i in [' 5 1', ' 5 1ch', ' 6ch', ' ddp5 1']):
-        info.append('DDP5.1')
-    if any(i in release_title for i in [' 7 1']):
+    if any(i in release_title for i in [' atmos']):
+        info.append('ATMOS')
+    if any(i in release_title for i in [' ddp', ' dd+']):
+        info.append('DD+')
+    if any(i in release_title for i in [' dd.', ' dd2', ' dd5', ' dd7']):
+        info.append('DD')
+    if any(i in release_title for i in [' 2 0', ' 2 0ch', ' 2ch', ' ddp2 0', ' dd2 0']):
+        info.append('2.0')
+    if any(i in release_title for i in [' 5 1', ' 5 1ch', ' 6ch', ' ddp5 1', ' dd5 1', 'dd+5 1']):
+        info.append('5.1')
+    if any(i in release_title for i in [' 7 1', ' 7 1ch', ' 8ch', ' ddp7 1', ' dd7 1']):
         info.append('7.1')
-    if any(i in release_title for i in ['x265', '.x265', 'hevc', ' h265', '.h265', 'x265', ' h 265']):
-        info.append('x265')
     if any(i in release_title for i in [' cam', ' camrip', ' hdcam', ' hd cam']):
         info.append('CAM')
     if any(i in release_title for i in [' dvdscr']):
@@ -89,13 +101,15 @@ def cleanTitle(title):
 
 def clean_title(title, broken=None):
     title = title.lower()
+    title = tools.deaccentString(title)
+    title = tools.strip_non_ascii_and_unprintable(title)
 
-    if broken is None:
-        apostrophe_replacement = 's'
-    elif broken == 1:
+    if broken == 1:
         apostrophe_replacement = ''
     elif broken == 2:
         apostrophe_replacement = ' s'
+    else:
+        apostrophe_replacement = 's'
 
     title = title.replace("\\'s", apostrophe_replacement)
     title = title.replace("'s", apostrophe_replacement)
@@ -208,6 +222,7 @@ def filter_movie_title(release_title, movie_title, year):
     release_title = release_title.lower()
 
     title = clean_title(movie_title)
+
     title_broken_1 = clean_title(movie_title, broken=1)
     title_broken_2 = clean_title(movie_title, broken=2)
     simple_info =  { 'year': year }

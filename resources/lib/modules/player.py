@@ -36,52 +36,43 @@ class serenPlayer(tools.player):
         self.original_action_args = ''
         tools.player.__init__(self)
 
-
     def play_source(self, stream_link, args):
 
         try:
             self.pre_cache_initiated = False
+
             if stream_link is None:
                 tools.cancelPlayback()
                 raise Exception
+
             self.original_action_args = args
 
             args = tools.get_item_information(args)
-
             self.args = args
-
-            item = tools.menuItem(path=stream_link)
 
             if 'showInfo' in args:
                 self.media_type = 'episode'
-                self.trakt_id = args['ids']['trakt']
-                item.setArt(args['art'])
-                item.setUniqueIDs(args['ids'])
-                item.setInfo(type='video', infoLabels=args['info'])
             else:
                 self.media_type = 'movie'
-                self.trakt_id = args['ids']['trakt']
-                item.setUniqueIDs(args['ids'])
-                item.setArt(args['art'])
-                item.setInfo(type='video', infoLabels=args['info'])
 
-            if tools.playList.getposition() == 0 and tools.getSetting('smartPlay.traktresume') == 'true' \
-                    and tools.getSetting('trakt.auth') is not '':
-                tools.log('Getting Trakt Resume Point', 'info')
-                self.traktBookmark()
+            self.trakt_id = args['ids']['trakt']
+
+            self.traktBookmark()
+
+            item = tools.menuItem(path=stream_link)
+            item.setInfo(type='video', infoLabels=args['info'])
+            item.setArt(args['art'])
+            item.setUniqueIDs(args['ids'])
+
+            tools.closeBusyDialog()
+            tools.closeAllDialogs()
 
             tools.resolvedUrl(syshandle, True, item)
 
             self.keepAlive()
 
-            try:
-                tools.closeBusyDialog()
-            except:
-                pass
-
         except:
-            import traceback
-            traceback.print_exc()
+            pass
 
     def onPlayBackSeek(self, time, seekOffset):
         seekOffset /= 1000
@@ -105,14 +96,15 @@ class serenPlayer(tools.player):
     def start_playback(self):
 
         try:
+
             if self.playback_started:
                 return
+            tools.closeAllDialogs()
 
             self.playback_started = True
+            self.scrobbled = False
 
             self.traktStartWatching()
-
-            tools.execute('Dialog.Close(all,true)')
 
             self.current_time = self.getTime()
             self.media_length = self.getTotalTime()
@@ -170,10 +162,14 @@ class serenPlayer(tools.player):
         total_length = self.media_length
         watched_percent = 0
 
+        tools.log('CP: %s, TL: %s' % (current_position, total_length))
+
         if int(total_length) == 0:
             try:
                 total_length = self.getTotalTime()
             except:
+                import traceback
+                traceback.print_exc()
                 return
 
         if offset is not None:
@@ -181,7 +177,7 @@ class serenPlayer(tools.player):
                 current_position += offset
             except:
                 pass
-
+        tools.log('CP: %s, TL: %s' % (current_position, total_length))
         if int(total_length) is not 0:
             try:
                 watched_percent = float(current_position) / float(total_length) * 100
@@ -191,7 +187,7 @@ class serenPlayer(tools.player):
                 import traceback
                 traceback.print_exc()
                 pass
-
+        tools.log('WP: %s' % watched_percent)
         return watched_percent
 
     def traktStartWatching(self, offset=None):
@@ -209,7 +205,6 @@ class serenPlayer(tools.player):
             return
 
         post_data = self.buildTraktObject(override_progress=override_progress)
-
         scrobble_response = self.trakt_api.json_response('scrobble/stop', postData=post_data, limit=False)
 
         # Consider the scrobble attempt a failure if the attempt returns a None value
@@ -223,7 +218,7 @@ class serenPlayer(tools.player):
                 if self.media_type == 'episode':
                     from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
                     TraktSyncDatabase().mark_episode_watched_by_id(self.trakt_id)
-                    
+
                 if self.media_type == 'movie':
                     from resources.lib.modules.trakt_sync.movies import TraktSyncDatabase
                     TraktSyncDatabase().mark_movie_watched(self.trakt_id)
@@ -266,45 +261,50 @@ class serenPlayer(tools.player):
             traceback.print_exc()
 
     def keepAlive(self):
-        tools.kodi.sleep(5000)
+
         for i in range(0, 240):
-            if self.isPlayingVideo(): break
-            tools.kodi.sleep(1000)
+            tools.kodi.sleep(500)
+            if self.isPlayingVideo() and self.getTime() > 0: break
+
+        # Skip to offset if required
+
+        if self.offset is not None and int(self.offset) != 0 and self.playback_resumed is False:
+            tools.log("Seeking %s seconds" % self.offset, 'info')
+            self.seekTime(self.offset)
+            self.offset = None
+            self.playback_resumed = True
+        else:
+            self.playback_resumed = True
 
         while self.isPlayingVideo():
             try:
-                if not self.playback_started:
-                    tools.kodi.sleep(1000)
-                    continue
-
-                if not self.playback_started:
-                    self.start_playback()
-
-                if self.offset is not None and int(self.offset) != 0 and self.playback_resumed is False:
-                    tools.log("Seeking %s seconds" % self.offset, 'info')
-                    self.seekTime(self.offset)
-                    self.offset = None
-                    self.playback_resumed = True
-                else:
-                    self.playback_resumed = True
 
                 try:
                     self.current_time = self.getTime()
                     self.media_length = self.getTotalTime()
                 except:
+                    import traceback
+                    traceback.print_exc()
                     pass
 
-                if self.pre_cache_initiated is False:
-                    try:
-                        if self.getWatchedPercent() > 80 and tools.getSetting('smartPlay.preScrape') == 'true':
-                            self.pre_cache_initiated = True
-                            smartPlay.SmartPlay(self.original_action_args).pre_scrape()
-                    except:
-                        pass
+                if not self.playback_started:
+                    tools.kodi.sleep(1000)
+                    continue
 
-                if self.getWatchedPercent() > 80 and not self.scrobbled:
-                    self.traktStopWatching()
-                    tools.trigger_widget_refresh()
+                if self.getWatchedPercent() > 80:
+                    if self.pre_cache_initiated is False:
+                        try:
+                            if tools.getSetting('smartPlay.preScrape') == 'true':
+                                self.pre_cache_initiated = True
+                                smartPlay.SmartPlay(self.original_action_args).pre_scrape()
+                        except:
+                            pass
+
+                    if not self.scrobbled:
+                        self.traktStopWatching()
+                        tools.trigger_widget_refresh()
+
+                    break
 
             except:
                 import traceback
@@ -312,14 +312,20 @@ class serenPlayer(tools.player):
                 tools.kodi.sleep(1000)
                 continue
 
-            tools.kodi.sleep(3000)
+            tools.kodi.sleep(1000)
 
         self.traktStopWatching()
 
     def traktBookmark(self):
-
+        if tools.playList.getposition() != 0:
+            return
+        if tools.getSetting('smartPlay.traktresume') != 'true':
+            return
         if not self.trakt_integration():
             return
+
+        tools.log('Getting Trakt Resume Point', 'info')
+
         try:
 
             offset = None
@@ -338,7 +344,7 @@ class serenPlayer(tools.player):
 
             if tools.getSetting('smartPlay.bookmarkprompt') == 'true':
                 if offset is not None and offset is not 0:
-                    prompt = tools.showDialog.yesno(tools.addonName + ': Resume', '%s %s' %
+                    prompt = tools.showDialog.yesno('{}: {}'.format(tools.addonName, tools.lang(40308)), '%s %s' %
                                                     (tools.lang(32092),
                                                      datetime.timedelta(seconds=offset)),
                                                     nolabel="Resume", yeslabel="Restart")
@@ -430,4 +436,3 @@ class serenPlayer(tools.player):
         }
 
         return next_info
-

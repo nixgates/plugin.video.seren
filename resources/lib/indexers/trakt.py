@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import json
+import threading
 from time import sleep
 
-import json
 import requests
-import threading
 
 from resources.lib.common import tools
 
@@ -103,7 +103,7 @@ class TraktAPI:
                 username = self.get_username()
                 tools.setSetting('trakt.username', username)
                 tools.progressDialog.close()
-                tools.showDialog.ok(tools.addonName, 'Sucessfully authenticated with Trakt')
+                tools.showDialog.ok(tools.addonName, tools.lang(40263))
 
                 # Synchronise Trakt Database with new user
                 from resources.lib.modules.trakt_sync import activities
@@ -174,11 +174,13 @@ class TraktAPI:
                 else:
                     tools.log('Failed to perform request even after token refresh', 'error')
             if response.status_code > 499:
+                tools.log('Trakt is having issues with their servers', 'error')
                 return None
             if response.status_code == 404:
+                tools.log('Trakt returned a 404', 'error')
                 return None
             if response.status_code == 502:
-                tools.log('Trakt is currently experiencing Gateway Issues')
+                tools.log('Trakt is currently experiencing Gateway Issues', 'error')
         except requests.exceptions.ConnectionError:
             return
         except not requests.exceptions.ConnectionError:
@@ -252,28 +254,40 @@ class TraktAPI:
             return None
         return response
 
+    @staticmethod
+    def _get_display_name(type):
+        if type == 'show':
+            return tools.lang(40276)
+        if type == 'season':
+            return tools.lang(40277)
+        if type == 'movie':
+            return tools.lang(40278)
+        if type == 'episode':
+            return tools.lang(40279)
+
     def traktManager(self, actionArgs):
 
         trakt_object = tools.get_item_information(actionArgs)['trakt_object']
 
         actionArgs = json.loads(tools.unquote(actionArgs))
 
-        type = actionArgs['item_type'].title()
+        type = actionArgs['item_type'].lower()
 
-        hide_type = actionArgs['item_type'].title()
+        display_type = self._get_display_name(type)
 
-        if trakt_object == None:
-            tools.showDialog.notification(tools.addonName,
-                                          'There may be an issue with the Trakt service, please clear cache and wait')
+        trakt_object['show_id'] = actionArgs['trakt_id']
+        
+        if trakt_object is None:
+            tools.showDialog.notification(tools.addonName, tools.lang(40264))
 
-        dialog_list = ['Add to Collection', 'Remove from Collection', 'Add to Watchlist', 'Remove from Watchlist',
-                       'Mark as Watched', 'Mark as Unwatched', 'Add to List', 'Remove From List', 'Hide %s' % hide_type,
-                       'Refresh %s Metadata' % type, 'Remove %s Progress' % type]
+        dialog_list = [tools.lang(40265), tools.lang(40266), tools.lang(40267), tools.lang(40268), tools.lang(40269),
+                       tools.lang(40270), tools.lang(40271), tools.lang(40272), tools.lang(40273) % display_type,
+                       tools.lang(40274) % display_type, tools.lang(40275) % display_type]
 
-        if type in ['Show', 'Season']:
+        if type in ['show', 'season']:
             dialog_list.pop(10)
 
-        selection = tools.showDialog.select(tools.addonName + ': Trakt Manager', dialog_list)
+        selection = tools.showDialog.select('{}: {}'.format(tools.addonName, tools.lang(40280)), dialog_list)
         thread = None
 
         if selection == 0:
@@ -320,24 +334,21 @@ class TraktAPI:
             raise Exception
 
         except Exception as e:
-            tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Failed to update status, please '
-                                                                               'check the log')
+            tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)), tools.lang(40281))
             tools.log('Failed to mark item as watched, error: %s \n Trakt Response: %s' % (e, response))
 
             return False
 
     def confirm_marked_unwatched(self, response, type):
         try:
-
             if response['deleted'][type] > 0:
                 return True
 
             raise Exception
 
         except Exception as e:
-            tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Failed to update status, please '
-                                                                               'check the log')
-            tools.log('Failed to mark item as watched, error: %s \n Trakt Response: %s' % (e, response))
+            tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)), tools.lang(40281))
+            tools.log('Failed to mark item as unwatched, error: %s \n Trakt Response: %s' % (e, response))
 
             return False
 
@@ -373,7 +384,7 @@ class TraktAPI:
             trakt_object = trakt_object['movies'][0]
             TraktSyncDatabase().mark_movie_watched(trakt_object['ids']['trakt'])
 
-        tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item marked as watched')
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)), tools.lang(40281))
         tools.trigger_widget_refresh()
 
     def markUnwatched(self, trakt_object, actionArgs):
@@ -410,7 +421,7 @@ class TraktAPI:
             trakt_object = trakt_object['movies'][0]
             TraktSyncDatabase().mark_movie_unwatched(trakt_object['ids']['trakt'])
 
-        tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item marked as unwatched')
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)), tools.lang(40283))
         tools.trigger_widget_refresh()
 
     def addToCollection(self, trakt_object):
@@ -435,7 +446,7 @@ class TraktAPI:
             trakt_object = trakt_object['movies'][0]
             TraktSyncDatabase().mark_movie_collected(trakt_object['ids']['trakt'])
 
-        tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item added to Collection')
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)), tools.lang(40284))
 
     def removeFromCollection(self, trakt_object):
         self.post_request('sync/collection/remove', postData=trakt_object)
@@ -458,36 +469,40 @@ class TraktAPI:
             trakt_object = trakt_object['movies'][0]
             TraktSyncDatabase().mark_movie_uncollected(trakt_object['ids']['trakt'])
 
-        tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item removed from Collection')
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)), tools.lang(40285))
 
     def addToWatchList(self, trakt_object):
         self.post_request('sync/watchlist', postData=trakt_object)
-        tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item added to Watchlist')
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)), tools.lang(40286))
 
     def removeFromWatchlist(self, trakt_object):
         self.post_request('sync/watchlist/remove', postData=trakt_object)
-        tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item removed from Watchlist')
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)), tools.lang(40287))
 
     def addToList(self, trakt_object):
         lists = self.getLists()
-        selection = tools.showDialog.select(tools.addonName + ": Select a list", [i['name'] for i in lists])
+        selection = tools.showDialog.select('{}: {}'.format(tools.addonName, tools.lang(40290)),
+                                            [i['name'] for i in lists])
         selection = lists[selection]
         self.json_response('users/me/lists/%s/items' % selection['ids']['trakt'], postData=trakt_object)
-        tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item added to %s' % selection['name'])
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)),
+                                      tools.lang(40288) % selection['name'])
 
     def removeFromList(self, trakt_object):
         lists = self.getLists()
-        selection = tools.showDialog.select(tools.addonName + ": Select a list", [i['name'] for i in lists])
+        selection = tools.showDialog.select('{}: {}'.format(tools.addonName, tools.lang(40290)),
+                                            [i['name'] for i in lists])
         selection = lists[selection]
         self.json_response('users/me/lists/%s/items/remove' % selection['ids']['trakt'], postData=trakt_object)
-        tools.showDialog.notification(tools.addonName + ': Trakt Manager', 'Item removed from %s' % selection['name'])
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40280)),
+                                      tools.lang(40289) % selection['name'])
 
     def hideItem(self, trakt_object):
         from resources.lib.modules.trakt_sync.hidden import TraktSyncDatabase
 
         sections = ['progress_watched', 'calendar']
-        sections_display = ['Watched Progress', 'Calendar']
-        selection = tools.showDialog.select(tools.addonName + ': Select Menu type to hide from', sections_display)
+        sections_display = [tools.lang(40291), tools.lang(40292)]
+        selection = tools.showDialog.select('{}: {}'.format(tools.addonName, tools.lang(40293)), sections_display)
         section = sections[selection]
 
         if trakt_object['item_type'] in ['season', 'show', 'episode']:
@@ -504,8 +519,7 @@ class TraktAPI:
             trakt_object = trakt_object['shows'][0]
             TraktSyncDatabase().add_hidden_item(trakt_object['ids']['trakt'], 'show', section)
 
-        tools.showDialog.notification(tools.addonName,
-                                      'Item has been hidden from your %s' % sections_display[selection])
+        tools.showDialog.notification(tools.addonName, tools.lang(40294) % sections_display[selection])
 
     def removePlaybackHistory(self, trakt_object):
         type = 'movie'
@@ -523,12 +537,11 @@ class TraktAPI:
         for i in progress:
             self.delete_request('sync/playback/%s' % i['id'])
 
-        tools.showDialog.notification(tools.addonName,
-                                      'Item\'s Progress History has been removed')
+        tools.showDialog.notification(tools.addonName, tools.lang(40295))
 
     def get_username(self):
-        settings = json.loads(self.get_request('users/me'))
-        return settings['username']
+        user_details = json.loads(self.get_request('users/me'))
+        return user_details['username']
 
     def getLists(self, username='me'):
         lists = self.json_response('users/%s/lists' % username, limit=True, limitOverride=500)
@@ -558,8 +571,7 @@ class TraktAPI:
                          }
 
             tools.addDirectoryItem(user_list['name'],
-                                   'traktList&page=1&actionArgs=%s' % tools.quote(json.dumps(arguments))
-                                   , None, None)
+                                   'traktList&page=1&actionArgs=%s' % tools.quote(json.dumps(arguments)))
 
         tools.closeDirectory('addons')
         return
@@ -601,13 +613,12 @@ class TraktAPI:
         return list_items
 
     def getListItems(self, arguments, page):
-        from resources.lib.modules import database
 
         arguments = json.loads(tools.unquote(arguments))
         media_type = arguments['type']
         username = tools.quote_plus(arguments['username'])
         url = 'users/%s/lists/%s/items/%s?extended=full' % (username, arguments['trakt_id'], media_type)
-        list_items = database.get(self.json_response, 12, url, None, False)
+        list_items = self.json_response(url, None, False)
 
         if list_items is None or len(list_items) == 0:
             return
@@ -634,7 +645,6 @@ class TraktAPI:
 
         if media_type == 'movie':
             content_type = 'movies'
-
 
         tools.closeDirectory(content_type)
         return

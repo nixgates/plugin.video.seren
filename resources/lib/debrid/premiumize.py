@@ -172,7 +172,7 @@ class PremiumizeFunctions(PremiumizeBase):
                           if any(tfile['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
         for torrent_file in folder_details:
             if source_utils.filter_movie_title(torrent_file['path'].split('/')[-1],
-                                               args['info']['title'],
+                                               tools.deaccentString(args['info']['title']),
                                                args['info']['year']):
                 selectedFile = torrent_file
                 break
@@ -256,7 +256,7 @@ class PremiumizeFunctions(PremiumizeBase):
             if any(i['path'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
                 display_list.append(i)
 
-        selection = tools.showDialog.select(tools.addonName + ": Torrent File Picker",
+        selection = tools.showDialog.select('{}: {}'.format(tools.addonName, tools.lang(40297)),
                                             [i['path'] for i in display_list])
         if selection == -1:
             return None

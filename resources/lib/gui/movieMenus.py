@@ -54,32 +54,32 @@ class Menus:
 
     def discoverMovies(self):
 
-        tools.addDirectoryItem(tools.lang(32007), 'moviesPopular&page=1', '', '')
+        tools.addDirectoryItem(tools.lang(32007), 'moviesPopular&page=1')
         if tools.getSetting('trakt.auth') is not '':
-            tools.addDirectoryItem(tools.lang(32008), 'moviesRecommended', '', '')
-        tools.addDirectoryItem(tools.lang(32009), 'moviesTrending&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32010), 'moviesPlayed&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32011), 'moviesWatched&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32012), 'moviesCollected&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32013), 'moviesAnticipated&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32015), 'moviesBoxOffice', '', '')
-        tools.addDirectoryItem(tools.lang(32014), 'moviesUpdated&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(32062), 'movieGenres&page=1', '', '')
-        tools.addDirectoryItem(tools.lang(40123), 'movieYears', '', '')
-        tools.addDirectoryItem(tools.lang(40151), 'movieByActor', '', '')
+            tools.addDirectoryItem(tools.lang(32008), 'moviesRecommended')
+        tools.addDirectoryItem(tools.lang(32009), 'moviesTrending&page=1')
+        tools.addDirectoryItem(tools.lang(32010), 'moviesPlayed&page=1')
+        tools.addDirectoryItem(tools.lang(32011), 'moviesWatched&page=1')
+        tools.addDirectoryItem(tools.lang(32012), 'moviesCollected&page=1')
+        tools.addDirectoryItem(tools.lang(32013), 'moviesAnticipated&page=1')
+        tools.addDirectoryItem(tools.lang(32015), 'moviesBoxOffice')
+        tools.addDirectoryItem(tools.lang(32014), 'moviesUpdated&page=1')
+        tools.addDirectoryItem(tools.lang(32062), 'movieGenres&page=1')
+        tools.addDirectoryItem(tools.lang(40123), 'movieYears')
+        tools.addDirectoryItem(tools.lang(40151), 'movieByActor')
 
-        # tools.addDirectoryItem('Years', 'movieYears', '', '')
+        # tools.addDirectoryItem('Years', 'movieYears')
         if tools.getSetting('searchHistory') == 'false':
-            tools.addDirectoryItem(tools.lang(32016), 'moviesSearch', '', '')
+            tools.addDirectoryItem(tools.lang(32016), 'moviesSearch', isFolder=True, isPlayable=False)
         else:
-            tools.addDirectoryItem(tools.lang(32016), 'moviesSearchHistory', '', '')
+            tools.addDirectoryItem(tools.lang(32016), 'moviesSearchHistory')
         tools.closeDirectory('addons')
 
     def myMovies(self):
         tools.addDirectoryItem(tools.lang(32063), 'onDeckMovies', None, None)
-        tools.addDirectoryItem(tools.lang(32017), 'moviesMyCollection', '', '')
-        tools.addDirectoryItem(tools.lang(32018), 'moviesMyWatchlist', '', '')
-        tools.addDirectoryItem(tools.lang(32064), 'myTraktLists&actionArgs=movies', '', '')
+        tools.addDirectoryItem(tools.lang(32017), 'moviesMyCollection')
+        tools.addDirectoryItem(tools.lang(32018), 'moviesMyWatchlist')
+        tools.addDirectoryItem(tools.lang(32064), 'myTraktLists&actionArgs=movies')
         tools.closeDirectory('addons')
 
     def myMovieCollection(self):
@@ -123,7 +123,7 @@ class Menus:
         if trakt_list is None:
             return
         self.commonListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'moviesPopular&page=%s' % (int(page) + 1), '', '',
+        tools.addDirectoryItem(tools.lang(32019), 'moviesPopular&page=%s' % (int(page) + 1),
                                isFolder=True)
         tools.closeDirectory('movies')
 
@@ -132,7 +132,7 @@ class Menus:
         if trakt_list is None:
             return
         self.commonListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'moviesTrending&page=%s' % (int(page) + 1), '', '',
+        tools.addDirectoryItem(tools.lang(32019), 'moviesTrending&page=%s' % (int(page) + 1),
                                isFolder=True)
         tools.closeDirectory('movies')
 
@@ -141,7 +141,7 @@ class Menus:
         if trakt_list is None:
             return
         self.commonListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'moviesPlayed&page=%s' % (int(page) + 1), '', '',
+        tools.addDirectoryItem(tools.lang(32019), 'moviesPlayed&page=%s' % (int(page) + 1),
                                isFolder=True)
         tools.closeDirectory('movies')
 
@@ -150,7 +150,7 @@ class Menus:
         if trakt_list is None:
             return
         self.commonListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'moviesWatched&page=%s' % (int(page) + 1), '', '',
+        tools.addDirectoryItem(tools.lang(32019), 'moviesWatched&page=%s' % (int(page) + 1),
                                isFolder=True)
         tools.closeDirectory('movies')
 
@@ -159,7 +159,7 @@ class Menus:
         if trakt_list is None:
             return
         self.commonListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'moviesCollected&page=%s' % (int(page) + 1), '', '',
+        tools.addDirectoryItem(tools.lang(32019), 'moviesCollected&page=%s' % (int(page) + 1),
                                isFolder=True)
         tools.closeDirectory('movies')
 
@@ -168,7 +168,7 @@ class Menus:
         if trakt_list is None:
             return
         self.commonListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'moviesAnticipated&page=%s' % (int(page) + 1), '', '',
+        tools.addDirectoryItem(tools.lang(32019), 'moviesAnticipated&page=%s' % (int(page) + 1),
                                isFolder=True)
         tools.closeDirectory('movies')
 
@@ -187,17 +187,17 @@ class Menus:
         if trakt_list is None:
             return
         self.commonListBuilder(trakt_list)
-        tools.addDirectoryItem(tools.lang(32019), 'moviesUpdated&page=%s' % (int(page) + 1), '', '',
+        tools.addDirectoryItem(tools.lang(32019), 'moviesUpdated&page=%s' % (int(page) + 1),
                                isFolder=True)
         tools.closeDirectory('movies')
 
     def moviesSearchHistory(self):
         history = database.getSearchHistory('movie')
-        tools.addDirectoryItem(tools.lang(40141), 'moviesSearch', '', '')
-        tools.addDirectoryItem(tools.lang(40140), 'clearSearchHistory', '', '', isFolder=False)
+        tools.addDirectoryItem(tools.lang(40141), 'moviesSearch', isFolder=True, isPlayable=False)
+        tools.addDirectoryItem(tools.lang(40140), 'clearSearchHistory', isFolder=False, isPlayable=False)
 
         for i in history:
-            tools.addDirectoryItem(i, 'moviesSearch&actionArgs=%s' % i, '', '')
+            tools.addDirectoryItem(i, 'moviesSearchResults&actionArgs=%s' % i)
         tools.closeDirectory('addon')
 
     def moviesSearch(self, actionArgs=None):
@@ -206,24 +206,27 @@ class Menus:
             k = tools.showKeyboard('', tools.lang(32016))
             k.doModal()
             query = (k.getText() if k.isConfirmed() else None)
+            del k
             if query == None or query == '':
                 return
         else:
             query = actionArgs
+
+        query = query.decode('utf-8')
         database.addSearchHistory(query, 'movie')
         query = tools.deaccentString(tools.display_string(query))
-        tools.quote(query)
-        tools.closeAllDialogs()
-        tools.closeDirectory('movies')
-        tools.execute("Container.Update(%s?action=moviesSearchResults&actionArgs=%s, replace)'" % (sysaddon, query))
+        query = tools.quote(query)
+
+        self.moviesSearchResults(query)
 
     def moviesSearchResults(self, query):
         query = tools.quote_plus(tools.unquote(query))
         trakt_list = trakt.json_response('search/movie?query=%s' % query)
         if trakt_list is None:
             return
-        self.commonListBuilder(trakt_list)
-        tools.closeDirectory('movies')
+        self.commonListBuilder([movie for movie in trakt_list if float(movie['score']) > 0])
+        tools.closeAllDialogs()
+        tools.closeDirectory('movies', cache=False)
 
     def moviesRelated(self, args):
         trakt_list = database.get(trakt.json_response, 12, 'movies/%s/related' % args)
@@ -240,7 +243,7 @@ class Menus:
             years.append(i)
         years = sorted(years, reverse=True)
         for i in years:
-            tools.addDirectoryItem(str(i), 'movieYearsMovies&actionArgs=%s&page=1' % i, '', '')
+            tools.addDirectoryItem(str(i), 'movieYearsMovies&actionArgs=%s&page=1' % i)
         tools.closeDirectory('addons')
 
     def movieYearsMovies(self, year, page):
@@ -253,7 +256,7 @@ class Menus:
         self.commonListBuilder(trakt_list)
 
         tools.addDirectoryItem(tools.lang(32019), 'movieYearsMovies&page=%s&actionArgs=%s' %
-                               (int(page) + 1, year), '', '')
+                               (int(page) + 1, year))
         tools.closeDirectory('movies')
 
     def moviesByActor(self, actionArgs):
@@ -288,12 +291,12 @@ class Menus:
         tools.closeDirectory('tvshows')
 
     def movieGenres(self):
-        tools.addDirectoryItem(tools.lang(32065), 'movieGenresGet', '', '', isFolder=True)
+        tools.addDirectoryItem(tools.lang(32065), 'movieGenresGet', isFolder=True)
         genres = database.get(trakt.json_response, 24, 'genres/movies')
         if genres is None:
             return
         for i in genres:
-            tools.addDirectoryItem(i['name'], 'movieGenresGet&actionArgs=%s' % i['slug'], '', '', isFolder=True)
+            tools.addDirectoryItem(i['name'], 'movieGenresGet&actionArgs=%s' % i['slug'], isFolder=True)
         tools.closeDirectory('addons')
 
     def movieGenresList(self, args, page):
@@ -305,7 +308,8 @@ class Menus:
             genres = database.get(trakt.json_response, 24, 'genres/movies')
             for genre in genres:
                 genre_display_list.append(genre['name'])
-            genre_multiselect = tools.showDialog.multiselect(tools.addonName + ": Genre Selection", genre_display_list)
+            genre_multiselect = tools.showDialog.multiselect('{}: {}'.format(tools.addonName, tools.lang(40298)),
+                                                             genre_display_list)
             if genre_multiselect is None: return
             for selection in genre_multiselect:
                 genre_string += ', %s' % genres[selection]['slug']
@@ -320,11 +324,9 @@ class Menus:
         self.commonListBuilder(trakt_list)
         tools.addDirectoryItem(tools.lang(32019),
                                'movieGenresGet&actionArgs=%s&page=%s' % (tools.quote(genre_string), int(page) + 1),
-                               '', '', isFolder=True)
+                               isFolder=True)
 
         tools.closeDirectory('movies')
-
-
 
     ######################################################
     # MENU TOOLS
@@ -356,26 +358,7 @@ class Menus:
                     name = tools.italic_string(name)
 
                 args = {'trakt_id': item['ids']['trakt'], 'item_type': 'movie'}
-
                 args = tools.quote(json.dumps(args, sort_keys=True))
-
-                # Begin Building Context Menu Items
-                cm = []
-
-                cm.append((tools.lang(32020),
-                           'Container.Update(%s?action=moviesRelated&actionArgs=%s)' % (
-                               sysaddon, item['ids']['trakt'])))
-                cm.append((tools.lang(32066),
-                           'PlayMedia(%s?action=getSourcesWorkaround&source_select=true&actionArgs=%s)' % (sysaddon, args)))
-                cm.append((tools.lang(33022),
-                           'PlayMedia(%s?action=getSourcesWorkaround&seren_reload=true&actionArgs=%s)' % (sysaddon, args)))
-
-                if tools.getSetting('trakt.auth') != '':
-                    cm.append(('Trakt Manager', 'RunPlugin(%s?action=traktManager&actionArgs=%s)'
-                               % (sysaddon, tools.quote(json.dumps(item['trakt_object'])))))
-
-                if tools.context_addon():
-                    cm = []
 
             except:
                 import traceback
@@ -386,8 +369,7 @@ class Menus:
                 continue
 
             item['info']['title'] = item['info']['originaltitle'] = name
-
-            list_items.append(tools.addDirectoryItem(name, 'getSources', item['info'], item['art'], cm=cm,
+            list_items.append(tools.addDirectoryItem(name, 'getSources', item['info'], item['art'], item['cast'],
                                                      isFolder=False, isPlayable=True, actionArgs=args,
                                                      set_ids=item['ids'], bulk_add=True))
 
@@ -395,14 +377,6 @@ class Menus:
             return list_items
 
         tools.addMenuItems(syshandle, list_items, len(list_items))
-
-    def tmdbListWorker(self, trakt_object):
-        tools.tmdb_sema.acquire()
-        listItem = database.get(TMDBAPI().movieToListItem, 24, trakt_object)
-        # Tried to use IMDB as a scraper source. Fuck it was slow
-        # listItem = database.get(imdb_scraper.trakt_movie_to_list_item, '24', trakt_object)
-        self.itemList.append(listItem)
-        tools.tmdb_sema.release()
 
     def runThreads(self, join=True):
         for thread in self.threadList:
@@ -414,8 +388,10 @@ class Menus:
 
     def is_aired(self, info):
         try:
-            try:air_date = info['aired']
-            except: air_date = info['premiered']
+            try:
+                air_date = info['aired']
+            except:
+                air_date = info['premiered']
 
             if tools.getSetting('general.datedelay') == 'true':
                 air_date = tools.datetime_workaround(air_date, '%Y-%m-%d', date_only=True)

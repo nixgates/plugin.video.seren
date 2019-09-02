@@ -304,7 +304,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             progress_perc = (float(inserted_tasks) / float(movie_tasks)) * 100
             if not self.silent:
                 self.progress_dialog.update(int(progress_perc))
-            # self.task_queue.put(i, block=True)
+
             cursor.execute(
                 "INSERT OR IGNORE INTO movies ("
                 "trakt_id, kodi_meta, collected, watched, last_updated)"
@@ -594,18 +594,16 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         show_ids = list(set(show_ids))
 
-        self._start_queue_workers()
-
         inserted_tasks = 0
 
         for show_id in show_ids:
-            self.task_queue.put((self._pull_show_episodes, (show_id,)))
+            self.task_queue.put(self._pull_show_episodes, show_id)
             inserted_tasks += 1
             progress_perc = (float(inserted_tasks) / float(len(show_ids))) * 100
             if not self.silent:
                 self.progress_dialog.update(int(progress_perc))
 
-        self._finish_queue_workers()
+        self.task_queue.wait_completion()
 
         for show_id in show_ids:
             try:
@@ -666,7 +664,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             progress_perc = (float(inserted_tasks) / float(len(episode_insert_list))) * 100
             if not self.silent:
                 self.progress_dialog.update(int(progress_perc))
-            # self.task_queue.put(i, block=True)
+
             cursor.execute(base_sql_statement % (int(i[0]), int(i[1]), int(i[2]), self.base_date, i[3]))
 
             # Batch the entries as to not reach SQL expression limit
