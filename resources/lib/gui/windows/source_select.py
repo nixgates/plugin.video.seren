@@ -4,6 +4,7 @@ from resources.lib.common import tools
 from resources.lib.gui.windows.base_window import BaseWindow
 from resources.lib.modules.resolver import Resolver
 from resources.lib.modules import database
+from resources.lib.modules.skin_manager import SkinManager
 
 class SourceSelect(BaseWindow):
 
@@ -15,7 +16,9 @@ class SourceSelect(BaseWindow):
         self.canceled = False
         self.display_list = None
         tools.closeBusyDialog()
-        self.Resolver = Resolver('resolver.xml', tools.addonDir, actionArgs=actionArgs)
+        self.Resolver = Resolver('resolver.xml',
+                                 SkinManager().active_skin_path,
+                                 actionArgs=actionArgs)
         self.stream_link = None
 
     def onInit(self):
@@ -32,8 +35,6 @@ class SourceSelect(BaseWindow):
                         value = ' '.join(sorted(value))
                     if info == 'size':
                         value = tools.source_size_display(value)
-                    if info == 'type' and i.get(info) == 'hoster':
-                        menu_item.setProperty('provider', str(value).replace('_', ' '))
                     menu_item.setProperty(info, str(value).replace('_', ' '))
                 except UnicodeEncodeError:
                     menu_item.setProperty(info, i[info])
@@ -55,7 +56,7 @@ class SourceSelect(BaseWindow):
     def onAction(self, action):
         id = action.getId()
         if id == 92 or id == 10:
-            self.position = -1
+            self.stream_link = False
             self.close()
 
         if id == 7:
@@ -75,7 +76,7 @@ class SourceSelect(BaseWindow):
                                         tools.get_item_information(self.actionArgs), False)
 
         if self.stream_link is None:
-            tools.showDialog.notification(tools.addonName, 'Failed to resolve item, please try another source')
+            tools.showDialog.notification(tools.addonName, tools.lang(32047), time=2000)
             return
         else:
             self.close()

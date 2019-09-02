@@ -240,7 +240,7 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>Torrents: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(total_torrents)][/COLOR] | Cached: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(cached_torrents)][/COLOR] | Hosters: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(hosters_sources)][/COLOR] | CloudFiles: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(cloud_sources)][/COLOR]</label>
+                <label>$ADDON[plugin.video.seren 40221]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(total_torrents)][/COLOR] | $ADDON[plugin.video.seren 40222]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(cached_torrents)][/COLOR] | $ADDON[plugin.video.seren 40223]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(hosters_sources)][/COLOR] | $ADDON[plugin.video.seren 40224]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(cloud_sources)][/COLOR]</label>
             </control>
 
             <control type="label">
@@ -264,7 +264,7 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>Remaining Providers: $INFO[Window().Property(remaining_providers_count)]</label>
+                <label>$ADDON[plugin.video.seren 40225]: $INFO[Window().Property(remaining_providers_count)]</label>
                 <visible>Integer.IsGreaterOrEqual(Window().Property(remaining_providers_count),10)</visible>
             </control>
 

@@ -22,7 +22,7 @@ class CacheAssit:
         if 'showInfo' in args:
             self.title = args['showInfo']['info']['originaltitle']
         else:
-            self.title = args['title']
+            self.title = args['info']['title']
 
         cache_location = int(tools.getSetting('general.cachelocation'))
 
@@ -66,10 +66,9 @@ class CacheAssit:
                 if transfer_status['status'] == 'finished':
                     database.add_assist_torrent(transfer_id, 'premiumize', transfer_status['status'],
                                                 torrent_object['release_title'], str(current_percent))
-                    if self.notified == False:
+                    if not self.notified:
                         tools.showDialog.notification(tools.addonName + ': %s' % self.title,
-                                                      'New cached sources have been created for %s' % self.title,
-                                                      time=5000)
+                                                      tools.lang(40299) % self.title, time=5000)
                         debrid.delete_transfer(transfer_id)
                         database.add_premiumize_transfer(transfer_id)
                         from resources.lib.common import maintenance
@@ -81,9 +80,7 @@ class CacheAssit:
                                                     torrent_object['release_title'],
                                                     str(current_percent))
                         debrid.delete_transfer(transfer_id)
-                        tools.showDialog.notification(tools.addonName,
-                                                      'Cache assist for %s has failed due to no progress'
-                                                      % self.title)
+                        tools.showDialog.notification(tools.addonName, tools.lang(40300) % self.title)
                         break
                     continue
                 else:
@@ -150,9 +147,7 @@ class CacheAssit:
                                                         torrent_object['release_title'],
                                                         str(current_percent))
                             debrid.deleteTorrent(torrent_id)
-                            tools.showDialog.notification(tools.addonName,
-                                                          'Cache assist for %s has failed due to no progress'
-                                                          % self.title)
+                            tools.showDialog.notification(tools.addonName, tools.lang(40300) % self.title)
                             break
                         continue
 
@@ -167,9 +162,7 @@ class CacheAssit:
                                                 str(current_percent))
                     debrid.deleteTorrent(torrent_id)
                     tools.log('Could not create cache for magnet- %s' % torrent_object['magnet'], 'info')
-                    tools.showDialog.notification(tools.addonName,
-                                                  'Cache assist for %s has failed according to Real Debrid'
-                                                  % self.title)
+                    tools.showDialog.notification(tools.addonName, tools.lang(40301) % self.title)
                     break
             except:
                 debrid.deleteTorrent(torrent_id)

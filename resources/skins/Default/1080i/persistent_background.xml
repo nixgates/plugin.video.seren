@@ -10,8 +10,6 @@
             <texture>$INFO[Window().Property(texture.white)]</texture>
             <colordiffuse>FF000000</colordiffuse>
         </control>
-        <control type="list" id="1100">
-        </control>
 
         <!-- Background -->
         <control type="image">
@@ -19,7 +17,7 @@
             <left>0</left>
             <width>1920</width>
             <height>1080</height>
-            <texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
+            <texture>$INFO[Window().Property(item.art.fanart)]</texture>
         </control>
 
         <control type="image">
@@ -27,10 +25,9 @@
             <left>0</left>
             <width>1920</width>
             <height>1080</height>
-            <texture background="true">$INFO[Window().Property(texture.white)]</texture>
+            <texture>$INFO[Window().Property(texture.white)]</texture>
             <colordiffuse>CC000000</colordiffuse>
         </control>
-
 
         <!-- Seren Ico -->
         <control type="image" id="1001">

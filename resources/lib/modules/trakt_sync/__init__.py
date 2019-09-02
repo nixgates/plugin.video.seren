@@ -4,6 +4,7 @@ import threading
 from datetime import datetime
 
 from resources.lib.common import tools
+from resources.lib.common.worker import ThreadPool
 from resources.lib.gui import seren_dialog
 
 try:
@@ -17,8 +18,6 @@ except ImportError:
     from pysqlite2 import dbapi2 as db, OperationalError
 
 database_path = tools.traktSyncDB
-
-# threading.stack_size(64 * 1024)
 
 
 class TraktSyncDatabase:
@@ -35,7 +34,7 @@ class TraktSyncDatabase:
 
         self.item_list = []
         self.threads = []
-        self.task_queue = Queue(20)
+        self.task_queue = ThreadPool(workers=4)
         self.queue_finished = False
         self.task_len = 0
         self.base_date = '1970-01-01T00:00:00'
@@ -49,7 +48,7 @@ class TraktSyncDatabase:
         # You will need to update the below version number to match the new addon version
         # This will ensure that the metadata required for operations is available
 
-        self.last_meta_update = '1.0.12'
+        self.last_meta_update = '1.4.0'
 
         if self.activites is None:
             meta = '{}'
@@ -200,44 +199,6 @@ class TraktSyncDatabase:
         cursor = conn.cursor()
         return cursor
 
-    def _run_threads(self):
-        for i in self.threads:
-            i.start()
-
-        for i in self.threads:
-            i.join()
-
-    def _start_queue_workers(self):
-
-        self.queue_finished = False
-
-        for i in range(self.number_of_threads):
-            self.threads.append(threading.Thread(target=self._queue_worker))
-
-        for i in self.threads:
-            i.start()
-
-    def _finish_queue_workers(self):
-
-        self.queue_finished = True
-
-        for i in self.threads:
-            i.join()
-
-        self.threads = []
-
-    def _queue_worker(self):
-        while not self.task_queue.empty() or not self.queue_finished:
-            try:
-                target = self.task_queue.get(timeout=3)
-            except:
-                continue
-            try:
-                target[0](*target[1])
-            except:
-                pass
-            self.task_len -= 1
-
     def flush_activities(self, clear_meta=True):
         if clear_meta:
             self.clear_all_meta()
@@ -247,7 +208,6 @@ class TraktSyncDatabase:
         cursor.close()
 
     def clear_user_information(self):
-
         cursor = self._get_cursor()
         cursor.execute('UPDATE episodes SET watched=0')
         cursor.execute('UPDATE episodes SET collected=0')
@@ -256,6 +216,7 @@ class TraktSyncDatabase:
         cursor.connection.commit()
         cursor.close()
         self.set_trakt_user('')
+        tools.showDialog.notification(tools.addonName + ': Trakt', tools.lang(40260), time=5000)
 
     def set_trakt_user(self, trakt_username):
         cursor = self._get_cursor()
@@ -278,6 +239,7 @@ class TraktSyncDatabase:
         cursor.execute("UPDATE movies SET kodi_meta=?", (meta,))
         cursor.connection.commit()
         cursor.close()
+        tools.showDialog.notification(tools.addonName + ': Trakt', tools.lang(40261), time=5000)
 
     def clear_specific_meta(self, trakt_object):
 
@@ -338,6 +300,7 @@ class TraktSyncDatabase:
 
         from resources.lib.modules.trakt_sync.activities import TraktSyncDatabase as activities
         activities().sync_activities()
+        tools.showDialog.notification(tools.addonName + ': Trakt', tools.lang(40262), time=5000)
 
 
 def _bring_out_your_dead(population):
@@ -379,13 +342,3 @@ def _get_connection():
     conn = db.connect(database_path, timeout=60.0)
     conn.row_factory = _dict_factory
     return conn
-
-class sync_notification(seren_dialog.Dialog):
-
-    def __init__(self):
-        seren_dialog.Dialog.__init__(self)
-
-        self.text_box = tools.multi_text(self.window_width / 2 + 30, self.window_height - 90,
-                                         self.window_width - 60, self.window_height - 125, font='font12')
-        self.addControl(self.text_box)
-        self.text_box.setText(tools.lang(40133))

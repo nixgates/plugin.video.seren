@@ -1,12 +1,13 @@
-import threading
 import ast
 import copy
-
+import threading
 from datetime import datetime
-from resources.lib.modules import trakt_sync
-from resources.lib.indexers import trakt
+
+from resources.lib.indexers import trakt, imdb, tmdb
 from resources.lib.indexers import tvdb
 from resources.lib.modules import database
+from resources.lib.modules import trakt_sync
+
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
@@ -131,7 +132,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         seasons = cursor.fetchall()
         cursor.close()
         season_count = int(show_meta['info']['season_count'])
-
         try:
             if len([i for i in seasons if i['kodi_meta'] == '{}']) > 0:
                 raise Exception
@@ -146,9 +146,15 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             # We likely haven't built the meta information yet
             pass
 
-        for season in range(int(show_meta['info']['season_count']) + 1):
+        seasons = trakt.TraktAPI().json_response('shows/%s/seasons' % show_meta['ids']['trakt'])
+
+        # Maybe we can add here other providers to get some more information out
+        # if seasons is None:
+        #    return self.item_list
+
+        for season in seasons:
             self.threads.append(threading.Thread(target=self.get_single_season, args=(show_meta['ids']['trakt'],
-                                                                                      season, True)))
+                                                                                      season['number'], True)))
 
         for i in self.threads:
             i.start()
@@ -166,12 +172,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         return self.item_list
 
     def update_show_list(self, show_list, watch_info=True):
-        self._start_queue_workers()
-
         for i in show_list:
-            self.task_queue.put((self.get_single_show, (i, True, watch_info)), True)
+            self.task_queue.put(self.get_single_show, i, True, watch_info)
 
-        self._finish_queue_workers()
+        self.task_queue.wait_completion()
 
         return self.item_list
 
@@ -228,6 +232,36 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         return meta_list
 
+    def get_flat_episode_list(self, show_id):
+
+        show_meta = self.get_single_show(show_id)
+
+        cursor = self._get_cursor()
+
+        cursor.execute('SELECT * FROM episodes WHERE show_id=?', (show_id,))
+        episodes = cursor.fetchall()
+        cursor.close()
+        try:
+            if len(episodes) != int(show_meta['info']['episode_count']):
+                raise Exception
+
+            if len([i for i in episodes if i['kodi_meta'] == '{}']) > 0:
+                raise Exception
+
+            return self.get_meta_episode_list(episodes, [show_meta])
+
+        except:
+
+            seasons = trakt.TraktAPI().json_response('shows/%s/seasons?extended=episodes' % show_id)
+            episodes = [episode for season in seasons for episode in season['episodes']]
+
+            for i in episodes:
+                self.task_queue.put(self.get_single_episode, show_id, i['season'], i['number'], True)
+
+            self.task_queue.wait_completion()
+
+            return self.item_list
+
     def get_episode_list(self, episode_dicts):
 
         self.item_list = []
@@ -275,12 +309,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def update_episode_list(self, episode_dicts):
         self.item_list = []
-        self._start_queue_workers()
         for item in episode_dicts:
-            self.task_queue.put((self.get_single_episode, (item['show']['ids']['trakt'], item['episode']['season'],
-                                                           item['episode']['number'], True)), True)
-
-        self._finish_queue_workers()
+            self.task_queue.put(self.get_single_episode, item['show']['ids']['trakt'], item['episode']['season'],
+                                                           item['episode']['number'])
+        self.task_queue.wait_completion()
 
         return self.item_list
 
@@ -346,15 +378,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return [episode['kodi_meta'] for episode in season_episodes]
 
         except:
+            from resources.lib.common import tools
 
             trakt_list = database.get(trakt.TraktAPI().json_response, 24, 'shows/%s/seasons/%s' % (show_id, season))
 
-            self._start_queue_workers()
-
             for i in trakt_list:
-                self.task_queue.put((self.get_single_episode, (show_id, season, i['number'], True)), True)
+                self.task_queue.put(self.get_single_episode, show_id, season, i['number'], True)
 
-            self._finish_queue_workers()
+            self.task_queue.wait_completion()
 
             return self.item_list
 
@@ -386,7 +417,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             if item['kodi_meta'] == '{}' and get_meta:
                 show_item = database.get(trakt.TraktAPI().json_response, 24, '/shows/%s?extended=full' % show_id)
                 item = self._update_show(show_id, show_item, get_meta)
-
             else:
                 item['kodi_meta'] = ast.literal_eval(item['kodi_meta'])
 
@@ -457,7 +487,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return item['kodi_meta']
 
     def get_season_watch_info(self, season_meta):
-
+        if season_meta is None:
+            return None
         try:
             if int(season_meta['info']['aired_episodes']) != 0:
                 play_count = 0
@@ -499,7 +530,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def get_single_episode(self, show_id, season, episode, list_mode=False, get_meta=True,
                            watched=None, collected=None):
-
         cursor = self._get_cursor()
 
         cursor.execute('SELECT * FROM episodes WHERE show_id=? AND season=? AND number=?',
@@ -517,6 +547,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                                           '/shows/%s/seasons/%s/episodes/%s?extended=full' % (show_id, season, episode))
             if episode_object is None:
                 return
+
             item = self._update_episode(show_id, episode_object, get_meta, watched, collected)
         else:
             if get_meta and item['kodi_meta'] == '{}':
@@ -525,6 +556,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                                               (show_id, season, episode))
                 if episode_object is None:
                     return
+
                 item = self._update_episode(show_id, episode_object, get_meta, watched, collected)
             else:
                 item['kodi_meta'] = ast.literal_eval(item['kodi_meta'])
@@ -560,10 +592,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return item['kodi_meta']
 
     def clean_episode_showinfo(self, item):
-
         item['showInfo']['info'].pop('plot', '')
-        item['showInfo']['info'].pop('castandrole', '')
-        item['showInfo'].pop('setCast', '')
+        item['showInfo'].pop('cast', '')
         return item
 
     def update_episode_playcount(self, item):
@@ -585,7 +615,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         return item
 
-
     def _update_show(self, trakt_id, show_item, get_meta=True):
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM shows WHERE trakt_id=?', (trakt_id,))
@@ -594,7 +623,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if get_meta:
             kodi_meta = tvdb.TVDBAPI().seriesIDToListItem(show_item)
-            if kodi_meta is None:
+            if kodi_meta is None or kodi_meta == '{}':
+                kodi_meta = tmdb.TMDBAPI().showToListItem(show_item)
+            if kodi_meta is None or kodi_meta == '{}':
+                kodi_meta = imdb.IMDBScraper().showToListItem(show_item)
+            if kodi_meta is None or kodi_meta == '{}':
                 return
             update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         else:
@@ -630,6 +663,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if get_meta:
             kodi_meta = tvdb.TVDBAPI().seasonIDToListItem(season_meta, show_meta)
+            if kodi_meta is None or kodi_meta == '{}':
+                kodi_meta = tmdb.TMDBAPI().showSeasonToListItem(season_meta, show_meta)
+            if kodi_meta is None or kodi_meta == '{}':
+                kodi_meta = imdb.IMDBScraper().showSeasonToListItem(season_meta, show_meta)
         else:
             kodi_meta = {}
 
@@ -660,16 +697,19 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             pass
 
     def _update_episode(self, show_id, episode_object, get_meta=True, watched=None, collected=None):
-
-        show_meta = self.get_single_show(show_id, get_meta=get_meta)
-        if show_meta is None:
-            return
-
         episode_id = episode_object['ids']['trakt']
         season = episode_object['season']
         old_entry = None
         number = episode_object['number']
         cursor = self._get_cursor()
+
+        show_meta = self.get_single_show(show_id, get_meta=get_meta)
+        if show_meta is None:
+            return
+
+        season_meta = self.get_single_season(show_id, season, get_meta=get_meta)
+        if season_meta is None:
+            return
 
         try:
             cursor.execute("SELECT * FROM episodes WHERE trakt_id=?", (episode_id,))
@@ -681,11 +721,15 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if show_meta == '{}' and get_meta:
             return
 
-        show_meta = {'showInfo': show_meta}
+        show_meta = {'showInfo': show_meta, 'seasonInfo': season_meta}
 
         if (get_meta and old_entry is None) or (get_meta and old_entry['kodi_meta'] == '{}'):
             kodi_meta = tvdb.TVDBAPI().episodeIDToListItem(episode_object, copy.deepcopy(show_meta))
-            if kodi_meta is None:
+            if kodi_meta is None or kodi_meta == '{}':
+               kodi_meta = tmdb.TMDBAPI().episodeIDToListItem(episode_object, copy.deepcopy(show_meta))
+            if kodi_meta is None or kodi_meta == '{}':
+                kodi_meta = imdb.IMDBScraper().episodeIDToListItem(episode_object, copy.deepcopy(show_meta))
+            if kodi_meta is None or kodi_meta == '{}':
                 return
             kodi_meta.pop('showInfo')
             update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))

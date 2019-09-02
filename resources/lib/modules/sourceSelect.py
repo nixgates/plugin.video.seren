@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from resources.lib.common import tools
-
+from resources.lib.modules.skin_manager import SkinManager
 
 def sourceSelect(uncached_sources, source_list, info):
     try:
@@ -9,8 +9,13 @@ def sourceSelect(uncached_sources, source_list, info):
             return None
 
         from resources.lib.gui.windows.source_select import SourceSelect
-        window = SourceSelect('source_select.xml', tools.addonDir, actionArgs=info, sources=source_list)
+        window = SourceSelect('source_select.xml',
+                              SkinManager().active_skin_path,
+                              actionArgs=info,
+                              sources=source_list)
+
         selection = window.doModal()
+
         del window
 
     except:

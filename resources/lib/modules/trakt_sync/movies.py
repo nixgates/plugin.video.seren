@@ -4,7 +4,7 @@ import copy
 
 from datetime import datetime
 from resources.lib.modules import trakt_sync
-from resources.lib.indexers import trakt
+from resources.lib.indexers import trakt, imdb
 from resources.lib.indexers import tmdb
 
 
@@ -60,17 +60,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             meta_list.append(self.movie_db_to_meta(movie))
         return meta_list
 
-
     def update_movie_list(self, id_list):
 
         self.item_list = []
-        self._start_queue_workers()
 
         for movie in id_list:
-            self.task_queue.put((self.get_movie, (movie, False, True)), True)
+            self.task_queue.put(self.get_movie, movie, False, True)
 
-        self._finish_queue_workers()
-
+        self.task_queue.wait_completion()
 
     def movie_db_to_meta(self, movie_object):
         watched = movie_object['watched']
@@ -182,6 +179,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if get_meta and (old_entry is None or old_entry['kodi_meta'] == '{}'):
             kodi_meta = tmdb.TMDBAPI().movieToListItem(trakt_object)
+            if kodi_meta is None or kodi_meta == '{}':
+                kodi_meta = imdb.IMDBScraper().movieToListItem(trakt_object)
         else:
             if old_entry is None:
                 kodi_meta = {}

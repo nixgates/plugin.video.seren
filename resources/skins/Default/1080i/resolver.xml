@@ -81,7 +81,7 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>Provider: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(debrid_provider)][/COLOR][/UPPERCASE] | Source:  [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_provider)][/COLOR][/UPPERCASE]</label>
+                <label>$ADDON[plugin.video.seren 40226]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(debrid_provider)][/COLOR][/UPPERCASE] | $ADDON[plugin.video.seren 40227]:  [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_provider)][/COLOR][/UPPERCASE]</label>
             </control>
 
             <control type="label">
@@ -93,7 +93,7 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>Resolution: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_resolution)][/COLOR][UPPERCASE] | Info: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_info)][/COLOR][/UPPERCASE]</label>
+                <label>$ADDON[plugin.video.seren 40228]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_resolution)][/COLOR][UPPERCASE] | $ADDON[plugin.video.seren 40229]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_info)][/COLOR][/UPPERCASE]</label>
             </control>
 
         </control>

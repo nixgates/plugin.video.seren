@@ -3,8 +3,8 @@
 import sys
 from resources.lib.common import tools
 
-def api(params):
 
+def api(params):
     from resources.lib.common import tools
     from resources.lib.modules import database
 
@@ -173,6 +173,8 @@ def api(params):
 
     if action == 'getSources':
 
+        from resources.lib.modules.skin_manager import SkinManager
+
         try:
             from resources.lib.gui.windows.persistent_background import PersistentBackground
             item_information = tools.get_item_information(actionArgs)
@@ -190,11 +192,10 @@ def api(params):
             else:
                 display_background = False
 
-            if tools.getSetting('general.scrapedisplay') == '1':
-                tools.closeBusyDialog()
-
             if display_background:
-                background = PersistentBackground('persistent_background.xml', tools.addonDir, actionArgs=actionArgs)
+                background = PersistentBackground('persistent_background.xml',
+                                                  SkinManager().active_skin_path,
+                                                  actionArgs=actionArgs)
                 background.setText(tools.lang(32045))
                 background.show()
 
@@ -215,8 +216,11 @@ def api(params):
                 source_select_style = 'Movie'
 
             if tools.getSetting('general.playstyle%s' % source_select_style) == '1' or source_select == 'true':
-                try: background.setText(tools.lang(40135))
-                except: pass
+
+                try:
+                    background.setText(tools.lang(40135))
+                except:
+                    pass
 
                 from resources.lib.modules import sourceSelect
 
@@ -224,6 +228,9 @@ def api(params):
 
                 if stream_link is None:
                     tools.showDialog.notification(tools.addonName, tools.lang(32047), time=5000)
+                    raise Exception
+                if not stream_link:
+                    # user has backed out of source select, don't show no playable sources notification
                     raise Exception
             else:
                 try:
@@ -233,8 +240,12 @@ def api(params):
 
                 from resources.lib.modules import resolver
 
-                resolver_window = resolver.Resolver('resolver.xml', tools.addonDir, actionArgs=actionArgs)
-                stream_link = database.get(resolver_window.doModal, 1, source_results, args, pack_select,
+                resolver_window = resolver.Resolver('resolver.xml',
+                                                    SkinManager().active_skin_path,
+                                                    actionArgs=actionArgs)
+
+                stream_link = database.get(resolver_window.doModal, 1,
+                                           source_results, args, pack_select,
                                            seren_reload=seren_reload)
                 del resolver_window
 
@@ -243,11 +254,15 @@ def api(params):
                     tools.showDialog.notification(tools.addonName, tools.lang(32047), time=5000)
                     raise Exception
 
-
-            try: background.close()
-            except: pass
-            try: del background
-            except: pass
+            tools.showBusyDialog()
+            try:
+                background.close()
+            except:
+                pass
+            try:
+                del background
+            except:
+                pass
 
             from resources.lib.modules import player
 
@@ -255,28 +270,51 @@ def api(params):
 
         except:
             # Perform cleanup and make sure all open windows close and playlist is cleared
-            try:tools.closeBusyDialog()
-            except: pass
-            try: background.close()
-            except: pass
-            try: del background
-            except: pass
-            try: sources_window.close()
-            except: pass
-            try: del sources_window
-            except: pass
-            try: resolver_window.close()
-            except: pass
-            try: del resolver_window
-            except: pass
-            try: tools.playList.clear()
-            except: pass
-            try: tools.closeOkDialog()
-            except: pass
-            try: tools.cancelPlayback()
-            except: pass
+            try:
+                tools.closeBusyDialog()
+            except:
+                pass
+            try:
+                background.close()
+            except:
+                pass
+            try:
+                del background
+            except:
+                pass
+            try:
+                sources_window.close()
+            except:
+                pass
+            try:
+                del sources_window
+            except:
+                pass
+            try:
+                resolver_window.close()
+            except:
+                pass
+            try:
+                del resolver_window
+            except:
+                pass
+            try:
+                tools.playList.clear()
+            except:
+                pass
+            try:
+                tools.closeOkDialog()
+            except:
+                pass
+            try:
+                tools.cancelPlayback()
+            except:
+                pass
 
     if action == 'preScrape':
+
+        from resources.lib.modules.skin_manager import SkinManager
+
         try:
             item_information = tools.get_item_information(actionArgs)
 
@@ -298,7 +336,8 @@ def api(params):
 
                 from resources.lib.modules import resolver
 
-                resolver_window = resolver.Resolver('resolver.xml', tools.addonDir, actionArgs=actionArgs)
+                resolver_window = resolver.Resolver('resolver.xml', SkinManager().active_skin_path,
+                                                    actionArgs=actionArgs)
                 database.get(resolver_window.doModal, 1, source_results, args, pack_select, seren_reload=seren_reload)
 
             tools.setSetting(id='general.tempSilent', value='false')
@@ -308,6 +347,7 @@ def api(params):
 
             traceback.print_exc()
             pass
+
         tools.log('Pre-scraping completed')
 
     if action == 'authRealDebrid':
@@ -491,7 +531,7 @@ def api(params):
 
     if action == 'resetSilent':
         tools.setSetting('general.tempSilent', 'false')
-        tools.showDialog.notification(tools.addonName + ": Silent scrape", tools.lang(32048), time=5000)
+        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40296)), tools.lang(32048), time=5000)
 
     if action == 'clearTorrentCache':
         from resources.lib.modules import database
@@ -547,14 +587,19 @@ def api(params):
         homeMenu.Menus().providerMenu()
 
     if action == 'adjustProviders':
-        from resources.lib.modules import customProviders
-
-        customProviders.providers().adjust_providers(actionArgs)
+        tools.log('adjustProviders endpoint has been deprecated')
+        return
+        # from resources.lib.modules import customProviders
+        #
+        # customProviders.providers().adjust_providers(actionArgs)
 
     if action == 'adjustPackage':
-        from resources.lib.modules import customProviders
-
-        customProviders.providers().adjust_providers(actionArgs, package_disable=True)
+        tools.log('adjustPackage endpoint has been deprecated')
+        return
+        # DEPRECATED
+        # from resources.lib.modules import customProviders
+        #
+        # customProviders.providers().adjust_providers(actionArgs, package_disable=True)
 
     if action == 'installProviders':
         from resources.lib.modules import customProviders
@@ -582,7 +627,6 @@ def api(params):
         maintenance.wipe_install()
 
     if action == 'buildPlaylistWorkaround':
-
         from resources.lib.modules import smartPlay
         smartPlay.SmartPlay(actionArgs).resume_playback()
 
@@ -592,7 +636,7 @@ def api(params):
         maintenance.premiumize_transfer_cleanup()
 
     if action == 'test2':
-        tools.log('Nope')
+        pass
 
     if action == 'manualProviderUpdate':
         from resources.lib.modules import customProviders
@@ -603,7 +647,6 @@ def api(params):
         from resources.lib.modules import database
 
         database.clearSearchHistory()
-        tools.showDialog.ok(tools.addonName, 'Search History has been cleared')
 
     if action == 'externalProviderInstall':
         from resources.lib.modules import customProviders
@@ -701,13 +744,39 @@ def api(params):
         from resources.lib.modules.customProviders import providers
         providers().update_known_providers()
 
+    if action == 'installSkin':
+        from resources.lib.modules.skin_manager import SkinManager
+        SkinManager().install_skin()
+
+    if action == 'uninstallSkin':
+        from resources.lib.modules.skin_manager import SkinManager
+        SkinManager().uninstall_skin()
+
+    if action == 'switchSkin':
+        from resources.lib.modules.skin_manager import SkinManager
+        SkinManager().switch_skin()
+
+    if action == 'manageProviders':
+        tools.showBusyDialog()
+        from resources.lib.gui.windows.custom_providers import CustomProviders
+        from resources.lib.modules.skin_manager import SkinManager
+        CustomProviders('custom_providers.xml', SkinManager().active_skin_path).doModal()
+
+    if action == 'flatEpisodes':
+        from resources.lib.gui.tvshowMenus import Menus
+        Menus().flat_episode_list(actionArgs)
+
     if unit_tests:
         items = tools.xbmcplugin.DIRECTORY.items
         tools.xbmcplugin.DIRECTORY.items = []
         return items
 
+
 if __name__ == "__main__":
 
-    api_params = dict(tools.parse_qsl(sys.argv[2].replace('?', '')))
+    try:
+        api_params = dict(tools.parse_qsl(sys.argv[2].replace('?', '')))
+    except:
+        api_params = {}
 
     api(api_params)

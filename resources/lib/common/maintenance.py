@@ -3,19 +3,19 @@
 import time
 import requests
 import re
-import xbmcaddon
 
 from resources.lib.common import tools
 from resources.lib.modules import customProviders
 
 
 def check_for_addon_update():
+
     try:
         if tools.getSetting('general.checkAddonUpdates') == 'false':
             return
-        update_timestamp = tools.getSetting('addon.updateCheckTimeStamp')
+        update_timestamp = float(tools.getSetting('addon.updateCheckTimeStamp'))
 
-        if time.time() > (update_timestamp - (24 * (60 * 60))):
+        if time.time() > (update_timestamp + (24 * (60 * 60))):
             repo_xml = requests.get('https://raw.githubusercontent.com/nixgates/nixgates/master/packages/addons.xml')
             if not repo_xml.status_code == 200:
                 tools.log('Could not connect to repo XML, status: %s' % repo_xml.status_code, 'error')
@@ -30,15 +30,21 @@ def check_for_addon_update():
 
 
 def update_provider_packages():
-    if tools.getSetting('providers.autoupdates') == 'false':
-        return
+
     try:
-        provider_check_stamp = int(tools.getSetting('provider.updateCheckTimeStamp'))
+        provider_check_stamp = float(tools.getSetting('provider.updateCheckTimeStamp'))
     except:
+        import traceback
+        traceback.print_exc()
         provider_check_stamp = 0
 
-    if time.time() > (provider_check_stamp - (30 * 60)):
-        customProviders.providers().check_for_updates(silent=True, automatic=True)
+    if time.time() > (provider_check_stamp + (24 * (60 * 60))):
+        if tools.getSetting('providers.autoupdates') == 'false':
+            available_updates = customProviders.providers().check_for_updates(silent=True, automatic=False)
+            if len(available_updates) > 0:
+                tools.showDialog.notification(tools.addonName, tools.lang(40239))
+        else:
+            customProviders.providers().check_for_updates(silent=True, automatic=True)
         tools.setSetting('provider.updateCheckTimeStamp', str(time.time()))
 
 
