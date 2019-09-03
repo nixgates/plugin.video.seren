@@ -471,10 +471,9 @@ class TVDBAPI:
             pass
 
         try:
-            if self.episode_fanart:
+            if self.episode_fanart == 'true':
                 art.update(tmdb.TMDBAPI().getEpisodeFanartArt(trakt_object, showArgs))
         except:
-            traceback.print_exc()
             pass
         try:
             art['thumb'] = self.baseImageUrl + response['filename']

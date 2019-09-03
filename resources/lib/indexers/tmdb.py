@@ -63,7 +63,7 @@ class TMDBAPI:
                 except requests.exceptions.SSLError:
                     response = requests.get(url, verify=False)
             except requests.exceptions.ConnectionError:
-                tools.showDialog.ok(tools.addonName, tools.lang(32028))
+                tools.showDialog.notification(tools.addonName, tools.lang(32028))
                 return
 
             if '200' in str(response):
@@ -77,8 +77,6 @@ class TMDBAPI:
                 sleep(int(throttleTime) + 1)
                 return self.get_request(url)
             else:
-                tools.log('Get request failed to TMDB URL: %s' % url, 'error')
-                tools.log('TMDB Response: %s' % response.text, 'error')
                 return None
         except:
             import traceback
@@ -607,7 +605,7 @@ class TMDBAPI:
                 pass
 
             try:
-                info['premiered'] = details.get('first_air_date', '')
+                info['premiered'] = trakt_info['first_aired']
             except:
                 pass
 
@@ -819,13 +817,13 @@ class TMDBAPI:
             except:
                 pass
             try:
-                info['aired'] = response.get('air_date', '')
+                info['aired'] = traktInfo['first_aired']
             except:
                 import traceback
                 traceback.print_exc()
                 pass
             try:
-                info['premiered'] = response.get('air_date', '')
+                info['premiered'] = traktInfo['first_aired']
             except:
                 pass
             try:

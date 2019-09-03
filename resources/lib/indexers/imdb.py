@@ -119,7 +119,7 @@ class IMDBScraper:
             aired = aired.split(' ')
             aired[0] = aired[0].zfill(2)
             aired = tools.datetime_workaround('%s %s %s' % (aired[0], aired[1], aired[2]), '%d %B %Y')
-            info['premiered'] = aired.strftime('%Y-%m-%d')
+            info['premiered'] = trakt_object['first_aired']
             info['year'] = aired.strftime('%Y')
         except:
             pass

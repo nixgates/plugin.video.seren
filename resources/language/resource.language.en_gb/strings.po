@@ -1606,11 +1606,11 @@ msgid "Hide %s"
 msgstr ""
 
 msgctxt "#40274"
-msgid "Refresh %s Metadata"
+msgid "Refresh Item Metadata"
 msgstr ""
 
 msgctxt "#40275"
-msgid "Remove %s Progress"
+msgid "Remove Playback Progress"
 msgstr ""
 
 msgctxt "#40276"
@@ -1799,4 +1799,40 @@ msgstr ""
 
 msgctxt "#40322"
 msgid "Starting Playback"
+msgstr ""
+
+msgctxt "#40323"
+msgid "Poster"
+msgstr ""
+
+msgctxt "#40324"
+msgid "Keyart"
+msgstr ""
+
+msgctxt "#40325"
+msgid "Fanart"
+msgstr ""
+
+msgctxt "#40326"
+msgid "Banner"
+msgstr ""
+
+msgctxt "#40327"
+msgid "Clear Logo"
+msgstr ""
+
+msgctxt "#40328"
+msgid "Landscape"
+msgstr ""
+
+msgctxt "#40329"
+msgid "Character Art"
+msgstr ""
+
+msgctxt "#40330"
+msgid "Clear Art"
+msgstr ""
+
+msgctxt "#40331"
+msgid "Disc Art"
 msgstr ""

@@ -1,3 +1,10 @@
+Changelog 1.4.7:
+Enable Kodi Menu caching on search results
+Increase source info identification
+Fix mislabeled strings in trakt manager
+Adjust premiered meta key to be gathered from trakt information instead of alternative indexer
+Add fallback to account for empty premiered key set to empty string
+
 Changelog 1.4.6:
 Removed duplicate caching from meta provider modules
 Fixed typos
