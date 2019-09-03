@@ -68,6 +68,8 @@ def getInfo(release_title):
         info.append('x264')
     if any(i in release_title for i in ['x265', '.x265', 'hevc', ' h265', '.h265', 'x265', ' h 265']):
         info.append('x265')
+    if any(i in release_title for i in [' xvid']):
+        info.append('XVID')
     if any(i in release_title for i in [' remux']):
         info.append('REMUX')
     if any(i in release_title for i in [' 3d']):
@@ -78,15 +80,15 @@ def getInfo(release_title):
         info.append('DTS')
     if any(i in release_title for i in [' atmos']):
         info.append('ATMOS')
-    if any(i in release_title for i in [' ddp', ' dd+']):
+    if any(i in release_title for i in [' ddp', ' dd+', ' eac3', ' e-ac3']):
         info.append('DD+')
-    if any(i in release_title for i in [' dd.', ' dd2', ' dd5', ' dd7']):
+    if any(i in release_title for i in [' dd ', ' dd2', ' dd5', ' dd7', ' dd 2', ' dd 5', ' dd 7', ' ac3']):
         info.append('DD')
-    if any(i in release_title for i in [' 2 0', ' 2 0ch', ' 2ch', ' ddp2 0', ' dd2 0']):
+    if any(i in release_title for i in [' 2 0 ', ' 2 0ch', ' 2ch', ' ddp2', ' dd2', ' dd+2', ' aac2']):
         info.append('2.0')
-    if any(i in release_title for i in [' 5 1', ' 5 1ch', ' 6ch', ' ddp5 1', ' dd5 1', 'dd+5 1']):
+    if any(i in release_title for i in [' 5 1 ', ' 5 1ch', ' 6ch', ' ddp5', ' dd5', ' dd+5', ' aac5']):
         info.append('5.1')
-    if any(i in release_title for i in [' 7 1', ' 7 1ch', ' 8ch', ' ddp7 1', ' dd7 1']):
+    if any(i in release_title for i in [' 7 1 ', ' 7 1ch', ' 8ch', ' ddp7', ' dd7', ' dd+7', ' aac7']):
         info.append('7.1')
     if any(i in release_title for i in [' cam', ' camrip', ' hdcam', ' hd cam']):
         info.append('CAM')

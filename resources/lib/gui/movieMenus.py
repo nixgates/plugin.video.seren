@@ -226,7 +226,7 @@ class Menus:
             return
         self.commonListBuilder([movie for movie in trakt_list if float(movie['score']) > 0])
         tools.closeAllDialogs()
-        tools.closeDirectory('movies', cache=False)
+        tools.closeDirectory('movies')
 
     def moviesRelated(self, args):
         trakt_list = database.get(trakt.json_response, 12, 'movies/%s/related' % args)

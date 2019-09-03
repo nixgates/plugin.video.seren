@@ -256,14 +256,10 @@ class TraktAPI:
 
     @staticmethod
     def _get_display_name(type):
-        if type == 'show':
-            return tools.lang(40276)
-        if type == 'season':
-            return tools.lang(40277)
         if type == 'movie':
-            return tools.lang(40278)
-        if type == 'episode':
             return tools.lang(40279)
+        else:
+            return tools.lang(40276)
 
     def traktManager(self, actionArgs):
 
@@ -282,7 +278,7 @@ class TraktAPI:
 
         dialog_list = [tools.lang(40265), tools.lang(40266), tools.lang(40267), tools.lang(40268), tools.lang(40269),
                        tools.lang(40270), tools.lang(40271), tools.lang(40272), tools.lang(40273) % display_type,
-                       tools.lang(40274) % display_type, tools.lang(40275) % display_type]
+                       tools.lang(40274), tools.lang(40275)]
 
         if type in ['show', 'season']:
             dialog_list.pop(10)

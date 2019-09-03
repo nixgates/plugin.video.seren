@@ -84,33 +84,33 @@
         <setting type="sep" />
         <setting id="movies.preferedsource" label="40240" type="select" default="1" lvalues="40242|40243" />
         <setting id="movie.artwork.advanced" label="40253" type="bool" default="false" enabled="!eq(-4,)"/>
-        <setting id="movies.poster_limit" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40187]" type="slider" option="int" default="1" range="1,1,10" visible="eq(-1,true)" />
-		<setting id="movies.keyart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40252]: Key Art" type="slider" option="int" default="0" range="0,1,10" visible="eq(-2,true) + !eq(-6,)"/>
-		<setting id="movies.fanart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40194]" type="slider" option="int" default="5" range="1,1,20" visible="eq(-3,true)"/>
-		<setting id="movies.banner" subsetting="true" label="$ADDON[plugin.video.seren 40252]: Banner" type="bool" default="true" visible="eq(-4,true)"/>
-		<setting id="movies.clearlogo" subsetting="true" label="$ADDON[plugin.video.seren 40252]: Clear Logo" type="bool" default="true" visible="eq(-5,true) + !eq(-9,)"/>
-		<setting id="movies.landscape" subsetting="true" label="$ADDON[plugin.video.seren 40252]: Landscape" type="bool" default="true" visible="eq(-6,true)"/>
-		<setting id="movies.clearart" subsetting="true" label="$ADDON[plugin.video.seren 40252]: Clear Art" type="bool" default="true" visible="eq(-7,true) + !eq(-11,)"/>
-		<setting id="movies.discart" subsetting="true" label="$ADDON[plugin.video.seren 40252]: Disc Art" type="bool" default="true" visible="eq(-8,true) + !eq(12,)"/>
-		<setting id="movies.characterart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40252]: Character Art" type="slider" option="int" default="1" range="0,1,20" visible="eq(-9,true)"/>
+        <setting id="movies.poster_limit" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40323]" type="slider" option="int" default="1" range="1,1,10" visible="eq(-1,true)" />
+		<setting id="movies.keyart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40324]" type="slider" option="int" default="0" range="0,1,10" visible="eq(-2,true) + !eq(-6,)"/>
+		<setting id="movies.fanart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40325]" type="slider" option="int" default="1" range="1,1,20" visible="eq(-3,true)"/>
+		<setting id="movies.banner" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40326]" type="bool" default="true" visible="eq(-4,true)"/>
+		<setting id="movies.clearlogo" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40327]" type="bool" default="false" visible="eq(-5,true) + eq(-6,1) + !eq(-9,)"/>
+		<setting id="movies.landscape" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40328]" type="bool" default="false" visible="eq(-6,true)"/>
+		<setting id="movies.clearart" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40330]" type="bool" default="false" visible="eq(-7,true) + !eq(-11,)"/>
+		<setting id="movies.discart" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40331]" type="bool" default="false" visible="eq(-8,true) + !eq(12,)"/>
+		<setting id="movies.characterart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40252]: $ADDON[plugin.video.seren 40329]" type="slider" option="int" default="0" range="0,1,20" visible="eq(-9,true)"/>
 
         <setting type="lsep" label="40258"/>
         <setting type="sep" />
         <setting id="tvshows.preferedsource" label="40241" type="select" default="1" lvalues="40242|40244" />
         <setting id="tv.artwork.advanced" label="40254" type="bool" default="false"  enabled="!eq(-17,)"/>
-        <setting id="tvshows.poster_limit" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40187]" type="slider" option="int" default="1" range="1,1,10" visible="eq(-1,true)"/>
-		<setting id="tvshows.keyart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40251]: Key Art" type="slider" option="int" default="1" range="0,1,10" visible="eq(-2,true) + !eq(-19,)"/>
-		<setting id="tvshows.fanart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40194]" type="slider" option="int" default="5" range="1,1,20" visible="eq(-3,true)"/>
-		<setting id="tvshows.banner" subsetting="true" label="$ADDON[plugin.video.seren 40251]: Banner" type="bool" default="true" visible="eq(-4,true)"/>
-		<setting id="tvshows.clearlogo" subsetting="true" label="$ADDON[plugin.video.seren 40251]: Clear Logo" type="bool" default="true" visible="eq(-5,true) + !eq(-22,)"/>
-		<setting id="tvshows.landscape" subsetting="true" label="$ADDON[plugin.video.seren 40251]: Landscape" type="bool" default="true" visible="eq(-6,true)"/>
-		<setting id="tvshows.clearart" subsetting="true" label="$ADDON[plugin.video.seren 40251]: Clear Art" type="bool" default="true" visible="eq(-7,true) + !eq(-24,)"/>
-		<setting id="tvshows.characterart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40251]: Character Art" type="slider" option="int" default="1" range="0,1,20" visible="eq(-8,true)"/>
-		<setting id="season.poster" subsetting="true" label="$ADDON[plugin.video.seren 40249]: Poster" type="bool" default="true" visible="eq(-9,true)"/>
-		<setting id="season.banner" subsetting="true" label="$ADDON[plugin.video.seren 40249]: Banner" type="bool" default="true" visible="eq(-10,true)"/>
-		<setting id="season.landscape" subsetting="true" label="$ADDON[plugin.video.seren 40249]: Landscape" type="bool" default="true" visible="eq(-11,true)"/>
-		<setting id="season.fanart" subsetting="true" label="$ADDON[plugin.video.seren 40249]: Fanart" type="bool" default="true" visible="eq(-12,true)"/>
-		<setting id="episode.fanart" subsetting="true" label="$ADDON[plugin.video.seren 40250]: Fanart" type="bool" default="true" visible="eq(-13,true)"/>
+        <setting id="tvshows.poster_limit" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40323]" type="slider" option="int" default="1" range="1,1,10" visible="eq(-1,true)"/>
+		<setting id="tvshows.keyart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40324]" type="slider" option="int" default="0" range="0,1,10" visible="eq(-2,true) + !eq(-19,)"/>
+		<setting id="tvshows.fanart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40325]" type="slider" option="int" default="1" range="1,1,20" visible="eq(-3,true)"/>
+		<setting id="tvshows.banner" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40326]" type="bool" default="true" visible="eq(-4,true)"/>
+		<setting id="tvshows.clearlogo" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40327]" type="bool" default="false" visible="eq(-5,true) + eq(-6,1) + !eq(-22,)"/>
+		<setting id="tvshows.landscape" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40328]" type="bool" default="false" visible="eq(-6,true)"/>
+		<setting id="tvshows.clearart" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40330]" type="bool" default="false" visible="eq(-7,true) + eq(-8,1) + !eq(-24,)"/>
+		<setting id="tvshows.characterart_limit" subsetting="true" label="$ADDON[plugin.video.seren 40251]: $ADDON[plugin.video.seren 40329]" type="slider" option="int" default="0" range="0,1,20" visible="eq(-8,true)"/>
+		<setting id="season.poster" subsetting="true" label="$ADDON[plugin.video.seren 40249]: $ADDON[plugin.video.seren 40323]" type="bool" default="true" visible="eq(-9,true)"/>
+		<setting id="season.banner" subsetting="true" label="$ADDON[plugin.video.seren 40249]: $ADDON[plugin.video.seren 40326]" type="bool" default="true" visible="eq(-10,true)"/>
+		<setting id="season.landscape" subsetting="true" label="$ADDON[plugin.video.seren 40249]: $ADDON[plugin.video.seren 40328]" type="bool" default="false" visible="eq(-11,true)"/>
+		<setting id="season.fanart" subsetting="true" label="$ADDON[plugin.video.seren 40249]: $ADDON[plugin.video.seren 40325]" type="bool" default="true" visible="eq(-12,true)"/>
+		<setting id="episode.fanart" subsetting="true" label="$ADDON[plugin.video.seren 40250]: $ADDON[plugin.video.seren 40325]" type="bool" default="false" visible="eq(-13,true)"/>
 
     </category>
 
