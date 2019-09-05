@@ -1,0 +1,186 @@
+# -*- coding: UTF-8 -*-
+
+# Kodi Media Center language file
+# Addon Name: Seren
+# Addon id: plugin.video.Seren
+# Addon Provider: Nixgates
+msgid ""
+msgstr ""
+
+
+msgctxt "#32001"
+msgid "Discover Movies"
+msgstr "Entdecke Filme"
+
+msgctxt "#32002"
+msgid "My Movies"
+msgstr "Meine Filme"
+
+msgctxt "#32003"
+msgid "Discover TV Shows"
+msgstr "Entdecke Serien"
+
+msgctxt "#32004"
+msgid "My Shows"
+msgstr "Meine TV Serien"
+
+msgctxt "#32005"
+msgid "Auth Trakt"
+msgstr "Authentifiziere Trakt"
+
+msgctxt "#32006"
+msgid "Disconnect Trakt"
+msgstr "Beende Trakt Verknüpfung"
+
+msgctxt "#32007"
+msgid "Most Popular"
+msgstr "Am Populärsten"
+
+msgctxt "#32008"
+msgid "Recommended For You"
+msgstr "Empfohlen"
+
+msgctxt "#32009"
+msgid "Trending"
+msgstr "Trend"
+
+msgctxt "#32010"
+msgid "Most Played"
+msgstr "Meist gespielte"
+
+msgctxt "#32011"
+msgid "Most Watched"
+msgstr "Meist gesehen"
+
+msgctxt "#32012"
+msgid "Most Collected"
+msgstr "Meist gesammelt"
+
+msgctxt "#32013"
+msgid "Most Anticipated"
+msgstr "Am meisten erwartet"
+
+msgctxt "#32014"
+msgid "Recently Updated"
+msgstr "Kürzlich aktualisiert"
+
+msgctxt "#32015"
+msgid "Box Office Top 10"
+msgstr "Bestes Einspielergebnis Top10"
+
+msgctxt "#32016"
+msgid "Search..."
+msgstr "Suche"
+
+msgctxt "#32017"
+msgid "Collection"
+msgstr "Sammlung"
+
+msgctxt "#32018"
+msgid "Watchlist"
+msgstr "Watchlist"
+
+msgctxt "#32019"
+msgid "Next"
+msgstr "Nächste"
+
+msgctxt "#32020"
+msgid "Find similar"
+msgstr "Finde ähnliche"
+
+msgctxt "#32021"
+msgid "Color Picker"
+msgstr "Farbauswahl"
+
+msgctxt "#32022"
+msgid "Getting Things Ready"
+msgstr "Dinge bereit machen"
+
+msgctxt "#32023"
+msgid "Real Debrid Auth"
+msgstr "Real Debrid Authentifizierung"
+
+msgctxt "#32024"
+msgid "Open this link in a browser: "
+msgstr "Öffne Link in einem Browser"
+
+msgctxt "#32025"
+msgid "Enter the code: "
+msgstr "Code eingeben:"
+
+msgctxt "#32026"
+msgid "Authentication is completed"
+msgstr "Authentifizierung fertig"
+
+msgctxt "#32027"
+msgid "Highlight Color Changed to - "
+msgstr "Farbe geändert auf - "
+
+msgctxt "#32028"
+msgid "Error Connecting to TMDB"
+msgstr "Fehler bei der Verbindung zu TMDB"
+
+msgctxt "#32029"
+msgid ": Revoked Trakt Auth"
+msgstr "Wiederrufe Trakt Authentifizierung"
+
+msgctxt "#32030"
+msgid "Trakt Successfully Disconnected"
+msgstr "Trakt erfolgreich getrennt"
+
+msgctxt "#32031"
+msgid "Authorize Trakt"
+msgstr "Authorisiere Trakt"
+
+msgctxt "#32032"
+msgid "Error while authenticating with Trakt.\nPlease try again."
+msgstr "Fehler beim Authorisieren von Trakt.\Bitte nocheinmal versuchen"
+
+msgctxt "#32033"
+msgid "Failed to Authorize Trakt"
+msgstr "Trakt Authorisierung Fehlgeschlagen"
+
+msgctxt "#32034"
+msgid "Please check your Internet Connection"
+msgstr "Bitte Internet Verbindung überprüfen"
+
+msgctxt "#32035"
+msgid "Unknown Error Connecting to Trakt"
+msgstr "Unbekannter Fehler bei Trakt Verbindung"
+
+msgctxt "#32036"
+msgid "Release Title: "
+msgstr "Erscheinungs Titel:"
+
+msgctxt "#32037"
+msgid "Host: "
+msgstr "Host:"
+
+msgctxt "#32038"
+msgid "Quality: "
+msgstr "Qualität: "
+
+msgctxt "#32039"
+msgid "Search Movies..."
+msgstr "Suche Filme"
+
+msgctxt "#32040"
+msgid "Search Shows..."
+msgstr "Suche Serien"
+
+msgctxt "#32041"
+msgid "Tools"
+msgstr "Werkzeuge"
+
+msgctxt "#32042"
+msgid "Clear Cache"
+msgstr "Cache leeren"
+
+msgctxt "#32043"
+msgid "Are you sure you wish to clear the cache?"
+msgstr "Wollen Sie sicher den Cache löschen?"
+
+msgctxt "#32044"
+msgid "Mark Unwatched"
+msgstr "Markiere als ungesehen"
+
