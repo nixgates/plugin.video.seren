@@ -107,9 +107,9 @@ def cache_get(key):
         cursor_lock.release()
 
 
-def cache_insert(key, value):
-    cursor_lock.acquire()
+def cache_insert(key, value):    
     try:
+		cursor_lock.acquire()		
         # type: (str, str) -> None
         cursor = _get_connection_cursor(tools.cacheFile)
         now = int(time.time())
@@ -258,9 +258,9 @@ def clearSearchHistory():
 
 def getTorrents(item_meta):
     if tools.getSetting('general.torrentCache') == 'false':
-        return []
-    cursor_lock.acquire()
+        return []    
     try:
+		cursor_lock.acquire()
         cursor = _get_connection_cursor(tools.torrentScrapeCacheFile)
 
         if 'showInfo' in item_meta:
@@ -373,6 +373,7 @@ def torrent_cache_clear():
     if not confirmation:
         return
     try:
+		cursor_lock.acquire()
         cursor = _get_connection_cursor(tools.torrentScrapeCacheFile)
         for t in [cache_table, 'rel_list', 'rel_lib']:
             try:
