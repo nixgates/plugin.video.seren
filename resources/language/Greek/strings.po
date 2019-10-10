@@ -1,1 +1,197 @@
+# Kodi Media Center language file
+# Addon Name: Seren
+# Addon id: plugin.video.Seren
+# Addon Provider: Nixgates
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Project-Id-Version: Greek Language\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: el\n"
+"X-Generator: Poedit 2.2.4\n"
 
+msgctxt "#32001"
+msgid "Discover Movies"
+msgstr "Ανακαλύψτε Ταινίες"
+
+msgctxt "#32002"
+msgid "My Movies"
+msgstr "Οι Ταινίες μου"
+
+msgctxt "#32003"
+msgid "Discover TV Shows"
+msgstr "Ανακαλύψτε Τηλεοπτικές Σειρές"
+
+msgctxt "#32004"
+msgid "My Shows"
+msgstr "Οι Τηλεοπτικές Σειρές μου"
+
+msgctxt "#32005"
+msgid "Auth Trakt"
+msgstr "Πιστοποίηση Trakt"
+
+msgctxt "#32006"
+msgid "Disconnect Trakt"
+msgstr "Αποσύνδεση Trakt"
+
+msgctxt "#32007"
+msgid "Most Popular"
+msgstr "Δημοφιλέστερα"
+
+msgctxt "#32008"
+msgid "Recommended For You"
+msgstr "Συνιστάται για εσάς"
+
+msgctxt "#32009"
+msgid "Trending"
+msgstr "Σε ανοδική τάση"
+
+msgctxt "#32010"
+msgid "Most Played"
+msgstr "Οι περισσότεροι έπαιξαν"
+
+msgctxt "#32011"
+msgid "Most Watched"
+msgstr "Οι περισσότεροι είδαν"
+
+msgctxt "#32012"
+msgid "Most Collected"
+msgstr "Οι περισσότεροι έχουν συλλέξει"
+
+msgctxt "#32013"
+msgid "Most Anticipated"
+msgstr "Οι περισσότεροι αναμένουν"
+
+msgctxt "#32014"
+msgid "Recently Updated"
+msgstr "Πρόσφατα ενημερωμένα"
+
+msgctxt "#32015"
+msgid "Box Office Top 10"
+msgstr "Τα Top 10 του Box Office"
+
+msgctxt "#32016"
+msgid "Search..."
+msgstr "Αναζήτηση..."
+
+msgctxt "#32017"
+msgid "Collection"
+msgstr "Συλλογή"
+
+msgctxt "#32018"
+msgid "Watchlist"
+msgstr "Λίστα παρακολούθησης"
+
+msgctxt "#32019"
+msgid "Next"
+msgstr "Επόμενο"
+
+msgctxt "#32020"
+msgid "Find similar"
+msgstr "Βρες παρόμοιο"
+
+msgctxt "#32021"
+msgid ""
+msgstr "Color Picker"
+
+msgctxt "#32022"
+msgid "Getting Things Ready"
+msgstr "Ετοιμάζοντας τα Πράγματα"
+
+msgctxt "#32023"
+msgid "Real Debrid Auth"
+msgstr "Πιστοποίηση Real-Debrid"
+
+msgctxt "#32024"
+msgid "Open this link in a browser: "
+msgstr "Άνοιξε τον συγκεκριμένο σύνδεσμο στον browser: "
+
+msgctxt "#32025"
+msgid "Enter the code: "
+msgstr "Εισήγαγε τον κωδικό: "
+
+msgctxt "#32026"
+msgid "Authentication is completed"
+msgstr "Η πιστοποίηση ολοκληρώθηκε"
+
+msgctxt "#32027"
+msgid "Highlight Color Changed to - "
+msgstr "Το Επιλεγμένο Χρώμα Άλλαξε σε - "
+
+msgctxt "#32028"
+msgid "Error Connecting to TMDB"
+msgstr "Σφάλμα Σύνδεσης στο TMDB"
+
+msgctxt "#32029"
+msgid ": Revoked Trakt Auth"
+msgstr ": Ανάκληση Πιστοποίησης Trakt"
+
+msgctxt "#32030"
+msgid "Trakt Successfully Disconnected"
+msgstr "Επιτυχής Αποσύνδεση Trakt"
+
+msgctxt "#32031"
+msgid "Authorize Trakt"
+msgstr "Εξουσιοδότηση Trakt"
+
+msgctxt "#32032"
+msgid ""
+"Error while authenticating with Trakt.\n"
+"Please try again."
+msgstr ""
+"Σφάλμα καθώς πιστοποιούνταν το Trakt.\n"
+"Παρακαλώ δοκιμάστε ξανά."
+
+msgctxt "#32033"
+msgid "Failed to Authorize Trakt"
+msgstr "Αποτυχία Εξουσιοδότησης Trakt"
+
+msgctxt "#32034"
+msgid "Please check your Internet Connection"
+msgstr "Παρακαλώ ελέγξτε την σύνδεση στο Ίντερνετ"
+
+msgctxt "#32035"
+msgid "Unknown Error Connecting to Trakt"
+msgstr "Άγνωστο Σφάλμα Σύνδεσης στο Trakt"
+
+msgctxt "#32036"
+msgid "Release Title: "
+msgstr "Τίτλος Κυκλοφορίας: "
+
+msgctxt "#32037"
+msgid "Host: "
+msgstr "Host: "
+
+msgctxt "#32038"
+msgid "Quality: "
+msgstr "Ποιότητα: "
+
+msgctxt "#32039"
+msgid "Search Movies..."
+msgstr "Αναζήτηση Ταινιών..."
+
+msgctxt "#32040"
+msgid "Search Shows..."
+msgstr "Αναζήτηση Εκπομπών..."
+
+msgctxt "#32041"
+msgid "Tools"
+msgstr "Εργαλεία"
+
+msgctxt "#32042"
+msgid "Clear Cache"
+msgstr "Εκκαθάριση Κρυφής Μνήμης"
+
+msgctxt "#32043"
+msgid "Are you sure you wish to clear the cache?"
+msgstr "Σίγουρα θέλετε να καθαρίσετε την κρυφή μνήμη?"
+
+msgctxt "#32044"
+msgid "Mark Unwatched"
+msgstr "Σημείωσε Μη-Προβεβλημένο"
