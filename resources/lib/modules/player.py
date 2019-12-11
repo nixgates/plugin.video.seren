@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+import json
 import sys
-
-try:
-    import AddonSignals
-except:
-    pass
+import traceback
 
 from resources.lib.common import tools
 from resources.lib.indexers import trakt
 from resources.lib.modules import smartPlay
+from resources.lib.modules.trakt_sync import bookmark
+from resources.lib.modules import database
 
 try:
     sysaddon = sys.argv[0]
     syshandle = int(sys.argv[1])
 except:
     pass
+
+bookmark_sync = bookmark.TraktSyncDatabase()
 
 
 class serenPlayer(tools.player):
@@ -31,37 +31,63 @@ class serenPlayer(tools.player):
         self.current_time = 0
         self.args = {}
         self.playback_started = False
+        self.playing_file = None
+        self.AVStarted = False
+        self.scrobbling_enabled = tools.getSetting('trakt.scrobbling') == 'true'
         self.scrobbled = False
-        self.playback_resumed = False
         self.original_action_args = ''
+        self.smart_playlists = tools.getSetting('smartplay.playlistcreate')
+        self.smart_module = None
+        self.ignoreSecondsAtStart = int(tools.get_advanced_setting('video', 'ignoresecondsatstart'))
+        self.ignorePercentAtEnd = int(tools.get_advanced_setting('video', 'ignorepercentatend'))
+        self.playCountMinimumPercent = int(tools.get_advanced_setting('video', 'playcountminimumpercent'))
+
+        self.min_time_before_scrape = int(tools.getSetting('playingnext.time')) + \
+                                      int(int(tools.getSetting('general.timeout'))) + 20
+        self.marked_watched = False
         tools.player.__init__(self)
 
-    def play_source(self, stream_link, args):
-
+    def play_source(self, stream_link, args, resume_time=None, params=None):
         try:
             self.pre_cache_initiated = False
+            if resume_time is not None:
+                self.offset = float(resume_time)
+
+            self.params = params
 
             if stream_link is None:
                 tools.cancelPlayback()
                 raise Exception
 
+            self.playing_file = stream_link
             self.original_action_args = args
+            self.smart_module = smartPlay.SmartPlay(self.original_action_args)
 
             args = tools.get_item_information(args)
             self.args = args
 
             if 'showInfo' in args:
                 self.media_type = 'episode'
+                # Workaround for estuary skin to allow episode information to be displayed in Video Top Info
+                args['art']['tvshow.clearlogo'] = args['art'].get('clearlogo', '')
             else:
                 self.media_type = 'movie'
 
             self.trakt_id = args['ids']['trakt']
 
-            self.traktBookmark()
+            orginalArgs = json.loads(tools.unquote(self.original_action_args))
+
+            if 'resume' in orginalArgs:
+                if orginalArgs['resume'] == 'true':
+                    self.tryGetBookmark()
+
+            self.handleBookmark()
 
             item = tools.menuItem(path=stream_link)
+            args['info']['FileNameAndPath'] = tools.unquote(stream_link)
             item.setInfo(type='video', infoLabels=args['info'])
             item.setArt(args['art'])
+            item.setCast(args['cast'])
             item.setUniqueIDs(args['ids'])
 
             tools.closeBusyDialog()
@@ -72,6 +98,7 @@ class serenPlayer(tools.player):
             self.keepAlive()
 
         except:
+            traceback.print_exc()
             pass
 
     def onPlayBackSeek(self, time, seekOffset):
@@ -87,18 +114,24 @@ class serenPlayer(tools.player):
         pass
 
     def onAVStarted(self):
+        self.AVStarted = True
         self.start_playback()
-        pass
+
+    def onAVChange(self):
+        self.AVStarted = True
+        self.start_playback()
 
     def onPlayBackError(self):
+        self.handleBookmark()
+        tools.playList.clear()
         sys.exit(1)
 
     def start_playback(self):
-
         try:
 
             if self.playback_started:
                 return
+
             tools.closeAllDialogs()
 
             self.playback_started = True
@@ -106,31 +139,15 @@ class serenPlayer(tools.player):
 
             self.traktStartWatching()
 
-            self.current_time = self.getTime()
             self.media_length = self.getTotalTime()
 
-            if tools.playList.size() == tools.playList.getposition() + 1 and self.media_type == 'episode':
+            if tools.playList.size() == 1 and self.smart_playlists == 'true' and self.media_type == 'episode':
+                self.smart_module.build_playlist(params=self.params)
+
+            if tools.playList.size() == tools.playList.getposition() + 1 \
+                    and self.media_type == 'episode' \
+                    and self.smart_playlists == 'true':
                 smartPlay.SmartPlay(self.original_action_args).append_next_season()
-
-            if self.media_type == 'episode' and tools.getSetting('smartplay.upnext') == 'true':
-                self.registerUpNext()
-
-        except:
-            import traceback
-            traceback.print_exc()
-            pass
-
-    def registerUpNext(self):
-        source_id = 'plugin.video.%s' % tools.addonName.lower()
-        return_id = 'plugin.video.%s_play_action' % tools.addonName.lower()
-
-        try:
-            next_info = self.next_info()
-            AddonSignals.registerSlot('upnextprovider', return_id, self.signals_callback)
-            AddonSignals.sendSignal('upnext_data', next_info, source_id=source_id)
-
-        except RuntimeError:
-            pass
 
         except:
             import traceback
@@ -138,31 +155,33 @@ class serenPlayer(tools.player):
             pass
 
     def onPlayBackEnded(self):
-        if not self.scrobbled:
-            self.traktStopWatching()
-            tools.trigger_widget_refresh()
-        pass
+        self.commonEndPlayBack()
 
     def onPlayBackStopped(self):
-        self.traktStopWatching()
-
         tools.playList.clear()
+        self.commonEndPlayBack()
+
+    def commonEndPlayBack(self):
+        self.handleBookmark()
+        self.traktStopWatching()
+        tools.container_refresh()
+        tools.trigger_widget_refresh()
 
     def onPlayBackPaused(self):
-
         self.traktPause()
 
     def onPlayBackResumed(self):
-
         self.traktStartWatching()
 
     def getWatchedPercent(self, offset=None):
 
-        current_position = self.current_time
+        try:
+            current_position = self.getTime()
+        except:
+            current_position = self.current_time
+
         total_length = self.media_length
         watched_percent = 0
-
-        tools.log('CP: %s, TL: %s' % (current_position, total_length))
 
         if int(total_length) == 0:
             try:
@@ -177,7 +196,7 @@ class serenPlayer(tools.player):
                 current_position += offset
             except:
                 pass
-        tools.log('CP: %s, TL: %s' % (current_position, total_length))
+
         if int(total_length) is not 0:
             try:
                 watched_percent = float(current_position) / float(total_length) * 100
@@ -187,12 +206,11 @@ class serenPlayer(tools.player):
                 import traceback
                 traceback.print_exc()
                 pass
-        tools.log('WP: %s' % watched_percent)
+
         return watched_percent
 
     def traktStartWatching(self, offset=None):
-
-        if not self.trakt_integration() or self.scrobbled:
+        if not self.trakt_integration() or not self.scrobbling_enabled or self.scrobbled:
             return
 
         post_data = self.buildTraktObject(offset=offset)
@@ -200,37 +218,50 @@ class serenPlayer(tools.player):
         self.trakt_api.post_request('scrobble/start', postData=post_data, limit=False)
 
     def traktStopWatching(self, override_progress=None):
-
-        if not self.trakt_integration() or self.scrobbled:
+        if not self.trakt_integration():
             return
 
-        post_data = self.buildTraktObject(override_progress=override_progress)
-        scrobble_response = self.trakt_api.json_response('scrobble/stop', postData=post_data, limit=False)
+        self.handleBookmark()
 
-        # Consider the scrobble attempt a failure if the attempt returns a None value
-        if scrobble_response is None:
-            return
+        if self.scrobbling_enabled and not self.scrobbled:
+            post_data = self.buildTraktObject(override_progress=override_progress)
+            try:
+                scrobble_response = self.trakt_api.json_response('scrobble/stop', postData=post_data, limit=False)
 
-        self.scrobbled = True
+                # Consider the scrobble attempt a failure if the attempt returns a None value
+                if scrobble_response is not None:
+                    self.scrobbled = True
+            except:
+                pass
 
-        try:
-            if post_data['progress'] >= 80:
+            try:
+                if post_data['progress'] >= 80:
+
+                    if self.media_type == 'episode':
+                        from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
+                        TraktSyncDatabase().mark_episode_watched_by_id(self.trakt_id)
+
+                    if self.media_type == 'movie':
+                        from resources.lib.modules.trakt_sync.movies import TraktSyncDatabase
+                        TraktSyncDatabase().mark_movie_watched(self.trakt_id)
+
+            except:
+                import traceback
+                traceback.print_exc()
+                pass
+
+        elif not self.scrobbling_enabled and not self.marked_watched:
+            if int(self.getWatchedPercent()) >= int(tools.get_advanced_setting('video', 'playcountminimumpercent')):
                 if self.media_type == 'episode':
                     from resources.lib.modules.trakt_sync.shows import TraktSyncDatabase
                     TraktSyncDatabase().mark_episode_watched_by_id(self.trakt_id)
-
-                if self.media_type == 'movie':
+                else:
                     from resources.lib.modules.trakt_sync.movies import TraktSyncDatabase
                     TraktSyncDatabase().mark_movie_watched(self.trakt_id)
 
-        except:
-            import traceback
-            traceback.print_exc()
-            pass
-
     def traktPause(self):
 
-        if not self.trakt_integration():
+        if not self.trakt_integration() or not self.scrobbling_enabled or self.scrobbled:
             return
 
         post_data = self.buildTraktObject()
@@ -262,26 +293,30 @@ class serenPlayer(tools.player):
 
     def keepAlive(self):
 
-        for i in range(0, 240):
-            tools.kodi.sleep(500)
-            if self.isPlayingVideo() and self.getTime() > 0: break
+        for i in range(0, 480):
+            tools.kodi.sleep(250)
+            if self.isPlayingVideo():
+                break
 
-        # Skip to offset if required
+        for i in range(0, 480):
+            if self.AVStarted:
+                break
 
-        if self.offset is not None and int(self.offset) != 0 and self.playback_resumed is False:
-            tools.log("Seeking %s seconds" % self.offset, 'info')
+        self.media_length = self.getTotalTime()
+
+        if self.offset is not None and self.offset != 0:
+            tools.log("Seeking {} seconds".format(self.offset))
             self.seekTime(self.offset)
             self.offset = None
-            self.playback_resumed = True
-        else:
-            self.playback_resumed = True
 
-        while self.isPlayingVideo():
+        while self.isPlayingVideo() and not self.scrobbled:
             try:
+                watched_percentage = self.getWatchedPercent()
+                time_left = int(self.getTotalTime()) - int(self.getTime())
 
                 try:
                     self.current_time = self.getTime()
-                    self.media_length = self.getTotalTime()
+
                 except:
                     import traceback
                     traceback.print_exc()
@@ -291,19 +326,22 @@ class serenPlayer(tools.player):
                     tools.kodi.sleep(1000)
                     continue
 
-                if self.getWatchedPercent() > 80:
+                if watched_percentage > 80 or time_left <= self.min_time_before_scrape:
+
                     if self.pre_cache_initiated is False:
+
                         try:
                             if tools.getSetting('smartPlay.preScrape') == 'true':
                                 self.pre_cache_initiated = True
                                 smartPlay.SmartPlay(self.original_action_args).pre_scrape()
                         except:
+                            import traceback
+                            traceback.print_exc()
                             pass
 
-                    if not self.scrobbled:
-                        self.traktStopWatching()
-                        tools.trigger_widget_refresh()
-
+                if watched_percentage > 80:
+                    self.traktStopWatching()
+                    self.handleBookmark()
                     break
 
             except:
@@ -314,125 +352,119 @@ class serenPlayer(tools.player):
 
             tools.kodi.sleep(1000)
 
+        else:
+            self.traktStopWatching()
+            return
+
         self.traktStopWatching()
+        tools.execute('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')
 
-    def traktBookmark(self):
-        if tools.playList.getposition() != 0:
-            return
-        if tools.getSetting('smartPlay.traktresume') != 'true':
-            return
-        if not self.trakt_integration():
+    def tryGetBookmark(self):
+        bookmark = bookmark_sync.get_bookmark(self.trakt_id)
+        self.offset = bookmark['timeInSeconds'] if bookmark is not None else None
+
+    def handleBookmark(self):
+        if self.media_length == 0 or self.current_time == 0:
+            bookmark_sync.remove_bookmark(self.trakt_id)
             return
 
-        tools.log('Getting Trakt Resume Point', 'info')
+        if self.getWatchedPercent() < 80 and self.current_time >= 60:
+            bookmark_sync.set_bookmark(self.trakt_id, self.current_time)
+        else:
+            bookmark_sync.remove_bookmark(self.trakt_id)
 
         try:
-
-            offset = None
-            if self.media_type == 'episode':
-                progress = self.trakt_api.json_response('sync/playback/episodes?extended=full')
-                for i in progress:
-                    if int(self.trakt_id) == int(i['episode']['ids']['trakt']):
-                        # Calculating Offset to seconds
-                        offset = int((float(i['progress'] / 100) * int(i['episode']['runtime']) * 60))
-            else:
-                progress = self.trakt_api.json_response('sync/playback/movies?extended=full')
-                for i in progress:
-                    if self.trakt_id == i['movie']['ids']['trakt']:
-                        # Calculating Offset to seconds
-                        offset = int((float(i['progress'] / 100) * int(i['movie']['runtime']) * 60))
-
-            if tools.getSetting('smartPlay.bookmarkprompt') == 'true':
-                if offset is not None and offset is not 0:
-                    prompt = tools.showDialog.yesno('{}: {}'.format(tools.addonName, tools.lang(40308)), '%s %s' %
-                                                    (tools.lang(32092),
-                                                     datetime.timedelta(seconds=offset)),
-                                                    nolabel="Resume", yeslabel="Restart")
-                    if prompt == 0:
-                        self.offset = offset
-                    else:
-                        return
-            else:
-                self.offset = offset
-                tools.log('Offset is equal to : %s seconds' % offset)
+            database.clear_local_bookmarks()
         except:
-            import traceback
-            traceback.print_exc()
+            pass
 
-    def signals_callback(self, data):
-
-        if not self.play_next_triggered:
-            if not self.scrobbled:
-                try:
-                    self.traktStopWatching()
-                except:
-                    pass
-            self.play_next_triggered = True
-            # Using a seek here as playnext causes Kodi gui to wig out. So we seek instead so it looks more graceful
-            self.seekTime(self.media_length)
-
-    def trakt_integration(self):
-
+    @staticmethod
+    def trakt_integration():
         if tools.getSetting('trakt.auth') == '':
             return False
         else:
-            if tools.getSetting('trakt.scrobbling') == 'true':
-                return True
+            return True
 
-    def next_info(self):
 
-        current_info = self.args
-        current_episode = {}
-        current_episode["episodeid"] = current_info['ids']['trakt']
-        current_episode["tvshowid"] = current_info['showInfo']['info']['imdbnumber']
-        current_episode["title"] = current_info['info']['title']
-        current_episode["art"] = {}
-        current_episode["art"]["tvshow.poster"] = current_info['art']['poster']
-        current_episode["art"]["thumb"] = current_info['art']['thumb']
-        current_episode["art"]["tvshow.fanart"] = current_info['art']['fanart']
-        current_episode["art"]["tvshow.landscape"] = current_info['art']['fanart']
-        current_episode["art"]["tvshow.clearart"] = current_info['art'].get('clearart', '')
-        current_episode["art"]["tvshow.clearlogo"] = current_info['art'].get('clearlogo', '')
-        current_episode["plot"] = current_info['info']['plot']
-        current_episode["showtitle"] = current_info['showInfo']['info']['tvshowtitle']
-        current_episode["playcount"] = current_info['info'].get('playcount', 0)
-        current_episode["season"] = current_info['info']['season']
-        current_episode["episode"] = current_info['info']['episode']
-        current_episode["rating"] = current_info['info']['rating']
-        current_episode["firstaired"] = current_info['info']['premiered'][:10]
+class PlayerDialogs(tools.player):
 
+    def __init__(self):
+        super(PlayerDialogs, self).__init__()
+        self._min_time = int(tools.getSetting('playingnext.time'))
+        self.playing_file = self.getPlayingFile()
+
+    def display_dialog(self):
+
+        if tools.playList.size() > 0 and tools.playList.getposition() != (tools.playList.size() - 1):
+            if tools.getSetting('smartplay.stillwatching') == 'true' and self._still_watching_calc():
+
+                target = self._show_still_watching
+
+            elif tools.getSetting('smartplay.playingnextdialog') == 'true':
+
+                target = self._show_playing_next
+
+            else:
+                return
+
+            sleep_time = ((int(self.getTotalTime()) - int(self.getTime())) - self._min_time) - 3
+
+            if sleep_time > 0:
+                tools.kodi.sleep(sleep_time * 100)
+
+            while (int(self.getTotalTime()) - int(self.getTime())) > self._min_time and self.isPlayingVideo() and \
+                    self.playing_file == self.getPlayingFile():
+                tools.kodi.sleep(300)
+
+            if self.playing_file != self.getPlayingFile():
+                return
+
+            if not self.isPlayingVideo():
+                return
+
+            if not self._is_video_window_open():
+                return
+
+            target()
+
+    @staticmethod
+    def _still_watching_calc():
+        calculation = float(tools.playList.getposition() + 1) / \
+                      float(tools.getSetting('stillwatching.numepisodes'))
+
+        if calculation == 0:
+            return False
+
+        return calculation.is_integer()
+
+    def _show_playing_next(self):
+
+        from resources.lib.gui.windows.playing_next import PlayingNext
+        from resources.lib.modules.skin_manager import SkinManager
+
+        PlayingNext(*SkinManager().confirm_skin_path('playing_next.xml'),
+                    actionArgs=self._get_next_item_args()).doModal()
+
+    def _show_still_watching(self):
+
+        from resources.lib.gui.windows.still_watching import StillWatching
+        from resources.lib.modules.skin_manager import SkinManager
+
+        StillWatching(*SkinManager().confirm_skin_path('still_watching.xml'),
+                      actionArgs=self._get_next_item_args()).doModal()
+
+    @staticmethod
+    def _get_next_item_args():
         current_position = tools.playList.getposition()
         url = tools.playList[current_position + 1].getPath()
         params = dict(tools.parse_qsl(url.replace('?', '')))
-        next_info = tools.get_item_information(params.get('actionArgs'))
-
-        next_episode = {}
-        next_episode["episodeid"] = next_info['ids']['trakt']
-        next_episode["tvshowid"] = next_info['showInfo']['info']['imdbnumber']
-        next_episode["title"] = next_info['info']['title']
-        next_episode["art"] = {}
-        next_episode["art"]["tvshow.poster"] = next_info['art']['poster']
-        next_episode["art"]["thumb"] = next_info['art']['thumb']
-        next_episode["art"]["tvshow.fanart"] = next_info['art']['fanart']
-        next_episode["art"]["tvshow.landscape"] = next_info['art']['fanart']
-        next_episode["art"]["tvshow.clearart"] = next_info['art'].get('clearart', '')
-        next_episode["art"]["tvshow.clearlogo"] = next_info['art'].get('clearlogo', '')
-        next_episode["plot"] = next_info['info']['plot']
-        next_episode["showtitle"] = next_info['showInfo']['info']['tvshowtitle']
-        next_episode["playcount"] = next_info['info'].get('playcount', 0)
-        next_episode["season"] = next_info['info']['season']
-        next_episode["episode"] = next_info['info']['episode']
-        next_episode["rating"] = next_info['info']['rating']
-        next_episode["firstaired"] = next_info['info']['premiered'][:10]
-
-        play_info = {}
-        play_info["item_id"] = current_info['ids']['trakt']
-
-        next_info = {
-            "current_episode": current_episode,
-            "next_episode": next_episode,
-            "play_info": play_info,
-            "notification_time": int(tools.getSetting('smartplay.upnexttime'))
-        }
-
+        next_info = params.get('actionArgs')
         return next_info
+
+    @staticmethod
+    def _is_video_window_open():
+
+        if tools.kodiGui.getCurrentWindowId() != 12005:
+            return False
+        return True
+

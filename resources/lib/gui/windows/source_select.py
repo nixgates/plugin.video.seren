@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from resources.lib.common import tools
+from resources.lib.common import source_utils
 from resources.lib.gui.windows.base_window import BaseWindow
 from resources.lib.modules.resolver import Resolver
 from resources.lib.modules import database
@@ -16,9 +17,6 @@ class SourceSelect(BaseWindow):
         self.canceled = False
         self.display_list = None
         tools.closeBusyDialog()
-        self.Resolver = Resolver('resolver.xml',
-                                 SkinManager().active_skin_path,
-                                 actionArgs=actionArgs)
         self.stream_link = None
 
     def onInit(self):
@@ -38,6 +36,11 @@ class SourceSelect(BaseWindow):
                     menu_item.setProperty(info, str(value).replace('_', ' '))
                 except UnicodeEncodeError:
                     menu_item.setProperty(info, i[info])
+
+            struct_info = source_utils.info_list_to_sorted_dict(i.get('info', []))
+            for property in struct_info.keys():
+                menu_item.setProperty('info.{}'.format(property), struct_info[property])
+
             menu_items.append(menu_item)
             self.display_list.addItem(menu_item)
 
@@ -72,7 +75,9 @@ class SourceSelect(BaseWindow):
         else:
             sources = [self.sources[self.position]]
 
-        self.stream_link = database.get(self.Resolver.doModal, 1, sources,
+        resolver = Resolver(*SkinManager().confirm_skin_path('resolver.xml'), actionArgs=self.actionArgs)
+
+        self.stream_link = database.get(resolver.doModal, 1, sources,
                                         tools.get_item_information(self.actionArgs), False)
 
         if self.stream_link is None:

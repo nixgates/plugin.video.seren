@@ -26,7 +26,6 @@ class Worker(Thread):
             try:
                 func, args, kwargs = self.tasks.get(1)
             except Empty:
-                tools.log('Thread exited')
                 return
 
             try:

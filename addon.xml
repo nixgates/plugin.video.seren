@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="1.4.7" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="1.5.1" name="Seren" provider-name="Nixgates">
 	<requires>
-		<import addon="xbmc.python" version="2.19.0" />
+		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.requests" version="2.19.1" />
 		<import addon="script.module.beautifulsoup4" version="4.5.3"/>
-		<import addon="script.module.metahandler" version="1.0.0" />
 		<import addon="plugin.video.youtube" version="6.2.0"/>
 		<import addon="script.module.addon.signals" version="0.0.1"/>
 		<import addon="script.module.dateutil" version="2.7.3"/>
@@ -16,166 +15,64 @@
 	</extension>
 	<extension point="xbmc.service" library="service.py" />
 	<extension point="xbmc.addon.metadata">
-		<summary lang="en">Seren - This Addon is currently in beta. Please be aware there may be bugs present</summary>
-		<description lang="en">
+		<reuselanguageinvoker>false</reuselanguageinvoker> <!-- You can enable this if you want, expect some instability but much faster menu speeds -->
+		<summary lang="en">Seren - Modular Multi-source Addon</summary>
+		<description lang="en"> Seren is a modular provider based, cloud service streaming software that is tightly interwoven with Trakt. Seren provides the freedom to view media from a single menu system from service providers of the users choosing. Please Note: This addon requires the use of a compatible cloud service.
 		</description>
 		<platform>all</platform>
 		<license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
 		<forum></forum>
-		<website></website>
-		<source></source>
-		<disclaimer lang="en">The author of this addon takes no responsibility for any 3rd party intergration or modification of this software, please ensure your use of this software abides by your local and insterstate laws.</disclaimer>
+		<website>https://github.com/nixgates/plugin.video.seren</website>
+		<source>https://github.com/nixgates/plugin.video.seren</source>
+		<disclaimer lang="en">
+			Last updated: September 09, 2019.
+			The information contained within the Seren software (the "Service") is for general information purposes only.
+			The author assumes no responsibility for errors, omissions in the contents on the Service, nor does it assume responsibility for any material provided by any external services.
+			The use of the Service does not authorise the user to engage in any kind of illegal, criminal or tortious activity through the use of the software, including infringement of any third party intellectual property rights (including without limitation copyright, trade marks, patent, trade secrets and confidential information), fraud, child pornography, trafficking in obscene material, violation of applicable export restrictions, drug dealing, gambling, harassment, stalking, spamming, hacking, sending of viruses or other harmful files or illegal posting of computer passwords or computer code.
+			The user is responsible for all their activity in connection with the use of the Service and the author reserves the right to report any potentially criminal activity to appropriate law enforcement agencies.
+			The user must not transmit to or via the Service, any material that may infringe the intellectual property rights of any third party, or any defamatory, derogatory or offensive material or publication.
+			In no event shall the author of this software be liable for any special, direct, indirect, consequential, or incidental damages or any damages whatsoever, whether in an action of contract, negligence or other tort, arising out of or in connection with the use of the Service or the contents of the Service.
+			The author reserves the right to make additions, deletions, or modification to the contents on the Service at any time without prior notice.
+			The author of this software does not warrant that the software is free of viruses or other harmful components.
+			Seren may contain links to external websites that are not provided or maintained by or in any way affiliated with the author.
+			Please note that the author does not guarantee the accuracy, relevance, timeliness, or completeness of any information on these external websites.
+		</disclaimer>
 		<assets>
 			<icon>ico-fox-gold-final.png</icon>
 			<fanart>fanart-fox-gold-final.png</fanart>
+			<screenshot>resources/screenshots/screenshot-01.jpg</screenshot>
+			<screenshot>resources/screenshots/screenshot-02.jpg</screenshot>
+			<screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
 		</assets>
 		<news>
-Changelog 1.4.7:
-Enable Kodi Menu caching on search results
-Increase source info identification
-Fix mislabeled strings in trakt manager
-Adjust premiered meta key to be gathered from trakt information instead of alternative indexer
-Add fallback to account for empty premiered key set to empty string
-
-Changelog 1.4.6:
-Removed duplicate caching from meta provider modules
-Fixed typos
-Additional translation strings added
-Fixed potential deadlocks from occuring in the worker module
-Reduced workers for Trakt Sync operations
-
-Changelog 1.4.5:
-Inceased speed in TMDb module by threading more network requests
-
-Changelog 1.4.4:
-Fixed accidental swap of preferred source of artwork labels
-Duplicated poster value to thumb for show and season objects
-
-Changelog 1.4.3:
-Created Artwork Category in settings
-Adjusted artwork settings visibility to better represent end format
-
-Changelog 1.4.2:
-Adjust Advanced artwork strings
-Fixed Premiumize Max Storage setting visibility
-Changing highlight color now re-opens settings menu
-Adjusted getInfo to support more information tags
-
-Changelog 1.4.1:
-Created worker module and lazy threadpool
-Increased title and information identification for sources
-Added advanced settings for item artwork
-Increased network request caching
-Uninstall in provider manager now works similar to disabling providers
-Threadlocked SQL database entries
-
-Changelog 1.4.0:
-Fixed Provider Manager Default Focus
-Fixed language string spacing for Disable All Hosters
-Fixed Notification timeouts for available updates
-Added multiple fall backs for metadata information to better support outages
-Fixed Premiumize visibility equations
-Settings re-work for better flow
-Added settings to allow user to choose artwork service
-Fix setCast for items, cast items now display images
-Updated last_meta_update for trakt sync database
-
-Changelog 1.3.6:
-Fix skin_dir XML pointer
-
-Changelog 1.3.5:
-Theme Manager now uses pointer to reduce file movements
-Fixed Unicode errors on deaccentString method
-Fixed SkinManager import for Provider Manager
-Fixed type issues with tuples for view types
-
-Changelog 1.3.4:
-Fixed Cache Assist always triggering
-Fixed cache clear notification appearing if user cancels process
-Increased fall backs for TV show artwork
-Fixed series posters being served as thumbnail fallback, changed to fanart
-Removed Caching of Trakt user lists
-Increased text translation
-Added Dutch Translations
-
-Changelog 1.3.3:
-Added check to confirm folder "Default" is included in theme package
-Added new language strings
-
-Changelog 1.3.2:
-Fixed Scrobbling
-
-Changelog 1.3.1:
-Fixed delay when resuming items
-Fixed issues with missing theme variables in tools module
-Lowered RD request timeout
-Improved Seren's ability to detect moment playback has started
-Improved handeling of accented text in Premiumize resolver
-
-Changelog 1.3.0:
-Serens skins renamed to "Themes" to try avoid confusion with Kodi skins
-Fixed issue displaying show seasons where season numbering does not start from 1 eg BBC Horizon
-Added Flatten Seasons setting
-Small improvements to player module
-
-Changelog 1.2.2:
-Fixed search history results not searching
-Fixed issue with providers not displaying names correctly
-Fixed RD Cloud movie sources showing incorrect size meta
-Movies Fanart now acquired using TMDB ID
-Added redundant reset to scrobble status on playback start in player module
-Fixed and confirmed all searching related items
-
-Changelog 1.2.1:
-Fixed providers not refreshing after new dialog raised with Toolbox button in Provider Manager
-Added touch/mouse support for Provider Manager window
-Fixed Kodi crashing on playback from widgets
-Fixed Kodi playback error displaying when played from skin info dialog
-
-Changelog 1.2.0:
-Fixed arguments or Trakt Manager context item
-Fixed playlist not clearing on cancel of source select
-Re-design of provider package management
-
-Changelog 1.1.3:
-Updated hash regex to support uncommon magnets
-Fixed browse show from mixed episode lists
-Language string "32055" change to "Clear Local Torrent Cache"
-Added confirmation at clearing of torrent cache
-Added confirmation at clearing of search history
-Removed multiline source select setting as it is no longer required
-Setting "Hide Low Quality Items" renamed to "Hide Common Undesirable Items"
-Setting "Check for Seren Updates" renamed to "Notify Me About Available Updates"
-Removal of orphaned files
-Restructuring of some folders
-Fixed duplicate removal process removing debrid duplicates
-Clean up of player init method
-
-Changelog 1.1.2:
-Added fallback to hash on failure to extract from magnet in RD resolver
-
-Changelog 1.1.1:
-Added the ability to use custom images for custom window skins
-Added the window property "skin.dir", property contains the file path for the current active skin (similar to special://skin/)
-Moved RD premium check further down in auth process
-Trakt username api call changed to users/me endpoint
-
-Changelog 1.1.0:
-Added the Skin Manager Feature
-Users can now install custom XML window packages
-Users can now uninstall custom XML window packages
-Users can now switch between custom XML window packages
-
-Changelog 1.0.24:
-Fix Automatic Episode Resume
-
-Changelog 1.0.23:
-Fixed disable/enabled of providers
-Clean up some missed logging
-
-Changelog 1.0.22:
-Fixed Background Scraping Display style
-
+Changelog 1.6.0:
+Some Greek translations added
+Some German translations added
+Next Up menu now generated completely locally using DB query
+Added All-Debrid Support
+Premiumize now uses O-Auth (re-auth is required)
+Complete re-work of the standard playlist building (removes building playlist window for standard playback)
+Re-work of My Files module to reduce spaghetti
+Re-work of resolver module to reduce spaghetti
+New Custom Windows Still Watching/Play Next
+Added update support for Seren Themes
+Removed support for UpNext addon
+Lists are now synced to the trakt database
+More work on player.py module, better bookmark identification and playback marking
+Re-work Trakt Manager to be more context sensitive
+Added ability to paginate Trakt lists
+Added some more shortcuts to the search menu
+Show information is confirmed with IMDB prior to scrape
+Date and time in custom windows now displays in regional format
+Added fallbacks for shows meta gathering in Trakt DB
+Source filtering improvements to reduce meta loss
+Set a timeout for Fanart.tv calls (reduces slow downs at cost of artwork)
+Re-worked intial trakt sync and removed dialog box
+Complete overhaul of the bookmark system
+Fixed torrent semaphore not being released
+Playback parameters are now applied to further episodes
+Implement new listall endpoint for Premiumize cloud scraping (decreased scrape times)
+More minor bugfixes (honestly could not list them all)
 		</news>
 	</extension>
 </addon>

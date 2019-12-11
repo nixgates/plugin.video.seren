@@ -70,7 +70,7 @@ def get_query(art):
 def get(remote_id, query, season_number=None):
     art_request = base_url % (query if query == 'movies' or query == 'tv' else 'tv', remote_id)
     headers = {'client-key': client_key, 'api-key': api_key}
-    art = requests.get(art_request, headers=headers).json()
+    art = requests.get(art_request, headers=headers, timeout=5).json()
 
     meta = {}
     if query == 'movies':

@@ -43,7 +43,7 @@ class CacheAssit:
 
     def premiumize_downloader(self, torrent_object):
         current_percent = 0
-        debrid = premiumize.PremiumizeFunctions()
+        debrid = premiumize.Premiumize()
 
         try:
             transfer_id = debrid.create_transfer(torrent_object['magnet'])['id']

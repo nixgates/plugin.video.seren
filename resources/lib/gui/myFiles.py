@@ -1,9 +1,9 @@
 import json
 import sys
-import threading
 
-from resources.lib.common import tools, source_utils
-from resources.lib.debrid import premiumize, real_debrid
+from resources.lib.common import tools
+from resources.lib.debrid import premiumize, real_debrid, all_debrid
+from resources.lib.common.worker import ThreadPool
 
 try:
     sysaddon = sys.argv[0]
@@ -15,135 +15,178 @@ class Menus:
 
     def __init__(self):
         self.threads = []
-        self.premiumize_files = []
-        self.real_debrid_files = []
+        self.menu_list = []
+        self.thread_pool = ThreadPool()
+        self.providers = {}
+        if tools.all_debrid_enabled():
+            self.providers.update({'all_debrid': AllDebridWalker})
+        if tools.premiumize_enabled():
+            self.providers.update({'premiumize': PremiumizeWalker})
+        if tools.real_debrid_enabled():
+            self.providers.update({'real_debrid': RealDebridWalker})
+
 
     def home(self):
-        if tools.premiumize_enabled():
-            self.threads.append(threading.Thread(target=self.thread_worker, args=(self.get_premiumize_files, '')))
+        for key, value in self.providers.iteritems():
+            self.thread_pool.put(value().get_init_list)
 
-        if tools.real_debrid_enabled():
-            self.threads.append(threading.Thread(target=self.thread_worker, args=(self.get_real_debrid_files,)))
+        self.thread_pool.wait_completion()
 
-        self.run_threads()
-
-        for file in self.real_debrid_files:
-            file.update({'debrid_provider': 'real_debrid'})
-            if len(file['links']) > 1:
-                isPlayable = False
-                isFolder = True
-                action = 'myFilesFolder'
-            else:
-                isPlayable = True
-                isFolder = False
-                action = 'myFilesPlay'
-                file['link'] = file['links'][0]
-            actionArgs = json.dumps(file)
-            tools.addDirectoryItem(file['filename'], action, isPlayable=isPlayable, isFolder=isFolder,
-                                   actionArgs=actionArgs)
-
-        for file in self.premiumize_files:
-            file.update({'debrid_provider': 'premiumize'})
-            actionArgs = json.dumps(file)
-            if file['type'] == 'folder':
-                isPlayable = False
-                isFolder = True
-                action = 'myFilesFolder'
-            else:
-                isPlayable = True
-                isFolder = False
-                action = 'myFilesPlay'
-
-            tools.addDirectoryItem(file['name'], action, isPlayable=isPlayable, isFolder=isFolder,
-                                   actionArgs=actionArgs)
-
-        tools.closeDirectory('addon')
+        tools.closeDirectory('addons', sort='title')
 
     def myFilesFolder(self, args):
         args = json.loads(args)
-        if args['debrid_provider'] == 'real_debrid':
-            self.get_real_debrid_folder(args)
-        elif args['debrid_provider'] == 'premiumize':
-            self.get_premiumize_folder(args)
+        self.providers[args['debrid_provider']]().get_folder(args)
+        tools.closeDirectory('files', sort='title')
 
     def myFilesPlay(self, args):
         args = json.loads(args)
+        self.providers[args['debrid_provider']]().play_item(args)
 
-        if args['debrid_provider'] == 'real_debrid':
-            resolved_link = real_debrid.RealDebrid().unrestrict_link(args['link'])
-        elif args['debrid_provider'] == 'premiumize':
-            resolved_link = args['link']
-        else:
-            raise IncorrectDebridProvider
 
+class BaseDebridWalker:
+
+    provider = ''
+
+    def get_init_list(self):
+        """
+        Return initial listing for menu
+        :return:
+        """
+        pass
+
+    def _is_folder(self, list_item):
+        """
+        Returns True if item is a folder
+        Returns False if items is a playable file
+        :param list_item:
+        :return:
+        """
+        pass
+
+    def get_folder(self, list_item):
+        """
+        Creates new Kodi menu list from list_item
+        :param list_item:
+        :return:
+        """
+
+    def play_item(self, args):
+        resolved_link = self.resolve_link(args)
         item = tools.menuItem(path=resolved_link)
 
         tools.resolvedUrl(syshandle, True, item)
 
-    def get_real_debrid_folder(self, args):
-        internal_files = real_debrid.RealDebrid().torrentInfo(args['id'])
-        selected_files = [i for i in internal_files['files'] if i['selected'] == 1]
-
-        for idx, file in enumerate(selected_files):
-            file['link'] = internal_files['links'][idx]
-        try:
-            selected_files = sorted(selected_files, key=lambda i: i['path'])
-        except:
-            import traceback
-            traceback.print_exc()
-
-        for file in selected_files:
-            file.update({'debrid_provider': 'real_debrid'})
-            args = json.dumps(file)
-            name = file['path']
-            if name.startswith('/'):
-                name = name.split('/')[-1]
-            tools.addDirectoryItem(name, 'myFilesPlay', isPlayable=True, isFolder=False,
-                                   actionArgs=args)
-
-        tools.closeDirectory('video')
-
-    def get_premiumize_folder(self, args):
-        internal_files = premiumize.PremiumizeFunctions().list_folder(args['id'])
-        for file in internal_files:
-            file.update({'debrid_provider': 'premiumize'})
-            actionArgs = json.dumps(file)
-            if file['type'] == 'folder':
+    def _format_items(self, items):
+        for i in items:
+            i.update({'debrid_provider': self.provider})
+            if self._is_folder(i):
                 isPlayable = False
                 isFolder = True
                 action = 'myFilesFolder'
             else:
-                if not any(file['name'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
-                    continue
                 isPlayable = True
                 isFolder = False
                 action = 'myFilesPlay'
 
-            tools.addDirectoryItem(file['name'], action, isPlayable=isPlayable, isFolder=isFolder,
-                                   actionArgs=actionArgs)
+            actionArgs = json.dumps(i)
+            tools.addDirectoryItem(i['name'], action, isPlayable=isPlayable, isFolder=isFolder,
+                                   actionArgs=tools.quote(actionArgs))
 
-        tools.closeDirectory('addons')
+    def resolve_link(self, args):
+        """
+        Returns playable link from arguments
+        :param args:
+        :return:
+        """
 
-    def get_real_debrid_files(self):
-        torrents = real_debrid.RealDebrid().list_torrents()
-        torrents = [i for i in torrents if i['status'] == 'downloaded']
-        self.real_debrid_files = torrents
 
-    def get_premiumize_files(self, folder_id):
-        self.premiumize_files = premiumize.PremiumizeFunctions().list_folder(folder_id)
+class PremiumizeWalker(BaseDebridWalker):
 
-    def run_threads(self):
+    provider = 'premiumize'
 
-        for i in self.threads:
-            i.start()
+    def get_init_list(self):
+        items = premiumize.Premiumize().list_folder('')
+        self._format_items(items)
 
-        for i in self.threads:
-            i.join()
+    def _is_folder(self, list_item):
+        if list_item['type'] == 'folder':
+            return True
+        else:
+            return False
 
-        self.threads = []
+    def get_folder(self, list_item):
+        items = premiumize.Premiumize().list_folder(list_item['id'])
+        self._format_items(items)
 
-    def thread_worker(self, target, *args):
-        target(*args)
+    def resolve_link(self, list_item):
+        return list_item['link']
+
+
+class RealDebridWalker(BaseDebridWalker):
+
+    provider = 'real_debrid'
+
+    def get_init_list(self):
+        items = real_debrid.RealDebrid().list_torrents()
+
+        items = [i for i in items if i['status'] == 'downloaded']
+        for i in items:
+            i['name'] = i['filename']
+        self._format_items(items)
+
+    def _is_folder(self, list_item):
+        if len(list_item['links']) > 1:
+            return True
+        else:
+            list_item['link'] = list_item['links'][0]
+            return False
+
+    def get_folder(self, list_item):
+        folder = real_debrid.RealDebrid().torrentInfo(list_item['id'])
+        items = folder['files']
+        items = [i for i in items if i['selected'] == 1]
+        count = 0
+        for i in items:
+            i['name'] = i['path']
+            if i['name'].startswith('/'):
+                i['name'] = i['name'].split('/')[-1]
+            i['links'] = [folder['links'][count]]
+        self._format_items(items)
+
+    def resolve_link(self, list_item):
+        return real_debrid.RealDebrid().resolve_hoster(list_item['link'])
+
+
+class AllDebridWalker(BaseDebridWalker):
+
+    provider = 'all_debrid'
+
+    def get_init_list(self):
+        items = all_debrid.AllDebrid().magnet_status('')
+        for i in items:
+            i['name'] = i['filename']
+        self._format_items(items)
+
+    def _is_folder(self, list_item):
+        if len(list_item['links']) > 1:
+            return True
+        else:
+            return False
+
+    def get_folder(self, list_item):
+        folder = all_debrid.AllDebrid().magnet_status(list_item['id'])
+        items = []
+        for key, value in folder['links']:
+            item = {}
+            item['name'] = value
+            item['link'] = key
+            item['debrid_provider'] = self.provider
+        self._format_items(items)
+
+    def resolve_link(self, list_item):
+        return real_debrid.RealDebrid().resolve_hoster(list_item['link'])
+
 
 class IncorrectDebridProvider(Exception):
     pass

@@ -21,14 +21,6 @@ msgctxt "#32004"
 msgid "My Shows"
 msgstr ""
 
-msgctxt "#32005"
-msgid "Auth Trakt"
-msgstr ""
-
-msgctxt "#32006"
-msgid "Disconnect Trakt"
-msgstr ""
-
 msgctxt "#32007"
 msgid "Most Popular"
 msgstr ""
@@ -81,16 +73,8 @@ msgctxt "#32019"
 msgid "Next"
 msgstr ""
 
-msgctxt "#32020"
-msgid "Find similar"
-msgstr ""
-
 msgctxt "#32021"
 msgid "Color Picker"
-msgstr ""
-
-msgctxt "#32022"
-msgid "Getting Things Ready"
 msgstr ""
 
 msgctxt "#32023"
@@ -98,27 +82,19 @@ msgid "Real-Debrid Auth"
 msgstr ""
 
 msgctxt "#32024"
-msgid "Open this link in a browser: "
+msgid "Open this link in a browser: {}"
 msgstr ""
 
 msgctxt "#32025"
-msgid "Enter the code: "
+msgid "Enter the code: {}"
 msgstr ""
 
 msgctxt "#32026"
 msgid "Authentication is completed"
 msgstr ""
 
-msgctxt "#32027"
-msgid "Highlight Color Changed to - "
-msgstr ""
-
 msgctxt "#32028"
 msgid "Error Connecting to TMDb"
-msgstr ""
-
-msgctxt "#32029"
-msgid ": Revoked Trakt Auth"
 msgstr ""
 
 msgctxt "#32030"
@@ -133,28 +109,8 @@ msgctxt "#32032"
 msgid "Error while authenticating with Trakt.\nPlease try again."
 msgstr ""
 
-msgctxt "#32033"
-msgid "Failed to Authorize Trakt"
-msgstr ""
-
-msgctxt "#32034"
-msgid "Please check your Internet Connection"
-msgstr ""
-
 msgctxt "#32035"
 msgid "Unknown Error Connecting to Trakt"
-msgstr ""
-
-msgctxt "#32036"
-msgid "Release Title:"
-msgstr ""
-
-msgctxt "#32037"
-msgid "Host:"
-msgstr ""
-
-msgctxt "#32038"
-msgid "Quality:"
 msgstr ""
 
 msgctxt "#32039"
@@ -175,10 +131,6 @@ msgstr ""
 
 msgctxt "#32043"
 msgid "Are you sure you wish to clear the cache?"
-msgstr ""
-
-msgctxt "#32044"
-msgid "Mark Unwatched"
 msgstr ""
 
 ######SEREN.PY VALUES######
@@ -240,22 +192,6 @@ msgctxt "#32057"
 msgid "Wipe Addon Data"
 msgstr ""
 
-msgctxt "#32058"
-msgid "Install Provider Package"
-msgstr ""
-
-msgctxt "#32059"
-msgid "Uninstall Provider Package"
-msgstr ""
-
-msgctxt "#32060"
-msgid "Enable Providers"
-msgstr ""
-
-msgctxt "#32061"
-msgid "Disable Providers"
-msgstr ""
-
 ######MOVIEMENU.PY######
 msgctxt "#32062"
 msgid "Genres"
@@ -273,29 +209,9 @@ msgctxt "#32065"
 msgid "Multi Select..."
 msgstr ""
 
-msgctxt "#32066"
-msgid "Source Select"
-msgstr ""
-
 ######TVSHOWMENY.PY######
 msgctxt "#32067"
 msgid "New TV Shows"
-msgstr ""
-
-msgctxt "#32068"
-msgid "Torrent file select"
-msgstr ""
-
-msgctxt "#32069"
-msgid "Browse TV Show"
-msgstr ""
-
-msgctxt "#32070"
-msgid "Shuffle Play"
-msgstr ""
-
-msgctxt "#33022"
-msgid "Rescrape Item"
 msgstr ""
 
 ######TRAKT.PY######
@@ -306,10 +222,6 @@ msgstr ""
 ######CACHEASSIST.PY######
 msgctxt "#32072"
 msgid "Cache Assist is attempting to build a torrent source"
-msgstr ""
-
-msgctxt "#32073"
-msgid "New cached sources have been created for"
 msgstr ""
 
 ######CUSTOMPROVIDERS.PY######
@@ -323,6 +235,10 @@ msgstr ""
 
 msgctxt "#32076"
 msgid "Are you sure you wish to remove?"
+msgstr ""
+
+msgctxt "#32092"
+msgid "Resume From: "
 msgstr ""
 
 msgctxt "#32077"
@@ -405,10 +321,6 @@ msgctxt "#33019"
 msgid "Checking for available package updates"
 msgstr ""
 
-msgctxt "#33020"
-msgid "Providers %s"
-msgstr ""
-
 ######DATABASE.PY######
 msgctxt "#32078"
 msgid "All Cache Successfully Cleared"
@@ -429,14 +341,6 @@ msgstr ""
 
 msgctxt "#32082"
 msgid "Initializing Providers"
-msgstr ""
-
-msgctxt "#32083"
-msgid "Scraping Sources"
-msgstr ""
-
-msgctxt "#32084"
-msgid "duplicate entries removed"
 msgstr ""
 
 msgctxt "#32085"
@@ -467,11 +371,6 @@ msgctxt "#32091"
 msgid "Remaining Providers"
 msgstr ""
 
-######PLAYER.PY######
-msgctxt "#32092"
-msgid "Resume from"
-msgstr ""
-
 ######SMARTPLAY.PY######
 msgctxt "#32093"
 msgid "Error: Trakt is not authorized \nPlease authorise Trakt in the settings menu to use this feature"
@@ -495,11 +394,6 @@ msgstr ""
 
 msgctxt "#32098"
 msgid "Starting Scraping"
-msgstr ""
-
-######SOURCESELECT.PY######
-msgctxt "#32099"
-msgid "Source Selection"
 msgstr ""
 
 ######RESOLVER.PY######
@@ -539,10 +433,6 @@ msgstr ""
 
 msgctxt "#40007"
 msgid "Dialog"
-msgstr ""
-
-msgctxt "#40008"
-msgid "UI Settings"
 msgstr ""
 
 msgctxt "#40009"
@@ -617,16 +507,12 @@ msgctxt "#40026"
 msgid "Smart Play"
 msgstr ""
 
-msgctxt "#40027"
-msgid "Install UpNext Addon..."
-msgstr ""
-
 msgctxt "#40028"
-msgid "Enabled Up Next Addon Integration"
+msgid "Enable Playing Next Dialog"
 msgstr ""
 
 msgctxt "#40029"
-msgid "    Up Next Notification Time"
+msgid "Seconds To Show Dialog"
 msgstr ""
 
 msgctxt "#40030"
@@ -634,27 +520,15 @@ msgid "Auto Playlist Creation"
 msgstr ""
 
 msgctxt "#40031"
-msgid "Auto Episode Resume"
-msgstr ""
-
-msgctxt "#40032"
-msgid "Force Episode Resume on Continue Watching Items"
+msgid "Force Auto Episode Resume"
 msgstr ""
 
 msgctxt "#40033"
 msgid "Pre-emptive Scraping"
 msgstr ""
 
-msgctxt "#40034"
-msgid "Bookmarks"
-msgstr ""
-
-msgctxt "#40035"
-msgid "Enable Trakt Bookmarks"
-msgstr ""
-
 msgctxt "#40036"
-msgid "Enable Bookmark Prompt"
+msgid "Resume Style"
 msgstr ""
 
 msgctxt "#40037"
@@ -666,7 +540,7 @@ msgid "Cache Torrent Info Locally"
 msgstr ""
 
 msgctxt "#40039"
-msgid "Hide x265 Items"
+msgid "Hide HEVC Items"
 msgstr ""
 
 msgctxt "#40040"
@@ -701,10 +575,6 @@ msgctxt "#40047"
 msgid "Episode File Size limit (GB)"
 msgstr ""
 
-msgctxt "#40048"
-msgid "Remove 3D Sources"
-msgstr ""
-
 msgctxt "#40049"
 msgid "Sort Sources Method"
 msgstr ""
@@ -714,7 +584,7 @@ msgid "Enable Secondary Filesize Sort"
 msgstr ""
 
 msgctxt "#40051"
-msgid "Enable Tertiary x265 Sort Preference"
+msgid "Enable Tertiary HEVC Sort Preference"
 msgstr ""
 
 msgctxt "#40052"
@@ -754,7 +624,7 @@ msgid "Enable Account Expiry Notifications"
 msgstr ""
 
 msgctxt "#40061"
-msgid "Trakt Account"
+msgid "Trakt"
 msgstr ""
 
 msgctxt "#40062"
@@ -774,63 +644,19 @@ msgid "Revoke Trakt Authentication..."
 msgstr ""
 
 msgctxt "#40066"
-msgid "Premiumize Account"
+msgid "Premiumize"
 msgstr ""
 
 msgctxt "#40067"
-msgid "Real-Debrid Account"
+msgid "Real-Debrid"
 msgstr ""
 
 msgctxt "#40068"
 msgid "Providers"
 msgstr ""
 
-msgctxt "#40069"
-msgid "Provider Package Settings"
-msgstr ""
-
-msgctxt "#40070"
-msgid ""
-msgstr ""
-
-msgctxt "#40071"
-msgid "Install Provider Package"
-msgstr ""
-
-msgctxt "#40072"
-msgid "Uninstall Provider Package"
-msgstr ""
-
-msgctxt "#40073"
-msgid "Enable Provider Package"
-msgstr ""
-
-msgctxt "#40074"
-msgid "Disable Provider Package"
-msgstr ""
-
-msgctxt "#40075"
-msgid "Provider Settings"
-msgstr ""
-
-msgctxt "#40076"
-msgid "Enable Individual Providers"
-msgstr ""
-
-msgctxt "#40077"
-msgid "Disable Individual Providers"
-msgstr ""
-
 msgctxt "#40078"
 msgid "API Keys"
-msgstr ""
-
-msgctxt "#40079"
-msgid "Authorize Trakt..."
-msgstr ""
-
-msgctxt "#40080"
-msgid "Authorize Trakt..."
 msgstr ""
 
 msgctxt "#40081"
@@ -861,20 +687,12 @@ msgctxt "#40087"
 msgid "TMDb API Key"
 msgstr ""
 
-msgctxt "#40088"
-msgid "Trakt"
-msgstr ""
-
 msgctxt "#40089"
 msgid "Trakt Client ID"
 msgstr ""
 
 msgctxt "#40090"
 msgid "Trakt Client Secret"
-msgstr ""
-
-msgctxt "#40091"
-msgid "TVDB"
 msgstr ""
 
 msgctxt "#40092"
@@ -934,7 +752,7 @@ msgid "Prefer Transcoded Files"
 msgstr ""
 
 msgctxt "#40106"
-msgid "API Key"
+msgid "Premiumize Customer ID"
 msgstr ""
 
 msgctxt "#40107"
@@ -951,10 +769,6 @@ msgstr ""
 
 msgctxt "#40110"
 msgid "Enable Quaternary Low Quality Sort Preference"
-msgstr ""
-
-msgctxt "#40111"
-msgid "TMDb"
 msgstr ""
 
 msgctxt "#40112"
@@ -1005,10 +819,6 @@ msgctxt "#40123"
 msgid "Years"
 msgstr ""
 
-msgctxt "#40124"
-msgid "Trending Lists"
-msgstr ""
-
 msgctxt "#40125"
 msgid "Hide Specials"
 msgstr ""
@@ -1042,7 +852,7 @@ msgid "Auto Select Delay"
 msgstr ""
 
 msgctxt "#40133"
-msgid "[COLOR yellow]Please Note: [/COLOR] Seren requires an initial synchronization with trakt.\n\nThis synchronization assists to speed up Seren's menus and will allow usage of certain menus in the event Trakt experiences server issues. \n\nYou may choose to delay this process for now, although it is highly recommended that you don't. Should you choose to delay this process, it should be noted that some menus and information will not be available. \n\nIf you choose to skip this process, you will be reminded again."
+msgid "Rebuilding Trakt Sync Database, please be patient"
 msgstr ""
 
 msgctxt "#40134"
@@ -1059,10 +869,6 @@ msgstr ""
 
 msgctxt "#40137"
 msgid "Notify Me About Available Updates"
-msgstr ""
-
-msgctxt "#40138"
-msgid "Refresh item's meta information"
 msgstr ""
 
 msgctxt "#40139"
@@ -1109,20 +915,12 @@ msgctxt "#40149"
 msgid "Inspect Cloud Files on Scrape"
 msgstr ""
 
-msgctxt "#40150"
-msgid "Upcoming Episodes"
-msgstr ""
-
 msgctxt "#40151"
 msgid "By Actor..."
 msgstr ""
 
 msgctxt "#40152"
 msgid "Movie Play Style"
-msgstr ""
-
-msgctxt "#40153"
-msgid "Play From Random Episode"
 msgstr ""
 
 msgctxt "#40154"
@@ -1222,11 +1020,11 @@ msgid "Trakt Sync Tools"
 msgstr ""
 
 msgctxt "#40178"
-msgid "Flush Activities"
+msgid "Clear last sync time"
 msgstr ""
 
 msgctxt "#40179"
-msgid "Force Sync Activities"
+msgid "Force a sync with Trakt"
 msgstr ""
 
 msgctxt "#40180"
@@ -1570,11 +1368,11 @@ msgid "There may be an issue with the Trakt service, please clear cache and wait
 msgstr ""
 
 msgctxt "#40265"
-msgid "Add to Collection"
+msgid "Add %s to Collection"
 msgstr ""
 
 msgctxt "#40266"
-msgid "Remove from Collection"
+msgid "Remove %s from Collection"
 msgstr ""
 
 msgctxt "#40267"
@@ -1615,14 +1413,6 @@ msgstr ""
 
 msgctxt "#40276"
 msgid "Show"
-msgstr ""
-
-msgctxt "#40277"
-msgid "Season"
-msgstr ""
-
-msgctxt "#40278"
-msgid "Episode"
 msgstr ""
 
 msgctxt "#40279"
@@ -1741,10 +1531,6 @@ msgctxt "#40307"
 msgid "Cache Assist"
 msgstr ""
 
-msgctxt "#40308"
-msgid "Resume"
-msgstr ""
-
 msgctxt "#40309"
 msgid "Sorry, SMB shares are not supported"
 msgstr ""
@@ -1835,4 +1621,120 @@ msgstr ""
 
 msgctxt "#40331"
 msgid "Disc Art"
+msgstr ""
+
+msgctxt "#40332"
+msgid "Smart Play Display Style"
+msgstr ""
+
+msgctxt "#40333"
+msgid "Smart Play Popup"
+msgstr ""
+
+msgctxt "#40334"
+msgid "Dialog Style"
+msgstr ""
+
+msgctxt "#40335"
+msgid "Simple"
+msgstr ""
+
+msgctxt "#40336"
+msgid "Default Action if Nothing Selected"
+msgstr ""
+
+msgctxt "#40337"
+msgid "Play"
+msgstr ""
+
+msgctxt "#40338"
+msgid "Pause"
+msgstr ""
+
+msgctxt "#40339"
+msgid "Still Watching Dialog"
+msgstr ""
+
+msgctxt "#40340"
+msgid "Enable Still Watching Dialog"
+msgstr ""
+
+msgctxt "#40341"
+msgid "Episodes Between Dialog Prompts"
+msgstr ""
+
+msgctxt "#40342"
+msgid "Paginate Trakt Lists"
+msgstr ""
+
+msgctxt "#40343"
+msgid "My Watched Episodes"
+msgstr ""
+
+msgctxt "#40344"
+msgid "My Watched Movies"
+msgstr ""
+
+msgctxt "#40346"
+msgid "Search Movies By Actor..."
+msgstr ""
+
+msgctxt "#40347"
+msgid "Search Shows By Actor..."
+msgstr ""
+
+msgctxt "#40348"
+msgid "Ask"
+msgstr ""
+
+msgctxt "#40349"
+msgid "Automatic"
+msgstr ""
+
+msgctxt "#40350"
+msgid "Do not resume"
+msgstr ""
+
+msgctxt "#40351"
+msgid "Start From Beginning"
+msgstr ""
+
+msgctxt "#40352"
+msgid "Due to the implementation of new features to the local database, a rebuild is now required"
+msgstr ""
+
+msgctxt "#40353"
+msgid "There were issues when processing the synchronization with Trakt, please check the log"
+msgstr ""
+
+msgctxt "#40354"
+msgid "AllDebrid"
+msgstr ""
+
+msgctxt "#40355"
+msgid "AllDebrid Auth"
+msgstr ""
+
+msgctxt "#40356"
+msgid "Enabled AllDebrid"
+msgstr ""
+
+msgctxt "#40357"
+msgid "AllDebrid Username"
+msgstr ""
+
+msgctxt "#40358"
+msgid "Authorize AllDebrid..."
+msgstr ""
+
+msgctxt "#40359"
+msgid "AllDebrid Priority"
+msgstr ""
+
+msgctxt "#40360"
+msgid "Enable Automatic Theme Updates"
+msgstr ""
+
+msgctxt "#40361"
+msgid "Authorise Premiumize"
 msgstr ""

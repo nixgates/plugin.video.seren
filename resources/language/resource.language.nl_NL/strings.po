@@ -30,14 +30,6 @@ msgctxt "#32004"
 msgid "My Shows"
 msgstr "Mijn TV-Series"
 
-msgctxt "#32005"
-msgid "Auth Trakt"
-msgstr "Auth trakt"
-
-msgctxt "#32006"
-msgid "Disconnect Trakt"
-msgstr "Ontkoppel Trakt"
-
 msgctxt "#32007"
 msgid "Most Popular"
 msgstr "Populair"
@@ -90,17 +82,9 @@ msgctxt "#32019"
 msgid "Next"
 msgstr "Volgende"
 
-msgctxt "#32020"
-msgid "Find similar"
-msgstr "Zoek soortgelijk"
-
 msgctxt "#32021"
 msgid "Color Picker"
 msgstr "Kleur kiezer"
-
-msgctxt "#32022"
-msgid "Getting Things Ready"
-msgstr "Schrapen voorbereiden"
 
 msgctxt "#32023"
 msgid "Real-Debrid Auth"
@@ -118,17 +102,9 @@ msgctxt "#32026"
 msgid "Authentication is completed"
 msgstr "Authenticatie is voltooid"
 
-msgctxt "#32027"
-msgid "Highlight Color Changed to - "
-msgstr "Markeer kleur gewijzigd in - "
-
 msgctxt "#32028"
 msgid "Error Connecting to TMDb"
 msgstr "Fout bij verbinding maken met TMDb"
-
-msgctxt "#32029"
-msgid ": Revoked Trakt Auth"
-msgstr ": Intrekking van Trakt autorisatie"
 
 msgctxt "#32030"
 msgid "Trakt Successfully Disconnected"
@@ -146,29 +122,9 @@ msgstr ""
 "Fout tijdens het verifiëren met Trakt.\n"
 "Probeer het opnieuw."
 
-msgctxt "#32033"
-msgid "Failed to Authorize Trakt"
-msgstr "Kan Trakt niet autoriseren"
-
-msgctxt "#32034"
-msgid "Please check your Internet Connection"
-msgstr "Controleer uw internetverbinding"
-
 msgctxt "#32035"
 msgid "Unknown Error Connecting to Trakt"
 msgstr "Onbekende fout bij verbinding maken met Trakt"
-
-msgctxt "#32036"
-msgid "Release Title:"
-msgstr "Titel:"
-
-msgctxt "#32037"
-msgid "Host:"
-msgstr "Bron:"
-
-msgctxt "#32038"
-msgid "Quality:"
-msgstr "Kwaliteit:"
 
 msgctxt "#32039"
 msgid "Search Movies..."
@@ -189,10 +145,6 @@ msgstr "Cache wissen"
 msgctxt "#32043"
 msgid "Are you sure you wish to clear the cache?"
 msgstr "Weet je zeker dat je de cache wilt wissen?"
-
-msgctxt "#32044"
-msgid "Mark Unwatched"
-msgstr "Markeren als niet-gekeken"
 
 # #####SEREN.PY VALUES######
 msgctxt "#32045"
@@ -261,22 +213,6 @@ msgctxt "#32057"
 msgid "Wipe Addon Data"
 msgstr "Wis add-ongegevens"
 
-msgctxt "#32058"
-msgid "Install Provider Package"
-msgstr "Providerpakket installeren"
-
-msgctxt "#32059"
-msgid "Uninstall Provider Package"
-msgstr "Verwijder het Provider-pakket"
-
-msgctxt "#32060"
-msgid "Enable Providers"
-msgstr "Providers inschakelen"
-
-msgctxt "#32061"
-msgid "Disable Providers"
-msgstr "Providers uitschakelen"
-
 # #####MOVIEMENU.PY######
 msgctxt "#32062"
 msgid "Genres"
@@ -288,36 +224,16 @@ msgstr "Voltooi het kijken"
 
 msgctxt "#32064"
 msgid "My Movie Lists"
-msgstr "Mijn filmlijsten"
+msgstr "Mijn lijsten"
 
 msgctxt "#32065"
 msgid "Multi Select..."
 msgstr "Multi-Select..."
 
-msgctxt "#32066"
-msgid "Source Select"
-msgstr "Bron selecteren"
-
 # #####TVSHOWMENY.PY######
 msgctxt "#32067"
 msgid "New TV Shows"
 msgstr "Nieuwe TV-Series"
-
-msgctxt "#32068"
-msgid "Torrent file select"
-msgstr "Torrent-bestand selecteren"
-
-msgctxt "#32069"
-msgid "Browse TV Show"
-msgstr "Blader door tv-programma"
-
-msgctxt "#32070"
-msgid "Shuffle Play"
-msgstr "Willekeurig afspelen"
-
-msgctxt "#33022"
-msgid "Rescrape Item"
-msgstr "Her-schraap item"
 
 # #####TRAKT.PY######
 msgctxt "#32071"
@@ -328,10 +244,6 @@ msgstr "Deze code is naar uw klembord gekopieerd"
 msgctxt "#32072"
 msgid "Cache Assist is attempting to build a torrent source"
 msgstr "Cache Assist probeert een torrent-bron te bouwen"
-
-msgctxt "#32073"
-msgid "New cached sources have been created for"
-msgstr "Nieuwe bronnen in de cache zijn gemaakt voor"
 
 # #####CUSTOMPROVIDERS.PY######
 msgctxt "#32074"
@@ -434,10 +346,6 @@ msgctxt "#33019"
 msgid "Checking for available package updates"
 msgstr "Bezig met controleren op beschikbare pakketupdates"
 
-msgctxt "#33020"
-msgid "Providers %s"
-msgstr "Providers %s"
-
 # #####DATABASE.PY######
 msgctxt "#32078"
 msgid "All Cache Successfully Cleared"
@@ -459,14 +367,6 @@ msgstr "Lokale database controleren"
 msgctxt "#32082"
 msgid "Initializing Providers"
 msgstr "Providers initialiseren"
-
-msgctxt "#32083"
-msgid "Scraping Sources"
-msgstr "Schraapbronnen"
-
-msgctxt "#32084"
-msgid "duplicate entries removed"
-msgstr "dubbele vermeldingen verwijderd"
 
 msgctxt "#32085"
 msgid ""
@@ -504,11 +404,6 @@ msgctxt "#32091"
 msgid "Remaining Providers"
 msgstr "Resterende providers"
 
-# #####PLAYER.PY######
-msgctxt "#32092"
-msgid "Resume from"
-msgstr "Hervatten vanaf"
-
 # #####SMARTPLAY.PY######
 msgctxt "#32093"
 msgid ""
@@ -537,11 +432,6 @@ msgstr "Lijstitems maken"
 msgctxt "#32098"
 msgid "Starting Scraping"
 msgstr "Beginnen met schrapen"
-
-# #####SOURCESELECT.PY######
-msgctxt "#32099"
-msgid "Source Selection"
-msgstr "Bronselectie"
 
 # #####RESOLVER.PY######
 msgctxt "#33000"
@@ -581,10 +471,6 @@ msgstr "Lijst"
 msgctxt "#40007"
 msgid "Dialog"
 msgstr "Dialoog"
-
-msgctxt "#40008"
-msgid "UI Settings"
-msgstr "UI-instellingen"
 
 msgctxt "#40009"
 msgid "Next Up Sort Style"
@@ -658,10 +544,6 @@ msgctxt "#40026"
 msgid "Smart Play"
 msgstr "Smart Play"
 
-msgctxt "#40027"
-msgid "Install UpNext Addon..."
-msgstr "UpNext-add-on installeren ..."
-
 msgctxt "#40028"
 msgid "Enabled Up Next Addon Integration"
 msgstr "UpNext Add-on-integratie inschakelen"
@@ -678,21 +560,9 @@ msgctxt "#40031"
 msgid "Auto Episode Resume"
 msgstr "Automatisch aflevering hervatten"
 
-msgctxt "#40032"
-msgid "Force Episode Resume on Continue Watching Items"
-msgstr "Aflevering geforceerd hervatten bij items blijven bekijken"
-
 msgctxt "#40033"
 msgid "Pre-emptive Scraping"
 msgstr "Preventief schrapen"
-
-msgctxt "#40034"
-msgid "Bookmarks"
-msgstr "Bladwijzers"
-
-msgctxt "#40035"
-msgid "Enable Trakt Bookmarks"
-msgstr "Trakt bladwijzers inschakelen"
 
 msgctxt "#40036"
 msgid "Enable Bookmark Prompt"
@@ -707,8 +577,8 @@ msgid "Cache Torrent Info Locally"
 msgstr "Cache Torrent Info Lokaal"
 
 msgctxt "#40039"
-msgid "Hide x265 Items"
-msgstr "X265 items verbergen"
+msgid "Hide HEVC Items"
+msgstr "HEVC items verbergen"
 
 msgctxt "#40040"
 msgid "Timeout"
@@ -742,10 +612,6 @@ msgctxt "#40047"
 msgid "Episode File Size limit (GB)"
 msgstr "Maximale bestandsgrootte aflevering (GB)"
 
-msgctxt "#40048"
-msgid "Remove 3D Sources"
-msgstr "Verwijder 3D-bronnen"
-
 msgctxt "#40049"
 msgid "Sort Sources Method"
 msgstr "Sorteer bronnen methode"
@@ -755,8 +621,8 @@ msgid "Enable Secondary Filesize Sort"
 msgstr "Secundaire bestandsgrootte sorteren inschakelen"
 
 msgctxt "#40051"
-msgid "Enable Tertiary x265 Sort Preference"
-msgstr "Tertiaire x265 sorteervoorkeuren inschakelen"
+msgid "Enable Tertiary HEVC Sort Preference"
+msgstr "Tertiaire HEVC sorteervoorkeuren inschakelen"
 
 msgctxt "#40052"
 msgid "Max Resolution"
@@ -826,53 +692,9 @@ msgctxt "#40068"
 msgid "Providers"
 msgstr "Bronnen"
 
-msgctxt "#40069"
-msgid "Provider Package Settings"
-msgstr "Provider-pakketinstellingen"
-
-msgctxt "#40070"
-msgid ""
-msgstr ""
-
-msgctxt "#40071"
-msgid "Install Provider Package"
-msgstr "Providerpakket installeren"
-
-msgctxt "#40072"
-msgid "Uninstall Provider Package"
-msgstr "Providerpakket verwijderen"
-
-msgctxt "#40073"
-msgid "Enable Provider Package"
-msgstr "Providerpakket inschakelen"
-
-msgctxt "#40074"
-msgid "Disable Provider Package"
-msgstr "Providerpakket uitschakelen"
-
-msgctxt "#40075"
-msgid "Provider Settings"
-msgstr "Provider instellingen"
-
-msgctxt "#40076"
-msgid "Enable Individual Providers"
-msgstr "Schakel individuele providers in"
-
-msgctxt "#40077"
-msgid "Disable Individual Providers"
-msgstr "Schakel individuele providers uit"
-
 msgctxt "#40078"
 msgid "API Keys"
 msgstr "API-sleutels"
-
-msgctxt "#40079"
-msgid "Authorize Trakt..."
-msgstr "Trakt autoriseren..."
-
-msgctxt "#40080"
-msgid "Authorize Trakt..."
-msgstr "Trakt autoriseren..."
 
 msgctxt "#40081"
 msgid "Enable Automatic Provider Updates"
@@ -902,10 +724,6 @@ msgctxt "#40087"
 msgid "TMDb API Key"
 msgstr "TMDb API-sleutel"
 
-msgctxt "#40088"
-msgid "TMDb API Key"
-msgstr "Trakt API-sleutel"
-
 msgctxt "#40089"
 msgid "Trakt Client ID"
 msgstr "Trakt-client-ID"
@@ -913,10 +731,6 @@ msgstr "Trakt-client-ID"
 msgctxt "#40090"
 msgid "Trakt Client Secret"
 msgstr "Trakt Client Secret"
-
-msgctxt "#40091"
-msgid "TVDB"
-msgstr "TVDB"
 
 msgctxt "#40092"
 msgid "TVDB API Key"
@@ -994,10 +808,6 @@ msgctxt "#40110"
 msgid "Enable Quaternary Low Quality Sort Preference"
 msgstr "Schakel Quartaire sorteervoorkeur van lage kwaliteit in"
 
-msgctxt "#40111"
-msgid "TMDb"
-msgstr "TMDb API-sleutels"
-
 msgctxt "#40112"
 msgid "Enable search history"
 msgstr "Schakel zoekgeschiedenis in"
@@ -1063,10 +873,6 @@ msgstr "Niet-uitgezonden items verbergen"
 msgctxt "#40123"
 msgid "Years"
 msgstr "Jaren"
-
-msgctxt "#40124"
-msgid "Trending Lists"
-msgstr "Trending lijsten"
 
 msgctxt "#40125"
 msgid "Hide Specials"
@@ -1134,10 +940,6 @@ msgctxt "#40137"
 msgid "Notify Me About Available Updates"
 msgstr "Houd mij op de hoogte van beschikbare updates"
 
-msgctxt "#40138"
-msgid "Refresh item's meta information"
-msgstr "Vernieuw de meta-informatie van het item"
-
 msgctxt "#40139"
 msgid ""
 "[COLOR red]WARNING[/COLOR]\n"
@@ -1186,10 +988,6 @@ msgctxt "#40149"
 msgid "Inspect Cloud Files on Scrape"
 msgstr "Inspecteer cloudbestanden tijdens schrapen"
 
-msgctxt "#40150"
-msgid "Upcoming Episodes"
-msgstr "Aankomende afleveringen"
-
 msgctxt "#40151"
 msgid "By Actor..."
 msgstr "Zoeken op acteur..."
@@ -1197,10 +995,6 @@ msgstr "Zoeken op acteur..."
 msgctxt "#40152"
 msgid "Movie Play Style"
 msgstr "Film speelstijl"
-
-msgctxt "#40153"
-msgid "Play From Random Episode"
-msgstr "Speel vanuit willekeurige aflevering"
 
 msgctxt "#40154"
 msgid "Movie File Size limit (GB)"
@@ -1300,7 +1094,7 @@ msgstr "Recente afleveringen"
 
 msgctxt "#40176"
 msgid "My Show Lists"
-msgstr "Mijn TV-Serielijsten"
+msgstr "Mijn lijsten"
 
 msgctxt "#40177"
 msgid "Trakt Sync Tools"
@@ -1702,14 +1496,6 @@ msgctxt "#40276"
 msgid "Show"
 msgstr "TV-Serie"
 
-msgctxt "#40277"
-msgid "Season"
-msgstr "Seizoen"
-
-msgctxt "#40278"
-msgid "Episode"
-msgstr "Aflevering"
-
 msgctxt "#40279"
 msgid "Movie"
 msgstr "Film"
@@ -1826,10 +1612,6 @@ msgctxt "#40307"
 msgid "Cache Assist"
 msgstr "Cache Assist"
 
-msgctxt "#40308"
-msgid "Resume"
-msgstr "Doorgaan"
-
 msgctxt "#40309"
 msgid "Sorry, SMB shares are not supported"
 msgstr "Sorry, netwerkpaden worden niet ondersteund"
@@ -1889,3 +1671,111 @@ msgstr "Een thema met de naam 'Default' is niet toegestaan"
 msgctxt "#40322"
 msgid "Starting Playback"
 msgstr "Afspelen starten"
+
+msgctxt "#40323"
+msgid "Poster"
+msgstr "Poster"
+
+msgctxt "#40324"
+msgid "Keyart"
+msgstr "Keyart"
+
+msgctxt "#40325"
+msgid "Fanart"
+msgstr "Fanart"
+
+msgctxt "#40326"
+msgid "Banner"
+msgstr "Banner"
+
+msgctxt "#40327"
+msgid "Clear Logo"
+msgstr "Clear Logo"
+
+msgctxt "#40328"
+msgid "Landscape"
+msgstr "Landscape"
+
+msgctxt "#40329"
+msgid "Character Art"
+msgstr "Character Art"
+
+msgctxt "#40330"
+msgid "Clear Art"
+msgstr "Clear Art"
+
+msgctxt "#40331"
+msgid "Disc Art"
+msgstr "Disc Art"
+
+msgctxt "#40332"
+msgid "Smart Play Display Style"
+msgstr "Stijl van Smart Play"
+
+msgctxt "#40333"
+msgid "Smart Play Popup"
+msgstr "Smart Play Popup"
+
+msgctxt "#40334"
+msgid "Dialog Style"
+msgstr "Dialoog stijl"
+
+msgctxt "#40335"
+msgid "Simple"
+msgstr "Simpel"
+
+msgctxt "#40336"
+msgid "Default Action if Nothing Selected"
+msgstr "Standaardactie als er niets is geselecteerd"
+
+msgctxt "#40337"
+msgid "Play"
+msgstr "Afspelen"
+
+msgctxt "#40338"
+msgid "Pause"
+msgstr "Pauzeren"
+
+msgctxt "#40339"
+msgid "Still Watching Dialog"
+msgstr "Nog steeds kijken dialoogvenster"
+
+msgctxt "#40340"
+msgid "Enable Still Watching Dialog"
+msgstr "Dialoogvenster nog steeds bekijken inschakelen"
+
+msgctxt "#40341"
+msgid "Episodes Between Dialog Prompts"
+msgstr "Afleveringen tussen dialoog prompts"
+
+msgctxt "#40342"
+msgid "Paginate Trakt Lists"
+msgstr "Paginate trakt-lijsten"
+
+msgctxt "#40343"
+msgid "My Watched Episodes"
+msgstr "Mijn bekeken afleveringen"
+
+msgctxt "#40344"
+msgid "My Watched Movies"
+msgstr "Mijn bekeken films"
+
+msgctxt "#40346"
+msgid "Search Movies By Actor..."
+msgstr "Films zoeken op acteur..."
+
+msgctxt "#40347"
+msgid "Search Shows By Actor..."
+msgstr "Zoek shows op acteur..."
+
+msgctxt "#40348"
+msgid "Ask"
+msgstr "Vraag"
+
+msgctxt "#40349"
+msgid "Automatic"
+msgstr "Automatisch"
+
+msgctxt "#40350"
+msgid "Do not resume"
+msgstr "Niet hervatten"

@@ -1,51 +1,38 @@
 from datetime import datetime, timedelta
-from resources.lib.modules import trakt_sync
-from resources.lib.modules.trakt_sync import shows
-from resources.lib.modules.trakt_sync import movies
-from resources.lib.modules.trakt_sync import hidden
+
 from resources.lib.common import tools
 from resources.lib.indexers import trakt as Trakt
 from resources.lib.modules import database
+from resources.lib.modules import trakt_sync
+from resources.lib.modules.trakt_sync import hidden
+from resources.lib.modules.trakt_sync import movies
+from resources.lib.modules.trakt_sync import shows
+from resources.lib.modules.trakt_sync import lists
 
 show_sync = shows.TraktSyncDatabase()
 movie_sync = movies.TraktSyncDatabase()
+list_sync = lists.TraktSyncDatabase()
 
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
-
     progress_dialog = None
     silent = True
     results_mill = {}
 
-    def run_activities_service(self):
-        try:
-            import xbmc
-            monitor = xbmc.Monitor()
-        except:
-            pass
-        self.sync_activities()
-        while not monitor.abortRequested():
-            try:
-                if monitor.waitForAbort(60 * 30):
-                    break
+    def sync_activities(self, silent=False):
 
-            except:
-                import traceback
-                traceback.print_exc()
-                pass
-
-    def sync_activities(self):
+        sync_errors = False
 
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
 
-        if str(self.activites['all_activities']) == self.base_date and tools.getSetting('trakt.auth') != '':
-            # Increase the amount of concurrent tasks running during initial and Force Sync processes to speed up task
-            tools.showDialog.textviewer(tools.addonName, tools.lang(40133))
-            confirmation = tools.showDialog.yesno(tools.addonName, tools.lang(40134))
+        tools.log('STARTING SYNC')
+        if not silent and \
+                str(self.activites['all_activities']) == self.base_date and \
+                tools.getSetting('trakt.auth') != '':
+            tools.showDialog.notification(tools.addonName, tools.lang(40133))
 
-            if not confirmation:
-                return
-
+            # Give the people time to read the damn notification
+            tools.kodi.sleep(500)
         try:
 
             if str(self.activites['all_activities']) == self.base_date:
@@ -73,6 +60,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         self._remove_old_meta_items('shows')
                         self._update_activity_record('shows_meta_update', update_time)
             except:
+                sync_errors = True
                 import traceback
                 traceback.print_exc()
                 pass
@@ -89,6 +77,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         self._remove_old_meta_items('movies')
                         self._update_activity_record('movies_meta_update', update_time)
             except:
+                sync_errors = True
                 import traceback
                 traceback.print_exc()
                 pass
@@ -107,10 +96,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 if self.progress_dialog is not None:
                     self.progress_dialog.close()
                     self.progress_dialog = None
-                return
+                return True
 
             if trakt_sync._requires_update(trakt_activities['all'], self.activites['all_activities']):
-
 
                 ########################################################################################################
                 # SYNC HIDDEN ITEMS
@@ -125,6 +113,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         self._sync_hidden()
 
                 except:
+                    sync_errors = True
                     import traceback
                     traceback.print_exc()
                     pass
@@ -139,6 +128,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         sync_triggered = True
                         self._sync_watched_episodes()
                 except:
+                    sync_errors = True
                     import traceback
                     traceback.print_exc()
                     pass
@@ -148,15 +138,17 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         sync_triggered = True
                         self._sync_watched_movies()
                 except:
+                    sync_errors = True
                     import traceback
                     traceback.print_exc()
                     pass
                 try:
                     if sync_triggered:
                         if not self.silent:
-                            self.progress_dialog.update(100, 'Syncing Unwatched items')
+                            self.progress_dialog.update(0, 'Syncing Unwatched items')
                         self._sync_unwatched()
                 except:
+                    sync_errors = True
                     import traceback
                     traceback.print_exc()
                     pass
@@ -173,6 +165,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         self._sync_collection_shows()
                         sync_triggered = True
                 except:
+                    sync_errors = True
                     import traceback
                     traceback.print_exc()
                     pass
@@ -183,6 +176,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         self._sync_collection_movies()
                         sync_triggered = True
                 except:
+                    sync_errors = True
                     import traceback
                     traceback.print_exc()
                     pass
@@ -190,12 +184,79 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 try:
                     if sync_triggered:
                         if not self.silent:
-                            self.progress_dialog.update(100, 'Syncing Uncollected items')
+                            self.progress_dialog.update(0, 'Syncing Uncollected items')
                         self._sync_uncollected()
                 except:
+                    sync_errors = True
                     import traceback
                     traceback.print_exc()
                     pass
+
+                ########################################################################################################
+                # SYNC BOOKMARK
+                ########################################################################################################
+
+                sync_triggered = False
+
+                try:
+                    if trakt_sync._requires_update(trakt_activities['episodes']['paused_at'],
+                                                   self.activites['episodes_bookmarked']):
+                        cursor = self._get_cursor()
+                        cursor.execute('DELETE FROM bookmark WHERE 1=1')
+                        cursor.connection.commit()
+                        cursor.close()
+                        self._sync_bookmarks('episodes')
+                        sync_triggered = True
+                except:
+                    sync_errors = True
+                    import traceback
+                    traceback.print_exc()
+                    pass
+
+                try:
+                    if trakt_sync._requires_update(trakt_activities['movies']['paused_at'],
+                                                   self.activites['movies_bookmarked']):
+                        self._sync_bookmarks('movies')
+                        sync_triggered = True
+                except:
+                    sync_errors = True
+                    import traceback
+                    traceback.print_exc()
+                    pass
+
+                try:
+                    if sync_triggered:
+                        if not self.silent:
+                            self.progress_dialog.update(100, 'Syncing bookmarked items')
+                except:
+                    sync_errors = True
+                    import traceback
+                    traceback.print_exc()
+                    pass
+
+                ########################################################################################################
+                # SYNC LISTS
+                ########################################################################################################
+
+                lists_to_update = []
+
+                try:
+                    trakt_api = Trakt.TraktAPI()
+                    lists = trakt_api.json_response('users/me/lists', limit=True, limitOverride=500)
+                    lists.extend([i['list'] for i in trakt_api.json_response('users/likes/lists', limit=True,
+                                                                             limitOverride=500)])
+                    for item in lists:
+                        if not trakt_sync._requires_update(item['updated_at'], self.activites['lists_sync']):
+                            continue
+                        lists_to_update.append(item)
+
+                    self._sync_lists(lists_to_update)
+                except:
+                    sync_errors = True
+                    import traceback
+                    traceback.print_exc()
+                    pass
+
 
                 self._update_activity_record('all_activities', update_time)
 
@@ -213,6 +274,48 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             traceback.print_exc()
             pass
 
+        return sync_errors
+
+    def get_bookmark(self, trakt_id):
+        tools.traktSyncDB_lock.acquire()
+        cursor = self._get_cursor()
+        try:
+            cursor.execute("SELECT * FROM bookmark WHERE trakt_id = '%s'" % trakt_id)
+            return cursor.fetchone()
+        except:
+            import traceback
+            traceback.print_exc()
+        finally:
+            cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
+
+
+    def set_bookmark(self, trakt_id, time_in_seconds):
+        tools.traktSyncDB_lock.acquire()
+        cursor = self._get_cursor()
+        try:
+            cursor.execute("REPLACE INTO bookmark Values (?, ?)", (trakt_id, time_in_seconds))
+            cursor.connection.commit()
+        except:
+            import traceback
+            traceback.print_exc()
+        finally:
+            cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
+
+    def remove_bookmark(self, trakt_id):
+        tools.traktSyncDB_lock.acquire()
+        cursor = self._get_cursor()
+        try:
+            cursor.execute("DELETE FROM bookmark WHERE trakt_id = '%s'" % trakt_id)
+            cursor.connection.commit()
+        except:
+            import traceback
+            traceback.print_exc()
+        finally:
+            cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
+
 
     def _sync_hidden(self):
         progress_perc = 0
@@ -224,9 +327,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         for section in sections:
             progress_perc += 20
             if not self.silent:
-                self.progress_dialog.update(progress_perc, 'Syncing %s Hidden Items' % section.title().replace('_', ' '))
+                self.progress_dialog.update(progress_perc,
+                                            'Syncing %s Hidden Items' % section.title().replace('_', ' '))
             to_remove = hidden.TraktSyncDatabase().get_hidden_items(section)
-            to_remove = [i['trakt_id'] for i in to_remove]
+            to_remove = set(i['trakt_id'] for i in to_remove)
             page = 1
             total_pages = 1000
             while page < (total_pages + 1):
@@ -273,16 +377,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if not self.silent:
             self.progress_dialog.update(-1, 'Fetching Watched Movies')
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
-        trakt_watched = Trakt.TraktAPI().json_response('/sync/watched/movies')
-
-        trakt_watched = [i['movie']['ids']['trakt'] for i in trakt_watched]
+        trakt_watched = Trakt.TraktAPI().json_response('/sync/watched/movies?extended=full')
 
         local_watched = movies.TraktSyncDatabase().get_watched_movies()
-        local_watched = [i['trakt_id'] for i in local_watched]
+        local_watched = {i['trakt_id']: i for i in local_watched}
 
         for movie in trakt_watched:
-            if movie not in local_watched:
-                insert_list.append((movie, False, False))
+            if movie['movie']['ids']['trakt'] not in local_watched:
+                insert_list.append(movie)
 
         movie_tasks = len(insert_list)
 
@@ -290,225 +392,174 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             self._update_activity_record('movies_watched', update_time)
             return
 
-        inserted_tasks = 0
         if not self.silent:
             self.progress_dialog.update(0, 'Inserting Watched Movies')
 
+        sql_statement = "INSERT OR IGNORE INTO movies (trakt_id, kodi_meta, collected, watched, last_updated, air_date)" \
+                        "VALUES " \
+                        "(?, '{}', ?, ?, ?, ?)"
 
-        cursor = self._get_cursor()
-
-        sql_statements = 0
-
-        for i in insert_list:
-            inserted_tasks += 1
-            progress_perc = (float(inserted_tasks) / float(movie_tasks)) * 100
-            if not self.silent:
-                self.progress_dialog.update(int(progress_perc))
-
-            cursor.execute(
-                "INSERT OR IGNORE INTO movies ("
-                "trakt_id, kodi_meta, collected, watched, last_updated)"
-                "VALUES "
-                "(?, ?, ?, ?, ?)",
-                (i[0], str({}), 0, 0, self.base_date))
-
-            sql_statements += 1
-            if sql_statements > 999:
-                cursor.connection.commit()
-                sql_statements = 0
-
-        if not self.silent:
-            self.progress_dialog.update(0, 'Marking Movies Watched')
-
-        for item in insert_list:
-            # movie_sync.mark_movie_watched(item[1][0])
-            cursor.execute('UPDATE movies SET watched=1 WHERE trakt_id=?', (item[0],))
-
-        cursor.connection.commit()
-        cursor.close()
-
+        self._execute_batch_sql(sql_statement, ((i['movie']['ids']['trakt'], 0, 1,
+                                                 self.base_date, i['movie'].get('released')) for i in insert_list),
+                                movie_tasks)
 
         self._update_activity_record('movies_watched', update_time)
 
     def _sync_watched_episodes(self):
-
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         if not self.silent:
             self.progress_dialog.update(-1, 'Fetching Watched Episodes')
-        trakt_watched = Trakt.TraktAPI().json_response('/sync/watched/shows')
-        trakt_watched = ['%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
+        trakt_watched = Trakt.TraktAPI().json_response('/sync/watched/shows?extended=full')
+        trakt_watched = {'%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number']): episode
                          for show in trakt_watched for season in show['seasons'] for episode
-                         in season['episodes']]
+                         in season['episodes']}
 
         local_watched = shows.TraktSyncDatabase().get_watched_episodes()
-        local_watched = ['%s-%s-%s' % (i['show_id'], i['season'], i['number']) for i in local_watched]
+        local_watched = {'%s-%s-%s' % (i['show_id'], i['season'], i['number']): i for i in local_watched}
 
-        self._mill_episodes(trakt_watched, local_watched, 1, None)
+        self._mill_episodes(trakt_watched, local_watched, True)
 
         self._update_activity_record('shows_watched', update_time)
 
     def _sync_unwatched(self):
-
-        if not self.silent:
-            self.progress_dialog.update(-1, 'Fetching Unwatched Movies')
         trakt_watched_movies = Trakt.TraktAPI().json_response('sync/watched/movies')
-        trakt_watched_movies = [i['movie']['ids']['trakt'] for i in trakt_watched_movies]
+        trakt_watched_movies = set(int(i['movie']['ids']['trakt']) for i in trakt_watched_movies)
         local_watched_movies = movie_sync.get_watched_movies()
-        local_watched_movies = [i['trakt_id'] for i in local_watched_movies]
+        local_watched_movies = set(int(i['trakt_id']) for i in local_watched_movies)
+
+        trakt_watched_episodes = Trakt.TraktAPI().json_response('sync/watched/shows')
+        trakt_watched_episodes = set('%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
+                                     for show in trakt_watched_episodes for season in show['seasons'] for episode
+                                     in season['episodes'])
+        local_watched_episodes = show_sync.get_watched_episodes()
+        local_watched_episodes = set('%s-%s-%s' % (i['show_id'], i['season'], i['number']) for i in
+                                     local_watched_episodes)
+
+        workload = local_watched_movies - trakt_watched_movies
+        sql_statement = "UPDATE movies SET watched=0 WHERE trakt_id=?"
+        self._execute_batch_sql(sql_statement, ((movie,) for movie in workload),
+                                len(workload))
+
+        workload = local_watched_episodes - trakt_watched_episodes
+        sql_statement = "UPDATE episodes SET watched=0 WHERE show_id=? AND season=? AND number=?"
+        self._execute_batch_sql(sql_statement, ((tuple(episode.split('-'))) for episode in workload),
+                                len(workload))
 
         if not self.silent:
-            self.progress_dialog.update(-1, 'Fetching Unwatched Episodes')
-        trakt_watched_episodes = Trakt.TraktAPI().json_response('sync/watched/shows')
-        trakt_watched_episodes = ['%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
-                                  for show in trakt_watched_episodes for season in show['seasons'] for episode
-                                  in season['episodes']]
-        local_watched_episodes = show_sync.get_watched_episodes()
-        local_watched_episodes = ['%s-%s-%s' % (i['show_id'], i['season'], i['number']) for i in local_watched_episodes]
-
-        for movie in local_watched_movies:
-            if movie not in trakt_watched_movies:
-                movie_sync.mark_movie_unwatched(movie)
-
-        for episode in local_watched_episodes:
-            if episode not in trakt_watched_episodes:
-
-                show_sync.mark_episode_unwatched(*episode.split('-'))
+            self.progress_dialog.update(100, 'Syncing Unwatched items')
 
     def _sync_collection_movies(self):
-
         insert_list = []
         if not self.silent:
             self.progress_dialog.update(0, 'Fetching Collected Movies')
-        local_collection = [i['trakt_id'] for i in movie_sync.get_collected_movies()]
+        local_collection = set(i['trakt_id'] for i in movie_sync.get_collected_movies())
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
-        trakt_collecton = [i['movie']['ids']['trakt'] for i in Trakt.TraktAPI().json_response('sync/collection/movies')]
+        trakt_collecton = Trakt.TraktAPI().json_response('sync/collection/movies?extended=full')
 
         for item in trakt_collecton:
-            if item not in local_collection:
+            if item['movie']['ids']['trakt'] not in local_collection:
                 insert_list.append(item)
-
-        inserted_tasks = 0
-        cursor = self._get_cursor()
 
         if not self.silent:
             self.progress_dialog.update(0, 'Inserting Collected Movies')
 
-        sql_statements = 0
-
-        for i in insert_list:
-            inserted_tasks += 1
-            progress_perc = (float(inserted_tasks) / float(len(insert_list))) * 100
-            if not self.silent:
-                self.progress_dialog.update(int(progress_perc))
-            cursor.execute(
-                "INSERT OR IGNORE INTO movies ("
-                "trakt_id, kodi_meta, collected, watched, last_updated)"
-                "VALUES "
-                "(?, ?, ?, ?, ?)",
-                (i, str({}), 0, 0, self.base_date))
-
-            # Batch the entries as to not reach SQL expression limit
-            sql_statements += 1
-            if sql_statements > 999:
-                cursor.connection.commit()
-                sql_statements = 0
-
-        cursor.connection.commit()
-        cursor.close()
-
-        cursor = self._get_cursor()
-
-        if not self.silent:
-            self.progress_dialog.update(0, 'Marking Movies Collected')
-
-        for item in insert_list:
-            cursor.execute('UPDATE movies SET collected=1 WHERE trakt_id=?', (item,))
-            # movie_sync.mark_movie_collected(item[1][0])
-        cursor.connection.commit()
-        cursor.close()
+        sql_statement = "INSERT OR IGNORE INTO movies (trakt_id, kodi_meta, collected, watched, last_updated, " \
+                        "air_date) VALUES (?, '{}', ?, ?, ?, ?) "
+        self._execute_batch_sql(sql_statement, ((i['movie']['ids']['trakt'], 1, 0,
+                                                 self.base_date, i['movie'].get('released')) for i in insert_list),
+                                len(insert_list))
 
         self._update_activity_record('movies_collected', update_time)
 
     def _sync_collection_shows(self):
-
-        local_collection = ['%s-%s-%s' % (i['show_id'], i['season'], i['number'])
-                            for i in show_sync.get_collected_episodes()]
+        local_collection = {'%s-%s-%s' % (i['show_id'], i['season'], i['number']): i
+                            for i in show_sync.get_collected_episodes()}
 
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         if not self.silent:
             self.progress_dialog.update(0, 'Fetching Collected Episodes')
-        trakt_collection = Trakt.TraktAPI().json_response('sync/collection/shows')
-        trakt_collection = ['%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
+        trakt_collection = Trakt.TraktAPI().json_response('sync/collection/shows?extended=full')
+        trakt_collection = {'%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number']): show
                             for show in trakt_collection for season in show['seasons'] for episode
-                            in season['episodes']]
+                            in season['episodes']}
 
-        self._mill_episodes(trakt_collection, local_collection, None, 1)
-
+        self._mill_episodes(trakt_collection, local_collection, False)
         self._update_activity_record('shows_collected', update_time)
 
     def _sync_uncollected(self):
-
-        if not self.silent:
-            self.progress_dialog.update(0, 'Fetching Uncollected Movies')
-
-        trakt_collected_movies = Trakt.TraktAPI().json_response('sync/collected/movies')
+        trakt_collected_movies = Trakt.TraktAPI().json_response('sync/collection/movies')
 
         if trakt_collected_movies is not None:
-            trakt_collected_movies = [i['movie']['ids']['trakt'] for i in trakt_collected_movies]
+            trakt_collected_movies = set(int(i['movie']['ids']['trakt']) for i in trakt_collected_movies)
         else:
-            trakt_collected_movies = []
+            trakt_collected_movies = set()
+
         local_collected_movies = movie_sync.get_collected_movies()
-        local_collected_movies = [i['trakt_id'] for i in local_collected_movies]
-
-        if not self.silent:
-            self.progress_dialog.update(0, 'Fetching Uncollected Episodes')
-
-        trakt_collected_episodes = Trakt.TraktAPI().json_response('sync/collected/shows')
+        local_collected_movies = set(int(i['trakt_id']) for i in local_collected_movies)
+        trakt_collected_episodes = Trakt.TraktAPI().json_response('sync/collection/shows')
 
         if trakt_collected_episodes is not None:
-            trakt_collected_episodes = ['%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
-                                        for show in trakt_collected_episodes for season in show['seasons'] for episode
-                                        in season['episodes']]
+            trakt_collected_episodes = set(
+                '%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number'])
+                for show in trakt_collected_episodes for season in show['seasons'] for episode
+                in season['episodes'])
         else:
-            trakt_collected_episodes = []
+            trakt_collected_episodes = set()
 
         local_collected_episodes = show_sync.get_collected_episodes()
-        local_collected_episodes = ['%s-%s-%s' % (i['show_id'], i['season'], i['number'])
-                                    for i in local_collected_episodes]
+        local_collected_episodes = set('%s-%s-%s' % (i['show_id'], i['season'], i['number'])
+                                       for i in local_collected_episodes)
 
-        cursor = self._get_cursor()
+        workload = local_collected_movies - trakt_collected_movies
+        sql_statement = "UPDATE movies SET collected=0 WHERE trakt_id=?"
+        self._execute_batch_sql(sql_statement, ((movie,) for movie in workload),
+                                len(workload))
 
-        sql_statements = 0
+        workload = local_collected_episodes - trakt_collected_episodes
+        sql_statement = "UPDATE episodes SET collected=0 WHERE show_id=? AND season=? AND number=?"
+        self._execute_batch_sql(sql_statement, ((tuple(episode.split('-'))) for episode in workload),
+                                len(workload))
 
-        if len(trakt_collected_movies) > 0:
-            for movie in local_collected_movies:
-                if movie not in trakt_collected_movies:
-                    cursor.execute('UPDATE movies SET collected=0 WHERE trakt_id=?', (movie,))
-                    # movie_sync.mark_movie_uncollected(movie)
+        if not self.silent:
+            self.progress_dialog.update(100, 'Syncing Uncollected items')
 
-                    sql_statements += 1
-                    if sql_statements > 999:
-                        cursor.connection.commit()
-                        sql_statements = 0
+    def _sync_lists(self, lists_to_sync):
+        trakt_api = Trakt.TraktAPI()
+        media_types = ['movie', 'show']
+        update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
 
-        if len(trakt_collected_episodes) > 0:
-            for episode in local_collected_episodes:
-                if episode not in trakt_collected_episodes:
-                    episode_split = episode.split('-')
-                    # show_sync.mark_episode_unwatched(*episode.split('-'))
-                    cursor.execute('UPDATE episodes SET watched=0 WHERE show_id=? AND season=? AND number=?',
-                                   (episode_split[0], episode_split[1], episode_split[2]))
+        total_lists = len(lists_to_sync) * len(media_types)
 
-                    sql_statements += 1
-                    if sql_statements > 999:
-                        cursor.connection.commit()
-                        sql_statements = 0
+        processed_lists = 0
 
-        cursor.connection.commit()
-        cursor.close()
+        for media_type in media_types:
+            for trakt_list in lists_to_sync:
+                if not self.silent:
+                    processed_lists += 1
+                    self.progress_dialog.update(int(float(processed_lists) / float(total_lists) * 100), 'Syncing lists')
+
+                url = 'users/%s/lists/%s/items/%s?extended=full' % (trakt_list['user']['ids']['slug'],
+                                                                    trakt_list['ids']['trakt'], media_type)
+                list_items = trakt_api.json_response(url, None, False)
+
+                if list_items is None or len(list_items) == 0:
+                    list_sync.remove_list(trakt_list['ids']['trakt'], media_type)
+                    continue
+
+                list_items = trakt_api.sort_list(trakt_list['sort_by'], trakt_list['sort_how'], list_items, media_type)
+                list_items = [i[media_type] for i in list_items if i['type'] == media_type and i is not None]
+
+                list_sync.add_list(trakt_list['ids']['trakt'], list_items, trakt_list['name'],
+                                   tools.quote_plus(trakt_list['user']['ids']['slug']), 'myLists',
+                                   media_type, trakt_list['updated_at'], len(list_items), trakt_list['sort_how'],
+                                   trakt_list['sort_by'], trakt_list['ids']['slug'])
+
+        if not self.silent:
+            self.progress_dialog.update(100, 'Syncing lists')
+
+        self._update_activity_record('lists_sync', update_time)
 
     def _remove_old_meta_items(self, type):
-
         last_update = self.activites['%s_meta_update' % type]
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
 
@@ -538,6 +589,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 item_id = item[type[:-1]]['ids']['trakt']
                 updated_item.append(item_id)
 
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
 
         updated_item = sorted(list(set(updated_item)))
@@ -563,36 +615,24 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             for i in updated_item:
                 cursor.execute('UPDATE movies SET kodi_meta=?, last_updated=? WHERE trakt_id=?',
                                (str({}), update_time, i))
-
-                sql_statements += 1
-
                 # Batch the entries as to not reach SQL expression limit
                 sql_statements += 1
                 if sql_statements > 999:
                     cursor.connection.commit()
                     sql_statements = 0
 
-        else:
-            raise Exception
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
-    def _mill_episodes(self, trakt_collection, local_collection, watched, collected):
+    def _mill_episodes(self, trakt_collection, local_collection, watched):
 
         episode_insert_list = []
-        show_ids = []
+        season_insert_list = []
 
-        sync_type = 'Watched' if watched == 1 else 'Collected'
+        sync_type = 'Watched' if watched else 'Collected'
 
-        insert_collection = [i for i in trakt_collection if i not in local_collection]
-
-        if len(insert_collection) == 0:
-            return
-
-        for i in insert_collection:
-            show_ids.append(i.split('-')[0])
-
-        show_ids = list(set(show_ids))
+        show_ids = set(i.split('-')[0] for i in trakt_collection if i not in local_collection)
 
         inserted_tasks = 0
 
@@ -608,12 +648,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         for show_id in show_ids:
             try:
                 for season in self.results_mill[str(show_id)]:
+                    season_insert_list.append((show_id, season['number'], season['first_aired']))
                     for episode in season['episodes']:
-                        episode_string = '%s-%s-%s' % (show_id, episode['season'], episode['number'])
-
-                        if episode_string in trakt_collection:
-                            episode_insert_list.append((show_id, episode['season'], episode['ids']['trakt'],
-                                                        episode['number']))
+                        episode_insert_list.append((show_id, episode['season'], episode['ids']['trakt'],
+                                                    episode['number'], episode['first_aired']))
             except KeyError:
                 pass
             except:
@@ -624,94 +662,108 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if not self.silent:
             self.progress_dialog.update(0, 'Inserting %s Shows' % sync_type)
 
-        inserted_tasks = 0
+        sql_statement = "INSERT OR IGNORE INTO shows (trakt_id, kodi_meta, last_updated, air_date) " \
+                        "VALUES (?, '{}', ?, ?)"
+        self._execute_batch_sql(sql_statement, ((i, self.base_date, None) for i in show_ids), len(show_ids))
 
-        base_sql_statement = "INSERT OR IGNORE INTO shows (trakt_id, kodi_meta, last_updated) VALUES (%s, '{}', '%s')"
-        cursor = self._get_cursor()
+        if not self.silent:
+            self.progress_dialog.update(0, 'Inserting %s Seasons' % sync_type)
 
-        sql_statements = 0
+        sql_statement = "INSERT OR IGNORE INTO seasons " \
+                        "(show_id, season, kodi_meta, air_date) VALUES (?, ?, '{}', ?)"
 
-        for i in show_ids:
-            inserted_tasks += 1
-            progress_perc = (float(inserted_tasks) / float(len(show_ids))) * 100
-            if not self.silent:
-                self.progress_dialog.update(int(progress_perc))
-            cursor.execute(base_sql_statement % (i, self.base_date))
-
-            # Batch the entries as to not reach SQL expression limit
-            sql_statements += 1
-            if sql_statements > 999:
-                cursor.connection.commit()
-                sql_statements = 0
-
-        cursor.connection.commit()
-        cursor.close()
-
-        base_sql_statement = "INSERT OR IGNORE INTO episodes " \
-                             "(show_id, season, trakt_id, kodi_meta, last_updated, watched, collected, number)" \
-                             " VALUES (%s, %s, %s, '{}', '%s', 0, 0, %s)"
-        cursor = self._get_cursor()
+        self._execute_batch_sql(sql_statement, ((int(i[0]), int(i[1]), i[2]) for i in season_insert_list),
+                                len(season_insert_list))
 
         if not self.silent:
             self.progress_dialog.update(0, 'Inserting %s Episodes' % sync_type)
-        inserted_tasks = 0
 
-        sql_statements = 0
+        sql_statement = "INSERT OR IGNORE INTO episodes " \
+                        "(show_id, season, trakt_id, kodi_meta, last_updated, watched, collected, number, " \
+                        "air_date) VALUES (?, ?, ?, '{}', ?, ?, ?, ?, ?)"
 
-        # Insert the episode Records
-        for i in episode_insert_list:
-            inserted_tasks += 1
-            progress_perc = (float(inserted_tasks) / float(len(episode_insert_list))) * 100
-            if not self.silent:
-                self.progress_dialog.update(int(progress_perc))
+        self._execute_batch_sql(sql_statement, ((i[0], int(i[1]), int(i[2]), self.base_date, 0,
+                                                 0, i[3], i[4]) for i in episode_insert_list),
+                                len(episode_insert_list))
 
-            cursor.execute(base_sql_statement % (int(i[0]), int(i[1]), int(i[2]), self.base_date, i[3]))
-
-            # Batch the entries as to not reach SQL expression limit
-            sql_statements += 1
-            if sql_statements > 999:
-                cursor.connection.commit()
-                sql_statements = 0
-
-        cursor.connection.commit()
-        cursor.close()
-
-        if not self.silent:
-            self.progress_dialog.update(0, 'Marking Episodes %s' % sync_type)
-
-        inserted_tasks = 0
-
-        cursor = self._get_cursor()
-
-        # Update episode records watched/collected status
-        if watched == 1:
-            for i in episode_insert_list:
-                inserted_tasks += 1
-                progress_perc = (float(inserted_tasks) / float(len(episode_insert_list))) * 100
-                if not self.silent:
-                    self.progress_dialog.update(int(progress_perc))
-                cursor.execute('UPDATE episodes SET watched=1 WHERE trakt_id=?', (int(i[2]),))
-
+        if watched:
+            query = "UPDATE episodes SET watched=1 WHERE trakt_id=?"
         else:
-            for i in episode_insert_list:
-                inserted_tasks += 1
-                progress_perc = (float(inserted_tasks) / float(len(episode_insert_list))) * 100
-                if not self.silent:
-                    self.progress_dialog.update(int(progress_perc))
-                cursor.execute('UPDATE episodes SET collected=1 WHERE trakt_id=?', (int(i[2]),))
+            query = "UPDATE episodes SET collected=1 WHERE trakt_id=?"
 
-        cursor.connection.commit()
-        cursor.close()
+        self._execute_batch_sql(query, ((i[2],) for i in episode_insert_list), len(episode_insert_list))
 
         return episode_insert_list
 
     def _update_activity_record(self, record, time):
-
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('UPDATE activities SET %s=? WHERE sync_id=1' % record, (time,))
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def _pull_show_episodes(self, show_id):
         self.results_mill.update({str(show_id): database.get(Trakt.TraktAPI().json_response, 24,
-                                                        '/shows/%s/seasons?extended=episodes' % show_id)})
+                                                             '/shows/{}/seasons?extended=episodes%2Cfull'.format(
+                                                                 show_id))})
+
+    def _sync_bookmarks(self, type):
+        update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
+        if not self.silent:
+            self.progress_dialog.update(-1, 'Fetching {} bookmark status'.format(type))
+
+        trakt_api = Trakt.TraktAPI()
+        progress = trakt_api.json_response('sync/playback/{}/?extended=full'.format(type))
+
+        base_sql_statement = "REPLACE INTO bookmark Values (%s, %s)"
+        tools.traktSyncDB_lock.acquire()
+        cursor = self._get_cursor()
+        sql_statements = 0
+
+        for i in progress:
+            if i['progress'] == 0 or i['progress'] == 100:
+                continue
+            if i[i['type']]['runtime'] is None:
+                continue
+            if 'episode' in i:
+                offset = int((float(i['progress'] / 100) * int(i['episode']['runtime']) * 60))
+                cursor.execute(base_sql_statement % (i['episode']['ids']['trakt'], offset))
+            if 'movie' in i:
+                offset = int((float(i['progress'] / 100) * int(i['movie']['runtime']) * 60))
+                cursor.execute(base_sql_statement % (i['movie']['ids']['trakt'], offset))
+
+            # Batch the entries as to not reach SQL expression limit
+            sql_statements += 1
+            if sql_statements > 999:
+                cursor.connection.commit()
+                sql_statements = 0
+
+        cursor.connection.commit()
+        cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
+        self._update_activity_record('{}_bookmarked'.format(type), update_time)
+
+    def _execute_batch_sql(self, query, items, max_items):
+        inserted_tasks = 0
+        tools.traktSyncDB_lock.acquire()
+        cursor = self._get_cursor()
+        sql_statements = 0
+
+        for item in items:
+            inserted_tasks += 1
+            progress_perc = (float(inserted_tasks) / float(max_items)) * 100
+            if not self.silent:
+                self.progress_dialog.update(int(progress_perc))
+            cursor.execute(query, item)
+            # Batch the entries as to not reach SQL expression limit
+            sql_statements += 1
+            if sql_statements > 999:
+                cursor.connection.commit()
+                sql_statements = 0
+
+        if sql_statements > 0:
+            cursor.connection.commit()
+
+        cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)

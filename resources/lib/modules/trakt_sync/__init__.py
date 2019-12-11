@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import threading
 from datetime import datetime
 
 from resources.lib.common import tools
 from resources.lib.common.worker import ThreadPool
-from resources.lib.gui import seren_dialog
 
 try:
     from Queue import Queue
@@ -31,6 +29,8 @@ class TraktSyncDatabase:
         self._build_hidden_items()
         self._build_sync_activities()
         self._build_season_table()
+        self._build_bookmark_table()
+        self._build_lists_table()
 
         self.item_list = []
         self.threads = []
@@ -40,6 +40,7 @@ class TraktSyncDatabase:
         self.base_date = '1970-01-01T00:00:00'
         self.number_of_threads = 20
 
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM activities WHERE sync_id=1')
         self.activites = cursor.fetchone()
@@ -48,7 +49,7 @@ class TraktSyncDatabase:
         # You will need to update the below version number to match the new addon version
         # This will ensure that the metadata required for operations is available
 
-        self.last_meta_update = '1.4.0'
+        self.last_meta_update = '1.6.0'
 
         if self.activites is None:
             meta = '{}'
@@ -59,73 +60,115 @@ class TraktSyncDatabase:
 
             cursor.execute('INSERT INTO activities(sync_id, all_activities, shows_watched, movies_watched,'
                            ' movies_collected, shows_collected, hidden_sync, shows_meta_update, movies_meta_update,'
-                           'seren_version, trakt_username) '
-                           'VALUES(1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                           'seren_version, trakt_username, movies_bookmarked, episodes_bookmarked, lists_sync) '
+                           'VALUES(1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                            (self.base_date, self.base_date, self.base_date, self.base_date, self.base_date,
                             self.base_date, self.base_date, self.base_date, self.last_meta_update,
-                            tools.getSetting('trakt.username')))
+                            tools.getSetting('trakt.username'), self.base_date, self.base_date, self.base_date))
             cursor.connection.commit()
             cursor.execute('SELECT * FROM activities WHERE sync_id=1')
             self.activites = cursor.fetchone()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
         if self.activites is not None:
             self._check_database_version()
 
-
     def _check_database_version(self):
-
         # If we are updating from a database prior to database versioning, we must clear the meta data
-
         # Migrate from older versions before trakt username tracking
         if 'trakt_username' not in self.activites and tools.getSetting('trakt.auth') != '':
+            tools.traktSyncDB_lock.acquire()
             tools.log('Upgrading Trakt Sync Database Version to support Trakt username identification')
             cursor = self._get_cursor()
             cursor.execute('ALTER TABLE activities ADD COLUMN trakt_username TEXT')
             cursor.execute('UPDATE activities SET trakt_username = ?', (tools.getSetting('trakt.username'),))
             cursor.connection.commit()
             cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
 
         # Migrate from an old version before database migrations
         if 'seren_version' not in self.activites:
             tools.log('Upgrading Trakt Sync Database Version')
             self.clear_all_meta(False)
+            tools.traktSyncDB_lock.acquire()
             cursor = self._get_cursor()
             cursor.execute('ALTER TABLE activities ADD COLUMN seren_version TEXT')
             cursor.execute('UPDATE activities SET seren_version = ?', (self.last_meta_update,))
             cursor.connection.commit()
             cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
 
         if tools.check_version_numbers(self.activites['seren_version'], self.last_meta_update):
-            tools.log('Upgrading Trakt Sync Database Version')
-            self.clear_all_meta(False)
-            cursor = self._get_cursor()
-            cursor.execute('UPDATE activities SET seren_version=?', (self.last_meta_update,))
-            cursor.connection.commit()
-            cursor.close()
+            tools.log('Rebuilding Trakt Sync Database Version')
+            tools.showDialog.ok(tools.addonName, tools.lang(40352))
+            self.re_build_database(True)
             return
 
-        if tools.check_version_numbers(tools.addonVersion, self.activites['seren_version']) and \
-                        self.activites['seren_version'] != self.last_meta_update:
-            tools.log('Downgrading Trakt Sync Database Version')
-            self.clear_all_meta(False)
+        if 'movies_bookmarked' not in self.activites:
+            tools.log('Upgrading Trakt Sync Database Version to support bookmark sync')
+            tools.traktSyncDB_lock.acquire()
             cursor = self._get_cursor()
-            cursor.execute('UPDATE activities SET seren_version=?', (self.last_meta_update,))
+            cursor.execute('ALTER TABLE activities ADD COLUMN movies_bookmarked TEXT')
+            cursor.execute('ALTER TABLE activities ADD COLUMN episodes_bookmarked TEXT')
+            cursor.connection.commit()
+            cursor.execute('UPDATE activities SET movies_bookmarked = ?', (self.base_date,))
+            cursor.execute('UPDATE activities SET episodes_bookmarked = ?', (self.base_date,))
             cursor.connection.commit()
             cursor.close()
-            return
+            tools.try_release_lock(tools.traktSyncDB_lock)
+
+        tools.traktSyncDB_lock.acquire()
+        cursor = self._get_cursor()
+        cursor.execute('SELECT 1 FROM sqlite_master WHERE type = \'table\' AND name = \'shows\' AND sql LIKE '
+                       '\'%air_date%\'')
+        if len(cursor.fetchall()) == 0:
+            cursor.execute('ALTER TABLE shows ADD COLUMN air_date DATE')
+            cursor.connection.commit()
+        cursor.execute('SELECT 1 FROM sqlite_master WHERE type = \'table\' AND name = \'episodes\' AND sql LIKE '
+                       '\'%air_date%\'')
+        if len(cursor.fetchall()) == 0:
+            cursor.execute('ALTER TABLE episodes ADD COLUMN air_date DATE')
+            cursor.connection.commit()
+        cursor.execute('SELECT 1 FROM sqlite_master WHERE type = \'table\' AND name = \'seasons\' AND sql LIKE '
+                       '\'%air_date%\'')
+        if len(cursor.fetchall()) == 0:
+            cursor.execute('ALTER TABLE seasons ADD COLUMN air_date DATE')
+            cursor.connection.commit()
+        cursor.execute('SELECT 1 FROM sqlite_master WHERE type = \'table\' AND name = \'movies\' AND sql LIKE '
+                       '\'%air_date%\'')
+        if len(cursor.fetchall()) == 0:
+            cursor.execute('ALTER TABLE movies ADD COLUMN air_date DATE')
+            cursor.connection.commit()
+        tools.try_release_lock(tools.traktSyncDB_lock)
+
+        if 'movies_bookmarked' not in self.activites:
+            tools.log('Upgrading Trakt Sync Database Version to support bookmark sync')
+            cursor = self._get_cursor()
+            cursor.execute('ALTER TABLE activities ADD COLUMN movies_bookmarked TEXT')
+            cursor.execute('ALTER TABLE activities ADD COLUMN episodes_bookmarked TEXT')
+            cursor.connection.commit()
+            cursor.execute('UPDATE activities SET movies_bookmarked = ?', (self.base_date,))
+            cursor.execute('UPDATE activities SET episodes_bookmarked = ?', (self.base_date,))
+            cursor.connection.commit()
+            cursor.close()
 
     def _build_show_table(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS shows '
                        '(trakt_id INTEGER PRIMARY KEY, '
                        'kodi_meta TEXT NOT NULL, '
                        'last_updated TEXT NOT NULL, '
+                       'air_date TEXT, '
                        'UNIQUE(trakt_id))')
+        cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS ix_shows ON "shows" (trakt_id ASC )')
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def _build_episode_table(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS episodes ('
                        'show_id INTEGER NOT NULL, '
@@ -136,22 +179,31 @@ class TraktSyncDatabase:
                        'watched INTEGER NOT NULL, '
                        'collected INTEGER NOT NULL, '
                        'number INTEGER NOT NULL, '
+                       'air_date TEXT, '
                        'UNIQUE (trakt_id),'
                        'FOREIGN KEY(show_id) REFERENCES shows(trakt_id) ON DELETE CASCADE)')
+        cursor.execute(
+            'CREATE UNIQUE INDEX IF NOT EXISTS ix_episodes ON episodes (show_id ASC, season ASC, number ASC)')
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def _build_season_table(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS seasons ('
                        'show_id INTEGER NOT NULL, '
                        'season INTEGER NOT NULL, '
                        'kodi_meta TEXT NOT NULL, '
+                       'air_date TEXT, '
                        'FOREIGN KEY(show_id) REFERENCES shows(trakt_id) ON DELETE CASCADE)')
+        cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS ix_season ON seasons (show_id ASC, season ASC)')
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def _build_movies_table(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS movies ('
                        'trakt_id INTEGER NOT NULL PRIMARY KEY, '
@@ -159,11 +211,15 @@ class TraktSyncDatabase:
                        'collected INTEGER NOT NULL, '
                        'watched INTEGER NOT NULL, '
                        'last_updated INTEGER NOT NULL, '
+                       'air_date TEXT, '
                        'UNIQUE (trakt_id))')
+        cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS ix_movies ON movies (trakt_id ASC)')
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def _build_hidden_items(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS hidden ('
                        'id_section TEXT NOT NULL, '
@@ -174,8 +230,10 @@ class TraktSyncDatabase:
 
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def _build_sync_activities(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS activities ('
                        'sync_id INTEGER PRIMARY KEY, '
@@ -188,9 +246,50 @@ class TraktSyncDatabase:
                        'shows_meta_update TEXT NOT NULL,'
                        'movies_meta_update TEXT NOT NULL,'
                        'seren_version TEXT NOT NULL,'
-                       'trakt_username TEXT) '
+                       'trakt_username TEXT,'
+                       'movies_bookmarked TEXT NOT NULL,'
+                       'episodes_bookmarked TEXT NOT NULL,'
+                       'lists_sync TEXT NOT NULL) '
                        )
         cursor.connection.commit()
+        cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
+
+    def _build_lists_table(self):
+        tools.traktSyncDB_lock.acquire()
+        cursor = self._get_cursor()
+        cursor.execute('CREATE TABLE IF NOT EXISTS lists ('
+                       'trakt_id INTEGER PRIMARY KEY, '
+                       'name TEXT NOT NULL, '
+                       'username TEXT NOT NULL, '
+                       'kodi_meta TEXT NOT NULL, '
+                       'updated_at TEXT NOT NULL,'
+                       'list_type TEXT NOT NULL,'
+                       'media_type TEXT NOT NULL,'
+                       'item_count INT NOT NULL,'
+                       'sort_by TEXT NOT NULL,'
+                       'sort_how TEXT NOT NULL,'
+                       'slug TEXT NOT NULL) '
+                       )
+
+        cursor.connection.commit()
+        cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
+
+    def _build_bookmark_table(self):
+        tools.traktSyncDB_lock.acquire()
+        cursor = self._get_cursor()
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS bookmark (trakt_id TEXT, timeInSeconds TEXT, UNIQUE(trakt_id))")
+        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_bookmark ON bookmark (trakt_id)")
+        cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
+
+    def _build_bookmark_table(self):
+        cursor = self._get_cursor()
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS bookmark (trakt_id TEXT, timeInSeconds TEXT, UNIQUE(trakt_id))")
+        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_bookmark ON bookmark (trakt_id)")
         cursor.close()
 
     def _get_cursor(self):
@@ -199,15 +298,18 @@ class TraktSyncDatabase:
         cursor = conn.cursor()
         return cursor
 
-    def flush_activities(self, clear_meta=True):
+    def flush_activities(self, clear_meta=False):
         if clear_meta:
             self.clear_all_meta()
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('DROP TABLE activities')
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def clear_user_information(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('UPDATE episodes SET watched=0')
         cursor.execute('UPDATE episodes SET collected=0')
@@ -215,22 +317,25 @@ class TraktSyncDatabase:
         cursor.execute('UPDATE movies SET collected=0')
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
         self.set_trakt_user('')
         tools.showDialog.notification(tools.addonName + ': Trakt', tools.lang(40260), time=5000)
 
     def set_trakt_user(self, trakt_username):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         tools.log('Setting Trakt Username: %s' % trakt_username)
         cursor.execute('UPDATE activities SET trakt_username=?', (trakt_username,))
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def clear_all_meta(self, notify=True):
         if notify:
             confirm = tools.showDialog.yesno(tools.addonName, tools.lang(40139))
             if confirm == 0:
                 return
-
+        tools.traktSyncDB_lock.acquire()
         meta = '{}'
         cursor = self._get_cursor()
         cursor.execute("UPDATE shows SET kodi_meta=?", (meta,))
@@ -239,57 +344,69 @@ class TraktSyncDatabase:
         cursor.execute("UPDATE movies SET kodi_meta=?", (meta,))
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
         tools.showDialog.notification(tools.addonName + ': Trakt', tools.lang(40261), time=5000)
 
     def clear_specific_meta(self, trakt_object):
-
         if 'seasons' in trakt_object:
             show_id = trakt_object['show_id']
             season_no = trakt_object['seasons'][0]['number']
+            tools.traktSyncDB_lock.acquire()
             cursor = self._get_cursor()
             cursor.execute('UPDATE episodes SET kodi_meta=? WHERE show_id=? AND season=?', ('{}', show_id, season_no))
             cursor.execute('UPDATE seasons SET kodi_meta=? WHERE show_id=? AND season=?', ('{}', show_id, season_no))
             cursor.connection.commit()
             cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
 
         elif 'shows' in trakt_object:
             show_id = trakt_object['shows'][0]['ids']['trakt']
+            tools.traktSyncDB_lock.acquire()
             cursor = self._get_cursor()
             cursor.execute('UPDATE shows SET kodi_meta=? WHERE trakt_id=?', ('{}', show_id))
             cursor.execute('UPDATE episodes SET kodi_meta=? WHERE show_id=? ', ('{}', show_id))
             cursor.execute('UPDATE seasons SET kodi_meta=? WHERE show_id=? ', ('{}', show_id))
             cursor.connection.commit()
             cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
 
         elif 'episodes' in trakt_object:
             trakt_id = trakt_object['episodes'][0]['ids']['trakt']
+            tools.traktSyncDB_lock.acquire()
             cursor = self._get_cursor()
             cursor.execute('UPDATE episodes SET kodi_meta=? WHERE trakt_id=? ', ('{}', trakt_id))
             cursor.connection.commit()
             cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
 
         elif 'movies' in trakt_object:
             trakt_id = trakt_object['movies'][0]['ids']['trakt']
+            tools.traktSyncDB_lock.acquire()
             cursor = self._get_cursor()
             cursor.execute('UPDATE movies SET kodi_meta=? WHERE trakt_id=? ', ('{}', trakt_id))
             cursor.connection.commit()
             cursor.close()
+            tools.try_release_lock(tools.traktSyncDB_lock)
 
+    def re_build_database(self, silent=False):
+        if not silent:
+            confirm = tools.showDialog.yesno(tools.addonName, tools.lang(40139))
+            if confirm == 0:
+                return
 
-    def re_build_database(self):
-        confirm = tools.showDialog.yesno(tools.addonName, tools.lang(40139))
-        if confirm == 0:
-            return
-
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
-        cursor.execute('DROP TABLE shows')
-        cursor.execute('DROP TABLE seasons')
-        cursor.execute('DROP TABLE episodes')
-        cursor.execute('DROP TABLE movies')
-        cursor.execute('DROP TABLE activities')
-        cursor.execute('DROP TABLE hidden')
+        cursor.execute('DROP TABLE IF EXISTS shows')
+        cursor.execute('DROP TABLE IF EXISTS seasons')
+        cursor.execute('DROP TABLE IF EXISTS episodes')
+        cursor.execute('DROP TABLE IF EXISTS movies')
+        cursor.execute('DROP TABLE IF EXISTS activities')
+        cursor.execute('DROP TABLE IF EXISTS hidden')
+        cursor.execute('DROP TABLE IF EXISTS lists')
+        cursor.execute('DROP TABLE IF EXISTS bookmark')
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
         self._build_show_table()
         self._build_episode_table()
@@ -297,10 +414,18 @@ class TraktSyncDatabase:
         self._build_hidden_items()
         self._build_sync_activities()
         self._build_season_table()
+        self._build_lists_table()
+        self._build_bookmark_table()
 
-        from resources.lib.modules.trakt_sync.activities import TraktSyncDatabase as activities
-        activities().sync_activities()
-        tools.showDialog.notification(tools.addonName + ': Trakt', tools.lang(40262), time=5000)
+        from resources.lib.modules.trakt_sync import activities
+        sync_errors = activities.TraktSyncDatabase().sync_activities(silent)
+
+        if sync_errors:
+            tools.showDialog.notification(tools.addonName + ': Trakt', tools.lang(40353), time=5000)
+        elif sync_errors is None:
+            return
+        else:
+            tools.showDialog.notification(tools.addonName + ': Trakt', tools.lang(40262), time=5000)
 
 
 def _bring_out_your_dead(population):

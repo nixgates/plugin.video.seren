@@ -2,6 +2,8 @@ import sys
 import os
 import re
 import xbmcgui
+from resources.lib.modules import router
+from urllib.parse import parse_qsl
 
 #======================================================================================================================
 # API Constants
@@ -145,7 +147,10 @@ class directory:
         if self.last_action != '':
             self.history.append(self.last_action)
             self.last_action = sys.argv[2]
-        execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
+
+        router.dispatch(dict(parse_qsl(sys.argv[2].replace('?', ''))))
+
+        # execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
         sys.argv = ['', 0, '']
 
 DIRECTORY = directory()

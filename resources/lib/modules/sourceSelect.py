@@ -9,8 +9,7 @@ def sourceSelect(uncached_sources, source_list, info):
             return None
 
         from resources.lib.gui.windows.source_select import SourceSelect
-        window = SourceSelect('source_select.xml',
-                              SkinManager().active_skin_path,
+        window = SourceSelect(*SkinManager().confirm_skin_path('source_select.xml'),
                               actionArgs=info,
                               sources=source_list)
 

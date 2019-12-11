@@ -2,11 +2,12 @@
 
 import requests
 import sys
-import threading
+from resources.lib.common.worker import ThreadPool
 
 from resources.lib.common import tools
 from resources.lib.debrid import premiumize as Premiumize
 from resources.lib.debrid import real_debrid
+from resources.lib.debrid import all_debrid
 from resources.lib.gui.windows.base_window import BaseWindow
 
 try:
@@ -30,14 +31,21 @@ class Resolver(BaseWindow):
         self.silent = False
 
         self.pack_select = None
+        self.resolvers = {'all_debrid': all_debrid.AllDebrid,
+                          'premiumize': Premiumize.Premiumize,
+                          'real_debrid': real_debrid.RealDebrid}
+
+    def onInit(self):
+        self.resolve(self.sources, self.args, self.pack_select)
 
     def resolve(self, sources, args, pack_select=False):
+
         try:
 
             stream_link = None
             loop_count = 0
             # Begin resolving links
-            tools.log('Attempting to Resolve file link', 'info')
+
             for i in sources:
                 debrid_provider = i.get('debrid_provider', 'None').replace('_', ' ')
                 loop_count += 1
@@ -45,6 +53,7 @@ class Resolver(BaseWindow):
                     if self.is_canceled():
                         self.close()
                         return
+
                     if 'size' in i:
                         i['info'].append(tools.source_size_display(i['size']))
 
@@ -55,11 +64,7 @@ class Resolver(BaseWindow):
                     self.setProperty('source_info', " ".join(i['info']))
 
                     if i['type'] == 'torrent':
-                        if i['debrid_provider'] == 'premiumize':
-                            stream_link = self.premiumizeResolve(i, args, pack_select)
-                        elif i['debrid_provider'] == 'real_debrid':
-                            stream_link = self.realdebridResolve(i, args)
-
+                        stream_link = self.resolve_source(self.resolvers[i['debrid_provider']], i, args, pack_select)
                         if stream_link is None:
                             tools.log('Failed to resolve for torrent %s' % i['release_title'])
                             continue
@@ -68,9 +73,20 @@ class Resolver(BaseWindow):
                             self.close()
                             return
 
-
                     elif i['type'] == 'hoster' or i['type'] == 'cloud':
-                        # Quick fallback to speed up resolving while direct and free hosters are not supported
+
+                        if i['url'] is None:
+                            continue
+
+                        if i['type'] == 'cloud' and i['debrid_provider'] == 'premiumize':
+                            selected_file = Premiumize.Premiumize().item_details(i['url'])
+                            if tools.getSetting('premiumize.transcoded') == 'true':
+                                url = selected_file['stream_link']
+                            else:
+                                url = selected_file['link']
+                            self.return_data = url
+                            self.close()
+                            return
 
                         if 'provider_imports' in i:
                             provider = i['provider_imports']
@@ -84,57 +100,49 @@ class Resolver(BaseWindow):
                                 traceback.print_exc()
                                 pass
 
-                        if i['url'] is None:
-                            continue
-
                         if 'debrid_provider' in i:
-                            if i['debrid_provider'] == 'premiumize' and tools.premiumize_enabled():
-                                stream_link = self.premiumizeResolve(i, args)
-                                if stream_link is None:
-                                    continue
-                                else:
-                                    try:
-                                        requests.head(stream_link, timeout=1)
-                                    except:
-                                        tools.log('Head Request failed link might be dead, skipping')
-                                        continue
-
-                            if i['debrid_provider'] == 'real_debrid' and tools.real_debrid_enabled():
-                                stream_link = self.realdebridResolve(i, args)
-                                if stream_link is None:
-                                    continue
+                            stream_link = self.resolve_source(self.resolvers[i['debrid_provider']], i, args,
+                                                              pack_select)
+                            if stream_link is None:
+                                continue
+                            else:
                                 try:
                                     requests.head(stream_link, timeout=1)
-                                except:
-                                    tools.log('Head Request failed link might be dead, skipping')
+                                except requests.exceptions.RequestException:
+                                    tools.log('Head Request failed link likely dead, skipping')
                                     continue
-                        else:
-                            # Currently not supporting free hosters at this point in time
-                            # ResolveURL and Direct link testing needs to be tested first
+
+                        elif i['url'].startswith('http'):
                             try:
-                                ext = i['url'].split('?')[0].split('&')[0].split('|')[0].rsplit('.')[-1].replace('/',
-                                                                                                            '').lower()
+                                ext = i['url'].split('?')[0]
+                                ext = ext.split('&')[0]
+                                ext = ext.split('|')[0]
+                                ext = ext.rsplit('.')[-1]
+                                ext = ext.replace('/', '').lower()
                                 if ext == 'rar': raise Exception()
-                                try:
-                                    headers = i['url'].rsplit('|', 1)[1]
-                                except:
-                                    headers = ''
 
                                 try:
                                     headers = i['url'].rsplit('|', 1)[1]
                                 except:
                                     headers = ''
+
                                 headers = tools.quote_plus(headers).replace('%3D', '=') if ' ' in headers else headers
                                 headers = dict(tools.parse_qsl(headers))
 
                                 live_check = requests.head(i['url'], headers=headers, timeout=10)
 
                                 if not live_check.status_code == 200:
+                                    tools.log('Head Request failed link likely dead, skipping')
                                     continue
 
                                 stream_link = i['url']
                             except:
+                                import traceback
+                                traceback.print_exc()
                                 stream_link = None
+
+                        elif tools.file_exists(i['url']):
+                            stream_link = i['url']
 
                         if stream_link is None:
                             continue
@@ -159,70 +167,45 @@ class Resolver(BaseWindow):
             self.close()
             return
 
-    def premiumizeResolve(self, source, args, pack_select=False):
-
+    def resolve_source(self, api, source, args, pack_select=False):
         stream_link = None
+        api = api()
         try:
 
-            premiumize = Premiumize.PremiumizeFunctions()
-
             if source['type'] == 'torrent':
-                stream_link = premiumize.magnetToStream(source['magnet'], args, pack_select)
+                stream_link = api.resolve_magnet(source['magnet'], args, source, pack_select)
             elif source['type'] == 'hoster':
-                stream_link = premiumize.resolveHoster(source['url'])
-            elif source['type'] == 'cloud':
-                stream_link = source['url']
+                stream_link = api.resolve_hoster(source['url'])
         except:
             import traceback
             traceback.print_exc()
             pass
         return stream_link
 
-    def realdebridResolve(self, i, args):
-
-        stream_link = None
-        rd = real_debrid.RealDebrid()
-
-        try:
-            if i['type'] == 'torrent':
-                stream_link = rd.magnetToLink(i, args)
-
-            elif i['type'] == 'hoster' or i['type'] == 'cloud':
-                stream_link = rd.unrestrict_link(i['url'])
-        except:
-            import traceback
-            traceback.print_exc()
-
-        return stream_link
-
     def getHosterList(self):
-        from resources.lib.modules import database
+        thread_pool = ThreadPool()
         try:
             hosters = {'premium': {}, 'free': []}
             try:
                 if tools.getSetting('premiumize.enabled') == 'true' and tools.getSetting(
                         'premiumize.hosters') == 'true':
-                    host_list = database.get(Premiumize.PremiumizeFunctions().updateRelevantHosters, 1)
-                    if host_list is None:
-                        host_list = Premiumize.PremiumizeFunctions().updateRelevantHosters()
-                    if host_list is not None:
-                        hosters['premium']['premiumize'] = [(i, i.split('.')[0]) for i in host_list['directdl']]
-                    else:
-                        hosters['premium']['premiumize'] = []
+                   thread_pool.put(Premiumize.Premiumize().get_hosters, hosters)
             except:
                 pass
 
             try:
                 if tools.getSetting('realdebrid.enabled') == 'true' and tools.getSetting('rd.hosters') == 'true':
-                    host_list = database.get(real_debrid.RealDebrid().getRelevantHosters, 1)
-                    if host_list is None:
-                        host_list = real_debrid.RealDebrid().getRelevantHosters()
-                    if host_list is not None:
-                        hosters['premium']['real_debrid'] = [(i, i.split('.')[0]) for i in host_list]
-                    else:
-                        hosters['premium']['real_debrid'] = []
+                    thread_pool.put(real_debrid.RealDebrid().get_hosters, hosters)
             except:
                 pass
+
+            try:
+                if tools.getSetting('alldebrid.enabled') == 'true' and tools.getSetting('alldebrid.hosters') == 'true':
+                    thread_pool.put(all_debrid.AllDebrid().get_hosters, hosters)
+            except:
+                pass
+
+            thread_pool.wait_completion()
 
             return hosters
 
@@ -235,12 +218,18 @@ class Resolver(BaseWindow):
         if tools.getSetting('general.tempSilent') == 'true':
             self.silent = True
 
-        thread = threading.Thread(target=self.resolve, args=(sources, args, pack_select))
-        thread.start()
+        self.sources = sources
+        self.args = args
+        self.pack_select = pack_select
+        self.setProperty('release_title', tools.display_string(self.sources[0]['release_title']))
+        self.setProperty('debrid_provider', self.sources[0].get('debrid_provider', 'None').replace('_', ' '))
+        self.setProperty('source_provider', self.sources[0]['provider'])
+        self.setProperty('source_resolution', self.sources[0]['quality'])
+        self.setProperty('source_info', " ".join(self.sources[0]['info']))
         if not self.silent:
-            tools.dialogWindow.doModal(self)
+            super(Resolver, self).doModal()
         else:
-            thread.join()
+            self.resolve(sources, args, pack_select)
 
         return self.return_data
 
@@ -254,6 +243,7 @@ class Resolver(BaseWindow):
         id = action.getId()
         if id == 92 or id == 10:
             self.canceled = True
+            self.close()
 
     def setBackground(self, url):
         if not self.silent:

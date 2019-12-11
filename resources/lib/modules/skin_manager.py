@@ -9,10 +9,23 @@ else:
     import zipfile
 
 import xbmc
-import requests
 import os
 import json
 import shutil
+import requests
+
+
+class SkinNotFoundException(Exception):
+
+    def __init__(self, skin_name):
+        tools.log('Unable to find skin "{}", check it\'s installed?'.format(skin_name), 'error')
+
+
+class SkinUpdateFailed(Exception):
+
+    def __init__(self, msg):
+        tools.log('Skin Update Failed: \n {}'.format(msg), 'error')
+
 
 class SkinManager:
 
@@ -24,11 +37,10 @@ class SkinManager:
         if not os.path.exists(tools.SKINS_PATH):
             os.mkdir(tools.SKINS_PATH)
 
+        self._check_database_for_updates()
         self._create_database()
+
         self.installed_skins = self._get_all_installed()
-
-        self.seren_default_window_path = os.path.join(tools.addonDir, 'resources', 'skins', 'seren_backup_files')
-
         self.active_skin_path = self.get_active_skin_path()
 
     def get_active_skin_path(self):
@@ -40,15 +52,21 @@ class SkinManager:
             return os.path.join(tools.dataPath, 'skins', active_skin_name)
 
     def get_active_skin(self):
-        cursor = database._get_connection_cursor(tools.SKINS_DB_PATH)
+        cursor = self._get_skin_cursor()
 
         cursor.execute('SELECT * FROM skins WHERE active = 1')
         active_skin = cursor.fetchone()
+        if active_skin is None:
+            tools.log('Failed to identify active skin, resetting to Default', 'error')
+            cursor.execute('UPDATE skins SET active=1 WHERE skin_name == ?', ('Seren Fox',))
+            cursor.connection.commit()
+            cursor.execute('SELECT * FROM skins WHERE active = 1')
+            active_skin = cursor.fetchone()
         cursor.close()
 
         return active_skin['skin_name']
 
-    def install_skin(self, zip_location=None):
+    def install_skin(self, zip_location=None, silent=False):
         if zip_location is None:
             zip_location = self._get_zip_location()
 
@@ -73,13 +91,15 @@ class SkinManager:
 
         self._cleanup_temp_files(skin_meta)
 
-        switch_skin = tools.showDialog.yesno(tools.addonName, tools.lang(40158).encode('utf-8') %
-                                             (skin_meta['skin_name'], skin_meta['version']))
+        if not silent:
+            switch_skin = tools.showDialog.yesno(tools.addonName, tools.lang(40158) %
+                                                 (skin_meta['skin_name'].encode('utf-8'),
+                                                  skin_meta['version'].encode('utf-8')))
 
-        if not switch_skin:
-             return
+            if not switch_skin:
+                return
 
-        self.switch_skin(skin_meta['skin_name'])
+            self.switch_skin(skin_meta['skin_name'])
 
     def uninstall_skin(self, skin_name=None):
 
@@ -120,7 +140,7 @@ class SkinManager:
         tools.showDialog.ok(tools.addonName, tools.lang(40167) % skin_name)
 
     def _is_skin_active(self, skin_name):
-        cursor = database._get_connection_cursor(tools.SKINS_DB_PATH)
+        cursor = self._get_skin_cursor()
 
         cursor.execute('SELECT * FROM skins WHERE skin_name=?', (skin_name,))
         skin_info = cursor.fetchone()
@@ -133,16 +153,17 @@ class SkinManager:
             return False
 
     def _select_installed_skin(self, hide_default=False):
-        installed_skins = [i['skin_name'] for i in self.installed_skins]
+        installed_skins = [('{} - {}'.format(i['skin_name'], i['version']), i['skin_name'])
+                           for i in self.installed_skins]
         if hide_default:
-            installed_skins.remove('Seren Fox')
+            installed_skins.remove([i for i in installed_skins if i[1] == 'Seren Fox'][0])
 
-        selection = tools.showDialog.select(tools.addonName, installed_skins)
+        selection = tools.showDialog.select(tools.addonName, [i[0] for i in installed_skins])
 
         if selection == -1:
             return
 
-        return installed_skins[selection]
+        return installed_skins[selection][1]
 
     def _extract_zip(self, install_package, skin_meta):
 
@@ -151,7 +172,7 @@ class SkinManager:
             file_path = file_path.split('resources/')[0]
         except:
             file_path = ''
-        tools.log('%sresources/' % file_path)
+
         if '%sresources/' % file_path not in install_package.namelist():
             tools.log('Theme Folder Structure Invalid: Missing folder "Resources"')
             tools.showDialog.ok(tools.addonName, tools.lang(40171))
@@ -231,7 +252,6 @@ class SkinManager:
                 meta_file = i
 
         if meta_file is None:
-            tools.log('%s/meta.json' % file_list[0])
             if '%s/meta.json' % file_list[0] in file_list:
                 zip_root_dir = file_list[0]
                 meta_file = 'meta.json'
@@ -276,27 +296,46 @@ class SkinManager:
 
     def _create_database(self):
 
-        cursor = database._get_connection_cursor(tools.SKINS_DB_PATH)
+        cursor = self._get_skin_cursor()
 
         cursor.execute("CREATE TABLE IF NOT EXISTS skins ("
                        "skin_name TEXT, "
                        "version TEXT, "
                        "author TEXT, "
                        "active TEXT, "
+                       "remote_meta TEXT, "
+                       "update_directory TEXT, "
                        "UNIQUE(skin_name))")
 
         default_installed = cursor.execute('UPDATE skins SET '
-                                           'skin_name=?, version=?, author=? WHERE skin_name=?',
-                                           ('Seren Fox', '1.0.0', 'Nixgates', 'Seren Fox'))
+                                           'skin_name=?, '
+                                           'version=?,'
+                                           ' author=?, '
+                                           'update_directory=?, '
+                                           'remote_meta=?'
+                                           ' WHERE skin_name=?',
+                                           ('Seren Fox',
+                                            '1.0.1',
+                                            'Nixgates',
+                                            None,
+                                            None,
+                                            'Seren Fox'))
         if default_installed.rowcount == 0:
-            cursor.execute('INSERT INTO skins VALUES (?,?,?,?)', ('Seren Fox', '1.0.0', 'Nixgates', '1'))
+            cursor.execute('INSERT INTO skins VALUES (?,?,?,?,?,?)',
+                           ('Seren Fox',
+                            '1.0.1',
+                            'Nixgates',
+                            '1',
+                            None,
+                            None
+                            ))
 
         cursor.connection.commit()
         cursor.close()
 
     def _get_all_installed(self):
 
-        cursor = database._get_connection_cursor(tools.SKINS_DB_PATH)
+        cursor = self._get_skin_cursor()
 
         cursor.execute("SELECT * FROM skins")
         installed_skins = cursor.fetchall()
@@ -306,7 +345,7 @@ class SkinManager:
 
     def _mark_skin_active(self, skin_name):
 
-        cursor = database._get_connection_cursor(tools.SKINS_DB_PATH)
+        cursor = self._get_skin_cursor()
 
         cursor.execute('UPDATE skins SET active=? WHERE active=?', ('0', '1'))
 
@@ -323,22 +362,162 @@ class SkinManager:
             tools.showDialog.ok(tools.addonName, tools.lang(40321))
             return
 
-        cursor = database._get_connection_cursor(tools.SKINS_DB_PATH)
+        cursor = self._get_skin_cursor()
 
-        update = cursor.execute('UPDATE skins SET version=?, author=? WHERE skin_name=?', (skin_meta['version'],
-                                                                                           skin_meta['author'],
-                                                                                           skin_meta['skin_name']))
+        update = cursor.execute('UPDATE skins SET '
+                                'version=?, '
+                                'author=?, '
+                                'remote_meta=?, '
+                                'update_directory=? '
+                                'WHERE skin_name=?', (skin_meta['version'],
+                                                      skin_meta['author'],
+                                                      skin_meta.get('remote_meta', None),
+                                                      skin_meta.get('update_directory', None),
+                                                      skin_meta['skin_name']))
         if update.rowcount == 0:
-            cursor.execute('INSERT INTO skins VALUES (?,?,?,?)', (skin_meta['skin_name'],
-                                                                  skin_meta['version'],
-                                                                  skin_meta['author'], '0'))
+            cursor.execute('INSERT INTO skins VALUES (?,?,?,?,?,?)',
+                           (skin_meta['skin_name'],
+                            skin_meta['version'],
+                            skin_meta['author'],
+                            '0',
+                            skin_meta.get('remote_meta', None),
+                            skin_meta.get('update_directory', None)
+                            ))
 
         cursor.connection.commit()
         cursor.close()
 
     def _remove_skin_from_database(self, skin_name):
 
-        cursor = database._get_connection_cursor(tools.SKINS_DB_PATH)
+        cursor = self._get_skin_cursor()
         cursor.execute('DELETE FROM skins WHERE skin_name=?', (skin_name,))
         cursor.connection.commit()
+        cursor.close()
+
+    def confirm_skin_path(self, xml_file):
+
+        if self.active_skin_path == tools.ADDON_PATH:
+            return xml_file, self.active_skin_path
+
+        skins_folder = os.path.join(self.active_skin_path, 'resources', 'skins', 'Default')
+
+        for folder in [folder for folder in
+                       os.listdir(skins_folder)
+                       if os.path.isdir(os.path.join(skins_folder, folder))]:
+
+            if folder == 'media':
+                continue
+
+            if xml_file in os.listdir(os.path.join(skins_folder, folder)):
+                return xml_file, self.active_skin_path
+
+        return xml_file, tools.ADDON_PATH
+
+    def _check_skin_for_update(self, skin_info):
+
+        try:
+            remote_meta = requests.get(skin_info['remote_meta']).json()
+            return tools.check_version_numbers(skin_info['version'], remote_meta['version'])
+        except:
+            tools.log('Failed to obtain remote meta information for skin: {}'.format(skin_info['skin_name']))
+            return False
+
+    def _skin_can_update(self, skin_info):
+        keys = ['remote_meta', 'update_directory']
+
+        for key in keys:
+            if skin_info[key] is None:
+                print('{} NONE'.format(key))
+                return False
+            if skin_info[key] is '':
+                print('{} EMP'.format(key))
+                return False
+            if not skin_info[key].startswith('http'):
+                print('{} HTTP'.format(key))
+                return False
+
+        return True
+
+    def check_for_updates(self, skin_name=None, silent=False):
+
+        skins = []
+
+        if skin_name is None:
+            skins = self.installed_skins
+
+        else:
+            try:
+                skins.append([i for i in self.installed_skins if i['skin_name'] == skin_name][0])
+            except IndexError:
+                raise SkinNotFoundException(skin_name)
+
+        skins = [i for i in skins if self._skin_can_update(i)]
+
+        if not silent:
+            tools.progressDialog.create(tools.addonName, tools.lang(33019))
+            tools.progressDialog.update(-1)
+
+        skins = list([self._check_skin_for_update(i) for i in skins])
+
+        if len(skins) == 0:
+            if not silent:
+                tools.progressDialog.close()
+                tools.showDialog.ok(tools.addonName, tools.lang(33018))
+            return
+
+        if not silent:
+            tools.progressDialog.close()
+            while skins and len(skins) > 0:
+                tools.progressDialog.create(tools.addonName, tools.lang(40311))
+                tools.progressDialog.update(-1)
+
+                selection = tools.showDialog.select(tools.addonName, ['{} - {}'.format(i['skin_name'], i['version'])
+                                                                      for i in skins])
+                if selection == -1:
+                    return
+
+                skin_info = skins[selection]
+
+                try:
+                    self.install_skin(skin_info['update_directory'], True)
+                    skins.remove(skin_info)
+                    tools.progressDialog.close()
+                    tools.showDialog.ok(tools.addonName, tools.lang(40318))
+                except:
+                    import traceback
+                    traceback.print_exc()
+                    tools.log('Failed to update skin: {}'.format(selection['skin_name']))
+                    tools.showDialog.notification(tools.addonName, tools.lang(33013))
+
+            tools.showDialog.ok(tools.addonName, tools.lang(33018))
+            return
+
+        for skin in skins:
+            try:
+                self.install_skin(skin['update_directory'], True)
+            except:
+                tools.log('Failed to update theme: {}'.format(skin['skin_name']))
+
+        tools.log('Skin updates completed')
+
+    def _get_skin_cursor(self):
+        return database._get_connection_cursor(tools.SKINS_DB_PATH)
+
+    def _check_database_for_updates(self):
+        cursor = self._get_skin_cursor()
+        try:
+            cursor.execute("SELECT * FROM skins WHERE skin_name=?", ('Seren Fox',))
+            base_skin = cursor.fetchone()
+        except database.OperationalError:
+            return
+        finally:
+            cursor.close()
+
+        if 'update_directory' not in base_skin:
+            self._update_db_skin_updates()
+
+    def _update_db_skin_updates(self):
+        cursor = self._get_skin_cursor()
+        cursor.execute('ALTER TABLE skins ADD COLUMN update_directory TEXT')
+        cursor.execute('ALTER TABLE skins ADD COLUMN remote_meta TEXT')
         cursor.close()

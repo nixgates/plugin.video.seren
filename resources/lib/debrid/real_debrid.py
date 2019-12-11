@@ -8,6 +8,7 @@ import threading
 
 from resources.lib.common import source_utils
 from resources.lib.common import tools
+from resources.lib.modules import database
 
 
 class RealDebrid:
@@ -57,10 +58,10 @@ class RealDebrid:
         response = json.loads(requests.get(url).text)
         tools.copy2clip(response['user_code'])
         tools.progressDialog.create(tools.lang(32023))
-        tools.progressDialog.update(-1, tools.lang(32024) + ' %s' % tools.colorString(
-            'https://real-debrid.com/device'),
-                                    tools.lang(32025) + ' %s' % tools.colorString(
-                                        response['user_code']),
+        tools.progressDialog.update(-1, tools.lang(32024).format(tools.colorString(
+            'https://real-debrid.com/device')),
+                                    tools.lang(32025).format(tools.colorString(
+                                        response['user_code'])),
                                     'This code has been copied to your clipboard')
         self.OauthTimeout = int(response['expires_in'])
         self.OauthTimeStep = int(response['interval'])
@@ -209,7 +210,7 @@ class RealDebrid:
         postData = {'files': fileID}
         return self.post_url(url, postData)
 
-    def unrestrict_link(self, link):
+    def resolve_hoster(self, link):
         url = 'unrestrict/link'
         postData = {'link': link}
         response = self.post_url(url, postData)
@@ -224,7 +225,7 @@ class RealDebrid:
         url = "torrents/delete/%s&auth_token=%s" % (id, self.token)
         requests.delete(self.BaseUrl + url, timeout=5)
 
-    def singleMagnetToLink(self, torrent):
+    def _single_magnet_resolve(self, torrent):
         try:
             magnet = torrent['magnet']
 
@@ -255,7 +256,7 @@ class RealDebrid:
                     for idx, file in enumerate(selected_files):
                         if file['bytes'] > index_bytes:
                             link_index = idx
-                link = self.unrestrict_link(link['links'][link_index])
+                link = self.resolve_hoster(link['links'][link_index])
                 if tools.getSetting('rd.autodelete') == 'true':
                     self.deleteTorrent(torrent['id'])
             except:
@@ -269,10 +270,10 @@ class RealDebrid:
             traceback.print_exc()
             return None
 
-    def magnetToLink(self, torrent, args):
+    def resolve_magnet(self, magnet, args, torrent, pack_select=False):
         try:
             if torrent['package'] == 'single' or 'showInfo' not in args:
-                return self.singleMagnetToLink(torrent)
+                return self._single_magnet_resolve(torrent)
 
             try:
                 hash = str(re.findall(r'btih:(.*?)(?:&|$)', torrent['magnet'])[0].lower())
@@ -290,14 +291,18 @@ class RealDebrid:
                 bad_storage = False
 
                 for key, value in storage_variant.items():
-                    filename = storage_variant[key]['filename']
-                    if not any(filename.endswith(extension) for extension in
+                    file_name = storage_variant[key]['filename']
+
+                    if not any(file_name.endswith(extension) for extension in
                                source_utils.COMMON_VIDEO_EXTENSIONS):
                         bad_storage = True
                         break
+
                     else:
+                        file_name = file_name.replace(source_utils.get_quality(file_name), '')
+                        file_name = source_utils.cleanTitle(file_name)
                         key_list.append(key)
-                        if any(episodeString in source_utils.cleanTitle(filename) for
+                        if any(episodeString in source_utils.cleanTitle(file_name) for
                                episodeString in episodeStrings):
                             file_inside = True
 
@@ -318,9 +323,12 @@ class RealDebrid:
 
             file_index = None
 
-
             for idx, i in enumerate([i for i in link['files'] if i['selected'] == 1]):
-                if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(i['path'].split('/')[-1]) for
+                file_name = i['path'].split('/')[-1]
+                file_name = file_name.replace(source_utils.get_quality(file_name), '')
+                file_name = source_utils.cleanTitle(file_name)
+
+                if any(source_utils.cleanTitle(episodeString) in file_name for
                        episodeString in episodeStrings):
                         file_index = idx
                         break
@@ -330,7 +338,7 @@ class RealDebrid:
                 return None
 
             link = link['links'][file_index]
-            link = self.unrestrict_link(link)
+            link = self.resolve_hoster(link)
 
             if link.endswith('rar'):
                 link = None
@@ -361,3 +369,12 @@ class RealDebrid:
         except:
             import traceback
             traceback.print_exc()
+
+    def get_hosters(self, hosters):
+        host_list = database.get(self.getRelevantHosters, 1)
+        if host_list is None:
+            host_list = self.getRelevantHosters()
+        if host_list is not None:
+            hosters['premium']['real_debrid'] = [(i, i.split('.')[0]) for i in host_list]
+        else:
+            hosters['premium']['real_debrid'] = []
