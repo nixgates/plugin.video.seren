@@ -43,11 +43,12 @@ init_contents = 'aW1wb3J0IG9zCmZyb20gcmVzb3VyY2VzLmxpYi5jb21tb24gaW1wb3J0IHRvb2x
                 'ICAgIGV4Y2VwdDoKICAgICAgICAgICAgaW1wb3J0IHRyYWNlYmFjawogICAgICAgICAgICB0cmFjZWJhY2sucHJpbnRfZXhjKCkK' \
                 'ICAgICAgICAgICAgY29udGludWUKCiAgICByZXR1cm4gKHRvcnJlbnRfc291cmNlcywgaG9zdGVyX3NvdXJjZXMpCg=='
 
-import os
-import sys
-import json
-import shutil
 import base64
+import json
+import os
+import shutil
+import sys
+
 import requests
 import xbmc
 
@@ -68,15 +69,30 @@ class providers:
         self.language = 'en'
         self.known_packages = database.get_provider_packages()
         self.known_providers = database.get_providers()
-        self.update_known_providers()
 
         self.providers_path = os.path.join(tools.dataPath, 'providers')
         self.modules_path = os.path.join(tools.dataPath, 'providerModules')
         self.meta_path = os.path.join(tools.dataPath, 'providerMeta')
 
+        self.update_known_providers()
+        self.update_known_packages()
+
     def poll_database(self):
         self.known_providers = database.get_providers()
         self.known_packages = database.get_provider_packages()
+
+    def update_known_packages(self):
+        for root, _, filenames in os.walk(self.meta_path):
+            for filename in filenames:
+                if filename.endswith('.json'):
+                    with open(os.path.join(root, filename)) as file:
+                        try:
+                            meta = json.loads(file.read())
+                            database.add_provider_package(meta['name'], meta['author'], meta['remote_meta'],
+                                                          meta['version'])
+                        except:
+                            pass
+        self.poll_database()
 
     def update_known_providers(self):
         provider_types = ['torrent', 'hosters']
@@ -88,12 +104,28 @@ class providers:
                          'hosters': all_providers[1]}
 
         for provider_type in provider_types:
-
             for provider in all_providers[provider_type]:
-                database.add_provider(provider[1], provider[2], 'enabled', self.language,
-                                      provider_type)
+                if not self._provider_exists(provider[1], provider[2]):
+                    database.add_provider(provider[1], provider[2], 'enabled', self.language,
+                                          provider_type)
+
+        for known_provider in self.known_providers:
+            provider_exists = False
+            for provider in all_providers[known_provider['provider_type']]:
+                if known_provider['provider_name'] == provider[1] and known_provider['package'] == provider[2]:
+                    provider_exists = True
+                    break
+
+            if not provider_exists:
+                database.remove_individual_provider(known_provider['provider_name'], known_provider['package'])
 
         self.poll_database()
+
+    def _provider_exists(self, provider_name, package):
+        for provider in self.known_providers:
+            if provider['provider_name'] == provider_name and provider['package'] == package:
+                return True
+        return False
 
     def flip_provider_status(self, package_name, provider_name, status_overide=None):
 

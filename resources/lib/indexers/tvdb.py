@@ -3,7 +3,6 @@ import copy
 import json
 import threading
 import time
-import traceback
 
 import requests
 from math import pi, sin
@@ -165,7 +164,7 @@ class TVDBAPI:
                     for i in range(0, self.tvshows_poster_limit):
                         name = 'poster' if i == 0 else 'poster{}'.format(i)
                         art[name] = self.fanartart.get(name, self.art.get(name, ''))
-                    art['thumb'] = art['poster']
+                    art['thumb'] = self.art.get('fanart', self.art.get(['poster'], ''))
                 except:
                     pass
                 try:
@@ -398,6 +397,8 @@ class TVDBAPI:
 
             item['info']['mediatype'] = 'season'
             item['ids'] = seasonObject['ids']
+            for id, value in showArgs['ids'].items():
+                item['ids']['tvshow.{}'.format(id)] = value
             item['cast'] = showArgs['cast']
             item['trakt_object'] = {}
             item['trakt_object']['seasons'] = [seasonObject]
@@ -479,7 +480,6 @@ class TVDBAPI:
             art['thumb'] = self.baseImageUrl + response['filename']
             if art['thumb'] == self.baseImageUrl:
                 art['thumb'] = art['fanart']
-            art['landscape'] = art['thumb']
         except:
             pass
         try:
@@ -498,6 +498,8 @@ class TVDBAPI:
         info['trailer'] = ''
         info['mediatype'] = 'episode'
         item['ids'] = trakt_object['ids']
+        for id, value in showArgs['showInfo']['ids'].items():
+            item['ids']['tvshow.{}'.format(id)] = value
         item['info'] = info
         item['art'] = art
         item['cast'] = showArgs['showInfo']['cast']
@@ -525,7 +527,7 @@ class TVDBAPI:
         images = [(self.baseImageUrl + x['fileName'],
                    x['ratingsInfo']['average'] if x['ratingsInfo']['count'] >= 5 else 5 + (
                                x['ratingsInfo']['average'] - 5) * sin(x['ratingsInfo']['count'] / pi))
-                  for x in response if x['languageId'] == 7]
+                  for x in response if x['languageId'] == 0]
         images = sorted(images, key=lambda x: int(x[1]), reverse=True)
 
         counter = 0

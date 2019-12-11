@@ -1,121 +1,126 @@
 # -*- coding: utf-8 -*-
 
-import json
-
+import time
 import requests
 
 from resources.lib.common import source_utils
 from resources.lib.common import tools
 from resources.lib.modules import database
 
-##################################################
-# ACCOUNT VARIABLES
-##################################################
 
-CustomerPin = tools.getSetting('premiumize.pin')
+class Premiumize:
 
-##################################################
-# URL VARIABLES
-##################################################
+    def __init__(self):
+        self.client_id = "288300453"
+        self.client_secret = "2jw9suzfdue2t7eq46"
+        self.headers = {
+            'Authorization': 'Bearer {}'.format(tools.getSetting('premiumize.token'))
+        }
 
-BaseUrl = "https://www.premiumize.me/api"
-DirectDownload = '/transfer/directdl'
-AccountURL = "/account/info"
-ListFolder = "/folder/list"
-ItemDetails = "/item/details"
-TransferList = "/transfer/list"
-TransferCreate = "/transfer/create"
-TransferDelete = "/transfer/delete"
-CacheCheck = '/cache/check'
+    def auth(self):
+        data = {'client_id': self.client_id, 'response_type': 'device_code'}
+        token = requests.post('https://www.premiumize.me/token', data=data).json()
+        expiry = token['expires_in']
+        token_ttl = token['expires_in']
+        poll_again = True
+        success = False
+        tools.copy2clip(token['user_code'])
+        tools.progressDialog.create(tools.addonName,
+                                    line1=tools.lang(32024).format(tools.colorString(token['verification_uri'])),
+                                    line2=tools.lang(32025).format(tools.colorString(token['user_code'])))
+        tools.progressDialog.update(0)
 
-##################################################
-# REQUESTS WRAPPERS
-# Returns JSON on all calls
-##################################################
-import inspect
+        while poll_again and not token_ttl <= 0 and not tools.progressDialog.iscanceled():
+            poll_again, success = self.poll_token(token['device_code'])
+            progress_percent = 100 - int((float((expiry - token_ttl) / expiry) * 100))
+            tools.progressDialog.update(progress_percent)
+            time.sleep(token['interval'])
+            token_ttl -= int(token['interval'])
 
-def get_url(url):
-    if CustomerPin == '':
-        return
-    url = BaseUrl + "apikey=" + CustomerPin + url
-    req = requests.get(url, timeout=10).text
-    return json.loads(req)
+        tools.progressDialog.close()
 
+        if success:
+            tools.showDialog.ok(tools.addonName, tools.lang(32026))
 
-def post_url(url, data):
-    if CustomerPin == '':
-        return
-    url = BaseUrl + url
-    data['apikey'] = CustomerPin
-    req = requests.post(url, data=data,  timeout=10)
-    req = req.text
-    return json.loads(req)
+    def poll_token(self, device_code):
+        data = {'client_id': self.client_id, 'code': device_code, 'grant_type': 'device_code'}
+        token = requests.post('https://www.premiumize.me/token', data=data).json()
 
+        if 'error' in token:
+            if token['error'] == "access_denied":
+                return False, False
+            return True, False
 
-class PremiumizeBase():
-    ##################################################
-    # ACCOUNT FUNCTIONS
-    ##################################################
+        tools.setSetting('premiumize.token', token['access_token'])
+        self.headers['Authorization'] = 'Bearer {}'.format(token['access_token'])
+
+        account_info = self.account_info()
+        tools.setSetting('premiumize.username', account_info['customer_id'])
+
+        return False, True
+
+    def get_url(self, url):
+        if self.headers['Authorization'] == 'Bearer ':
+            tools.log('User is not authorised to make PM requests')
+            return None
+        url = "https://www.premiumize.me/api{}".format(url)
+        req = requests.get(url, timeout=10, headers=self.headers).json()
+        return req
+
+    def post_url(self, url, data):
+        if self.headers['Authorization'] == 'Bearer ':
+            tools.log('User is not authorised to make PM requests')
+            return None
+        url = "https://www.premiumize.me/api{}".format(url)
+        req = requests.post(url, headers=self.headers, data=data, timeout=10).json()
+        return req
 
     def account_info(self):
-        url = AccountURL
-        postData = {}
-        response = post_url(url, postData)
+        url = "/account/info"
+        response = self.get_url(url)
         return response
 
     def list_folder(self, folderID):
-        url = ListFolder
+        url = "/folder/list"
         postData = {'id': folderID}
-        response = post_url(url, postData)
+        response = self.post_url(url, postData)
         return response['content']
 
-    ##################################################
-    # CACHE FUNCTIONS
-    ##################################################
+    def list_folder_all(self, folderID):
+        url = "/item/listall"
+        response = self.get_url(url)
+        return response['files']
 
     def hash_check(self, hashList):
-        url = CacheCheck
+        url = '/cache/check'
         postData = {'items[]': hashList}
-        response = post_url(url, postData)
+        response = self.post_url(url, postData)
         return response
 
-    ##################################################
-    # ITEM FUNCTIONS
-    ##################################################
-
     def item_details(self, itemID):
-        url = ItemDetails
+        url = "/item/details"
         postData = {'id': itemID}
-        return post_url(url, postData)
-
-    ##################################################
-    # TRANSFER FUNCTIONS
-    ##################################################
+        return self.post_url(url, postData)
 
     def create_transfer(self, src, folderID=0):
         postData = {'src': src, 'folder_id': folderID}
-        url = TransferCreate
-        return post_url(url, postData)
+        url = "/transfer/create"
+        return self.post_url(url, postData)
 
     def direct_download(self, src):
         postData = {'src': src}
-        url = DirectDownload
-        return post_url(url, postData)
+        url = '/transfer/directdl'
+        return self.post_url(url, postData)
 
     def list_transfers(self):
-        url = TransferList
+        url = "/transfer/list"
         postData = {}
-        return post_url(url, postData)
+        return self.post_url(url, postData)
 
     def delete_transfer(self, id):
-        url = TransferDelete
+        url = "/transfer/delete"
         postData = {'id': id}
-        return post_url(url, postData)
-
-
-class PremiumizeFunctions(PremiumizeBase):
-    def __init__(self):
-        pass
+        return self.post_url(url, postData)
 
     def get_used_space(self):
         info = self.account_info()
@@ -124,13 +129,13 @@ class PremiumizeFunctions(PremiumizeBase):
 
     def hosterCacheCheck(self, source_list):
         post_data = {'items[]': source_list}
-        return post_url(CacheCheck, data=post_data)
+        return self.post_url('/cache/check', data=post_data)
 
     def updateRelevantHosters(self):
-        hoster_list = database.get(post_url, 1, '/services/list', {})
+        hoster_list = database.get(self.post_url, 1, '/services/list', {})
         return hoster_list
 
-    def resolveHoster(self, source):
+    def resolve_hoster(self, source):
 
         directLink = self.direct_download(source)
         if directLink['status'] == 'success':
@@ -163,7 +168,7 @@ class PremiumizeFunctions(PremiumizeBase):
                 returnFolders.append({'name': i['name'], 'id': i['id'], 'type': 'folder'})
         return returnFolders
 
-    def movieMagnetToStream(self, magnet, args):
+    def _single_magnet_resolve(self, magnet, args, pack_select=False):
 
         selectedFile = None
         folder_details = self.direct_download(magnet)['content']
@@ -205,10 +210,10 @@ class PremiumizeFunctions(PremiumizeBase):
             pass
         return selectedFile['link']
 
-    def magnetToStream(self, magnet, args, pack_select):
+    def resolve_magnet(self, magnet, args, torrent, pack_select):
 
         if 'showInfo' not in args:
-            return self.movieMagnetToStream(magnet, args)
+            return self._single_magnet_resolve(magnet, args)
 
         episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
 
@@ -219,6 +224,18 @@ class PremiumizeFunctions(PremiumizeBase):
             if pack_select is not False and pack_select is not None:
                 streamLink = self.user_select(folder_details)
                 return streamLink
+
+            if 'extra' not in args['info']['title'] and 'extra' not in args['showInfo']['info']['tvshowtitle'] \
+                    and int(args['info']['season']) != 0:
+                folder_details = [i for i in folder_details if
+                                  'extra' not in
+                                  source_utils.cleanTitle(i['path'].split('/')[-1].replace('&', ' ').lower())]
+
+            if 'special' not in args['info']['title'] and 'special' not in args['showInfo']['info']['tvshowtitle'] \
+                    and int(args['info']['season']) != 0:
+                folder_details = [i for i in folder_details if
+                                  'special' not in
+                                  source_utils.cleanTitle(i['path'].split('/')[-1].replace('&', ' ').lower())]
 
             streamLink = self.check_episode_string(folder_details, episodeStrings)
 
@@ -272,3 +289,13 @@ class PremiumizeFunctions(PremiumizeBase):
 
         return selection['link']
 
+    def get_hosters(self, hosters):
+
+        host_list = database.get(self.updateRelevantHosters, 1)
+        if host_list is None:
+            host_list = self.updateRelevantHosters()
+
+        if host_list is not None:
+            hosters['premium']['premiumize'] = [(i, i.split('.')[0]) for i in host_list['directdl']]
+        else:
+            hosters['premium']['premiumize'] = []

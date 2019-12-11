@@ -28,7 +28,7 @@ class Menus:
                                                                  i['progress'], i['release_title']))
                 tools.addDirectoryItem(title, '', None, None)
 
-        tools.closeDirectory('addons')
+        tools.closeDirectory(self.view_type)
 
     def assist_non_active_clear(self):
         database.clear_non_active_assist()
@@ -36,7 +36,7 @@ class Menus:
     def list_premiumize_transfers(self):
 
         from resources.lib.debrid import premiumize
-        transfer_list = premiumize.PremiumizeFunctions().list_transfers()
+        transfer_list = premiumize.Premiumize().list_transfers()
         if len(transfer_list['transfers']) == 0 or 'transfers' not in transfer_list:
             tools.closeDirectory(self.view_type)
             return

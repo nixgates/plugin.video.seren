@@ -12,7 +12,7 @@ import _strptime
 import string
 
 import time
-from collections import OrderedDict
+from xml.etree import ElementTree
 
 try:
     from dateutil import tz
@@ -45,7 +45,7 @@ viewTypes = [
     ('Default', 50),
     ('Poster', 51),
     ('Icon Wall', 52),
-    ('Shift',  53),
+    ('Shift', 53),
     ('Info Wall', 54),
     ('Wide List', 55),
     ('Wall', 500),
@@ -108,6 +108,8 @@ try:
 
     listDir = xbmcvfs.listdir
 
+    file_exists = xbmcvfs.exists
+
     execute = xbmc.executebuiltin
 
     console_mode = False
@@ -165,19 +167,28 @@ addonInfo = xbmcaddon.Addon().getAddonInfo
 
 SETTINGS_PATH = os.path.join(dataPath, 'settings.xml')
 
+ADVANCED_SETTINGS_PATH = xbmc.translatePath("special://home/userdata/advancedsettings.xml")
+
 cacheFile = os.path.join(dataPath, 'cache.db')
+cacheFile_lock = threading.Lock()
 
 torrentScrapeCacheFile = os.path.join(dataPath, 'torrentScrape.db')
+torrentScrapeCacheFile_lock = threading.Lock()
 
 activeTorrentsDBFile = os.path.join(dataPath, 'activeTorrents.db')
+activeTorrentsDBFile_lock = threading.Lock()
 
 providersDB = os.path.join(dataPath, 'providers.db')
+providersDB_lock = threading.Lock()
 
 premiumizeDB = os.path.join(dataPath, 'premiumize.db')
+premiumizeDB_lock = threading.Lock()
 
 traktSyncDB = os.path.join(dataPath, 'traktSync.db')
+traktSyncDB_lock = threading.Lock()
 
 searchHistoryDB = os.path.join(dataPath, 'search.db')
+searchHistoryDB_lock = threading.Lock()
 
 imageControl = xbmcgui.ControlImage
 labelControl = xbmcgui.ControlLabel
@@ -244,6 +255,8 @@ player = xbmc.Player
 
 homeWindow = xbmcgui.Window(10000)
 
+get_region = xbmc.getRegion
+
 GUI_PATH = os.path.join(ADDON_PATH, 'resources', 'lib', 'gui')
 
 IMAGES_PATH = os.path.join(ADDON_PATH, 'resources', 'images')
@@ -256,29 +269,28 @@ SKINS_PATH = os.path.join(dataPath, 'skins')
 
 SKINS_DB_PATH = os.path.join(dataPath, 'skins.db')
 
-UNIT_TESTS = False
-
-
 # COMMON USE UTIlS
+
+def get_video_database_path():
+    database_path = os.path.abspath(os.path.join(dataPath, '..', '..', 'Database', ))
+    if kodiVersion == 17:
+        database_path = os.path.join(database_path, 'MyVideos107.db')
+    elif kodiVersion == 18:
+        database_path = os.path.join(database_path, 'MyVideos116.db')
+
+    return database_path
 
 def showBusyDialog():
     execute('ActivateWindow(busydialognocancel)')
 
-
-def enable_unit_tests():
-    xbmcplugin.UNIT_TEST_MODE = True
-    xbmcgui.UNIT_TEST_MODE = True
-    UNIT_TESTS = True
-
-
 def lang(language_id):
     text = getLangString(language_id)
     text = text.encode('utf-8', 'replace')
-    text = display_string(text)
     return text
 
 
-def addDirectoryItem(name, query, info=None, art=None, cast=None, cm=[], isPlayable=False, isAction=True, isFolder=True,
+def addDirectoryItem(name, query, info=None, art=None, cast=None, cm=None, isPlayable=False, isAction=True,
+                     isFolder=True,
                      actionArgs=False, label2=None, set_ids=None, bulk_add=False):
     url = '%s?action=%s' % (sysaddon, query) if isAction else query
 
@@ -298,17 +310,26 @@ def addDirectoryItem(name, query, info=None, art=None, cast=None, cm=[], isPlaya
     try:
         if 'UnWatchedEpisodes' in info:
             item.setProperty('UnWatchedEpisodes', str(info['UnWatchedEpisodes']))
-
         # Check for either to support of old versions
         if 'episodeCount' in info:
             item.setProperty('TotalEpisodes', str(info['episodeCount']))
         if 'episode_count' in info:
             item.setProperty('TotalEpisodes', str(info['episode_count']))
-
         if 'WatchedEpisodes' in info:
             item.setProperty('WatchedEpisodes', str(info['WatchedEpisodes']))
         if 'season_count' in info:
             item.setProperty('TotalSeasons', str(info['season_count']))
+        if 'resumetime' in info:
+            if int(info['resumetime']) > 0:
+                item.setProperty('resumetime', str(info['resumetime']))
+                url += '&resume={}'.format(str(info['resumetime']))
+                if 'totaltime' in info:
+                    percent_played = int(float(int(info['resumetime']) / int(info['totaltime'])))
+                    item.setProperty('percentplayed', str(percent_played))
+
+        # Adding this property causes the bookmark CM items to be added
+        # if 'totaltime' in info:
+        #     item.setProperty('totaltime', str(info['totaltime']))
     except:
         pass
 
@@ -317,7 +338,11 @@ def addDirectoryItem(name, query, info=None, art=None, cast=None, cm=[], isPlaya
 
     if set_ids is not None:
         item.setUniqueIDs(set_ids)
+        for label, value in set_ids.items():
+            item.setProperty('{}_id'.format(label), str(value))
 
+    if cm is None or type(cm) is not []:
+        cm = []
     item.addContextMenuItems(cm)
 
     if art is None or type(art) is not dict:
@@ -346,13 +371,13 @@ def clean_info_keys(info_dict):
         return info_dict
 
     keys_to_keep = ['count', 'size', 'date', 'genre', 'country', 'year', 'episode', 'season', 'sortepisode',
-                   'sortseason', 'episodeguide', 'showlink', 'top250', 'setid', 'tracknumber', 'rating', 'userrating',
-                   'watched', 'playcount', 'overlay', 'cast', 'castandrole', 'director', 'mpaa', 'plot', 'plotoutline',
-                   'title', 'originaltitle', 'sorttitle', 'duration', 'studio', 'tagline', 'writer', 'tvshowtitle',
-                   'premiered', 'status', 'set', 'setoverview', 'tag', 'imdbnumber', 'code', 'aired', 'credits',
-                   'lastplayed', 'album', 'artist', 'votes', 'path', 'trailer', 'dateadded', 'mediatype', 'dbid']
+                    'sortseason', 'episodeguide', 'showlink', 'top250', 'setid', 'tracknumber', 'rating', 'userrating',
+                    'watched', 'playcount', 'overlay', 'cast', 'castandrole', 'director', 'mpaa', 'plot', 'plotoutline',
+                    'title', 'originaltitle', 'sorttitle', 'duration', 'studio', 'tagline', 'writer', 'tvshowtitle',
+                    'premiered', 'status', 'set', 'setoverview', 'tag', 'imdbnumber', 'code', 'aired', 'credits',
+                    'lastplayed', 'album', 'artist', 'votes', 'path', 'trailer', 'dateadded', 'mediatype', 'dbid']
 
-    keys = info_dict.keys()
+    keys = list(info_dict.keys())
 
     for i in keys:
         if i.lower() not in keys_to_keep:
@@ -389,6 +414,9 @@ def closeDirectory(contentType, sort=False, cache=None):
     if getSetting('general.setViews') == 'true':
         xbmc.executebuiltin('Container.SetViewMode(%s)' % str(viewType))
 
+def cancel_directory():
+    content(syshandle, 'addons')
+    endDirectory(syshandle, cacheToDisc=False)
 
 def get_view_type(contentType):
     viewType = 'Default'
@@ -404,7 +432,6 @@ def get_view_type(contentType):
             viewType = getSetting('episode.view')
         if contentType == 'seasons':
             viewType = getSetting('season.view')
-
 
         viewName, viewType = viewTypes[int(viewType)]
 
@@ -436,7 +463,10 @@ def closeOkDialog():
 
 
 def closeBusyDialog():
-    execute('Dialog.Close(busydialognocancel)')
+    if condVisibility('Window.IsActive(busydialog)'):
+        execute('Dialog.Close(busydialog)')
+    if condVisibility('Window.IsActive(busydialognocancel)'):
+        execute('Dialog.Close(busydialognocancel)')
 
 
 def cancelPlayback():
@@ -455,8 +485,6 @@ def safeStr(obj):
 
 
 def log(msg, level='info'):
-    if UNIT_TESTS:
-        return
     msg = safeStr(msg)
     msg = addonName.upper() + ': ' + msg
     if level == 'error':
@@ -494,9 +522,11 @@ def deaccentString(text):
     text = ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
     return text
 
+
 def strip_non_ascii_and_unprintable(text):
     result = ''.join(char for char in text if char in string.printable)
     return result.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+
 
 def get_user_text_color():
     color = getSetting('general.textColor')
@@ -517,8 +547,12 @@ def colorString(text, color=None):
 
 
 def display_string(object):
-    if type(object) is str or type(object) is unicode:
-        return deaccentString(object)
+    try:
+        if type(object) is str or type(object) is unicode:
+            return deaccentString(object)
+    except NameError:
+        if type(object) is str:
+            return deaccentString(object)
     if type(object) is int:
         return '%s' % object
     if type(object) is bytes:
@@ -653,6 +687,8 @@ def shortened_debrid(debrid):
         return 'PM'
     if debrid == 'real_debrid':
         return 'RD'
+    if debrid == 'all_debrid':
+        'ALLDEBRID'
     return ''
 
 
@@ -771,7 +807,7 @@ def getSetting(id):
 
 
 def premiumize_enabled():
-    if getSetting('premiumize.pin') != '' and getSetting('premiumize.enabled') == 'true':
+    if getSetting('premiumize.token') != '' and getSetting('premiumize.enabled') == 'true':
         return True
     else:
         return False
@@ -779,6 +815,12 @@ def premiumize_enabled():
 
 def real_debrid_enabled():
     if getSetting('rd.auth') != '' and getSetting('realdebrid.enabled') == 'true':
+        return True
+    else:
+        return False
+
+def all_debrid_enabled():
+    if getSetting('alldebrid.token') != '' and getSetting('alldebrid.enabled') == 'true':
         return True
     else:
         return False
@@ -847,7 +889,34 @@ def get_item_information(actionArgs):
 
 
 def premium_check():
-    if playList.getposition() == 0 and not premiumize_enabled() and not real_debrid_enabled():
+    if playList.getposition() == 0 \
+            and not premiumize_enabled() \
+            and not real_debrid_enabled() \
+            and not all_debrid_enabled():
         return False
     else:
         return True
+
+
+def get_advanced_setting(*args):
+    defaults = {
+        ("video", "playcountminimumpercent"): 90,
+        ("video", "ignoresecondsatstart"): 180,
+        ("video", "ignorepercentatend"): 8
+    }
+
+    try:
+        root = ElementTree.parse(ADVANCED_SETTINGS_PATH).getroot()
+    except (ElementTree.ParseError, IOError):
+        return defaults.get(args)
+    elem = root.find("./{}".format("/".join(args)))
+    return elem.text if elem else defaults.get(args)
+
+
+def container_refresh():
+    return execute('Container.Refresh')
+
+
+def try_release_lock(lock):
+    if lock.locked():
+        lock.release()

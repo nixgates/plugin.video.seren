@@ -1,11 +1,11 @@
-import threading
 import ast
 import copy
-
 from datetime import datetime
-from resources.lib.modules import trakt_sync
-from resources.lib.indexers import trakt, imdb
+
+from resources.lib.common import tools
 from resources.lib.indexers import tmdb
+from resources.lib.indexers import trakt, imdb
+from resources.lib.modules import trakt_sync
 
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
@@ -15,16 +15,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         trakt_list = [movie['ids']['trakt'] for movie in trakt_list]
 
-        statement = 'SELECT * FROM movies WHERE '
-        for idx, i in enumerate(trakt_list):
-            statement += 'trakt_id = %s' % i
-            if trakt_list[int(idx)] != trakt_list[-1]:
-                statement += ' OR '
-
+        statement = 'SELECT * FROM movies WHERE trakt_id in (%s)' % ','.join((str(i) for i in trakt_list))
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute(statement)
         movie_db_list = cursor.fetchall()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
         requires_update = []
 
         for movie_id in trakt_list:
@@ -42,17 +39,17 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 if movie['kodi_meta'] == '{}':
                     continue
                 meta_list.append(self.movie_db_to_meta(movie))
-            # meta_list = [ast.literal_eval(i['kodi_meta']) for i in movie_db_list if i['kodi_meta'] != '{}']
             return meta_list
         else:
             self.update_movie_list(requires_update)
 
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute(statement)
         movie_db_list = cursor.fetchall()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
-        # meta_list = [ast.literal_eval(i['kodi_meta']) for i in show_db_list if i['kodi_meta'] != '{}']
         meta_list = []
         for movie in movie_db_list:
             if movie['kodi_meta'] == '{}':
@@ -61,9 +58,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         return meta_list
 
     def update_movie_list(self, id_list):
-
         self.item_list = []
-
         for movie in id_list:
             self.task_queue.put(self.get_movie, movie, False, True)
 
@@ -76,25 +71,31 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         return movie_meta
 
     def get_all_movies(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM movies')
         movies = cursor.fetchall()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
         movies = [i['trakt_id'] for i in movies]
         return movies
 
     def get_watched_movies(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM movies WHERE watched =1')
         movies = cursor.fetchall()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
         return movies
 
     def get_collected_movies(self):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM movies WHERE collected =1')
         movies = cursor.fetchall()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
         return movies
 
     def mark_movie_watched(self, trakt_id):
@@ -110,16 +111,20 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self._mark_movie_record('collected', 0, trakt_id)
 
     def _mark_movie_record(self, column, value, trakt_id):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('UPDATE movies SET %s=? WHERE trakt_id=?' % column, (value, trakt_id))
         cursor.connection.commit()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
     def get_movie(self, trakt_id, list_mode=False, get_meta=True, watched=None, collected=None):
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM movies WHERE trakt_id=? ', (trakt_id,))
         item = cursor.fetchone()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
         if item is None:
 
@@ -169,18 +174,22 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         pass
 
     def _update_movie(self, trakt_object, get_meta=True):
-
         movie_id = trakt_object['ids']['trakt']
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM movies WHERE trakt_id=?', (int(movie_id),))
         old_entry = cursor.fetchone()
         cursor.close()
+        tools.try_release_lock(tools.traktSyncDB_lock)
 
         if get_meta and (old_entry is None or old_entry['kodi_meta'] == '{}'):
-            kodi_meta = tmdb.TMDBAPI().movieToListItem(trakt_object)
-            if kodi_meta is None or kodi_meta == '{}':
-                kodi_meta = imdb.IMDBScraper().movieToListItem(trakt_object)
+            try:
+                kodi_meta = tmdb.TMDBAPI().movieToListItem(trakt_object)
+                if kodi_meta is None or kodi_meta == '{}':
+                    kodi_meta = imdb.IMDBScraper().movieToListItem(trakt_object)
+            except:
+                return None
         else:
             if old_entry is None:
                 kodi_meta = {}
@@ -191,20 +200,23 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             return
 
         if old_entry is None:
-            old_entry = {'collected': 0, 'watched': 0}
+            air_date = kodi_meta['info'].get('aired', kodi_meta['info']['premiered'])
+            old_entry = {'collected': 0, 'watched': 0, 'air_date': air_date}
 
         collected = old_entry['collected']
         watched = old_entry['watched']
+        air_date = old_entry['air_date']
 
+        tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
 
         try:
             cursor.execute(
-                "INSERT OR REPLACE INTO movies ("
-                "trakt_id, kodi_meta, collected, watched, last_updated)"
+                "REPLACE INTO movies ("
+                "trakt_id, kodi_meta, collected, watched, last_updated, air_date)"
                 "VALUES "
-                "(?, ?, ?, ?, ?)",
-                (movie_id, str(kodi_meta), collected, watched, update_time))
+                "(?, ?, ?, ?, ?, ?)",
+                (movie_id, str(kodi_meta), collected, watched, update_time, air_date))
             cursor.connection.commit()
             cursor.close()
 
@@ -215,3 +227,5 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             import traceback
             traceback.print_exc()
             pass
+        finally:
+            tools.try_release_lock(tools.traktSyncDB_lock)

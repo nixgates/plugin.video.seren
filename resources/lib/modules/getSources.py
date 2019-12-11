@@ -7,16 +7,18 @@ import random
 import re
 import sys
 import threading
-import requests
 import time
+
+import requests
 
 from resources.lib.common import source_utils
 from resources.lib.common import tools
 from resources.lib.debrid import premiumize
 from resources.lib.debrid import real_debrid
+from resources.lib.debrid import all_debrid
+from resources.lib.gui.windows.get_sources_window import GetSources as DisplayWindow
 from resources.lib.modules import database
 from resources.lib.modules import resolver as resolver
-from resources.lib.gui.windows.get_sources_window import GetSources as DisplayWindow
 from resources.lib.modules.skin_manager import SkinManager
 
 sysaddon = sys.argv[0]
@@ -27,9 +29,9 @@ approved_qualities = ['4K', '1080p', '720p', 'SD']
 class CancelProcess(Exception):
     pass
 
+
 def getSourcesHelper(actionArgs):
-    sources_window = Sources('get_sources.xml',
-                             SkinManager().active_skin_path,
+    sources_window = Sources(*SkinManager().confirm_skin_path('get_sources.xml'),
                              actionArgs=actionArgs)
     sources = sources_window.doModal()
     try:
@@ -110,13 +112,35 @@ class Sources(DisplayWindow):
                     self.background_dialog.create('%s (%s)' % (self.args['info']['title'],
                                                                self.args['info']['year']))
 
-                    # Confirm movie year against IMDb's information
-
             if not 'showInfo' in self.args:
-                resp = requests.get('https://v2.sg.media-imdb.com/suggestion/t/%s.json' % self.args['ids']['imdb'])
-                year = json.loads(resp.text)['d'][0]['y']
-                if year != self.args['info']['year']:
-                    self.args['info']['year'] = str(year)
+                # Confirm movie year against IMDb's information
+
+                try:
+                    resp = requests.get('https://v2.sg.media-imdb.com/suggestion/t/%s.json' % self.args['ids']['imdb'])
+                    year = json.loads(resp.text)['d'][0]['y']
+                    if year != self.args['info']['year']:
+                        self.args['info']['year'] = str(year)
+                except:
+                    pass
+
+            else:
+                try:
+                    imdb = self.args['showInfo']['info']['imdbnumber']
+                    resp = requests.get('https://v2.sg.media-imdb.com/suggestion/t/%s.json' % imdb)
+                    resp = json.loads(resp.text)['d'][0]
+                    year = resp['y']
+                    title = resp['l']
+
+                    if year != self.args['info']['year']:
+                        self.args['showInfo']['info']['year'] = str(year)
+                    if self.args['showInfo']['info']['tvshowtitle'] != title:
+                        self.args['showInfo']['info']['showaliases'].append(
+                            self.args['showInfo']['info']['tvshowtitle'])
+                        self.args['showInfo']['info']['tvshowtitle'] = title
+                        self.args['showInfo']['info']['originaltitle'] = title
+                        self.args['info']['tvshowtitle'] = title
+                except:
+                    pass
 
             try:
                 if tools.getSetting('general.torrentCache') == 'true':
@@ -136,14 +160,17 @@ class Sources(DisplayWindow):
 
                 self.setText(tools.lang(32082))
                 self.initProviders()
-                # Load threads for all sources
-                for i in self.torrentProviders:
-                    self.torrent_threads.append(threading.Thread(target=self.getTorrent, args=(self.args, i)))
-                for i in self.hosterProviders:
-                    self.hoster_threads.append(threading.Thread(target=self.getHosters, args=(self.args, i)))
 
                 # Add the users cloud inspection to the threads to be run
                 self.hoster_threads.append(threading.Thread(target=self.user_cloud_inspection))
+
+                # Load threads for all sources
+                if self._torrents_enabled():
+                    for i in self.torrentProviders:
+                        self.torrent_threads.append(threading.Thread(target=self.getTorrent, args=(self.args, i)))
+                if self._hosters_enabled():
+                    for i in self.hosterProviders:
+                        self.hoster_threads.append(threading.Thread(target=self.getHosters, args=(self.args, i)))
 
                 # Shuffle and start scraping threads
                 random.shuffle(self.torrent_threads)
@@ -236,6 +263,23 @@ class Sources(DisplayWindow):
             self.close()
             import traceback
             traceback.print_exc()
+
+    def _torrents_enabled(self):
+        if (tools.getSetting('premiumize.torrents') == 'true' and tools.premiumize_enabled())\
+                or (tools.getSetting('rd.torrents') == 'true' and tools.real_debrid_enabled())\
+                or (tools.getSetting('alldebrid.torrents') == 'true' and tools.all_debrid_enabled()):
+            return True
+        else:
+            return False
+
+    def _hosters_enabled(self):
+        if (tools.getSetting('premiumize.hosters') == 'true' and tools.premiumize_enabled())\
+                or (tools.getSetting('rd.hosters') == 'true' and tools.real_debrid_enabled())\
+                or (tools.getSetting('alldebrid.hosters') == 'true' and tools.all_debrid_enabled()):
+            return True
+        else:
+            return False
+
 
     def storeTorrentResults(self, torrent_list):
 
@@ -348,13 +392,13 @@ class Sources(DisplayWindow):
 
         hoster_providers, torrent_providers = self.remove_duplicate_providers(torrent_providers, hoster_providers)
 
-        self.hosterDomains = resolver.Resolver('resolver.xml', SkinManager().active_skin_path).getHosterList()
+        self.hosterDomains = resolver.Resolver(*SkinManager().confirm_skin_path('resolver.xml')).getHosterList()
         self.torrentProviders = torrent_providers
         self.hosterProviders = hoster_providers
         self.host_domains = list(set([host[0].lower() for provider in self.hosterDomains['premium'].iterkeys()
-                             for host in self.hosterDomains['premium'][provider]]))
+                                      for host in self.hosterDomains['premium'][provider]]))
         self.host_names = list(set([host[1].lower() for provider in self.hosterDomains['premium'].iterkeys()
-                           for host in self.hosterDomains['premium'][provider]]))
+                                    for host in self.hosterDomains['premium'][provider]]))
 
     def remove_duplicate_providers(self, torrent, hosters):
 
@@ -379,6 +423,7 @@ class Sources(DisplayWindow):
     def getTorrent(self, info, provider):
         # Extract provider name from Tuple
         provider_name = provider[1].upper()
+
         # Begin Scraping Torrent Sources
 
         def exit_thread():
@@ -435,7 +480,7 @@ class Sources(DisplayWindow):
                             torrent['hash'] = re.findall(r'btih:(.*?)(?:&|$)', torrent['magnet'])[0]
                         torrent['hash'] = torrent['hash'].lower()
 
-                        torrent['size'] = torrent.get('size', '')
+                        torrent['size'] = torrent.get('size', 0)
                         if torrent['size'] == '':
                             torrent['size'] = 0
 
@@ -471,7 +516,22 @@ class Sources(DisplayWindow):
 
                 for torrent in cached:
                     try:
-                        self.torrentCacheSources.update({torrent['hash'] + torrent['debrid_provider']: torrent})
+                        # Compare and combine source meta
+                        tor_key = torrent['hash'] + torrent['debrid_provider']
+                        if tor_key in self.torrentCacheSources:
+                            c_size = self.torrentCacheSources[tor_key].get('size', 0)
+                            n_size = torrent.get('size', 0)
+                            info = torrent.get('info', [])
+
+                            if c_size < n_size:
+                                self.torrentCacheSources.update({tor_key: torrent})
+
+                            self.torrentCacheSources[tor_key]['info'] += [i for i in info
+                                                                          if i not in
+                                                                          self.torrentCacheSources[tor_key]
+                                                                              .get('info', [])]
+                        else:
+                            self.torrentCacheSources.update({tor_key: torrent})
                     except AttributeError:
                         break
 
@@ -483,19 +543,16 @@ class Sources(DisplayWindow):
 
                 tools.log('%s cache check took %s seconds' % (provider_name, time.time() - start_time))
 
-            self.remainingProviders.remove(provider_name)
-
             return
+
         except CancelProcess:
-            self.torrent_semaphore.release()
             try:
                 self.remainingProviders.remove(provider_name)
             except:
                 pass
             return
 
-        except Exception:
-            self.torrent_semaphore.release()
+        except:
             import traceback
             traceback.print_exc()
             try:
@@ -503,7 +560,15 @@ class Sources(DisplayWindow):
             except:
                 pass
 
-            return
+        finally:
+            try:
+                self.remainingProviders.remove(provider_name)
+            except:
+                pass
+            try:
+                self.torrent_semaphore.release()
+            except:
+                pass
 
     def getHosters(self, info, provider):
         provider_name = provider[1].upper()
@@ -511,49 +576,37 @@ class Sources(DisplayWindow):
 
         self.hoster_semaphore.acquire()
 
-        def exit_thread():
-            self.hoster_semaphore.release()
-            if provider_name in self.remainingProviders:
-                self.remainingProviders.remove(provider_name)
-
         try:
             if self.canceled:
-                exit_thread()
                 return
             providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
             provider_sources = providerModule.source()
 
             if 'showInfo' in info:
                 if not getattr(provider_sources, 'tvshow', None):
-                    exit_thread()
                     return
                 imdb, tvdb, title, localtitle, aliases, year = self.buildHosterVariables(info, 'tvshow')
 
                 if self.canceled:
-                    exit_thread()
                     return
 
                 url = provider_sources.tvshow(imdb, tvdb, title, localtitle, aliases, year)
 
                 if self.canceled:
-                    exit_thread()
                     return
 
                 imdb, tvdb, title, premiered, season, episode = self.buildHosterVariables(info, 'episode')
 
                 if self.canceled:
-                    exit_thread()
                     return
 
                 url = provider_sources.episode(url, imdb, tvdb, title, premiered, season, episode)
 
                 if self.canceled:
-                    exit_thread()
                     return
 
             else:
                 if not getattr(provider_sources, 'movie'):
-                    exit_thread()
                     return
                 imdb, title, localtitle, aliases, year = self.buildHosterVariables(info, 'movie')
                 url = provider_sources.movie(imdb, title, localtitle, aliases, year)
@@ -561,18 +614,15 @@ class Sources(DisplayWindow):
             hostDict, hostprDict = self.buildHosterVariables(info, 'sources')
 
             if self.canceled:
-                exit_thread()
                 return
 
             sources = provider_sources.sources(url, hostDict, hostprDict)
 
             if self.canceled:
-                exit_thread()
                 return
 
             if sources is None:
                 tools.log('%s: Found No Sources' % provider_name, 'info')
-                exit_thread()
                 return
 
             if 'showInfo' in info:
@@ -605,16 +655,20 @@ class Sources(DisplayWindow):
                 except AttributeError:
                     break
 
-            self.remainingProviders.remove(provider_name.upper())
-
-        except Exception as e:
-            try: self.remainingProviders.remove(provider_name)
-            except: pass
-            self.hoster_semaphore.release()
-            exit_thread()
+        except:
             import traceback
             traceback.print_exc()
             return
+
+        finally:
+            try:
+                self.remainingProviders.remove(provider_name)
+            except:
+                pass
+            try:
+                self.hoster_semaphore.release()
+            except:
+                pass
 
         return
 
@@ -682,7 +736,8 @@ class Sources(DisplayWindow):
 
             for i in torrents:
                 if self.prem_terminate(): return
-                if source_utils.filter_movie_title(i['filename'], self.args['info']['title'], self.args['info']['year']):
+                if source_utils.filter_movie_title(i['filename'], self.args['info']['title'],
+                                                   self.args['info']['year']):
 
                     torrent_info = real_debrid.RealDebrid().torrentInfo(i['id'])
 
@@ -708,116 +763,35 @@ class Sources(DisplayWindow):
                     continue
 
     def premiumize_cloud_inspection(self):
+        cloud_items = premiumize.Premiumize().list_folder_all('')
 
-        cloud_items = premiumize.PremiumizeFunctions().list_folder('')
+        cloud_items = [i for i in cloud_items
+                       if any(i['name'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
 
         if 'showInfo' in self.args:
             torrent_simple_info = self.buildSimpleShowInfo(self.args)
-
-        for item in cloud_items:
-            if self.prem_terminate():
-                return
-            selected_file = None
-            if item['type'] == 'file':
-                if 'showInfo' in self.args:
-                    if source_utils.filter_single_episode(torrent_simple_info, item['name']):
-                        selected_file = item
-                else:
-                    if source_utils.filter_movie_title(item['name'],
-                                                       self.args['info']['title'],
-                                                       self.args['info']['year']):
-                        selected_file = item
-
-            else:
-                if 'showInfo' in self.args:
-                    if not self.premiumize_folder_inspection(item, torrent_simple_info) and \
-                            not item['name'].lower() in ['feed downloads', 'tvshows', 'tv shows']:
-                        continue
-
-                    try:
-                        selected_file = self.premiumize_folder_digger(item['id'], torrent_simple_info)
-                    except:
-                        return
-                else:
-
-                    if not source_utils.filter_movie_title(item['name'],
-                                                           self.args['info']['title'],
-                                                           self.args['info']['year']) and \
-                            not item['name'].lower() in ['feed downloads', 'movies']:
-                        continue
-
-                    try:
-                        selected_file = self.premiumize_folder_digger(item['id'], self.args)
-                    except:
-                        import traceback
-                        traceback.print_exc()
-                        continue
-
-            if selected_file:
-                if tools.getSetting('premiumize.transcoded') == 'true':
-                    url = selected_file['stream_link']
-                else:
-                    url = selected_file['link']
-                try:
-                    size = (int(selected_file['size']) / 1024) / 1024
-                except:
-                    size = 0
-                self.cloud_files.append({
-                    'quality': source_utils.getQuality(selected_file['name']),
-                    'language': self.language,
-                    'url': url,
-                    'provider': 'Cloud',
-                    'type': 'cloud',
-                    'release_title': selected_file['name'],
-                    'info': source_utils.getInfo(selected_file['name']),
-                    'debrid_provider': 'premiumize',
-                    'size': size
-                })
-
-    def premiumize_folder_digger(self, folder_id, item_information):
-        if self.prem_terminate():
-            return
-        found_item = None
-        folder_items = premiumize.PremiumizeFunctions().list_folder(folder_id)
-
-        for folder_item in folder_items:
-            if self.prem_terminate():
-                return
-            if folder_item['type'] == 'folder':
-                folder_id = folder_item['id']
-                found_item = self.premiumize_folder_digger(folder_id, item_information)
-                if found_item is None:
-                    continue
-            else:
-                if 'show_title' in item_information:
-                    if folder_item['name'].lower() in ['feed downloads', 'tv shows', 'tvshows']:
-                        return folder_item
-                    if source_utils.filter_single_episode(item_information, folder_item['name']) and \
-                            any(folder_item['name'].lower().endswith(extension) for
-                                extension in source_utils.COMMON_VIDEO_EXTENSIONS):
-                        return folder_item
-                    else:
-                        continue
-                else:
-                    if folder_item['name'].lower() in ['feed downloads', 'movies']:
-                        return folder_item
-                    if source_utils.filter_movie_title(folder_item['name'], item_information['info']['title'],
-                                                       item_information['info']['year']):
-                        if not any(folder_item['name'].lower().endswith(extension) for extension in
-                                   source_utils.COMMON_VIDEO_EXTENSIONS):
-                            continue
-
-                        return folder_item
-
-        return found_item
-
-    def premiumize_folder_inspection(self, folder_item, torrent_simple_info):
-        if source_utils.filter_show_pack(torrent_simple_info, folder_item['name']) or \
-                source_utils.filter_season_pack(torrent_simple_info, folder_item['name']) or \
-                source_utils.filter_single_episode(torrent_simple_info, folder_item['name']):
-            return True
+            for item in cloud_items:
+                if source_utils.filter_single_episode(torrent_simple_info, item['name']):
+                    self._add_premiumize_cloud_item(item)
         else:
-            return False
+            for item in cloud_items:
+                if source_utils.filter_movie_title(item['name'],
+                                                   self.args['info']['title'],
+                                                   self.args['info']['year']):
+                    self._add_premiumize_cloud_item(item)
+
+    def _add_premiumize_cloud_item(self, item):
+        self.cloud_files.append({
+            'quality': source_utils.getQuality(item['name']),
+            'language': self.language,
+            'url': item['id'],
+            'provider': 'Cloud',
+            'type': 'cloud',
+            'release_title': item['name'],
+            'info': source_utils.getInfo(item['name']),
+            'debrid_provider': 'premiumize',
+            'size': (int(item['size']) / 1024) / 1024
+        })
 
     def resolutionList(self):
         resolutions = []
@@ -841,6 +815,8 @@ class Sources(DisplayWindow):
             p.append({'slug': 'premiumize', 'priority': int(tools.getSetting('premiumize.priority'))})
         if tools.getSetting('realdebrid.enabled') == 'true':
             p.append({'slug': 'real_debrid', 'priority': int(tools.getSetting('rd.priority'))})
+        if tools.getSetting('alldebrid.enabled') == 'true':
+            p.append({'slug': 'all_debrid', 'priority': int(tools.getSetting('alldebrid.priority'))})
 
         p = sorted(p, key=lambda i: i['priority'])
 
@@ -879,11 +855,11 @@ class Sources(DisplayWindow):
             torrent_list = [i for i in torrent_list if i.get('size', 0) < size_limit]
 
         if tools.getSetting('general.265sort') == 'true':
-            torrent_list = [i for i in torrent_list if 'x265' in i['info']] + \
-                           [i for i in torrent_list if 'x265' not in i['info']]
+            torrent_list = [i for i in torrent_list if 'HEVC' in i['info']] + \
+                           [i for i in torrent_list if 'HEVC' not in i['info']]
 
-            hoster_list = [i for i in hoster_list if 'x265' in i['info']] + \
-                          [i for i in hoster_list if 'x265' not in i['info']]
+            hoster_list = [i for i in hoster_list if 'HEVC' in i['info']] + \
+                          [i for i in hoster_list if 'HEVC' not in i['info']]
 
         if tools.getSetting('general.lowQualitysort') == 'true':
             torrent_list = [i for i in torrent_list if 'CAM' not in i['info']] + \
@@ -943,7 +919,7 @@ class Sources(DisplayWindow):
                         continue
 
         if tools.getSetting('general.disable265') == 'true':
-            sortedList = [i for i in sortedList if 'x265' not in i['info']]
+            sortedList = [i for i in sortedList if 'HEVC' not in i['info']]
 
         if tools.getSetting('general.hidesd') == 'true':
             sortedList = [i for i in sortedList if i['quality'] != 'SD']
@@ -1185,6 +1161,7 @@ class TorrentCacheCheck:
     def __init__(self):
         self.premiumizeCached = []
         self.realdebridCached = []
+        self.all_debridCached = []
         self.threads = []
 
         self.episodeStrings = None
@@ -1193,21 +1170,50 @@ class TorrentCacheCheck:
     def torrentCacheCheck(self, torrent_list, info):
 
         if tools.getSetting('realdebrid.enabled') == 'true' and \
-                        tools.getSetting('rd.torrents') == 'true':
+                tools.getSetting('rd.torrents') == 'true':
             self.threads.append(
                 threading.Thread(target=self.realdebridWorker, args=(copy.deepcopy(torrent_list), info)))
 
         if tools.getSetting('premiumize.enabled') == 'true' and \
-                        tools.getSetting('premiumize.torrents') == 'true':
+                tools.getSetting('premiumize.torrents') == 'true':
             self.threads.append(threading.Thread(target=self.premiumizeWorker, args=(copy.deepcopy(torrent_list),)))
+
+        if tools.getSetting('alldebrid.enabled') == 'true' and \
+                tools.getSetting('alldebrid.torrents') == 'true':
+            self.threads.append(threading.Thread(target=self.all_debrid_worker, args=(copy.deepcopy(torrent_list),)))
 
         for i in self.threads:
             i.start()
         for i in self.threads:
             i.join()
 
-        cachedList = self.realdebridCached + self.premiumizeCached
+        cachedList = self.realdebridCached + self.premiumizeCached + self.all_debridCached
         return cachedList
+
+    def all_debrid_worker(self, torrent_list):
+
+        api = all_debrid.AllDebrid()
+        hash_list = [i['hash'] for i in torrent_list]
+
+        if len(hash_list) == 0:
+            return
+
+        cache_check = api.check_hash(hash_list)
+
+        if not cache_check['success']:
+            return
+
+        cache_list = []
+        count = 0
+
+        for i in torrent_list:
+            if cache_check['data'][count]['instant'] is True:
+                i['debrid_provider'] = 'all_debrid'
+                cache_list.append(i)
+            count += 1
+
+        self.all_debridCached = cache_list
+
 
     def _real_debrid_confirm_media(self, storage_variant):
         keys = list(storage_variant.keys())
@@ -1221,10 +1227,11 @@ class TorrentCacheCheck:
 
     def _real_debrid_check_files(self, storage_variant):
         for key in storage_variant.keys():
-            filename = storage_variant[key]['filename']
-            if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(filename)
+            file_name = storage_variant[key]['filename']
+            file_name = file_name.replace(source_utils.get_quality(file_name), '')
+            file_name = source_utils.cleanTitle(file_name)
+            if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(file_name)
                    for episodeString in self.episodeStrings):
-
                 return True
 
     def realdebridWorker(self, torrent_list, info):
@@ -1242,8 +1249,9 @@ class TorrentCacheCheck:
 
             for i in torrent_list:
                 try:
-
-                    if 'rd' in realDebridCache[i['hash']] and len(realDebridCache[i['hash']]['rd']) >= 1:
+                    if 'rd' not in realDebridCache.get(i['hash'], {}):
+                        continue
+                    if len(realDebridCache[i['hash']]['rd']) >= 1:
                         if 'showInfo' in info:
                             for storage_variant in realDebridCache[i['hash']]['rd']:
 
@@ -1278,7 +1286,7 @@ class TorrentCacheCheck:
             hash_list = [i['hash'] for i in torrent_list]
             if len(hash_list) == 0:
                 return
-            premiumizeCache = premiumize.PremiumizeBase().hash_check(hash_list)
+            premiumizeCache = premiumize.Premiumize().hash_check(hash_list)
             premiumizeCache = premiumizeCache['response']
             cache_list = []
             count = 0

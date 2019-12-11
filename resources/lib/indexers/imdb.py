@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import copy
 import re
 import threading
 import traceback
@@ -24,6 +24,7 @@ class IMDBScraper:
         self.fanart_url = '{}/mediaindex?refine=publicity'.format(self.title_url)
         self.trailer_url = 0
         self.art = {}
+        self.fanartart = {}
         self.info = {}
         self.episode_summary = {}
         self.cast = []
@@ -31,24 +32,19 @@ class IMDBScraper:
             self.fanart_support = False
         else:
             self.fanart_support = True
+
+        self.tvshows_prefer_fanart = tools.getSetting('tvshows.preferedsource') == '0'
+        self.movies_prefer_fanart = tools.getSetting('movies.preferedsource') == '0'
+
         self.threads = []
 
     def _amazon_image_enlarger(self, url):
         if url is not None and 'm.media-amazon.com' in url:
             try:
-                splittend_url = url.split("@.")
-                media_info = splittend_url[1].split('_')
-                dymensions = media_info[3].split(',')
-
-                if dymensions[3] in media_info[2]:
-                    media_info[2] = media_info[2].replace(dymensions[3], str(int(dymensions[3]) * 10))
-                else:
-                    media_info[2] = media_info[2].replace(dymensions[2], str(int(dymensions[2]) * 10))
-                dymensions[3] = str(int(dymensions[3]) * 10)
-                dymensions[2] = str(int(dymensions[2]) * 10)
-                media_info[3] = ','.join(dymensions)
-                splittend_url[1] = '_'.join(media_info)
-                return "@.".join(splittend_url)
+                splitted_url = url.split("._")
+                media_info = splitted_url[1].split('_')
+                splitted_url[1] = '_'.join([media_info[0], media_info[-1]])
+                return "._".join(splitted_url)
             except:
                 return url
         else:
@@ -164,6 +160,7 @@ class IMDBScraper:
                                       'thumbnail': self._amazon_image_enlarger(
                                           cells[0].find('img', src=True).get('loadlate'))})
         except:
+            traceback.print_exc()
             pass
         try:
             info['episode_count'] = re.findall(r'(\d{1,3})', details.find('span', {'class': 'bp_sub_heading'}).text)[0]
@@ -188,10 +185,11 @@ class IMDBScraper:
             pass
 
         # Begin Scraping Artwork
-        if 'poster' not in self.art:
+        self.art.update(self.fanartart)
+        if not self.tvshows_prefer_fanart:
             self.art['poster'] = self._amazon_image_enlarger(details.find('div', {'class': 'poster'})
                                                              .find('img')['src'])
-        if 'fanart' not in self.art:
+        if not self.tvshows_prefer_fanart:
             self.art['fanart'] = self._amazon_image_enlarger(details.find('div', {'class': 'mediastrip'})
                                                              .find('img', src=True).get('loadlate'))
 
@@ -214,11 +212,18 @@ class IMDBScraper:
 
     def showSeasonToListItem(self, trakt_object, show_meta):
         try:
-            item = {'info': show_meta['info'], 'art': show_meta['art']}
+            item = {'info': copy.deepcopy(show_meta['info']), 'art': copy.deepcopy(show_meta['art'])}
             season = trakt_object['number']
 
+            tvdbID = trakt_object['ids']['tvdb']
+            if self.fanart_support:
+                self.threads.append(threading.Thread(target=self.getFanartTVSeason, args=(tvdbID, season)))
+
+            [i.start() for i in self.threads]
+            [i.join() for i in self.threads]
+
             response = requests.get(
-                self.base_url + self.season_url % (show_meta['ids']['imdb'], trakt_object['season']))
+                self.base_url + self.season_url % (show_meta['ids']['imdb'], season))
             details = BeautifulSoup(response.text, 'html.parser', parse_only=SoupStrainer('div', {'id': 'pagecontent'}))
 
             if details is None:
@@ -256,6 +261,7 @@ class IMDBScraper:
                 pass
             try:
                 item['info']['premiered'] = trakt_object['first_aired']
+                item['info']['aired'] = trakt_object['first_aired']
             except:
                 pass
             try:
@@ -283,11 +289,16 @@ class IMDBScraper:
                 traceback.print_exc()
                 return None
 
+            self.art.update(self.fanartart)
+
             item['info']['mediatype'] = 'season'
             item['ids'] = trakt_object['ids']
+            for id, value in show_meta['ids'].items():
+                item['ids']['tvshow.{}'.format(id)] = value
             item['trakt_object'] = {}
             item['trakt_object']['seasons'] = [trakt_object]
             item['showInfo'] = show_meta
+            item['cast'] = show_meta['cast']
 
             item['art']['thumb'] = item['art'].get('poster', '')
 
@@ -372,6 +383,7 @@ class IMDBScraper:
             pass
 
         try:
+            self.art.update(self.fanartart)
             art['thumb'] = self._amazon_image_enlarger(episode.find('img', src=True)['src'].strip())
         except:
             art['thumb'] = art['fanart']
@@ -396,6 +408,8 @@ class IMDBScraper:
         info['trailer'] = ''
         info['mediatype'] = 'episode'
         item['ids'] = trakt_object['ids']
+        for id, value in show_meta['showInfo']['ids'].items():
+            item['ids']['tvshow.{}'.format(id)] = value
         item['info'] = info
         item['art'] = art
         item['cast'] = show_meta['showInfo'].get('cast', [])
@@ -422,6 +436,9 @@ class IMDBScraper:
             imdbID = trakt_object['ids']['imdb']
             if self.fanart_support:
                 self.threads.append(threading.Thread(target=self.getFanartTVMovie, args=(imdbID,)))
+
+            [i.start() for i in self.threads]
+            [i.join() for i in self.threads]
 
             # Set Info
             info = {}
@@ -523,10 +540,11 @@ class IMDBScraper:
                 pass
 
             # Begin Scraping Artwork
-            if 'poster' not in self.art:
+            self.art.update(self.fanartart)
+            if not self.movies_prefer_fanart:
                 self.art['poster'] = self._amazon_image_enlarger(
                     details.find('div', {'class': 'poster'}).find('img')['src'])
-            if 'fanart' not in self.art:
+            if not self.movies_prefer_fanart:
                 self.art['fanart'] = self._amazon_image_enlarger(details.find('div', {'class': 'mediastrip'})
                                                                  .find('img', src=True).get('loadlate'))
 
@@ -550,13 +568,20 @@ class IMDBScraper:
     def getFanartTVShow(self, tvdb_id):
         try:
             artwork = fanarttv.get(tvdb_id, 'tv')
-            self.art.update(artwork)
+            self.fanartart.update(artwork)
         except:
             pass
 
     def getFanartTVMovie(self, imdb_id):
         try:
-            artwork = fanarttv.get(imdb_id, 'movie')
-            self.art.update(artwork)
+            artwork = fanarttv.get(imdb_id, 'movies')
+            self.fanartart.update(artwork)
+        except:
+            pass
+
+    def getFanartTVSeason(self, tvdb_id, season):
+        try:
+            artwork = fanarttv.get(tvdb_id, 'season', season)
+            self.fanartart.update(artwork)
         except:
             pass

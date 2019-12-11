@@ -27,12 +27,6 @@ BROWSER_AGENTS = [
 
 exclusions = ['soundtrack', 'gesproken']
 
-common_info_tags = ['1080p', '720p', '480p', '300mb', 'HEVC', 'x265', 'x264', '4k', '2180p', 'DDP', 'WEBDL', 'AMZN',
-                    'BRRIP', 'DVDRIP', 'WEB', 'SCR', 'TC', 'DVDscr', 'Retail Dvd', 'tvrip', 'HDTV', 'PDTV', 'SDTV',
-                    'PROPER', 'LIMITED', 'INTERNAL', 'STV', 'festival', 'DC', 'FS', 'WS', 'rated', 'unrated', 'recode',
-                    'repack', 'unsubbed', 'subbed', 'custom.subbed', 'dubbed', 'readnfo', 'dupe', 'nuked', 'nfo', 'cam',
-                    'telesync', 'ts', 'telecine', 'tc', 'bluray']
-
 
 # LEGACY COMPATIBILITY
 
@@ -42,58 +36,136 @@ def getQuality(release_title):
 def get_quality(release_title):
     release_title = release_title.lower()
     quality = 'SD'
-    if ' 4k' in release_title:
+    if '4k' in release_title:
         quality = '4K'
-    if '2160p' in release_title:
+    if '2160' in release_title:
         quality = '4K'
-    if '1080p' in release_title:
+    if '1080' in release_title:
         quality = '1080p'
-    if ' 1080 ' in release_title:
-        quality = '1080p'
-    if ' 720 ' in release_title:
+    if '720' in release_title:
         quality = '720p'
-    if ' hd ' in release_title:
-        quality = '720p'
-    if '720p' in release_title:
-        quality = '720p'
-    if 'cam' in release_title:
+    if any(i in release_title for i in [' cam ', 'camrip', 'hdcam', 'hd cam', ' ts ', 'hd ts', 'hdts', 'telesync', ' tc ', 'hd tc', 'hdtc', 'telecine', 'xbet']):
         quality = 'CAM'
 
     return quality
 
+def info_list_to_sorted_dict(info_list):
+    info = {}
+
+    info_struct = {
+        'videocodec': {
+            'AVC': ['x264', 'x 264', 'h264', 'h 264', 'avc'],
+            'HEVC': ['x265', 'x 265', 'h265', 'h 265', 'hevc'],
+            'XviD': ['xvid'],
+            'DivX': ['divx'],
+            'WMV': ['wmv']
+        },
+        'audiocodec': {
+            'AAC': ['aac'],
+            'DTS': ['dts'],
+            'HD-MA': ['hd ma', 'hdma'],
+            'ATMOS': ['atmos'],
+            'TRUEHD': ['truehd', 'true hd'],
+            'DD+': ['ddp', 'dd+', 'eac3'],
+            'DD': [' dd ', 'dd2', 'dd5', 'dd7', ' ac3'],
+            'MP3': ['mp3'],
+            'WMA': [' wma ']
+        },
+
+        'audiochannels': {
+            '2.0': ['2 0 ', '2 0ch', '2ch'],
+            '5.1': ['5 1 ', '5 1ch', '6ch'],
+            '7.1': ['7 1 ', '7 1ch', '8ch']
+        }
+
+    }
+
+    for property in info_struct.keys():
+        for codec in info_struct[property].keys():
+            if codec in info_list:
+                info[property] = codec
+                break
+    return info
+
 def getInfo(release_title):
     info = []
     release_title = cleanTitle(release_title)
-    if any(i in release_title for i in [' x264', '.x264', ' h264', 'h 264']):
-        info.append('x264')
-    if any(i in release_title for i in ['x265', '.x265', 'hevc', ' h265', '.h265', 'x265', ' h 265']):
-        info.append('x265')
-    if any(i in release_title for i in [' xvid']):
+    #info.video
+    if any(i in release_title for i in ['x264', 'x 264', 'h264', 'h 264', 'avc']):
+        info.append('AVC')
+    if any(i in release_title for i in ['x265', 'x 265', 'h265', 'h 265', 'hevc']):
+        info.append('HEVC')
+    if any(i in release_title for i in ['xvid']):
         info.append('XVID')
-    if any(i in release_title for i in [' remux']):
+    if any(i in release_title for i in ['divx']):
+        info.append('DIVX')
+    if any(i in release_title for i in ['mp4']):
+        info.append('MP4')
+    if any(i in release_title for i in ['wmv']):
+        info.append('WMV')
+    if any(i in release_title for i in ['mpeg']):
+        info.append('MPEG')
+    if any(i in release_title for i in ['remux', 'bdremux']):
         info.append('REMUX')
+    if any(i in release_title for i in [' hdr ', 'hdr10', 'hdr 10']):
+        info.append('HDR')
+    if any(i in release_title for i in [' sdr ']):
+        info.append('SDR')
+    
+    #info.audio
+    if any(i in release_title for i in ['aac']):
+        info.append('AAC')
+    if any(i in release_title for i in ['dts']):
+        info.append('DTS')
+    if any(i in release_title for i in ['hd ma' , 'hdma']):
+        info.append('HD-MA')
+    if any(i in release_title for i in ['atmos']):
+        info.append('ATMOS')
+    if any(i in release_title for i in ['truehd', 'true hd']):
+        info.append('TRUEHD')
+    if any(i in release_title for i in ['ddp', 'dd+', 'eac3']):
+        info.append('DD+')
+    if any(i in release_title for i in [' dd ', 'dd2', 'dd5', 'dd7', ' ac3']):
+        info.append('DD')
+    if any(i in release_title for i in ['mp3']):
+        info.append('MP3')
+    if any(i in release_title for i in [' wma']):
+        info.append('WMA')
+    
+    #info.channels
+    if any(i in release_title for i in ['2 0 ', '2 0ch', '2ch']):
+        info.append('2.0')
+    if any(i in release_title for i in ['5 1 ', '5 1ch', '6ch']):
+        info.append('5.1')
+    if any(i in release_title for i in ['7 1 ', '7 1ch', '8ch']):
+        info.append('7.1')
+    
+    #info.source 
+    # no point at all with WEBRip vs WEB-DL cuz it's always labeled wrong with TV Shows 
+    # WEB = WEB-DL in terms of size and quality
+    if any(i in release_title for i in ['bluray' , 'blu ray' , 'bdrip', 'bd rip', 'brrip', 'br rip']):
+        info.append('BLURAY')
+    if any(i in release_title for i in [' web ' , 'webrip' , 'webdl', 'web rip', 'web dl']):
+        info.append('WEB')
+    if any(i in release_title for i in ['hdrip', 'hd rip']):
+        info.append('HDRIP')
+    if any(i in release_title for i in ['dvdrip', 'dvd rip']):
+        info.append('DVDRIP')
+    if any(i in release_title for i in ['hdtv']):
+        info.append('HDTV')
+    if any(i in release_title for i in ['pdtv']):
+        info.append('PDTV')
+    if any(i in release_title for i in [' cam ', 'camrip', 'hdcam', 'hd cam', ' ts ', 'hd ts', 'hdts', 'telesync', ' tc ', 'hd tc', 'hdtc', 'telecine', 'xbet']):
+        info.append('CAM')
+    if any(i in release_title for i in ['dvdscr', ' scr ', 'screener']):
+        info.append('SCR')
+    if any(i in release_title for i in ['korsub', ' kor ', ' hc']):
+        info.append('HC')
+    if any(i in release_title for i in ['blurred']):
+        info.append('BLUR')
     if any(i in release_title for i in [' 3d']):
         info.append('3D')
-    if any(i in release_title for i in [' aac']):
-        info.append('AAC')
-    if any(i in release_title for i in [' dts']):
-        info.append('DTS')
-    if any(i in release_title for i in [' atmos']):
-        info.append('ATMOS')
-    if any(i in release_title for i in [' ddp', ' dd+', ' eac3', ' e-ac3']):
-        info.append('DD+')
-    if any(i in release_title for i in [' dd ', ' dd2', ' dd5', ' dd7', ' dd 2', ' dd 5', ' dd 7', ' ac3']):
-        info.append('DD')
-    if any(i in release_title for i in [' 2 0 ', ' 2 0ch', ' 2ch', ' ddp2', ' dd2', ' dd+2', ' aac2']):
-        info.append('2.0')
-    if any(i in release_title for i in [' 5 1 ', ' 5 1ch', ' 6ch', ' ddp5', ' dd5', ' dd+5', ' aac5']):
-        info.append('5.1')
-    if any(i in release_title for i in [' 7 1 ', ' 7 1ch', ' 8ch', ' ddp7', ' dd7', ' dd+7', ' aac7']):
-        info.append('7.1')
-    if any(i in release_title for i in [' cam', ' camrip', ' hdcam', ' hd cam']):
-        info.append('CAM')
-    if any(i in release_title for i in [' dvdscr']):
-        info.append('DVD SCREENER')
+        
     return info
 
 
@@ -422,6 +494,7 @@ class serenRequests(Session):
 def torrentCacheStrings(args, strict=False):
 
     episodeInfo = args['info']
+    show_title = args['showInfo']['info']['tvshowtitle']
     episode_title = cleanTitle(episodeInfo['title'])
     season_number = str(episodeInfo['season'])
     episode_number = str(episodeInfo['episode'])
@@ -442,13 +515,15 @@ def torrentCacheStrings(args, strict=False):
                       '[%sx%s] ' % (season_number.zfill(2), episode_number),
                       '[%sx%s] ' % (season_number, episode_number.zfill(2)),
                       '[%sx%s] ' % (season_number, episode_number),
-                      '%s ' % clean_title(episode_title),
                       '%s%s ' % (season_number, episode_number.zfill(2)),
                       '%s%s ' % (season_number.zfill(2), episode_number.zfill(2)),
                       '%s.%s ' % (season_number, episode_number.zfill(2)),
                       '%s.%s ' % (season_number.zfill(2), episode_number),
                       '%s.%s ' % (season_number.zfill(2), episode_number.zfill(2)),
                       ]
+    if not clean_title(episode_title) == clean_title(show_title):
+        episodeStrings.append('%s ' % clean_title(episode_title))
+
     if strict == False:
         relaxed_strings = [
             'episode %s ' % episode_number.zfill(2),

@@ -45,6 +45,10 @@ class Menus:
             tools.addDirectoryItem(tools.lang(32040), 'showsSearch', isFolder=True, isPlayable=False)
         else:
             tools.addDirectoryItem(tools.lang(32040), 'showsSearchHistory')
+            
+        tools.addDirectoryItem(tools.lang(40346), 'movieByActor')
+        tools.addDirectoryItem(tools.lang(40347), 'showsByActor')
+        
         tools.closeDirectory('addons')
 
     def toolsMenu(self):

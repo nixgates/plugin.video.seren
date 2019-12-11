@@ -308,7 +308,7 @@
                         <control type="label">
                             <width>50%</width>
                             <left>10</left>
-                            <label>$ADDON[plugin.video.seren 40219] [COLOR $INFO[Window.Property(settings.color)]][CAPITALIZE]$INFO[ListItem.Property(provider_type)][/CAPITALIZE][/COLOR]</label>
+                            <label>$ADDON[plugin.video.seren 40219]: [COLOR $INFO[Window.Property(settings.color)]][CAPITALIZE]$INFO[ListItem.Property(provider_type)][/CAPITALIZE][/COLOR]</label>
                         </control>
                         <control type="label">
                             <left>65%</left>
