@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<defaultcontrol always="true">3001</defaultcontrol>
+	<onload>Dialog.Close(fullscreeninfo,true)</onload>
+	<onload>Dialog.Close(videoosd,true)</onload>
+	<controls>
+		<control type="group">
+			<animation type="WindowOpen" reversible="false">
+				<effect type="fade" start="0" end="100" time="300" />
+				<effect type="slide" start="400%,0" end="0,0" time="400" />
+			</animation>
+			<animation type="WindowClose" reversible="false">
+				<effect type="fade" start="100" end="0" time="400" />
+				<effect type="slide" start="0,0" end="400%,0" time="400" />
+			</animation>
+			<control type="group">
+				<height>25%</height>
+				<width>25%</width>
+				<right>0</right>
+				<bottom>10%</bottom>
+
+				<!-- Background -->
+				<control type="image">
+					<top>0</top>
+					<right>0</right>
+					<width>100%</width>
+					<height>100%</height>
+					<texture colordiffuse="dd000000">$INFO[Window.Property(texture.white)]</texture>
+				</control>
+				<!-- Thumb -->
+				<control type="group">
+					<top>0</top>
+					<right>0</right>
+					<width>100%</width>
+					<control type="image">
+						<width>100%</width>
+						<height>100%</height>
+						<texture colordiffuse="FF12A0C7">$INFO[Window.Property(texture.white)]</texture>
+						<visible>String.IsEmpty(Window.Property(item.art.thumb)) + String.IsEmpty(Window.Property(item.art.landscape)) + String.IsEmpty(Window.Property(item.art.fanart))</visible>
+					</control>
+					<control type="textbox">
+						<top>10</top>
+						<right>10</right>
+						<width>230</width>
+						<height>121</height>
+						<font>font12</font>
+						<textcolor>ffffffff</textcolor>
+						<shadowcolor>00000000</shadowcolor>
+						<align>center</align>
+						<aligny>center</aligny>
+						<label>$INFO[Window.Property(item.info.tvshowtitle)]</label>
+						<visible>String.IsEmpty(Window.Property(item.art.thumb)) + String.IsEmpty(Window.Property(item.art.landscape)) + String.IsEmpty(Window.Property(item.art.fanart))</visible>
+					</control>
+					<control type="image">
+						<width>100%</width>
+						<height>100%</height>
+						<texture>$INFO[Window.Property(item.art.landscape)]</texture>
+						<aspectratio>scale</aspectratio>
+					</control>
+					<control type="image">
+						<width>100%</width>
+						<height>100%</height>
+						<texture>$INFO[Window.Property(item.art.fanart)]</texture>
+						<aspectratio>scale</aspectratio>
+						<visible>String.IsEmpty(Window.Property(item.art.landscape))</visible>
+					</control>
+					<control type="image">
+						<width>100%</width>
+						<height>100%</height>
+						<texture>$INFO[Window.Property(item.art.thumb)]</texture>
+						<aspectratio>scale</aspectratio>
+						<visible>String.IsEmpty(Window.Property(item.art.landscape)) + String.IsEmpty(Window.Property(item.art.fanart))</visible>
+					</control>
+					<control type="progress" id="3014">
+						<width>100%</width>
+						<bottom>0</bottom>
+						<height>5</height>
+						<reveal>true</reveal>
+						<righttexture></righttexture>
+						<overlaytexture></overlaytexture>
+						<lefttexture></lefttexture>
+						<texturebg colordiffuse="33FFFFFF">white.png</texturebg>
+						<midtexture colordiffuse="$INFO[Window.Property(settings.color)]">white.png</midtexture>
+					</control>
+					<!-- SHADOW -->
+					<control type="image">
+						<width>100%</width>
+						<height>30%</height>
+						<texture colordiffuse="99000000">white.png</texture>
+					</control>
+				</control>
+				<!-- Labels -->
+				<control type="group">
+					<top>2%</top>
+					<left>5%</left>
+					<width>90%</width>
+					<!-- Time -->
+					<control type="label">
+						<width>auto</width>
+						<height>35</height>
+						<aligny>center</aligny>
+						<font>font25_title</font>
+						<textcolor>eeffffff</textcolor>
+						<shadowcolor>00000000</shadowcolor>
+						<label>Playing in [COLOR $INFO[Window.Property(settings.color)]]$INFO[Player.TimeRemaining(ss),,][/COLOR] seconds</label>
+						<visible>!Integer.IsGreater(Player.TimeRemaining,59)</visible>
+					</control>
+					<control type="label">
+						<width>auto</width>
+						<height>35</height>
+						<aligny>center</aligny>
+						<font>font25_title</font>
+						<textcolor>eeffffff</textcolor>
+						<shadowcolor>00000000</shadowcolor>
+						<label>$ADDON[service.upnext 30008]</label>
+						<visible>Integer.IsGreater(Player.TimeRemaining,59)</visible>
+					</control>
+					<!-- Details -->
+					<control type="grouplist">
+						<orientation>horizontal</orientation>
+						<height>35</height>
+						<top>40</top>
+						<itemgap>0</itemgap>
+						<left>0</left>
+						<control type="label">
+							<width>auto</width>
+							<height>35</height>
+							<aligny>center</aligny>
+							<font>font12</font>
+							<textcolor>eeffffff</textcolor>
+							<shadowcolor>00000000</shadowcolor>
+							<label>[COLOR $INFO[Window.Property(settings.color)]]$INFO[Window.Property(item.info.title)]  [/COLOR]</label>
+							<visible>!String.IsEmpty(Window.Property(item.info.title))</visible>
+						</control>
+						<!--<control type="label">-->
+							<!--<width>auto</width>-->
+							<!--<height>35</height>-->
+							<!--<aligny>center</aligny>-->
+							<!--<font>font12</font>-->
+							<!--<textcolor>eeffffff</textcolor>-->
+							<!--<shadowcolor>00000000</shadowcolor>-->
+							<!--<label>$INFO[Window.Property(item.info.year),,   ]</label>-->
+							<!--<visible>!String.IsEmpty(Window.Property(item.info.year))</visible>-->
+						<!--</control>-->
+						<control type="image">
+							<width>19</width>
+							<height>19</height>
+							<aspect>keep</aspect>
+							<texture colordiffuse="FFFF4081">star.png</texture>
+							<animation effect="slide" end="0,8" time="0" condition="true">Conditional</animation>
+							<visible>!String.IsEmpty(Window.Property(item.info.rating))</visible>
+						</control>
+						<control type="label">
+							<width>auto</width>
+							<height>35</height>
+							<aligny>center</aligny>
+							<label>$INFO[Window.Property(item.info.rating), ,   ]</label>
+							<font>font12</font>
+							<textcolor>eeffffff</textcolor>
+							<shadowcolor>00000000</shadowcolor>
+							<visible>!String.IsEmpty(Window.Property(item.info.rating))</visible>
+						</control>
+					</control>
+					<!-- Buttons -->
+					<control type="grouplist">
+						<orientation>horizontal</orientation>
+						<height>56</height>
+						<bottom>20</bottom>
+						<left>0</left>
+						<itemgap>10</itemgap>
+						<width>100%</width>
+						<control type="button" id="3001">
+							<label>Play Now</label>
+							<height>56</height>
+							<width min="50">auto</width>
+							<font>font20_title</font>
+							<textoffsetx>55</textoffsetx>
+							<textcolor>ddffffff</textcolor>
+							<focusedcolor>eeffffff</focusedcolor>
+							<selectedcolor>ddffffff</selectedcolor>
+							<shadowcolor>22000000</shadowcolor>
+							<aligny>center</aligny>
+							<align>center</align>
+							<texturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</texturefocus>
+							<texturenofocus border="10" colordiffuse="AA212121">white.png</texturenofocus>
+							<alttexturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</alttexturefocus>
+							<alttexturenofocus border="10" colordiffuse="AA212121">white.png</alttexturenofocus>
+							<pulseonselect>no</pulseonselect>
+						</control>
+						<control type="button" id="3002">
+							<label>Close</label>
+							<height>56</height>
+							<width min="50">auto</width>
+							<font>font20_title</font>
+							<textoffsetx>15</textoffsetx>
+							<textcolor>ddffffff</textcolor>
+							<focusedcolor>eeffffff</focusedcolor>
+							<selectedcolor>ddffffff</selectedcolor>
+							<shadowcolor>22000000</shadowcolor>
+							<aligny>center</aligny>
+							<align>center</align>
+							<texturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</texturefocus>
+							<texturenofocus border="10" colordiffuse="AA212121">white.png</texturenofocus>
+							<alttexturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</alttexturefocus>
+							<alttexturenofocus border="10" colordiffuse="AA212121">white.png</alttexturenofocus>
+							<pulseonselect>no</pulseonselect>
+						</control>
+					</control>
+					<!--<control type="image">-->
+						<!--<bottom>20</bottom>-->
+						<!--<width>46</width>-->
+						<!--<height>46</height>-->
+						<!--<aspect>keep</aspect>-->
+						<!--<texture colordiffuse="ddffffff">nextupicons/00.png</texture>-->
+						<!--<animation effect="slide" end="13,-5" time="0" condition="true">Conditional</animation>-->
+					<!--</control>-->
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

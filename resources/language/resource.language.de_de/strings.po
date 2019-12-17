@@ -1,0 +1,938 @@
+﻿# -*- coding: UTF-8 -*-
+# Kodi Media Center language file
+# Addon Name: Seren
+# Addon id: plugin.video.Seren
+# Addon Provider: Nixgates
+msgid ""
+msgstr ""
+
+
+msgctxt "#32001"
+msgid "Discover Movies"
+msgstr "Filme"
+
+msgctxt "#32002"
+msgid "My Movies"
+msgstr "Meine Filme"
+
+msgctxt "#32003"
+msgid "Discover TV Shows"
+msgstr "Serien"
+
+msgctxt "#32004"
+msgid "My Shows"
+msgstr "Meine TV Serien"
+
+msgctxt "#32007"
+msgid "Most Popular"
+msgstr "Am Populärsten"
+
+msgctxt "#32008"
+msgid "Recommended For You"
+msgstr "Empfohlen"
+
+msgctxt "#32009"
+msgid "Trending"
+msgstr "Trend"
+
+msgctxt "#32010"
+msgid "Most Played"
+msgstr "Meist gespielte"
+
+msgctxt "#32011"
+msgid "Most Watched"
+msgstr "Meist gesehen"
+
+msgctxt "#32012"
+msgid "Most Collected"
+msgstr "Meist gesammelt"
+
+msgctxt "#32013"
+msgid "Most Anticipated"
+msgstr "Am meisten erwartet"
+
+msgctxt "#32014"
+msgid "Recently Updated"
+msgstr "Kürzlich aktualisiert"
+
+msgctxt "#32015"
+msgid "Box Office Top 10"
+msgstr "Bestes Einspielergebnis Top10"
+
+msgctxt "#32016"
+msgid "Search..."
+msgstr "Suche"
+
+msgctxt "#32017"
+msgid "Collection"
+msgstr "Sammlung"
+
+msgctxt "#32018"
+msgid "Watchlist"
+msgstr "Watchlist"
+
+msgctxt "#32019"
+msgid "Next"
+msgstr "Nächste"
+
+msgctxt "#32021"
+msgid "Color Picker"
+msgstr "Farbauswahl"
+
+msgctxt "#32023"
+msgid "Real Debrid Auth"
+msgstr "Real Debrid Authentifizierung"
+
+msgctxt "#32024"
+msgid "Open this link in a browser: "
+msgstr "Öffne Link in einem Browser"
+
+msgctxt "#32025"
+msgid "Enter the code: "
+msgstr "Code eingeben:"
+
+msgctxt "#32026"
+msgid "Authentication is completed"
+msgstr "Authentifizierung fertig"
+
+msgctxt "#32028"
+msgid "Error Connecting to TMDB"
+msgstr "Fehler bei der Verbindung zu TMDB"
+
+msgctxt "#32030"
+msgid "Trakt Successfully Disconnected"
+msgstr "Trakt erfolgreich getrennt"
+
+msgctxt "#32031"
+msgid "Authorize Trakt"
+msgstr "Authorisiere Trakt"
+
+msgctxt "#32032"
+msgid "Error while authenticating with Trakt.\nPlease try again."
+msgstr "Fehler beim Authorisieren von Trakt.\Bitte nocheinmal versuchen"
+
+msgctxt "#32035"
+msgid "Unknown Error Connecting to Trakt"
+msgstr "Unbekannter Fehler bei Trakt Verbindung"
+
+msgctxt "#32039"
+msgid "Search Movies..."
+msgstr "Suche Filme"
+
+msgctxt "#32040"
+msgid "Search Shows..."
+msgstr "Suche Serien"
+
+msgctxt "#32041"
+msgid "Tools"
+msgstr "Werkzeuge"
+
+msgctxt "#32042"
+msgid "Clear Cache"
+msgstr "Cache leeren"
+
+msgctxt "#32043"
+msgid "Are you sure you wish to clear the cache?"
+msgstr "Wollen Sie sicher den Cache löschen?"
+
+######SEREN.PY VALUES######
+msgctxt "#32045"
+msgid "Starting Engines"
+msgstr "Starte Vorgang"
+
+msgctxt "#32046"
+msgid "Starting Resolver..."
+msgstr "Starte Resolver"
+
+msgctxt "#32047"
+msgid "No playable sources found for item"
+msgstr "Keine abspielbare Quelle gefunden"
+
+msgctxt "#32048"
+msgid "Silent Scraper Setting has been reset"
+msgstr "Scraper Einstellungen wurden Resetet"
+
+######MAINTENANCE.PY VALUES######
+msgctxt "#33021"
+msgid "This will completely wipe your addon settings.\nAre you completely sure you want to do this?"
+msgstr "Alle Addon Einstellungen werde gelöscht.\nSollen wirklich alle Einstellungen gelöscht werden?"
+
+msgctxt "#32049"
+msgid "Please be aware this will completely wipe the following:\nCached Data, Settings, Installed Providers\n"
+msgstr "Bitte Vorsicht, diese Aktion löscht folgendes:\nGespeicherte Daten, Einstellungen. Installierte Anbieter\n"
+
+msgctxt "#32050"
+msgid "ARE YOU SURE?"
+msgstr "Bist Du sicher"
+
+msgctxt "#32051"
+msgid "Your Real Debrid Premium status has expired"
+msgstr "Dein Real Debrid Konto ist abgelaufen"
+
+msgctxt "#32052"
+msgid "Your Premiumize Premium status has expired"
+msgstr "Dein Premiumize Konto ist abgelaufen"
+
+######HOMEMENU.PY######
+msgctxt "#32053"
+msgid "Provider Tools"
+msgstr "Anbieter Werkzeuge"
+
+msgctxt "#32054"
+msgid "Premium Services"
+msgstr "Premium Service"
+
+msgctxt "#32055"
+msgid "Clear Local Result Cache"
+msgstr "Suchverlauf löschen"
+
+msgctxt "#32056"
+msgid "Open Settings Menu"
+msgstr "Öffne Einstellungs Menü"
+
+msgctxt "#32057"
+msgid "Wipe Addon Data"
+msgstr "Lösche Addon Daten"
+
+######MOVIEMENU.PY######
+msgctxt "#32062"
+msgid "Genres"
+msgstr "Genres"
+
+msgctxt "#32063"
+msgid "Finish Watching"
+msgstr "Zu Ende gesehen"
+
+msgctxt "#32064"
+msgid "My Movie Lists"
+msgstr "Meine Film Listen"
+
+msgctxt "#32065"
+msgid "Multi Select..."
+msgstr "Mehrfach Auswahl"
+
+######TVSHOWMENY.PY######
+msgctxt "#32067"
+msgid "New TV Shows"
+msgstr "Neue TV Serien"
+
+######TRAKT.PY######
+msgctxt "#32071"
+msgid "This code has been copied to your clipboard"
+msgstr "Der Code wurde in die Zwischenablage kopiert"
+
+######CACHEASSIST.PY######
+msgctxt "#32072"
+msgid "Cache Assist is attempting to build a torrent source"
+msgstr "Cache Hilfe versucht eine Torrent Quelle aufzubauen"
+
+######CUSTOMPROVIDERS.PY######
+msgctxt "#32074"
+msgid "There are currently no packages installed"
+msgstr "Es sind momentan keine Indexseiten Pakete installiert"
+
+msgctxt "#32075"
+msgid "Unistall"
+msgstr "Deinstallieren"
+
+msgctxt "#32076"
+msgid "Are you sure you wish to remove"
+msgstr "Wollen Sie wirklich entfernen"
+
+msgctxt "#32077"
+msgid "successfully uninstalled"
+msgstr "Erfolgreich deinstalliert"
+
+msgctxt "#33001"
+msgid "Installing:"
+msgstr "Installiere:"
+
+msgctxt "#33002"
+msgid "Author: "
+msgstr "Authorisiere"
+
+msgctxt "#33003"
+msgid "Are you sure you wish to proceed?"
+msgstr "Vorgang fortsetzen?"
+
+msgctxt "#33004"
+msgid "Custom Sources Install"
+msgstr "Benutzerdefinierte Quellen installieren"
+
+msgctxt "#33005"
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgctxt "#33006"
+msgid "Install"
+msgstr "Installieren"
+
+msgctxt "#33007"
+msgid "Failed to install provider package\nPlease check the log for further information"
+msgstr "Installation der Indexseiten Pakete fehlgeschlagen\nFür mehr Informationen siehe Log-Datei"
+
+msgctxt "#33008"
+msgid "Extracting"
+msgstr "Extrahiere"
+
+msgctxt "#33009"
+msgid "Please Wait..."
+msgstr "Bitte warten"
+
+msgctxt "#33010"
+msgid "Successfully Installed"
+msgstr "Erfolgreich installiert"
+
+msgctxt "#33011"
+msgid "Please check the log for further details"
+msgstr "Für mehr Informationen siehe Log-Datei"
+
+msgctxt "#33012"
+msgid "Failed to install"
+msgstr "Installation fehlgeschlagen"
+
+msgctxt "#33013"
+msgid "Failed to install package"
+msgstr "Indexseiten Paket Installation fehlgeschlagen"
+
+msgctxt "#33014"
+msgid "Sorry, SMB shares are not supported"
+msgstr "Entschuldigung, SMB wird nicht unterstützt"
+
+msgctxt "#33015"
+msgid "Unable to connect to file.\nPlease check URL and try again."
+msgstr "Verbindung zur Datei nicht möglich.\nBitte kontrolliere URL und versuche es erneut."
+
+msgctxt "#33016"
+msgid "Please note, this package does not provide automatic updates"
+msgstr "Bitte beachte, dieses Indexseiten Paket bietet keine automatischen Updates"
+
+msgctxt "#33017"
+msgid "%s package has been updated"
+msgstr "%s Indexseiten Paket wurde aktualisiert"
+
+msgctxt "#33018"
+msgid "There are currently no updates available"
+msgstr "Zur Zeit keine Updates verfügbar"
+
+msgctxt "#33019"
+msgid "Checking for available package updates"
+msgstr "Prüfe auf verfügbare Indexseiten Updates"
+
+######DATABASE.PY######
+msgctxt "#32078"
+msgid "All Cache Successfully Cleared"
+msgstr "Alle Cache erfolgreich geleert"
+
+msgctxt "#32079"
+msgid "Local Result Cache Successfully Cleared"
+msgstr "Suchverlauf erfolgreich gelöscht"
+
+msgctxt "#32080"
+msgid "Active Torrent Database Successfully Cleared"
+msgstr "Aktive Torrent Datenbank erfolgreich geleert"
+
+######GETSOURCES.PY######
+msgctxt "#32081"
+msgid "Checking Local Database"
+msgstr "Prüfe Lokale Datenbank"
+
+msgctxt "#32082"
+msgid "Initializing Providers"
+msgstr "Initialisiere Anbieter"
+
+msgctxt "#32085"
+msgid "No Sources found for next item in playlist.\nClearing current playlist"
+msgstr "Keine Quellen zum abspielen in der Playlist gefuden.\nLeere aktuelle Playlist"
+
+msgctxt "#32086"
+msgid "No Playable Sources were found.\nWould you like to attempt to cache a torrent?"
+msgstr "Keine abspielbare Quellen gefunden.\nMöchten Sie Torrent Suche versuchen"
+
+msgctxt "#32087"
+msgid "Select Torrent to Cache"
+msgstr "Füge Torrent zum Cache hinzu"
+
+msgctxt "#32088"
+msgid "Torrents"
+msgstr "Torrents"
+
+msgctxt "#32089"
+msgid "Hosters"
+msgstr "Anbieter"
+
+msgctxt "#32090"
+msgid "Free Hosters"
+msgstr "Freie Anbieter"
+
+msgctxt "#32091"
+msgid "Remaining Providers"
+msgstr "Verbleibende Anbieter"
+
+######SMARTPLAY.PY######
+msgctxt "#32093"
+msgid "Error: Trakt is not authorized \nPlease authorise Trakt in the settings menu to use this feature"
+msgstr "Fehler:Trakt ist nicht authorisiert \nBitte authorisiere Trakt im Einstellungsmenü um diese Funktion zu verwenden"
+
+msgctxt "#32094"
+msgid "Begining SmartPlay"
+msgstr "Beginne SmartPlay"
+
+msgctxt "#32095"
+msgid "Identifying Resume Point"
+msgstr "Identifiziere Fortsetzungspunkt"
+
+msgctxt "#32096"
+msgid "Building Playlist"
+msgstr "Erzeuge Playlist"
+
+msgctxt "#32097"
+msgid "Building List Items"
+msgstr "Erzeuge Listen Einträge"
+
+msgctxt "#32098"
+msgid "Starting Scraping"
+msgstr "Starte Scraping"
+
+######RESOLVER.PY######
+msgctxt "#33000"
+msgid "Starting Link Resolver"
+msgstr "Starte Resolver Verlinkung"
+
+######REAL_DEBRID.PY#########
+msgctxt "#32100"
+msgid "Authentication with Real Debrid has failed, please try again"
+msgstr "Real Debrid Authentifizierung fehlgeschlagen, bitte nocheinmal versuchen"
+
+######SETTINGS.XML VALUES######
+msgctxt "#40001"
+msgid "General"
+msgstr "Allgemein"
+
+msgctxt "#40002"
+msgid "Episode Play Style"
+msgstr "Episoden abspielen"
+
+msgctxt "#40003"
+msgid "Auto Play"
+msgstr "Auto Play"
+
+msgctxt "#40004"
+msgid "Source Select"
+msgstr "Quelle auswählen"
+
+msgctxt "#40005"
+msgid "Source Select View"
+msgstr "Quellen Übersicht"
+
+msgctxt "#40006"
+msgid "List"
+msgstr "Liste"
+
+msgctxt "#40007"
+msgid "Dialog"
+msgstr "Dialog"
+
+msgctxt "#40009"
+msgid "Next Up Sort Style"
+msgstr "Next Up Sortierungs Stil"
+
+msgctxt "#40010"
+msgid "Release Date"
+msgstr "Erscheinungs Datum"
+
+msgctxt "#40011"
+msgid "Recently Watched"
+msgstr "kürzlich gesehen"
+
+msgctxt "#40012"
+msgid "Multiline Source Select"
+msgstr "Mehrfache Quellen Auswahl"
+
+msgctxt "#40013"
+msgid "TV Metadata location"
+msgstr "TV Metadaten Standort"
+
+msgctxt "#40014"
+msgid "Page Item Limit"
+msgstr "Seiteneintrag Limit"
+
+msgctxt "#40015"
+msgid "Use Custom View IDs (Advanced)"
+msgstr "Verwende Benutzer Ansicht IDs (Fortgeschritten)"
+
+msgctxt "#40016"
+msgid "Movie View"
+msgstr "Film Ansicht"
+
+msgctxt "#40017"
+msgid "Movie View ID"
+msgstr "Film Ansicht ID"
+
+msgctxt "#40018"
+msgid "Show View"
+msgstr "Serien Ansicht"
+
+msgctxt "#40019"
+msgid "Show View ID"
+msgstr "Serien Ansicht ID"
+
+msgctxt "#40020"
+msgid "Episode View"
+msgstr "Episoden Ansicht"
+
+msgctxt "#40021"
+msgid "Episode View ID"
+msgstr "Episoden Ansicht ID"
+
+msgctxt "#40022"
+msgid "Season View"
+msgstr "Staffel Ansicht"
+
+msgctxt "#40023"
+msgid "Season View ID"
+msgstr "Staffel Ansicht ID"
+
+msgctxt "#40024"
+msgid "Select Text Highlight Color..."
+msgstr "Wähle Text Farbe"
+
+msgctxt "#40025"
+msgid "Current Color"
+msgstr "Aktuelle Farbe"
+
+msgctxt "#40026"
+msgid "Smart Play Settings"
+msgstr "Smart Play Einstellungen"
+
+msgctxt "#40028"
+msgid "Enabled Up Next Addon Integration"
+msgstr "UpNext Integration ermöglicht"
+
+msgctxt "#40029"
+msgid "Up Next Notification Time"
+msgstr "UpNext Benachrichtigungszeit"
+
+msgctxt "#40030"
+msgid "Auto Playlist Creation"
+msgstr "Auto Playlist Erstellung"
+
+msgctxt "#40031"
+msgid "Auto Episode Resume"
+msgstr "Automatisch Episoden Fortsetzen"
+
+msgctxt "#40033"
+msgid "Pre-emptive Scraping"
+msgstr "Streamsuche vorzeitig abbrechen (Pre-Emptive)"
+
+msgctxt "#40036"
+msgid "Enable Bookmark Prompt"
+msgstr "Aktiviere Fortsetzunspunkt Anzeige/Hinweis"
+
+msgctxt "#40037"
+msgid "Scraping"
+msgstr "Scraping"
+
+msgctxt "#40038"
+msgid "Cache Torrent Info Locally"
+msgstr "Speichere Torrent Informationen lokal"
+
+msgctxt "#40039"
+msgid "Hide HEVC Items"
+msgstr "Verberge HEVC Einträge"
+
+msgctxt "#40040"
+msgid "Timeout"
+msgstr "Zeitlimit für Indexseiten Suche"
+
+msgctxt "#40041"
+msgid "Auto Caching Assistant"
+msgstr "Automatische Speicherfunktion"
+
+msgctxt "#40042"
+msgid "Auto Add Un-Cached Sources to Debrid"
+msgstr "Automatisches hinzufügen ungespeicherter Quellen zu Debrid"
+
+msgctxt "#40043"
+msgid "Assist Mode"
+msgstr "Hilfe Modus"
+
+msgctxt "#40044"
+msgid "Preferred Cloud Location"
+msgstr "Bevorzugter Cloud Speicherort"
+
+msgctxt "#40045"
+msgid "Source Filters"
+msgstr "Quellen Filter"
+
+msgctxt "#40046"
+msgid "Enable File Size Limit"
+msgstr "Aktiviere Dateigrößen Limit"
+
+msgctxt "#40047"
+msgid "Episode File Size limit (GB)"
+msgstr "Episoden Dateigrößen Limit (GB)"
+
+msgctxt "#40049"
+msgid "Sort Sources Method"
+msgstr "Quellenanzeige sortieren"
+
+msgctxt "#40050"
+msgid "Enable Secondary Filesize Sort"
+msgstr "Aktiviere (zweitens) Dateigrößen Sortierung"
+
+msgctxt "#40051"
+msgid "Enable Tertiary HEVC Sort Preference"
+msgstr "Aktiviere (drittens) HEVC Sortierung bevorzugt"
+
+msgctxt "#40052"
+msgid "Max Resolution"
+msgstr "Maximal Auflösung"
+
+msgctxt "#40053"
+msgid "Pre-emptive Termination Settings"
+msgstr "Einstellungen Streamsuche vorzeitig abbrechen"
+
+msgctxt "#40054"
+msgid "Enable Pre-emptive Termination"
+msgstr "Aktiviere Streamsuche vorzeitig abbrechen"
+
+msgctxt "#40055"
+msgid "Minimum Movie Resolution"
+msgstr "Minimale Auflösung Filme"
+
+msgctxt "#40056"
+msgid "Minimum TV Shows Resolution"
+msgstr "Minimale Auflösung Serien"
+
+msgctxt "#40057"
+msgid "Minimum Sources"
+msgstr "Minimum Quellen"
+
+msgctxt "#40058"
+msgid "Terminate on... "
+msgstr "Beende bei"
+
+msgctxt "#40059"
+msgid "Accounts"
+msgstr "Konten"
+
+msgctxt "#40060"
+msgid "Enable Account Expiry Notifications"
+msgstr "Aktiviere Mitteilung: Konto läuft ab"
+
+msgctxt "#40061"
+msgid "Trakt Account Settings"
+msgstr "Trakt Konto Einstellungen"
+
+msgctxt "#40062"
+msgid "Trakt Username"
+msgstr "Trakt Benutzername"
+
+msgctxt "#40063"
+msgid "Authorize Trakt..."
+msgstr "Authorisiere Trakt"
+
+msgctxt "#40064"
+msgid "Enable Trakt Scrobbling"
+msgstr "Aktiviere Trakt Scrobbling"
+
+msgctxt "#40065"
+msgid "Revoke Trakt Authentication..."
+msgstr "Wiederrufe Trakt Authentifizierung"
+
+msgctxt "#40066"
+msgid "Premiumize Account Settings"
+msgstr "Premiumize Konto Einstellungen"
+
+msgctxt "#40067"
+msgid "Real Debrid Account Settings"
+msgstr "Real Debrid Konto Einstellungen"
+
+msgctxt "#40068"
+msgid "Providers"
+msgstr "Indexseiten"
+
+msgctxt "#40078"
+msgid "API Keys"
+msgstr "API Keys"
+
+msgctxt "#40081"
+msgid "Enable Automatic Provider Updates"
+msgstr "Aktiviere Automatisches Indexseiten Update"
+
+msgctxt "#40082"
+msgid "Check For Updates"
+msgstr "Prüfe auf Aktualisierungen"
+
+msgctxt "#40083"
+msgid "Manage Provider Packages"
+msgstr "Indexseiten Pakete Verwalten"
+
+msgctxt "#40084"
+msgid "Force view types on menus"
+msgstr "Erzwinge Anzeige-Typen im Menü"
+
+msgctxt "#40085"
+msgid "Shortcuts"
+msgstr "Schnellzugriff"
+
+msgctxt "#40086"
+msgid "Append show info to mixed episode lists"
+msgstr "Serien Information bei gemischter Episoden Liste anzeigen"
+
+msgctxt "#40087"
+msgid "TMDB API Key"
+msgstr "TMDB API Key"
+
+msgctxt "#40089"
+msgid "Trakt Client ID"
+msgstr "Trakt Client v2 API Key"
+
+msgctxt "#40090"
+msgid "Trakt Client Secret"
+msgstr "Trakt Client Secret"
+
+msgctxt "#40092"
+msgid "TVDB API Key"
+msgstr "TVDB API Key"
+
+msgctxt "#40093"
+msgid "Sort & Filter"
+msgstr "Sortierung & Filter"
+
+msgctxt "#40094"
+msgid "Hide 3D Items"
+msgstr "3D Einträge ausblenden"
+
+msgctxt "#40095"
+msgid "Source Sorting"
+msgstr "Quellensortierung"
+
+msgctxt "#40096"
+msgid "Authorize Real Debrid..."
+msgstr "Authorisiere Real Debrid"
+
+msgctxt "#40097"
+msgid "Real Debrid Username"
+msgstr "Real Debrid Benutzername"
+
+msgctxt "#40098"
+msgid "Enable Real Debrid"
+msgstr "Aktiviere Real Debrid"
+
+msgctxt "#40099"
+msgid "Real Debrid Priority"
+msgstr "Real Debrid Priorität"
+
+msgctxt "#40100"
+msgid "Enable Torrents"
+msgstr "Aktiviere Torrents"
+
+msgctxt "#40101"
+msgid "Enable Hosters"
+msgstr "Aktiviere Hoster"
+
+msgctxt "#40102"
+msgid "Auto-Delete Torrents"
+msgstr "Automatisch Torrents löschen"
+
+msgctxt "#40103"
+msgid "Max Storage Space Used Before Deletion (GB)"
+msgstr "Maximalen Speicherplatz verwenden bevor gelöscht wird (GB)"
+
+msgctxt "#40104"
+msgid "Automatic Cloud Removal"
+msgstr "Automatische Cloud Löschung"
+
+msgctxt "#40105"
+msgid "Prefer Transcoded Files"
+msgstr "Bevorzuge verschlüsselte Dateien"
+
+msgctxt "#40106"
+msgid "Api Key"
+msgstr "API Key"
+
+msgctxt "#40107"
+msgid "Premiumize Priority"
+msgstr "Premiumize Priorität"
+
+msgctxt "#40108"
+msgid "Enable Premiumize"
+msgstr "Aktiviere Premiumize"
+
+msgctxt "#40109"
+msgid "Hide Low Quality Items"
+msgstr "Einträge mit schlechter Qualität ausblenden"
+
+msgctxt "#40110"
+msgid "Enable Quaternary Low Quality Sort Preference"
+msgstr "Aktiviere (viertens) schlechte Qualität Sortierung bevorzugen"
+
+msgctxt "#40112"
+msgid "Enable search history"
+msgstr "Aktiviere Suchverlauf"
+
+msgctxt "#40113"
+msgid "Unable to contact Trakt.\nPlease check Trakts outage status at:\nhttp://status.trakt.tv"
+msgstr "Trakt Verbindung nicht möglich.\nBitte prüfe Trakt Serverausfall Status auf:\nhttp://status.trakt.tv"
+
+msgctxt "#40114"
+msgid "Fanart.tv API Key"
+msgstr "Fanart.tv API Key"
+
+msgctxt "#40115"
+msgid "Fanart.tv"
+msgstr "Fanart.tv"
+
+msgctxt "#40116"
+msgid "Delay Release Dates by a day"
+msgstr "Bei Veröffentlichung, Verzögerung um einen Tag"
+
+msgctxt "#40117"
+msgid "Another addon is attempting to install a provider into Seren\nDo you wish to allow this?"
+msgstr "Ein anderes Addon versucht Indexseiten in Seren zu installieren\nWollen Sie das erlauben?"
+
+msgctxt "#40118"
+msgid "%s failed to uninstall the package: %s\nThis may require manual removal"
+msgstr "%s Paket deinstallieren fehlgeschlagen: %s\Manuelles entfernen notwendig"
+
+msgctxt "#40119"
+msgid "Another addon is attempting to uninstall the %s provider from Seren\nDo you wish to allow this?"
+msgstr "Ein anderes Addon versucht die Indexseite %s in Seren zu deinstallieren\nWollen Sie das erlauben?"
+
+msgctxt "#40120"
+msgid "Hide SD quality sources"
+msgstr "SD Quellen ausblenden"
+
+msgctxt "#40121"
+msgid "Networks"
+msgstr "TV Sender"
+
+msgctxt "#40122"
+msgid "Hide Un-Aired Items"
+msgstr "Noch nicht ausgestrahltes ausblenden"
+
+msgctxt "#40123"
+msgid "Years"
+msgstr "Jahr"
+
+msgctxt "#40125"
+msgid "Hide Specials"
+msgstr "Spezials ausblenden"
+
+msgctxt "#40126"
+msgid "My Files"
+msgstr "Meine Dateien"
+
+msgctxt "#40127"
+msgid "Scraper Display Style"
+msgstr "Scraper Vorgang Anzeige"
+
+msgctxt "#40128"
+msgid "Resolve Display Style"
+msgstr "Resolve Anzeige Stil"
+
+msgctxt "#40129"
+msgid "Fancy"
+msgstr "Vordergrund"
+
+msgctxt "#40130"
+msgid "Background Task"
+msgstr "Hintergrund"
+
+msgctxt "#40131"
+msgid "Auto-Select after (x) Seconds"
+msgstr "Automatische Auswahl nach (x) Sekunden"
+
+msgctxt "#40132"
+msgid "Auto Select Delay"
+msgstr "Automatische Verzögerung"
+
+msgctxt "#40133"
+msgid "[COLOR yellow]Please Note: [/COLOR] Seren v0.2 requires an initial synchronization with trakt.\n\nThis synchronization assists to speed up Seren's menus and will allow usage of certain menus in the event Trakt experiences server issues. \n\nYou may choose to delay this process for now, although it is highly recommended that you don't. Should you choose to delay this process, it should be noted that some menus and information will not be available. \n\nIf you choose to skip this process, you will be reminded again."
+msgstr "[COLOR yellow]Bitte beachte: [/COLOR] Seren erfordert eine erst Synchronistation mit Trakt.\n\nDiese Synchronistation unterstützt die Menügeschwindigkeit und erlaubt die Verwendung von bestimmten Menü Punkten. \n\nSie können diesen Prozess jetzt überspringen, aber es wird empfohlen dies nicht zu machen. Sollten Sie sich für die spätere Verknüpfung entscheiden, stehen manche Informationen und Menüs nicht zur Verfügung. \n\nWenn Sie Vorgang überspringen wählen, werden Sie später erneut erinnert."
+
+msgctxt "#40134"
+msgid "Would you like to perform the initial sync now?"
+msgstr "Möchten Sie jetzt die Erstsynchronisierung ausführen?"
+
+msgctxt "#40135"
+msgid "Starting Source Select"
+msgstr "Starte Quellen Auswahl"
+
+msgctxt "#40136"
+msgid "A new verison of Seren is available from the repository. Please consider updating to v%s"
+msgstr "Eine neue Seren Version ist im Repo verfügbar. Bitte aktualisieren Sie auf v%s"
+
+msgctxt "#40137"
+msgid "Check for Seren updates"
+msgstr "Prüfe auf Seren Aktualisierungen"
+
+msgctxt "#40139"
+msgid "[COLOR red]WARNING[/COLOR]\nThis will reset all meta information, are you sure?"
+msgstr "[COLOR red]WARNUNG[/COLOR]\nDies löscht alle Meta Informationen, sind Sie sicher?"
+
+msgctxt "#40140"
+msgid "Clear Search History"
+msgstr "Suchverlauf löschen"
+
+msgctxt "#40141"
+msgid "New Movie Search..."
+msgstr "Neue Film Suche"
+
+msgctxt "#40142"
+msgid "New Show Search..."
+msgstr "Neue Serien Sucche"
+
+msgctxt "#40143"
+msgid "Store resolved items in cloud"
+msgstr "Empfangene Einträge in der Cloud speichern"
+
+msgctxt "#40144"
+msgid "General Menu View"
+msgstr "Allgemeine Menü Ansicht"
+
+msgctxt "#40145"
+msgid "General Menu View ID"
+msgstr "Allgemeine Menü Ansicht ID"
+
+msgctxt "#40146"
+msgid "[COLOR red]Error:[/COLOR] No Debrid accounts were identified."
+msgstr "[COLOR red]Fehler:[/COLOR] Kein Debrid Konto wurde gefunden"
+
+msgctxt "#40147"
+msgid "Please setup your accounts in the settings menu before attempting to play an item"
+msgstr "Bitte Kontodaten im Einstellungsmenü eintragen, damit etwas abgespielt werden kann"
+
+msgctxt "#40148"
+msgid "Terminate if cloud sources are found"
+msgstr "Beende wenn Cloud Quellen gefunden wurden "
+
+msgctxt "#40149"
+msgid "Inspect Cloud Files on Scrape"
+msgstr "Prüfe Cloud Dateien beim Scrapen"
+
+msgctxt "#40151"
+msgid "By Actor..."
+msgstr "Schauspieler"
+
+msgctxt "#40152"
+msgid "Movie Play Style"
+msgstr "Film abspielen"
+
+msgctxt "#40154"
+msgid "Movie File Size limit (GB)"
+msgstr "Film Dateigrößen Limit (GB)"
+
+msgctxt "#40155"
+msgid "Enable Kodi Menu Caching"
+msgstr "Aktiviere Kodi Menü Caching"
+
+msgctxt "#40156"
+msgid "Please Note\nYou appear to have authorized a non-premium account and will not be able to play items using this account"
+msgstr "Bitte beachte\nEs scheint als haben Sie ein ungültiges Premium Konto authorisiert, damit können keine Einträge abgespielt werden"
+
+msgctxt "#40157"
+msgid "Auto try next link on resolve failure (Source Select)"
+msgstr "Nächsten Hoster automatisch abspielen (wenn Link fehlerhaft)"
