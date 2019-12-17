@@ -1,4 +1,7 @@
-Changelog 1.6.1:
+Changelog 1.6.2:
+Fixed trakt database rebuild issues
+
+Changelog 1.6.2:
 Fix playback for RD items in My Files
 Fix Trakt Sync Databsae not upgrading correctly
 Fixed Trakt lists missing items
