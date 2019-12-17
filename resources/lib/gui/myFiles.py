@@ -152,6 +152,7 @@ class RealDebridWalker(BaseDebridWalker):
             if i['name'].startswith('/'):
                 i['name'] = i['name'].split('/')[-1]
             i['links'] = [folder['links'][count]]
+            count += 1
         self._format_items(items)
 
     def resolve_link(self, list_item):

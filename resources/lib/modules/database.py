@@ -209,7 +209,7 @@ def addSearchHistory(search_string, media_type):
         cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON show (value)")
 
         cursor.execute(
-            "INSERT INTO %s Values (?)"
+            "REPLACE INTO %s Values (?)"
             % media_type, (search_string,)
         )
 

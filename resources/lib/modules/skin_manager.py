@@ -427,13 +427,10 @@ class SkinManager:
 
         for key in keys:
             if skin_info[key] is None:
-                print('{} NONE'.format(key))
                 return False
             if skin_info[key] is '':
-                print('{} EMP'.format(key))
                 return False
             if not skin_info[key].startswith('http'):
-                print('{} HTTP'.format(key))
                 return False
 
         return True
@@ -451,13 +448,12 @@ class SkinManager:
             except IndexError:
                 raise SkinNotFoundException(skin_name)
 
-        skins = [i for i in skins if self._skin_can_update(i)]
-
         if not silent:
             tools.progressDialog.create(tools.addonName, tools.lang(33019))
             tools.progressDialog.update(-1)
 
-        skins = list([self._check_skin_for_update(i) for i in skins])
+        skins = [i for i in skins if self._skin_can_update(i)]
+        skins = [i for i in skins if self._check_skin_for_update(i)]
 
         if len(skins) == 0:
             if not silent:

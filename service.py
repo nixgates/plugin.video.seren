@@ -16,13 +16,13 @@ tools.log('Performing initial background maintenance...')
 if tools.getSetting('general.checkAddonUpdates') == 'true':
     maintenance.check_for_addon_update()
 
+TraktSyncDatabase().sync_activities()
+
 maintenance.run_maintenance()
 
 tools.log('Initial maintenance cycle completed')
 
 tools.log('#############  SERVICE ENTERED KEEP ALIVE  #################')
-
-TraktSyncDatabase().sync_activities()
 
 while not monitor.abortRequested():
     try:

@@ -9,8 +9,6 @@ import requests
 from resources.lib.common import tools
 from resources.lib.modules.trakt_sync import lists
 
-lists_database = lists.TraktSyncDatabase()
-
 
 class TraktAPI:
     def __init__(self):
@@ -593,6 +591,7 @@ class TraktAPI:
         return lists
 
     def myTraktLists(self, media_type):
+        lists_database = lists.TraktSyncDatabase()
         for user_list in lists_database.get_lists(self._remove_pluralization(media_type), 'myLists'):
             arguments = {'trakt_id': user_list['trakt_id'],
                          'username': user_list['username'],
@@ -649,10 +648,11 @@ class TraktAPI:
         return list_items
 
     def getListItems(self, arguments, page):
+        lists_database = lists.TraktSyncDatabase()
         paginate_lists = (tools.getSetting('general.paginatetraktlists') == 'true')
         arguments = json.loads(tools.unquote(arguments))
         media_type = arguments['type']
-        list_items = ast.literal_eval(lists_database.get_list(arguments['trakt_id'])['kodi_meta'])
+        list_items = ast.literal_eval(lists_database.get_list(arguments['trakt_id'], media_type)['kodi_meta'])
         max_items = len(list_items)
 
         if paginate_lists:

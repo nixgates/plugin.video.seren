@@ -9,23 +9,20 @@ from resources.lib.modules.trakt_sync import movies
 from resources.lib.modules.trakt_sync import shows
 from resources.lib.modules.trakt_sync import lists
 
-show_sync = shows.TraktSyncDatabase()
-movie_sync = movies.TraktSyncDatabase()
-list_sync = lists.TraktSyncDatabase()
-
-
-class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
+class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
     progress_dialog = None
     silent = True
     results_mill = {}
 
     def sync_activities(self, silent=False):
-
         sync_errors = False
 
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
 
         tools.log('STARTING SYNC')
+
+        self._refresh_activites()
+
         if not silent and \
                 str(self.activites['all_activities']) == self.base_date and \
                 tools.getSetting('trakt.auth') != '':
@@ -422,6 +419,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self._update_activity_record('shows_watched', update_time)
 
     def _sync_unwatched(self):
+        show_sync = shows.TraktSyncDatabase()
+        movie_sync = movies.TraktSyncDatabase()
         trakt_watched_movies = Trakt.TraktAPI().json_response('sync/watched/movies')
         trakt_watched_movies = set(int(i['movie']['ids']['trakt']) for i in trakt_watched_movies)
         local_watched_movies = movie_sync.get_watched_movies()
@@ -449,6 +448,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             self.progress_dialog.update(100, 'Syncing Unwatched items')
 
     def _sync_collection_movies(self):
+        movie_sync = movies.TraktSyncDatabase()
+
         insert_list = []
         if not self.silent:
             self.progress_dialog.update(0, 'Fetching Collected Movies')
@@ -472,6 +473,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self._update_activity_record('movies_collected', update_time)
 
     def _sync_collection_shows(self):
+        show_sync = shows.TraktSyncDatabase()
         local_collection = {'%s-%s-%s' % (i['show_id'], i['season'], i['number']): i
                             for i in show_sync.get_collected_episodes()}
 
@@ -487,6 +489,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self._update_activity_record('shows_collected', update_time)
 
     def _sync_uncollected(self):
+        show_sync = shows.TraktSyncDatabase()
+        movie_sync = movies.TraktSyncDatabase()
         trakt_collected_movies = Trakt.TraktAPI().json_response('sync/collection/movies')
 
         if trakt_collected_movies is not None:
@@ -531,6 +535,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         total_lists = len(lists_to_sync) * len(media_types)
 
         processed_lists = 0
+        list_sync = lists.TraktSyncDatabase()
 
         for media_type in media_types:
             for trakt_list in lists_to_sync:
@@ -540,7 +545,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
                 url = 'users/%s/lists/%s/items/%s?extended=full' % (trakt_list['user']['ids']['slug'],
                                                                     trakt_list['ids']['trakt'], media_type)
-                list_items = trakt_api.json_response(url, None, False)
+                list_items = trakt_api.json_response(url, limit=False)
 
                 if list_items is None or len(list_items) == 0:
                     list_sync.remove_list(trakt_list['ids']['trakt'], media_type)
@@ -548,11 +553,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
                 list_items = trakt_api.sort_list(trakt_list['sort_by'], trakt_list['sort_how'], list_items, media_type)
                 list_items = [i[media_type] for i in list_items if i['type'] == media_type and i is not None]
-
                 list_sync.add_list(trakt_list['ids']['trakt'], list_items, trakt_list['name'],
                                    tools.quote_plus(trakt_list['user']['ids']['slug']), 'myLists',
-                                   media_type, trakt_list['updated_at'], len(list_items), trakt_list['sort_how'],
-                                   trakt_list['sort_by'], trakt_list['ids']['slug'])
+                                   media_type, trakt_list['updated_at'], len(list_items), trakt_list['sort_by'],
+                                   trakt_list['sort_how'], trakt_list['ids']['slug'])
 
         if not self.silent:
             self.progress_dialog.update(100, 'Syncing lists')
