@@ -458,10 +458,7 @@ class TraktSyncDatabase:
 
         self._set_base_activites()
         self._refresh_activites()
-        import inspect
-        stack = inspect.stack()
-        the_class = stack[1][0].f_locals["self"].__class__
-        tools.log(the_class)
+
         from resources.lib.modules.trakt_sync import activities
         sync_errors = activities.TraktSyncDatabase().sync_activities(silent)
 
