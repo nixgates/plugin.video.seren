@@ -199,7 +199,7 @@
         <setting type="lsep" label="40066" />
         <setting type="sep" />
         <setting id="premiumize.enabled" type="bool" label="40108" default="false" />
-        <setting id="premiumize.auth" label="40361" type="action" action="RunPlugin(plugin://plugin.video.seren/?action=authPremiumize)" visible="eq(-1,true)" />
+        <setting id="premiumize.auth" label="40361" type="action" option="close" action="RunPlugin(plugin://plugin.video.seren/?action=authPremiumize)" visible="eq(-1,true)" />
         <setting id="premiumize.username" type="text" subsetting="true" label="40106" default="" enable="false" visible="eq(-2,true)" />
         <setting id="premiumize.priority" type="slider" subsetting="true" label="40107" option="int" range="1,1,10" default="10" visible="eq(-3,true)" />
         <setting id="premiumize.torrents" type="bool" subsetting="true" label="40100" default="true" visible="eq(-4,true)" />

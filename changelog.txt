@@ -1,3 +1,12 @@
+Changelog 1.6.1:
+Fix playback for RD items in My Files
+Fix Trakt Sync Databsae not upgrading correctly
+Fixed Trakt lists missing items
+Settings dialog now closes during PM auth
+Fixed double database rebuilding
+Fixed AllDebrid movie resolving
+Fix list comprehension error in check_for_updates method in skin_manager module
+
 Changelog 1.6.0:
 Some Greek translations added
 Some German translations added
