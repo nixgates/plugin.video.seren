@@ -164,7 +164,7 @@ class AllDebrid:
                 selectedFile = folder_details[0]
             else:
                 return
-
+        self.delete_magnet(magnet_id)
         return self.resolve_hoster(selectedFile)
 
     def resolve_magnet(self, magnet, args, torrent, pack_select=False):
@@ -202,6 +202,8 @@ class AllDebrid:
             if streamLink is None:
                 return
 
+            self.delete_magnet(magnet_id)
+
             return self.resolve_hoster(streamLink)
         except:
             import traceback
@@ -215,3 +217,6 @@ class AllDebrid:
                     if any(i['filename'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
                         return i['link']
         return None
+
+    def delete_magnet(self, magnet_id):
+        return self.get_url('magnet/delete?id={}'.format(magnet_id), token_req=True)

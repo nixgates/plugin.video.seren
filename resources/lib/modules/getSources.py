@@ -117,9 +117,15 @@ class Sources(DisplayWindow):
 
                 try:
                     resp = requests.get('https://v2.sg.media-imdb.com/suggestion/t/%s.json' % self.args['ids']['imdb'])
-                    year = json.loads(resp.text)['d'][0]['y']
+                    resp = json.loads(resp.text)['d'][0]
+                    title = resp['l']
+                    year = resp['y']
                     if year != self.args['info']['year']:
                         self.args['info']['year'] = str(year)
+                    if title != self.args['info']['title']:
+                        self.args['info']['aliases'].append(self.args['info']['title'])
+                        self.args['info']['title'] = title
+                        self.args['info']['originaltitle'] = title
                 except:
                     pass
 
@@ -191,10 +197,9 @@ class Sources(DisplayWindow):
                 while self.progress < 100:
 
                     tools.log('Remainin Providers %s' % self.remainingProviders)
-                    if self.prem_terminate() is True or len(self.remainingProviders) == 0:
+                    if self.prem_terminate() is True or (len(self.remainingProviders) == 0 and runtime > 5):
                         # Give some time for scrapers to initiate
-                        if runtime > 5:
-                            break
+                        break
 
                     if self.canceled:
                         break
@@ -827,17 +832,18 @@ class Sources(DisplayWindow):
 
         sortedList = []
 
-        for i in self.cloud_files:
-            sortedList.append(i)
-
         resolutions = self.resolutionList()
 
         resolutions.reverse()
 
         if tools.getSetting('general.sizesort') == 'true':
             torrent_list = sorted(torrent_list, key=lambda k: k['size'], reverse=True)
+            self.cloud_files = sorted(self.cloud_files, key=lambda k: k['size'], reverse=True)
         else:
             random.shuffle(torrent_list)
+
+        for i in self.cloud_files:
+            sortedList.append(i)
 
         if tools.getSetting('general.disable3d') == 'true':
             torrent_list = [i for i in torrent_list if '3D' not in i['info']]

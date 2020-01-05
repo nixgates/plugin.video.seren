@@ -1,7 +1,19 @@
+Changelog 1.6.3:
+Fixed backwards compatibility for older Seren list urls
+Movie titles now confirm against IMDB before scrape
+Stop triggering Oauth refresh on 401 errors
+Next up sort style now requires Trakt Auth
+All Debrid magnets are now removed from account after resolving is complete
+Fixed source size possibly displaying multiple times in resolver window
+Rescrape now only applies to initial playlist item
+Fixed ability to backout of Hide Item selection in Trakt manager
+Fixed Trakt lists with same name being mixed up
+Trakt list titles now also append the username
+
 Changelog 1.6.2:
 Fixed trakt database rebuild issues
 
-Changelog 1.6.2:
+Changelog 1.6.1:
 Fix playback for RD items in My Files
 Fix Trakt Sync Databsae not upgrading correctly
 Fixed Trakt lists missing items

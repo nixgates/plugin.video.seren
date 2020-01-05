@@ -164,13 +164,16 @@ class TraktAPI:
         try:
             response = requests.get(self.ApiUrl + url, headers=self.headers)
             self.response_headers = response.headers
-            if response.status_code in [403, 401]:
+
+            if response.status_code == 403:
+
                 tools.log('Trakt OAuth Failure, %s %s' % (str(response.text), response.request.headers), 'info')
                 if refreshCheck == False:
                     self.refreshToken()
                     self.get_request(url, refreshCheck=True)
                 else:
                     tools.log('Failed to perform request even after token refresh', 'error')
+
             if response.status_code > 499:
                 tools.log('Trakt is having issues with their servers', 'error')
                 return None
@@ -199,7 +202,8 @@ class TraktAPI:
         try:
             response = requests.post(url, json=postData, headers=self.headers)
             self.response_headers = response.headers
-            if response.status_code in [403, 401]:
+
+            if response.status_code == 403:
                 if refreshCheck == False:
                     self.refreshToken()
                     self.post_request(url, postData, limit=limit, refreshCheck=True)
@@ -539,6 +543,8 @@ class TraktAPI:
         sections = ['progress_watched', 'calendar']
         sections_display = [tools.lang(40291), tools.lang(40292)]
         selection = tools.showDialog.select('{}: {}'.format(tools.addonName, tools.lang(40293)), sections_display)
+        if selection == -1:
+            return
         section = sections[selection]
 
         if trakt_object['item_type'] in ['season', 'show', 'episode']:
@@ -599,7 +605,9 @@ class TraktAPI:
                          'sort_how': user_list['sort_how'],
                          'sort_by': user_list['sort_by']}
 
-            tools.addDirectoryItem('{}'.format(user_list['name'].encode('utf-8')),
+            tools.addDirectoryItem('{} - [COLOR {}]{}[/COLOR]'.format(user_list['name'].encode('utf-8'),
+                                                                      tools.get_user_text_color(),
+                                                                      user_list['username'].encode('utf-8')),
                                    'traktList&page=1&actionArgs=%s' % tools.quote(json.dumps(arguments)))
 
         tools.closeDirectory('addons')
@@ -652,7 +660,7 @@ class TraktAPI:
         paginate_lists = (tools.getSetting('general.paginatetraktlists') == 'true')
         arguments = json.loads(tools.unquote(arguments))
         media_type = arguments['type']
-        list_items = ast.literal_eval(lists_database.get_list(arguments['trakt_id'], media_type)['kodi_meta'])
+        list_items = ast.literal_eval(lists_database.get_list(arguments['trakt_id'], media_type, arguments['username'])['kodi_meta'])
         max_items = len(list_items)
 
         if paginate_lists:

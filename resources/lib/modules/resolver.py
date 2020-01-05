@@ -55,7 +55,8 @@ class Resolver(BaseWindow):
                         return
 
                     if 'size' in i:
-                        i['info'].append(tools.source_size_display(i['size']))
+                        if tools.source_size_display(i['size']) not in i['info']:
+                            i['info'].append(tools.source_size_display(i['size']))
 
                     self.setProperty('release_title', tools.display_string(i['release_title']))
                     self.setProperty('debrid_provider', debrid_provider)

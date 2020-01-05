@@ -24,7 +24,7 @@ def dispatch(params):
 
         source_select = params.get('source_select')
 
-        seren_reload = True if params.get('seren_reload') == 'true' else False
+        seren_reload = True if params.get('seren_reload') == 'true' and tools.playList.getposition() == 0 else False
 
         resume = params.get('resume')
 
@@ -581,7 +581,7 @@ def dispatch(params):
         from resources.lib.modules import smartPlay
 
         try:
-            smart = smartPlay.SmartPlay(actionArgs).shufflePlay()
+            smartPlay.SmartPlay(actionArgs).shufflePlay()
         except:
             import traceback
             traceback.print_exc()
@@ -694,6 +694,8 @@ def dispatch(params):
         maintenance.premiumize_transfer_cleanup()
 
     if action == 'test2':
+        from resources.lib.debrid import premiumize
+        tools.log(premiumize.Premiumize().hash_check(['80a5cbe2ae41a409d6989afee5cc81da51d69566']))
         pass
 
     if action == 'manualProviderUpdate':
