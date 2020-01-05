@@ -21,6 +21,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def get_lists(self, media_type, list_type):
         tools.traktSyncDB_lock.acquire()
+
+        # Backwards compatibility for older Seren URLS
+        if media_type == 'movies':
+            media_type = 'movie'
+        if media_type == 'shows':
+            media_type = 'show'
+
         cursor = self._get_cursor()
         cursor.execute('SELECT * FROM lists WHERE list_type=? and media_type=?',
                        (list_type, media_type))
@@ -29,15 +36,22 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         tools.try_release_lock(tools.traktSyncDB_lock)
         return list
 
-    def get_list(self, trakt_id, media_type):
+    def get_list(self, trakt_id, media_type, username):
         tools.traktSyncDB_lock.acquire()
+
+        # Backwards compatibility for older Seren URLS
+        if media_type == 'movies':
+            media_type = 'movie'
+        if media_type == 'shows':
+            media_type = 'show'
+
         cursor = self._get_cursor()
-        cursor.execute('SELECT * FROM lists WHERE trakt_id=? and media_type=?',
-                       (trakt_id, media_type))
+        cursor.execute('SELECT * FROM lists WHERE trakt_id=? and media_type=? and username=?',
+                       (trakt_id, media_type, username))
         list = cursor.fetchone()
         if list is None:
-            cursor.execute('SELECT * FROM lists WHERE slug=? and media_type=?',
-                           (trakt_id, media_type))
+            cursor.execute('SELECT * FROM lists WHERE slug=? and media_type=? and username=?',
+                           (trakt_id, media_type, username))
             list = cursor.fetchone()
         cursor.close()
         tools.try_release_lock(tools.traktSyncDB_lock)

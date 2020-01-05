@@ -11,7 +11,8 @@
         <setting id="general.hideSpecials" type="bool" label="40125" default="false" />
         <setting id="general.hideUnAired" type="bool" label="40122" default="true" />
         <setting id="general.datedelay" type="bool" label="40116" default="false" />
-        <setting id="nextup.sort" type="enum" label="40009" default="0" lvalues="40010|40011" />
+        <setting id="trakt.auth" type="text" default="" visible="false" />
+        <setting id="nextup.sort" type="enum" label="40009" default="0" lvalues="40010|40011" enable="!eq(-1,)" />
         <setting id="general.sourceselectlines" type="bool" label="40012" default="true" visible="false" />
         <setting id="general.textColorSelect" type="action" label="40024" option="close" action="RunPlugin(plugin://plugin.video.seren/?action=colorPicker)" />
         <setting id="general.displayColor" type="text" label="40025" default="None" enable="false" />
@@ -301,7 +302,7 @@
         <setting id="cache.clear" type="action" label="32042" action="RunPlugin(plugin://plugin.video.seren/?action=clearCache)" />
         <setting id="cache.cleartorrent" type="action" label="32055" action="RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)" />
         <setting id="cache.clearsearch" type="action" label="40140" action="RunPlugin(plugin://plugin.video.seren/?action=clearSearchHistory)" />
-        <setting id="cache.wipeaddon" type="action" label="32057" action="RunPlugin(plugin://plugin.video.seren/?action=cleanInstall)" />
+        <setting id="cache.wipeaddon" type="action" label="32057" option="close" action="RunPlugin(plugin://plugin.video.seren/?action=cleanInstall)" />
         
         <!-- Trakt Sync Tools -->
         <setting type="lsep" label="40177" />
