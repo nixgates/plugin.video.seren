@@ -19,25 +19,30 @@ class Menus:
         self.thread_pool = ThreadPool()
         self.providers = {}
         if tools.all_debrid_enabled():
-            self.providers.update({'all_debrid': AllDebridWalker})
+            self.providers.update({'all_debrid': ('All Debrid', AllDebridWalker)})
         if tools.premiumize_enabled():
-            self.providers.update({'premiumize': PremiumizeWalker})
+            self.providers.update({'premiumize': ('Premiumize', PremiumizeWalker)})
         if tools.real_debrid_enabled():
-            self.providers.update({'real_debrid': RealDebridWalker})
+            self.providers.update({'real_debrid': ('Real Debrid', RealDebridWalker)})
 
 
     def home(self):
-        for key, value in self.providers.iteritems():
-            self.thread_pool.put(value().get_init_list)
-
-        self.thread_pool.wait_completion()
+        for i in self.providers:
+            args = {'debrid_provider': i, 'id': None}
+            tools.addDirectoryItem(self.providers[i][0], 'myFilesFolder', isPlayable=False, isFolder=True,
+                                   actionArgs=json.dumps(args))
 
         tools.closeDirectory('addons', sort='title')
 
     def myFilesFolder(self, args):
         args = json.loads(args)
-        self.providers[args['debrid_provider']]().get_folder(args)
-        tools.closeDirectory('files', sort='title')
+        tools.log(args)
+        if args['id'] is None:
+            tools.log('isNone')
+            self.providers[args['debrid_provider']][1]().get_init_list()
+        else:
+            self.providers[args['debrid_provider']][1]().get_folder(args)
+        tools.closeDirectory('addons', sort='title')
 
     def myFilesPlay(self, args):
         args = json.loads(args)
@@ -133,6 +138,7 @@ class RealDebridWalker(BaseDebridWalker):
         items = [i for i in items if i['status'] == 'downloaded']
         for i in items:
             i['name'] = i['filename']
+
         self._format_items(items)
 
     def _is_folder(self, list_item):
@@ -144,6 +150,7 @@ class RealDebridWalker(BaseDebridWalker):
 
     def get_folder(self, list_item):
         folder = real_debrid.RealDebrid().torrentInfo(list_item['id'])
+        tools.log(folder)
         items = folder['files']
         items = [i for i in items if i['selected'] == 1]
         count = 0
@@ -152,6 +159,7 @@ class RealDebridWalker(BaseDebridWalker):
             if i['name'].startswith('/'):
                 i['name'] = i['name'].split('/')[-1]
             i['links'] = [folder['links'][count]]
+            tools.log(i)
             count += 1
         self._format_items(items)
 
@@ -165,28 +173,50 @@ class AllDebridWalker(BaseDebridWalker):
 
     def get_init_list(self):
         items = all_debrid.AllDebrid().magnet_status('')
+
+        try:
+            items = [value for key, value in items.iteritems() if type(value) == dict and value['status'] == 'Ready']
+        except:
+            items = [value for key, value in items.items() if type(value) == dict and value['status'] == 'Ready']
+
         for i in items:
             i['name'] = i['filename']
+            tools.log(i['name'])
         self._format_items(items)
 
     def _is_folder(self, list_item):
         if len(list_item['links']) > 1:
             return True
         else:
+            try:
+                try:
+                    list_item['link'] = list_item['links'].iteritems[0][1]
+                except:
+                    list_item['link'] = list_item['links'].items()[0][1]
+            except KeyError:
+                tools.log(list_item['links'])
             return False
 
     def get_folder(self, list_item):
         folder = all_debrid.AllDebrid().magnet_status(list_item['id'])
         items = []
-        for key, value in folder['links']:
+
+        try:
+            links = [(key, value) for key, value in folder['links'].iteritems()]
+        except:
+            links = [(key, value) for key, value in folder['links'].items()]
+
+        for key, value in links:
             item = {}
             item['name'] = value
-            item['link'] = key
+            item['links'] = [key]
             item['debrid_provider'] = self.provider
+            items.append(item)
+
         self._format_items(items)
 
     def resolve_link(self, list_item):
-        return real_debrid.RealDebrid().resolve_hoster(list_item['link'])
+        return all_debrid.AllDebrid().resolve_hoster(list_item['link'])
 
 
 class IncorrectDebridProvider(Exception):

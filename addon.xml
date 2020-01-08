@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="1.6.3" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="1.6.4" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -45,6 +45,16 @@
 			<screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
 		</assets>
 		<news>
+Changelog 1.6.4:
+Trakt requests now automatically re-try in the event of remote server failures
+Fixed issue with some movies not being marked as collected during sync
+Catch stringed NoneType values in database.py
+Resolver now returns None if cancelled, regardless if resolving was successful
+File size limits are now enabled by default (10GB)
+Fixed settings cleanup method (missmatch settings error)
+Fixed MyFiles for All Debrid
+Seperated cloud services within MyFiles
+
 Changelog 1.6.3:
 Fixed backwards compatibility for older Seren list urls
 Movie titles now confirm against IMDB before scrape

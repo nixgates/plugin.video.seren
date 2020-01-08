@@ -454,6 +454,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
         if not self.silent:
             self.progress_dialog.update(0, 'Fetching Collected Movies')
         local_collection = set(i['trakt_id'] for i in movie_sync.get_collected_movies())
+
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         trakt_collecton = Trakt.TraktAPI().json_response('sync/collection/movies?extended=full')
 
@@ -469,6 +470,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
         self._execute_batch_sql(sql_statement, ((i['movie']['ids']['trakt'], 1, 0,
                                                  self.base_date, i['movie'].get('released')) for i in insert_list),
                                 len(insert_list))
+
+        sql_statement = "UPDATE movies SET collected=1 WHERE trakt_id=?"
+
+        self._execute_batch_sql(sql_statement, [(i['movie']['ids']['trakt'],) for i in trakt_collecton],
+                                len(trakt_collecton))
 
         self._update_activity_record('movies_collected', update_time)
 

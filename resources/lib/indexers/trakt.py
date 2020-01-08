@@ -148,40 +148,57 @@ class TraktAPI:
             tools.log('Failed to refresh Trakt Access Token', 'error')
             return
 
-    def get_request(self, url, limit=True, limitOverride=0, refreshCheck=False):
+    def _handle_re_auth(self, response):
 
-        if refreshCheck == False:
-            if limit == True:
-                if limitOverride == 0:
-                    limitAmount = int(tools.getSetting('item.limit'))
-                else:
-                    limitAmount = limitOverride
-                if not '?' in url:
-                    url += '?limit=%s' % limitAmount
-                else:
-                    url += '&limit=%s' % limitAmount
+        tools.log('Trakt OAuth Failure, %s %s' % (str(response.text), response.request.headers), 'info')
+
+        self.refreshToken()
+
+    def _append_limit(self, url, limit_override):
+        if limit_override == 0:
+            limit_amount = int(tools.getSetting('item.limit'))
+        else:
+            limit_amount = limit_override
+        if not '?' in url:
+            url += '?limit=%s' % limit_amount
+        else:
+            url += '&limit=%s' % limit_amount
+
+        return url
+
+    def get_request(self, url, limit=True, limitOverride=0, refreshCheck=False, attempts=0):
+
+        if not refreshCheck:
+            if limit:
+                url = self._append_limit(url, limitOverride)
 
         try:
             response = requests.get(self.ApiUrl + url, headers=self.headers)
             self.response_headers = response.headers
 
             if response.status_code == 403:
-
-                tools.log('Trakt OAuth Failure, %s %s' % (str(response.text), response.request.headers), 'info')
                 if refreshCheck == False:
-                    self.refreshToken()
-                    self.get_request(url, refreshCheck=True)
+                    self._handle_re_auth(response)
+                    return self.get_request(url, refreshCheck=True)
                 else:
                     tools.log('Failed to perform request even after token refresh', 'error')
 
             if response.status_code > 499:
-                tools.log('Trakt is having issues with their servers', 'error')
-                return None
+                if attempts < 5:
+                    attempts += 1
+                    tools.log('Failed to perform Trakt Get request, re-trying. Attempts: {}'.format(attempts), 'error')
+                    return self.get_request(url, limit, limitOverride, True, attempts)
+                else:
+                    tools.log('Trakt failed to reply on multiple attempts, URL: {}'.format(url), 'error')
+                    return None
+
             if response.status_code == 404:
                 tools.log('Trakt returned a 404: {}'.format(url), 'error')
                 return None
+
             if response.status_code == 502:
                 tools.log('Trakt is currently experiencing Gateway Issues', 'error')
+
         except requests.exceptions.ConnectionError:
             return
         except not requests.exceptions.ConnectionError:
@@ -190,28 +207,29 @@ class TraktAPI:
 
         return response.text
 
-    def post_request(self, url, postData, limit=True, refreshCheck=False):
-        if refreshCheck == False:
-            url = self.ApiUrl + url
-            if limit == True:
-                limitAmount = tools.getSetting('item.limit')
-                if not '?' in url:
-                    url += '?limit=%s' % limitAmount
-                else:
-                    url += '&limit=%s' % limitAmount
+    def post_request(self, url, postData, limit=True, refreshCheck=False, attempts=0):
+        if not refreshCheck:
+            if limit:
+                url = self._append_limit(url, 0)
         try:
-            response = requests.post(url, json=postData, headers=self.headers)
+            response = requests.post(self.ApiUrl + url, json=postData, headers=self.headers)
             self.response_headers = response.headers
 
             if response.status_code == 403:
-                if refreshCheck == False:
-                    self.refreshToken()
+                if not refreshCheck:
+                    self._handle_re_auth(response)
                     self.post_request(url, postData, limit=limit, refreshCheck=True)
                 else:
                     tools.log('Failed to perform trakt request even after token refresh', 'error')
 
             if response.status_code > 499:
-                return None
+                if attempts < 5:
+                    attempts += 1
+                    tools.log('Failed to perform Trakt POST request, re-trying. Attempts: {}'.format(attempts), 'error')
+                    return self.post_request(url, postData, limit, True, attempts)
+                else:
+                    tools.log('Trakt failed to reply on multiple attempts, URL: {}'.format(url), 'error')
+                    return None
 
         except requests.exceptions.ConnectionError:
             return

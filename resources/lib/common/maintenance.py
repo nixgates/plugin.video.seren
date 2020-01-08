@@ -161,6 +161,7 @@ def clean_deprecated_settings():
                 pass
 
     filtered_settings = []
+    valid_settings = set(valid_settings)
 
     with open(current_settings_file, 'r') as settings_file:
         current_setting_lines = settings_file.readlines()
@@ -171,6 +172,8 @@ def clean_deprecated_settings():
     for i in current_setting_lines:
         if re.findall(r'id="(.*?)"', i)[0] in valid_settings:
             filtered_settings.append(i)
+
+    filtered_settings = set(filtered_settings)
 
     if len(valid_settings) != len(filtered_settings):
         tools.log('Mismatch in valid settings, cancelling the removal of deprecated settings', 'error')
