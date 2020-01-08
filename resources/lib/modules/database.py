@@ -59,8 +59,10 @@ def get(function, duration, *args, **kwargs):
                         return return_data
                     except:
                         return ast.literal_eval(cache_result['value'])
+
         fresh_result = repr(function(*args, **kwargs))
-        if fresh_result is None or fresh_result == None:
+
+        if fresh_result is None or fresh_result == 'None':
             # If the cache is old, but we didn't get fresh result, return the old cache
             if cache_result:
                 return cache_result

@@ -227,12 +227,16 @@ class Resolver(BaseWindow):
         self.setProperty('source_provider', self.sources[0]['provider'])
         self.setProperty('source_resolution', self.sources[0]['quality'])
         self.setProperty('source_info', " ".join(self.sources[0]['info']))
+
         if not self.silent:
             super(Resolver, self).doModal()
         else:
             self.resolve(sources, args, pack_select)
 
-        return self.return_data
+        if not self.canceled:
+            return self.return_data
+        else:
+            return None
 
     def is_canceled(self):
         if not self.silent:

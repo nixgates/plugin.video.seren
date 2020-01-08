@@ -257,7 +257,7 @@
         <setting type="lsep" label="40045"/>
         <setting type="sep" />
         <setting id="general.maxResolution" type="enum" label="40052" values="4k|1080p|720p|SD" default="0" />
-        <setting id="general.enablesizelimit" type="bool" label="40046" default="false" />
+        <setting id="general.enablesizelimit" type="bool" label="40046" default="true" />
         <setting id="general.sizelimit.movie" type="slider" subsetting="true" label="40154" option="int" range="0,1,300" default="10" visible="eq(-1,true)" />
         <setting id="general.sizelimit.episode" type="slider" subsetting="true" label="40047" option="int" range="0,1,300" default="10" visible="eq(-2,true)" />
         <setting id="general.disable3d" type="bool" label="40094" default="true" />
