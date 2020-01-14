@@ -263,7 +263,7 @@ class TMDBAPI:
 
             url = 'movie/%s?&append_to_response=credits,videos,release_dates,images&language=en-US' % str(trakt_object['ids']['tmdb'])
 
-            self.get_TMDB_Fanart_Threaded(url, (trakt_object['ids']['tmdb'], 'movie'))
+            self.get_TMDB_Fanart_Threaded(url, (trakt_object['ids']['tmdb'], 'movies'))
 
             details = self.request_response
 
