@@ -36,9 +36,7 @@ class Menus:
 
     def myFilesFolder(self, args):
         args = json.loads(args)
-        tools.log(args)
         if args['id'] is None:
-            tools.log('isNone')
             self.providers[args['debrid_provider']][1]().get_init_list()
         else:
             self.providers[args['debrid_provider']][1]().get_folder(args)
@@ -46,7 +44,7 @@ class Menus:
 
     def myFilesPlay(self, args):
         args = json.loads(args)
-        self.providers[args['debrid_provider']]().play_item(args)
+        self.providers[args['debrid_provider']][1]().play_item(args)
 
 
 class BaseDebridWalker:
@@ -93,9 +91,10 @@ class BaseDebridWalker:
                 isPlayable = True
                 isFolder = False
                 action = 'myFilesPlay'
+            art = {'thumb': 'None', 'poster': 'None'}
 
             actionArgs = json.dumps(i)
-            tools.addDirectoryItem(i['name'], action, isPlayable=isPlayable, isFolder=isFolder,
+            tools.addDirectoryItem(i['name'], action, art=art, isPlayable=isPlayable, isFolder=isFolder,
                                    actionArgs=tools.quote(actionArgs))
 
     def resolve_link(self, args):
@@ -150,7 +149,7 @@ class RealDebridWalker(BaseDebridWalker):
 
     def get_folder(self, list_item):
         folder = real_debrid.RealDebrid().torrentInfo(list_item['id'])
-        tools.log(folder)
+
         items = folder['files']
         items = [i for i in items if i['selected'] == 1]
         count = 0
@@ -159,8 +158,8 @@ class RealDebridWalker(BaseDebridWalker):
             if i['name'].startswith('/'):
                 i['name'] = i['name'].split('/')[-1]
             i['links'] = [folder['links'][count]]
-            tools.log(i)
             count += 1
+
         self._format_items(items)
 
     def resolve_link(self, list_item):
@@ -174,27 +173,24 @@ class AllDebridWalker(BaseDebridWalker):
     def get_init_list(self):
         items = all_debrid.AllDebrid().magnet_status('')
 
-        try:
-            items = [value for key, value in items.iteritems() if type(value) == dict and value['status'] == 'Ready']
-        except:
-            items = [value for key, value in items.items() if type(value) == dict and value['status'] == 'Ready']
+        items = [value for key, value in items.items() if type(value) == dict and value['status'] == 'Ready']
 
         for i in items:
             i['name'] = i['filename']
-            tools.log(i['name'])
+
         self._format_items(items)
 
     def _is_folder(self, list_item):
-        if len(list_item['links']) > 1:
-            return True
-        else:
-            try:
+        try:
+            if len(list_item['links']) > 1:
+                return True
+            else:
                 try:
-                    list_item['link'] = list_item['links'].iteritems[0][1]
+                    list_item['link'] = [key for key, value in list_item['links'].iteritems()][0]
                 except:
-                    list_item['link'] = list_item['links'].items()[0][1]
-            except KeyError:
-                tools.log(list_item['links'])
+                    list_item['link'] = [key for key, value in list_item['links'].items()][0]
+                return False
+        except:
             return False
 
     def get_folder(self, list_item):
@@ -202,14 +198,14 @@ class AllDebridWalker(BaseDebridWalker):
         items = []
 
         try:
-            links = [(key, value) for key, value in folder['links'].iteritems()]
+            links = [item for item in list_item['links'].iteritems()]
         except:
-            links = [(key, value) for key, value in folder['links'].items()]
+            links = [link for link in folder['links'].items()]
 
         for key, value in links:
             item = {}
             item['name'] = value
-            item['links'] = [key]
+            item['links'] = {key: value}
             item['debrid_provider'] = self.provider
             items.append(item)
 

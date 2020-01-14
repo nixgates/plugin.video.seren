@@ -337,6 +337,17 @@ class Sources(DisplayWindow):
         if len(self.cloud_files) > 0:
             return
 
+        valid_packages = ['show', 'season', 'single']
+
+        if 'showInfo' in self.args:
+            if self.item_information['showInfo']['info']['status'] == 'Returning Series':
+                valid_packages.remove('show')
+                if int(self.item_information['info']['season']) >= int(
+                        self.item_information['showInfo']['info']['season_count']):
+                    valid_packages.remove('season')
+
+        sources = [i for i in self.allTorrents if i['package'] in valid_packages]
+
         build_list = []
 
         if tools.getSetting('general.cacheAssistMode') == "0":
@@ -344,7 +355,7 @@ class Sources(DisplayWindow):
 
             for quality in quality_list:
                 if len(build_list) > 0: break
-                quality_filter = [i for i in self.allTorrents if i['quality'] == quality]
+                quality_filter = [i for i in sources if i['quality'] == quality]
                 if len(quality_filter) > 0:
                     packtype_filter = [i for i in quality_filter if
                                        i['package'] == 'show' or i['package'] == 'season']

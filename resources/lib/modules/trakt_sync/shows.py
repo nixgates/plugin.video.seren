@@ -655,9 +655,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if get_meta:
             try:
-                kodi_meta = tvdb.TVDBAPI().seriesIDToListItem(show_item)
+                kodi_meta = tmdb.TMDBAPI().showToListItem(show_item)
                 if kodi_meta is None or kodi_meta == '{}':
-                    kodi_meta = tmdb.TMDBAPI().showToListItem(show_item)
+                    kodi_meta = tvdb.TVDBAPI().seriesIDToListItem(show_item)
                 if kodi_meta is None or kodi_meta == '{}':
                     kodi_meta = imdb.IMDBScraper().showToListItem(show_item)
                 if kodi_meta is None or kodi_meta == '{}':
@@ -700,9 +700,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if get_meta:
             try:
-                kodi_meta = tvdb.TVDBAPI().seasonIDToListItem(season_meta, show_meta)
+                kodi_meta = tmdb.TMDBAPI().showSeasonToListItem(season_meta, show_meta)
                 if kodi_meta is None or kodi_meta == '{}':
-                    kodi_meta = tmdb.TMDBAPI().showSeasonToListItem(season_meta, show_meta)
+                    kodi_meta = tvdb.TVDBAPI().seasonIDToListItem(season_meta, show_meta)
                 if kodi_meta is None or kodi_meta == '{}':
                     kodi_meta = imdb.IMDBScraper().showSeasonToListItem(season_meta, show_meta)
             except:
@@ -765,9 +765,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if (get_meta and old_entry is None) or (get_meta and old_entry['kodi_meta'] == '{}'):
             try:
-                kodi_meta = tvdb.TVDBAPI().episodeIDToListItem(episode_object, copy.deepcopy(show_meta))
+                kodi_meta = tmdb.TMDBAPI().episodeIDToListItem(episode_object, copy.deepcopy(show_meta))
                 if kodi_meta is None or kodi_meta == '{}':
-                    kodi_meta = tmdb.TMDBAPI().episodeIDToListItem(episode_object, copy.deepcopy(show_meta))
+                    kodi_meta = tvdb.TVDBAPI().episodeIDToListItem(episode_object, copy.deepcopy(show_meta))
                 if kodi_meta is None or kodi_meta == '{}':
                     kodi_meta = imdb.IMDBScraper().episodeIDToListItem(episode_object, copy.deepcopy(show_meta))
                 if kodi_meta is None or kodi_meta == '{}':
