@@ -41,10 +41,10 @@ class TMDBAPI:
         self.info = {}
         self.episode_summary = {}
         self.cast = []
-        if not tools.fanart_api_key == '':
-            self.fanarttv = True
-        else:
+        if tools.fanart_api_key == '':
             self.fanarttv = False
+        else:
+            self.fanarttv = True
 
     def get_request(self, url):
         try:
@@ -104,7 +104,7 @@ class TMDBAPI:
             url = 'tv/%s/season/%s?&append_to_response=credits,videos,images&language=en-US' % (
                 str(showArgs['ids']['tmdb']), str(seasonObject['number']))
 
-            self.get_TMDB_Fanart_Threaded(url, (showArgs['ids']['tmdb'],))
+            self.get_TMDB_Fanart_Threaded(url, (showArgs['ids']['tvdb'], 'season'))
 
             details = self.request_response
 
@@ -263,7 +263,7 @@ class TMDBAPI:
 
             url = 'movie/%s?&append_to_response=credits,videos,release_dates,images&language=en-US' % str(trakt_object['ids']['tmdb'])
 
-            self.get_TMDB_Fanart_Threaded(url, (trakt_object['ids']['tmdb'],))
+            self.get_TMDB_Fanart_Threaded(url, (trakt_object['ids']['tmdb'], 'movie'))
 
             details = self.request_response
 
@@ -466,7 +466,7 @@ class TMDBAPI:
             url = 'tv/%s?&append_to_response=credits,alternative_titles,videos,content_ratings,images&language=en-US' % \
                   traktItem['ids']['tmdb']
 
-            self.get_TMDB_Fanart_Threaded(url, (traktItem['ids']['tmdb'],))
+            self.get_TMDB_Fanart_Threaded(url, (traktItem['ids']['tvdb'], 'tv'))
 
             details = self.request_response
 
@@ -476,6 +476,8 @@ class TMDBAPI:
             parsed_info = self.parseShowInfo(details, traktItem)
             return parsed_info
         except:
+            import traceback
+            traceback.print_exc()
             return None
 
     def parseShowInfo(self, details, trakt_info):
@@ -903,9 +905,9 @@ class TMDBAPI:
         except:
             pass
 
-    def getFanartTVMovie(self, tmdb_id):
+    def getFanartTVMovie(self, tmdb_id, item_type):
         try:
-            artwork = fanarttv.get(tmdb_id, 'movies')
+            artwork = fanarttv.get(tmdb_id, item_type)
             self.fanartart.update(artwork)
         except:
             traceback.print_exc()

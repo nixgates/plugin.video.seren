@@ -54,8 +54,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
                     now = trakt_sync._utc_now_as_trakt_string()
                     local_date = trakt_sync._strf_local_date(local_date)
                     if trakt_sync._requires_update(now, local_date):
-                        self._remove_old_meta_items('shows')
-                        self._update_activity_record('shows_meta_update', update_time)
+                        success = self._remove_old_meta_items('shows')
+                        if success:
+                            self._update_activity_record('shows_meta_update', update_time)
             except:
                 sync_errors = True
                 import traceback
@@ -71,8 +72,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
                     now = trakt_sync._utc_now_as_trakt_string()
                     local_date = trakt_sync._strf_local_date(local_date)
                     if trakt_sync._requires_update(now, local_date):
-                        self._remove_old_meta_items('movies')
-                        self._update_activity_record('movies_meta_update', update_time)
+                        success = self._remove_old_meta_items('movies')
+                        if success:
+                            self._update_activity_record('movies_meta_update', update_time)
             except:
                 sync_errors = True
                 import traceback
@@ -572,6 +574,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
     def _remove_old_meta_items(self, type):
         last_update = self.activites['%s_meta_update' % type]
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
+        success = True
 
         trakt_api = Trakt.TraktAPI()
         updated_item = []
@@ -602,38 +605,45 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
         tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
 
-        updated_item = sorted(list(set(updated_item)))
+        try:
+            updated_item = sorted(list(set(updated_item)))
 
-        sql_statements = 0
+            sql_statements = 0
 
-        if type == 'shows':
-            for i in updated_item:
-                cursor.execute('UPDATE shows SET kodi_meta=?, last_updated=? WHERE trakt_id=?',
-                               (str({}), update_time, i))
-                cursor.execute('UPDATE episodes SET kodi_meta=?, last_updated=? WHERE show_id=?',
-                               (str({}), update_time, i))
-                cursor.execute('UPDATE seasons SET kodi_meta=? WHERE show_id=?', (str({}), i))
+            if type == 'shows':
+                for i in updated_item:
+                    cursor.execute('UPDATE shows SET kodi_meta=?, last_updated=? WHERE trakt_id=?',
+                                   ('{}', update_time, i))
+                    cursor.execute('UPDATE episodes SET kodi_meta=?, last_updated=? WHERE show_id=?',
+                                   ('{}', update_time, i))
+                    cursor.execute('UPDATE seasons SET kodi_meta=? WHERE show_id=?', ('{}', i))
 
-                sql_statements += 3
+                    sql_statements += 3
 
-                # Batch the entries as to not reach SQL expression limit
-                if sql_statements > 999:
-                    cursor.connection.commit()
-                    sql_statements = 0
+                    # Batch the entries as to not reach SQL expression limit
+                    if sql_statements > 500:
+                        cursor.connection.commit()
+                        sql_statements = 0
 
-        elif type == 'movies':
-            for i in updated_item:
-                cursor.execute('UPDATE movies SET kodi_meta=?, last_updated=? WHERE trakt_id=?',
-                               (str({}), update_time, i))
-                # Batch the entries as to not reach SQL expression limit
-                sql_statements += 1
-                if sql_statements > 999:
-                    cursor.connection.commit()
-                    sql_statements = 0
+            elif type == 'movies':
+                for i in updated_item:
+                    cursor.execute('UPDATE movies SET kodi_meta=?, last_updated=? WHERE trakt_id=?',
+                                   (str({}), update_time, i))
+                    # Batch the entries as to not reach SQL expression limit
+                    sql_statements += 1
+                    if sql_statements > 999:
+                        cursor.connection.commit()
+                        sql_statements = 0
 
-        cursor.connection.commit()
-        cursor.close()
+        except database.OperationalError:
+            tools.log('Failed to update some meta items')
+            success = False
+        finally:
+            cursor.connection.commit()
+            cursor.close()
+
         tools.try_release_lock(tools.traktSyncDB_lock)
+        return success
 
     def _mill_episodes(self, trakt_collection, local_collection, watched):
 
@@ -659,9 +669,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
             try:
                 for season in self.results_mill[str(show_id)]:
                     season_insert_list.append((show_id, season['number'], season['first_aired']))
-                    for episode in season['episodes']:
-                        episode_insert_list.append((show_id, episode['season'], episode['ids']['trakt'],
-                                                    episode['number'], episode['first_aired']))
+                    if 'episodes' in season:
+                        for episode in season['episodes']:
+                            episode_insert_list.append((show_id, episode['season'], episode['ids']['trakt'],
+                                                        episode['number'], episode['first_aired']))
             except KeyError:
                 pass
             except:
@@ -708,9 +719,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
     def _update_activity_record(self, record, time):
         tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
-        cursor.execute('UPDATE activities SET %s=? WHERE sync_id=1' % record, (time,))
-        cursor.connection.commit()
-        cursor.close()
+        try:
+            cursor.execute('UPDATE activities SET %s=? WHERE sync_id=1' % record, (time,))
+            cursor.connection.commit()
+        except database.OperationalError:
+            tools.log('Failed to update activity record: {}'.format(record))
+        finally:
+            cursor.close()
+
         tools.try_release_lock(tools.traktSyncDB_lock)
 
     def _pull_show_episodes(self, show_id):

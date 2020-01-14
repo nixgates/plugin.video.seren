@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="1.6.4" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="1.6.5" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -45,6 +45,14 @@
 			<screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
 		</assets>
 		<news>
+Changelog 1.6.5:
+Fixed shows not syncing due to oddly formatted season information
+Fix MyFiles link resolving
+Fix All Debrid menu structuring in MyFiles
+Added more filtering to cache assist to provide a more relevant source
+Moved TMDb indexer to default meta provider for show items
+Added try/except/finally to _remove_old_meta_items in sync activities to ensure database cursor is closed on failure
+
 Changelog 1.6.4:
 Trakt requests now automatically re-try in the event of remote server failures
 Fixed issue with some movies not being marked as collected during sync

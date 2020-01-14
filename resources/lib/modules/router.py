@@ -694,8 +694,6 @@ def dispatch(params):
         maintenance.premiumize_transfer_cleanup()
 
     if action == 'test2':
-        from resources.lib.debrid import premiumize
-        tools.log(premiumize.Premiumize().hash_check(['80a5cbe2ae41a409d6989afee5cc81da51d69566']))
         pass
 
     if action == 'manualProviderUpdate':
