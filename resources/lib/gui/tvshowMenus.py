@@ -514,7 +514,7 @@ class Menus:
 
         self.itemList = [x for x in self.itemList if x is not None and 'info' in x]
 
-        self.itemList = sorted(self.itemList, key=lambda k: k['info']['season'])
+        self.itemList = sorted(self.itemList, key=lambda k: int(k['info']['season']))
 
         if len(self.itemList) == 0:
             tools.log('We received no titles to build a list', 'error')

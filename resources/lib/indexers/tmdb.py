@@ -176,11 +176,11 @@ class TMDBAPI:
             except:
                 pass
             try:
-                item['info']['sortseason'] = str(details.get('season_number', ''))
+                item['info']['sortseason'] = int(details.get('season_number', ''))
             except:
                 pass
             try:
-                item['info']['season'] = str(details.get('season_number', ''))
+                item['info']['season'] = int(details.get('season_number', ''))
             except:
                 pass
             try:
