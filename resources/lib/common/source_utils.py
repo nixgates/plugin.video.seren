@@ -9,9 +9,13 @@ except: pass
 from requests import Session
 from resources.lib.common import tools
 
-COMMON_VIDEO_EXTENSIONS = xbmc.getSupportedMedia('video').split('|')
+try:
+    COMMON_VIDEO_EXTENSIONS = xbmc.getSupportedMedia('video').split('|')
 
-COMMON_VIDEO_EXTENSIONS = [i for i in COMMON_VIDEO_EXTENSIONS if i != '' and i != '.zip']
+    COMMON_VIDEO_EXTENSIONS = [i for i in COMMON_VIDEO_EXTENSIONS if i != '' and i != '.zip']
+except:
+    pass
+
 
 BROWSER_AGENTS = [
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
@@ -490,6 +494,75 @@ class serenRequests(Session):
             # Spoof common and random user agent
             self.headers["User-Agent"] = random.choice(BROWSER_AGENTS)
 
+def is_file_ext_valid(file_name):
+    if '.' + file_name.split('.')[-1] not in COMMON_VIDEO_EXTENSIONS:
+        return False
+
+    return True
+
+def get_best_match(dict_key, dictionary_list, item_information):
+    regex = get_cache_check_reg(item_information)
+
+    files = []
+
+    for i in dictionary_list:
+        path = cleanTitle(i[dict_key].split('/')[-1].replace('&', ' ').lower())
+        i['regex_matches'] = regex.findall(path)
+        files.append(i)
+
+    files = [i for i in files if len(i['regex_matches']) > 0]
+
+    if len(files) == 0:
+        return None
+
+    files = sorted(files, key=lambda x: len(' '.join(x['regex_matches'])), reverse=True)
+
+    return files[0]
+
+def clear_extras_by_string(args, string, folder_details):
+
+    if string not in clean_title(args['info']['title']) \
+            and string not in clean_title(args['showInfo']['info']['tvshowtitle']) \
+            and int(args['info']['season']) != 0:
+        folder_details = [i for i in folder_details if
+                          string not in
+                          cleanTitle(i['path'].replace('/', ' ')[-1].replace('&', ' ').lower())]
+        return [i for i in folder_details if string not in i['path']]
+
+
+def get_cache_check_reg(args):
+
+    episodeInfo = args['info']
+    show_title = clean_title(args['showInfo']['info']['tvshowtitle'])
+    country = args['showInfo']['info'].get('country', ' ').lower()
+    year = args['showInfo']['info'].get('year', ' ')
+    episode_title = cleanTitle(episodeInfo['title'])
+    season = str(episodeInfo['season'])
+    episode = str(episodeInfo['episode'])
+
+    if episode_title == show_title\
+            or len(re.findall(r'^\d+$', episode_title)) > 0:
+        episode_title = None
+
+    reg_string = '(?#SHOW TITLE)(?:%s)' \
+                 '? ?' \
+                 '(?#COUNTRY)(?:%s)' \
+                 '? ?' \
+                 '(?#YEAR)(?:%s)' \
+                 '? ?(?:(?:s?|\[?)0?' \
+                 '(?#SEASON)%s' \
+                 '[x .e]|(?:season 0?' \
+                 '(?#SEASON)%s ' \
+                 '(?:episode )|(?: ep)))(?:\d\de)?0?' \
+                 '(?#EPSIDOE)%s' \
+                 '(?:e\d\d)?\]? '
+
+    reg_string = reg_string % (show_title, country, year, season, season, episode)
+
+    if episode_title:
+        reg_string += '|{eptitle}'.format(eptitle=episode_title)
+
+    return re.compile(reg_string)
 
 def torrentCacheStrings(args, strict=False):
 
@@ -522,7 +595,8 @@ def torrentCacheStrings(args, strict=False):
                       '%s.%s ' % (season_number.zfill(2), episode_number.zfill(2)),
                       ]
     if not clean_title(episode_title) == clean_title(show_title):
-        episodeStrings.append('%s ' % clean_title(episode_title))
+        if not len(re.findall(r'^[0-9]+$', clean_title(episode_title))) > 0:
+            episodeStrings.append('%s ' % clean_title(episode_title))
 
     if strict == False:
         relaxed_strings = [

@@ -185,10 +185,7 @@ class AllDebridWalker(BaseDebridWalker):
             if len(list_item['links']) > 1:
                 return True
             else:
-                try:
-                    list_item['link'] = [key for key, value in list_item['links'].iteritems()][0]
-                except:
-                    list_item['link'] = [key for key, value in list_item['links'].items()][0]
+                list_item['link'] = [key for key, value in list_item['links'].items()][0]
                 return False
         except:
             return False
@@ -197,10 +194,7 @@ class AllDebridWalker(BaseDebridWalker):
         folder = all_debrid.AllDebrid().magnet_status(list_item['id'])
         items = []
 
-        try:
-            links = [item for item in list_item['links'].iteritems()]
-        except:
-            links = [link for link in folder['links'].items()]
+        links = [link for link in folder['links'].items()]
 
         for key, value in links:
             item = {}

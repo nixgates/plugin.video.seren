@@ -281,6 +281,9 @@ class SmartPlay:
     def play_from_random_point(self):
 
         import random
+
+        tools.playList.clear()
+
         random_season = random.randint(1, int(self.info_dictionary['info']['season_count']))
 
         playlist = tvshowMenus.Menus().episodeListBuilder(self.show_trakt_id, random_season, smartPlay=True,

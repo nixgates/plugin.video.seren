@@ -667,7 +667,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
 
         for show_id in show_ids:
             try:
-                for season in self.results_mill[str(show_id)]:
+                for season in self.results_mill.get(str(show_id), []):
                     season_insert_list.append((show_id, season['number'], season['first_aired']))
                     if 'episodes' in season:
                         for episode in season['episodes']:
@@ -675,9 +675,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
                                                         episode['number'], episode['first_aired']))
             except KeyError:
                 pass
-            except:
-                import traceback
-                traceback.print_exc()
+            except TypeError:
                 pass
 
         if not self.silent:

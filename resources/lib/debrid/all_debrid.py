@@ -146,7 +146,7 @@ class AllDebrid:
         magnet_id = self.upload_magnet(magnet)['id']
         folder_details = self.magnet_status(magnet_id)['links']
 
-        folder_details = [(key, value) for key, value in folder_details.iteritems()
+        folder_details = [(key, value) for key, value in folder_details.items()
                           if any(value.endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
 
         for torrent_file in folder_details:
@@ -183,7 +183,9 @@ class AllDebrid:
             if folder_details['status'] != 'Ready':
                 return
 
-            folder_details = [{'link': key, 'filename': value} for key, value in folder_details['links'].iteritems()]
+            folder_details = [{'link': key, 'filename': value}
+                              for key, value in folder_details['links'].items()]
+
 
             if 'extra' not in args['info']['title'] and 'extra' not in args['showInfo']['info']['tvshowtitle'] \
                     and int(args['info']['season']) != 0:
