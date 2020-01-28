@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import time
 from resources.lib.common import tools
 from resources.lib.common import source_utils
 from resources.lib.gui.windows.base_window import BaseWindow
@@ -16,6 +17,7 @@ class SourceSelect(BaseWindow):
         self.position = -1
         self.canceled = False
         self.display_list = None
+        self.last_action = 0
         tools.closeBusyDialog()
         self.stream_link = None
 
@@ -53,21 +55,28 @@ class SourceSelect(BaseWindow):
     def onClick(self, controlId):
 
         if controlId == 1000:
+            self.handle_action(7)
+
+    def handle_action(self, actionID):
+        if (time.time() - self.last_action) < .5:
+            return
+
+        if actionID == 7:
+
             self.position = self.display_list.getSelectedPosition()
             self.resolve_item()
 
-    def onAction(self, action):
-        id = action.getId()
-        if id == 92 or id == 10:
+        if actionID == 92 or id == 10:
             self.stream_link = False
             self.close()
 
-        if id == 7:
-            self.position = self.display_list.getSelectedPosition()
-            self.resolve_item()
+        self.last_action = time.time()
 
-        if id == 0:
-            pass
+    def onAction(self, action):
+        actionID = action.getId()
+
+        if actionID in [7, 92, 10]:
+            self.handle_action(actionID)
 
     def resolve_item(self):
         if tools.getSetting('general.autotrynext') == 'true':

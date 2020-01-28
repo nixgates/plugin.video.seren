@@ -231,14 +231,8 @@ class Sources(DisplayWindow):
 
             self.debridHosterDuplicates()
 
-            try:
-                self.torrentCacheSources = [value for key, value in self.torrentCacheSources.iteritems()]
-            except:
-                self.torrentCacheSources = [value for key, value in self.torrentCacheSources.items()]
-            try:
-                self.allTorrents = [value for key, value in self.allTorrents.iteritems()]
-            except:
-                self.allTorrents = [value for key, value in self.allTorrents.items()]
+            self.torrentCacheSources = [value for key, value in self.torrentCacheSources.items()]
+            self.allTorrents = [value for key, value in self.allTorrents.items()]
 
             self.build_cache_assist()
 
@@ -411,9 +405,9 @@ class Sources(DisplayWindow):
         self.hosterDomains = resolver.Resolver(*SkinManager().confirm_skin_path('resolver.xml')).getHosterList()
         self.torrentProviders = torrent_providers
         self.hosterProviders = hoster_providers
-        self.host_domains = list(set([host[0].lower() for provider in self.hosterDomains['premium'].iterkeys()
+        self.host_domains = list(set([host[0].lower() for provider in self.hosterDomains['premium'].keys()
                                       for host in self.hosterDomains['premium'][provider]]))
-        self.host_names = list(set([host[1].lower() for provider in self.hosterDomains['premium'].iterkeys()
+        self.host_names = list(set([host[1].lower() for provider in self.hosterDomains['premium'].keys()
                                     for host in self.hosterDomains['premium'][provider]]))
 
     def remove_duplicate_providers(self, torrent, hosters):
@@ -517,10 +511,7 @@ class Sources(DisplayWindow):
                 for i in torrent_results:
                     de_dup.update({i['hash']: i})
 
-                try:
-                    torrent_results = [value for key, value in de_dup.iteritems()]
-                except:
-                    torrent_results = [value for key, value in de_dup.items()]
+                torrent_results = [value for key, value in de_dup.items()]
 
                 start_time = time.time()
 
@@ -707,8 +698,8 @@ class Sources(DisplayWindow):
         self.remainingProviders.remove('Cloud Inspection')
 
     def rd_cloud_inspection(self):
-
-        torrents = real_debrid.RealDebrid().list_torrents()
+        api = real_debrid.RealDebrid()
+        torrents = api.list_torrents()
 
         if 'showInfo' in self.args:
             torrent_simple_info = self.buildSimpleShowInfo(self.args)
@@ -719,7 +710,7 @@ class Sources(DisplayWindow):
                         or source_utils.filter_season_pack(torrent_simple_info, i['filename']) \
                         or source_utils.filter_single_episode(torrent_simple_info, i['filename']):
 
-                    torrent_info = real_debrid.RealDebrid().torrentInfo(i['id'])
+                    torrent_info = api.torrentInfo(i['id'])
 
                     if not any(tor_file['path'].lower().endswith(extension) for extension in
                                source_utils.COMMON_VIDEO_EXTENSIONS for tor_file in
@@ -784,8 +775,12 @@ class Sources(DisplayWindow):
         cloud_items = [i for i in cloud_items
                        if any(i['name'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
 
-        if 'showInfo' in self.args:
+        if 'showInfo' in self.item_information:
             torrent_simple_info = self.buildSimpleShowInfo(self.args)
+            cleaned_title = source_utils.clean_title(torrent_simple_info['show_title'])
+            cloud_items = [i for i in cloud_items if cleaned_title in source_utils.clean_title(i['name']) or
+                           cleaned_title in source_utils.clean_title(i['path'])]
+
             for item in cloud_items:
                 if source_utils.filter_single_episode(torrent_simple_info, item['name']):
                     self._add_premiumize_cloud_item(item)
@@ -952,16 +947,7 @@ class Sources(DisplayWindow):
 
     def updateProgress(self):
 
-        try:
-            list1 = [
-                len([key for key, value in self.torrentCacheSources.iteritems() if value['quality'] == '4K']),
-                len([key for key, value in self.torrentCacheSources.iteritems() if value['quality'] == '1080p']),
-                len([key for key, value in self.torrentCacheSources.iteritems() if value['quality'] == '720p']),
-                len([key for key, value in self.torrentCacheSources.iteritems() if value['quality'] == 'SD']),
-            ]
-        except:
-            # Python 3 compatibility
-            list1 = [
+        list1 = [
                 len([key for key, value in self.torrentCacheSources.items() if value['quality'] == '4K']),
                 len([key for key, value in self.torrentCacheSources.items() if value['quality'] == '1080p']),
                 len([key for key, value in self.torrentCacheSources.items() if value['quality'] == '720p']),
@@ -970,16 +956,7 @@ class Sources(DisplayWindow):
 
         self.torrents_qual_len = list1
 
-        try:
-            list2 = [
-                len([key for key, value in self.hosterSources.iteritems() if value['quality'] == '4K']),
-                len([key for key, value in self.hosterSources.iteritems() if value['quality'] == '1080p']),
-                len([key for key, value in self.hosterSources.iteritems() if value['quality'] == '720p']),
-                len([key for key, value in self.hosterSources.iteritems() if value['quality'] == 'SD']),
-
-            ]
-        except:
-            list2 = [
+        list2 = [
                 len([key for key, value in self.hosterSources.items() if value['quality'] == '4K']),
                 len([key for key, value in self.hosterSources.items() if value['quality'] == '1080p']),
                 len([key for key, value in self.hosterSources.items() if value['quality'] == '720p']),
@@ -1011,16 +988,16 @@ class Sources(DisplayWindow):
     def buildSimpleShowInfo(self, info):
 
         simpleInfo = {}
-        simpleInfo['show_title'] = info['showInfo']['info']['originaltitle']
-        simpleInfo['episode_title'] = info['info']['originaltitle']
-        simpleInfo['year'] = info['showInfo']['info']['year']
+        simpleInfo['show_title'] = info['showInfo']['info'].get('tvshowtitle', '')
+        simpleInfo['episode_title'] = info['info'].get('originaltitle', '')
+        simpleInfo['year'] = info['showInfo']['info'].get('year', '')
         simpleInfo['season_number'] = str(info['info']['season'])
         simpleInfo['episode_number'] = str(info['info']['episode'])
         simpleInfo['show_aliases'] = info['showInfo']['info']['showaliases']
         if '.' in simpleInfo['show_title']:
             simpleInfo['show_aliases'].append(source_utils.cleanTitle(simpleInfo['show_title'].replace('.', '')))
-        simpleInfo['country'] = info['showInfo']['info']['country']
-        simpleInfo['no_seasons'] = str(info['showInfo']['info']['season_count'])
+        simpleInfo['country'] = info['showInfo']['info'].get('country', '')
+        simpleInfo['no_seasons'] = str(info['showInfo']['info'].get('season_count', ''))
         simpleInfo['absolute_number'] = str(info['info'].get('absoluteNumber', ''))
         simpleInfo['isanime'] = False
 
@@ -1061,8 +1038,8 @@ class Sources(DisplayWindow):
             return imdb, title, localtitle, aliases, year
         elif type == 'sources':
             hostprDict = [host[0]
-                          for debrid in self.hosterDomains['premium'].itervalues()
-                          for host in debrid]
+                              for debrid in self.hosterDomains['premium'].values()
+                              for host in debrid]
             hostDict = self.hosterDomains['free']
             return hostDict, hostprDict
 
@@ -1071,23 +1048,17 @@ class Sources(DisplayWindow):
         if len(self.hosterSources) == 0: return
 
         source_list = []
-        providers = [i for i in self.hosterDomains['premium'].iterkeys()]
+        providers = [i for i in self.hosterDomains['premium'].keys()]
 
         for provider in providers:
             hoster_sources = copy.deepcopy(self.hosterSources)
-            try:
-                hoster_sources = [value for key, value in hoster_sources.iteritems()]
-            except:
-                hoster_sources = [value for key, value in hoster_sources.items()]
+            hoster_sources = [value for key, value in hoster_sources.items()]
             for hoster in self.hosterDomains['premium'][provider]:
                 for file in hoster_sources:
                     if hoster[1].lower() == file['source'].lower() or hoster[0].lower() in str(file['url']).lower():
                         source_list.append(file)
                         source_list[-1]['debrid_provider'] = provider
-        try:
-            self.hosterSources = [value for key, value in self.hosterSources.iteritems()]
-        except:
-            self.hosterSources = [value for key, value in self.hosterSources.items()]
+        self.hosterSources = [value for key, value in self.hosterSources.items()]
         self.hosterSources += source_list
 
     def prem_terminate(self):
@@ -1111,32 +1082,22 @@ class Sources(DisplayWindow):
         type = int(tools.getSetting('preem.type'))
         try:
             if type == 0:
-                try:
-                    sources = [value for key, value in self.torrentCacheSources.iteritems()]
-                except:
-                    sources = [value for key, value in self.torrentCacheSources.items()]
+                sources = [value for key, value in self.torrentCacheSources.items()]
 
                 # Terminating on Torrents only
                 if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
                     tools.log('Pre-emptively Terminated', 'info')
                     return True
             if type == 1:
-                try:
-                    sources = [value for key, value in self.hosterSources.iteritems()]
-                except:
-                    sources = [value for key, value in self.hosterSources.items()]
+                sources = [value for key, value in self.hosterSources.items()]
                 # Terminating on Hosters only
                 if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
                     tools.log('Pre-emptively Terminated', 'info')
                     return True
             if type == 2:
                 # Terminating on both hosters and torrents
-                try:
-                    sources = [value for key, value in self.hosterSources.iteritems()]
-                    sources += [value for key, value in self.torrentCacheSources.iteritems()]
-                except:
-                    sources = [value for key, value in self.hosterSources.items()]
-                    sources += [value for key, value in self.torrentCacheSources.items()]
+                sources = [value for key, value in self.hosterSources.items()]
+                sources += [value for key, value in self.torrentCacheSources.items()]
 
                 if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
                     tools.log('Pre-emptively Terminated', 'info')
@@ -1210,82 +1171,61 @@ class TorrentCacheCheck:
     def all_debrid_worker(self, torrent_list):
 
         api = all_debrid.AllDebrid()
-        hash_list = [i['hash'] for i in torrent_list]
+        torrent_list = [i['hash'] for i in torrent_list if i.get('hash')]
 
-        if len(hash_list) == 0:
+        if len(torrent_list) == 0:
             return
 
-        cache_check = api.check_hash(hash_list)
+        cache_check = api.check_hash([i['hash'] for i in torrent_list])
 
         if not cache_check['success']:
             return
 
         cache_list = []
-        count = 0
 
-        for i in torrent_list:
-            if cache_check['data'][count]['instant'] is True:
+        for idx, i in enumerate(torrent_list):
+            if cache_check['data'][idx]['instant'] is True:
                 i['debrid_provider'] = 'all_debrid'
                 cache_list.append(i)
-            count += 1
 
         self.all_debridCached = cache_list
 
-
-    def _real_debrid_confirm_media(self, storage_variant):
-        keys = list(storage_variant.keys())
-        all_extensions = [storage_variant[key]['filename'] for key in keys]
-        all_extensions = ['.' + filename.split('.')[-1] for filename in all_extensions]
-        for ext in all_extensions:
-            if ext not in source_utils.COMMON_VIDEO_EXTENSIONS:
-                return False
-
-        return True
-
-    def _real_debrid_check_files(self, storage_variant):
-        for key in storage_variant.keys():
-            file_name = storage_variant[key]['filename']
-            file_name = file_name.replace(source_utils.get_quality(file_name), '')
-            file_name = source_utils.cleanTitle(file_name)
-            if any(source_utils.cleanTitle(episodeString) in source_utils.cleanTitle(file_name)
-                   for episodeString in self.episodeStrings):
-                return True
-
     def realdebridWorker(self, torrent_list, info):
         try:
-            if 'showInfo' in info:
-                self.episodeStrings, self.seasonStrings = source_utils.torrentCacheStrings(info)
             cache_list = []
 
             hash_list = [i['hash'] for i in torrent_list]
 
             if len(hash_list) == 0:
                 return
-
-            realDebridCache = real_debrid.RealDebrid().checkHash(hash_list)
+            api = real_debrid.RealDebrid()
+            realDebridCache = api.checkHash(hash_list)
 
             for i in torrent_list:
                 try:
                     if 'rd' not in realDebridCache.get(i['hash'], {}):
                         continue
+
                     if len(realDebridCache[i['hash']]['rd']) >= 1:
                         if 'showInfo' in info:
                             for storage_variant in realDebridCache[i['hash']]['rd']:
 
-                                if not self._real_debrid_confirm_media(storage_variant):
+                                if not api.is_streamable_storage_type(storage_variant):
                                     continue
 
-                                if self._real_debrid_check_files(storage_variant):
+                                if source_utils.get_best_match('filename', storage_variant.values(), info):
                                     cache_list.append(i)
                                     cache_list[-1]['debrid_provider'] = 'real_debrid'
                                     break
                         else:
                             for storage_variant in realDebridCache[i['hash']]['rd']:
-                                if not self._real_debrid_confirm_media(storage_variant):
+                                if not api.is_streamable_storage_type(storage_variant):
                                     continue
                                 else:
                                     cache_list.append(i)
                                     cache_list[-1]['debrid_provider'] = 'real_debrid'
+                except KeyError:
+                    pass
                 except:
                     import traceback
                     traceback.print_exc()

@@ -90,7 +90,7 @@ class Addon(object):
         settings_file = os.path.join(settings_dir, "settings.xml")
 
         root = ET.Element("settings")
-        for key, value in self._settings.iteritems():
+        for key, value in self._settings.items():
             node = ET.Element("setting")
             node.attrib["id"] = key
             node.attrib["value"] = value

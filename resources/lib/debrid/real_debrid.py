@@ -229,42 +229,35 @@ class RealDebrid:
         try:
             magnet = torrent['magnet']
 
-            try:
-                hash = str(re.findall(r'btih:(.*?)(?:&|$)', magnet)[0].lower())
-            except:
-                hash = torrent['hash']
+            hash = torrent['hash']
 
-            hashCheck = self.checkHash(hash)
-
-            fileIDString = ''
-
-            if hash in hashCheck:
-                if 'rd' in hashCheck[hash]:
-                    for key in hashCheck[hash]['rd'][0]:
-                        fileIDString += ',' + key
-
-            torrent = self.addMagnet(magnet)
-            try:
-                self.torrentSelect(torrent['id'], fileIDString[1:])
-                link = self.torrentInfo(torrent['id'])
-                selected_files = [i for i in link['files'] if i['selected'] == 1]
+            hash_check = self.checkHash(hash)
+           
+            for storage_variant in hash_check[hash]['rd']:
+                
+                if not self.is_streamable_storage_type(storage_variant):
+                    continue
+                
+                key_list = ','.join(storage_variant.keys())
+                
+                torrent = self.addMagnet(magnet)
+                
+                self.torrentSelect(torrent['id'], key_list)
+                
+                files = self.torrentInfo(torrent['id'])
+                selected_files = [i for i in files['files'] if i['selected'] == 1]
+                
                 if len(selected_files) == 1:
-                    link_index = 0
+                    stream_link = self.resolve_hoster(files['links'][0])
                 else:
-                    link_index = 0
-                    index_bytes = 0
-                    for idx, file in enumerate(selected_files):
-                        if file['bytes'] > index_bytes:
-                            link_index = idx
-                link = self.resolve_hoster(link['links'][link_index])
+                    selected_files = [(idx, i) for idx, i in enumerate(selected_files)]
+                    selected_files = sorted(selected_files, key=lambda x: x[1]['bytes'], reverse=True)
+                    stream_link = self.resolve_hoster(files['links'][selected_files[0][0]])
+                    
                 if tools.getSetting('rd.autodelete') == 'true':
                     self.deleteTorrent(torrent['id'])
-            except:
-                import traceback
-                traceback.print_exc()
-                self.deleteTorrent(torrent['id'])
-                return None
-            return link
+                
+                return stream_link
         except:
             import traceback
             traceback.print_exc()
@@ -275,96 +268,78 @@ class RealDebrid:
             if torrent['package'] == 'single' or 'showInfo' not in args:
                 return self._single_magnet_resolve(torrent)
 
-            try:
-                hash = str(re.findall(r'btih:(.*?)(?:&|$)', torrent['magnet'])[0].lower())
-            except:
-                hash = torrent['hash']
+            hash = torrent['hash']
 
             hashCheck = self.checkHash(hash)
-            torrent = self.addMagnet(torrent['magnet'])
-            episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
-            key_list = []
+            cached_torrent = self.addMagnet(torrent['magnet'])
 
             for storage_variant in hashCheck[hash]['rd']:
-                file_inside = False
-                key_list = []
-                bad_storage = False
 
-                for key, value in storage_variant.items():
-                    file_name = storage_variant[key]['filename']
+                valid_storage = self.is_streamable_storage_type(storage_variant)
 
-                    if not any(file_name.endswith(extension) for extension in
-                               source_utils.COMMON_VIDEO_EXTENSIONS):
-                        bad_storage = True
-                        break
-
-                    else:
-                        file_name = file_name.replace(source_utils.get_quality(file_name), '')
-                        file_name = source_utils.cleanTitle(file_name)
-                        key_list.append(key)
-                        if any(episodeString in source_utils.cleanTitle(file_name) for
-                               episodeString in episodeStrings):
-                            file_inside = True
-
-                if not file_inside or bad_storage:
+                if not valid_storage:
                     continue
-                else:
-                    break
 
-            if len(key_list) == 0:
-                self.deleteTorrent(torrent['id'])
-                return None
+                file_check = source_utils.get_best_match('filename', storage_variant.values(), args)
 
-            key_list = ','.join(key_list)
+                if not file_check:
+                    continue
 
-            self.torrentSelect(torrent['id'], key_list)
+                key_list = storage_variant.keys()
 
-            link = self.torrentInfo(torrent['id'])
+                if len(key_list) == 0:
+                    self.deleteTorrent(cached_torrent['id'])
+                    return None
 
-            file_index = None
+                key_list = ','.join(key_list)
 
-            for idx, i in enumerate([i for i in link['files'] if i['selected'] == 1]):
-                file_name = i['path'].split('/')[-1]
-                file_name = file_name.replace(source_utils.get_quality(file_name), '')
-                file_name = source_utils.cleanTitle(file_name)
+                self.torrentSelect(cached_torrent['id'], key_list)
 
-                if any(source_utils.cleanTitle(episodeString) in file_name for
-                       episodeString in episodeStrings):
-                        file_index = idx
-                        break
+                link = self.torrentInfo(cached_torrent['id'])
 
-            if file_index is None:
-                self.deleteTorrent(torrent['id'])
-                return None
+                selected_files = [(idx, i) for idx, i in enumerate([i for i in link['files'] if i['selected'] == 1])]
 
-            link = link['links'][file_index]
-            link = self.resolve_hoster(link)
+                best_match = source_utils.get_best_match('path', [i[1] for i in selected_files], args)
 
-            if link.endswith('rar'):
-                link = None
+                if not best_match:
+                    continue
 
-            if tools.getSetting('rd.autodelete') == 'true':
-                self.deleteTorrent(torrent['id'])
-            return link
+                file_index = [i[0] for i in selected_files if i[1]['path'] == best_match['path']][0]
+
+                link = link['links'][file_index]
+                link = self.resolve_hoster(link)
+
+                if link.endswith('rar'):
+                    link = None
+
+                if tools.getSetting('rd.autodelete') == 'true':
+                    self.deleteTorrent(cached_torrent['id'])
+
+                return link
         except:
             import traceback
             traceback.print_exc()
-            self.deleteTorrent(torrent['id'])
+            self.deleteTorrent(cached_torrent['id'])
             return None
+
+    def is_streamable_storage_type(self, storage_variant):
+        """
+        Confirms that all files within the storage variant are video files
+        This ensure the pack from RD is instantly streamable and does not require a download
+        :param storage_variant:
+        :return: BOOL
+        """
+        return False if len([i for i in storage_variant.values()
+                            if not source_utils.is_file_ext_valid(i['filename'])]) > 0 else True
 
     def getRelevantHosters(self):
         try:
             host_list = self.get_url('hosts/status')
             valid_hosts = []
-            try:
-                for domain, status in host_list.iteritems():
-                    if status['supported'] == 1 and status['status'] == 'up':
-                        valid_hosts.append(domain)
-            except:
-                # Python 3 support
-                for domain, status in host_list.items():
-                    if status['supported'] == 1 and status['status'] == 'up':
-                        valid_hosts.append(domain)
+
+            for domain, status in host_list.items():
+                if status['supported'] == 1 and status['status'] == 'up':
+                    valid_hosts.append(domain)
             return valid_hosts
         except:
             import traceback

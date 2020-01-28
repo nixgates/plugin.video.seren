@@ -170,102 +170,73 @@ class Premiumize:
 
     def _single_magnet_resolve(self, magnet, args, pack_select=False):
 
-        selectedFile = None
         folder_details = self.direct_download(magnet)['content']
         folder_details = sorted(folder_details, key=lambda i: int(i['size']), reverse=True)
-        folder_details = [tfile for tfile in folder_details
-                          if any(tfile['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
-        for torrent_file in folder_details:
-            if source_utils.filter_movie_title(torrent_file['path'].split('/')[-1],
-                                               tools.deaccentString(args['info']['title']),
-                                               args['info']['year']):
-                selectedFile = torrent_file
-                break
+        folder_details = [i for i in folder_details if source_utils.is_file_ext_valid(i['link'])]
 
-        if selectedFile is None:
-            folder_details = [tfile for tfile in folder_details if 'sample' not in tfile['path'].lower()]
-            folder_details = [tfile for tfile in folder_details if source_utils.cleanTitle(args['info']['title'])
-                              in source_utils.cleanTitle(tfile['path'].lower())]
-            if len(folder_details) == 1:
-                selectedFile = folder_details[0]
-            else:
-                return
+        filter_list = [i for i in folder_details if source_utils.filter_movie_title(i['path'].split('/')[-1],
+                                                                                    args['info']['title'],
+                                                                                    args['info']['year'])]
+        if len(filter_list) == 1:
+            stream_link = self._fetch_transcode_or_standard(filter_list[0])
+            self._handle_add_to_cloud(magnet)
+            return stream_link
 
-        if tools.getSetting('premiumize.transcoded') == 'true':
-            if selectedFile['transcode_status'] == 'finished':
-                try:
-                    if selectedFile['stream_link'] is not None and tools.getSetting('premiumize.addToCloud') == 'true':
-                        transfer = self.create_transfer(magnet)
-                        database.add_premiumize_transfer(transfer['id'])
-                except:
-                    pass
-                return selectedFile['stream_link']
-            else:
-                pass
-        try:
-            if selectedFile['link'] is not None and tools.getSetting('premiumize.addToCloud') == 'true':
-                transfer = self.create_transfer(magnet)
-                database.add_premiumize_transfer(transfer['id'])
-        except:
-            pass
-        return selectedFile['link']
+        filter_list = [tfile for tfile in folder_details if 'sample' not in tfile['path'].lower()]
+        filter_list = [tfile for tfile in filter_list if source_utils.cleanTitle(args['info']['title'])
+                          in source_utils.cleanTitle(tfile['path'].lower())]
+
+        if len(filter_list) == 1:
+            stream_link = self._fetch_transcode_or_standard(filter_list[0])
+            self._handle_add_to_cloud(magnet)
+            return stream_link
+
 
     def resolve_magnet(self, magnet, args, torrent, pack_select):
 
         if 'showInfo' not in args:
             return self._single_magnet_resolve(magnet, args)
 
-        episodeStrings, seasonStrings = source_utils.torrentCacheStrings(args)
-
         try:
 
             folder_details = self.direct_download(magnet)['content']
 
             if pack_select is not False and pack_select is not None:
-                streamLink = self.user_select(folder_details)
-                return streamLink
+                return self.user_select(folder_details)
 
-            if 'extra' not in args['info']['title'] and 'extra' not in args['showInfo']['info']['tvshowtitle'] \
-                    and int(args['info']['season']) != 0:
-                folder_details = [i for i in folder_details if
-                                  'extra' not in
-                                  source_utils.cleanTitle(i['path'].split('/')[-1].replace('&', ' ').lower())]
+            folder_details = source_utils.clear_extras_by_string(args, 'extras', folder_details)
+            folder_details = source_utils.clear_extras_by_string(args, 'specials', folder_details)
+            folder_details = source_utils.clear_extras_by_string(args, 'featurettes', folder_details)
+            folder_details = source_utils.clear_extras_by_string(args, 'deleted scenes', folder_details)
+            folder_details = source_utils.clear_extras_by_string(args, 'sample', folder_details)
 
-            if 'special' not in args['info']['title'] and 'special' not in args['showInfo']['info']['tvshowtitle'] \
-                    and int(args['info']['season']) != 0:
-                folder_details = [i for i in folder_details if
-                                  'special' not in
-                                  source_utils.cleanTitle(i['path'].split('/')[-1].replace('&', ' ').lower())]
+            folder_details = [i for i in folder_details if source_utils.is_file_ext_valid(i['link'])]
 
-            streamLink = self.check_episode_string(folder_details, episodeStrings)
+            identified_file = source_utils.get_best_match('path', folder_details, args)
+
+            stream_link = self._fetch_transcode_or_standard(identified_file)
 
         except:
             import traceback
             traceback.print_exc()
             return
 
-        try:
-            if streamLink is not None and tools.getSetting('premiumize.addToCloud') == 'true':
-                transfer = self.create_transfer(magnet)
-                database.add_premiumize_transfer(transfer['id'])
-        except:
-            pass
+        if stream_link is not None:
+            self._handle_add_to_cloud(magnet)
 
-        return streamLink
+        return stream_link
 
-    def check_episode_string(self, folder_details, episodeStrings):
-        for i in folder_details:
-            for epstring in episodeStrings:
-                if epstring in source_utils.cleanTitle(i['path'].replace('&', ' ').lower()):
-                    if any(i['link'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS):
-                        if tools.getSetting('premiumize.transcoded') == 'true':
-                            if i['transcode_status'] == 'finished':
-                                return i['stream_link']
-                            else:
-                                pass
+    def _handle_add_to_cloud(self, magnet):
+        if tools.getSetting('premiumize.addToCloud') == 'true':
+            transfer = self.create_transfer(magnet)
+            database.add_premiumize_transfer(transfer['id'])
 
-                        return i['link']
-        return None
+    def _fetch_transcode_or_standard(self, file_object):
+        if tools.getSetting('premiumize.transcoded') == 'true' and \
+                file_object['transcode_status'] == 'finished':
+            return file_object['stream_link']
+        else:
+            return file_object['link']
 
     def user_select(self, content):
         display_list = []

@@ -77,6 +77,13 @@ class TraktSyncDatabase:
         cursor.close()
 
     def _set_base_activites(self):
+        trakt_username = tools.getSetting('trakt.username')
+
+        try:
+            trakt_username = trakt_username.decode('utf-8')
+        except AttributeError:
+            pass
+
         cursor = self._get_cursor()
         cursor.execute('INSERT INTO activities(sync_id, all_activities, shows_watched, movies_watched,'
                        ' movies_collected, shows_collected, hidden_sync, shows_meta_update, movies_meta_update,'
@@ -84,13 +91,11 @@ class TraktSyncDatabase:
                        'VALUES(1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                        (self.base_date, self.base_date, self.base_date, self.base_date, self.base_date,
                         self.base_date, self.base_date, self.base_date, self.last_meta_update,
-                        tools.getSetting('trakt.username'), self.base_date, self.base_date, self.base_date))
+                        trakt_username, self.base_date, self.base_date, self.base_date))
 
         cursor.connection.commit()
         self.activites = cursor.fetchone()
         cursor.close()
-
-
 
     def _check_database_version(self):
         # If we are updating from a database prior to database versioning, we must clear the meta data

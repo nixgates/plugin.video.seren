@@ -336,7 +336,7 @@ class Menus:
         else:
             genre_string = tools.unquote(args)
 
-        trakt_list = trakt.json_response('movies/popular?genres=%s&page=%s' % (genre_string, page))
+        trakt_list = trakt.json_response('movies/trending?genres=%s&page=%s' % (genre_string, page))
 
         if trakt_list is None:
             tools.cancel_directory()

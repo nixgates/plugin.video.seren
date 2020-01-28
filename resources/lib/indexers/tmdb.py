@@ -41,6 +41,7 @@ class TMDBAPI:
         self.info = {}
         self.episode_summary = {}
         self.cast = []
+
         if tools.fanart_api_key == '':
             self.fanarttv = False
         else:
@@ -70,12 +71,14 @@ class TMDBAPI:
                 response = json.loads(response.text)
                 self.request_response = response
                 return response
-            elif 'Retry-After' in response.headers:
-                # API REQUESTS ARE BEING THROTTLED, INTRODUCE WAIT TIME
-                throttleTime = response.headers['Retry-After']
-                tools.log('TMDB Throttling Applied, Sleeping for %s seconds' % throttleTime, '')
-                sleep(int(throttleTime) + 1)
-                return self.get_request(url)
+            # This code is now deprecated as the throttling has been removed,
+            # We will leave it here though in case they decide to use it later
+            # elif 'Retry-After' in response.headers:
+            #     # API REQUESTS ARE BEING THROTTLED, INTRODUCE WAIT TIME
+            #     throttleTime = response.headers['Retry-After']
+            #     tools.log('TMDB Throttling Applied, Sleeping for %s seconds' % throttleTime, '')
+            #     sleep(int(throttleTime) + 1)
+            #     return self.get_request(url)
             else:
                 return None
         except:
@@ -131,7 +134,8 @@ class TMDBAPI:
             try:
                 count = 0
                 for i in details['images']['posters'][:self.tvshows_poster_limit]:
-                    self.art.update({'poster{}'.format(count if count > 0 else ''): self.backgroundPath + i['file_path']})
+                    self.art.update({'poster{}'.format(count if count > 0 else ''):
+                                         self.backgroundPath + i['file_path']})
                     count = count + 1
             except:
                 pass
@@ -139,7 +143,8 @@ class TMDBAPI:
             if self.tvshows_prefer_fanart:
                 try:
                     if self.season_poster == 'true':
-                        self.art['poster'] = self.fanartart.get('poster', self.posterPath + str(details.get('poster_path', '')))
+                        self.art['poster'] = self.fanartart.get('poster',
+                                                                self.posterPath + str(details.get('poster_path', '')))
                         self.art['thumb'] = self.fanartart.get('thumb',
                                                                self.posterPath + str(details.get('poster_path', '')))
                 except:
@@ -149,42 +154,41 @@ class TMDBAPI:
                     count = 0
                     for i in details['images']['posters'][:self.tvshows_poster_limit]:
                         dict_name = 'poster{}'.format(count if count > 0 else '')
-                        self.art.update({dict_name: self.fanartart.get(dict_name, self.backgroundPath + i['file_path'])})
+                        self.art.update(
+                            {dict_name: self.fanartart.get(dict_name, self.backgroundPath + i['file_path'])})
                         count = count + 1
                 except:
                     pass
 
             try:
-                if details.get('overview', '') is not '':
-                    item['info']['plot'] = item['info']['plotoutline'] = details.get('overview', '')
+                item['info']['plot'] = item['info']['plotoutline'] = item['info']['overview'] = \
+                    details.get('overview', '')
+
+                if item['info']['plot'] == '':
+                    item['info']['plot'] = item['info']['plotoutline'] = item['info']['overview'] =  \
+                        seasonObject['overview']
             except:
                 pass
             try:
-                item['info']['aired'] = details.get('air_date', '')
-            except:
-                import traceback
-                traceback.print_exc()
-                pass
-            try:
-                item['info']['premiered'] = details.get('air_date', '')
-            except:
-                import traceback
-                traceback.print_exc()
-                pass
-            try:
-                item['info']['year'] = details.get('air_date', '0000')[:4]
+                item['info']['aired'] = item['info']['premiered'] = details.get('air_date', '')
+                if item['info']['premiered'] == '':
+                    item['info']['aired'] = item['info']['premiered'] = seasonObject['first_aired']
             except:
                 pass
             try:
-                item['info']['sortseason'] = int(details.get('season_number', ''))
+                item['info']['year'] = int(details.get('air_date', '0000')[:4])
             except:
                 pass
             try:
-                item['info']['season'] = int(details.get('season_number', ''))
+                item['info']['season'] = item['info']['sortseason'] = int(details.get('season_number', ''))
             except:
                 pass
             try:
-                item['info']['season_title'] = str(details.get('name', ''))
+                item['info']['season_title'] = seasonObject.get('title', '')
+                if item['info']['season_title'] == '':
+                    item['info']['season_title'] = details.get('name', '')
+                if item['info']['season_title'] == '':
+                    item['info']['season_title'] = 'Season {}'.format(details['season_number'])
             except:
                 pass
             try:
@@ -196,24 +200,10 @@ class TMDBAPI:
                 item['info']['episode_count'] = len(details['episodes'])
             except:
                 pass
-
             try:
                 item['info']['aired_episodes'] = seasonObject['aired_episodes']
             except:
                 item['info']['aired_episodes'] = 0
-                pass
-
-            try:
-                item['info']['premiered'] = seasonObject['first_aired']
-            except:
-                pass
-            try:
-                item['info']['plot'] = item['info']['overview'] = seasonObject['overview']
-            except:
-                pass
-            try:
-                item['info']['season_title'] = seasonObject['title']
-            except:
                 pass
 
             if item['info']['season_title'] == '':
@@ -261,7 +251,8 @@ class TMDBAPI:
             if trakt_object['ids']['tmdb'] is None:
                 return None
 
-            url = 'movie/%s?&append_to_response=credits,videos,release_dates,images&language=en-US' % str(trakt_object['ids']['tmdb'])
+            url = 'movie/%s?&append_to_response=credits,videos,release_dates,images&language=en-US' % str(
+                trakt_object['ids']['tmdb'])
 
             self.get_TMDB_Fanart_Threaded(url, (trakt_object['ids']['tmdb'], 'movies'))
 
@@ -277,7 +268,8 @@ class TMDBAPI:
             self.art.update(self.fanartart)
             try:
                 if self.movies_landscape:
-                    self.art['landscape'] = self.art.get('landscape', self.backgroundPath + str(details.get('backdrop_path', '')))
+                    self.art['landscape'] = self.art.get('landscape',
+                                                         self.backgroundPath + str(details.get('backdrop_path', '')))
             except:
                 pass
             try:
@@ -312,19 +304,19 @@ class TMDBAPI:
                 try:
                     if self.movies_landscape:
                         self.art['landscape'] = self.fanartart.get('landscape',
-                                                             self.backgroundPath + str(
-                                                                 details.get('backdrop_path', '')))
+                                                                   self.backgroundPath + str(
+                                                                       details.get('backdrop_path', '')))
                 except:
                     pass
                 try:
                     self.art['poster'] = self.fanartart.get('poster',
-                                                      self.backgroundPath + str(details.get('poster_path', '')))
+                                                            self.backgroundPath + str(details.get('poster_path', '')))
                     self.art['thumb'] = self.fanartart['poster']
                 except:
                     pass
                 try:
                     self.art['fanart'] = self.fanartart.get('fanart',
-                                                      self.backgroundPath + str(details.get('backdrop_path', '')))
+                                                            self.backgroundPath + str(details.get('backdrop_path', '')))
                 except:
                     pass
 
@@ -530,27 +522,27 @@ class TMDBAPI:
                 # Set Art
                 try:
                     self.art['poster'] = self.fanartart.get('poster',
-                                                      self.posterPath + str(details.get('poster_path', '')))
+                                                            self.posterPath + str(details.get('poster_path', '')))
                 except:
                     pass
 
                 try:
                     self.art['fanart'] = self.fanartart.get('fanart',
-                                                      self.backgroundPath + str(details.get('backdrop_path', '')))
+                                                            self.backgroundPath + str(details.get('backdrop_path', '')))
                 except:
                     pass
 
                 try:
                     self.art['thumb'] = self.fanartart.get('thumb',
-                                                     self.posterPath + str(details.get('poster_path', '')))
+                                                           self.posterPath + str(details.get('poster_path', '')))
                 except:
                     pass
 
                 try:
-                    if self.tvshows_landscape == 'true' :
+                    if self.tvshows_landscape == 'true':
                         self.art['landscape'] = self.fanartart.get('landscape',
-                                                             self.backgroundPath + str(
-                                                                 details.get('backdrop_path', '')))
+                                                                   self.backgroundPath + str(
+                                                                       details.get('backdrop_path', '')))
                 except:
                     pass
 
@@ -604,15 +596,11 @@ class TMDBAPI:
                 pass
 
             try:
-                info['aired'] = details.get('first_air_date', '')
+                info['premiered'] = info['aired'] = details.get('first_air_date', '')
+                if info['premiered'] == '':
+                    info['premiered'] = info['aired'] = trakt_info['first_aired']
             except:
                 pass
-
-            try:
-                info['premiered'] = trakt_info['first_aired']
-            except:
-                pass
-
             try:
                 info['year'] = details.get('first_air_date', '0000')[:4]
             except:
@@ -631,10 +619,11 @@ class TMDBAPI:
             try:
                 info['country'] = details['origin_country'][0]
             except:
+                info['country'] = ''
                 pass
 
             try:
-                info['originaltitle'] = details.get('name')
+                info['originaltitle'] = details.get('original_name')
             except:
                 pass
 
@@ -663,7 +652,7 @@ class TMDBAPI:
                 pass
 
             try:
-                info['season_count'] = details.get('number_of_seasons', '')
+                info['season_count'] = int(details.get('number_of_seasons', ''))
             except:
                 return None
 
@@ -795,11 +784,11 @@ class TMDBAPI:
             try:
                 info['episode'] = response.get('episode_number', '')
             except:
-                pass
+                return None
             try:
                 info['season'] = response.get('season_number', '')
             except:
-                pass
+                return None
             try:
                 info['sortepisode'] = response.get('episode_number', '')
             except:
@@ -831,7 +820,9 @@ class TMDBAPI:
             except:
                 pass
             try:
-                info['year'] = response.get('air_date', '0000')[:4]
+                info['year'] = int(response.get('air_date', '0000')[:4])
+                if info['year'] == '0000':
+                    info['year'] = int(traktInfo.get('firstAired', '0000')[:4])
             except:
                 pass
             try:
@@ -839,12 +830,9 @@ class TMDBAPI:
             except:
                 pass
             try:
-                info['year'] = response.get('firstAired', '')[:4]
-            except:
-                pass
-
-            try:
                 info['plot'] = response.get('overview', '')
+                if info['plot'] == '':
+                    traktInfo.get('overview', '')
             except:
                 pass
             try:

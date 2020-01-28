@@ -456,7 +456,7 @@ class Menus:
 
         page = int(page)
         trakt_list = database.get(trakt.json_response, 12,
-                                  'shows/popular?genres=%s&page=%s' % (genre_string, page))
+                                  'shows/trending?genres=%s&page=%s' % (genre_string, page))
         if trakt_list is None:
             tools.cancel_directory()
             return
