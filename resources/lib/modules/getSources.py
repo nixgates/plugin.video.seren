@@ -1171,7 +1171,6 @@ class TorrentCacheCheck:
     def all_debrid_worker(self, torrent_list):
 
         api = all_debrid.AllDebrid()
-        torrent_list = [i['hash'] for i in torrent_list if i.get('hash')]
 
         if len(torrent_list) == 0:
             return
