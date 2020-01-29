@@ -1,3 +1,6 @@
+Changelog 1.6.9:
+Fixed AllDebrid Cache check mistake during py3 compatibility changes
+
 Changelog 1.6.8:
 Tighten and speed up PM cloud file inspection
 Multiple fixes to TMDb module
