@@ -15,7 +15,7 @@ def install_zip(install_style):
     if install_style == None:
         browse_download = tools.showDialog.select(tools.addonName, [tools.lang(40302), tools.lang(40303)])
         if browse_download == 0:
-            zip_location = tools.fileBrowser(1, tools.lang(40304), 'files', '.zip', True, False)
+            zip_location = tools.fileBrowser(1, tools.lang(40304).format('Provider'), 'files', '.zip', True, False)
         elif browse_download == 1:
             zip_location = tools.showKeyboard('', '%s: %s' % (tools.addonName, tools.lang(40305)))
             zip_location.doModal()
@@ -27,7 +27,7 @@ def install_zip(install_style):
             return
     else:
         if install_style == '0':
-            zip_location = tools.fileBrowser(1, tools.lang(40304), 'files', '.zip', True, False)
+            zip_location = tools.fileBrowser(1, tools.lang(40304).format('Provider'), 'files', '.zip', True, False)
         if install_style == '1':
             zip_location = tools.showKeyboard('', '%s: %s' % (tools.addonName, tools.lang(40305)))
             zip_location.doModal()

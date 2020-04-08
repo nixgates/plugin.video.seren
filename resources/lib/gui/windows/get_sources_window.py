@@ -97,7 +97,7 @@ class GetSources(BaseWindow):
             self.background_dialog.update(self.progress, message=text)
 
     def update_properties(self):
-
+        self.remaining_providers_list = self.getControl(2000)
         try:
             # Set Resolution count properties
             self.setProperty('4k_sources', str(self.torrents_qual_len[0] + self.hosters_qual_len[0]))
@@ -115,8 +115,10 @@ class GetSources(BaseWindow):
 
             # Set remaining providers string
             self.setProperty("remaining_providers_count", str((len(self.remainingProviders))))
-            self.setProperty("remaining_providers_list", ' | '.join([tools.colorString(i.upper())
-                                                                     for i in self.remainingProviders]))
+            self.remaining_providers_list.reset()
+            self.remaining_providers_list.addItems(self.remainingProviders)
+            self.setProperty("remaining_providers_list", tools.color_string(' | ')
+                             .join([i.upper() for i in self.remainingProviders]))
         except:
             pass
 

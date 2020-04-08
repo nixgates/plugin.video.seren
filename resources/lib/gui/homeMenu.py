@@ -62,6 +62,7 @@ class Menus:
         tools.addDirectoryItem(tools.lang(32056), 'openSettings', isFolder=False)
         tools.addDirectoryItem(tools.lang(32057), 'cleanInstall', None, None, isFolder=False)
         tools.addDirectoryItem(tools.lang(40177), 'traktSyncTools', None, None, isFolder=True)
+        tools.addDirectoryItem('Window Tests', 'testWindows', None, None, isFolder=True)
         tools.closeDirectory('addons')
 
     def providerMenu(self):
@@ -75,4 +76,11 @@ class Menus:
         tools.addDirectoryItem(tools.lang(40179), 'forceTraktSync', None, None, isFolder=False)
         tools.addDirectoryItem(tools.lang(40180), 'flushTraktDBMeta', None, None, isFolder=False)
         tools.addDirectoryItem(tools.lang(40181), 'rebuildTraktDatabase', None, None, isFolder=False)
+        tools.closeDirectory('addons')
+
+    def test_windows(self):
+        tools.addDirectoryItem('Test Playing Next', 'testPlayingNext', None, None, isFolder=False)
+        tools.addDirectoryItem('Test Still Watching', 'testStillWatching', None, None, isFolder=False)
+        tools.addDirectoryItem('Test Resolver Window', 'testResolverWindow', None, None, isFolder=False)
+        tools.addDirectoryItem('Test Source Select', 'testSourceSelectWindow', None, None, isFolder=False)
         tools.closeDirectory('addons')

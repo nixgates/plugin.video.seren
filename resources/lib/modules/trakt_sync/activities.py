@@ -88,6 +88,38 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
                 self._update_activity_record('all_activities', update_time)
                 return
 
+            ########################################################################################################
+            # SYNC LISTS
+            ########################################################################################################
+
+            lists_to_update = []
+
+            try:
+                lists_db = lists.TraktSyncDatabase()
+                trakt_api = Trakt.TraktAPI()
+                my_lists = trakt_api.json_response('users/me/lists', limit=True, limitOverride=500)
+                my_lists.extend([i['list'] for i in trakt_api.json_response('users/likes/lists', limit=True,
+                                                                         limitOverride=500)])
+                for item in my_lists:
+                    sync_dates = [lists_db.get_list(item['ids']['trakt'], 'movie', item['user']['ids']['slug']),
+                                  lists_db.get_list(item['ids']['trakt'], 'show', item['user']['ids']['slug'])]
+                    sync_dates = [i for i in sync_dates if i]
+                    sync_dates = [i['updated_at'][:19] for i in sync_dates]
+                    if len(sync_dates) == 0:
+                        lists_to_update.append(item)
+                        continue
+                    for date in sync_dates:
+                        if trakt_sync._requires_update(item['updated_at'], date):
+                            lists_to_update.append(item)
+                            break
+
+                self._sync_lists(lists_to_update)
+            except:
+                sync_errors = True
+                import traceback
+                traceback.print_exc()
+                pass
+
             trakt_activities = Trakt.TraktAPI().json_response('sync/last_activities')
 
             if trakt_activities is None:
@@ -232,30 +264,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
                     import traceback
                     traceback.print_exc()
                     pass
-
-                ########################################################################################################
-                # SYNC LISTS
-                ########################################################################################################
-
-                lists_to_update = []
-
-                try:
-                    trakt_api = Trakt.TraktAPI()
-                    lists = trakt_api.json_response('users/me/lists', limit=True, limitOverride=500)
-                    lists.extend([i['list'] for i in trakt_api.json_response('users/likes/lists', limit=True,
-                                                                             limitOverride=500)])
-                    for item in lists:
-                        if not trakt_sync._requires_update(item['updated_at'], self.activites['lists_sync']):
-                            continue
-                        lists_to_update.append(item)
-
-                    self._sync_lists(lists_to_update)
-                except:
-                    sync_errors = True
-                    import traceback
-                    traceback.print_exc()
-                    pass
-
 
                 self._update_activity_record('all_activities', update_time)
 
@@ -409,14 +417,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
         if not self.silent:
             self.progress_dialog.update(-1, 'Fetching Watched Episodes')
         trakt_watched = Trakt.TraktAPI().json_response('/sync/watched/shows?extended=full')
-        trakt_watched = {'%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number']): episode
-                         for show in trakt_watched for season in show['seasons'] for episode
-                         in season['episodes']}
+        trakt_watched = [(show['show']['ids']['trakt'], season['number'], episode['number'])
+                         for show in trakt_watched for season in show['seasons'] for episode in season['episodes']]
 
         local_watched = shows.TraktSyncDatabase().get_watched_episodes()
-        local_watched = {'%s-%s-%s' % (i['show_id'], i['season'], i['number']): i for i in local_watched}
+        local_watched = [(i['show_id'], i['season'], i['number']) for i in local_watched]
 
-        self._mill_episodes(trakt_watched, local_watched, True)
+        filtered = [i for i in trakt_watched if i not in local_watched]
+        self._mill_episodes(filtered, True)
 
         self._update_activity_record('shows_watched', update_time)
 
@@ -482,18 +490,20 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
 
     def _sync_collection_shows(self):
         show_sync = shows.TraktSyncDatabase()
-        local_collection = {'%s-%s-%s' % (i['show_id'], i['season'], i['number']): i
-                            for i in show_sync.get_collected_episodes()}
+        local_collection = [(i['show_id'], i['season'], i['number'])
+                            for i in show_sync.get_collected_episodes()]
 
         update_time = str(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'))
         if not self.silent:
             self.progress_dialog.update(0, 'Fetching Collected Episodes')
         trakt_collection = Trakt.TraktAPI().json_response('sync/collection/shows?extended=full')
-        trakt_collection = {'%s-%s-%s' % (show['show']['ids']['trakt'], season['number'], episode['number']): show
+        trakt_collection = [(show['show']['ids']['trakt'], season['number'], episode['number'])
                             for show in trakt_collection for season in show['seasons'] for episode
-                            in season['episodes']}
+                            in season['episodes']]
+        
+        filtered = [i for i in trakt_collection if i not in local_collection]
 
-        self._mill_episodes(trakt_collection, local_collection, False)
+        self._mill_episodes(filtered, False)
         self._update_activity_record('shows_collected', update_time)
 
     def _sync_uncollected(self):
@@ -645,14 +655,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
         tools.try_release_lock(tools.traktSyncDB_lock)
         return success
 
-    def _mill_episodes(self, trakt_collection, local_collection, watched):
+    def _mill_episodes(self, trakt_collection, watched):
 
         episode_insert_list = []
         season_insert_list = []
 
         sync_type = 'Watched' if watched else 'Collected'
 
-        show_ids = set(i.split('-')[0] for i in trakt_collection if i not in local_collection)
+        show_ids = set(i[0] for i in trakt_collection)
 
         inserted_tasks = 0
 
@@ -705,12 +715,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
                                                  0, i[3], i[4]) for i in episode_insert_list),
                                 len(episode_insert_list))
 
+        to_be_marked = [i[2] for i in episode_insert_list if (i[0], i[1], i[3]) in trakt_collection]
+
         if watched:
             query = "UPDATE episodes SET watched=1 WHERE trakt_id=?"
         else:
             query = "UPDATE episodes SET collected=1 WHERE trakt_id=?"
 
-        self._execute_batch_sql(query, ((i[2],) for i in episode_insert_list), len(episode_insert_list))
+        self._execute_batch_sql(query, ((i,) for i in to_be_marked), len(episode_insert_list))
 
         return episode_insert_list
 
@@ -738,7 +750,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
             self.progress_dialog.update(-1, 'Fetching {} bookmark status'.format(type))
 
         trakt_api = Trakt.TraktAPI()
-        progress = trakt_api.json_response('sync/playback/{}/?extended=full'.format(type))
+        progress = trakt_api.json_response('sync/playback/{}/?extended=full&limit=300'.format(type))
 
         base_sql_statement = "REPLACE INTO bookmark Values (%s, %s)"
         tools.traktSyncDB_lock.acquire()

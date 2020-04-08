@@ -26,7 +26,7 @@ class SourceSelect(BaseWindow):
         menu_items = []
 
         for idx, i in enumerate(self.sources):
-            menu_item = tools.menuItem(label=('%s) %s' % (idx + 1, i['release_title'])))
+            menu_item = tools.menuItem(label='%s' % i['release_title'])
             for info in i.keys():
                 try:
                     value = i[info]
@@ -61,8 +61,7 @@ class SourceSelect(BaseWindow):
         if (time.time() - self.last_action) < .5:
             return
 
-        if actionID == 7:
-
+        if actionID == 7 and self.getFocusId() == 1000:
             self.position = self.display_list.getSelectedPosition()
             self.resolve_item()
 

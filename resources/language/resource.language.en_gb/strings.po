@@ -512,7 +512,7 @@ msgid "Enable Playing Next Dialog"
 msgstr ""
 
 msgctxt "#40029"
-msgid "Seconds To Show Dialog"
+msgid "Minimum Seconds Left Before Showing Dialog"
 msgstr ""
 
 msgctxt "#40030"
@@ -1737,4 +1737,8 @@ msgstr ""
 
 msgctxt "#40361"
 msgid "Authorise Premiumize"
+msgstr ""
+
+msgctxt "#40362"
+msgid "There appears to be a problem with you Trakt Authorization \nPlease try re-authorizing your account"
 msgstr ""

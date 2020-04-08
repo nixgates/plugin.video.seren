@@ -34,7 +34,7 @@ class TraktSyncDatabase:
 
         self.item_list = []
         self.threads = []
-        self.task_queue = ThreadPool(workers=4)
+        self.task_queue = ThreadPool(workers=20)
         self.queue_finished = False
         self.task_len = 0
         self.base_date = '1970-01-01T00:00:00'
@@ -185,17 +185,6 @@ class TraktSyncDatabase:
             cursor.connection.commit()
         tools.try_release_lock(tools.traktSyncDB_lock)
 
-        if 'movies_bookmarked' not in self.activites:
-            tools.log('Upgrading Trakt Sync Database Version to support bookmark sync')
-            cursor = self._get_cursor()
-            cursor.execute('ALTER TABLE activities ADD COLUMN movies_bookmarked TEXT')
-            cursor.execute('ALTER TABLE activities ADD COLUMN episodes_bookmarked TEXT')
-            cursor.connection.commit()
-            cursor.execute('UPDATE activities SET movies_bookmarked = ?', (self.base_date,))
-            cursor.execute('UPDATE activities SET episodes_bookmarked = ?', (self.base_date,))
-            cursor.connection.commit()
-            cursor.close()
-
     def _build_show_table(self):
         tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
@@ -328,13 +317,6 @@ class TraktSyncDatabase:
         cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_bookmark ON bookmark (trakt_id)")
         cursor.close()
         tools.try_release_lock(tools.traktSyncDB_lock)
-
-    def _build_bookmark_table(self):
-        cursor = self._get_cursor()
-        cursor.execute(
-            "CREATE TABLE IF NOT EXISTS bookmark (trakt_id TEXT, timeInSeconds TEXT, UNIQUE(trakt_id))")
-        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_bookmark ON bookmark (trakt_id)")
-        cursor.close()
 
     def _get_cursor(self):
         conn = _get_connection()

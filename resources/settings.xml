@@ -21,7 +21,7 @@
         <setting id="addon.view" type="enum" subsetting="true" label="40144" lvalues='40186|40187|40188|40189|40190|40191|40192|40193|40194' default="0" visible="eq(-1,false) + eq(-2,true)" />
         <setting id="addon.view.id" type="number" subsetting="true" label="40145" default="" visible="eq(-2,true) + eq(-3,true)" />
         <setting id="movie.view" type="enum" subsetting="true" label="40016" lvalues='40186|40187|40188|40189|40190|40191|40192|40193|40194' default="0" visible="eq(-3,false) + eq(-4,true)" />
-        <setting id="movie.view.id" type="number" subsetting="true" label="40017" default="" visible="eq(-4, true) + eq(-5, true)" />
+        <setting id="movie.view.id" type="number" subsetting="true" label="40017" default="" visible="eq(-4,true) + eq(-5,true)" />
         <setting id="show.view" type="enum" subsetting="true" label="40018" lvalues='40186|40187|40188|40189|40190|40191|40192|40193|40194' default="0" visible="eq(-5,false) + eq(-6,true)" />
         <setting id="show.view.id" type="number" subsetting="true" label="40019" default="" visible="eq(-6,true) + eq(-7,true)" />
         <setting id="episode.view" type="enum" subsetting="true" label="40020" lvalues='40186|40187|40188|40189|40190|40191|40192|40193|40194' default="0" visible="eq(-7,false) + eq(-8,true)" />

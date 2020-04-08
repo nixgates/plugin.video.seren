@@ -3,10 +3,7 @@
 from resources.lib.common import tools
 from resources.lib.modules import database
 
-if tools.kodiVersion > 17:
-    from resources.lib.modules import zfile as zipfile
-else:
-    import zipfile
+import zipfile
 
 import xbmc
 import os
@@ -276,7 +273,7 @@ class SkinManager:
             return None
 
         if install_type == 0:
-            zip_location = tools.fileBrowser(1, tools.lang(40304), 'files', '.zip', True, False)
+            zip_location = tools.fileBrowser(1, tools.lang(40304).format('Theme'), 'files', '.zip', True, False)
         elif install_type == 1:
             user_input = tools.showKeyboard('', '%s: %s' % (tools.addonName, tools.lang(40305)))
             user_input.doModal()

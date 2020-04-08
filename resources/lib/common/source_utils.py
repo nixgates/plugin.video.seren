@@ -179,7 +179,7 @@ def cleanTitle(title):
 
 def clean_title(title, broken=None):
     title = title.lower()
-    title = tools.deaccentString(title)
+    # title = tools.deaccentString(title)
     title = tools.strip_non_ascii_and_unprintable(title)
 
     if broken == 1:
@@ -188,7 +188,6 @@ def clean_title(title, broken=None):
         apostrophe_replacement = ' s'
     else:
         apostrophe_replacement = 's'
-
     title = title.replace("\\'s", apostrophe_replacement)
     title = title.replace("'s", apostrophe_replacement)
     title = title.replace("&#039;s", apostrophe_replacement)
@@ -527,6 +526,8 @@ def clear_extras_by_string(args, string, folder_details):
         folder_details = [i for i in folder_details if
                           string not in
                           cleanTitle(i['path'].replace('/', ' ')[-1].replace('&', ' ').lower())]
+        folder_details = [i for i in folder_details if not any(True for folder in i['path'].split('/')
+                                                               if string.lower() == folder.lower())]
         return [i for i in folder_details if string not in i['path']]
 
 

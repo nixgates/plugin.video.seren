@@ -34,6 +34,8 @@ def dispatch(params):
 
         smartPlay = True if params.get('smartPlay') == 'true' else False
 
+        if tools.console_mode and action is None:
+            raise  Exception
     except:
 
         print('Welcome to console mode')
@@ -326,11 +328,6 @@ def dispatch(params):
                 pass
 
             from resources.lib.modules import player
-
-            # if 'resume' not in actionArgs:
-            #     actionArgs = json.loads(actionArgs)
-            #     actionArgs['resume'] = sys.argv[3].split(':')[-1]
-            #     actionArgs = json.dumps(actionArgs, sort_keys=True)
 
             player.serenPlayer().play_source(stream_link, actionArgs, resume_time=resume, params=params)
 
@@ -851,3 +848,23 @@ def dispatch(params):
     if action == 'authPremiumize':
         from resources.lib.debrid.premiumize import Premiumize
         Premiumize().auth()
+
+    if action == 'testWindows':
+        from resources.lib.gui.homeMenu import Menus
+        Menus().test_windows()
+
+    if action == 'testPlayingNext':
+        from resources.lib.gui import test_windows
+        test_windows.test_playing_next()
+
+    if action == 'testStillWatching':
+        from resources.lib.gui import test_windows
+        test_windows.test_still_watching()
+
+    if action == 'testResolverWindow':
+        from resources.lib.gui import test_windows
+        test_windows.test_resolver()
+
+    if action == 'testSourceSelectWindow':
+        from resources.lib.gui import test_windows
+        test_windows.test_source_select()

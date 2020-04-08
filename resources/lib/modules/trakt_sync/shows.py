@@ -12,6 +12,15 @@ from resources.lib.modules import trakt_sync
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
+    def _update_watched(self, show_id):
+        from activities import TraktSyncDatabase as activities_database
+        progress = trakt.TraktAPI().json_response('shows/{}/progress/watched?'
+                                                  'specials=true&extended=full'.format(show_id))
+        progress = [(show_id, season['number'], episode['number']) for season in progress['seasons']
+                    for episode in season['episodes'] if episode['completed']]
+        sync_thread = threading.Thread(target=activities_database()._mill_episodes, args=(progress, 1))
+        sync_thread.run()
+
     def mark_show_watched(self, show_id, watched):
         tools.traktSyncDB_lock.acquire()
         cursor = self._get_cursor()
@@ -19,9 +28,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         cursor.connection.commit()
         cursor.close()
         tools.try_release_lock(tools.traktSyncDB_lock)
-        from activities import TraktSyncDatabase as activities_database
-        sync_thread = threading.Thread(target=activities_database()._sync_watched_episodes())
-        sync_thread.run()
+        if watched:
+            self._update_watched(show_id)
 
     def mark_season_watched(self, show_id, season, watched):
         tools.traktSyncDB_lock.acquire()
@@ -30,9 +38,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         cursor.connection.commit()
         cursor.close()
         tools.try_release_lock(tools.traktSyncDB_lock)
-        from activities import TraktSyncDatabase as activities_database
-        sync_thread = threading.Thread(target=activities_database()._sync_watched_episodes())
-        sync_thread.run()
+        if watched:
+            self._update_watched(show_id)
 
     def mark_show_collected(self, show_id, collected):
         tools.traktSyncDB_lock.acquire()

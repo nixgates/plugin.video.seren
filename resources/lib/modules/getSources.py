@@ -20,6 +20,8 @@ from resources.lib.gui.windows.get_sources_window import GetSources as DisplayWi
 from resources.lib.modules import database
 from resources.lib.modules import resolver as resolver
 from resources.lib.modules.skin_manager import SkinManager
+from resources.lib.modules import monkey_requests
+from resources.lib.common.worker import ThreadPool
 
 sysaddon = sys.argv[0]
 
@@ -63,7 +65,6 @@ class Sources(DisplayWindow):
         self.hosterDomains = {}
         self.torrents_qual_len = [0, 0, 0, 0]
         self.hosters_qual_len = [0, 0, 0, 0]
-        self.terminate = False
         self.trakt_id = ''
         self.silent = False
         self.return_data = (None, None, None)
@@ -73,9 +74,8 @@ class Sources(DisplayWindow):
         self.domain_list = []
         self.display_style = 0
         self.background_dialog = None
-
-        self.torrent_semaphore = threading.Semaphore(20)
-        self.hoster_semaphore = threading.Semaphore(30)
+        self.thread_pool = ThreadPool(workers=100)
+        self.running_providers = []
 
         self.line1 = ''
         self.line2 = ''
@@ -168,23 +168,15 @@ class Sources(DisplayWindow):
                 self.initProviders()
 
                 # Add the users cloud inspection to the threads to be run
-                self.hoster_threads.append(threading.Thread(target=self.user_cloud_inspection))
+                threading.Thread(target=self.user_cloud_inspection).start()
 
                 # Load threads for all sources
                 if self._torrents_enabled():
                     for i in self.torrentProviders:
-                        self.torrent_threads.append(threading.Thread(target=self.getTorrent, args=(self.args, i)))
+                        self.thread_pool.put(self.getTorrent, self.args, i)
                 if self._hosters_enabled():
                     for i in self.hosterProviders:
-                        self.hoster_threads.append(threading.Thread(target=self.getHosters, args=(self.args, i)))
-
-                # Shuffle and start scraping threads
-                random.shuffle(self.torrent_threads)
-                random.shuffle(self.hoster_threads)
-                for i in self.torrent_threads:
-                    i.start()
-                for i in self.hoster_threads:
-                    i.start()
+                        self.thread_pool.put(self.getHosters, self.args, i)
 
                 self.setProperty('process_started', 'true')
 
@@ -229,6 +221,9 @@ class Sources(DisplayWindow):
 
                 tools.log('Exited Keep Alive', 'info')
 
+            monkey_requests.allow_provider_requests = False
+            self._send_provider_stop_event()
+
             self.debridHosterDuplicates()
 
             self.torrentCacheSources = [value for key, value in self.torrentCacheSources.items()]
@@ -263,6 +258,13 @@ class Sources(DisplayWindow):
             import traceback
             traceback.print_exc()
 
+    def _send_provider_stop_event(self):
+        for provider in self.running_providers:
+            print(provider)
+            if hasattr(provider, 'cancel_operations') and callable(provider.cancel_operations):
+                print('Cancelling Provider: {}'.format(provider))
+                provider.cancel_operations()
+
     def _torrents_enabled(self):
         if (tools.getSetting('premiumize.torrents') == 'true' and tools.premiumize_enabled())\
                 or (tools.getSetting('rd.torrents') == 'true' and tools.real_debrid_enabled())\
@@ -278,7 +280,6 @@ class Sources(DisplayWindow):
             return True
         else:
             return False
-
 
     def storeTorrentResults(self, torrent_list):
 
@@ -443,9 +444,9 @@ class Sources(DisplayWindow):
 
         try:
             self.remainingProviders.append(provider_name)
-            self.torrent_semaphore.acquire()
             providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
             provider_source = providerModule.sources()
+            self.running_providers.append(provider_source)
 
             if 'showInfo' in info:
                 if not getattr(provider_source, 'episode', None):
@@ -550,6 +551,8 @@ class Sources(DisplayWindow):
 
                 tools.log('%s cache check took %s seconds' % (provider_name, time.time() - start_time))
 
+            self.running_providers.remove(provider_source)
+
             return
 
         except CancelProcess:
@@ -572,22 +575,18 @@ class Sources(DisplayWindow):
                 self.remainingProviders.remove(provider_name)
             except:
                 pass
-            try:
-                self.torrent_semaphore.release()
-            except:
-                pass
+
 
     def getHosters(self, info, provider):
         provider_name = provider[1].upper()
         self.remainingProviders.append(provider_name.upper())
-
-        self.hoster_semaphore.acquire()
 
         try:
             if self.canceled:
                 return
             providerModule = __import__('%s.%s' % (provider[0], provider[1]), fromlist=[''])
             provider_sources = providerModule.source()
+            self.running_providers.append(provider_sources)
 
             if 'showInfo' in info:
                 if not getattr(provider_sources, 'tvshow', None):
@@ -662,6 +661,8 @@ class Sources(DisplayWindow):
                 except AttributeError:
                     break
 
+            self.running_providers.remove(provider_sources)
+
         except:
             import traceback
             traceback.print_exc()
@@ -670,10 +671,6 @@ class Sources(DisplayWindow):
         finally:
             try:
                 self.remainingProviders.remove(provider_name)
-            except:
-                pass
-            try:
-                self.hoster_semaphore.release()
             except:
                 pass
 

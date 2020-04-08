@@ -9,9 +9,10 @@ class PlayingNext(BaseWindow):
             super(PlayingNext, self).__init__(xml_file, xml_location, actionArgs=actionArgs)
             self.player = tools.player()
             self.playing_file = self.player.getPlayingFile()
-            self.duration = int(tools.getSetting('playingnext.time'))
+            self.duration = self.player.getTotalTime() - self.player.getTime()
             self.closed = False
             self.actioned = None
+            self.default_action = tools.getSetting('playingnext.defaultaction')
         except:
             import traceback
             traceback.print_exc()
@@ -29,12 +30,13 @@ class PlayingNext(BaseWindow):
             except:
                 progress_bar = None
 
-            while 120 > (int(self.player.getTotalTime()) - int(self.player.getTime())) > 1 and not self.closed:
+            while int(self.player.getTotalTime()) - int(self.player.getTime()) > 2 and not self.closed \
+                    and self.playing_file == self.player.getPlayingFile():
                 tools.kodi.sleep(500)
                 if progress_bar is not None:
                     progress_bar.setPercent(self.calculate_percent())
 
-            if tools.getSetting('playingnext.defaultaction') == '1' and\
+            if self.default_action == '1' and\
                     self.playing_file == self.player.getPlayingFile() and\
                     not self.actioned:
                 self.player.pause()
