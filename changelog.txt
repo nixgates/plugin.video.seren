@@ -1,3 +1,6 @@
+Changelog 1.6.11:
+Fix provider list not showing due to theme changes
+
 Changelog 1.6.10:
 Increased concurrent threads for Trakt Sync database to speed up large menu lists
 Fixed movie view by ID setting not displaying
