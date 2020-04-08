@@ -9,6 +9,7 @@ from resources.lib.indexers import trakt
 from resources.lib.modules import smartPlay
 from resources.lib.modules.trakt_sync import bookmark
 from resources.lib.modules import database
+from resources.lib.modules.playback_points import IdentifyCreditsIntro
 
 try:
     sysaddon = sys.argv[0]
@@ -132,7 +133,7 @@ class serenPlayer(tools.player):
             if self.playback_started:
                 return
 
-            tools.closeAllDialogs()
+            # tools.closeAllDialogs()
 
             self.playback_started = True
             self.scrobbled = False
@@ -302,12 +303,20 @@ class serenPlayer(tools.player):
             if self.AVStarted:
                 break
 
+        tools.closeAllDialogs()
+
         self.media_length = self.getTotalTime()
 
         if self.offset is not None and self.offset != 0:
             tools.log("Seeking {} seconds".format(self.offset))
             self.seekTime(self.offset)
             self.offset = None
+
+        if tools.getSetting('smartplay.playingnextdialog') == 'true' or tools.getSetting('smartplay.stillwatching'):
+            endpoint = int(tools.getSetting('playingnext.time'))
+            endpoint = int(self.getTotalTime()) - endpoint
+        else:
+            endpoint = False
 
         while self.isPlayingVideo() and not self.scrobbled:
             try:
@@ -356,8 +365,15 @@ class serenPlayer(tools.player):
             self.traktStopWatching()
             return
 
+        if endpoint:
+            while self.isPlayingVideo():
+                if int(self.getTime()) >= endpoint:
+                    tools.execute('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')
+                    break
+                else:
+                    tools.kodi.sleep(1000)
+
         self.traktStopWatching()
-        tools.execute('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')
 
     def tryGetBookmark(self):
         bookmark = bookmark_sync.get_bookmark(self.trakt_id)
@@ -406,15 +422,6 @@ class PlayerDialogs(tools.player):
 
             else:
                 return
-
-            sleep_time = ((int(self.getTotalTime()) - int(self.getTime())) - self._min_time) - 3
-
-            if sleep_time > 0:
-                tools.kodi.sleep(sleep_time * 100)
-
-            while (int(self.getTotalTime()) - int(self.getTime())) > self._min_time and self.isPlayingVideo() and \
-                    self.playing_file == self.getPlayingFile():
-                tools.kodi.sleep(300)
 
             if self.playing_file != self.getPlayingFile():
                 return

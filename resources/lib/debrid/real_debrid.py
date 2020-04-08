@@ -236,6 +236,7 @@ class RealDebrid:
             for storage_variant in hash_check[hash]['rd']:
                 
                 if not self.is_streamable_storage_type(storage_variant):
+                    tools.log('Storage Variant of file is not valid, RD will not provide a playable link', 'error')
                     continue
                 
                 key_list = ','.join(storage_variant.keys())
@@ -278,16 +279,19 @@ class RealDebrid:
                 valid_storage = self.is_streamable_storage_type(storage_variant)
 
                 if not valid_storage:
+                    tools.log('Storage Variant of file is not valid, RD will not provide a playable link', 'error')
                     continue
 
                 file_check = source_utils.get_best_match('filename', storage_variant.values(), args)
 
                 if not file_check:
+                    tools.log('Failed to find the file within the pack at RD', 'error')
                     continue
 
                 key_list = storage_variant.keys()
 
                 if len(key_list) == 0:
+                    tools.log('Received no keys from storage varaint (RD), skipping', 'error')
                     self.deleteTorrent(cached_torrent['id'])
                     return None
 
@@ -302,6 +306,7 @@ class RealDebrid:
                 best_match = source_utils.get_best_match('path', [i[1] for i in selected_files], args)
 
                 if not best_match:
+                    tools.log('Failed to find the file within the pack at RD', 'error')
                     continue
 
                 file_index = [i[0] for i in selected_files if i[1]['path'] == best_match['path']][0]

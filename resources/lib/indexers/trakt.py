@@ -174,6 +174,7 @@ class TraktAPI:
 
         try:
             response = requests.get(self.ApiUrl + url, headers=self.headers)
+
             self.response_headers = response.headers
 
             if response.status_code == 403:
@@ -183,6 +184,10 @@ class TraktAPI:
                 else:
                     tools.log('Failed to perform request even after token refresh', 'error')
 
+            if response.status_code in [403, 401]:
+                tools.showDialog.notification('Seren', tools.lang(40362))
+                return
+            
             if response.status_code > 499:
                 if attempts < 5:
                     attempts += 1
@@ -215,11 +220,12 @@ class TraktAPI:
             response = requests.post(self.ApiUrl + url, json=postData, headers=self.headers)
             self.response_headers = response.headers
 
-            if response.status_code == 403:
+            if response.status_code in [403, 401]:
                 if not refreshCheck:
                     self._handle_re_auth(response)
                     self.post_request(url, postData, limit=limit, refreshCheck=True)
                 else:
+                    tools.showDialog.notification('Seren', tools.lang(40362))
                     tools.log('Failed to perform trakt request even after token refresh', 'error')
 
             if response.status_code > 499:

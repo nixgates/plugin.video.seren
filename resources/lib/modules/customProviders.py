@@ -54,11 +54,12 @@ import xbmc
 
 from resources.lib.common import tools
 from resources.lib.modules import database
+import zipfile
 
-if tools.kodiVersion > 17:
-    from resources.lib.modules import zfile as zipfile
-else:
-    import zipfile
+try:
+    ModuleNotFoundError
+except NameError:
+    ModuleNotFoundError = NameError
 
 
 class providers:
@@ -193,7 +194,7 @@ class providers:
                 install_style = int(install_style)
 
             if install_style == 0:
-                zip_location = tools.fileBrowser(1, tools.lang(40304), 'files', '.zip', True, False)
+                zip_location = tools.fileBrowser(1, tools.lang(40304).format('Provider'), 'files', '.zip', True, False)
             elif install_style == 1:
                 zip_location = tools.showKeyboard('', '%s: %s' % (tools.addonName, tools.lang(40305)))
                 zip_location.doModal()
@@ -239,7 +240,7 @@ class providers:
         if meta_file is not None:
             meta = zip_file.open(zip_root_dir + meta_file)
             meta = meta.readlines()
-            meta = ''.join(meta)
+            meta = ''.join([i if not isinstance(value, bytes) else value.decode('utf-8') for value in meta])
             meta = meta.replace(' ', '').replace('\r', '').replace('\n', '')
             meta = json.loads(meta)
             requirements = ['author', 'name', 'version']
@@ -448,7 +449,7 @@ class providers:
             try:
                 import StringIO
                 file = zipfile.ZipFile(StringIO.StringIO(response.content))
-            except:
+            except ModuleNotFoundError:
                 # Python 3 Support
                 import io
                 file = zipfile.ZipFile(io.BytesIO(response.content))
@@ -492,7 +493,7 @@ class providers:
         packages = self.known_packages
 
         if len(packages) == 0:
-            return
+            return []
 
         for package in packages:
             if package['remote_meta'] == '':

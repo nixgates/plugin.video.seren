@@ -59,6 +59,11 @@ if KODIV > 17:
     pass
 else:
     pass
+
+try:
+    basestring
+except NameError:
+    basestring = str
 __all__ = ["BadZipfile", "error", "ZIP_STORED", "ZIP_DEFLATED", "is_zipfile",
            "ZipInfo", "ZipFile", "PyZipFile", "LargeZipFile"]
 
@@ -674,18 +679,16 @@ class ZipFile(object):
                 file = io.FileIO(file, mode)
             except:
                 pass
-        if isinstance(file, basestring):
-            self._filePassed = 0
-            self.filename = file
-            modeDict = {'r': 'rb', 'w': 'wb', 'a': 'r+b'}
-            try:
+
+        modeDict = {'r': 'rb', 'w': 'wb', 'a': 'r+b'}
+        try:
+            self.fp = open(file, modeDict[mode])
+        except IOError:
+            if mode == 'a':
+                mode = key = 'w'
                 self.fp = open(file, modeDict[mode])
-            except IOError:
-                if mode == 'a':
-                    mode = key = 'w'
-                    self.fp = open(file, modeDict[mode])
-                else:
-                    raise  ################
+            else:
+                raise  ################
         else:
             self._filePassed = 1
             self.fp = file

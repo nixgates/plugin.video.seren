@@ -21,7 +21,7 @@ class BaseWindow(tools.xmlWindow):
         self.setProperty('seren.logo', tools.SEREN_LOGO_PATH)
         self.setProperty('seren.fanart', tools.SEREN_FANART_PATH)
         self.setProperty('settings.color', tools.get_user_text_color())
-        self.setProperty('test_pattern', os.path.join(tools.IMAGES_PATH, 'test_pattern.png'))
+        self.setProperty('test.pattern', os.path.join(tools.IMAGES_PATH, 'test_pattern.png'))
         self.setProperty('skin.dir', SkinManager().confirm_skin_path(xml_file)[1])
 
         if actionArgs is None:
@@ -67,8 +67,8 @@ class BaseWindow(tools.xmlWindow):
                     value = 'TBA'
             if i == 'duration':
                 try:
-                    hours = int(value) % 60
-                    self.setProperty('item.info.%s.minutes' % i, str(int(value) - (hours*60)))
+                    hours, minutes = divmod(value, 60 * 60)
+                    self.setProperty('item.info.%s.minutes' % i, str(minutes // 60))
                     self.setProperty('item.info.%s.hours' % i, str(hours))
                 except:
                     pass

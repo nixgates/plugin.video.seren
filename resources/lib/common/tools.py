@@ -283,9 +283,11 @@ def get_video_database_path():
 def showBusyDialog():
     execute('ActivateWindow(busydialognocancel)')
 
+
 def lang(language_id):
     text = getLangString(language_id)
-    text = text.encode('utf-8', 'replace')
+    if kodiVersion < 19:
+        text = text.encode('utf-8', 'replace')
     return text
 
 
@@ -296,6 +298,14 @@ def addDirectoryItem(name, query, info=None, art=None, cast=None, cm=None, isPla
 
     if actionArgs is not False:
         url += '&actionArgs=%s' % actionArgs
+
+    if isinstance(name, bytes):
+        name = name.decode('utf-8')
+
+    if info:
+        for key, value in info.items():
+            if isinstance(value, bytes):
+                info[key] = value.decode('utf-8')
 
     item = menuItem(label=name)
 
@@ -513,10 +523,8 @@ def colorPicker():
 
 def deaccentString(text):
     try:
-        try:
-            text = u'%s' % text.decode('utf-8')
-        except:
-            text = u'%s' % text.encode('utf-8')
+        if isinstance(text, bytes):
+            text = text.decode('utf-8')
     except UnicodeDecodeError:
         text = u'%s' % text
     text = ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')

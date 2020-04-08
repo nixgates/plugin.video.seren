@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="1.6.9" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="1.6.10" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.requests" version="2.19.1" />
 		<import addon="script.module.beautifulsoup4" version="4.5.3"/>
 		<import addon="plugin.video.youtube" version="6.2.0"/>
-		<import addon="script.module.addon.signals" version="0.0.1"/>
 		<import addon="script.module.dateutil" version="2.7.3"/>
-        <import addon="context.seren" version="1.0.3"/>
-<!--		<import addon="script.module.inputstreamhelper" version="0.3.3"/> #### Not yet big boy ####-->
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="seren.py">
 		<provides>video</provides>
@@ -45,6 +42,19 @@
 			<screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
 		</assets>
 		<news>
+Changelog 1.6.10:
+Increased concurrent threads for Trakt Sync database to speed up large menu lists
+Fixed movie view by ID setting not displaying
+Fix TypeError when a manual update check is performed and no providers are installed.
+Added monkey patch of requests to allow cancellation of provider requests after we have exited getSources keepalive
+Added support to inform providers to shutdown
+Force lists to sync against trakts dates instead of local
+Fix marking watched on specials if no episodes are present
+Re-factored marking as watched for shows/seasons to speed up process
+Randomize service run time to avoid conflicting schedules
+More py3 compatibility fixes
+Zip file handling fixes due to issues with py3 compat
+Extended logging in RD resolving to allow better identification of issues
 
 Changelog 1.6.9:
 Fixed AllDebrid Cache check mistake during py3 compatibility changes

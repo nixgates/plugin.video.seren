@@ -267,7 +267,7 @@
                 <label>$ADDON[plugin.video.seren 40225]: $INFO[Window().Property(remaining_providers_count)]</label>
                 <visible>Integer.IsGreaterOrEqual(Window().Property(remaining_providers_count),10)</visible>
             </control>
-
+            
             <control type="label">
                 <top>-140</top>
                 <left>-760</left>
@@ -279,6 +279,34 @@
                 <textcolor>FFDDDDDD</textcolor>
                 <label>$INFO[Window().Property(remaining_providers_list)]</label>
                 <visible>!Integer.IsGreaterOrEqual(Window().Property(remaining_providers_count),10)</visible>
+            </control>
+
+            <control type="list" id="2000">
+                <visible>false</visible>
+                <top>-140</top>
+                <left>-760</left>
+                <width>1920</width>
+                <align>center</align>
+                <aligny>center</aligny>
+                <orientation>horizontal</orientation>
+                
+                <itemlayout width="192">
+                    <width>auto</width>
+                    <control type="label">
+                        <font>font12</font>
+                        <textcolor>FFDDDDDD</textcolor>
+                        <label>$INFO[ListItem.Label]</label>
+                    </control>
+                </itemlayout>
+                
+                <focusedlayout width="192">
+                    <width>auto</width>
+                    <control type="label">
+                        <font>font12</font>
+                        <textcolor>FFDDDDDD</textcolor>
+                        <label>$INFO[ListItem.Label]</label>
+                    </control>
+                </focusedlayout>
             </control>
         </control>
 

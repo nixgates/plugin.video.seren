@@ -9,7 +9,7 @@ class StillWatching(BaseWindow):
             self.player = tools.player()
             self.playing_file = self.player.getPlayingFile()
             self.closed = False
-            self.duration = int(tools.getSetting('playingnext.time'))
+            self.duration = self.player.getTotalTime() - self.player.getTime()
             super(StillWatching, self).__init__(xml_file, xml_location, actionArgs=actionArgs)
 
         except:
@@ -65,7 +65,7 @@ class StillWatching(BaseWindow):
         if control_id == 3001:
             self.close()
         if control_id == 3002:
-            self.stop()
+            self.player.stop()
             self.close()
 
     def onAction(self, action):

@@ -55,14 +55,14 @@ class Resolver(BaseWindow):
                         return
 
                     if 'size' in i:
-                        if tools.source_size_display(i['size']) not in i['info']:
-                            i['info'].append(tools.source_size_display(i['size']))
+                        self.setProperty('source_size', tools.source_size_display(i['size']))
 
                     self.setProperty('release_title', tools.display_string(i['release_title']))
                     self.setProperty('debrid_provider', debrid_provider)
                     self.setProperty('source_provider', i['provider'])
                     self.setProperty('source_resolution', i['quality'])
                     self.setProperty('source_info', " ".join(i['info']))
+                    self.setProperty('source_type', i['type'])
 
                     if i['type'] == 'torrent':
                         stream_link = self.resolve_source(self.resolvers[i['debrid_provider']], i, args, pack_select)
@@ -227,6 +227,10 @@ class Resolver(BaseWindow):
         self.setProperty('source_provider', self.sources[0]['provider'])
         self.setProperty('source_resolution', self.sources[0]['quality'])
         self.setProperty('source_info', " ".join(self.sources[0]['info']))
+        self.setProperty('source_type', self.sources[0]['type'])
+        
+        if 'size' in self.sources[0]:
+            self.setProperty('source_size', tools.source_size_display(self.sources[0]['size']))
 
         if not self.silent:
             super(Resolver, self).doModal()
