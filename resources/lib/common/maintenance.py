@@ -228,9 +228,3 @@ def run_maintenance():
             premiumize_transfer_cleanup()
     except:
         pass
-
-    try:
-        clean_deprecated_settings()
-    except:
-        import traceback
-        traceback.print_exc()
