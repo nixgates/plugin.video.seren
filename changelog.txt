@@ -1,3 +1,6 @@
+Changelog 1.6.14:
+Remove cleaning of depricated settings as it was causing corrupt settings file
+
 Changelog 1.6.13:
 Add workaround on failure to grab user lists
 
