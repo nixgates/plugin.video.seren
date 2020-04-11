@@ -1,3 +1,6 @@
+Changelog 1.6.13:
+Add workaround on failure to grab user lists
+
 Changelog 1.6.12:
 Fix endpoint for still watching and playing next windows
 

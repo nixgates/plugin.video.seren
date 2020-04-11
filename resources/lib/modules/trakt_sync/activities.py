@@ -98,6 +98,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase, object):
                 lists_db = lists.TraktSyncDatabase()
                 trakt_api = Trakt.TraktAPI()
                 my_lists = trakt_api.json_response('users/me/lists', limit=True, limitOverride=500)
+                if my_lists is None:
+                    my_lists = []
                 my_lists.extend([i['list'] for i in trakt_api.json_response('users/likes/lists', limit=True,
                                                                          limitOverride=500)])
                 for item in my_lists:
