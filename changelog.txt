@@ -1,3 +1,6 @@
+Changelog 1.6.12:
+Fix endpoint for still watching and playing next windows
+
 Changelog 1.6.11:
 Fix provider list not showing due to theme changes
 
