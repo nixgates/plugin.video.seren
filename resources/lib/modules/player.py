@@ -312,12 +312,6 @@ class serenPlayer(tools.player):
             self.seekTime(self.offset)
             self.offset = None
 
-        if tools.getSetting('smartplay.playingnextdialog') == 'true' or tools.getSetting('smartplay.stillwatching'):
-            endpoint = int(tools.getSetting('playingnext.time'))
-            endpoint = int(self.getTotalTime()) - endpoint
-        else:
-            endpoint = False
-
         while self.isPlayingVideo() and not self.scrobbled:
             try:
                 watched_percentage = self.getWatchedPercent()
@@ -365,9 +359,15 @@ class serenPlayer(tools.player):
             self.traktStopWatching()
             return
 
+        if tools.getSetting('smartplay.playingnextdialog') == 'true' or \
+                tools.getSetting('smartplay.stillwatching') == 'true':
+            endpoint = int(tools.getSetting('playingnext.time'))
+        else:
+            endpoint = False
+
         if endpoint:
             while self.isPlayingVideo():
-                if int(self.getTime()) >= endpoint:
+                if int(self.getTotalTime()) - int(self.getTime()) <= endpoint:
                     tools.execute('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')
                     break
                 else:
