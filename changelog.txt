@@ -1,3 +1,6 @@
+Changelog 1.6.15:
+Adjsut status code responses for Trakt module
+
 Changelog 1.6.14:
 Remove cleaning of depricated settings as it was causing corrupt settings file
 

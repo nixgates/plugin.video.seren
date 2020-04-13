@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="1.6.14" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="1.6.15" name="Seren" provider-name="Nixgates">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.requests" version="2.19.1" />
@@ -42,6 +42,9 @@
 			<screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
 		</assets>
 		<news>
+Changelog 1.6.15:
+Adjsut status code responses for Trakt module
+
 Changelog 1.6.14:
 Remove cleaning of depricated settings as it was causing corrupt settings file
 
