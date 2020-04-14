@@ -88,7 +88,7 @@ class TraktAPI:
             url = 'https://api.trakt.tv/oauth/device/token'
             response = requests.post(url, data=postData)
 
-            if response.code == 200:
+            if response.status_code == 200:
                 response = json.loads(response.text)
                 tools.setSetting('trakt.auth', response['access_token'])
                 tools.setSetting('trakt.refresh', response['refresh_token'])
