@@ -1,0 +1,1745 @@
+# -*- coding: UTF-8 -*-
+# Kodi Media Center language file
+# Addon Name: Seren
+# Addon id: plugin.video.Seren
+# Addon Provider: Nixgates
+msgid ""
+msgstr ""
+
+msgctxt "#32001"
+msgid "Discover Movies"
+msgstr "اكتشف افلام"
+
+msgctxt "#32002"
+msgid "My Movies"
+msgstr "افلامي"
+
+msgctxt "#32003"
+msgid "Discover TV Shows"
+msgstr "اكتشف مسلسلات"
+
+msgctxt "#32004"
+msgid "My Shows"
+msgstr "مسلسلاتي"
+
+msgctxt "#32007"
+msgid "Most Popular"
+msgstr "الاكثر شهرة"
+
+msgctxt "#32008"
+msgid "Recommended For You"
+msgstr "موصى به لك"
+
+msgctxt "#32009"
+msgid "Trending"
+msgstr "الشائع"
+
+msgctxt "#32010"
+msgid "Most Played"
+msgstr "الاكثر تشغيلاً"
+
+msgctxt "#32011"
+msgid "Most Watched"
+msgstr "الاكثر مشاهدة"
+
+msgctxt "#32012"
+msgid "Most Collected"
+msgstr "الاكثر تجميعاً"
+
+msgctxt "#32013"
+msgid "Most Anticipated"
+msgstr "الاكثر انتظاراً"
+
+msgctxt "#32014"
+msgid "Recently Updated"
+msgstr "تم تحديثه مؤخراً"
+
+msgctxt "#32015"
+msgid "Box Office Top 10"
+msgstr "افضل ١٠ في البوكس اوفيس"
+
+msgctxt "#32016"
+msgid "Search..."
+msgstr "بحث..."
+
+msgctxt "#32017"
+msgid "Collection"
+msgstr "مجموعات"
+
+msgctxt "#32018"
+msgid "Watchlist"
+msgstr "قائمة المشاهدة"
+
+msgctxt "#32019"
+msgid "Next"
+msgstr "التالي"
+
+msgctxt "#32021"
+msgid "Color Picker"
+msgstr "أداة انتقاء الالوان"
+
+msgctxt "#32023"
+msgid "Real-Debrid Auth"
+msgstr "مصادقة Real-Debrid"
+
+msgctxt "#32024"
+msgid "Open this link in a browser: {}"
+msgstr "افتح هذا الرابط في المتصفح: {}"
+
+msgctxt "#32025"
+msgid "Enter the code: {}"
+msgstr "ادخل الرمز: {}"
+
+msgctxt "#32026"
+msgid "Authentication is completed"
+msgstr "المصادقة أكتملت"
+
+msgctxt "#32028"
+msgid "Error Connecting to TMDb"
+msgstr "تعذر الاتصال بـ TMDb"
+
+msgctxt "#32030"
+msgid "Trakt Successfully Disconnected"
+msgstr "تم قطع اتصال Trakt بنجاح"
+
+msgctxt "#32031"
+msgid "Authorize Trakt"
+msgstr "مصادقة Trakt"
+
+msgctxt "#32032"
+msgid "Error while authenticating with Trakt.\nPlease try again."
+msgstr "تعذر المصدقة مع Trakt.\nيرجى المحاولة مرة اخرى"
+
+msgctxt "#32035"
+msgid "Unknown Error Connecting to Trakt"
+msgstr "تعذر الاتصال مع Trakt بسبب خطأ غير معروف"
+
+msgctxt "#32039"
+msgid "Search Movies..."
+msgstr "بحث في الافلام..."
+
+msgctxt "#32040"
+msgid "Search Shows..."
+msgstr "بحث في المسلسلات..."
+
+msgctxt "#32041"
+msgid "Tools"
+msgstr "أدوات"
+
+msgctxt "#32042"
+msgid "Clear Cache"
+msgstr "مسح ذاكرة التخزين المؤقتة"
+
+msgctxt "#32043"
+msgid "Are you sure you wish to clear the cache?"
+msgstr "سيتم مسح ذاكرة التخزين المؤقته، هل انت متأكد؟"
+
+######SEREN.PY VALUES######
+msgctxt "#32045"
+msgid "Starting Engines"
+msgstr "جاري التشغيل"
+
+msgctxt "#32046"
+msgid "Starting Resolver..."
+msgstr "جاري تشغيل محلل الروابط"
+
+msgctxt "#32047"
+msgid "No playable sources found for item"
+msgstr "لم يتم العثور على مصادر لتشغيل هذا العنصر"
+
+msgctxt "#32048"
+msgid "Silent Scraper Setting has been reset"
+msgstr "تمت إعادة تعيين إعدادت الباحث الصامت"
+
+######MAINTENANCE.PY VALUES######
+msgctxt "#33021"
+msgid "This will completely wipe your addon settings.\nAre you completely sure you want to do this?"
+msgstr "سيؤدي هذا إلى مسح إعدادات الاضافة بالكامل.\nهل أنت متأكد تمامًا من أنك تريد القيام بذلك؟"
+
+msgctxt "#32049"
+msgid "Please be aware this will completely wipe the following:\nCached Data, Settings, Installed Providers\n"
+msgstr "الرجاء الانتباه إلى أن هذا سيؤدي إلى مسح ما يلي تمامًا:\nالبيانات المخزنة مؤقتًا، الإعدادات، مقدمي الخدمة المثبتون\n"
+
+msgctxt "#32050"
+msgid "ARE YOU SURE?"
+msgstr "هل انت متأكد؟"
+
+msgctxt "#32051"
+msgid "Your Real-Debrid Premium status has expired"
+msgstr "انتهت صلاحية عضويتك المدفوعة بـ Real-Debrid"
+
+msgctxt "#32052"
+msgid "Your Premiumize Premium status has expired"
+msgstr "انتهت صلاحية عضويتك المدفوعة بـ Premiumize"
+
+######HOMEMENU.PY######
+msgctxt "#32053"
+msgid "Provider Tools"
+msgstr "ادوات مقدمي الخدمة"
+
+msgctxt "#32054"
+msgid "Premium Services"
+msgstr "خدمات العضوية المميزة"
+
+msgctxt "#32055"
+msgid "Clear Local Torrent Cache"
+msgstr "مسح ذاكرة التخزين المؤقتة المحلية للتورنت"
+
+msgctxt "#32056"
+msgid "Open Settings Menu"
+msgstr "افتح فائمة الاعدادات"
+
+msgctxt "#32057"
+msgid "Wipe Addon Data"
+msgstr "مسح بيانات الاضافة"
+
+######MOVIEMENU.PY######
+msgctxt "#32062"
+msgid "Genres"
+msgstr "الانواع"
+
+msgctxt "#32063"
+msgid "Finish Watching"
+msgstr "إنهاء المشاهدة"
+
+msgctxt "#32064"
+msgid "My Movie Lists"
+msgstr "قائمة افلامي"
+
+msgctxt "#32065"
+msgid "Multi Select..."
+msgstr "اختيار متعدد..."
+
+######TVSHOWMENY.PY######
+msgctxt "#32067"
+msgid "New TV Shows"
+msgstr "مسلسلات جديدة"
+
+######TRAKT.PY######
+msgctxt "#32071"
+msgid "This code has been copied to your clipboard"
+msgstr "تم نسخ الرابط"
+
+######CACHEASSIST.PY######
+msgctxt "#32072"
+msgid "Cache Assist is attempting to build a torrent source"
+msgstr "جاري بناء مصدر تحميل تورنت"
+
+######CUSTOMPROVIDERS.PY######
+msgctxt "#32074"
+msgid "There are currently no packages installed"
+msgstr "لا توجد حزم مثبتة حاليا"
+
+msgctxt "#32075"
+msgid "Uninstall"
+msgstr "الغاء التثبيت"
+
+msgctxt "#32076"
+msgid "Are you sure you wish to remove?"
+msgstr "هل أنت متأكد من رغبتك في الإزالة؟"
+
+msgctxt "#32092"
+msgid "Resume From: "
+msgstr "اكمل من: "
+
+msgctxt "#32077"
+msgid "successfully uninstalled"
+msgstr "تم الغاء التثبيت بنجاح"
+
+msgctxt "#33001"
+msgid "Installing:"
+msgstr "جاري التثبيت:"
+
+msgctxt "#33002"
+msgid "Author: "
+msgstr "الكاتب: "
+
+msgctxt "#33003"
+msgid "Are you sure you wish to proceed?"
+msgstr "هل أنت متأكد أنك تريد المتابعة؟"
+
+msgctxt "#33004"
+msgid "Custom Sources Install"
+msgstr "تثبيت مصادر خاصة"
+
+msgctxt "#33005"
+msgid "Cancel"
+msgstr "الغاء"
+
+msgctxt "#33006"
+msgid "Install"
+msgstr "تثبيت"
+
+msgctxt "#33007"
+msgid "Failed to install provider package\nPlease check the log for further information"
+msgstr "فشل تثبيت حزمة الموفر\nالرجاء التحقق من سجل الاخطاء للحصول على مزيد من المعلومات"
+
+msgctxt "#33008"
+msgid "Extracting"
+msgstr "جاري الاستخراج"
+
+msgctxt "#33009"
+msgid "Please Wait..."
+msgstr "يرجى الانتظار..."
+
+msgctxt "#33010"
+msgid "Successfully Installed"
+msgstr "تم التثبيت بنجاح"
+
+msgctxt "#33011"
+msgid "Please check the log for further details"
+msgstr "يرجى التحقق من سجل الاخطاء لمزيد من المعلومات"
+
+msgctxt "#33012"
+msgid "Failed to install"
+msgstr "تعذر التثبيت"
+
+msgctxt "#33013"
+msgid "Failed to install package"
+msgstr "تعذر تثبيت الحزمة"
+
+msgctxt "#33014"
+msgid "Sorry, SMB shares are not supported"
+msgstr "عذرًا،المشاركة عبر SMB غير مدعومة"
+
+msgctxt "#33015"
+msgid "Unable to connect to file.\nPlease check URL and try again."
+msgstr "تعذر الاتصار مع الملف\nيرجى التحقق من الرابط والمحاولة مرة اخرى"
+
+msgctxt "#33016"
+msgid "Please note, this package does not provide automatic updates"
+msgstr "يرجى الاخذ بعين الاعتبار ان هذه الحزمة لاتوفر تحديثات تلقائية"
+
+msgctxt "#33017"
+msgid "%s package has been updated"
+msgstr "تم تحديث الحزمة %s"
+
+msgctxt "#33018"
+msgid "There are currently no updates available"
+msgstr "لا يوجد حاليا أي تحديثات متاحة"
+
+msgctxt "#33019"
+msgid "Checking for available package updates"
+msgstr "جاري التحقق من التحديثات المتاحة للحزمة"
+
+######DATABASE.PY######
+msgctxt "#32078"
+msgid "All Cache Successfully Cleared"
+msgstr "تم مسح ذاكرة التخزين المؤقته"
+
+msgctxt "#32079"
+msgid "Local Result Cache Successfully Cleared"
+msgstr "تم مسح ذاكرة التخزين المؤقتة المحلية"
+
+msgctxt "#32080"
+msgid "Active Torrent Database Successfully Cleared"
+msgstr "تم مسح قاعدة بيانات التورنت النشطة بنجاح"
+
+######GETSOURCES.PY######
+msgctxt "#32081"
+msgid "Checking Local Database"
+msgstr "جاري التحقق من قاعدة البيانات المحلية"
+
+msgctxt "#32082"
+msgid "Initializing Providers"
+msgstr "تهيئة مقدمي الخدمة"
+
+msgctxt "#32085"
+msgid "No Sources found for next item in playlist.\nClearing current playlist"
+msgstr "لم يتم العثور على مصادر للعنصر التالي في قائمة التشغيل.\nجاري مسح قائمة التشغيل الحالية"
+
+msgctxt "#32086"
+msgid "No Playable Sources were found.\nWould you like to attempt to cache a torrent?"
+msgstr "لم يتم العثور على مصادر قابلة للتشغيل.\nهل ترغب في محاولة تخزين العنصر مؤقتًا عن طريق التورنت؟"
+
+msgctxt "#32087"
+msgid "Select Torrent to Cache"
+msgstr "اختار التورنت للتخزين"
+
+msgctxt "#32088"
+msgid "Torrents"
+msgstr "عناصر التورنت"
+
+msgctxt "#32089"
+msgid "Hosters"
+msgstr "المضيفين"
+
+msgctxt "#32090"
+msgid "Free Hosters"
+msgstr "مضيفين مجانين"
+
+msgctxt "#32091"
+msgid "Remaining Providers"
+msgstr "مزودي الخدمة المتبقين"
+
+######SMARTPLAY.PY######
+msgctxt "#32093"
+msgid "Error: Trakt is not authorized \nPlease authorise Trakt in the settings menu to use this feature"
+msgstr "حطأ: لم يتم مصادقة Trakt\nيرجى مصادقة Trakt في قائمة الاعدادات لأستخدام هذه الميزة"
+
+msgctxt "#32094"
+msgid "Begining SmartPlay"
+msgstr "بدء التشغيل الذكي"
+
+msgctxt "#32095"
+msgid "Identifying Resume Point"
+msgstr "جاري تحديد نقط استكمال التشغيل"
+
+msgctxt "#32096"
+msgid "Building Playlist"
+msgstr "جاري بناء قائمة التشغيل"
+
+msgctxt "#32097"
+msgid "Building List Items"
+msgstr "جاري تحضير قائمة العناصر"
+
+msgctxt "#32098"
+msgid "Starting Scraping"
+msgstr "جاري تشغيل الباحث"
+
+######RESOLVER.PY######
+msgctxt "#33000"
+msgid "Starting Link Resolver"
+msgstr "جاري تشغيل محلل الروابط"
+
+######REAL_DEBRID.PY#########
+msgctxt "#32100"
+msgid "Authentication with Real-Debrid has failed, please try again"
+msgstr "تعذر المصادقة مع Real-Debrid يرجى المحاولة مرة اخرى"
+
+######SETTINGS.XML VALUES######
+msgctxt "#40001"
+msgid "General"
+msgstr "عام"
+
+msgctxt "#40002"
+msgid "Episode Play Style"
+msgstr "طريقة تشغيل الحلقة"
+
+msgctxt "#40003"
+msgid "Auto Play"
+msgstr "تشغيل تلقائي"
+
+msgctxt "#40004"
+msgid "Source Select"
+msgstr "اختيار المصدر"
+
+msgctxt "#40005"
+msgid "Source Select View"
+msgstr "طريقة عرض المصادر للأختيار"
+
+msgctxt "#40006"
+msgid "List"
+msgstr "قائمة"
+
+msgctxt "#40007"
+msgid "Dialog"
+msgstr "نافذة"
+
+msgctxt "#40009"
+msgid "Next Up Sort Style"
+msgstr "طريقة تصنيف العناصر لـNext Up"
+
+msgctxt "#40010"
+msgid "Release Date"
+msgstr "تاريخ الاصدار"
+
+msgctxt "#40011"
+msgid "Recently Watched"
+msgstr "شُهدا مؤخراً"
+
+msgctxt "#40012"
+msgid "Multiline Source Select"
+msgstr "اختيار متعدد للمصادر"
+
+msgctxt "#40013"
+msgid "TV Metadata location"
+msgstr "موقع البيانت الواصفة للتلفاز"
+
+msgctxt "#40014"
+msgid "Page Item Limit"
+msgstr "حد عناصر الصفحة"
+
+msgctxt "#40015"
+msgid "Use Custom View IDs (Advanced)"
+msgstr "اختيار طريقة العرض عن طريق الـIDs (متقدم)"
+
+msgctxt "#40016"
+msgid "Movie View"
+msgstr "طريقة عرض الافلام"
+
+msgctxt "#40017"
+msgid "Movie View ID"
+msgstr "ID طريقة عرض الافلام"
+
+msgctxt "#40018"
+msgid "Show View"
+msgstr "طريقة عرض المسلسلات"
+
+msgctxt "#40019"
+msgid "Show View ID"
+msgstr "اظهار الـID الخاص بطريقة العرض"
+
+msgctxt "#40020"
+msgid "Episode View"
+msgstr "طريقة عرض الحلقات"
+
+msgctxt "#40021"
+msgid "Episode View ID"
+msgstr "ID طريقة عرض الحلقات"
+
+msgctxt "#40022"
+msgid "Season View"
+msgstr "طريقة عرض الموسم"
+
+msgctxt "#40023"
+msgid "Season View ID"
+msgstr "ID طريقة عرض الموسم"
+
+msgctxt "#40024"
+msgid "Select Text Highlight Color..."
+msgstr "حدد لون تمييز النص..."
+
+msgctxt "#40025"
+msgid "Current Color"
+msgstr "الون الحالي"
+
+msgctxt "#40026"
+msgid "Smart Play"
+msgstr "التشغيل الذكي"
+
+msgctxt "#40028"
+msgid "Enable Playing Next Dialog"
+msgstr "تمكين نافذة ماسيتم تشغيله تالياً"
+
+msgctxt "#40029"
+msgid "Minimum Seconds Left Before Showing Dialog"
+msgstr "الحد الأدنى من الثواني المتبقية قبل إظهار النافذة"
+
+msgctxt "#40030"
+msgid "Auto Playlist Creation"
+msgstr "بناء قائمة التشغيل التلقائية"
+
+msgctxt "#40031"
+msgid "Force Auto Episode Resume"
+msgstr "فرض استئناف الحلقة تلقائياً "
+
+msgctxt "#40033"
+msgid "Pre-emptive Scraping"
+msgstr "بحث استباقي"
+
+msgctxt "#40036"
+msgid "Resume Style"
+msgstr "طريقة الاستكمال"
+
+msgctxt "#40037"
+msgid "Scraping"
+msgstr "جاري البحث"
+
+msgctxt "#40038"
+msgid "Cache Torrent Info Locally"
+msgstr "تخزين معلومات التورنت محلياً"
+
+msgctxt "#40039"
+msgid "Hide HEVC Items"
+msgstr "اخفاء عناصر HEVC"
+
+msgctxt "#40040"
+msgid "Timeout"
+msgstr "نفاذ وقت البحث بعد"
+
+msgctxt "#40041"
+msgid "Auto Caching Assistant"
+msgstr "مساعد التخزين المؤقت التلقائي"
+
+msgctxt "#40042"
+msgid "Auto Add Un-Cached Sources to Debrid"
+msgstr "اضافة العناصر الغير مخزنة تلقائياً لـDebrid"
+
+msgctxt "#40043"
+msgid "Assist Mode"
+msgstr "وضع المساعدة"
+
+msgctxt "#40044"
+msgid "Preferred Cloud Location"
+msgstr "الموقع المفضل للتخزين السحابي"
+
+msgctxt "#40045"
+msgid "Source Filters"
+msgstr "فلتر المصادر"
+
+msgctxt "#40046"
+msgid "Enable File Size Limit"
+msgstr "تمكين حد حجم الملف"
+
+msgctxt "#40047"
+msgid "Episode File Size limit (GB)"
+msgstr "حد حجم ملف الحلقات (GB)"
+
+msgctxt "#40049"
+msgid "Sort Sources Method"
+msgstr "طريقة تصنيف المصادر"
+
+msgctxt "#40050"
+msgid "Enable Secondary Filesize Sort"
+msgstr "تمكين تفضيل تصنيف ثانوي بناءً على حجم الملف"
+
+msgctxt "#40051"
+msgid "Enable Tertiary HEVC Sort Preference"
+msgstr "تمكين تفضيل تصنيف ثالث بناءً على نوع العنصر HEVC"
+
+msgctxt "#40052"
+msgid "Max Resolution"
+msgstr "حد الدقة القصوى"
+
+msgctxt "#40053"
+msgid "Preemptive Termination"
+msgstr "الانهاء الاستباقي"
+
+msgctxt "#40054"
+msgid "Enable Preemptive Termination"
+msgstr "تمكين الانهاء الاستباقي"
+
+msgctxt "#40055"
+msgid "Minimum Movie Resolution"
+msgstr "حد الدقة الادنى للافلام"
+
+msgctxt "#40056"
+msgid "Minimum TV Shows Resolution"
+msgstr "حد الدقة الادنى للمسلسلات"
+
+msgctxt "#40057"
+msgid "Minimum Sources"
+msgstr "الحد الادنى لعدد المصادر"
+
+msgctxt "#40058"
+msgid "Terminate on... "
+msgstr "انهاء عند..."
+
+msgctxt "#40059"
+msgid "Accounts"
+msgstr "الحسابات"
+
+msgctxt "#40060"
+msgid "Enable Account Expiry Notifications"
+msgstr "تمكين اشعار انتهاء صلاحية الحساب"
+
+msgctxt "#40061"
+msgid "Trakt"
+msgstr ""
+
+msgctxt "#40062"
+msgid "Trakt Username"
+msgstr "اسم المستخدم Trakt"
+
+msgctxt "#40063"
+msgid "Authorize Trakt..."
+msgstr "مصادقة Trakt..."
+
+msgctxt "#40064"
+msgid "Enable Trakt Scrobbling"
+msgstr "تمكين Trakt Scrobbling"
+
+msgctxt "#40065"
+msgid "Revoke Trakt Authentication..."
+msgstr "الغاء المصادقة مع Trakt..."
+
+msgctxt "#40066"
+msgid "Premiumize"
+msgstr ""
+
+msgctxt "#40067"
+msgid "Real-Debrid"
+msgstr ""
+
+msgctxt "#40068"
+msgid "Providers"
+msgstr "موفرو الخدمة"
+
+msgctxt "#40078"
+msgid "API Keys"
+msgstr "مفاتيح API"
+
+msgctxt "#40081"
+msgid "Enable Automatic Provider Updates"
+msgstr "تمكين التحديث التلقائي لموفري المصادر"
+
+msgctxt "#40082"
+msgid "Check For Updates"
+msgstr "تحقق من وجود تحديثات"
+
+msgctxt "#40083"
+msgid "Manage Provider Packages"
+msgstr "ادارة حزم موفري الخدمة"
+
+msgctxt "#40084"
+msgid "Force view types on menus"
+msgstr "فرض طرق العرض على القوائم"
+
+msgctxt "#40085"
+msgid "Shortcuts"
+msgstr "الاختصارات"
+
+msgctxt "#40086"
+msgid "Append show info to mixed episode lists"
+msgstr "إلحاق معلومات المسلسل بقوائم الحلقات المختلطة"
+
+msgctxt "#40087"
+msgid "TMDb API Key"
+msgstr "مفتاح API لموقع TMDb"
+
+msgctxt "#40089"
+msgid "Trakt Client ID"
+msgstr "رقم حساب Trakt"
+
+msgctxt "#40090"
+msgid "Trakt Client Secret"
+msgstr "كلمة سر حساب Trakt"
+
+msgctxt "#40092"
+msgid "TVDB API Key"
+msgstr "مفتاح API لموقع TVDB"
+
+msgctxt "#40093"
+msgid "Sort & Filter"
+msgstr "تصنيف & فلتر"
+
+msgctxt "#40094"
+msgid "Hide 3D Items"
+msgstr "اخفاء عناصر 3D"
+
+msgctxt "#40095"
+msgid "Source Sorting"
+msgstr "تصنيف المصادر"
+
+msgctxt "#40096"
+msgid "Authorize Real-Debrid..."
+msgstr "مصادقة Real-Debrid..."
+
+msgctxt "#40097"
+msgid "Real-Debrid Username"
+msgstr "Real-Debrid اسم المستخدم"
+
+msgctxt "#40098"
+msgid "Enable Real-Debrid"
+msgstr "تمكين Real-Debrid"
+
+msgctxt "#40099"
+msgid "Real-Debrid Priority"
+msgstr "اولوية Real-Debrid"
+
+msgctxt "#40100"
+msgid "Enable Torrents"
+msgstr "تمكين التورنت"
+
+msgctxt "#40101"
+msgid "Enable Hosters"
+msgstr "تمكين المضيفين"
+
+msgctxt "#40102"
+msgid "Auto-Delete Torrents"
+msgstr "حذف ملفات التورنت تلقائياً"
+
+msgctxt "#40103"
+msgid "Max Storage Space Used Before Deletion (GB)"
+msgstr "الحد الأقصى لمساحة التخزين المستخدمة قبل الحذف (GB)"
+
+msgctxt "#40104"
+msgid "Automatic Cloud Removal"
+msgstr "ازالة التخزين السحابي تلقائياً"
+
+msgctxt "#40105"
+msgid "Prefer Transcoded Files"
+msgstr "تفضيل الملفات المحولة"
+
+msgctxt "#40106"
+msgid "Premiumize Customer ID"
+msgstr "رقم حساب Premiumize"
+
+msgctxt "#40107"
+msgid "Premiumize Priority"
+msgstr "اولوية Premiumize"
+
+msgctxt "#40108"
+msgid "Enable Premiumize"
+msgstr "تمكين Premiumize"
+
+msgctxt "#40109"
+msgid "Hide Common Undesirable Items"
+msgstr "إخفاء العناصر الشائعة غير المرغوب فيها"
+
+msgctxt "#40110"
+msgid "Enable Quaternary Low Quality Sort Preference"
+msgstr "تمكين تفضيل تصنيف رابع منخفض الجودة"
+
+msgctxt "#40112"
+msgid "Enable search history"
+msgstr "تمكين سجل البحث"
+
+msgctxt "#40113"
+msgid "Unable to contact Trakt.\nPlease check Trakts outage status at:\nhttp://status.trakt.tv"
+msgstr "تعذر الاتصال بـTrakt.\nالرجاء التحقق من حالة الخدمة عبر:\nhttp://status.trakt.tv"
+
+msgctxt "#40114"
+msgid "Fanart.TV API Key"
+msgstr "مفتاح Fanart.TV API"
+
+msgctxt "#40115"
+msgid "Fanart.TV"
+msgstr ""
+
+msgctxt "#40116"
+msgid "Delay Release Dates By a Day"
+msgstr "تأخير تاريخ الاصدر بيوم"
+
+msgctxt "#40117"
+msgid "Another addon is attempting to install a provider into Seren\nDo you wish to allow this?"
+msgstr "هناك اضافة اخرى تحاول تثبيت موفر خدمة على Seren\nهل ترغب في السماح بذلك؟"
+
+msgctxt "#40118"
+msgid "%s failed to uninstall the package: %s\nThis may require manual removal"
+msgstr "%s تعذر الغاء تثبيت الحزمة: %s\nيرجى المحاولة يدوياً"
+
+msgctxt "#40119"
+msgid "Another addon is attempting to uninstall the %s provider from Seren\nDo you wish to allow this?"
+msgstr "هناك اضافة اخرى تحاول الغاء تثبيت موفر خدمة على Seren\nهل ترغب في السماح بذلك؟"
+
+msgctxt "#40120"
+msgid "Hide SD quality sources"
+msgstr "اخفاء المصادر ذات الجودة الضعيفة"
+
+msgctxt "#40121"
+msgid "Networks"
+msgstr "الشبكات"
+
+msgctxt "#40122"
+msgid "Hide Un-Aired Items"
+msgstr "اخفاء العناصر التي لم يتم بثها بعد"
+
+msgctxt "#40123"
+msgid "Years"
+msgstr "السنوات"
+
+msgctxt "#40125"
+msgid "Hide Specials"
+msgstr "اخفاء العروض الخاصة"
+
+msgctxt "#40126"
+msgid "My Files"
+msgstr "ملفاتي"
+
+msgctxt "#40127"
+msgid "Scraper Display Style"
+msgstr "طريقة عرض الباحث"
+
+msgctxt "#40128"
+msgid "Resolve Display Style"
+msgstr "طريقة عرض المحلل"
+
+msgctxt "#40129"
+msgid "Fancy"
+msgstr "فاخر"
+
+msgctxt "#40130"
+msgid "Background Task"
+msgstr "مهمة خلفية"
+
+msgctxt "#40131"
+msgid "Auto-Select after (x) Seconds"
+msgstr "اختيار تلقائي بعد (x) ثواني"
+
+msgctxt "#40132"
+msgid "Auto Select Delay"
+msgstr "تأخير الاختيار التلقائي"
+
+msgctxt "#40133"
+msgid "Rebuilding Trakt Sync Database, please be patient"
+msgstr "جاري اعادة بناء قاعدة بيانات المزامنة من Trakt يرجى الانتظار"
+
+msgctxt "#40134"
+msgid "Would you like to perform the initial sync now?"
+msgstr "هل ترغب في إجراء المزامنة الأولية الآن؟"
+
+msgctxt "#40135"
+msgid "Starting Source Select"
+msgstr "بدء اختيار المصادر"
+
+msgctxt "#40136"
+msgid "A new verison of Seren is available from the repository. Please consider updating to v%s"
+msgstr "يتوفر اصدار جديد من Seren. يرجى اخذ التحديث الى v%s بعين الاعتبار"
+
+msgctxt "#40137"
+msgid "Notify Me About Available Updates"
+msgstr "أبلغني عن التحديثات المتوفرة"
+
+msgctxt "#40139"
+msgid "[COLOR red]WARNING[/COLOR]\nThis will reset all meta information, are you sure?"
+msgstr "[COLOR red]تحذير[/COLOR]\nسيؤدي هذا إلى إعادة تعيين جميع معلومات التعريف ، هل أنت متأكد؟"
+
+msgctxt "#40140"
+msgid "Clear Search History"
+msgstr "مسح سجل البحث"
+
+msgctxt "#40141"
+msgid "New Movie Search..."
+msgstr "اجراء بحث جديد عن فلم..."
+
+msgctxt "#40142"
+msgid "New Show Search..."
+msgstr "اجراء بحث جديد عن مسلسل..."
+
+msgctxt "#40143"
+msgid "Store resolved items in cloud"
+msgstr "تخزين العناصر التي تم تحويلها في المخزن السحابي"
+
+msgctxt "#40144"
+msgid "General Menu View"
+msgstr "طريقة عرض القائمة العامة"
+
+msgctxt "#40145"
+msgid "General Menu View ID"
+msgstr "ID طريقة عرض القائمة العامة"
+
+msgctxt "#40146"
+msgid "[COLOR red]Error:[/COLOR] No Debrid accounts were identified."
+msgstr "[COLOR red]خطأ:[/COLOR] تعذر العثور على خدمة Debrid"
+
+msgctxt "#40147"
+msgid "Please setup your accounts in the settings menu before attempting to play an item"
+msgstr "يرجى إعداد حساباتك في قائمة الإعدادات قبل محاولة تشغيل هذا العنصر"
+
+msgctxt "#40148"
+msgid "Terminate if cloud sources are found"
+msgstr "انهاء البحث اذا تم العثور على مصادر في المخزن السحابي"
+
+msgctxt "#40149"
+msgid "Inspect Cloud Files on Scrape"
+msgstr "فحص المخزن السحابي اثناء البحث"
+
+msgctxt "#40151"
+msgid "By Actor..."
+msgstr "بواسطة الممثل"
+
+msgctxt "#40152"
+msgid "Movie Play Style"
+msgstr "طريقة تشغيل الافلام"
+
+msgctxt "#40154"
+msgid "Movie File Size limit (GB)"
+msgstr "حد حجم ملف الفلم (GB)"
+
+msgctxt "#40155"
+msgid "Enable Kodi Menu Caching"
+msgstr "تفعيل التخزين المؤقت لقوائم كودي"
+
+msgctxt "#40156"
+msgid "Please Note\nYou appear to have authorized a non-premium account and will not be able to play items using this account"
+msgstr "يرجى المرعاة\nالحساب الذي قمت بمصادقته يفتقد العضوية الخاصة لذلك لن تتمكن من تشغيل العناصر"
+
+msgctxt "#40157"
+msgid "Auto try next link on resolve failure (Source Select)"
+msgstr "جرب الرابط التالي تلقائيًا عند فشل التحويل (اختيار المصدر)"
+
+msgctxt "#40158"
+msgid "Successfully installed %s - %s\nWould you like to switch to this theme?"
+msgstr "تم تثبيت %s - %s بنجاح\nهل ترغب بتدبيل السمة"
+
+msgctxt "#40159"
+msgid "Are you sure you wish to uninstall the theme %s?"
+msgstr "هل أنت متأكد أنك تريد إلغاء تثبيت السمة %s?"
+
+msgctxt "#40160"
+msgid "Successfully uninstalled %s"
+msgstr "تم الغاء تثبيت %s بنجاح"
+
+msgctxt "#40161"
+msgid "Themes"
+msgstr "السيمات"
+
+msgctxt "#40162"
+msgid "Active theme"
+msgstr "السمة النشطة"
+
+msgctxt "#40163"
+msgid "Switch theme"
+msgstr "تبديل سمة"
+
+msgctxt "#40164"
+msgid "Uninstall theme"
+msgstr "الغاء تثبيت سمة"
+
+msgctxt "#40165"
+msgid "Install theme"
+msgstr "تثبيت سمة"
+
+msgctxt "#40166"
+msgid "You are attempting to uninstall the active theme, this will switch you to the default theme."
+msgstr "انت تحاول إلغاء تثبيت السمة النشطة، سيؤدي هذا للتبديل إلى السمة الافتراضية."
+
+msgctxt "#40167"
+msgid "Succesfully Switched to %s"
+msgstr "تم التبديل الى %s بنجاح"
+
+msgctxt "#40168"
+msgid "The theme name %s is not allowed"
+msgstr "اسم السمة %s غير مسموح به"
+
+msgctxt "#40169"
+msgid "Are you sure you wish to clear the search history?"
+msgstr "هل أنت متأكد أنك تريد مسح سجل البحث؟"
+
+msgctxt "#40170"
+msgid "Flatten Season Episodes"
+msgstr "دمج حلقات الموسم"
+
+msgctxt "#40171"
+msgid "This theme package appears to be invalid, please refer to the log for more information"
+msgstr "بدو أن حزمة السمة غير صالحة، يرجى مراجعة السجل لمزيد من المعلومات"
+
+msgctxt "#40172"
+msgid "Next Up"
+msgstr "اكمل المتابعة"
+
+msgctxt "#40173"
+msgid "Upcoming Episodes"
+msgstr "الحلقات القادمة"
+
+msgctxt "#40174"
+msgid "Unfinished Shows in Collection"
+msgstr "مسلسلات غير مكتملة في المجموعة"
+
+msgctxt "#40175"
+msgid "Recent Episodes"
+msgstr "الحلقات الصادرة مؤخراً"
+
+msgctxt "#40176"
+msgid "My Show Lists"
+msgstr "قائمة مسلسلاتي"
+
+msgctxt "#40177"
+msgid "Trakt Sync Tools"
+msgstr "ادوات Trakt للمزامنة"
+
+msgctxt "#40178"
+msgid "Clear last sync time"
+msgstr "مسح اخر مزامنة"
+
+msgctxt "#40179"
+msgid "Force a sync with Trakt"
+msgstr "فرض المزامنة مع Trakt"
+
+msgctxt "#40180"
+msgid "Clear All Metadata"
+msgstr "مسح جميع البيانات الوصفية"
+
+msgctxt "#40181"
+msgid "Rebuild Database"
+msgstr "اعادة بناء قاعدة البيانات"
+
+msgctxt "#40182"
+msgid "Cache Assist History"
+msgstr "سجل مساعد ذاكرة التخزين المؤقت"
+
+msgctxt "#40183"
+msgid "Current Premiumize Transfers"
+msgstr "تحويلات Premiumize الحالية"
+
+msgctxt "#40184"
+msgid "Current Real-Debrid Transfers"
+msgstr "تحويلات Real-Debrid الحالية"
+
+msgctxt "#40185"
+msgid "Clear Non Active..."
+msgstr "مسح غير النشطين..."
+
+msgctxt "#40186"
+msgid "Default"
+msgstr "إفتراضي"
+
+msgctxt "#40187"
+msgid "Poster"
+msgstr ""
+
+msgctxt "#40188"
+msgid "Icon Wall"
+msgstr "ملصق"
+
+msgctxt "#40189"
+msgid "Shift"
+msgstr "تحريك"
+
+msgctxt "#40190"
+msgid "Info Wall"
+msgstr "حائط المعلومات"
+
+msgctxt "#40191"
+msgid "Wide List"
+msgstr "قائمة واسعة"
+
+msgctxt "#40192"
+msgid "Wall"
+msgstr "حائط"
+
+msgctxt "#40193"
+msgid "Banner"
+msgstr "راية"
+
+msgctxt "#40194"
+msgid "Fanart"
+msgstr "من العجبين"
+
+msgctxt "#40195"
+msgid "Automatic"
+msgstr "تلقائي"
+
+msgctxt "#40196"
+msgid "Manual Selection"
+msgstr "تحديد يدوي"
+
+msgctxt "#40197"
+msgid "Torrents Only"
+msgstr "تورنت فقط"
+
+msgctxt "#40198"
+msgid "Hosters Only"
+msgstr "مضيفون فقط"
+
+msgctxt "#40199"
+msgid "Torrents/Hosters"
+msgstr "تورنت/مضيفون"
+
+msgctxt "#40200"
+msgid "Premiumize"
+msgstr ""
+
+msgctxt "#40201"
+msgid "Real-Debrid"
+msgstr ""
+
+msgctxt "#40202"
+msgid "Torrents"
+msgstr "تورنت"
+
+msgctxt "#40203"
+msgid "Hosters"
+msgstr "مضيفون"
+
+msgctxt "#40204"
+msgid "Resolution"
+msgstr "دقة"
+
+msgctxt "#40205"
+msgid "Provider Manager"
+msgstr "مدير الموفرين"
+
+msgctxt "#40206"
+msgid "Tool Box"
+msgstr "صندوق الادوات"
+
+msgctxt "#40207"
+msgid "Install Package"
+msgstr "تثبيت الحزمة"
+
+msgctxt "#40208"
+msgid "Uninstall Package"
+msgstr "الغاء تثبيت الحزمة"
+
+msgctxt "#40209"
+msgid "Enable Package"
+msgstr "تمكين الحزمة"
+
+msgctxt "#40210"
+msgid "Disable Package"
+msgstr "تعطيل الحزمة"
+
+msgctxt "#40211"
+msgid "Enable All Hosters"
+msgstr "تمكين جميع المضيفين"
+
+msgctxt "#40212"
+msgid "Enable All Torrents"
+msgstr "تمكين جميع التورنت"
+
+msgctxt "#40213"
+msgid "Disable All Hosters"
+msgstr "تعطيل جميع المضيفين"
+
+msgctxt "#40214"
+msgid "Disable All Torrents"
+msgstr "تعطيل جميع التورنت"
+
+msgctxt "#40215"
+msgid "Enable All"
+msgstr "تمكين الجميع"
+
+msgctxt "#40216"
+msgid "Disable All"
+msgstr "الغاء الجميع"
+
+msgctxt "#40217"
+msgid "Installed Packages"
+msgstr "الحزم المثبته"
+
+msgctxt "#40218"
+msgid "Package Providers"
+msgstr "مزود الخزمة"
+
+msgctxt "#40219"
+msgid "Provider type"
+msgstr "نوع المزود"
+
+msgctxt "#40220"
+msgid "Status"
+msgstr "الحالة"
+
+msgctxt "#40221"
+msgid "Torrents"
+msgstr "تورنت"
+
+msgctxt "#40222"
+msgid "Cached"
+msgstr "مخزنة مؤقتاً"
+
+msgctxt "#40223"
+msgid "Hosters"
+msgstr "مضيفون"
+
+msgctxt "#40224"
+msgid "Cloudfiles"
+msgstr "ملفات سحابية"
+
+msgctxt "#40225"
+msgid "Remaining providers"
+msgstr "الموفرون المتبقون"
+
+msgctxt "#40226"
+msgid "Provider"
+msgstr "موفر"
+
+msgctxt "#40227"
+msgid "Source"
+msgstr "مصدر"
+
+msgctxt "#40228"
+msgid "Resolution"
+msgstr "دقة"
+
+msgctxt "#40229"
+msgid "Info"
+msgstr "معلومة"
+
+msgctxt "#40230"
+msgid "Year"
+msgstr "سنة"
+
+msgctxt "#40231"
+msgid "Rating"
+msgstr "تقييم"
+
+msgctxt "#40232"
+msgid "Aired"
+msgstr "تم بثه"
+
+msgctxt "#40233"
+msgid "Debrid"
+msgstr ""
+
+msgctxt "#40234"
+msgid "Size"
+msgstr "حجم"
+
+msgctxt "#40235"
+msgid "Provider"
+msgstr "موفر"
+
+msgctxt "#40236"
+msgid "Source type"
+msgstr "نوع المصدر"
+
+msgctxt "#40237"
+msgid "Resolution"
+msgstr "الدقة"
+
+msgctxt "#40238"
+msgid "Info"
+msgstr "معلومات"
+
+msgctxt "#40239"
+msgid "One or more providers have updates pending"
+msgstr "واحد أو أكثر من مقدمي الخدمة لديهم تحديثات معلقة"
+
+msgctxt "#40240"
+msgid "Prefer Movie artwork from"
+msgstr "تفضل عمل فني للأفلام من"
+
+msgctxt "#40241"
+msgid "Prefer TV Show artwork from"
+msgstr "تفضيل عمل فني للمسلسلات من"
+
+msgctxt "#40242"
+msgid "Fanart.TV (slower)"
+msgstr "Fanart.TV (أبطأ)"
+
+msgctxt "#40243"
+msgid "TMDb"
+msgstr ""
+
+msgctxt "#40244"
+msgid "TVDB/TMDb"
+msgstr ""
+
+msgctxt "#40245"
+msgid "Playback"
+msgstr "التشغيل"
+
+msgctxt "#40246"
+msgid "Interface"
+msgstr "واجهة المستخدم"
+
+msgctxt "#40247"
+msgid "Artwork"
+msgstr "عمل فني"
+
+msgctxt "#40248"
+msgid "Advanced"
+msgstr "متقدم"
+
+msgctxt "#40249"
+msgid "Season"
+msgstr "موسم"
+
+msgctxt "#40250"
+msgid "Episode"
+msgstr "حلقة"
+
+msgctxt "#40251"
+msgid "TV Show"
+msgstr "مسلسل"
+
+msgctxt "#40252"
+msgid "Movie"
+msgstr "فلم"
+
+msgctxt "#40253"
+msgid "Show Advanced Movie Artwork Settings"
+msgstr "اظهار الاعدادات المتقدمة للأعمال الفنية الخاصة بالافلام"
+
+msgctxt "#40254"
+msgid "Show Advanced TV Artwork Settings"
+msgstr "اظهار الاعدادات المتقدمة للأعمال الفنية الخاصة بالمسلسلات"
+
+msgctxt "#40255"
+msgid "Are you sure you wish to remove the %s package?"
+msgstr "هل انت متأكد انك تريد الغاء تثبيت الخزمة %s؟"
+
+msgctxt "#40256"
+msgid "Show Advanced Settings..."
+msgstr "اظهار الخيارات المتقدمة..."
+
+msgctxt "#40257"
+msgid "Movie Artwork"
+msgstr "عمل فني للأفلام"
+
+msgctxt "#40258"
+msgid "TV show Artwork"
+msgstr "عمل فني للمسلسلات"
+
+msgctxt "#40259"
+msgid "Search History has been cleared"
+msgstr "تم مسح سجل البحث"
+
+msgctxt "#40260"
+msgid "User information has been cleared"
+msgstr "تم مسح معلومات المستخدم"
+
+msgctxt "#40261"
+msgid "Metadata has been cleared"
+msgstr "تم مسح البيانات الوصفية"
+
+msgctxt "#40262"
+msgid "Database has been rebuilt"
+msgstr "تم اعادة بناء قاعدة البيانات"
+
+msgctxt "#40263"
+msgid "Sucessfully authenticated with Trakt"
+msgstr "تمت المصادقة مع Trakt بنجاح"
+
+msgctxt "#40264"
+msgid "There may be an issue with the Trakt service, please clear cache and wait"
+msgstr "قد تكون هناك مشكلة في خدمة Trakt، يرجى مسح ذاكرة التخزين المؤقت والانتظار"
+
+msgctxt "#40265"
+msgid "Add %s to Collection"
+msgstr "اضف %s الى المجموعة"
+
+msgctxt "#40266"
+msgid "Remove %s from Collection"
+msgstr "إزالة %s من المجموعة"
+
+msgctxt "#40267"
+msgid "Add to Watchlist"
+msgstr "أضافة الى قائمة المشاهدة"
+
+msgctxt "#40268"
+msgid "Remove from Watchlist"
+msgstr "أزالة من قائمة المشاهدة"
+
+msgctxt "#40269"
+msgid "Mark as Watched"
+msgstr "وضع علامة تمت المشاهدة"
+
+msgctxt "#40270"
+msgid "Mark as Unwatched"
+msgstr "ازالة علامة تمت المشاهدة"
+
+msgctxt "#40271"
+msgid "Add to List"
+msgstr "اضف الى القائمة"
+
+msgctxt "#40272"
+msgid "Remove From List"
+msgstr "ازالة من القائمة"
+
+msgctxt "#40273"
+msgid "Hide %s"
+msgstr "إخفاء %s"
+
+msgctxt "#40274"
+msgid "Refresh Item Metadata"
+msgstr "تحديث البيانات الوصفية للعنصر"
+
+msgctxt "#40275"
+msgid "Remove Playback Progress"
+msgstr "ازالة نقطة التشغيل"
+
+msgctxt "#40276"
+msgid "Show"
+msgstr "مسلسل"
+
+msgctxt "#40279"
+msgid "Movie"
+msgstr "فلم"
+
+msgctxt "#40280"
+msgid "Trakt manager"
+msgstr "مدير Trakt"
+
+msgctxt "#40281"
+msgid "Failed to update status, please check the log"
+msgstr "تعذر تحديث الحالة، يرجى التحقق من سجل الاخطاء"
+
+msgctxt "#40282"
+msgid "Item marked as watched"
+msgstr "تم وضع علامة على العنصر بأنه تمت مشاهدته"
+
+msgctxt "#40283"
+msgid "Item marked as unwatched"
+msgstr "تم وضع علامة على العنصر بأنه لم تتم مشاهدته"
+
+msgctxt "#40284"
+msgid "Item added to Collection"
+msgstr "تمت إضافة العنصر الى المجموعة"
+
+msgctxt "#40285"
+msgid "Item removed from Collection"
+msgstr "تمت ازالة العنصر من المجموعة"
+
+msgctxt "#40286"
+msgid "Item added to Watchlist"
+msgstr "تمت اضافة العنصر الى قائمة المشاهدة"
+
+msgctxt "#40287"
+msgid "Item removed from Watchlist"
+msgstr "تمت ازالة العنصر من قائمة المشاهدة"
+
+msgctxt "#40288"
+msgid "Item added to %s"
+msgstr "تمت اضافة العنصر الى %s"
+
+msgctxt "#40289"
+msgid "Item removed from %s"
+msgstr "تمت ازالة العنصر من %s"
+
+msgctxt "#40290"
+msgid "Select a list"
+msgstr "حدد احد القوائم"
+
+msgctxt "#40291"
+msgid "Watched Progress"
+msgstr "معدل المشاهدة"
+
+msgctxt "#40292"
+msgid "Calendar"
+msgstr "تقويم"
+
+msgctxt "#40293"
+msgid "Select Menu type to hide from"
+msgstr "اختار نوع القائمة للأخفاء منها"
+
+msgctxt "#40294"
+msgid "Item has been hidden from your %s"
+msgstr "تم اخفاء العنصر من %s"
+
+msgctxt "#40295"
+msgid "Item's Progress History has been removed"
+msgstr "تم مسح معدل المشاهدة لهذا العنصر"
+
+msgctxt "#40296"
+msgid "Silent scrape"
+msgstr "بحث صامت"
+
+msgctxt "#40297"
+msgid "Torrent File Picker"
+msgstr "طريقة اختيار ملفات التورنت"
+
+msgctxt "#40298"
+msgid "Genre Selection"
+msgstr "اختيار النوع"
+
+msgctxt "#40299"
+msgid "New cached sources have been created for %s"
+msgstr "تم إنشاء مصادر جديدة مخزنة مؤقتًا لـ%s"
+
+msgctxt "#40300"
+msgid "Cache assist for %s has failed due to no progress"
+msgstr "فشل مساعد ذاكرة التخزين المؤقت لـ%s بسبب عدم التقدم في المعالجة"
+
+msgctxt "#40301"
+msgid "Cache assist for %s has failed according to Real-Debrid"
+msgstr "فشل مساعد ذاكرة التخزين المؤقت لـ%s بناءً على تقرير Real-Debrid"
+
+msgctxt "#40302"
+msgid "Browse..."
+msgstr "تصفح..."
+
+msgctxt "#40303"
+msgid "Web Location..."
+msgstr "موقع الويب..."
+
+msgctxt "#40304"
+msgid "Locate Provider Zip"
+msgstr "اختار ملف الـZip للمزود"
+
+msgctxt "#40305"
+msgid "Enter Zip URL"
+msgstr "أدخل رابط ملف الـZip"
+
+msgctxt "#40306"
+msgid "Cache"
+msgstr "ذاكرة التخزين المؤقت"
+
+msgctxt "#40307"
+msgid "Cache Assist"
+msgstr "مساعد ذاكرة التخزين المؤقت"
+
+msgctxt "#40309"
+msgid "Sorry, SMB shares are not supported"
+msgstr "عذراً، خدمة المشاركة SMB غير مدعومة"
+
+msgctxt "#40310"
+msgid "Unable to connect to file.\nPlease check URL and try again."
+msgstr "تعذر الاتصال بالملف\nيرجى التحقق من الرابط واعادة المحاولة"
+
+msgctxt "#40311"
+msgid "Installing"
+msgstr "جاري التثبيت"
+
+msgctxt "#40312"
+msgid "Author"
+msgstr "الكاتب"
+
+msgctxt "#40313"
+msgid "Are you sure you wish to proceed?"
+msgstr "هل أنت متأكد أنك تريد المتابعة؟"
+
+msgctxt "#40314"
+msgid "Custom Sources Install"
+msgstr "تثبيت مصادر مخصصة"
+
+msgctxt "#40315"
+msgid "Cancel"
+msgstr "الغاء"
+
+msgctxt "#40316"
+msgid "Install"
+msgstr "تثبيت"
+
+msgctxt "#40317"
+msgid "Extracting"
+msgstr "استخراج"
+
+msgctxt "#40318"
+msgid "Successfully Installed"
+msgstr "تم التثبيت بنجاح"
+
+msgctxt "#40319"
+msgid "Failed to install"
+msgstr "تعذر التثبيت"
+
+msgctxt "#40320"
+msgid "Please check the log for further details"
+msgstr "الرجاء التحقق من السجل لمزيد من المعلومات"
+
+msgctxt "#40321"
+msgid "The skin name 'Default' is not allowed."
+msgstr "اسم السمة 'Default' غير مسموح به"
+
+msgctxt "#40322"
+msgid "Starting Playback"
+msgstr "جاري التشغيل"
+
+msgctxt "#40323"
+msgid "Poster"
+msgstr "ملصق"
+
+msgctxt "#40324"
+msgid "Keyart"
+msgstr "ملصق دعائي عالي الجودة"
+
+msgctxt "#40325"
+msgid "Fanart"
+msgstr "من المعجبين"
+
+msgctxt "#40326"
+msgid "Banner"
+msgstr "راية"
+
+msgctxt "#40327"
+msgid "Clear Logo"
+msgstr "شعار بدون خلفية"
+
+msgctxt "#40328"
+msgid "Landscape"
+msgstr "خلفية"
+
+msgctxt "#40329"
+msgid "Character Art"
+msgstr "عمل فني للشخصية"
+
+msgctxt "#40330"
+msgid "Clear Art"
+msgstr "عمل فني بدون خلفية"
+
+msgctxt "#40331"
+msgid "Disc Art"
+msgstr "عمل فني للقرص الصب"
+
+msgctxt "#40332"
+msgid "Smart Play Display Style"
+msgstr "طريقة عرض التشغيل الذكي"
+
+msgctxt "#40333"
+msgid "Smart Play Popup"
+msgstr "نافذة التشغيل الذكي"
+
+msgctxt "#40334"
+msgid "Dialog Style"
+msgstr "شكل النافذة"
+
+msgctxt "#40335"
+msgid "Simple"
+msgstr "بسيط"
+
+msgctxt "#40336"
+msgid "Default Action if Nothing Selected"
+msgstr "الإجراء الافتراضي إذا لم يتم تحديد أي شيء"
+
+msgctxt "#40337"
+msgid "Play"
+msgstr "تشغيل"
+
+msgctxt "#40338"
+msgid "Pause"
+msgstr "إيقاف مؤقت"
+
+msgctxt "#40339"
+msgid "Still Watching Dialog"
+msgstr "نافذة: هل مازلت تشاهد"
+
+msgctxt "#40340"
+msgid "Enable Still Watching Dialog"
+msgstr "تمكين نافذة: هل مازلت تشاهد"
+
+msgctxt "#40341"
+msgid "Episodes Between Dialog Prompts"
+msgstr "نافذة: مابين الحلقات"
+
+msgctxt "#40342"
+msgid "Paginate Trakt Lists"
+msgstr "ترقيم قوائم Trakt"
+
+msgctxt "#40343"
+msgid "My Watched Episodes"
+msgstr "الحلقات التي شاهدتها"
+
+msgctxt "#40344"
+msgid "My Watched Movies"
+msgstr "الافلام التي شاهدتها"
+
+msgctxt "#40346"
+msgid "Search Movies By Actor..."
+msgstr "بحث عن افلام بناءً على الممثل..."
+
+msgctxt "#40347"
+msgid "Search Shows By Actor..."
+msgstr "بحث عن مسلسلات بناءً على الممثل..."
+
+msgctxt "#40348"
+msgid "Ask"
+msgstr "اسأل"
+
+msgctxt "#40349"
+msgid "Automatic"
+msgstr "تلقائي"
+
+msgctxt "#40350"
+msgid "Do not resume"
+msgstr "لاتستكمل"
+
+msgctxt "#40351"
+msgid "Start From Beginning"
+msgstr "ابدأ من البداية"
+
+msgctxt "#40352"
+msgid "Due to the implementation of new features to the local database, a rebuild is now required"
+msgstr "نظرًا لتطبيق ميزات جديدة على قاعدة البيانات المحلية، يجب الآن إعادة بنائها"
+
+msgctxt "#40353"
+msgid "There were issues when processing the synchronization with Trakt, please check the log"
+msgstr "حدثت مشاكل اثناءالمزامنة مع Trakt، يرجى التحقق من السجل"
+
+msgctxt "#40354"
+msgid "AllDebrid"
+msgstr ""
+
+msgctxt "#40355"
+msgid "AllDebrid Auth"
+msgstr "مصادقة AllDebrid"
+
+msgctxt "#40356"
+msgid "Enabled AllDebrid"
+msgstr "تمكين AllDebrid"
+
+msgctxt "#40357"
+msgid "AllDebrid Username"
+msgstr "اسم المستخدم AllDebrid"
+
+msgctxt "#40358"
+msgid "Authorize AllDebrid..."
+msgstr "مصادقة AllDebrid"
+
+msgctxt "#40359"
+msgid "AllDebrid Priority"
+msgstr "اولوية AllDebrid"
+
+msgctxt "#40360"
+msgid "Enable Automatic Theme Updates"
+msgstr "تمكين تحديث السيمات تلقائياً"
+
+msgctxt "#40361"
+msgid "Authorise Premiumize"
+msgstr "مصادقة Premiumize"
+
+msgctxt "#40362"
+msgid "There appears to be a problem with you Trakt Authorization \nPlease try re-authorizing your account"
+msgstr "حدثت مشكلة اثناء مصادقة Trakt الخاص بك\nيرجى اعادة المصادقة"
