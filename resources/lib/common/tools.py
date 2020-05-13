@@ -20,10 +20,10 @@ except:
     pass
 
 try:
-    from urlparse import parse_qsl, parse_qs, unquote, urlparse
+    from urlparse import parse_qsl, parse_qs, unquote, urlparse, urljoin
     from urllib import urlencode, quote_plus, quote
 except:
-    from urllib.parse import parse_qsl, urlencode, quote_plus, parse_qs, quote, unquote, urlparse
+    from urllib.parse import parse_qsl, urlencode, quote_plus, parse_qs, quote, unquote, urlparse, urljoin
 
 try:
     sysaddon = sys.argv[0]
@@ -828,7 +828,7 @@ def real_debrid_enabled():
         return False
 
 def all_debrid_enabled():
-    if getSetting('alldebrid.token') != '' and getSetting('alldebrid.enabled') == 'true':
+    if getSetting('alldebrid.apikey') != '' and getSetting('alldebrid.enabled') == 'true':
         return True
     else:
         return False
