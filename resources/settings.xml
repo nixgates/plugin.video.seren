@@ -64,7 +64,7 @@
         <setting id="general.fake" type="text" default="" visible="false" />
         <setting id="provider.updateCheckTimeStamp" type="text" default="" visible="false" />
         <setting id="addon.updateCheckTimeStamp" type="text" default="" visible="false" />
-        <setting id="alldebrid.token" type="text" default="" visible="false"/>
+        <setting id="alldebrid.apikey" type="text" default="" visible="false"/>
         
         <!-- I'm leaving this hidden for now, TMDB needs a fair bit of work to get back up to scratch -->
         <setting id="general.metalocation" type="enum" label="40013" values="TMDB|TVDB" default="1" visible="false" />
