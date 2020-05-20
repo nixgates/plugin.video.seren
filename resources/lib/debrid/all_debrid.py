@@ -161,7 +161,7 @@ class AllDebrid:
     def movie_magnet_to_stream(self, magnet, args):
         selected_file = None
 
-        magnet_id = self.upload_magnet(magnet)['id']
+        magnet_id = self.upload_magnet(magnet)['magnets'][0]['id']
         folder_details = self.magnet_status(magnet_id)['magnets']
 
         folder_details = [(key, value) for i in folder_details for l in i['links'] for key, value in l

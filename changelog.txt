@@ -1,3 +1,6 @@
+Changelog 1.6.18:
+Fixed extraction of magnet ID in AllDebrid module when resolving single file items
+
 Changelog 1.6.17:
 Update AllDebrid module for new API version
 
