@@ -1,3 +1,6 @@
+Changelog 1.6.19:
+Actually fixed alldebrid this time, promise
+
 Changelog 1.6.18:
 Fixed extraction of magnet ID in AllDebrid module when resolving single file items
 
