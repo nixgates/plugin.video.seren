@@ -162,10 +162,10 @@ class AllDebrid:
         selected_file = None
 
         magnet_id = self.upload_magnet(magnet)['magnets'][0]['id']
-        folder_details = self.magnet_status(magnet_id)['magnets']
+        folder_details = self.magnet_status(magnet_id)['magnets']['links']
 
-        folder_details = [(key, value) for i in folder_details for l in i['links'] for key, value in l
-                          if any(value.endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
+        folder_details = [(l['link'], l['filename']) for l in folder_details
+                          if any(l['filename'].endswith(ext) for ext in source_utils.COMMON_VIDEO_EXTENSIONS)]
 
         for torrent_file in folder_details:
             if source_utils.filter_movie_title(torrent_file[1],
