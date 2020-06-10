@@ -616,6 +616,7 @@ class Menus:
                             item['info']['title'] = name
 
                     item['info'] = tools.clean_air_dates(item['info'])
+                    item['info']['studio'] = item['showInfo']['info']['studio']
 
                     if 'trakt' in item['ids']:
                         try:
