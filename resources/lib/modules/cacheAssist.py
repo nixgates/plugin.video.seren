@@ -119,7 +119,7 @@ class CacheAssit:
                 key_list.append(str(key))
                 break
 
-        debrid.torrentSelect(torrent_id, ','.join(key_list))
+        debrid.torrentSelect(torrent_id, key_list)
         downloading_status = ['queued', 'downloading']
         current_percent = 0
         timestamp = time.time()
