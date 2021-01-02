@@ -354,7 +354,10 @@ class TraktSyncDatabase(Database):
         ):
             g.log("Rebuilding Trakt Sync Database Version")
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30363))
-            self.re_build_database(True)
+            try:
+                self.re_build_database(True)
+            except:
+                self.rebuild_database()
 
     def flush_activities(self, clear_meta=False):
         if clear_meta:
