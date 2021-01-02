@@ -77,15 +77,18 @@ class CustomProviders(ProviderCache):
                 if filename.endswith(".json"):
                     with open(os.path.join(root, filename), "r") as f:
                         meta = json.load(f)
-                        packages.append(
-                            (
-                                meta["name"],
-                                meta["author"],
-                                meta["remote_meta"],
-                                meta["version"],
-                                "|".join(meta.get("services", [])),
-                            )
-                        )
+                        try:
+                            packages.append(
+                                (
+                                    meta["name"],
+                                    meta["author"],
+                                    meta["remote_meta"],
+                                    meta["version"],
+                                    "|".join(meta.get("services", [])),
+                                    )
+                                )
+                        except KeyError:
+                            continue
 
         predicate = "','".join(p[0] for p in packages)
         self.execute_sql(self.package_insert_query, packages)
