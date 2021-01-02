@@ -864,10 +864,13 @@ class Sources(object):
                 sources = [i for i in self.sources_information["hosterSources"].values()]
                 sources.append([i for i in self.sources_information["torrentCacheSources"].values()])
 
-                if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
-                    g.log(pre_term_log_string, 'info')
-                    monkey_requests.PRE_TERM_BLOCK = True
-                    return True
+                try:
+                    if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
+                        g.log(pre_term_log_string, 'info')
+                        monkey_requests.PRE_TERM_BLOCK = True
+                        return True
+                except TypeError:
+                    return False
         except (ValueError, KeyError, IndexError):
             pass
 
