@@ -313,6 +313,9 @@ class SkinManager(Database, ZipManager):
         skins_folder = os.path.join(
             self._active_skin_path, "resources", "skins", "Default"
         )
+        if not os.path.exists(skins_folder):
+            os.mkdir(skins_folder)
+
         for folder in [
             folder
             for folder in os.listdir(skins_folder)

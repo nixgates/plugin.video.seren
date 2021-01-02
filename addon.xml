@@ -63,6 +63,10 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.0.6:
+            Create Skins directory if missing
+            Allow failure in pre-term until investigated
+            
             Changelog 2.0.5:
             Allow more failures that will require to be investigated further in the future
 
