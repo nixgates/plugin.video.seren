@@ -1,37 +1,54 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
 
-import xbmc
+import sys
 from random import randint
 
-from resources.lib.common import maintenance
+import xbmc
+
 from resources.lib.common import tools
-from resources.lib.modules.trakt_sync.activities import TraktSyncDatabase
 
-tools.log('##################  STARTING SERVICE  ######################')
-monitor = xbmc.Monitor()
+if tools.is_stub():
+    # noinspection PyUnresolvedReferences
+    from mock_kodi import MOCK
 
-tools.setSetting('general.tempSilent', 'false')
+from resources.lib.modules.globals import g
 
-tools.log('Performing initial background maintenance...')
+g.init_globals(sys.argv)
 
-if tools.getSetting('general.checkAddonUpdates') == 'true':
-    maintenance.check_for_addon_update()
+from resources.lib.common import maintenance
+from resources.lib.database.trakt_sync.activities import TraktSyncDatabase
+from resources.lib.modules.serenMonitor import SerenMonitor
+from resources.lib.modules.update_news import do_update_news
 
-TraktSyncDatabase().sync_activities()
+g.log("##################  STARTING SERVICE  ######################")
+g.log(
+    "### {} {}-{}".format(g.ADDON_ID, g.VERSION, g.read_all_text(".gitsha") or "local")
+)
+g.set_setting("general.tempSilent", "false")
+g.log("#############  SERVICE ENTERED KEEP ALIVE  #################")
+g.HOME_WINDOW.setProperty("SerenDownloadManagerIndex", "{}")
 
-maintenance.run_maintenance()
+monitor = SerenMonitor()
+xbmc.executebuiltin(
+    'RunPlugin("plugin://plugin.video.seren/?action=longLifeServiceManager")'
+)
 
-tools.log('Initial maintenance cycle completed')
-
-tools.log('#############  SERVICE ENTERED KEEP ALIVE  #################')
+do_update_news()
 
 while not monitor.abortRequested():
     try:
+        if g.get_bool_setting("general.checkAddonUpdates"):
+            maintenance.check_for_addon_update()
+        maintenance.run_maintenance()
+        TraktSyncDatabase().sync_activities()
         if monitor.waitForAbort(60 * randint(13, 17)):
             break
-        tools.execute('RunPlugin("plugin://plugin.video.%s/?action=runMaintenance")' % tools.addonName.lower())
-        TraktSyncDatabase().sync_activities()
-    except:
+    except:  # pylint: disable=bare-except
+        g.log("Background service failure", "error")
+        g.log_stacktrace()
+        if monitor.waitForAbort(10):
+            break
         continue
 
-
+del monitor

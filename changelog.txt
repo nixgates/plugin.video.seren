@@ -1,29 +1,41 @@
-Changelog 1.6.19:
-Actually fixed alldebrid this time, promise
+Changleog 2.0.0:
 
-Changelog 1.6.18:
-Fixed extraction of magnet ID in AllDebrid module when resolving single file items
+Added Download Manager
+Complete re-write of Trakt Sync Database
+Metadata handler introduced and complete re-write of handling of metadata
+Settings that modify metadata can now be changed on the fly and do not require a rebuild
+Users can now manually resolve a file from the source select screen
+Users can now manually cache a specific source from the source select screen
+Complete re-write of menu handling
+Introduced globals module to handle global variables for interpreter
+Implement re-use language invoker setting from Kodi
+Pre-emptive termination now disabled for background Pre-scrapes and timeout set to max for background scrapes
+New artwork and custom dialogs
+Metadata now upadted on the fly when updated item encountered from Trakt
+Next Up menu now populated from local database
+Sync has been fleshed out to include even more meta data during cycle
+Failures to auto resolve now prompt user in case they wish to manually interrupt
+Items are now able to supply multiple images for any given type for skins that make use of it
+Support for Python 3
+Global thread lock now implemented for required methods (prevents multiple syncs occuring at once and other locks)
+InputStreamAdaptive support
+Providers now have the abiity to implement settings
+Provider packages can now elect to make use of their own background services
+Provider packages can now offer images for each provider
+Cache and Sync database items are now pickled
+Complete re-write of resovler module and consolidated code
+Kodi 19 support
+All Debrid implementation now fully featured
+Sources can now be sorted by filesize low to high for users that wish to do so
+Forcing widget refresh after playback now optional
+Zip manager implemented for handling of zip files
+Skin Manager rework
+Automated resolving now more reliable
+OMDB API implemented
+Feedback provided at scrape if no providers are found
+Feedback provided at scrape if no debrid providers are setup
+Debrid account status now visible from Seren settings
 
-Changelog 1.6.17:
-Update AllDebrid module for new API version
-
-Changelog 1.6.16:
-Fix response.status_code check for Trakt Auth
-
-Changelog 1.6.15:
-Adjsut status code responses for Trakt module
-
-Changelog 1.6.14:
-Remove cleaning of depricated settings as it was causing corrupt settings file
-
-Changelog 1.6.13:
-Add workaround on failure to grab user lists
-
-Changelog 1.6.12:
-Fix endpoint for still watching and playing next windows
-
-Changelog 1.6.11:
-Fix provider list not showing due to theme changes
 
 Changelog 1.6.10:
 Increased concurrent threads for Trakt Sync database to speed up large menu lists
@@ -461,7 +473,7 @@ Added removal of duplicate space characters to clean title function
 Added support for single episode folders to Premiumize cloud inspection
 
 Changelog 0.2.28:
-Fixed issue with addonName variable change
+Fixed issue with ADDON_NAME variable change
 
 Changelog 0.2.27:
 Adjusted RD cache inspection to allow multiple video files within a single movie item

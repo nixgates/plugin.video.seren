@@ -4,6 +4,8 @@
         <left>0</left>
         <top>0</top>
     </coordinates>
+    <animation effect="fade" time="500">WindowOpen</animation>
+    <animation effect="fade" end="0,576" time="500">WindowClose</animation>
     <controls>
         <!-- Background Texture -->
         <control type="image">
@@ -31,9 +33,9 @@
 
         <!-- Seren Ico -->
         <control type="image" id="1001">
-            <top>-50</top>
-            <left>880</left>
-            <width>150</width>
+            <top>-80</top>
+            <left>900</left>
+            <width>100</width>
             <aspectratio>keep</aspectratio>
             <texture>$INFO[Window().Property(seren.logo)]</texture>
         </control>

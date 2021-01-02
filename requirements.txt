@@ -1,0 +1,21 @@
+﻿certifi==2020.4.5.1
+chardet==3.0.4
+idna==2.9
+requests==2.23.0
+urllib3==1.25.9
+dateutils==0.6.8
+polib~=1.1.0
+python-dateutil~=2.8.1
+future~=0.17.1
+bs4
+pytest
+vcrpy
+pylint
+coverage
+flake8
+flake8-docstrings
+parameterized
+darglint; python_version>"3.5"
+kodistubs; python_version<"3.7"
+requests-mock
+Mock
