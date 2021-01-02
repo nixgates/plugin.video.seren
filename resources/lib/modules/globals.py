@@ -689,6 +689,7 @@ class GlobalVariables(object):
     @staticmethod
     def _try_get_color_from_skin():
         skin_dir = xbmc.getSkinDir()
+        skin_color = None
         if not skin_dir:
             return None
         skin_theme = xbmc.getInfoLabel("Skin.CurrentTheme")
