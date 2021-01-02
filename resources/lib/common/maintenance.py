@@ -260,8 +260,15 @@ def run_maintenance():
 
     # Refresh API tokens
 
-    refresh_apis()
-    account_premium_status_checks()
+    try:
+        refresh_apis()
+    except Exception as e:
+        g.log("Failed to update API keys: {}".format(e), 'error')
+
+    try:
+        account_premium_status_checks()
+    except Exception as e:
+        g.log("Failed to check account status: {}".format(e), 'error')
     ProviderInstallManager()
     update_provider_packages()
     update_themes()
@@ -270,6 +277,9 @@ def run_maintenance():
     if g.get_bool_setting("premiumize.enabled") and g.get_bool_setting(
         "premiumize.autodelete"
     ):
-        premiumize_transfer_cleanup()
+        try:
+            premiumize_transfer_cleanup()
+        except Exception as e:
+            g.log("Failed to cleanup PM transfers: {}".format(e), 'error')
 
     # clean_deprecated_settings()

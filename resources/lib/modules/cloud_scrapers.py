@@ -110,7 +110,7 @@ class CloudScraper(ApiBase, object):
 
     @staticmethod
     def _get_clean_title(item):
-        return source_utils.clean_title(item['release_title'])
+        return source_utils.clean_title(item.get('release_title', ''))
 
     def _is_valid_pack(self, item):
         clean_title = self._get_clean_title(item)
