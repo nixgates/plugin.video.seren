@@ -1,11 +1,12 @@
-import requests
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
+
+import datetime
 import re
 import time
-import datetime
-import gzip
 
-from resources.lib.indexers.opensubs import OpenSubsApi
-from resources.lib.common import tools
+from resources.lib.modules.globals import g
+
 
 class IdentifyCreditsIntro:
 
@@ -13,20 +14,15 @@ class IdentifyCreditsIntro:
         self.title = title
         self.start_point = None
         self.end_point = None
-        self.os_api = OpenSubsApi()
         self._potential_starts = []
         self._potential_finishes = []
-        self.identify_points()
+        self._sub_regex = re.compile(r'(\d+)\r\n(\d\d:\d\d:\d\d,\d\d\d) --> (\d\d:\d\d:\d\d,\d\d\d)\r\n(.*)\r\n(.*)?')
 
-    def identify_points(self):
-        # extract the sub file from the zip
-        subs = self._get_subtitles()
-        if not subs:
-            return None
+    def identify_points(self, subtitle):
+        # extract the sub file_path from the zip
 
-        for sub in subs:
-            self._identify_start(sub['subcontents'])
-            self._identify_finish(sub['subcontents'])
+        self._identify_start(subtitle['subcontents'])
+        self._identify_finish(subtitle['subcontents'])
 
         self._potential_starts = sorted(self._potential_starts)
         self._potential_finishes = sorted(self._potential_finishes, reverse=True)
@@ -43,46 +39,21 @@ class IdentifyCreditsIntro:
         except IndexError:
             return None
 
-    def _get_subtitles(self):
+    def _get_subtitles(self, subtitle):
         try:
-            subs = self.os_api.search(self.title)
-            subs = [i for i in subs if i['SubLanguageID'] == 'eng']
-            sub_files = []
-            sub_regex = re.compile(r'(\d+)\r\n(\d\d:\d\d:\d\d,\d\d\d) --> (\d\d:\d\d:\d\d,\d\d\d)\r\n(.*)\r\n(.*)?')
-
-            sub = subs[0]
-            unzipped = requests.get(sub['SubDownloadLink']).content
-            
-            try:
-                from StringIO import StringIO
-                unzipped = gzip.GzipFile(fileobj=StringIO(unzipped)).read().decode('utf-8')
-            except ImportError:
-                import io
-                unzipped = gzip.decompress(unzipped).decode('utf-8')
-            new_sub = {
-                'subtitle': sub['MovieReleaseName'],
-                'subcontents': sub_regex.findall(unzipped)
+            return {
+                'subtitle': subtitle['MovieReleaseName'],
+                'subcontents': self._sub_regex.findall(subtitle['Content'])
             }
-            sub_files.append(new_sub)
-
         except IndexError:
-            tools.log('No available subtitles for item', 'debug')
+            g.log('No available subtitles for item', 'debug')
             return None
-        except IOError:
-            tools.log('Unable to obtain sub file due to robot filtering', 'notification')
-            return None
-        except requests.exceptions.ConnectionError:
-            tools.log('Failed to connect to OpenSubs', 'error')
-            return None
-
-        return sub_files
 
     def _identify_finish(self, sub_points):
         sub_points.reverse()
         self._potential_finishes.append(self._convert_time_to_seconds(self._confirm_return_subpoint(sub_points)[1]))
 
     def _confirm_return_subpoint(self, sub_points):
-
         for point in sub_points:
             if not self._confirm_sub_point(point):
                 continue
@@ -98,7 +69,6 @@ class IdentifyCreditsIntro:
 
     @staticmethod
     def _confirm_sub_point(sub_capture):
-
         if 'subtitle' in sub_capture[3].lower() or 'subtitle' in sub_capture[4].lower():
-                return False
+            return False
         return True

@@ -4,7 +4,8 @@
         <left>0</left>
         <top>0</top>
     </coordinates>
-
+    <animation effect="fade" time="500">WindowOpen</animation>
+    <animation effect="fade" end="0,576" time="500">WindowClose</animation>
     <controls>
         <!-- Background Texture -->
         <control type="image">
@@ -34,9 +35,9 @@
 
         <!-- Seren Ico -->
         <control type="image" id="1001">
-            <top>-50</top>
-            <left>880</left>
-            <width>150</width>
+            <top>-80</top>
+            <left>900</left>
+            <width>100</width>
             <aspectratio>keep</aspectratio>
             <texture>$INFO[Window().Property(seren.logo)]</texture>
         </control>
@@ -240,7 +241,8 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>$ADDON[plugin.video.seren 40221]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(total_torrents)][/COLOR] | $ADDON[plugin.video.seren 40222]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(cached_torrents)][/COLOR] | $ADDON[plugin.video.seren 40223]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(hosters_sources)][/COLOR] | $ADDON[plugin.video.seren 40224]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(cloud_sources)][/COLOR]</label>
+                <label>$ADDON[plugin.video.seren 30058]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(total_torrents)][/COLOR] | $ADDON[plugin.video.seren 30271]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(cached_torrents)][/COLOR] | $ADDON[plugin.video.seren 30059]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(hosters_sources)][/COLOR] | $ADDON[plugin.video.seren 30272]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(cloud_sources)][/COLOR] | $ADDON[plugin.video.seren 30508]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(adaptive_sources)][/COLOR]
+                </label>
             </control>
 
             <control type="label">
@@ -252,7 +254,8 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>4k: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(4k_sources)][/COLOR] | 1080p: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(1080p_sources)][/COLOR] | 720p: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(720p_sources)][/COLOR] | SD: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(sd_sources)][/COLOR]</label>
+                <label>4k: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(4k_sources)][/COLOR] | 1080p: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(1080p_sources)][/COLOR] | 720p: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(720p_sources)][/COLOR] | SD: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(sd_sources)][/COLOR]
+                </label>
             </control>
 
             <control type="label">
@@ -264,10 +267,10 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>$ADDON[plugin.video.seren 40225]: $INFO[Window().Property(remaining_providers_count)]</label>
+                <label>$ADDON[plugin.video.seren 30273]: $INFO[Window().Property(remaining_providers_count)]</label>
                 <visible>Integer.IsGreaterOrEqual(Window().Property(remaining_providers_count),10)</visible>
             </control>
-            
+
             <control type="label">
                 <top>-140</top>
                 <left>-760</left>
@@ -289,7 +292,7 @@
                 <align>center</align>
                 <aligny>center</aligny>
                 <orientation>horizontal</orientation>
-                
+
                 <itemlayout width="192">
                     <width>auto</width>
                     <control type="label">
@@ -298,7 +301,7 @@
                         <label>$INFO[ListItem.Label]</label>
                     </control>
                 </itemlayout>
-                
+
                 <focusedlayout width="192">
                     <width>auto</width>
                     <control type="label">
@@ -309,7 +312,6 @@
                 </focusedlayout>
             </control>
         </control>
-
 
 
         <!--LAYOUT GRID-->

@@ -1,95 +1,143 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
 
-import time
-from resources.lib.common import tools
+import xbmcgui
+
 from resources.lib.common import source_utils
+from resources.lib.common import tools
+from resources.lib.database.skinManager import SkinManager
 from resources.lib.gui.windows.base_window import BaseWindow
-from resources.lib.modules.resolver import Resolver
-from resources.lib.modules import database
-from resources.lib.modules.skin_manager import SkinManager
+from resources.lib.gui.windows.manual_caching import ManualCacheWindow
+from resources.lib.modules.download_manager import create_task as download_file
+from resources.lib.modules.globals import g
+from resources.lib.modules.helpers import Resolverhelper
+
 
 class SourceSelect(BaseWindow):
-
-    def __init__(self, xml_file, location, actionArgs=None, sources=None, **kwargs):
-        super(SourceSelect, self).__init__(xml_file, location, actionArgs=actionArgs)
-        self.actionArgs = actionArgs
+    """
+    Window for source select
+    """
+    def __init__(self, xml_file, location, item_information = None, sources = None, uncached = None):
+        super(SourceSelect, self).__init__(xml_file, location, item_information=item_information)
+        self.uncached_sources = uncached
         self.sources = sources
         self.position = -1
         self.canceled = False
         self.display_list = None
-        self.last_action = 0
-        tools.closeBusyDialog()
+        g.close_busy_dialog()
         self.stream_link = None
 
     def onInit(self):
-        self.display_list = self.getControl(1000)
-        menu_items = []
-
+        """
+        Callback method for Kodi
+        :return: None
+        """
+        self.display_list = self.getControlList(1000)
+        self.display_list.reset()
         for idx, i in enumerate(self.sources):
-            menu_item = tools.menuItem(label='%s' % i['release_title'])
+            menu_item = self.get_list_item_with_properties(self.item_information, i['release_title'])
             for info in i.keys():
                 try:
                     value = i[info]
-                    if type(value) == list:
+                    if isinstance(value, list):
                         value = [str(k) for k in value]
                         value = ' '.join(sorted(value))
-                    if info == 'size':
+                    if info == 'size' and value != 'Variable':
                         value = tools.source_size_display(value)
                     menu_item.setProperty(info, str(value).replace('_', ' '))
                 except UnicodeEncodeError:
                     menu_item.setProperty(info, i[info])
 
-            struct_info = source_utils.info_list_to_sorted_dict(i.get('info', []))
-            for property in struct_info.keys():
-                menu_item.setProperty('info.{}'.format(property), struct_info[property])
+            struct_info = source_utils.info_list_to_dict(i.get('info', []))
+            for prop in struct_info.keys():
+                menu_item.setProperty('info.{}'.format(prop), struct_info[prop])
 
-            menu_items.append(menu_item)
             self.display_list.addItem(menu_item)
 
         self.setFocusId(1000)
 
     def doModal(self):
+        """
+        Opens window in an intractable mode and runs background scripts
+        :return:
+        """
         super(SourceSelect, self).doModal()
         return self.stream_link
 
-    def onClick(self, controlId):
+    def onClick(self, control_id):
+        """
+        Callback method from Kodi
+        :param control_id: in
+        :return: None
+        """
+        self._handle_action(7)
 
-        if controlId == 1000:
-            self.handle_action(7)
+    def _handle_action(self, action_id, control_id = None):
+        self.position = self.display_list.getSelectedPosition()
 
-    def handle_action(self, actionID):
-        if (time.time() - self.last_action) < .5:
-            return
+        if action_id == 117:
+            response = xbmcgui.Dialog().contextmenu([g.get_language_string(30335),
+                                                     g.get_language_string(30350),
+                                                     g.get_language_string(30511),
+                                                     g.get_language_string(30525)])
+            if response == 0:
+                self._open_manual_cache_assist()
+            elif response == 1:
+                action_id = 7
+            elif response == 2:
+                download_file(self.sources[self.display_list.getSelectedPosition()])
+                xbmcgui.Dialog().ok(g.ADDON_NAME, 'Download task started')
+            elif response == 3:
+                self._resolve_item(True)
 
-        if actionID == 7 and self.getFocusId() == 1000:
-            self.position = self.display_list.getSelectedPosition()
-            self.resolve_item()
+        if action_id == 7:
+            focus_id = self.getFocusId()
 
-        if actionID == 92 or id == 10:
+            if focus_id == 1000 or focus_id == 2003:
+                self._resolve_item(False)
+            elif focus_id == 2001:
+                self._open_manual_cache_assist()
+            elif focus_id == 2002:
+                download_file(self.sources[self.position])
+                xbmcgui.Dialog().ok(g.ADDON_NAME, 'Download task started')
+
+        if action_id == 92 or action_id == 10:
             self.stream_link = False
             self.close()
 
-        self.last_action = time.time()
-
     def onAction(self, action):
-        actionID = action.getId()
+        """
+        Callback method from Kodi on keyboard input
+        :param action:
+        :return:
+        """
+        action_id = action.getId()
+        if action_id in [92, 10, 117]:
+            self._handle_action(action_id)
+            return
+        super(SourceSelect, self).onAction(action)
 
-        if actionID in [7, 92, 10]:
-            self.handle_action(actionID)
-
-    def resolve_item(self):
-        if tools.getSetting('general.autotrynext') == 'true':
+    def _resolve_item(self, pack_select):
+        if g.get_bool_setting('general.autotrynext') and not pack_select:
             sources = self.sources[self.position:]
         else:
             sources = [self.sources[self.position]]
 
-        resolver = Resolver(*SkinManager().confirm_skin_path('resolver.xml'), actionArgs=self.actionArgs)
-
-        self.stream_link = database.get(resolver.doModal, 1, sources,
-                                        tools.get_item_information(self.actionArgs), False)
+        self.stream_link = Resolverhelper().resolve_silent_or_visible(sources, self.item_information, pack_select,
+                                                                      overwrite_cache=pack_select)
 
         if self.stream_link is None:
-            tools.showDialog.notification(tools.addonName, tools.lang(32047), time=2000)
-            return
+            g.notification(g.ADDON_NAME, g.get_language_string(30033), time=2000)
         else:
             self.close()
+
+    def _open_manual_cache_assist(self):
+        window = ManualCacheWindow(*SkinManager().confirm_skin_path('manual_caching.xml'),
+                                   item_information=self.item_information, sources=self.uncached_sources)
+        newly_cached_source = window.doModal()
+        del window
+        if newly_cached_source is None:
+            return
+
+        self.sources = [newly_cached_source] + self.sources
+        self.onInit()

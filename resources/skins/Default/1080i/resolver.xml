@@ -4,6 +4,8 @@
         <left>0</left>
         <top>0</top>
     </coordinates>
+    <animation effect="fade" time="500">WindowOpen</animation>
+    <animation effect="fade" end="0,576" time="500">WindowClose</animation>
     <controls>
         <!-- Background Texture -->
         <control type="image">
@@ -34,9 +36,9 @@
 
         <!-- Seren Logo -->
         <control type="image" id="1001">
-            <top>-50</top>
-            <left>880</left>
-            <width>150</width>
+            <top>-80</top>
+            <left>900</left>
+            <width>100</width>
             <aspectratio>keep</aspectratio>
             <texture>$INFO[Window().Property(seren.logo)]</texture>
         </control>
@@ -69,7 +71,8 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>[COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(release_title)][/COLOR]</label>
+                <label>[COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(release_title)][/COLOR]
+                </label>
             </control>
 
             <control type="label">
@@ -81,7 +84,8 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>$ADDON[plugin.video.seren 40226]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(debrid_provider)][/COLOR][/UPPERCASE] | $ADDON[plugin.video.seren 40227]:  [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_provider)][/COLOR][/UPPERCASE]</label>
+                <label>$ADDON[plugin.video.seren 30257]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(debrid_provider)][/COLOR][/UPPERCASE] | $ADDON[plugin.video.seren 30274]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_provider)][/COLOR][/UPPERCASE]
+                </label>
             </control>
 
             <control type="label">
@@ -93,7 +97,8 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>$ADDON[plugin.video.seren 40228]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_resolution)][/COLOR][UPPERCASE] | $ADDON[plugin.video.seren 40229]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_info)][/COLOR][/UPPERCASE]</label>
+                <label>$ADDON[plugin.video.seren 30260]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_resolution)][/COLOR][UPPERCASE] | $ADDON[plugin.video.seren 30275]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_info)][/COLOR][/UPPERCASE]
+                </label>
             </control>
 
         </control>

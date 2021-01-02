@@ -1,134 +1,210 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
+
+from functools import wraps
+
 import requests
+import xbmcgui
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from resources.lib.common import tools
-
-client_key = tools.getSetting('fanart.apikey')
-
-movies_poster_limit = int(tools.getSetting('movies.poster_limit'))
-movies_fanart_limit = int(tools.getSetting('movies.fanart_limit'))
-movies_keyart_limit = int(tools.getSetting('movies.keyart_limit'))
-movies_characterart_limit = int(tools.getSetting('movies.characterart_limit'))
-movies_banner = tools.getSetting('movies.banner')
-movies_clearlogo = tools.getSetting('movies.clearlogo')
-movies_landscape = tools.getSetting('movies.landscape')
-movies_clearart = tools.getSetting('movies.clearart')
-movies_discart = tools.getSetting('movies.discart')
-
-tvshows_poster_limit = int(tools.getSetting('tvshows.poster_limit'))
-tvshows_fanart_limit = int(tools.getSetting('tvshows.fanart_limit'))
-tvshows_keyart_limit = int(tools.getSetting('tvshows.keyart_limit'))
-tvshows_characterart_limit = int(tools.getSetting('tvshows.characterart_limit'))
-tvshows_banner = tools.getSetting('tvshows.banner')
-tvshows_clearlogo = tools.getSetting('tvshows.clearlogo')
-tvshows_landscape = tools.getSetting('tvshows.landscape')
-tvshows_clearart = tools.getSetting('tvshows.clearart')
-season_poster = tools.getSetting('season.poster')
-season_banner = tools.getSetting('season.banner')
-season_landscape = tools.getSetting('season.landscape')
-season_fanart = tools.getSetting('season.fanart')
-
-base_url = "http://webservice.fanart.tv/v3/%s/%s"
-api_key = "dfe6380e34f49f9b2b9518184922b49c"
-language = tools.get_language_code()
+from resources.lib.database.cache import use_cache
+from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
+from resources.lib.modules.globals import g
 
 
-def get_query_lang(art, season_number=None):
-    if art is None:
-        return []
-    try:
-        result = [(x['url'], x['likes']) for x in art
-                  if (x.get('lang') == language or x.get('lang') == '00' or x.get('lang') == '') and
-                  (season_number is None or (x.get('season') is not None and ((int(x['season']) if x['season'] != 'all'
-                                                                               else 0) == int(season_number))))]
-        result = sorted(result, key=lambda x: int(x[1]), reverse=True)
-        result = [x[0].encode('utf-8') for x in result if 'http' in x[0]]
-    except:
-        result = []
+def fanart_guard_response(func):
+    @wraps(func)
+    def wrapper(*args, **kwarg):
+        try:
+            response = func(*args, **kwarg)
+            if response.status_code in [200, 201]:
+                return response
 
-    return result
+            g.log('FanartTv returned a {} ({}): while requesting {}'.format(response.status_code,
+                                                                            FanartTv.http_codes[response.status_code],
+                                                                            response.url), 'error')
+            return None
+        except requests.exceptions.ConnectionError:
+            return None
+        except:
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30025).format('Fanart'))
+            if g.get_global_setting("run.mode") == "test":
+                raise
+            return None
 
-
-def get_query(art):
-    if art is None:
-        return ''
-    try:
-        result = [(x['url'], x['likes']) for x in art]
-        result = [(x[0], x[1]) for x in result]
-        result = sorted(result, key=lambda x: int(x[1]), reverse=True)
-        result = [x[0] for x in result][0]
-        result = result.encode('utf-8')
-
-    except:
-        result = ''
-    if not 'http' in result:
-        result = ''
-
-    return result
+    return wrapper
 
 
-def get(remote_id, query, season_number=None):
-    art_request = base_url % (query if query == 'movies' or query == 'tv' else 'tv', remote_id)
-    headers = {'client-key': client_key, 'api-key': api_key}
-    art = requests.get(art_request, headers=headers, timeout=5).json()
+def wrap_fanart_object(func):
+    @wraps(func)
+    def wrapper(*args, **kwarg):
+        return {'fanart_object': func(*args, **kwarg)}
 
-    meta = {}
-    if query == 'movies':
-        if movies_clearlogo == 'true':
-            meta.update(create_meta_data(art, 'clearlogo', ['movielogo', 'hdmovielogo'], 1))
-        if movies_discart == 'true':
-            meta.update(create_meta_data(art, 'discart', ['moviedisc'], 1))
-        if movies_clearart == 'true':
-            meta.update(create_meta_data(art, 'clearart', ['movieart', 'hdmovieclearart'], 1))
-        meta.update(create_meta_data(art, 'characterart', ['characterart'], movies_characterart_limit))
-        meta.update(create_meta_data(art, 'poster', ['movieposter'], movies_poster_limit))
-        meta.update(create_meta_data(art, 'fanart', ['moviebackground'], movies_fanart_limit))
-        if movies_banner == 'true':
-            meta.update(create_meta_data(art, 'banner', ['moviebanner'], 1))
-        if movies_landscape == 'true':
-            meta.update(create_meta_data(art, 'landscape', ['moviethumb'], 1))
-    elif query == 'tv':
-        if tvshows_clearlogo == 'true':
-            meta.update(create_meta_data(art, 'clearlogo', ['hdtvlogo', 'clearlogo'], 1))
-        if tvshows_clearart == 'true':
-            meta.update(create_meta_data(art, 'clearart', ['hdclearart', 'clearart'], 1))
-        meta.update(create_meta_data(art, 'characterart', ['characterart'], tvshows_characterart_limit))
-        meta.update(create_meta_data(art, 'keyart', ['tvposter-alt'], tvshows_keyart_limit))
-        meta.update(create_meta_data(art, 'poster', ['tvposter'], tvshows_poster_limit))
-        meta.update(create_meta_data(art, 'fanart', ['showbackground'], tvshows_fanart_limit))
-        if tvshows_banner == 'true':
-            meta.update(create_meta_data(art, 'banner', ['tvbanner'], 1))
-        if tvshows_landscape == 'true':
-            meta.update(create_meta_data(art, 'landscape', ['tvthumb'], 1))
-    elif query == 'season':
-        if tvshows_clearlogo == 'true':
-            meta.update(create_meta_data(art, 'clearlogo', ['hdtvlogo', 'clearlogo'], 1))
-        if tvshows_clearart == 'true':
-            meta.update(create_meta_data(art, 'clearart', ['hdclearart', 'clearart'], 1))
-        meta.update(create_meta_data(art, 'characterart', ['characterart'], tvshows_characterart_limit))
-        meta.update(create_meta_data(art, 'keyart', ['tvposter-alt'], tvshows_keyart_limit))
-        if season_landscape == 'true':
-            meta.update(create_meta_data(art, 'landscape', ['seasonthumb'], 1, season_number))
-        if season_banner == 'true':
-            meta.update(create_meta_data(art, 'banner', ['seasonbanner'], 1, season_number))
-        if season_poster == 'true':
-            meta.update(create_meta_data(art, 'poster', ['seasonposter'], tvshows_poster_limit, season_number))
-        if season_fanart == 'true':
-            meta.update(
-                create_meta_data(art, 'fanart', ['showbackground-season'], tvshows_fanart_limit, season_number))
-    return meta
+    return wrapper
 
 
-def create_meta_data(art, dict_name, art_names, number, season_number=None):
-    result = {}
-    counter = 0
-    art_list = []
-    [art_list.extend(filtered) for filtered in [art.get(name) for name in art_names] if filtered is not None]
-    for art_item in get_query_lang(art_list, season_number)[:number]:
-        if counter == 0:
-            result[dict_name] = art_item
+class FanartTv(ApiBase):
+    base_url = "http://webservice.fanart.tv/v3/"
+    api_key = "dfe6380e34f49f9b2b9518184922b49c"
+    session = requests.Session()
+    retries = Retry(total=5,
+                    backoff_factor=0.1,
+                    status_forcelist=[500, 502, 503, 504])
+    session.mount('http://', HTTPAdapter(max_retries=retries))
+
+    http_codes = {
+        200: 'Success',
+        404: 'Not Found'
+    }
+    normalization = [('name', ('title', 'sorttitle'), None),
+                     ('tmdb_id', 'tmdb_id', None),
+                     ('imdb_id', 'imdb_id', None),
+                     ('art', 'art', None)
+                     ]
+
+    show_normalization = tools.extend_array([
+        ('thetvdb_id', 'tvdb_id', None),
+    ], normalization)
+    meta_objects = {'movie': normalization,
+                    'season': show_normalization,
+                    'tvshow': show_normalization}
+
+    def __init__(self):
+        self.language = g.get_language_code()
+        self.client_key = g.get_setting('fanart.apikey')
+        self.fanart_support = False if not self.client_key else True
+        self.headers = {'client-key': self.client_key, 'api-key': self.api_key}
+
+        self.meta_hash = tools.md5_hash(
+            [self.language, self.fanart_support, self.normalization, self.show_normalization, self.meta_objects,
+             self.base_url])
+
+    @staticmethod
+    def build_image(url, art, image):
+        result = {'url': url,
+                  'rating': 5.25 + int(image['likes']) / float(5.0),
+                  'size': FanartTv._get_image_size(art),
+                  'language': FanartTv._get_image_language(art, image)}
+        return result
+
+    @staticmethod
+    def _get_image_size(art):
+        if art in ('hdtvlogo', 'hdclearart', 'hdmovielogo', 'hdmovieclearart'):
+            return 800
+        elif art in ('clearlogo', 'clearart', 'movielogo', 'movieart', 'musiclogo'):
+            return 400
+        elif art in ('tvbanner', 'seasonbanner', 'moviebanner'):
+            return 1000
+        elif art in ('showbackground', 'moviebackground'):
+            return 1920
+        elif art in ('tvposter', 'seasonposter', 'movieposter'):
+            return 1426
+        elif art in ('tvthumb', 'seasonthumb'):
+            return 500
+        elif art == 'characterart':
+            return 512
+        elif art == 'moviethumb':
+            return 1000
+        return 0
+
+    @staticmethod
+    def _get_image_language(art, image):
+        if 'lang' not in image:
+            return None
+        return image['lang'] if image['lang'] not in ('', '00') else None
+
+    @fanart_guard_response
+    def get(self, url, **params):
+        if not self.fanart_support:
+            return None
+        return self.session.get(tools.urljoin(self.base_url, url), params=params, headers=self.headers, timeout=3)
+
+    def get_json(self, url, **params):
+        if not self.fanart_support:
+            return None
+        response = self.get(url)
+        if response is None:
+            return None
+        try:
+            return self._handle_response(response.json(), params.pop('type'), params.pop('season', None))
+        except (ValueError, AttributeError):
+            g.log('Failed to receive JSON from FanartTv response - response: {}'.format(response), 'error')
+            return None
+
+    @wrap_fanart_object
+    def get_movie(self, tmdb_id):
+        if not self.fanart_support:
+            return None
+        return self.get_json('movies/{}'.format(tmdb_id), type='movie')
+
+    @wrap_fanart_object
+    def get_show(self, tvdb_id):
+        if not self.fanart_support:
+            return None
+        return self.get_json('tv/{}'.format(tvdb_id), type='tvshow')
+
+    @use_cache()
+    @wrap_fanart_object
+    def get_season(self, tvdb_id, season):
+        return self.get_json('tv/{}'.format(tvdb_id), type='season', season=season)
+
+    @handle_single_item_or_list
+    def _handle_response(self, response, type, season):
+        result = {}
+        result.update({'art': self._handle_art(response, type, season)})
+        result.update({'info': self._normalize_info(self.meta_objects[type], response)})
+        return result
+
+    def _handle_art(self, item, type, season=None):
+        meta = {}
+        if type == 'movie':
+            meta.update(self.create_meta_data(item, 'clearlogo', ['movielogo', 'hdmovielogo']))
+            meta.update(self.create_meta_data(item, 'discart', ['moviedisc']))
+            meta.update(self.create_meta_data(item, 'clearart', ['movieart', 'hdmovieclearart']))
+            meta.update(self.create_meta_data(item, 'characterart', ['characterart']))
+            meta.update(self.create_meta_data(item, 'keyart', ['movieposter'],
+                                              selector=lambda n, i: self._get_image_language(n, i) is None))
+            meta.update(self.create_meta_data(item, 'poster', ['movieposter'],
+                                              selector=lambda n, i: self._get_image_language(n, i) is not None))
+            meta.update(self.create_meta_data(item, 'fanart', ['moviebackground']))
+            meta.update(self.create_meta_data(item, 'banner', ['moviebanner']))
+            meta.update(self.create_meta_data(item, 'landscape', ['moviethumb']))
+        elif type == 'tvshow':
+            meta.update(self.create_meta_data(item, 'clearlogo', ['hdtvlogo', 'clearlogo']))
+            meta.update(self.create_meta_data(item, 'clearart', ['hdclearart', 'clearart']))
+            meta.update(self.create_meta_data(item, 'characterart', ['characterart']))
+            meta.update(self.create_meta_data(item, 'keyart', ['tvposter'],
+                                              selector=lambda n, i: self._get_image_language(n, i) is None))
+            meta.update(self.create_meta_data(item, 'poster', ['tvposter'],
+                                              selector=lambda n, i: self._get_image_language(n, i) is not None))
+            meta.update(self.create_meta_data(item, 'fanart', ['showbackground']))
+            meta.update(self.create_meta_data(item, 'banner', ['tvbanner']))
+            meta.update(self.create_meta_data(item, 'landscape', ['tvthumb']))
+        elif type == 'season':
+            meta.update(self.create_meta_data(item, 'clearlogo', ['hdtvlogo', 'clearlogo'], season))
+            meta.update(self.create_meta_data(item, 'clearart', ['hdclearart', 'clearart'], season))
+            meta.update(self.create_meta_data(item, 'characterart', ['characterart'], season))
+            meta.update(self.create_meta_data(item, 'landscape', ['seasonthumb'], season))
+            meta.update(self.create_meta_data(item, 'banner', ['seasonbanner'], season))
+            meta.update(self.create_meta_data(item, 'poster', ['seasonposter'], season,
+                                              lambda n, i: self._get_image_language(n, i) is not None))
+            meta.update(self.create_meta_data(item, 'keyart', ['seasonposter'], season,
+                                              lambda n, i: self._get_image_language(n, i) is None))
+            meta.update(self.create_meta_data(item, 'fanart', ['showbackground-season'], season))
+        return meta
+
+    def create_meta_data(self, art, dict_name, art_names, season=None, selector=None):
+        art_list = []
+        for art_item, name in [(art.get(name), name) for name in art_names]:
+            if art_item is None:
+                continue
+            art_list.extend(self.build_image(item['url'], name, item) for item in art_item
+                            if (selector is None or selector(name, item)) and (season is None or
+                                                                               item.get('season', 'all') == 'all' or
+                                                                               int(item.get('season', 0)) == season))
+        if len(art_list) > 0:
+            return {dict_name: art_list}
         else:
-            result['{}{}'.format(dict_name, counter)] = art_item
-        counter = counter + 1
-
-    return result
+            return {}

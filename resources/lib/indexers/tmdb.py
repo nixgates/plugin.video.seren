@@ -1,902 +1,721 @@
 # -*- coding: utf-8 -*-
-import copy
-import json
-import threading
-import traceback
-from datetime import datetime
-from time import sleep
+from __future__ import absolute_import, division, unicode_literals
+
+from collections import OrderedDict
+from functools import wraps
 
 import requests
+import xbmc
+import xbmcgui
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from resources.lib.common import tools
-from resources.lib.indexers import fanarttv
+from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
+from resources.lib.modules.globals import g
+
+if g.PYTHON3:
+    unicode = str
 
 
-class TMDBAPI:
-    def __init__(self):
-        self.apiKey = tools.getSetting('tmdb.apikey')
-        if self.apiKey == '':
-            self.apiKey = "9f3ca569aa46b6fb13931ec96ab8ae7e"
-        self.baseUrl = "https://api.themoviedb.org/3/"
-        self.posterPath = "https://image.tmdb.org/t/p/w500"
-        self.thumbPath = "https://image.tmdb.org/t/p/w500"
-        self.backgroundPath = "https://image.tmdb.org/t/p/w1280"
-
-        self.movies_poster_limit = int(tools.getSetting('movies.poster_limit'))
-        self.movies_fanart_limit = int(tools.getSetting('movies.fanart_limit'))
-        self.movies_landscape = bool(tools.getSetting('movies.landscape'))
-
-        self.tvshows_poster_limit = int(tools.getSetting('tvshows.poster_limit'))
-        self.tvshows_landscape = tools.getSetting('tvshows.landscape')
-        self.season_poster = tools.getSetting('season.poster')
-        self.episode_fanart = bool(tools.getSetting('episode.fanart'))
-
-        self.tvshows_prefer_fanart = tools.getSetting('tvshows.preferedsource') == '0'
-        self.movies_prefer_fanart = tools.getSetting('movies.preferedsource') == '0'
-        self.request_response = None
-        self.threads = []
-
-        self.art = {}
-        self.fanartart = {}
-        self.info = {}
-        self.episode_summary = {}
-        self.cast = []
-
-        if tools.fanart_api_key == '':
-            self.fanarttv = False
-        else:
-            self.fanarttv = True
-
-    def get_request(self, url):
+def tmdb_guard_response(func):
+    @wraps(func)
+    def wrapper(*args, **kwarg):
         try:
-            if '?' not in url:
-                url += "?"
-            else:
-                url += "&"
-
-            if 'api_key' not in url:
-                url += "api_key=%s" % self.apiKey
-                url = self.baseUrl + url
-
-            try:
-                try:
-                    response = requests.get(url)
-                except requests.exceptions.SSLError:
-                    response = requests.get(url, verify=False)
-            except requests.exceptions.ConnectionError:
-                tools.showDialog.notification(tools.addonName, tools.lang(32028))
-                return
-
-            if '200' in str(response):
-                response = json.loads(response.text)
-                self.request_response = response
+            response = func(*args, **kwarg)
+            if response.status_code in [200, 201]:
                 return response
-            # This code is now deprecated as the throttling has been removed,
-            # We will leave it here though in case they decide to use it later
-            # elif 'Retry-After' in response.headers:
-            #     # API REQUESTS ARE BEING THROTTLED, INTRODUCE WAIT TIME
-            #     throttleTime = response.headers['Retry-After']
-            #     tools.log('TMDB Throttling Applied, Sleeping for %s seconds' % throttleTime, '')
-            #     sleep(int(throttleTime) + 1)
-            #     return self.get_request(url)
-            else:
-                return None
-        except:
-            import traceback
-            traceback.print_exc()
 
-    def get_TMDB_Fanart_Threaded(self, tmdb_url, fanart_args):
+            if "Retry-After" in response.headers:
+                # API REQUESTS Are not being throttled anymore but we leave it here for if the re-enable it again
+                throttle_time = response.headers["Retry-After"]
+                g.log(
+                    "TMDb Throttling Applied, Sleeping for {} seconds".format(
+                        throttle_time
+                    ),
+                    "",
+                )
+                xbmc.sleep((int(throttle_time) * 1000) + 1)
+                return wrapper(*args, **kwarg)
 
-        self.threads.append(threading.Thread(target=self.get_request, args=(tmdb_url,)))
-
-        if self.fanarttv:
-            self.threads.append(threading.Thread(target=self.getFanartTVMovie, args=fanart_args))
-
-        for thread in self.threads:
-            thread.start()
-
-        for thread in self.threads:
-            thread.join()
-
-    def showSeasonToListItem(self, seasonObject, showArgs):
-
-        try:
-            self.art = copy.deepcopy(showArgs['art'])
-            item = {'info': copy.deepcopy(showArgs['info'])}
-
-            url = 'tv/%s/season/%s?&append_to_response=credits,videos,images&language=en-US' % (
-                str(showArgs['ids']['tmdb']), str(seasonObject['number']))
-
-            self.get_TMDB_Fanart_Threaded(url, (showArgs['ids']['tvdb'], 'season'))
-
-            details = self.request_response
-
-            if details is None:
-                return None
-
-            try:
-                currentDate = datetime.today().date()
-                airdate = str(details['air_date'])
-                airdate = tools.datetime_workaround(airdate)
-
-                if airdate > currentDate:
-                    return
-            except:
-                pass
-
-            try:
-                if self.season_poster == 'true':
-                    self.art['poster'] = self.posterPath + str(details.get('poster_path', ''))
-                    self.art['thumb'] = self.posterPath + str(details.get('poster_path', ''))
-            except:
-                pass
-
-            try:
-                count = 0
-                for i in details['images']['posters'][:self.tvshows_poster_limit]:
-                    self.art.update({'poster{}'.format(count if count > 0 else ''):
-                                         self.backgroundPath + i['file_path']})
-                    count = count + 1
-            except:
-                pass
-
-            if self.tvshows_prefer_fanart:
-                try:
-                    if self.season_poster == 'true':
-                        self.art['poster'] = self.fanartart.get('poster',
-                                                                self.posterPath + str(details.get('poster_path', '')))
-                        self.art['thumb'] = self.fanartart.get('thumb',
-                                                               self.posterPath + str(details.get('poster_path', '')))
-                except:
-                    pass
-
-                try:
-                    count = 0
-                    for i in details['images']['posters'][:self.tvshows_poster_limit]:
-                        dict_name = 'poster{}'.format(count if count > 0 else '')
-                        self.art.update(
-                            {dict_name: self.fanartart.get(dict_name, self.backgroundPath + i['file_path'])})
-                        count = count + 1
-                except:
-                    pass
-
-            try:
-                item['info']['plot'] = item['info']['plotoutline'] = item['info']['overview'] = \
-                    details.get('overview', '')
-
-                if item['info']['plot'] == '':
-                    item['info']['plot'] = item['info']['plotoutline'] = item['info']['overview'] =  \
-                        seasonObject['overview']
-            except:
-                pass
-            try:
-                item['info']['aired'] = item['info']['premiered'] = details.get('air_date', '')
-                if item['info']['premiered'] == '':
-                    item['info']['aired'] = item['info']['premiered'] = seasonObject['first_aired']
-            except:
-                pass
-            try:
-                item['info']['year'] = int(details.get('air_date', '0000')[:4])
-            except:
-                pass
-            try:
-                item['info']['season'] = item['info']['sortseason'] = int(details.get('season_number', ''))
-            except:
-                pass
-            try:
-                item['info']['season_title'] = seasonObject.get('title', '')
-                if item['info']['season_title'] == '':
-                    item['info']['season_title'] = details.get('name', '')
-                if item['info']['season_title'] == '':
-                    item['info']['season_title'] = 'Season {}'.format(details['season_number'])
-            except:
-                pass
-            try:
-                item['info']['trailer'] = tools.youtube_url % \
-                                          [i for i in details['videos']['results'] if i['site'] == 'YouTube'][0]['key']
-            except:
-                pass
-            try:
-                item['info']['episode_count'] = len(details['episodes'])
-            except:
-                pass
-            try:
-                item['info']['aired_episodes'] = seasonObject['aired_episodes']
-            except:
-                item['info']['aired_episodes'] = 0
-                pass
-
-            if item['info']['season_title'] == '':
-                return None
-
-            director = None
-
-            for person in details['credits']['crew']:
-                if person.get('job') == 'Director':
-                    director = person.get('name')
-
-            if not director is None:
-                item['info']['director'] = director
-
-            try:
-                item['cast'] = [{'name': i['name'], 'role': i['character'], 'thumbnail': '{}{}'
-                    .format(self.backgroundPath, i['profile_path'])}
-                                for i in details['credits']['cast']]
-            except:
-                pass
-
-            item['info']['mediatype'] = 'season'
-            item['ids'] = seasonObject['ids']
-            for id, value in showArgs['ids'].items():
-                item['ids']['tvshow.{}'.format(id)] = value
-            item['trakt_object'] = {}
-            item['trakt_object']['seasons'] = [seasonObject]
-            item['art'] = self.art
-            item['info']['mediatype'] = 'season'
-            item['showInfo'] = showArgs
-
-            item['art']['thumb'] = item['art'].get('poster', '')
-
-        except:
-            import traceback
-            traceback.print_exc()
+            g.log(
+                "TMDb returned a {} ({}): while requesting {}".format(
+                    response.status_code,
+                    TMDBAPI.http_codes[response.status_code],
+                    response.url,
+                ),
+                "warning",
+            )
+            return None
+        except requests.exceptions.ConnectionError:
+            return None
+        except Exception:
+            xbmcgui.Dialog().notification(
+                g.ADDON_NAME, g.get_language_string(30025).format("TMDb")
+            )
+            if g.get_global_setting("run.mode") == "test":
+                raise
             return None
 
+    return wrapper
+
+
+def wrap_tmdb_object(func):
+    @wraps(func)
+    def wrapper(*args, **kwarg):
+        return {"tmdb_object": func(*args, **kwarg)}
+
+    return wrapper
+
+
+class TMDBAPI(ApiBase):
+    baseUrl = "https://api.themoviedb.org/3/"
+    imageBaseUrl = "https://image.tmdb.org/t/p/"
+
+    normalization = [
+        ("overview", ("plot", "overview", "plotoutline"), None),
+        ("release_date", ("premiered", "aired"), lambda t: tools.validate_date(t)),
+        (
+            "keywords",
+            "tag",
+            lambda t: sorted(OrderedDict.fromkeys(v["name"] for v in t["keywords"])),
+        ),
+        (
+            "genres",
+            "genre",
+            lambda t: sorted(
+                OrderedDict.fromkeys(x.strip() for v in t for x in v["name"].split("&"))
+            ),
+        ),
+        ("certification", "mpaa", None),
+        ("imdb_id", ("imdbnumber", "imdb_id"), None),
+        (("external_ids", "imdb_id"), ("imdbnumber", "imdb_id"), None),
+        ("show_id", "tmdb_show_id", None),
+        ("id", "tmdb_id", None),
+        ("network", "studio", None),
+        ("runtime", "duration", lambda d: d * 60),
+        (
+            None,
+            "rating.tmdb",
+            (
+                ("vote_average", "vote_count"),
+                lambda a, c: {"rating": tools.safe_round(a, 2), "votes": c},
+            ),
+        ),
+        ("tagline", "tagline", None),
+        ("status", "status", None),
+        ("trailer", "trailer", None),
+        ("belongs_to_collection", "set", lambda t: t.get("name") if t else None),
+        (
+            "production_companies",
+            "studio",
+            lambda t: sorted(
+                OrderedDict.fromkeys(v["name"] if "name" in v else v for v in t)
+            ),
+        ),
+        (
+            "production_countries",
+            "country",
+            lambda t: sorted(
+                OrderedDict.fromkeys(v["name"] if "name" in v else v for v in t)
+            ),
+        ),
+        ("aliases", "aliases", None),
+        ("mediatype", "mediatype", None),
+    ]
+
+    show_normalization = tools.extend_array(
+        [
+            ("name", ("tite", "tvshowtitle", "sorttitle"), None),
+            ("original_name", "originaltitle", None),
+            (
+                "first_air_date",
+                "year",
+                lambda t: tools.validate_date(t)[:4]
+                if tools.validate_date(t)
+                else None,
+            ),
+            (
+                "networks",
+                "studio",
+                lambda t: sorted(OrderedDict.fromkeys(v["name"] for v in t)),
+            ),
+            (
+                "origin_country",
+                "studio",
+                lambda t: sorted(
+                    OrderedDict.fromkeys(v["name"] if "name" in v else v for v in t)
+                ),
+            ),
+            (
+                ("credits", "crew"),
+                "director",
+                lambda t: sorted(
+                    OrderedDict.fromkeys(
+                        v["name"] if "name" in v else v
+                        for v in t
+                        if v.get("job") == "Director"
+                    )
+                ),
+            ),
+            (
+                ("credits", "crew"),
+                "writer",
+                lambda t: sorted(
+                    OrderedDict.fromkeys(
+                        v["name"] if "name" in v else v
+                        for v in t
+                        if v.get("department") == "Writing"
+                    )
+                ),
+            ),
+            (("external_ids", "tvdb_id"), "tvdb_id", None),
+            (
+                "origin_country",
+                "country_origin",
+                lambda t: t[0].upper() if t is not None and t[0] is not None else None,
+            ),
+        ],
+        normalization,
+    )
+
+    season_normalization = tools.extend_array(
+        [
+            ("name", ("title", "sorttitle"), None),
+            ("season_number", ("season", "sortseason"), None),
+            ("episodes", "episode_count", lambda t: len(t) if t is not None else None),
+            (
+                ("credits", "crew"),
+                "director",
+                lambda t: sorted(
+                    OrderedDict.fromkeys(
+                        v["name"] if "name" in v else v
+                        for v in t
+                        if v.get("job") == "Director"
+                    )
+                ),
+            ),
+            (
+                ("credits", "crew"),
+                "writer",
+                lambda t: sorted(
+                    OrderedDict.fromkeys(
+                        v["name"] if "name" in v else v
+                        for v in t
+                        if v.get("department") == "Writing"
+                    )
+                ),
+            ),
+            (("external_ids", "tvdb_id"), "tvdb_id", None),
+        ],
+        normalization,
+    )
+
+    episode_normalization = tools.extend_array(
+        [
+            ("name", ("title", "sorttitle"), None),
+            ("episode_number", ("episode", "sortepisode"), None),
+            ("season_number", ("season", "sortseason"), None),
+            (
+                "crew",
+                "director",
+                lambda t: sorted(
+                    OrderedDict.fromkeys(
+                        v["name"] for v in t if v.get("job") == "Director"
+                    )
+                ),
+            ),
+            (
+                "crew",
+                "writer",
+                lambda t: sorted(
+                    OrderedDict.fromkeys(
+                        v["name"] for v in t if v.get("department") == "Writing"
+                    )
+                ),
+            ),
+        ],
+        normalization,
+    )
+
+    movie_normalization = tools.extend_array(
+        [
+            ("title", ("title", "sorttitle"), None),
+            ("original_title", "originaltitle", None),
+            ("premiered", "year", lambda t: t[:4]),
+        ],
+        normalization,
+    )
+
+    meta_objects = {
+        "movie": movie_normalization,
+        "tvshow": show_normalization,
+        "season": season_normalization,
+        "episode": episode_normalization,
+    }
+
+    http_codes = {
+        200: "Success",
+        201: "Success - new resource created (POST)",
+        401: "Invalid API key: You must be granted a valid key.",
+        404: "The resource you requested could not be found.",
+        500: "Internal Server Error",
+        501: "Not Implemented",
+        502: "Bad Gateway",
+        503: "Service Unavailable",
+        504: "Gateway Timeout",
+    }
+
+    session = requests.Session()
+    retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+
+    append_to_response = [
+        "credits",
+        "images",
+        "release_dates",
+        "content_ratings",
+        "external_ids",
+        "movie_credits",
+        "tv_credits",
+        "videos",
+        "alternative_titles",
+    ]
+
+    def __init__(self):
+        self.apiKey = g.get_setting("tmdb.apikey", "9f3ca569aa46b6fb13931ec96ab8ae7e")
+        self.lang_code = g.get_language_code()
+        self.lang_full_code = g.get_language_code(True)
+        self.lang_region_code = self.lang_full_code.split("-")[1]
+        if self.lang_region_code == "":
+            self.lang_full_code = self.lang_full_code.strip("-")
+        self.include_languages = OrderedDict.fromkeys([self.lang_code, "en", "null"])
+        self.preferred_artwork_size = g.get_int_setting("artwork.preferredsize")
+        self.artwork_size = {}
+        self._set_artwork()
+
+        self.art_normalization = [
+            ("backdrops", "fanart", None),
+            (
+                "posters",
+                "poster",
+                lambda x: x["iso_639_1"] != "xx" and x["iso_639_1"] is not None,
+            ),
+            (
+                "posters",
+                "keyart",
+                lambda x: x["iso_639_1"] == "xx" or x["iso_639_1"] is None,
+            ),
+            ("stills", "fanart", None),
+        ]
+
+        self.meta_hash = tools.md5_hash(
+            (
+                self.lang_code,
+                self.lang_full_code,
+                self.lang_region_code,
+                self.include_languages,
+                self.preferred_artwork_size,
+                self.append_to_response,
+                self.baseUrl,
+                self.imageBaseUrl,
+            )
+        )
+
+    def _set_artwork(self):
+        if self.preferred_artwork_size == 0:
+            self.artwork_size["fanart"] = 2160
+            self.artwork_size["poster"] = 780
+            self.artwork_size["keyart"] = 780
+            self.artwork_size["thumb"] = 780
+            self.artwork_size["icon"] = 780
+            self.artwork_size["cast"] = 780
+        elif self.preferred_artwork_size == 1:
+            self.artwork_size["fanart"] = 1280
+            self.artwork_size["poster"] = 500
+            self.artwork_size["keyart"] = 500
+            self.artwork_size["thumb"] = 500
+            self.artwork_size["icon"] = 342
+            self.artwork_size["cast"] = 500
+        elif self.preferred_artwork_size == 2:
+            self.artwork_size["fanart"] = 780
+            self.artwork_size["poster"] = 342
+            self.artwork_size["keyart"] = 342
+            self.artwork_size["thumb"] = 300
+            self.artwork_size["icon"] = 185
+            self.artwork_size["cast"] = 342
+
+    @tmdb_guard_response
+    def get(self, url, **params):
+        return requests.get(
+            tools.urljoin(self.baseUrl, url),
+            params=self._add_api_key(params),
+            headers={"Accept": "application/json"},
+            timeout=3,
+        )
+
+    def get_json(self, url, **params):
+        response = self.get(url, **params)
+        if response is None:
+            return None
+        return self._handle_response(response.json())
+
+    @wrap_tmdb_object
+    def get_movie(self, tmdb_id):
+        return self.get_json(
+            "movie/{}".format(tmdb_id),
+            language=self.lang_full_code,
+            append_to_response=",".join(self.append_to_response),
+            include_image_language=",".join(self.include_languages),
+            region=self.lang_region_code,
+        )
+
+    @wrap_tmdb_object
+    def get_movie_rating(self, tmdb_id):
+        result = tools.filter_dictionary(
+            tools.safe_dict_get(self.get_json("movie/{}".format(tmdb_id)), "info"),
+            "rating",
+        )
+        return {"info": result} if result else None
+
+    @wrap_tmdb_object
+    def get_movie_cast(self, tmdb_id):
+        result = tools.safe_dict_get(
+            self.get_json("movie/{}/credits".format(tmdb_id)), "cast"
+        )
+        return {"cast": result} if result else None
+
+    @wrap_tmdb_object
+    def get_movie_art(self, tmdb_id):
+        return self.get_json(
+            "movie/{}/images".format(tmdb_id),
+            include_image_language=",".join(self.include_languages),
+        )
+
+    @wrap_tmdb_object
+    def get_show(self, tmdb_id):
+        return self.get_json(
+            "tv/{}".format(tmdb_id),
+            language=self.lang_full_code,
+            append_to_response=",".join(self.append_to_response),
+            include_image_language=",".join(self.include_languages),
+            region=self.lang_region_code,
+        )
+
+    @wrap_tmdb_object
+    def get_show_art(self, tmdb_id):
+        return self.get_json(
+            "tv/{}/images".format(tmdb_id),
+            include_image_language=",".join(self.include_languages),
+        )
+
+    @wrap_tmdb_object
+    def get_show_rating(self, tmdb_id):
+        result = tools.filter_dictionary(
+            tools.safe_dict_get(self.get_json("tv/{}".format(tmdb_id)), "info"),
+            "rating",
+        )
+        return {"info": result} if result else None
+
+    @wrap_tmdb_object
+    def get_show_cast(self, tmdb_id):
+        result = tools.safe_dict_get(
+            self.get_json("tv/{}/credits".format(tmdb_id)), "cast"
+        )
+        return {"cast": result} if result else None
+
+    @wrap_tmdb_object
+    def get_season(self, tmdb_id, season):
+        return self.get_json(
+            "tv/{}/season/{}".format(tmdb_id, season),
+            language=self.lang_full_code,
+            append_to_response=",".join(self.append_to_response),
+            include_image_language=",".join(self.include_languages),
+            region=self.lang_region_code,
+        )
+
+    @wrap_tmdb_object
+    def get_season_art(self, tmdb_id, season):
+        return self.get_json(
+            "tv/{}/season/{}/images".format(tmdb_id, season),
+            include_image_language=",".join(self.include_languages),
+        )
+
+    @wrap_tmdb_object
+    def get_episode(self, tmdb_id, season, episode):
+        return self.get_json(
+            "tv/{}/season/{}/episode/{}".format(tmdb_id, season, episode),
+            language=self.lang_full_code,
+            append_to_response=",".join(self.append_to_response),
+            include_image_language=",".join(self.include_languages),
+            region=self.lang_region_code,
+        )
+
+    @wrap_tmdb_object
+    def get_episode_art(self, tmdb_id, season, episode):
+        return self.get_json(
+            "tv/{}/season/{}/episode/{}/images".format(tmdb_id, season, episode),
+            include_image_language=",".join(self.include_languages),
+        )
+
+    @wrap_tmdb_object
+    def get_episode_rating(self, tmdb_id, season, episode):
+        result = tools.filter_dictionary(
+            tools.safe_dict_get(
+                self.get_json(
+                    "tv/{}/season/{}/episode/{}".format(tmdb_id, season, episode)
+                ),
+                "info",
+            ),
+            "rating",
+        )
+        return {"info": result} if result else None
+
+    def _add_api_key(self, params):
+        if "api_key" not in params:
+            params.update({"api_key": self.apiKey})
+        return params
+
+    @handle_single_item_or_list
+    def _handle_response(self, item):
+        result = {}
+        self._try_detect_type(item)
+        self._apply_localized_alternative_titles(item)
+        self._apply_releases(item)
+        self._apply_content_ratings(item)
+        self._apply_release_dates(item)
+        self._apply_trailers(item)
+        result.update({"art": self._handle_artwork(item)})
+        result.update({"cast": self._handle_cast(item)})
+        if item.get("mediatype"):
+            result.update(
+                {
+                    "info": self._normalize_info(
+                        self.meta_objects[item["mediatype"]], item
+                    )
+                }
+            )
+
+        return result
+
+    def _apply_localized_alternative_titles(self, item):
+        if "alternative_titles" in item:
+            item["aliases"] = []
+            for t in item["alternative_titles"].get(
+                "titles", item["alternative_titles"].get("results", [])
+            ):
+                if "iso_3166_1" in t and t["iso_3166_1"] in [
+                    self.lang_region_code,
+                    "US",
+                ]:
+                    if t.get("title") not in [None, ""]:
+                        item["aliases"].append(t["title"])
+                if "iso_3166_1" in t and t["iso_3166_1"] in [self.lang_region_code]:
+                    if t.get("title") not in [None, ""] and t.get("type") not in [
+                        None,
+                        "",
+                    ]:
+                        item.update({"title": t["title"]})
         return item
 
-    def movieToListItem(self, trakt_object):
-
-        try:
-
-            if trakt_object['ids']['tmdb'] is None:
-                return None
-
-            url = 'movie/%s?&append_to_response=credits,videos,release_dates,images&language=en-US' % str(
-                trakt_object['ids']['tmdb'])
-
-            self.get_TMDB_Fanart_Threaded(url, (trakt_object['ids']['tmdb'], 'movies'))
-
-            details = self.request_response
-
-            if details is None:
-                return None
-
-            item = {'info': None, 'art': None}
-
-            # Set Art
-
-            self.art.update(self.fanartart)
-            try:
-                if self.movies_landscape:
-                    self.art['landscape'] = self.art.get('landscape',
-                                                         self.backgroundPath + str(details.get('backdrop_path', '')))
-            except:
-                pass
-            try:
-                self.art['poster'] = self.backgroundPath + str(details.get('poster_path', ''))
-                self.art['thumb'] = self.art.get('thumb', self.art.get('poster', ''))
-            except:
-                pass
-            try:
-                self.art['fanart'] = self.backgroundPath + str(details.get('backdrop_path', ''))
-            except:
-                pass
-
-            try:
-                count = 0
-                for i in details['images']['backdrops'][:self.movies_fanart_limit]:
-                    self.art.update(
-                        {'fanart{}'.format(count if count > 0 else ''): self.backgroundPath + i['file_path']})
-                    count = count + 1
-            except:
-                pass
-
-            try:
-                count = 0
-                for i in details['images']['posters'][:self.movies_poster_limit]:
-                    self.art.update(
-                        {'poster{}'.format(count if count > 0 else ''): self.backgroundPath + i['file_path']})
-                    count = count + 1
-            except:
-                pass
-
-            if self.movies_prefer_fanart:
-                try:
-                    if self.movies_landscape:
-                        self.art['landscape'] = self.fanartart.get('landscape',
-                                                                   self.backgroundPath + str(
-                                                                       details.get('backdrop_path', '')))
-                except:
-                    pass
-                try:
-                    self.art['poster'] = self.fanartart.get('poster',
-                                                            self.backgroundPath + str(details.get('poster_path', '')))
-                    self.art['thumb'] = self.fanartart['poster']
-                except:
-                    pass
-                try:
-                    self.art['fanart'] = self.fanartart.get('fanart',
-                                                            self.backgroundPath + str(details.get('backdrop_path', '')))
-                except:
-                    pass
-
-                try:
-                    count = 0
-                    for i in details['images']['backdrops'][:self.movies_fanart_limit]:
-                        dict_name = 'fanart{}'.format(count if count > 0 else '')
-                        self.art.update(
-                            {dict_name: self.fanartart.get(dict_name, self.backgroundPath + i['file_path'])})
-                        count = count + 1
-                except:
-                    pass
-
-                try:
-                    count = 0
-                    for i in details['images']['posters'][:self.movies_poster_limit]:
-                        dict_name = 'poster{}'.format(count if count > 0 else '')
-                        self.art.update(
-                            {dict_name: self.fanartart.get(dict_name, self.backgroundPath + i['file_path'])})
-                        count = count + 1
-                except:
-                    pass
-
-            # Set Info
-            info = {}
-            try:
-                info['genre'] = []
-
-                if 'genres' in details:
-                    for i in details['genres']:
-                        info['genre'].append(i.get('name'))
-            except:
-                pass
-            try:
-                mpaa = details.get('release_dates')['results']
-                mpaa = [i for i in mpaa if i['iso_3166_1'] == 'US']
-                mpaa = mpaa[0].get('release_dates')[0].get('certification')
-                info['mpaa'] = str(mpaa)
-            except:
-                pass
-
-            try:
-                info['rating'] = float(details.get('vote_average'))
-            except:
-                pass
-
-            try:
-                info['title'] = details.get('title')
-            except:
-                return None
-
-            try:
-                info['year'] = details.get('release_date')[:4]
-            except:
-                return None
-
-            try:
-                info['duration'] = details.get('runtime')
-                info['duration'] = int(info['duration']) * 60
-            except:
-                info['duration'] = 0
-
-            try:
-                info['originaltitle'] = details.get('original_title')
-            except:
-                pass
-
-            try:
-                info['tagline'] = details.get('tagline')
-            except:
-                pass
-
-            try:
-                info['aired'] = details.get('release_date', '')
-            except:
-                pass
-
-            try:
-                info['premiered'] = details.get('release_date', '')
-            except:
-                pass
-
-            try:
-                info['plot'] = details.get('overview')
-            except:
-                pass
-
-            try:
-                info['imdbnumber'] = details.get('imdb_id')
-            except:
-                pass
-
-            try:
-                info['trailer'] = tools.youtube_url % \
-                                  [i for i in details['videos']['results'] if i['site'] == 'YouTube'][0]['key']
-            except:
-                pass
-
-            try:
-                info['aliases'] = [i['title'] for i in details['alternative_titles']['titles']]
-            except:
-                info['aliases'] = []
-
-            info['mediatype'] = 'movie'
-
-            # Set Crew/Cast Info
-            director = None
-            for person in details['credits']['crew']:
-                if person.get('job') == 'Director':
-                    director = person.get('name')
-
-            if not director is None:
-                info['director'] = director
-
-            try:
-                item['cast'] = [{'name': i['name'], 'role': i['character'], 'thumbnail': '{}{}'
-                    .format(self.backgroundPath, i['profile_path'])} for i in details['credits']['cast']]
-            except:
-                pass
-
-            item['ids'] = trakt_object['ids']
-            item['info'] = info
-            item['art'] = self.art
-            item['trakt_object'] = {}
-            item['trakt_object']['movies'] = [trakt_object]
+    def _apply_trailers(self, item):
+        if "videos" not in item:
             return item
+        if not TMDBAPI._apply_trailer(item, self.lang_region_code):
+            TMDBAPI._apply_trailer(item, "US")
 
-        except:
-            import traceback
-            traceback.print_exc()
-            return None
+    @staticmethod
+    def _apply_trailer(item, region_code):
+        for t in sorted(
+            item["videos"].get("results", []), key=lambda k: k["size"], reverse=True
+        ):
+            if (
+                "iso_3166_1" in t
+                and t["iso_3166_1"] == region_code
+                and t["site"] == "YouTube"
+                and t["type"] == "Trailer"
+            ):
+                if t.get("key"):
+                    item.update({"trailer": tools.youtube_url.format(t["key"])})
+                    return True
+        return False
 
-    def showToListItem(self, traktItem):
-
-        try:
-            if traktItem['ids']['tmdb'] is None:
-                return None
-
-            url = 'tv/%s?&append_to_response=credits,alternative_titles,videos,content_ratings,images&language=en-US' % \
-                  traktItem['ids']['tmdb']
-
-            self.get_TMDB_Fanart_Threaded(url, (traktItem['ids']['tvdb'], 'tv'))
-
-            details = self.request_response
-
-            if details is None:
-                return None
-
-            parsed_info = self.parseShowInfo(details, traktItem)
-            return parsed_info
-        except:
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def parseShowInfo(self, details, trakt_info):
-        try:
-
-            item = {'info': None}
-
-            self.art.update(self.fanartart)
-            # Set Art
-            try:
-                self.art['poster'] = self.posterPath + str(details.get('poster_path', ''))
-            except:
-                pass
-
-            try:
-                self.art['fanart'] = self.backgroundPath + str(details.get('backdrop_path', ''))
-            except:
-                pass
-
-            try:
-                self.art['thumb'] = self.posterPath + str(details.get('poster_path', ''))
-            except:
-                pass
-
-            try:
-                if self.tvshows_landscape == 'true':
-                    self.art['landscape'] = self.backgroundPath + str(details.get('backdrop_path', ''))
-            except:
-                pass
-
-            try:
-                count = 0
-                for i in details['images']['backdrops'][:self.movies_fanart_limit]:
-                    dict_name = 'fanart{}'.format(count if count > 0 else '')
-                    self.art.update({dict_name: self.backgroundPath + i['file_path']})
-                    count = count + 1
-            except:
-                pass
-
-            try:
-                count = 0
-                for i in details['images']['posters'][:self.movies_poster_limit]:
-                    dict_name = 'poster{}'.format(count if count > 0 else '')
-                    self.art.update({dict_name: self.backgroundPath + i['file_path']})
-                    count = count + 1
-            except:
-                pass
-
-            if self.tvshows_prefer_fanart:
-                # Set Art
-                try:
-                    self.art['poster'] = self.fanartart.get('poster',
-                                                            self.posterPath + str(details.get('poster_path', '')))
-                except:
-                    pass
-
-                try:
-                    self.art['fanart'] = self.fanartart.get('fanart',
-                                                            self.backgroundPath + str(details.get('backdrop_path', '')))
-                except:
-                    pass
-
-                try:
-                    self.art['thumb'] = self.fanartart.get('thumb',
-                                                           self.posterPath + str(details.get('poster_path', '')))
-                except:
-                    pass
-
-                try:
-                    if self.tvshows_landscape == 'true':
-                        self.art['landscape'] = self.fanartart.get('landscape',
-                                                                   self.backgroundPath + str(
-                                                                       details.get('backdrop_path', '')))
-                except:
-                    pass
-
-                try:
-                    count = 0
-                    for i in details['images']['backdrops'][:self.movies_fanart_limit]:
-                        dict_name = 'fanart{}'.format(count if count > 0 else '')
-                        self.art.update(
-                            {dict_name: self.fanartart.get(dict_name, self.backgroundPath + i['file_path'])})
-                        count = count + 1
-                except:
-                    pass
-
-                try:
-                    count = 0
-                    for i in details['images']['posters'][:self.movies_poster_limit]:
-                        dict_name = 'poster{}'.format(count if count > 0 else '')
-                        self.art.update(
-                            {dict_name: self.fanartart.get(dict_name, self.backgroundPath + i['file_path'])})
-                        count = count + 1
-                except:
-                    pass
-
-            # Set Info
-            info = {}
-
-            try:
-                info['showaliases'] = [alias['title'] for alias in details['alternative_titles']['results']]
-            except:
-                pass
-
-            try:
-                info['trailer'] = tools.youtube_url % \
-                                  [i for i in details['videos']['results'] if i['site'] == 'YouTube'][0]['key']
-            except:
-                pass
-
-            try:
-                info['genre'] = [str(i['name']).title() for i in details.get('genres', [])]
-            except:
-                pass
-
-            try:
-                info['duration'] = int(details.get('episode_run_time', '')[0]) * 60
-            except:
-                pass
-
-            try:
-                info['rating'] = float(details.get('vote_average', float(0.0)))
-            except:
-                pass
-
-            try:
-                info['premiered'] = info['aired'] = details.get('first_air_date', '')
-                if info['premiered'] == '':
-                    info['premiered'] = info['aired'] = trakt_info['first_aired']
-            except:
-                pass
-            try:
-                info['year'] = details.get('first_air_date', '0000')[:4]
-            except:
-                pass
-
-            try:
-                info['status'] = details.get('status', '')
-            except:
-                pass
-
-            try:
-                info['tvshowtitle'] = details.get('name')
-            except:
-                pass
-
-            try:
-                info['country'] = details['origin_country'][0]
-            except:
-                info['country'] = ''
-                pass
-
-            try:
-                info['originaltitle'] = details.get('original_name')
-            except:
-                pass
-
-            try:
-                info['plot'] = details.get('overview', '')
-            except:
-                pass
-
-            try:
-                info['imdbnumber'] = trakt_info['ids']['imdb']
-            except:
-                pass
-
-            try:
-                info['episode_count'] = trakt_info['aired_episodes']
-            except:
-                info['episode_count'] = 0
-                pass
-
-            info['mediatype'] = 'tvshow'
-
-            try:
-                info['mpaa'] = [i['rating'] for i in details['content_ratings']['results'] if i['iso_3166_1'] == 'US'][
-                    0]
-            except:
-                pass
-
-            try:
-                info['season_count'] = int(details.get('number_of_seasons', ''))
-            except:
-                return None
-
-            try:
-                info['tag'] = [i['name'] for i in details['keywords']['results']]
-            except:
-                pass
-
-            try:
-                info['studio'] = details.get('networks', None)[0]['name']
-            except:
-                info['studio'] = ''
-
-            # Set Crew/Cast Info
-            director = None
-            for person in details['credits']['crew']:
-                if person.get('job') == 'Director':
-                    director = person.get('name')
-
-            if not director is None:
-                info['director'] = director
-
-            try:
-                item['cast'] = [{'name': i['name'], 'role': i['character'], 'thumbnail': '{}{}'
-                    .format(self.backgroundPath, i['profile_path'])} for i in details['credits']['cast']]
-            except:
-                pass
-
-            item['ids'] = trakt_info['ids']
-            item['info'] = info
-            item['art'] = self.art
-            item['trakt_object'] = {}
-            item['trakt_object']['shows'] = [trakt_info]
-
-            item['art']['thumb'] = item['art'].get('poster', '')
-
+    def _apply_releases(self, item):
+        if "releases" not in item:
             return item
-        except:
-            import traceback
-            traceback.print_exc()
-            return None
+        if not TMDBAPI._apply_release(item, self.lang_region_code):
+            TMDBAPI._apply_release(item, "US")
 
-    def episodeIDToListItem(self, traktInfo, showArgs):
-        try:
-            if showArgs['showInfo']['ids']['tmdb'] is None:
-                return None
+    @staticmethod
+    def _apply_release(item, region_code):
+        for t in item["releases"]["countries"]:
+            if "iso_3166_1" in t and t["iso_3166_1"] == region_code:
+                if t.get("certification"):
+                    item.update({"certification": t["certification"]})
+                if t.get("release_date"):
+                    item.update({"release_date": t["release_date"]})
+                return True
+        return False
 
-            url = 'tv/%s/season/%s/episode/%s?&append_to_response=credits,videos,images&language=en-US' % (
-                showArgs['showInfo']['ids']['tmdb'],
-                traktInfo['season'],
-                traktInfo['number'])
-            response = self.get_request(url)
-
-            if response.get('status_code') == 34:
-                return None
-
-            parsed_info = self.parseEpisodeInfo(response, traktInfo, showArgs)
-
-            return parsed_info
-        except:
-            return None
-
-    def getEpisodeFanartArt(self, traktInfo, showArgs):
-        try:
-            if showArgs['showInfo']['ids']['tmdb'] is None:
-                return {}
-
-            url = 'tv/%s/season/%s/episode/%s/images&language=en-US' % (
-                showArgs['showInfo']['ids']['tmdb'],
-                traktInfo['season'],
-                traktInfo['number'])
-            response = self.get_request(url)
-
-            if response.get('status_code') == 34:
-                return {}
-
-            return self.parseEpisodeFanart(response)
-        except:
-            return {}
-
-    def parseEpisodeFanart(self, response):
-        art = {}
-        counter = 0
-        for still in response.joins()['stills']:
-            art['fanart{}'.format(counter if counter > 0 else '')] = self.backgroundPath + still['file_path']
-            counter = counter + 1
-
-    def parseEpisodeInfo(self, response, traktInfo, showArgs):
-        try:
-            if "status_code" in response:
-                if response["status_code"] == 34: return None
-
-            try:
-                response['name'] = tools.deaccentString(response['name'])
-            except:
-                pass
-            try:
-                currentDate = datetime.today().date()
-                airdate = str(response['air_date'])
-                airdate = tools.datetime_workaround(airdate)
-                if airdate > currentDate:
-                    return
-            except:
-                pass
-
-            item = {'info': None, 'art': None}
-
-            art = copy.deepcopy(showArgs['seasonInfo']['art'])
-            try:
-                if self.episode_fanart == 'true':
-                    art.update(self.parseEpisodeFanart(response))
-
-                art['landscape'] = self.backgroundPath + response.get('still_path', '')
-                art['thumb'] = self.thumbPath + response.get('still_path', '')
-            except:
-                pass
-
-            info = {}
-
-            try:
-                info['trailer'] = tools.youtube_url % \
-                                  [i for i in response['videos']['results'] if i['site'] == 'YouTube'][0]['key']
-            except:
-                pass
-            try:
-                info['duration'] = showArgs['showInfo']['info'].get('duration')
-            except:
-                pass
-            try:
-                info['episode'] = response.get('episode_number', '')
-            except:
-                return None
-            try:
-                info['season'] = response.get('season_number', '')
-            except:
-                return None
-            try:
-                info['sortepisode'] = response.get('episode_number', '')
-            except:
-                pass
-            try:
-                info['sortseason'] = response.get('season_number', '')
-            except:
-                pass
-            try:
-                info['genre'] = showArgs['showInfo']['info']['genre']
-            except:
-                pass
-            try:
-                info['title'] = info['sorttitle'] = info['originaltitle'] = tools.deaccentString(response['name'])
-            except:
-                return None
-            try:
-                info['rating'] = response.get('vote_average', '')
-            except:
-                pass
-            try:
-                info['aired'] = traktInfo['first_aired']
-            except:
-                import traceback
-                traceback.print_exc()
-                pass
-            try:
-                info['premiered'] = traktInfo['first_aired']
-            except:
-                pass
-            try:
-                info['year'] = int(response.get('air_date', '0000')[:4])
-                if info['year'] == '0000':
-                    info['year'] = int(traktInfo.get('firstAired', '0000')[:4])
-            except:
-                pass
-            try:
-                info['tvshowtitle'] = showArgs['showInfo']['info']['tvshowtitle']
-            except:
-                pass
-            try:
-                info['plot'] = response.get('overview', '')
-                if info['plot'] == '':
-                    traktInfo.get('overview', '')
-            except:
-                pass
-            try:
-                info['imdbnumber'] = showArgs['showInfo']['ids']['imdb']
-            except:
-                pass
-            try:
-                info['mediatype'] = 'episode'
-            except:
-                pass
-            try:
-                info['mpaa'] = showArgs['showInfo']['info']['mpaa']
-            except:
-                pass
-
-            try:
-                item['cast'] = [{'name': i['name'], 'role': i['character'], 'thumbnail': '{}{}'
-                    .format(self.backgroundPath, i['profile_path'])}
-                                for i in response['credits']['cast']]
-            except:
-                item['cast'] = []
-                pass
-
-            item['ids'] = traktInfo['ids']
-            for id, value in showArgs['showInfo']['ids'].items():
-                item['ids']['tvshow.{}'.format(id)] = value
-            item['info'] = info
-            item['art'] = art
-            item['showInfo'] = showArgs['showInfo']
-            item['trakt_object'] = {}
-            item['trakt_object']['episodes'] = [traktInfo]
-
+    def _apply_content_ratings(self, item):
+        if "content_ratings" not in item:
             return item
+        if not TMDBAPI._apply_content_rating(item, self.lang_region_code):
+            TMDBAPI._apply_content_rating(item, "US")
+        return item
 
-        except:
-            import traceback
-            traceback.print_exc()
+    @staticmethod
+    def _apply_content_rating(item, region_code):
+        for rating in item["content_ratings"]["results"]:
+            if "iso_3166_1" in rating and rating["iso_3166_1"] == region_code:
+                if rating.get("rating"):
+                    item.update({"rating": rating["rating"]})
+                    return True
+        return False
+
+    def _apply_release_dates(self, item):
+        if "release_dates" not in item:
+            return item
+        if not TMDBAPI._apply_release_date(item, self.lang_region_code):
+            TMDBAPI._apply_release_date(item, "US")
+        return item
+
+    @staticmethod
+    def _apply_release_date(item, region_code):
+        for rating in item["release_dates"]["results"]:
+            if "iso_3166_1" in rating and rating["iso_3166_1"] == region_code:
+                if (
+                    "release_dates" in rating
+                    and rating["release_dates"][0]
+                    and rating["release_dates"][0]["certification"]
+                ):
+                    item.update(
+                        {"certification": rating["release_dates"][0]["certification"]}
+                    )
+                if (
+                    "release_dates" in rating
+                    and rating["release_dates"][0]
+                    and rating["release_dates"][0]["release_date"]
+                ):
+                    item.update({"rating": rating["release_dates"][0]["release_date"]})
+                return True
+        return False
+
+    @staticmethod
+    def _try_detect_type(item):
+        if "still_path" in item:
+            item.update({"mediatype": "episode"})
+        elif "season_number" in item and "episode_count" in item or "episodes" in item:
+            item.update({"mediatype": "season"})
+        elif "number_of_seasons" in item:
+            item.update({"mediatype": "tvshow"})
+        elif "imdb_id" in item:
+            item.update({"mediatype": "movie"})
+        return item
+
+    def _handle_artwork(self, item):
+        result = {}
+        if item.get("still_path") is not None:
+            result.update(
+                {
+                    "thumb": self._get_absolute_image_path(
+                        item["still_path"],
+                        self._create_tmdb_image_size(self.artwork_size["thumb"]),
+                    )
+                }
+            )
+        if item.get("backdrop_path") is not None:
+            result.update(
+                {
+                    "fanart": self._get_absolute_image_path(
+                        item["backdrop_path"],
+                        self._create_tmdb_image_size(self.artwork_size["fanart"]),
+                    )
+                }
+            )
+        if item.get("poster_path") is not None:
+            result.update(
+                {
+                    "poster": self._get_absolute_image_path(
+                        item["poster_path"],
+                        self._create_tmdb_image_size(self.artwork_size["poster"]),
+                    )
+                }
+            )
+        images = item.get("images", item)
+        for tmdb_type, kodi_type, selector in self.art_normalization:
+            if tmdb_type not in images or not images[tmdb_type]:
+                continue
+            result.update(
+                {
+                    kodi_type: [
+                        {
+                            "url": self._get_absolute_image_path(
+                                i["file_path"],
+                                self._create_tmdb_image_size(
+                                    self.artwork_size[kodi_type]
+                                ),
+                            ),
+                            "language": i["iso_639_1"]
+                            if i["iso_639_1"] != "xx"
+                            else None,
+                            "rating": self._normalize_rating(i),
+                            "size": int(
+                                i["width" if tmdb_type != "posters" else "height"]
+                            )
+                            if int(i["width" if tmdb_type != "posters" else "height"])
+                            < self.artwork_size[kodi_type]
+                            else self.artwork_size[kodi_type],
+                        }
+                        for i in images[tmdb_type]
+                        if selector is None or selector(i)
+                    ]
+                }
+            )
+        return result
+
+    @staticmethod
+    def _create_tmdb_image_size(size):
+        if size == 2160 or size == 1080:
+            return "original"
+        else:
+            return "w{}".format(size)
+
+    def _handle_cast(self, item):
+        cast = item.get("credits", item)
+        if (not cast.get("cast")) and not item.get("guest_stars"):
+            return
+
+        return [
+            {
+                "name": item["name"],
+                "role": item["character"],
+                "order": idx,
+                "thumbnail": self._get_absolute_image_path(
+                    item["profile_path"],
+                    self._create_tmdb_image_size(self.artwork_size["cast"]),
+                ),
+            }
+            for idx, item in enumerate(
+                tools.extend_array(
+                    sorted(cast.get("cast", []), key=lambda k: k["order"],),
+                    sorted(cast.get("guest_stars", []), key=lambda k: k["order"]),
+                )
+            )
+            if "name" in item and "character" in item and "profile_path" in item
+        ]
+
+    @staticmethod
+    def _normalize_rating(image):
+        if image["vote_count"]:
+            rating = image["vote_average"]
+            rating = 5 + (rating - 5) * 2
+            return rating
+        return 5
+
+    def _get_absolute_image_path(self, relative_path, size="orginal"):
+        if not relative_path:
             return None
-
-    def directToEpisode(self, traktObject):
-        show_info = self.showToListItem(traktObject['show'])
-        episode_info = self.episodeIDToListItem(show_info, traktObject['episode'])
-        episode_info['showInfo'] = show_info
-
-        return episode_info
-
-    def getFanartTVShow(self, tvdb_id):
-        try:
-            artwork = fanarttv.get(tvdb_id, 'tv')
-            self.fanartart.update(artwork)
-        except:
-            pass
-
-    def getFanartTVSeason(self, tvdb_id, season):
-        try:
-            artwork = fanarttv.get(tvdb_id, 'season', season)
-            self.fanartart.update(artwork)
-        except:
-            pass
-
-    def getFanartTVMovie(self, tmdb_id, item_type):
-        try:
-            artwork = fanarttv.get(tmdb_id, item_type)
-            self.fanartart.update(artwork)
-        except:
-            traceback.print_exc()
-            pass
+        return "/".join(
+            [self.imageBaseUrl.strip("/"), size.strip("/"), relative_path.strip("/")]
+        )

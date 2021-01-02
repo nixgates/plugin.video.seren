@@ -1,650 +1,132 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals, print_function
 
+import collections
+import copy
+import datetime
+import hashlib
 import json
 import os
-import sys
-import threading
-import unicodedata
 import re
-import datetime
-# Import _strptime to workaround python 2 bug with threads
-import _strptime
-import string
-
+import sys
 import time
-from xml.etree import ElementTree
 
-try:
-    from dateutil import tz
-except:
-    pass
+import dateutil.parser
+import xbmc
+import xbmcvfs
 
 try:
     from urlparse import parse_qsl, parse_qs, unquote, urlparse, urljoin
     from urllib import urlencode, quote_plus, quote
-except:
-    from urllib.parse import parse_qsl, urlencode, quote_plus, parse_qs, quote, unquote, urlparse, urljoin
+except ImportError:
+    from urllib.parse import (
+        parse_qsl,
+        urlencode,
+        quote_plus,
+        parse_qs,
+        quote,
+        unquote,
+        urlparse,
+        urljoin,
+    )
 
 try:
-    sysaddon = sys.argv[0]
-    syshandle = int(sys.argv[1])
-except:
-    sysaddon = ''
-    syshandle = '1'
+    basestring = basestring  # noqa # pylint: disable=undefined-variable
+    unicode = unicode  # noqa # pylint: disable=undefined-variable
+    xrange = xrange  # noqa # pylint: disable=undefined-variable
+except NameError:
+    basestring = str
+    unicode = str
+    xrange = range
+
+try:
+    import xml.etree.cElementTree as ElementTree
+except ImportError:
+    import xml.etree.ElementTree as ElementTree
+
+youtube_url = "plugin://plugin.video.youtube/play/?video_id={}"
+
+try:
+    xrange = range
+except NameError:
     pass
 
-SETTINGS_CACHE = {}
-
-tvdb_refreshing = False
-
-tvdb_refresh = ''
-
-trakt_gmt_format = '%Y-%m-%dT%H:%M:%S.000Z'
-
-viewTypes = [
-    ('Default', 50),
-    ('Poster', 51),
-    ('Icon Wall', 52),
-    ('Shift', 53),
-    ('Info Wall', 54),
-    ('Wide List', 55),
-    ('Wall', 500),
-    ('Banner', 501),
-    ('Fanart', 502),
-]
-
-colorChart = ['black', 'white', 'whitesmoke', 'gainsboro', 'lightgray', 'silver', 'darkgray', 'gray', 'dimgray',
-              'snow', 'floralwhite', 'ivory', 'beige', 'cornsilk', 'antiquewhite', 'bisque', 'blanchedalmond',
-              'burlywood', 'darkgoldenrod', 'ghostwhite', 'azure', 'aliveblue', 'lightsaltegray', 'lightsteelblue',
-              'powderblue', 'lightblue', 'skyblue', 'lightskyblue', 'deepskyblue', 'dodgerblue', 'royalblue',
-              'blue', 'mediumblue', 'midnightblue', 'navy', 'darkblue', 'cornflowerblue', 'slateblue', 'slategray',
-              'yellowgreen', 'springgreen', 'seagreen', 'steelblue', 'teal', 'fuchsia', 'deeppink', 'darkmagenta',
-              'blueviolet', 'darkviolet', 'darkorchid', 'darkslateblue', 'darkslategray', 'indigo', 'cadetblue',
-              'darkcyan', 'darkturquoise', 'turquoise', 'cyan', 'paleturquoise', 'lightcyan', 'mintcream', 'honeydew',
-              'aqua', 'aquamarine', 'chartreuse', 'greenyellow', 'palegreen', 'lawngreen', 'lightgreen', 'lime',
-              'mediumspringgreen', 'mediumturquoise', 'lightseagreen', 'mediumaquamarine', 'mediumseagreen',
-              'limegreen', 'darkseagreen', 'forestgreen', 'green', 'darkgreen', 'darkolivegreen', 'olive', 'olivedab',
-              'darkkhaki', 'khaki', 'gold', 'goldenrod', 'lightyellow', 'lightgoldenrodyellow', 'lemonchiffon',
-              'yellow', 'seashell', 'lavenderblush', 'lavender', 'lightcoral', 'indianred', 'darksalmon',
-              'lightsalmon', 'pink', 'lightpink', 'hotpink', 'magenta', 'plum', 'violet', 'orchid', 'palevioletred',
-              'mediumvioletred', 'purple', 'marron', 'mediumorchid', 'mediumpurple', 'mediumslateblue', 'thistle',
-              'linen', 'mistyrose', 'palegoldenrod', 'oldlace', 'papayawhip', 'moccasin', 'navajowhite', 'peachpuff',
-              'sandybrown', 'peru', 'chocolate', 'orange', 'darkorange', 'tomato', 'orangered', 'red', 'crimson',
-              'salmon', 'coral', 'firebrick', 'brown', 'darkred', 'tan', 'rosybrown', 'sienna', 'saddlebrown']
-
 try:
-
-    # Standard setup for working within Kodi
-
-    import xbmcaddon, xbmc, xbmcgui, xbmcplugin, xbmcvfs
-
-    addonInfo = xbmcaddon.Addon().getAddonInfo
-
-    addonName = addonInfo('name')
-
-    addonVersion = addonInfo('version')
-
-    try:
-        ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path').decode('utf-8')
-    except:
-        ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path')
-
-    addonDir = os.path.join(xbmc.translatePath('special://home'), 'addons/plugin.video.%s' % addonName.lower())
-
-    try:
-        dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
-    except:
-        dataPath = xbmc.translatePath(addonInfo('profile'))
-
-    kodiVersion = int(xbmc.getInfoLabel("System.BuildVersion")[:2])
-
-    openFile = xbmcvfs.File
-
-    makeFile = xbmcvfs.mkdir
-
-    deleteFile = xbmcvfs.delete
-
-    deleteDir = xbmcvfs.rmdir
-
-    listDir = xbmcvfs.listdir
-
-    file_exists = xbmcvfs.exists
-
-    execute = xbmc.executebuiltin
-
-    console_mode = False
-
-
-except:
-
-    # Adjust to support running in console mode
-
-    sys.path.append(os.path.join(os.curdir, 'mock_kodi'))
-
-    console_mode = True
-
-    import xbmcaddon, xbmc, xbmcgui, xbmcplugin
-
-    addonInfo = xbmcaddon.Addon().getAddonInfo
-
-    addonName = addonInfo('name')
-
-    addonVersion = addonInfo('version')
-
-    try:
-        ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path').decode('utf-8')
-    except:
-        ADDON_PATH = os.getcwd()
-
-    kodiVersion = 18
-
-    kodi_base_directory = os.path.abspath(os.path.join(os.getcwd(), '../../'))
-
-    addonDir = os.path.join(kodi_base_directory, 'addons/plugin.video.%s' % addonName.lower())
-
-    dataPath = os.path.join(kodi_base_directory, 'userdata', 'addon_data', 'plugin.video.%s' % addonName.lower())
-
-
-    def execute(url):
-        if 'Dialog' in url:
-            return
-        import re
-        url = re.findall(r'.*?\((.*?)\)', url)
-        sys.argv = [None, None, url]
-        execfile(os.path.abspath(os.path.join(os.getcwd(), 'seren.py')))
-
-
-    def makeFile(path):
-        try:
-            file = open(path, 'a+')
-            file.close()
-        except:
-            pass
-
-# GLOBAL VARIABLES
-
-addonInfo = xbmcaddon.Addon().getAddonInfo
-
-SETTINGS_PATH = os.path.join(dataPath, 'settings.xml')
-
-ADVANCED_SETTINGS_PATH = xbmc.translatePath("special://home/userdata/advancedsettings.xml")
-
-cacheFile = os.path.join(dataPath, 'cache.db')
-cacheFile_lock = threading.Lock()
-
-torrentScrapeCacheFile = os.path.join(dataPath, 'torrentScrape.db')
-torrentScrapeCacheFile_lock = threading.Lock()
-
-activeTorrentsDBFile = os.path.join(dataPath, 'activeTorrents.db')
-activeTorrentsDBFile_lock = threading.Lock()
-
-providersDB = os.path.join(dataPath, 'providers.db')
-providersDB_lock = threading.Lock()
-
-premiumizeDB = os.path.join(dataPath, 'premiumize.db')
-premiumizeDB_lock = threading.Lock()
-
-traktSyncDB = os.path.join(dataPath, 'traktSync.db')
-traktSyncDB_lock = threading.Lock()
-
-searchHistoryDB = os.path.join(dataPath, 'search.db')
-searchHistoryDB_lock = threading.Lock()
-
-imageControl = xbmcgui.ControlImage
-labelControl = xbmcgui.ControlLabel
-buttonControl = xbmcgui.ControlButton
-listControl = xbmcgui.ControlList
-multi_text = xbmcgui.ControlTextBox
-groupControl = xbmcgui.ControlGroup
-
-XBFONT_LEFT = 0x00000000
-XBFONT_RIGHT = 0x00000001
-XBFONT_CENTER_X = 0x00000002
-XBFONT_CENTER_Y = 0x00000004
-XBFONT_TRUNCATED = 0x00000008
-
-youtube_url = 'plugin://plugin.video.youtube/play/?video_id=%s'
-
-kodiGui = xbmcgui
-
-kodi = xbmc
-
-language = xbmc.getLanguage()
-
-dialogWindow = kodiGui.WindowDialog
-
-xmlWindow = kodiGui.WindowXMLDialog
-
-addon = xbmcaddon.Addon
-
-progressDialog = xbmcgui.DialogProgress()
-
-bgProgressDialog = xbmcgui.DialogProgressBG
-
-showDialog = xbmcgui.Dialog()
-
-endDirectory = xbmcplugin.endOfDirectory
-
-condVisibility = xbmc.getCondVisibility
-
-getLangString = xbmcaddon.Addon().getLocalizedString
-
-addMenuItem = xbmcplugin.addDirectoryItem
-
-addMenuItems = xbmcplugin.addDirectoryItems
-
-menuItem = xbmcgui.ListItem
-
-langString = xbmcaddon.Addon().getLocalizedString
-
-content = xbmcplugin.setContent
-
-resolvedUrl = xbmcplugin.setResolvedUrl
-
-showKeyboard = xbmc.Keyboard
-
-fileBrowser = showDialog.browse
-
-sortMethod = xbmcplugin.addSortMethod
-
-abortRequested = xbmc.abortRequested
-
-playList = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-
-player = xbmc.Player
-
-homeWindow = xbmcgui.Window(10000)
-
-get_region = xbmc.getRegion
-
-GUI_PATH = os.path.join(ADDON_PATH, 'resources', 'lib', 'gui')
-
-IMAGES_PATH = os.path.join(ADDON_PATH, 'resources', 'images')
-
-SEREN_LOGO_PATH = os.path.join(IMAGES_PATH, 'trans-gold-fox-final.png')
-
-SEREN_FANART_PATH = os.path.join(IMAGES_PATH, 'fanart-fox-gold-final.png')
-
-SKINS_PATH = os.path.join(dataPath, 'skins')
-
-SKINS_DB_PATH = os.path.join(dataPath, 'skins.db')
-
-# COMMON USE UTIlS
-
-def get_video_database_path():
-    database_path = os.path.abspath(os.path.join(dataPath, '..', '..', 'Database', ))
-    if kodiVersion == 17:
-        database_path = os.path.join(database_path, 'MyVideos107.db')
-    elif kodiVersion == 18:
-        database_path = os.path.join(database_path, 'MyVideos116.db')
-
-    return database_path
-
-def showBusyDialog():
-    execute('ActivateWindow(busydialognocancel)')
-
-
-def lang(language_id):
-    text = getLangString(language_id)
-    if kodiVersion < 19:
-        text = text.encode('utf-8', 'replace')
-    return text
-
-
-def addDirectoryItem(name, query, info=None, art=None, cast=None, cm=None, isPlayable=False, isAction=True,
-                     isFolder=True,
-                     actionArgs=False, label2=None, set_ids=None, bulk_add=False):
-    url = '%s?action=%s' % (sysaddon, query) if isAction else query
-
-    if actionArgs is not False:
-        url += '&actionArgs=%s' % actionArgs
-
-    if isinstance(name, bytes):
-        name = name.decode('utf-8')
-
-    if info:
-        for key, value in info.items():
-            if isinstance(value, bytes):
-                info[key] = value.decode('utf-8')
-
-    item = menuItem(label=name)
-
-    if label2 is not None:
-        item.setLabel2(label2)
-
-    if isPlayable:
-        item.setProperty('IsPlayable', 'true')
-    else:
-        item.setProperty('IsPlayable', 'false')
-
-    try:
-        if 'UnWatchedEpisodes' in info:
-            item.setProperty('UnWatchedEpisodes', str(info['UnWatchedEpisodes']))
-        # Check for either to support of old versions
-        if 'episodeCount' in info:
-            item.setProperty('TotalEpisodes', str(info['episodeCount']))
-        if 'episode_count' in info:
-            item.setProperty('TotalEpisodes', str(info['episode_count']))
-        if 'WatchedEpisodes' in info:
-            item.setProperty('WatchedEpisodes', str(info['WatchedEpisodes']))
-        if 'season_count' in info:
-            item.setProperty('TotalSeasons', str(info['season_count']))
-        if 'resumetime' in info:
-            if int(info['resumetime']) > 0:
-                item.setProperty('resumetime', str(info['resumetime']))
-                url += '&resume={}'.format(str(info['resumetime']))
-                if 'totaltime' in info:
-                    percent_played = int(float(int(info['resumetime']) / int(info['totaltime'])))
-                    item.setProperty('percentplayed', str(percent_played))
-
-        # Adding this property causes the bookmark CM items to be added
-        # if 'totaltime' in info:
-        #     item.setProperty('totaltime', str(info['totaltime']))
-    except:
-        pass
-
-    if cast is not None:
-        item.setCast(cast)
-
-    if set_ids is not None:
-        item.setUniqueIDs(set_ids)
-        for label, value in set_ids.items():
-            item.setProperty('{}_id'.format(label), str(value))
-
-    if cm is None or type(cm) is not []:
-        cm = []
-    item.addContextMenuItems(cm)
-
-    if art is None or type(art) is not dict:
-        art = {}
-
-    if art.get('fanart') is None:
-        art['fanart'] = SEREN_FANART_PATH
-
-    item.setArt(art)
-
-    # Clear out keys not relevant to Kodi info labels
-    info = clean_info_keys(info)
-    item.setInfo('video', info)
-
-    if bulk_add:
-        return (url, item, isFolder)
-    else:
-        addMenuItem(handle=syshandle, url=url, listitem=item, isFolder=isFolder)
-
-
-def clean_info_keys(info_dict):
-    if info_dict is None:
-        return None
-
-    if not isinstance(info_dict, dict):
-        return info_dict
-
-    keys_to_keep = ['count', 'size', 'date', 'genre', 'country', 'year', 'episode', 'season', 'sortepisode',
-                    'sortseason', 'episodeguide', 'showlink', 'top250', 'setid', 'tracknumber', 'rating', 'userrating',
-                    'watched', 'playcount', 'overlay', 'cast', 'castandrole', 'director', 'mpaa', 'plot', 'plotoutline',
-                    'title', 'originaltitle', 'sorttitle', 'duration', 'studio', 'tagline', 'writer', 'tvshowtitle',
-                    'premiered', 'status', 'set', 'setoverview', 'tag', 'imdbnumber', 'code', 'aired', 'credits',
-                    'lastplayed', 'album', 'artist', 'votes', 'path', 'trailer', 'dateadded', 'mediatype', 'dbid']
-
-    keys = list(info_dict.keys())
-
-    for i in keys:
-        if i.lower() not in keys_to_keep:
-            try:
-                info_dict.pop(i, None)
-            except:
-                pass
-    return info_dict
-
-
-def closeDirectory(contentType, sort=False, cache=None):
-    if sort == 'title':
-        sortMethod(syshandle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
-    if sort == 'episode':
-        sortMethod(syshandle, xbmcplugin.SORT_METHOD_EPISODE)
-    if not sort:
-        sortMethod(syshandle, xbmcplugin.SORT_METHOD_NONE)
-
-    viewType = get_view_type(contentType)
-
-    content(syshandle, contentType)
-
-    if getSetting('general.menucaching') == 'true':
-        menu_caching = True
-    else:
-        menu_caching = False
-
-    if not cache is None:
-        menu_caching = cache
-
-    endDirectory(syshandle, cacheToDisc=menu_caching)
-    xbmc.sleep(200)
-
-    if getSetting('general.setViews') == 'true':
-        xbmc.executebuiltin('Container.SetViewMode(%s)' % str(viewType))
-
-def cancel_directory():
-    content(syshandle, 'addons')
-    endDirectory(syshandle, cacheToDisc=False)
-
-def get_view_type(contentType):
-    viewType = 'Default'
-
-    try:
-        if contentType == 'addons':
-            viewType = getSetting('addon.view')
-        if contentType == 'tvshows':
-            viewType = getSetting('show.view')
-        if contentType == 'movies':
-            viewType = getSetting('movie.view')
-        if contentType == 'episodes':
-            viewType = getSetting('episode.view')
-        if contentType == 'seasons':
-            viewType = getSetting('season.view')
-
-        viewName, viewType = viewTypes[int(viewType)]
-
-        if getSetting('general.viewidswitch') == 'true':
-            if contentType == 'addons':
-                viewType = getSetting('addon.view.id')
-            if contentType == 'tvshows':
-                viewType = getSetting('show.view.id')
-            if contentType == 'movies':
-                viewType = getSetting('movie.view.id')
-            if contentType == 'episodes':
-                viewType = getSetting('episode.view.id')
-            if contentType == 'seasons':
-                viewType = getSetting('season.view.id')
-
-        viewType = int(viewType)
-    except:
-        pass
-
-    return viewType
-
-
-def closeAllDialogs():
-    execute('Dialog.Close(all,true)')
-
-
-def closeOkDialog():
-    execute('Dialog.Close(okdialog, true)')
-
-
-def closeBusyDialog():
-    if condVisibility('Window.IsActive(busydialog)'):
-        execute('Dialog.Close(busydialog)')
-    if condVisibility('Window.IsActive(busydialognocancel)'):
-        execute('Dialog.Close(busydialognocancel)')
-
-
-def cancelPlayback():
-    playList.clear()
-    resolvedUrl(syshandle, False, menuItem())
-    closeOkDialog()
-
-
-def safeStr(obj):
-    try:
-        return str(obj)
-    except UnicodeEncodeError:
-        return obj.encode('utf-8', 'ignore').decode('ascii', 'ignore')
-    except:
-        return ""
-
-
-def log(msg, level='info'):
-    msg = safeStr(msg)
-    msg = addonName.upper() + ': ' + msg
-    if level == 'error':
-        xbmc.log(msg, level=xbmc.LOGERROR)
-    elif level == 'info':
-        xbmc.log(msg, level=xbmc.LOGINFO)
-    elif level == 'notice':
-        xbmc.log(msg, level=xbmc.LOGNOTICE)
-    elif level == 'warning':
-        xbmc.log(msg, level=xbmc.LOGWARNING)
-    else:
-        xbmc.log(msg)
-
-
-def colorPicker():
-    selectList = []
-    for i in colorChart:
-        selectList.append(colorString(i, i))
-    color = showDialog.select(addonName + lang(32021), selectList)
-    if color == -1:
-        return
-    setSetting('general.textColor', colorChart[color])
-    setSetting('general.displayColor', colorChart[color])
-    execute('Addon.OpenSettings(%s)' % addonInfo('id'))
-
-
-def deaccentString(text):
-    try:
-        if isinstance(text, bytes):
-            text = text.decode('utf-8')
-    except UnicodeDecodeError:
-        text = u'%s' % text
-    text = ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
-    return text
-
-
-def strip_non_ascii_and_unprintable(text):
-    result = ''.join(char for char in text if char in string.printable)
-    return result.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
-
-
-def get_user_text_color():
-    color = getSetting('general.textColor')
-    if color == '' or color == 'None':
-        color = 'deepskyblue'
-
-    return color
-
-
-def colorString(text, color=None):
-    if type(text) is not int:
-        text = display_string(text)
-
-    if color is 'default' or color is '' or color is None:
-        color = get_user_text_color()
-
-    return '[COLOR %s]%s[/COLOR]' % (color, text)
-
-
-def display_string(object):
-    try:
-        if type(object) is str or type(object) is unicode:
-            return deaccentString(object)
-    except NameError:
-        if type(object) is str:
-            return deaccentString(object)
-    if type(object) is int:
-        return '%s' % object
-    if type(object) is bytes:
-        object = ''.join(chr(x) for x in object)
-        return object
-
-
-def sort_list_items(threadList, originalList):
-    sortedList = []
-
-    for o in originalList:
-        if o is None:
-            continue
-        for t in threadList:
-            if t is not None:
-                if 'ids' in t:
-                    if t['ids']['trakt'] == o['ids']['trakt']:
-                        sortedList.append(t)
-                else:
-                    continue
-            else:
-                continue
-    return sortedList
-
-
-def metaFile():
-    return os.path.join(xbmcaddon.Addon('plugin.video.%s' % addonName.lower()).getAddonInfo('path'), 'resources',
-                        'cache', 'meta.db')
-
-
-def clearCache():
-    confirm = showDialog.yesno(addonName, lang(32043))
-    if confirm is 1:
-        from resources.lib.modules import database
-        database.cache_clear_all()
-        log(addonName + ': Cache Cleared', 'debug')
-    else:
-        pass
-
-
-def returnUrl(item):
-    return quote_plus(json.dumps(item))
-
-
-def remove_duplicate_dicts(src_lst, ignored_keys):
-    filtered = {tuple((k, d[k]) for k in sorted(d) if k not in ignored_keys): d for d in src_lst}
-    dst_lst = list(filtered.values())
-    return dst_lst
-
-
-import subprocess
+    from collections import Mapping
+
+    mapping_type = Mapping
+except ImportError:
+    mapping_type = collections.Mapping
+
+DIGIT_REGEX = re.compile(r"\d")
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.000Z"
+SORT_TOKENS = [
+    "a ",
+    "das ",
+    "de ",
+    "der ",
+    "die ",
+    "een ",
+    "el ",
+    "het ",
+    "i ",
+    "il ",
+    "l'",
+    "la ",
+    "le ",
+    "les ",
+    "o ",
+    "the ",
+]
 
 
 def copy2clip(txt):
-    platform = sys.platform
+    """
+    Takes a text string and attempts to copy it to the clipboard of the device
+    :param txt: Text to send to clipboard
+    :type txt: str
+    :return: None
+    :rtype: None
+    """
+    import subprocess
 
-    if platform == 'win32':
+    platform = sys.platform
+    if platform == "win32":
         try:
-            cmd = 'echo ' + txt.strip() + '|clip'
+            cmd = "echo " + txt.strip() + "|clip"
             return subprocess.check_call(cmd, shell=True)
-            pass
-        except:
-            pass
-    elif platform == 'linux2':
+        except Exception as e:
+            log("Failure to copy to clipboard, \n{}".format(e), "error")
+    elif platform == "linux2":
         try:
             from subprocess import Popen, PIPE
 
-            p = Popen(['xsel', '-pi'], stdin=PIPE)
+            p = Popen(["xsel", "-pi"], stdin=PIPE)
             p.communicate(input=txt)
-        except:
-            pass
-    else:
-        pass
-    pass
+        except Exception as e:
+            log("Failure to copy to clipboard, \n{}".format(e), "error")
 
 
-def datetime_workaround(string_date, format="%Y-%m-%d", date_only=True):
-    if string_date == '':
+def parse_datetime(string_date, format="%Y-%m-%d", date_only=True):
+    """
+    Attempts to pass over provided string and return a date or datetime object
+    :param string_date: String to parse
+    :type string_date: str
+    :param format: Format of str
+    :type format: str
+    :param date_only: Whether to return a date only object or not
+    :type date_only: bool
+    :return: Datetime.Datetime or Datetime.Date object
+    :rtype: object
+    """
+    if not string_date:
         return None
+    string_date = string_date.split(".000Z")[0]
     try:
         if date_only:
-            res = datetime.datetime.strptime(string_date, format).date()
+            res = dateutil.parser.parse(string_date).date()
         else:
-            res = datetime.datetime.strptime(string_date, format)
+            res = dateutil.parser.parse(string_date)
     except TypeError:
         if date_only:
             res = datetime.datetime(*(time.strptime(string_date, format)[0:6])).date()
@@ -654,277 +136,514 @@ def datetime_workaround(string_date, format="%Y-%m-%d", date_only=True):
     return res
 
 
-def gmt_to_local(gmt_string, format=None, date_only=False):
-    try:
-        local_timezone = tz.tzlocal()
-        gmt_timezone = tz.gettz('GMT')
-        if format is None:
-            format = trakt_gmt_format
-        GMT = datetime_workaround(gmt_string, format, date_only)
-        GMT = GMT.replace(tzinfo=gmt_timezone)
-        GMT = GMT.astimezone(local_timezone)
-        return GMT.strftime(format)
-    except:
-        return gmt_string
-
-
-def clean_air_dates(info):
-    try:
-        air_date = info.get('premiered')
-        if air_date != '' and air_date is not None:
-            info['aired'] = gmt_to_local(info['aired'])[:10]
-    except KeyError:
-        pass
-    except:
-        info['aired'] = info['aired'][:10]
-    try:
-        air_date = info.get('premiered')
-        if air_date != '' and air_date is not None:
-            info['premiered'] = gmt_to_local(info['premiered'])[:10]
-    except KeyError:
-        pass
-    except:
-        info['premiered'] = info['premiered'][:10]
-
-    return info
-
-
 def shortened_debrid(debrid):
+    """
+    Returns a display like version of provided backend label
+    :param debrid: backend debrid label
+    :type debrid: str
+    :return: shorthand display style debrid label
+    :rtype: str
+    """
     debrid = debrid.lower()
-    if debrid == 'premiumize':
-        return 'PM'
-    if debrid == 'real_debrid':
-        return 'RD'
-    if debrid == 'all_debrid':
-        'ALLDEBRID'
-    return ''
+    if debrid == "premiumize":
+        return "PM"
+    if debrid == "real_debrid":
+        return "RD"
+    if debrid == "all_debrid":
+        return "AD"
+    return ""
 
 
 def source_size_display(size):
+    """
+    Converts source size (MB) to (GB) display string
+    :param size: Size of source in MB
+    :type size: int
+    :return: Formatted string for size in GB
+    :rtype: str
+    """
     size = int(size)
     size = float(size) / 1024
     size = "{0:.2f} GB".format(size)
     return size
 
 
-def color_quality(quality):
-    color = 'darkred'
-
-    if quality == '4K':
-        color = 'lime'
-    if quality == '1080p':
-        color = 'greenyellow'
-    if quality == '720p':
-        color = 'sandybrown'
-    if quality == 'SD':
-        color = 'red'
-
-    return colorString(quality, color)
-
-
-def context_addon():
-    if condVisibility('System.HasAddon(context.seren)'):
-        return True
-    else:
-        return False
-
-
-def get_language_code():
-    from resources.lib.common import languageCodes
-
-    for code in languageCodes.isoLangs:
-        if languageCodes.isoLangs[code]['name'].lower() == language.lower():
-            language_code = code
-    # Continue using en until everything is tested to accept other languages
-    language_code = 'en'
-    return language_code
-
-
 def paginate_list(list_items, page, limit):
-    pages = [list_items[i:i + limit] for i in xrange(0, len(list_items), limit)]
-    return pages[page - 1]
-
-
-def setSetting(id, value):
-    if not console_mode:
-        return xbmcaddon.Addon().setSetting(id, value)
-
-    loaded = False
-
-    while loaded == False:
-
-        # Pull information from settings file
-        settings_file = open(SETTINGS_PATH, mode='r')
-        lines = settings_file.readlines()
-        settings_file.close()
-        join_lines = ''.join(lines)
-
-        # Make sure the information is complete before loading it
-        if len(lines) > 0 and "</settings>" in join_lines and \
-                len(re.findall(r'<settings version="2">|<settings>', join_lines)) > 0:
-            loaded = True
-
-    edited = False
-
-    # Begin Making Edits
-    while edited == False:
-        try:
-            settings_file = open(SETTINGS_PATH, mode='w')
-            update = []
-            for i in lines:
-                if 'id="%s"' % id in i:
-                    if '<settings version="2"' in join_lines:
-                        update.append(re.sub(r'><|>.*?<', '>%s<' % value, i))
-                    else:
-                        update.append(re.sub(r'value=".*?"', 'value="%s"' % value, i))
-                else:
-                    update.append(i)
-            settings_file.writelines(update)
-            settings_file.flush()
-            settings_file.close()
-            edited = True
-
-        except:
-            # Something went wrong with editing the file
-            # Try again after a brief timeout
-            import random
-            import time
-            time.sleep(float(random.randint(50, 100) / 100))
-
-
-def getSetting(id):
-    if id in SETTINGS_CACHE:
-        return SETTINGS_CACHE[id]
-
-    if not console_mode:
-        setting_value = xbmcaddon.Addon().getSetting(id)
-        SETTINGS_CACHE.update({id: setting_value})
-
-        return setting_value
-
-    try:
-        settings = open(SETTINGS_PATH, 'r')
-        value = ' '.join(settings.readlines())
-        value.strip('\n')
-        settings.close()
-        value = re.findall(r'id=\"%s\".*?>(.*?)<|id=\"%s\" value=\"(.*?)\" \/>' % (id, id), value)[0]
-        value = [i for i in value if i is not ''][0]
-        return value
-    except:
-        return ''
-
-
-def premiumize_enabled():
-    if getSetting('premiumize.token') != '' and getSetting('premiumize.enabled') == 'true':
-        return True
+    """
+    Paginate items and returns requested page
+    :param list_items: list of items to paginate
+    :type list_items: list
+    :param page: requested page
+    :type page: int
+    :param limit: items per page
+    :type limit: int
+    :return: items on page
+    :rtype: list
+    """
+    pages = [list_items[i : i + limit] for i in xrange(0, len(list_items), limit)]
+    if len(pages) > page - 1:
+        return pages[page - 1]
     else:
-        return False
-
-
-def real_debrid_enabled():
-    if getSetting('rd.auth') != '' and getSetting('realdebrid.enabled') == 'true':
-        return True
-    else:
-        return False
-
-def all_debrid_enabled():
-    if getSetting('alldebrid.apikey') != '' and getSetting('alldebrid.enabled') == 'true':
-        return True
-    else:
-        return False
+        return []
 
 
 def italic_string(text):
-    return "[I]%s[/I]" % text
+    """
+    Ease of use method to return a italic like ready string for display in Kodi
+    :param text: Text to display in italics
+    :type text: str
+    :return: Formatted string
+    :rtype: str
+    """
+    from resources.lib.modules.globals import g
+
+    return "[I]{}[/I]".format(g.decode_py2(text))
 
 
-fanart_api_key = getSetting('fanart.apikey')
-
-
-def check_version_numbers(current, new):
-    # Compares version numbers and return True if new version is newer
-    current = current.split('.')
-    new = new.split('.')
+def compare_version_numbers(current, new):
+    """
+    Comapres provided version numbers and returns True if new version is higher
+    :param current: Version number to check against
+    :type current: str
+    :param new: Remote/New version number to check against
+    :type new: str
+    :return: True if new version number is higher than the current, else False
+    :rtype: bool
+    """
+    current = current.split(".")
+    new = new.split(".")
     step = 0
+    if int(current[0]) > int(new[0]):
+        return False
     for i in current:
         if int(new[step]) > int(i):
             return True
-        if int(i) == int(new[step]):
-            step += 1
-            continue
-
+        if int(i) < int(new[step]):
+            return False
+        step += 1
     return False
 
 
-def trigger_widget_refresh():
-    # Force an update of widgets to occur
-    log('FORCE REFRESHING WIDGETS')
-    timestr = time.strftime("%Y%m%d%H%M%S", time.gmtime())
-    homeWindow.setProperty("widgetreload", timestr)
-    homeWindow.setProperty('widgetreload-tvshows', timestr)
-    homeWindow.setProperty('widgetreload-episodes', timestr)
-    homeWindow.setProperty('widgetreload-movies', timestr)
+def get_item_information(action_args):
+    """
+    Ease of use tool to retrieve items meta from TraktSyncDatabase based on action arguments
+    :param action_args: action arguments received in call to Seren
+    :type action_args: dict
+    :return: Metadata for item
+    :rtype: dict
+    """
+    if action_args is None:
+        return None
+    item_information = {"action_args": action_args}
+    if action_args["mediatype"] == "tvshow":
+        from resources.lib.database.trakt_sync import shows
+
+        item_information.update(
+            shows.TraktSyncDatabase().get_show(action_args["trakt_id"])
+        )
+        return item_information
+    elif action_args["mediatype"] == "season":
+        from resources.lib.database.trakt_sync import shows
+
+        item_information.update(
+            shows.TraktSyncDatabase().get_season(
+                action_args["trakt_id"], action_args["trakt_show_id"]
+            )
+        )
+        return item_information
+    elif action_args["mediatype"] == "episode":
+        from resources.lib.database.trakt_sync import shows
+
+        item_information.update(
+            shows.TraktSyncDatabase().get_episode(
+                action_args["trakt_id"], action_args["trakt_show_id"]
+            )
+        )
+        return item_information
+    elif action_args["mediatype"] == "movie":
+        from resources.lib.database.trakt_sync import movies
+
+        item_information.update(
+            movies.TraktSyncDatabase().get_movie(action_args["trakt_id"])
+        )
+        return item_information
 
 
-def get_item_information(actionArgs):
-    actionArgs = unquote(actionArgs)
+def deconstruct_action_args(action_args):
+    """
+    Attempts to create a dictionary from the calls action args
+    :param action_args: potential url quoted, stringed dict
+    :type action_args:  str
+    :return: unquoted and loaded dictionary
+    :rtype: dict, NoneType
+    """
+    return json.loads(unquote(action_args))
 
+
+def construct_action_args(action_args):
+    """
+    Takes a json capable response, dumps and urlquotes it ready for URL appending
+    :param action_args: Valid JSON
+    :type action_args: list, dict
+    :return: Url quoted response
+    :rtype: str
+    """
+    return quote(json.dumps(action_args, sort_keys=True))
+
+
+def extend_array(array1, array2):
+    """
+    Safe combining of two lists
+    :param array1: List to combine
+    :type array1: list
+    :param array2: List to combine
+    :type array2: list
+    :return: Combined lists
+    :rtype: list
+    """
+    result = []
+    if array1 and isinstance(array1, list):
+        result.extend(array1)
+    if array2 and isinstance(array2, list):
+        result.extend(array2)
+    return result
+
+
+def smart_merge_dictionary(dictionary, merge_dict, keep_original=False):
+    """Method for merging large multi typed dictionaries, it has support for handling arrays.
+
+    :param dictionary:Original dictionary to merge the second on into.
+    :type dictionary:dict
+    :param merge_dict:Dictionary that is used to merge into the original one.
+    :type merge_dict:dict
+    :param keep_original:Boolean that indicates if there are duplicated values to keep the original one.
+    :type keep_original:bool
+    :return:Merged dictionary
+    :rtype:dict
+    """
+    if not isinstance(dictionary, dict) or not isinstance(merge_dict, dict):
+        return dictionary
+    for new_key, new_value in merge_dict.items():
+        original_value = dictionary.get(new_key, {})
+        if isinstance(new_value, (dict, collections.Mapping)):
+            if original_value is None:
+                original_value = {}
+            new_value = smart_merge_dictionary(original_value, new_value, keep_original)
+        else:
+            if original_value and keep_original:
+                continue
+            if isinstance(original_value, (list, set)) and isinstance(
+                new_value, (list, set)
+            ):
+                original_value.extend(x for x in new_value if x not in original_value)
+                try:
+                    new_value = sorted(original_value)
+                except TypeError:  # Sorting of complex array doesn't work.
+                    pass
+        if new_value:
+            dictionary[new_key] = new_value
+    return dictionary
+
+
+def freeze_object(o):
+    """
+    Takes in a iterable object, freezes all dicts, tuples lists/sets
+    :param o: Object to free
+    :type o: dict/set/list/tuple
+    :return: Hashable object
+    :rtype: tuple, frozenset
+    """
+    if isinstance(o, dict):
+        return frozenset({k: freeze_object(v) for k, v in o.items()}.items())
+
+    if isinstance(o, (set, tuple, list)):
+        return tuple([freeze_object(v) for v in o])
+
+    return o
+
+
+def md5_hash(value):
+    """
+    Returns MD5 hash of given value
+    :param value: object to hash
+    :type value: object
+    :return: Hexdigest of hash
+    :rtype: str
+    """
+    return hashlib.md5(str(repr(value)).encode()).hexdigest()
+
+
+# Re-added for provider backwards compatibility support
+def log(msg, level):
+    """
+    Legacy compat method to log message
+    :param msg: Message to write to log
+    :type msg: str
+    :param level: Log level
+    :type level: str
+    :return: None
+    :rtype: None
+    """
+    from resources.lib.modules.globals import g
+
+    g.log(msg, level)
+
+
+def run_threaded(target_func, *args, **kwargs):
+    """
+    Ease of use method to spawn a new thread and run without joining
+    :param target_func: function to run
+    :type target_func: Any
+    :param args: tuple of arguments to pass through to function
+    :type args: (int) - > None
+    :param kwargs: dictionary of kwargs to pass to function
+    :type kwargs: (int) - > None
+    :return: None
+    :rtype: None
+    """
+    from threading import Thread
+
+    thread = Thread(target=target_func, args=args, kwargs=kwargs)
+    thread.start()
+
+
+def get_clean_number(value):
+    """
+    De-strings stringed int/float and returns respective type
+    :param value: Stringed value of an integer or float
+    :type value: str
+    :return: Converted int or float or None if value error
+    :rtype: int, float, None
+    """
+    if isinstance(value, (int, float)):
+        return value
     try:
-        actionArgs = json.loads(actionArgs)
-    except:
-        log('Unable to load dict')
+        if "." in value:
+            return float(value)
+        else:
+            return int(value.replace(",", ""))
+    except ValueError:
         return None
 
-    if actionArgs['item_type'] == 'show':
-        from resources.lib.modules.trakt_sync import shows
-        item_information = shows.TraktSyncDatabase().get_single_show(actionArgs['trakt_id'])
-        return item_information
-    if actionArgs['item_type'] == 'season':
-        from resources.lib.modules.trakt_sync import shows
-        item_information = shows.TraktSyncDatabase().get_single_season(actionArgs['trakt_id'],
-                                                                       actionArgs['season'])
-        return item_information
-    if actionArgs['item_type'] == 'episode':
-        from resources.lib.modules.trakt_sync import shows
-        item_information = shows.TraktSyncDatabase().get_single_episode(actionArgs['trakt_id'],
-                                                                        actionArgs['season'],
-                                                                        actionArgs['episode'])
-        return item_information
-    if actionArgs['item_type'] == 'movie':
-        from resources.lib.modules.trakt_sync import movies
-        item_information = movies.TraktSyncDatabase().get_movie(actionArgs['trakt_id'])
-        return item_information
+
+def ensure_path_is_dir(path):
+    """
+    Ensure provided path string will work for kodi methods involving directories
+    :param path: Path to directory
+    :type path: str
+    :return: Formatted path
+    :rtype: str
+    """
+    if not path.endswith("\\") and sys.platform == "win32":
+        if path.endswith("/"):
+            path = path.split("/")[0]
+        return path + "\\"
+    elif not path.endswith("/") and sys.platform == "linux2":
+        return path + "/"
+    return path
 
 
-def premium_check():
-    if playList.getposition() == 0 \
-            and not premiumize_enabled() \
-            and not real_debrid_enabled() \
-            and not all_debrid_enabled():
-        return False
+def safe_round(x, y=0):
+    """PY2 and PY3 equal rounding, its up to 15 digits behind the comma.
+
+    :param x: value to round
+    :type x: float
+    :param y: decimals behind the comma
+    :type y: int
+    :return: rounded value
+    :rtype: float
+    """
+    place = 10 ** y
+    rounded = (int(x * place + 0.5 if x >= 0 else -0.5)) / place
+    if rounded == int(rounded):
+        rounded = int(rounded)
+    return rounded
+
+
+def safe_dict_update(dictionary, value):
+    """Checks the value against not valid types to update the dictionary
+
+    :param dictionary:dictionary to update
+    :type dictionary:dict
+    :param value:value to update the supplied dictionary
+    :type value:dict
+    :return:updated dictionary
+    :rtype:dict
+    """
+    if dictionary is None:
+        return dictionary
+    if value and isinstance(value, dict):
+        dictionary.update(copy.deepcopy(value))
+    return dictionary
+
+
+def is_stub():
+    """Checks if the current loaded xbmc lib is from kodistubs
+
+    :return:True or False indicating if this is a kodistub
+    :rtype:bool
+    """
+    return hasattr(xbmc, "__kodistubs__")
+
+
+def validate_path(path):
+    """Returns the translated path.
+
+    :param path:Path to format
+    :type path:str
+    :return:Translated path
+    :rtype:str
+    """
+    if hasattr(xbmc, "validatePath"):
+        path = xbmc.validatePath(path)  # pylint: disable=no-member
     else:
-        return True
+        path = xbmcvfs.validatePath(path)  # pylint: disable=no-member
+    return path
 
 
-def get_advanced_setting(*args):
-    defaults = {
-        ("video", "playcountminimumpercent"): 90,
-        ("video", "ignoresecondsatstart"): 180,
-        ("video", "ignorepercentatend"): 8
-    }
+def translate_path(path):
+    """Validates the path against the running platform and ouputs the clean path.
+
+    :param path:Path to be verified
+    :type path:str
+    :return:Verified and cleaned path
+    :rtype:str
+    """
+    if hasattr(xbmc, "translatePath"):
+        path = xbmc.translatePath(path)  # pylint: disable=no-member
+    else:
+        path = xbmcvfs.translatePath(path)  # pylint: disable=no-member
+    return path
+
+
+def create_multiline_message(line1=None, line2=None, line3=None, *lines):
+    """Creates a message from the supplied lines
+
+    :param line1:Line 1
+    :type line1:str
+    :param line2:Line 2
+    :type line2:str
+    :param line3: Line3
+    :type line3:str
+    :param lines:List of additional lines
+    :type lines:list[str]
+    :return:New message wit the combined lines
+    :rtype:str
+    """
+    result = []
+    if line1:
+        result.append(line1)
+    if line2:
+        result.append(line2)
+    if line3:
+        result.append(line3)
+    if lines:
+        result.extend(l for l in lines if l)
+    return "\n".join(result)
+
+
+def validate_date(date_string):
+    """Validates the path and returns only the date portion, if it invalidates it just returns none.
+
+    :param date_string:string value with a supposed date.
+    :type date_string:str
+    :return:formatted datetime or none
+    :rtype:str
+    """
+    result = None
+    if not date_string:
+        return date_string
 
     try:
-        root = ElementTree.parse(ADVANCED_SETTINGS_PATH).getroot()
-    except (ElementTree.ParseError, IOError):
-        return defaults.get(args)
-    elem = root.find("./{}".format("/".join(args)))
-    return elem.text if elem else defaults.get(args)
+        result = parse_datetime(date_string, "%Y-%m-%d", False)
+    except ValueError:
+        pass
+
+    if not result:
+        try:
+            result = parse_datetime(date_string, DATE_FORMAT, False)
+        except ValueError:
+            pass
+
+    if not result:
+        try:
+            result = parse_datetime(date_string, "%d %b %Y", False)
+        except ValueError:
+            pass
+
+    if result and result.year > 1900:
+        return result.strftime(DATE_FORMAT)
+    return None
 
 
-def container_refresh():
-    return execute('Container.Refresh')
+def makedirs(name, mode=0o777, exist_ok=False):
+    """makedirs(name [, mode=0o777][, exist_ok=False])
+
+    Super-mkdir; create a leaf directory and all intermediate ones.  Works like
+    mkdir, except that any intermediate path segment (not just the rightmost)
+    will be created if it does not exist. If the target directory already
+    exists, raise an OSError if exist_ok is False. Otherwise no exception is
+    raised.  This is recursive.
+
+    :param name:Name of the directory to be created
+    :type name:str|unicode
+    :param mode:Unix file mode for created directories
+    :type mode:int
+    :param exist_ok:Boolean to indicate whether is should raise on an exception
+    :type exist_ok:bool
+    """
+    try:
+        os.makedirs(name, mode)
+    except OSError:
+        if not exist_ok:
+            raise
 
 
-def try_release_lock(lock):
-    if lock.locked():
-        lock.release()
+def merge_dicts(*dict_args):
+    """
+    Given any number of dictionaries, shallow copy and merge into a new dict,
+    precedence goes to key value pairs in latter dictionaries.
+    """
+    result = {}
+    for dictionary in dict_args:
+        safe_dict_update(result, dictionary)
+    return result
+
+
+def filter_dictionary(dictionary, *keys):
+    """Filters the dictionary with the supplied args
+
+    :param dictionary:Dictionary to filter
+    :type dictionary:dict
+    :param keys:Keys to filter on
+    :type keys:any
+    :return:Filtered dictionary
+    :rtype:dict
+    """
+    if not dictionary:
+        return None
+
+    return {k: v for k, v in dictionary.items() if any(k.startswith(x) for x in keys)}
+
+
+def safe_dict_get(dictionary, *path):
+    """Safely get the value from a given path taken into account taht the path can be none.
+
+    :param dictionary:Dictionary to take the path from
+    :type dictionary:dict
+    :param path:Collection of items we try to get form the dict.
+    :type path:str
+    :return:The value for that given path
+    :rtype:any
+    """
+    if len(path) == 0:
+        return dictionary
+    current_path = path[0]
+    if dictionary is None or not isinstance(dictionary, dict):
+        return None
+
+    result = dictionary.get(current_path)
+    if isinstance(result, dict):
+        return safe_dict_get(result, *path[1:])
+    else:
+        return dictionary.get(current_path)

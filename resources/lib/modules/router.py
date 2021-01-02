@@ -1,870 +1,773 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
 
-import json
-import sys
+import xbmc
+import xbmcgui
+
+"""
+    Dispatch module
+"""
+from resources.lib.modules.globals import g
+from resources.lib.modules.exceptions import NoPlayableSourcesException
 
 
 def dispatch(params):
-    from resources.lib.common import tools
-    from resources.lib.modules import database
+    url = params.get("url")
+    action = params.get("action")
+    action_args = params.get("action_args")
+    pack_select = params.get("packSelect")
+    source_select = params.get("source_select") == "true"
+    overwrite_cache = params.get("seren_reload") == "true"
+    resume = params.get("resume")
+    force_resume_check = params.get("forceresumecheck") == "true"
+    force_resume_off = params.get("forceresumeoff") == "true"
+    force_resume_on = params.get("forceresumeon") == "true"
+    smart_url_arg = params.get("smartPlay") == "true"
+    mediatype = params.get("mediatype")
+    endpoint = params.get("endpoint")
 
-    tools.SETTINGS_CACHE = {}
-
-    try:
-
-        url = params.get('url')
-
-        action = params.get('action')
-
-        page = params.get('page')
-
-        actionArgs = params.get('actionArgs')
-
-        pack_select = params.get('packSelect')
-
-        source_select = params.get('source_select')
-
-        seren_reload = True if params.get('seren_reload') == 'true' and tools.playList.getposition() == 0 else False
-
-        resume = params.get('resume')
-
-        forceresumeoff = True if params.get('forceresumeoff') == 'true' else False
-
-        forceresumeon = True if params.get('forceresumeon') == 'true' else False
-
-        smartPlay = True if params.get('smartPlay') == 'true' else False
-
-        if tools.console_mode and action is None:
-            raise  Exception
-    except:
-
-        print('Welcome to console mode')
-        print('Command Help:')
-        print('   - Menu Number: opens the relevant menu page')
-        print('   - shell: opens a interactive python shell within Seren')
-        print('   - action xxx: run a custom Seren URL argument')
-
-        url = ''
-
-        action = None
-
-        page = ''
-
-        actionArgs = ''
-
-        pack_select = ''
-
-        source_select = ''
-
-        seren_reload = ''
-
-        resume = None
-
-        forceresumeoff = True if params.get('forceresumeoff') == 'true' else False
-
-        forceresumeon = True if params.get('forceresumeon') == 'true' else False
-
-        smartPlay = True if params.get('smartPlay') == 'true' else False
-
-    tools.log('Seren, Running Path - Action: %s, actionArgs: %s' % (action, actionArgs))
+    g.log("Seren, Running Path - {}".format(g.REQUEST_PARAMS))
 
     if action is None:
         from resources.lib.gui import homeMenu
 
         homeMenu.Menus().home()
 
-    if action == 'smartPlay':
+    if action == "info" and g.get_global_setting(
+        "info.{}".format(action_args["trakt_id"])
+    ):
+        g.set_global_setting("info.{}".format(action_args["trakt_id"]), "false")
+        action = params.get("original_action")
+
+    if action == "genericEndpoint":
+        if mediatype == "movies":
+            from resources.lib.gui.movieMenus import Menus
+        else:
+            from resources.lib.gui.tvshowMenus import Menus
+        Menus().generic_endpoint(endpoint)
+
+    elif action == "forceResumeShow":
         from resources.lib.modules import smartPlay
-        # if 'resume' not in actionArgs:
-        #     actionArgs = json.loads(actionArgs)
-        #     actionArgs['resume'] = sys.argv[3].split(':')[-1]
-        #     actionArgs = tools.quote(json.dumps(actionArgs, sort_keys=True))
-        smartPlay.SmartPlay(actionArgs).fill_playlist()
+        from resources.lib.common import tools
 
-    if action == 'playbackResume':
-        from resources.lib.modules import smartPlay
-        smart = smartPlay.SmartPlay(actionArgs)
-        smart.workaround()
+        smartPlay.SmartPlay(tools.get_item_information(action_args)).resume_show()
 
-    if action == 'moviesHome':
+    elif action == "moviesHome":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().discoverMovies()
+        movieMenus.Menus().discover_movies()
 
-    if action == 'moviesPopular':
+    elif action == "moviesUpdated":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesPopular(page)
+        movieMenus.Menus().movies_updated()
 
-    if action == 'moviesTrending':
+    elif action == "moviesRecommended":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesTrending(page)
+        movieMenus.Menus().movies_recommended()
 
-    if action == 'moviesPlayed':
+    elif action == "moviesSearch":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesPlayed(page)
+        movieMenus.Menus().movies_search(action_args)
 
-    if action == 'moviesWatched':
+    elif action == "moviesSearchResults":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesWatched(page)
+        movieMenus.Menus().movies_search_results(action_args)
 
-    if action == 'moviesCollected':
+    elif action == "moviesSearchHistory":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesCollected(page)
+        movieMenus.Menus().movies_search_history()
 
-    if action == 'moviesAnticipated':
+    elif action == "myMovies":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesAnticipated(page)
+        movieMenus.Menus().my_movies()
 
-    if action == 'moviesBoxOffice':
+    elif action == "moviesMyCollection":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesBoxOffice()
+        movieMenus.Menus().my_movie_collection()
 
-    if action == 'moviesUpdated':
+    elif action == "moviesMyWatchlist":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesUpdated(page)
+        movieMenus.Menus().my_movie_watchlist()
 
-    if action == 'moviesRecommended':
+    elif action == "moviesRelated":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().moviesRecommended()
+        movieMenus.Menus().movies_related(action_args)
 
-    if action == 'moviesSearch':
-        from resources.lib.gui import movieMenus
+    elif action == "colorPicker":
+        g.color_picker()
 
-        movieMenus.Menus().moviesSearch(actionArgs)
-
-    if action == 'moviesSearchResults':
-        from resources.lib.gui import movieMenus
-
-        movieMenus.Menus().moviesSearchResults(actionArgs)
-
-    if action == 'moviesSearchHistory':
-        from resources.lib.gui import movieMenus
-
-        movieMenus.Menus().moviesSearchHistory()
-
-    if action == 'myMovies':
-        from resources.lib.gui import movieMenus
-
-        movieMenus.Menus().myMovies()
-
-    if action == 'moviesMyCollection':
-        from resources.lib.gui import movieMenus
-
-        movieMenus.Menus().myMovieCollection()
-
-    if action == 'moviesMyWatchlist':
-        from resources.lib.gui import movieMenus
-
-        movieMenus.Menus().myMovieWatchlist()
-
-    if action == 'moviesRelated':
-        from resources.lib.gui import movieMenus
-
-        movieMenus.Menus().moviesRelated(actionArgs)
-
-    if action == 'colorPicker':
-        tools.colorPicker()
-
-    if action == 'authTrakt':
+    elif action == "authTrakt":
         from resources.lib.indexers import trakt
 
         trakt.TraktAPI().auth()
 
-    if action == 'revokeTrakt':
+    elif action == "revokeTrakt":
         from resources.lib.indexers import trakt
 
-        trakt.TraktAPI().revokeAuth()
+        trakt.TraktAPI().revoke_auth()
 
-    if action == 'getSources':
+    elif action == "getSources":
+        from resources.lib.modules.smartPlay import SmartPlay
+        from resources.lib.common import tools
+        from resources.lib.modules import helpers
+
+        item_information = tools.get_item_information(action_args)
+        smart_play = SmartPlay(item_information)
+        background = None
+        resolver_window = None
 
         try:
-
-            item_information = tools.get_item_information(actionArgs)
-            #
-            # This tomfoolery here is the new workaround for Seren to skip the building playlist window
-
-            if tools.getSetting('smartplay.playlistcreate') == 'true' or smartPlay:
-
-                if tools.playList.size() > 0:
-                    playlist_uris = [tools.playList[i].getPath() for i in range(tools.playList.size())]
-                else:
-                    playlist_uris = []
-
-                if ('showInfo' in item_information and tools.playList.size() == 0) \
-                        or not any(sys.argv[2] in i for i in playlist_uris):
-
-                    try:
-                        name = item_information['info']['title']
-                        item = tools.addDirectoryItem(name,
-                                                      'getSources',
-                                                      item_information['info'],
-                                                      item_information['art'],
-                                                      item_information['cast'],
-                                                      isFolder=False,
-                                                      isPlayable=True,
-                                                      actionArgs=actionArgs,
-                                                      bulk_add=True,
-                                                      set_ids=item_information['ids'])
-                        tools.cancelPlayback()
-                        tools.playList.add(url=sys.argv[0] + sys.argv[2], listitem=item[1])
-                        tools.player().play(tools.playList)
-                        return
-                    except:
-                        import traceback
-                        traceback.print_exc()
-                        return
-
-            bookmark_style = tools.getSetting('general.bookmarkstyle')
-
-            if tools.playList.size() == 1 and resume is not None and bookmark_style != '2' and not forceresumeoff:
-
-                if bookmark_style == '0' and not forceresumeon:
-                    import datetime
-                    selection = tools.showDialog.contextmenu([
-                        '{} {}'.format(tools.lang(32092), datetime.timedelta(seconds=int(resume))),
-                        tools.lang(40350)
-                    ])
-                    if selection == -1:
-                        tools.cancelPlayback()
-                        sys.exit()
-                    elif selection != 0:
-                        resume = None
-            else:
-                resume = None
-
-            # Assume if we couldn't get information using the normal method, that it's the legacy method
-            if item_information is None:
-                item_information = actionArgs
-
-            if not tools.premium_check():
-                tools.showDialog.ok(tools.addonName, tools.lang(40146), tools.lang(40147))
+            # Check to confirm user has a debrid provider authenticated and enabled
+            if not g.premium_check():
+                xbmcgui.Dialog().ok(
+                    g.ADDON_NAME,
+                    tools.create_multiline_message(
+                        line1=g.get_language_string(30208),
+                        line2=g.get_language_string(30209),
+                    ),
+                )
                 return None
 
-            if tools.playList.getposition() == 0 and tools.getSetting('general.scrapedisplay') == '0':
-                display_background = True
-            else:
-                display_background = False
+            # workaround for widgets not generating a playlist on playback request
+            play_list = smart_play.playlist_present_check(smart_url_arg)
 
-            from resources.lib.modules.skin_manager import SkinManager
-
-            if display_background:
-                from resources.lib.gui.windows.persistent_background import PersistentBackground
-                background = PersistentBackground(*SkinManager().confirm_skin_path('persistent_background.xml'),
-                                                  actionArgs=actionArgs)
-                background.setText(tools.lang(32045))
-                background.show()
-
-            from resources.lib.modules import getSources
-
-            uncached_sources, source_results, args = database.get(getSources.getSourcesHelper,
-                                                                  1,
-                                                                  actionArgs,
-                                                                  seren_reload=seren_reload,
-                                                                  seren_sources=True)
-            if len(source_results) <= 0:
-                tools.showDialog.notification(tools.addonName, tools.lang(32047), time=5000)
+            if play_list:
+                g.log("Cancelling non playlist playback", "warning")
+                xbmc.Player().play(g.PLAYLIST)
                 return
 
-            if 'showInfo' in item_information:
-                source_select_style = 'Episodes'
+            resume_time = smart_play.handle_resume_prompt(
+                resume, force_resume_off, force_resume_on, force_resume_check
+            )
+            background = helpers.show_persistent_window_if_required(item_information)
+            sources = helpers.SourcesHelper().get_sources(
+                action_args, overwrite_cache=overwrite_cache
+            )
+
+            if sources is None:
+                return
+            if item_information["info"]["mediatype"] == "episode":
+                source_select_style = "Episodes"
             else:
-                source_select_style = 'Movie'
+                source_select_style = "Movie"
 
-            if tools.getSetting('general.playstyle%s' % source_select_style) == '1' or source_select == 'true':
+            if (
+                g.get_int_setting("general.playstyle{}".format(source_select_style))
+                == 1
+                or source_select
+            ):
 
-                try:
-                    background.setText(tools.lang(40135))
-                except:
-                    pass
-
+                if background:
+                    background.set_text(g.get_language_string(30198))
                 from resources.lib.modules import sourceSelect
 
-                stream_link = sourceSelect.sourceSelect(uncached_sources, source_results, actionArgs)
-
-                if stream_link is None:
-                    tools.showDialog.notification(tools.addonName, tools.lang(32047), time=5000)
-                    raise Exception
-                if not stream_link:
-                    # user has backed out of source select, don't show no playable sources notification
-                    raise Exception
+                stream_link = sourceSelect.source_select(
+                    sources[0], sources[1], item_information
+                )
             else:
-                try:
-                    background.setText(tools.lang(32046))
-                except:
-                    pass
-
-                from resources.lib.modules import resolver
-
-                resolver_window = resolver.Resolver(*SkinManager().confirm_skin_path('resolver.xml'),
-                                                    actionArgs=actionArgs)
-
-                stream_link = database.get(resolver_window.doModal, 1,
-                                           source_results, args, pack_select,
-                                           seren_reload=seren_reload)
-                del resolver_window
-
+                if background:
+                    background.set_text(g.get_language_string(30032))
+                stream_link = helpers.Resolverhelper().resolve_silent_or_visible(
+                    sources[1], sources[2], pack_select
+                )
                 if stream_link is None:
-                    tools.closeBusyDialog()
-                    tools.showDialog.notification(tools.addonName, tools.lang(32047), time=5000)
-                    raise Exception
+                    g.close_busy_dialog()
+                    g.notification(
+                        g.ADDON_NAME, g.get_language_string(30033), time=5000
+                    )
 
-            tools.showBusyDialog()
-            try:
+            g.show_busy_dialog()
+
+            if background:
                 background.close()
-            except:
-                pass
-            try:
                 del background
-            except:
-                pass
+
+            if not stream_link:
+                raise NoPlayableSourcesException
 
             from resources.lib.modules import player
 
-            player.serenPlayer().play_source(stream_link, actionArgs, resume_time=resume, params=params)
+            player.SerenPlayer().play_source(
+                stream_link, item_information, resume_time=resume_time
+            )
 
-        except:
-            import traceback
-            traceback.print_exc()
-            # Perform cleanup and make sure all open windows close and playlist is cleared
-            try:
-                tools.closeBusyDialog()
-            except:
-                pass
+        except NoPlayableSourcesException:
             try:
                 background.close()
-            except:
-                pass
-            try:
                 del background
-            except:
+            except (UnboundLocalError, AttributeError):
                 pass
             try:
                 resolver_window.close()
-            except:
-                pass
-            try:
                 del resolver_window
-            except:
-                pass
-            try:
-                tools.playList.clear()
-            except:
-                pass
-            try:
-                tools.closeOkDialog()
-            except:
-                pass
-            try:
-                tools.cancelPlayback()
-            except:
+            except (UnboundLocalError, AttributeError):
                 pass
 
-    if action == 'preScrape':
+            g.cancel_playback()
 
-        from resources.lib.modules.skin_manager import SkinManager
+    elif action == "preScrape":
+
+        from resources.lib.database.skinManager import SkinManager
+        from resources.lib.modules import helpers
 
         try:
-            item_information = tools.get_item_information(actionArgs)
+            from resources.lib.common import tools
 
-            if 'showInfo' in item_information:
-                source_select_style = 'Episodes'
+            item_information = tools.get_item_information(action_args)
+
+            if item_information["info"]["mediatype"] == "episode":
+                source_select_style = "Episodes"
             else:
-                source_select_style = 'Movie'
+                source_select_style = "Movie"
 
-            from resources.lib.modules import getSources
-
-            uncached_sources, source_results, args = database.get(getSources.getSourcesHelper,
-                                                                  1,
-                                                                  actionArgs,
-                                                                  seren_reload=seren_reload,
-                                                                  seren_sources=True)
-
-            if tools.getSetting('general.playstyle%s' % source_select_style) == '0':
+            sources = helpers.SourcesHelper().get_sources(action_args)
+            if (
+                g.get_int_setting("general.playstyle{}".format(source_select_style))
+                == 0
+                and sources
+            ):
                 from resources.lib.modules import resolver
 
-                resolver_window = resolver.Resolver(*SkinManager().confirm_skin_path('resolver.xml'),
-                                                                                     actionArgs=actionArgs)
-                database.get(resolver_window.doModal, 1, source_results, args, pack_select, seren_reload=seren_reload)
+                helpers.Resolverhelper().resolve_silent_or_visible(
+                    sources[1], sources[2], pack_select
+                )
+        finally:
+            g.set_setting("general.tempSilent", "false")
 
-            tools.setSetting(id='general.tempSilent', value='false')
-        except:
-            tools.setSetting(id='general.tempSilent', value='false')
-            import traceback
+        g.log("Pre-scraping completed")
 
-            traceback.print_exc()
-            pass
-
-        tools.log('Pre-scraping completed')
-
-    if action == 'authRealDebrid':
+    elif action == "authRealDebrid":
         from resources.lib.debrid import real_debrid
 
         real_debrid.RealDebrid().auth()
 
-    if action == 'showsHome':
+    elif action == "showsHome":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().discoverShows()
+        tvshowMenus.Menus().discover_shows()
 
-    if action == 'myShows':
+    elif action == "myShows":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().myShows()
+        tvshowMenus.Menus().my_shows()
 
-    if action == 'showsMyCollection':
+    elif action == "showsMyCollection":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().myShowCollection()
+        tvshowMenus.Menus().my_shows_collection()
 
-    if action == 'showsMyWatchlist':
+    elif action == "showsMyWatchlist":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().myShowWatchlist()
+        tvshowMenus.Menus().my_shows_watchlist()
 
-    if action == 'showsMyProgress':
+    elif action == "showsMyProgress":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().myProgress()
+        tvshowMenus.Menus().my_show_progress()
 
-    if action == 'showsMyRecentEpisodes':
+    elif action == "showsMyRecentEpisodes":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().myRecentEpisodes()
+        tvshowMenus.Menus().my_recent_episodes()
 
-    if action == 'showsPopular':
+    elif action == "showsRecommended":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsPopular(page)
+        tvshowMenus.Menus().shows_recommended()
 
-    if action == 'showsRecommended':
+    elif action == "showsUpdated":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsRecommended()
+        tvshowMenus.Menus().shows_updated()
 
-    if action == 'showsTrending':
+    elif action == "showsSearch":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsTrending(page)
+        tvshowMenus.Menus().shows_search(action_args)
 
-    if action == 'showsPlayed':
+    elif action == "showsSearchResults":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsPlayed(page)
+        tvshowMenus.Menus().shows_search_results(action_args)
 
-    if action == 'showsWatched':
+    elif action == "showsSearchHistory":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsWatched(page)
+        tvshowMenus.Menus().shows_search_history()
 
-    if action == 'showsCollected':
+    elif action == "showSeasons":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsCollected(page)
+        tvshowMenus.Menus().show_seasons(action_args)
 
-    if action == 'showsAnticipated':
+    elif action == "seasonEpisodes":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsAnticipated(page)
+        tvshowMenus.Menus().season_episodes(action_args)
 
-    if action == 'showsUpdated':
+    elif action == "showsRelated":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsUpdated(page)
+        tvshowMenus.Menus().shows_related(action_args)
 
-    if action == 'showsSearch':
+    elif action == "showYears":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsSearch(actionArgs)
+        tvshowMenus.Menus().shows_years(action_args)
 
-    if action == 'showsSearchResults':
-        from resources.lib.gui import tvshowMenus
-
-        tvshowMenus.Menus().showsSearchResults(actionArgs)
-
-    if action == 'showsSearchHistory':
-        from resources.lib.gui import tvshowMenus
-
-        tvshowMenus.Menus().showSearchHistory()
-
-    if action == 'showSeasons':
-        from resources.lib.gui import tvshowMenus
-
-        tvshowMenus.Menus().showSeasons(actionArgs)
-
-    if action == 'seasonEpisodes':
-        from resources.lib.gui import tvshowMenus
-
-        tvshowMenus.Menus().seasonEpisodes(actionArgs)
-
-    if action == 'showsRelated':
-        from resources.lib.gui import tvshowMenus
-
-        tvshowMenus.Menus().showsRelated(actionArgs)
-
-    if action == 'showYears':
-        from resources.lib.gui import tvshowMenus
-        tvshowMenus.Menus().showYears(actionArgs, page)
-
-    if action == 'searchMenu':
+    elif action == "searchMenu":
         from resources.lib.gui import homeMenu
 
-        homeMenu.Menus().searchMenu()
+        homeMenu.Menus().search_menu()
 
-    if action == 'toolsMenu':
+    elif action == "toolsMenu":
         from resources.lib.gui import homeMenu
 
-        homeMenu.Menus().toolsMenu()
+        homeMenu.Menus().tools_menu()
 
-    if action == 'clearCache':
+    elif action == "clearCache":
         from resources.lib.common import tools
 
-        tools.clearCache()
+        g.clear_cache()
 
-    if action == 'traktManager':
+    elif action == "traktManager":
         from resources.lib.indexers import trakt
+        from resources.lib.common import tools
 
-        trakt.TraktAPI().traktManager(actionArgs)
+        trakt.TraktManager(tools.get_item_information(action_args))
 
-    if action == 'onDeckShows':
+    elif action == "onDeckShows":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().onDeckShows()
+        tvshowMenus.Menus().on_deck_shows()
 
-    if action == 'onDeckMovies':
+    elif action == "onDeckMovies":
         from resources.lib.gui.movieMenus import Menus
 
-        Menus().onDeckMovies()
+        Menus().on_deck_movies()
 
-    if action == 'cacheAssist':
-        from resources.lib.modules import cacheAssist
+    elif action == "cacheAssist":
+        from resources.lib.modules.cacheAssist import CacheAssistHelper
 
-        cacheAssist.CacheAssit(actionArgs)
+        CacheAssistHelper().auto_cache(action_args)
 
-    if action == 'tvGenres':
+    elif action == "tvGenres":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showGenres()
+        tvshowMenus.Menus().shows_genres()
 
-    if action == 'showGenresGet':
+    elif action == "showGenresGet":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showGenreList(actionArgs, page)
+        tvshowMenus.Menus().shows_genre_list(action_args)
 
-    if action == 'movieGenres':
+    elif action == "movieGenres":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().movieGenres()
+        movieMenus.Menus().movies_genres()
 
-    if action == 'movieGenresGet':
+    elif action == "movieGenresGet":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().movieGenresList(actionArgs, page)
+        movieMenus.Menus().movies_genre_list(action_args)
 
-    if action == 'filePicker':
+    elif action == "shufflePlay":
         from resources.lib.modules import smartPlay
 
-        smartPlay.SmartPlay(actionArgs).torrent_file_picker()
+        smartPlay.SmartPlay(action_args).shuffle_play()
 
-    if action == 'shufflePlay':
-        from resources.lib.modules import smartPlay
+    elif action == "resetSilent":
+        g.set_setting("general.tempSilent", "false")
+        g.notification(
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30329)),
+            g.get_language_string(30034),
+            time=5000,
+        )
 
-        try:
-            smartPlay.SmartPlay(actionArgs).shufflePlay()
-        except:
-            import traceback
-            traceback.print_exc()
-            pass
+    elif action == "clearTorrentCache":
+        from resources.lib.database.torrentCache import TorrentCache
 
-    if action == 'resetSilent':
-        tools.setSetting('general.tempSilent', 'false')
-        tools.showDialog.notification('{}: {}'.format(tools.addonName, tools.lang(40296)), tools.lang(32048), time=5000)
+        TorrentCache().clear_all()
 
-    if action == 'clearTorrentCache':
-        from resources.lib.modules import database
+    elif action == "openSettings":
+        xbmc.executebuiltin("Addon.OpenSettings({})".format(g.ADDON_ID))
 
-        database.torrent_cache_clear()
+    elif action == "myTraktLists":
+        from resources.lib.modules.listsHelper import ListsHelper
 
-    if action == 'openSettings':
-        tools.execute('Addon.OpenSettings(%s)' % tools.addonInfo('id'))
+        ListsHelper().my_trakt_lists(mediatype)
 
-    if action == 'myTraktLists':
-        from resources.lib.indexers import trakt
+    elif action == "myLikedLists":
+        from resources.lib.modules.listsHelper import ListsHelper
 
-        trakt.TraktAPI().myTraktLists(actionArgs)
+        ListsHelper().my_liked_lists(mediatype)
 
-    if action == 'traktList':
-        from resources.lib.indexers import trakt
+    elif action == "TrendingLists":
+        from resources.lib.modules.listsHelper import ListsHelper
 
-        trakt.TraktAPI().getListItems(actionArgs, page)
+        ListsHelper().trending_lists(mediatype)
 
-    if action == 'nonActiveAssistClear':
+    elif action == "PopularLists":
+        from resources.lib.modules.listsHelper import ListsHelper
+
+        ListsHelper().popular_lists(mediatype)
+
+    elif action == "traktList":
+        from resources.lib.modules.listsHelper import ListsHelper
+
+        ListsHelper().get_list_items()
+
+    elif action == "nonActiveAssistClear":
         from resources.lib.gui import debridServices
 
         debridServices.Menus().assist_non_active_clear()
 
-    if action == 'debridServices':
+    elif action == "debridServices":
         from resources.lib.gui import debridServices
 
         debridServices.Menus().home()
 
-    if action == 'cacheAssistStatus':
+    elif action == "cacheAssistStatus":
         from resources.lib.gui import debridServices
 
         debridServices.Menus().get_assist_torrents()
 
-    if action == 'premiumizeTransfers':
+    elif action == "premiumize_transfers":
         from resources.lib.gui import debridServices
 
         debridServices.Menus().list_premiumize_transfers()
 
-    if action == 'showsNextUp':
+    elif action == "showsNextUp":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().myNextUp()
+        tvshowMenus.Menus().my_next_up()
 
-    if action == 'runMaintenance':
+    elif action == "runMaintenance":
         from resources.lib.common import maintenance
 
         maintenance.run_maintenance()
 
-    if action == 'providerTools':
+    elif action == "providerTools":
         from resources.lib.gui import homeMenu
 
-        homeMenu.Menus().providerMenu()
+        homeMenu.Menus().provider_menu()
 
-    if action == 'adjustProviders':
-        tools.log('adjustProviders endpoint has been deprecated')
-        return
-        # from resources.lib.modules import customProviders
-        #
-        # customProviders.providers().adjust_providers(actionArgs)
+    elif action == "installProviders":
+        from resources.lib.modules.providers.install_manager import (
+            ProviderInstallManager,
+        )
 
-    if action == 'adjustPackage':
-        tools.log('adjustPackage endpoint has been deprecated')
-        return
-        # DEPRECATED
-        # from resources.lib.modules import customProviders
-        #
-        # customProviders.providers().adjust_providers(actionArgs, package_disable=True)
+        ProviderInstallManager().install_package(action_args)
 
-    if action == 'installProviders':
-        from resources.lib.modules import customProviders
+    elif action == "uninstallProviders":
+        from resources.lib.modules.providers.install_manager import (
+            ProviderInstallManager,
+        )
 
-        customProviders.providers().install_package(actionArgs)
+        ProviderInstallManager().uninstall_package()
 
-    if action == 'uninstallProviders':
-        from resources.lib.modules import customProviders
-
-        customProviders.providers().uninstall_package()
-
-    if action == 'showsNew':
+    elif action == "showsNew":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().newShows()
+        tvshowMenus.Menus().shows_new()
 
-    if action == 'realdebridTransfers':
+    elif action == "realdebridTransfers":
         from resources.lib.gui import debridServices
 
-        debridServices.Menus().list_RD_transfers()
+        debridServices.Menus().list_rd_transfers()
 
-    if action == 'cleanInstall':
+    elif action == "cleanInstall":
         from resources.lib.common import maintenance
 
         maintenance.wipe_install()
 
-    if action == 'buildPlaylistWorkaround':
-        from resources.lib.modules import smartPlay
-        smartPlay.SmartPlay(actionArgs).resume_playback()
-
-    if action == 'premiumizeCleanup':
+    elif action == "premiumizeCleanup":
         from resources.lib.common import maintenance
 
         maintenance.premiumize_transfer_cleanup()
 
-    if action == 'test2':
-        pass
+    elif action == "manualProviderUpdate":
+        from resources.lib.modules.providers.install_manager import (
+            ProviderInstallManager,
+        )
 
-    if action == 'manualProviderUpdate':
-        from resources.lib.modules import customProviders
+        ProviderInstallManager().manual_update()
 
-        customProviders.providers().manual_update()
+    elif action == "clearSearchHistory":
+        from resources.lib.database.searchHistory import SearchHistory
 
-    if action == 'clearSearchHistory':
-        from resources.lib.modules import database
+        SearchHistory().clear_search_history(mediatype)
 
-        database.clearSearchHistory()
+    elif action == "externalProviderInstall":
+        from resources.lib.modules.providers.install_manager import (
+            ProviderInstallManager,
+        )
 
-    if action == 'externalProviderInstall':
-        from resources.lib.modules import customProviders
-
-        confirmation = tools.showDialog.yesno(tools.addonName, tools.lang(40117))
+        confirmation = xbmcgui.Dialog().yesno(
+            g.ADDON_NAME, g.get_language_string(30182)
+        )
         if confirmation == 0:
-            sys.exit()
+            return
+        ProviderInstallManager().install_package(1, url=url)
 
-        customProviders.providers().install_package(1, url=url)
+    elif action == "externalProviderUninstall":
+        from resources.lib.modules.providers.install_manager import (
+            ProviderInstallManager,
+        )
 
-    if action == 'externalProviderUninstall':
-        from resources.lib.modules import customProviders
-
-        confirmation = tools.showDialog.yesno(tools.addonName, tools.lang(40119) % url)
+        confirmation = xbmcgui.Dialog().yesno(
+            g.ADDON_NAME, g.get_language_string(30184).format(url)
+        )
         if confirmation == 0:
-            sys.exit()
+            return
+        ProviderInstallManager().uninstall_package(package=url, silent=False)
 
-        customProviders.providers().uninstall_package(package=url, silent=False)
-
-    if action == 'showsNetworks':
+    elif action == "showsNetworks":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsNetworks()
+        tvshowMenus.Menus().shows_networks()
 
-    if action == 'showsNetworkShows':
+    elif action == "showsNetworkShows":
         from resources.lib.gui import tvshowMenus
 
-        tvshowMenus.Menus().showsNetworkShows(actionArgs, page)
+        tvshowMenus.Menus().shows_networks_results(action_args)
 
-    if action == 'movieYears':
+    elif action == "movieYears":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().movieYears()
+        movieMenus.Menus().movies_years()
 
-    if action == 'movieYearsMovies':
+    elif action == "movieYearsMovies":
         from resources.lib.gui import movieMenus
 
-        movieMenus.Menus().movieYearsMovies(actionArgs, page)
+        movieMenus.Menus().movie_years_results(action_args)
 
-    if action == 'syncTraktActivities':
-        from resources.lib.modules.trakt_sync.activities import TraktSyncDatabase
+    elif action == "syncTraktActivities":
+        from resources.lib.database.trakt_sync.activities import TraktSyncDatabase
+
         TraktSyncDatabase().sync_activities()
 
-    if action == 'traktSyncTools':
+    elif action == "traktSyncTools":
         from resources.lib.gui import homeMenu
-        homeMenu.Menus().traktSyncTools()
 
-    if action == 'flushTraktActivities':
-        from resources.lib.modules import trakt_sync
+        homeMenu.Menus().trakt_sync_tools()
+
+    elif action == "flushTraktActivities":
+        from resources.lib.database import trakt_sync
+
         trakt_sync.TraktSyncDatabase().flush_activities()
 
-    if action == 'flushTraktDBMeta':
-        from resources.lib.modules import trakt_sync
+    elif action == "flushTraktDBMeta":
+        from resources.lib.database import trakt_sync
+
         trakt_sync.TraktSyncDatabase().clear_all_meta()
 
-    if action == 'myFiles':
+    elif action == "myFiles":
         from resources.lib.gui import myFiles
+
         myFiles.Menus().home()
 
-    if action == 'myFilesFolder':
+    elif action == "myFilesFolder":
         from resources.lib.gui import myFiles
-        myFiles.Menus().myFilesFolder(actionArgs)
 
-    if action == 'myFilesPlay':
+        myFiles.Menus().my_files_folder(action_args)
+
+    elif action == "myFilesPlay":
         from resources.lib.gui import myFiles
-        myFiles.Menus().myFilesPlay(actionArgs)
 
-    if action == 'forceTraktSync':
-        from resources.lib.modules import trakt_sync
-        from resources.lib.modules.trakt_sync.activities import TraktSyncDatabase
-        trakt_sync.TraktSyncDatabase().flush_activities()
-        TraktSyncDatabase().sync_activities()
+        myFiles.Menus().my_files_play(action_args)
 
-    if action == 'rebuildTraktDatabase':
-        from resources.lib.modules.trakt_sync import TraktSyncDatabase
+    elif action == "forceTraktSync":
+        from resources.lib.database.trakt_sync.activities import TraktSyncDatabase
+
+        trakt_db = TraktSyncDatabase()
+        trakt_db.flush_activities()
+        trakt_db.sync_activities()
+
+    elif action == "rebuildTraktDatabase":
+        from resources.lib.database.trakt_sync import TraktSyncDatabase
+
         TraktSyncDatabase().re_build_database()
 
-    if action == 'myUpcomingEpisodes':
+    elif action == "myUpcomingEpisodes":
         from resources.lib.gui import tvshowMenus
-        tvshowMenus.Menus().myUpcomingEpisodes()
 
-    if action == 'myWatchedEpisodes':
+        tvshowMenus.Menus().my_upcoming_episodes()
+
+    elif action == "myWatchedEpisodes":
         from resources.lib.gui import tvshowMenus
-        tvshowMenus.Menus().myWatchedEpisodes(page)
 
-    if action == 'myWatchedMovies':
+        tvshowMenus.Menus().my_watched_episode()
+
+    elif action == "myWatchedMovies":
         from resources.lib.gui import movieMenus
-        movieMenus.Menus().myWatchedMovies(page)
 
-    if action == 'showsByActor':
+        movieMenus.Menus().my_watched_movies()
+
+    elif action == "showsByActor":
         from resources.lib.gui import tvshowMenus
-        tvshowMenus.Menus().showsByActor(actionArgs)
 
-    if action == 'movieByActor':
+        tvshowMenus.Menus().shows_by_actor(action_args)
+
+    elif action == "movieByActor":
         from resources.lib.gui import movieMenus
-        movieMenus.Menus().moviesByActor(actionArgs)
 
-    if action == 'playFromRandomPoint':
+        movieMenus.Menus().movies_by_actor(action_args)
+
+    elif action == "playFromRandomPoint":
         from resources.lib.modules import smartPlay
-        smartPlay.SmartPlay(actionArgs).play_from_random_point()
 
-    if action == 'refreshProviders':
-        from resources.lib.modules.customProviders import providers
-        providers().update_known_providers()
+        smartPlay.SmartPlay(action_args).play_from_random_point()
 
-    if action == 'installSkin':
-        from resources.lib.modules.skin_manager import SkinManager
+    elif action == "refreshProviders":
+        from resources.lib.modules.providers import CustomProviders
+
+        providers = CustomProviders()
+        providers.update_known_providers()
+        providers.poll_database()
+
+    elif action == "installSkin":
+        from resources.lib.database.skinManager import SkinManager
+
         SkinManager().install_skin()
 
-    if action == 'uninstallSkin':
-        from resources.lib.modules.skin_manager import SkinManager
+    elif action == "uninstallSkin":
+        from resources.lib.database.skinManager import SkinManager
+
         SkinManager().uninstall_skin()
 
-    if action == 'switchSkin':
-        from resources.lib.modules.skin_manager import SkinManager
+    elif action == "switchSkin":
+        from resources.lib.database.skinManager import SkinManager
+
         SkinManager().switch_skin()
 
-    if action == 'manageProviders':
-        tools.showBusyDialog()
-        from resources.lib.gui.windows.custom_providers import CustomProviders
-        from resources.lib.modules.skin_manager import SkinManager
-        CustomProviders(*SkinManager().confirm_skin_path('custom_providers.xml')).doModal()
+    elif action == "manageProviders":
+        g.show_busy_dialog()
+        from resources.lib.gui.windows.provider_packages import ProviderPackages
+        from resources.lib.database.skinManager import SkinManager
 
-    if action == 'flatEpisodes':
+        window = ProviderPackages(
+            *SkinManager().confirm_skin_path("provider_packages.xml")
+        )
+        window.doModal()
+        del window
+
+    elif action == "flatEpisodes":
         from resources.lib.gui.tvshowMenus import Menus
-        Menus().flat_episode_list(actionArgs)
 
-    if action =='runPlayerDialogs':
+        Menus().flat_episode_list(action_args)
+
+    elif action == "runPlayerDialogs":
         from resources.lib.modules.player import PlayerDialogs
-        try:
-            PlayerDialogs().display_dialog()
-        except:
-            import traceback
-            traceback.print_exc()
 
-    if action == 'authAllDebrid':
+        PlayerDialogs().display_dialog()
+
+    elif action == "authAllDebrid":
         from resources.lib.debrid.all_debrid import AllDebrid
+
         AllDebrid().auth()
 
-    if action == 'checkSkinUpdates':
-        from resources.lib.modules.skin_manager import SkinManager
+    elif action == "checkSkinUpdates":
+        from resources.lib.database.skinManager import SkinManager
+
         SkinManager().check_for_updates()
 
-    if action == 'authPremiumize':
+    elif action == "authPremiumize":
         from resources.lib.debrid.premiumize import Premiumize
+
         Premiumize().auth()
 
-    if action == 'testWindows':
+    elif action == "testWindows":
         from resources.lib.gui.homeMenu import Menus
+
         Menus().test_windows()
 
-    if action == 'testPlayingNext':
-        from resources.lib.gui import test_windows
-        test_windows.test_playing_next()
+    elif action == "testPlayingNext":
+        from resources.lib.gui import mock_windows
 
-    if action == 'testStillWatching':
-        from resources.lib.gui import test_windows
-        test_windows.test_still_watching()
+        mock_windows.mock_playing_next()
 
-    if action == 'testResolverWindow':
-        from resources.lib.gui import test_windows
-        test_windows.test_resolver()
+    elif action == "testStillWatching":
+        from resources.lib.gui import mock_windows
 
-    if action == 'testSourceSelectWindow':
-        from resources.lib.gui import test_windows
-        test_windows.test_source_select()
+        mock_windows.mock_still_watching()
+
+    elif action == "testResolverWindow":
+        from resources.lib.gui import mock_windows
+
+        mock_windows.mock_resolver()
+
+    elif action == "testSourceSelectWindow":
+        from resources.lib.gui import mock_windows
+
+        mock_windows.mock_source_select()
+
+    elif action == "testManualCacheWindow":
+        from resources.lib.gui import mock_windows
+
+        mock_windows.mock_cache_assist()
+
+    elif action == "showsPopularRecent":
+        from resources.lib.gui.tvshowMenus import Menus
+
+        Menus().shows_popular_recent()
+
+    elif action == "showsTrendingRecent":
+        from resources.lib.gui.tvshowMenus import Menus
+
+        Menus().shows_trending_recent()
+
+    elif action == "moviePopularRecent":
+        from resources.lib.gui.movieMenus import Menus
+
+        Menus().movie_popular_recent()
+
+    elif action == "movieTrendingRecent":
+        from resources.lib.gui.movieMenus import Menus
+
+        Menus().movie_trending_recent()
+
+    elif action == "setDownloadLocation":
+        from resources.lib.modules.download_manager import set_download_location
+
+        set_download_location()
+
+    elif action == "downloadManagerView":
+        from resources.lib.gui.windows.download_manager import DownloadManager
+        from resources.lib.database.skinManager import SkinManager
+
+        window = DownloadManager(
+            *SkinManager().confirm_skin_path("download_manager.xml")
+        )
+        window.doModal()
+        del window
+
+    elif action == "info":
+        g.set_global_setting("info.{}".format(action_args["trakt_id"]), True)
+        xbmc.executebuiltin("Action(Info)")
+
+    elif action == "longLifeServiceManager":
+        from resources.lib.modules.providers.service_manager import (
+            ProvidersServiceManager,
+        )
+
+        ProvidersServiceManager().run_long_life_manager()
+
+    elif action == "showsRecentlyWatched":
+        from resources.lib.gui.tvshowMenus import Menus
+
+        Menus().shows_recently_watched()
+
+    elif action == "toggleLanguageInvoker":
+        from resources.lib.common.maintenance import toggle_reuselanguageinvoker
+        toggle_reuselanguageinvoker()
