@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.0.0" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.0.1" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.python" version="2.26.0" />
         <import addon="script.module.future" version="0.17.1"/>
@@ -63,7 +63,10 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
-           Changleog 2.0.0:
+            Changelog 2.0.1:
+            Fix last_meta_update value to reflect new Seren version
+
+            Changleog 2.0.0:
 
             Added Download Manager
             Complete re-write of Trakt Sync Database
