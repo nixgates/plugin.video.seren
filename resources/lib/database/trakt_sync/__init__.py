@@ -289,7 +289,7 @@ class TraktSyncDatabase(Database):
         # You will need to update the below version number to match the new addon version
         # This will ensure that the metadata required for operations is available
 
-        self.last_meta_update = "1.6.0"
+        self.last_meta_update = "2.0.0"
         if self.activities is None:
             self.clear_all_meta(False)
             self.set_base_activities()
