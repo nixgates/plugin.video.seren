@@ -94,13 +94,16 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
 
     def add_date_properties(self):
         try:
-            year, month, day = self.item_information['info'].get('aired', '0000-00-00').split('-')
-        except ValueError:
-            year, month, day = self.item_information['info'].get('aired', '00/00/0000').split('/')
+            try:
+                year, month, day = self.item_information['info'].get('aired', '0000-00-00').split('-')
+            except ValueError:
+                year, month, day = self.item_information['info'].get('aired', '00/00/0000').split('/')
 
-        self.setProperty('item.info.aired.year', year)
-        self.setProperty('item.info.aired.month', month)
-        self.setProperty('item.info.aired.day', day)
+            self.setProperty('item.info.aired.year', year)
+            self.setProperty('item.info.aired.month', month)
+            self.setProperty('item.info.aired.day', day)
+        except ValueError:
+            pass
 
         if 'aired' in self.item_information['info']:
             aired_date = self.item_information['info']['aired']
