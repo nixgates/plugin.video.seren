@@ -400,7 +400,7 @@ class SmartPlay:
                 resume_switch = bookmark["resume_time"]
 
         if (
-            g.PLAYLIST.size() == 1
+            g.PLAYLIST.size() <= 1
             and resume_switch is not None
             and bookmark_style != 2
             and not force_resume_off

@@ -96,7 +96,7 @@ msgctxt "#30016"
 msgid "Next"
 msgstr "Επόμενο"
 
-#: \resources\lib\modules\globals.py:679
+#: \resources\lib\modules\globals.py:680
 msgctxt "#30017"
 msgid "Color Picker"
 msgstr "Επιλογή χρώματος"
@@ -172,13 +172,13 @@ msgctxt "#30028"
 msgid "Tools"
 msgstr "Εργαλεία"
 
-#: \resources\settings.xml:436 \resources\settings.xml:438
+#: \resources\settings.xml:437 \resources\settings.xml:439
 #: \resources\lib\gui\homeMenu.py:71
 msgctxt "#30029"
 msgid "Clear Cache"
 msgstr "Εκκαθάριση Μνήμης Cache"
 
-#: \resources\lib\modules\globals.py:706
+#: \resources\lib\modules\globals.py:806
 msgctxt "#30030"
 msgid "Are you sure you wish to clear the cache?"
 msgstr "Σίγουρα θέλετε να καθαρίσετε την μνήμη cache?"
@@ -205,7 +205,7 @@ msgctxt "#30034"
 msgid "Silent Scraper Setting has been reset"
 msgstr "Οι Ρυθμίσεις του Scraper έχουν επαναφερθεί"
 
-#: \resources\lib\common\maintenance.py:112
+#: \resources\lib\common\maintenance.py:113
 msgctxt "#30035"
 msgid ""
 "Please be aware this will completely wipe the following:\n"
@@ -214,13 +214,13 @@ msgstr ""
 "Προσέξτε η ενέργεια αυτή θα διαγράψει εντελώς τα παρακάτω:\n"
 "Αποθηκευμένα δεδομένα, Ρυθμίσεις, Εγκατεστημένοι Πάροχοι\n"
 
-#: \resources\lib\common\maintenance.py:113
+#: \resources\lib\common\maintenance.py:114
 msgctxt "#30036"
 msgid "ARE YOU SURE?"
 msgstr "ΕΙΣΤΕ ΣΙΓΟΥΡΟΣ?"
 
-#: \resources\lib\common\maintenance.py:181
-#: \tests\integration\common\test_maintenance.py:108
+#: \resources\lib\common\maintenance.py:182
+#: \tests\integration\common\test_maintenance.py:109
 msgctxt "#30037"
 msgid "Your {} Premium status has expired"
 msgstr "Η κατάσταση του {} Premium σας έχει λήξει"
@@ -235,7 +235,7 @@ msgctxt "#30039"
 msgid "Premium Services"
 msgstr "Premium υπηρεσίες"
 
-#: \resources\settings.xml:440 \resources\lib\gui\homeMenu.py:75
+#: \resources\settings.xml:441 \resources\lib\gui\homeMenu.py:75
 msgctxt "#30040"
 msgid "Clear Local Torrent Cache"
 msgstr "Καθαρισμός Cache Μνήμης Torrent"
@@ -245,7 +245,7 @@ msgctxt "#30041"
 msgid "Open Settings Menu"
 msgstr "Άνοιγμα Μενού Ρυθμίσεων"
 
-#: \resources\settings.xml:444 \resources\lib\gui\homeMenu.py:87
+#: \resources\settings.xml:445 \resources\lib\gui\homeMenu.py:87
 msgctxt "#30042"
 msgid "Wipe Addon Data"
 msgstr "Καθαρισμός Δεδομένων Προσθέτου"
@@ -303,22 +303,22 @@ msgctxt "#30052"
 msgid "successfully uninstalled"
 msgstr "απεγκαταστήθηκε επιτυχώς"
 
-#: \resources\lib\modules\globals.py:713
+#: \resources\lib\modules\globals.py:813
 msgctxt "#30053"
 msgid "All Cache Successfully Cleared"
 msgstr "Επιτυχής Εκκαθάριση Μνήμης Cache"
 
-#: \resources\lib\modules\getSources.py:180
+#: \resources\lib\modules\getSources.py:192
 msgctxt "#30054"
 msgid "Checking Local Database"
 msgstr "Έλεγχος Τοπικής Βάσης Δεδομένων"
 
-#: \resources\lib\modules\getSources.py:104
+#: \resources\lib\modules\getSources.py:105
 msgctxt "#30055"
 msgid "Initializing Providers"
 msgstr "Εγκατάσταση Παρόχων"
 
-#: \resources\lib\modules\getSources.py:200
+#: \resources\lib\modules\getSources.py:212
 msgctxt "#30056"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -327,7 +327,7 @@ msgstr ""
 "Δεν βρέθηκαν πηγές για το επόμενο στοιχείο στην λίστα αναπαραγωγής.\n"
 "Καθαρισμός τρέχουσας λίστας αναπαραγωγής"
 
-#: \resources\lib\modules\getSources.py:341
+#: \resources\lib\modules\getSources.py:353
 msgctxt "#30057"
 msgid ""
 "No Playable Sources were found.\n"
@@ -336,29 +336,29 @@ msgstr ""
 "Δεν βρέθηκαν πηγές που να μπορούν να αναπαραχθούν.\n"
 "Θα θέλατε να δοκιμάσετε αναζήτηση με torrent?"
 
-#: \resources\settings.xml:403 \resources\lib\modules\getSources.py:719
+#: \resources\settings.xml:404 \resources\lib\modules\getSources.py:731
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30058"
 msgid "Torrents"
 msgstr "Torrent"
 
-#: \resources\settings.xml:403 \resources\lib\modules\getSources.py:724
+#: \resources\settings.xml:404 \resources\lib\modules\getSources.py:736
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30059"
 msgid "Hosters"
 msgstr "Hosters"
 
-#: \resources\lib\modules\getSources.py:730
+#: \resources\lib\modules\getSources.py:742
 msgctxt "#30060"
 msgid "Free Hosters"
 msgstr "Δωρεάν Hosters"
 
-#: \resources\lib\modules\getSources.py:732
+#: \resources\lib\modules\getSources.py:744
 msgctxt "#30061"
 msgid "Remaining Providers"
 msgstr "Εναπομείναντες Πάροχοι"
 
-#: \resources\lib\modules\smartPlay.py:400
+#: \resources\lib\modules\smartPlay.py:414
 msgctxt "#30062"
 msgid "Resume From: "
 msgstr "Συνέχεια από: "
@@ -494,7 +494,7 @@ msgctxt "#30085"
 msgid "Checking for available package updates"
 msgstr "Έλεγχος για διαθέσιμες ενημερώσεις πακέτων"
 
-#: \resources\lib\common\maintenance.py:106
+#: \resources\lib\common\maintenance.py:107
 msgctxt "#30086"
 msgid ""
 "This will completely wipe your addon settings.\n"
@@ -503,40 +503,40 @@ msgstr ""
 "Όλες οι ρυθμίσεις του πρόσθετου θα διαγραφούν.\n"
 "Είστε εντελώς σίγουρος πως θέλετε να το κάνετε?"
 
-#: \resources\settings.xml:7 \resources\settings.xml:208
-#: \resources\settings.xml:250 \resources\settings.xml:283
-#: \resources\settings.xml:369
+#: \resources\settings.xml:7 \resources\settings.xml:209
+#: \resources\settings.xml:251 \resources\settings.xml:284
+#: \resources\settings.xml:370
 msgctxt "#30087"
 msgid "General"
 msgstr "Γενικά"
 
-#: \resources\settings.xml:252
+#: \resources\settings.xml:253
 msgctxt "#30088"
 msgid "Episode Play Style"
 msgstr "Στυλ Αναπαραγωγής Επεισοδίων"
 
-#: \resources\settings.xml:251 \resources\settings.xml:252
+#: \resources\settings.xml:252 \resources\settings.xml:253
 msgctxt "#30089"
 msgid "Auto Play"
 msgstr "Αυτόματη Αναπαραγωγή"
 
-#: \resources\settings.xml:251 \resources\settings.xml:252
+#: \resources\settings.xml:252 \resources\settings.xml:253
 #: \resources\skins\Default\1080i\source_select.xml:32
 msgctxt "#30090"
 msgid "Source Select"
 msgstr "Επιλογή Πηγών"
 
-#: \resources\settings.xml:109
+#: \resources\settings.xml:110
 msgctxt "#30091"
 msgid "Source Select View"
 msgstr "Προβολή Επιλογής Προέλευσης"
 
-#: \resources\settings.xml:109
+#: \resources\settings.xml:110
 msgctxt "#30092"
 msgid "List"
 msgstr "Λίστα"
 
-#: \resources\settings.xml:109
+#: \resources\settings.xml:110
 msgctxt "#30093"
 msgid "Dialog"
 msgstr "Διάλογος"
@@ -626,209 +626,209 @@ msgctxt "#30110"
 msgid "Current Color"
 msgstr "Τρέχων Χρώμα"
 
-#: \resources\settings.xml:264
+#: \resources\settings.xml:265
 msgctxt "#30111"
 msgid "Enable Playing Next Dialog"
 msgstr "Ενεργοποίηση Διαλόγου Playing Next"
 
-#: \resources\settings.xml:265
+#: \resources\settings.xml:266
 msgctxt "#30112"
 msgid "Minimum Seconds Left Before Showing Dialog"
 msgstr "Ελάχιστος αρ. υπολειπόμενων δευτερολέπτων πρίν την εμφάνιση διαλόγου"
 
-#: \resources\settings.xml:257
+#: \resources\settings.xml:258
 msgctxt "#30113"
 msgid "Auto Playlist Creation"
 msgstr "Αυτόματη Δημιουργία Λίστας Αναπαραγωγής"
 
-#: \resources\settings.xml:258
+#: \resources\settings.xml:259
 msgctxt "#30114"
 msgid "Auto Episode Resume"
 msgstr "Αυτόματη Συνέχιση Επεισοδίου"
 
-#: \resources\settings.xml:259
+#: \resources\settings.xml:260
 msgctxt "#30115"
 msgid "Pre-emptive Scraping"
 msgstr "Προκαταβολική Αναζήτηση Ροής"
 
-#: \resources\settings.xml:255
+#: \resources\settings.xml:256
 msgctxt "#30116"
 msgid "Resume Style"
 msgstr "Στυλ Συνέχισης"
 
-#: \resources\settings.xml:205
+#: \resources\settings.xml:206
 msgctxt "#30117"
 msgid "Scraping"
 msgstr "Scraping"
 
-#: \resources\settings.xml:211
+#: \resources\settings.xml:212
 msgctxt "#30118"
 msgid "Cache Torrent Info Locally"
 msgstr "Αποθηκεύστε τις πληροφορίες Torrent τοπικά"
 
-#: \resources\settings.xml:395
+#: \resources\settings.xml:396
 msgctxt "#30119"
 msgid "Hide HEVC Items"
 msgstr "Κρύψτε Αντικείμενα HEVC"
 
-#: \resources\settings.xml:212
+#: \resources\settings.xml:213
 msgctxt "#30120"
 msgid "Timeout"
 msgstr "Χρονικό όριο αναζήτησης σελίδας"
 
-#: \resources\settings.xml:215
+#: \resources\settings.xml:216
 msgctxt "#30121"
 msgid "Auto Caching Assistant"
 msgstr "Λειτουργία Αυτόματης Μνήμης"
 
-#: \resources\settings.xml:217
+#: \resources\settings.xml:218
 msgctxt "#30122"
 msgid "Auto Add Un-Cached Sources to Debrid"
 msgstr "Αυτόματη Προσθήκη Μη Αποθηκευμένων Πηγών Στο Debrid"
 
-#: \resources\settings.xml:218
+#: \resources\settings.xml:219
 msgctxt "#30123"
 msgid "Assist Mode"
 msgstr "Λειτουργία Βοήθειας"
 
-#: \resources\settings.xml:220
+#: \resources\settings.xml:221
 msgctxt "#30124"
 msgid "Preferred Cloud Location"
 msgstr "Προτιμώμενη Τοποθεσία Cloud"
 
-#: \resources\settings.xml:386
+#: \resources\settings.xml:387
 msgctxt "#30125"
 msgid "Source Filters"
 msgstr "Φίλτρο Πηγών"
 
-#: \resources\settings.xml:389
+#: \resources\settings.xml:390
 msgctxt "#30126"
 msgid "Enable File Size Limit"
 msgstr "Ενεργοποίηση Ορίου Μεγέθους Αρχείου"
 
-#: \resources\settings.xml:392
+#: \resources\settings.xml:393
 msgctxt "#30127"
 msgid "Episode File Size limit (GB)"
 msgstr "Όριο Μεγέθους Αρχέιου Επεισοδίου"
 
-#: \resources\settings.xml:403
+#: \resources\settings.xml:404
 msgctxt "#30128"
 msgid "Sort Sources Method"
 msgstr "Μέθοδος Ταξινόμησης Πηγών"
 
-#: \resources\settings.xml:404
+#: \resources\settings.xml:405
 msgctxt "#30129"
 msgid "Enable Secondary Filesize Sort"
 msgstr "Ενεργοποιήστε Δευτερεύων Ταξινόμηση Μεγέθους Αρχείων"
 
-#: \resources\settings.xml:406
+#: \resources\settings.xml:407
 msgctxt "#30130"
 msgid "Enable Tertiary HEVC Sort Preference"
 msgstr "Ενεργοποιήστε Τρίτη Προτιμώμενη Σειρά Ταξινόμησης HEVC"
 
-#: \resources\settings.xml:388
+#: \resources\settings.xml:389
 msgctxt "#30131"
 msgid "Max Resolution"
 msgstr "Μέγιστη Ανάλυση"
 
-#: \resources\settings.xml:224
+#: \resources\settings.xml:225
 msgctxt "#30132"
 msgid "Preemptive Termination"
 msgstr "Ακύρωση Αναζήτησης Ροής Πρόωρα"
 
-#: \resources\settings.xml:226
+#: \resources\settings.xml:227
 msgctxt "#30133"
 msgid "Enable Preemptive Termination"
 msgstr "Ενεργοποίηση Ακύρωσης Αναζήτησης Ροής Πρόωρα"
 
-#: \resources\settings.xml:227
+#: \resources\settings.xml:228
 msgctxt "#30134"
 msgid "Minimum Movie Resolution"
 msgstr "Ελάχιστη Ανάλυση Ταινίας"
 
-#: \resources\settings.xml:229
+#: \resources\settings.xml:230
 msgctxt "#30135"
 msgid "Minimum TV Shows Resolution"
 msgstr "Ελάχιστη Ανάλυση Τηλεοπτικών Σειρών"
 
-#: \resources\settings.xml:231
+#: \resources\settings.xml:232
 msgctxt "#30136"
 msgid "Minimum Sources"
 msgstr "Ελάχιστες Πηγές"
 
-#: \resources\settings.xml:233
+#: \resources\settings.xml:234
 msgctxt "#30137"
 msgid "Terminate on... "
 msgstr "Τερμάτισε σε… "
 
-#: \resources\settings.xml:280
+#: \resources\settings.xml:281
 msgctxt "#30138"
 msgid "Accounts"
 msgstr "Λογαριασμοί"
 
-#: \resources\settings.xml:285
+#: \resources\settings.xml:286
 msgctxt "#30139"
 msgid "Enable Account Expiry Notifications"
 msgstr "Ενεργοποίηση Ειδοποιήσεων για Λήξη του Λογαριασμού"
 
-#: \resources\settings.xml:80 \resources\settings.xml:288
+#: \resources\settings.xml:80 \resources\settings.xml:289
 msgctxt "#30140"
 msgid "Trakt"
 msgstr "Trakt"
 
-#: \resources\settings.xml:290
+#: \resources\settings.xml:291
 msgctxt "#30141"
 msgid "Trakt Username"
 msgstr "Όνομα χρήστη Trakt"
 
-#: \resources\settings.xml:291
+#: \resources\settings.xml:292
 msgctxt "#30142"
 msgid "Authorize Trakt..."
 msgstr "Εξουσιοδότηση Trakt..."
 
-#: \resources\settings.xml:293
+#: \resources\settings.xml:294
 msgctxt "#30143"
 msgid "Enable Trakt Scrobbling"
 msgstr "Ενεργοποίηση Trakt Scrobbling"
 
-#: \resources\settings.xml:298
+#: \resources\settings.xml:299
 msgctxt "#30144"
 msgid "Revoke Trakt Authentication..."
 msgstr "Ανάκληση Πιστοποίησης Trakt..."
 
-#: \resources\settings.xml:220 \resources\settings.xml:302
+#: \resources\settings.xml:221 \resources\settings.xml:303
 msgctxt "#30145"
 msgid "Premiumize"
 msgstr "Premiumize"
 
-#: \resources\settings.xml:220 \resources\settings.xml:329
+#: \resources\settings.xml:221 \resources\settings.xml:330
 msgctxt "#30146"
 msgid "Real-Debrid"
 msgstr "Real-Debrid"
 
-#: \resources\settings.xml:366
+#: \resources\settings.xml:367
 #: \resources\lib\modules\providers\install_manager.py:54
 msgctxt "#30147"
 msgid "Providers"
 msgstr "Πάροχοι"
 
-#: \resources\settings.xml:411 \resources\settings.xml:414
+#: \resources\settings.xml:412 \resources\settings.xml:415
 msgctxt "#30148"
 msgid "API Keys"
 msgstr "Κλειδιά API"
 
-#: \resources\settings.xml:371
+#: \resources\settings.xml:372
 msgctxt "#30149"
 msgid "Enable Automatic Provider Updates"
 msgstr "Ενεργοποίηση Αυτόματων Ενημερώσεων Παρόχων"
 
-#: \resources\settings.xml:63 \resources\settings.xml:376
+#: \resources\settings.xml:63 \resources\settings.xml:377
 #: \resources\lib\gui\homeMenu.py:105
 msgctxt "#30150"
 msgid "Check For Updates"
 msgstr "Έλεγχος για Ενημερώσεις"
 
-#: \resources\settings.xml:374 \resources\settings.xml:378
+#: \resources\settings.xml:375 \resources\settings.xml:379
 #: \resources\lib\gui\homeMenu.py:109
 msgctxt "#30151"
 msgid "Manage Provider Packages"
@@ -839,7 +839,7 @@ msgctxt "#30152"
 msgid "Force view types on menus"
 msgstr "Ώθησε τους τύπους εμφάνισης στα μενού"
 
-#: \resources\settings.xml:433
+#: \resources\settings.xml:434
 msgctxt "#30153"
 msgid "Shortcuts"
 msgstr "Συντομεύσεις"
@@ -849,114 +849,114 @@ msgctxt "#30154"
 msgid "Mixed Episode Lists Title Display Style"
 msgstr "Στυλ εμφάνισης τίτλων στη μικτή λίστα επεισοδίων"
 
-#: \resources\settings.xml:419
+#: \resources\settings.xml:420
 msgctxt "#30155"
 msgid "TMDb API Key"
 msgstr "Κλειδί TMDb API"
 
-#: \resources\settings.xml:422
+#: \resources\settings.xml:423
 msgctxt "#30156"
 msgid "Trakt Client ID"
 msgstr "Αναγνωριστικό πελάτη Trakt"
 
-#: \resources\settings.xml:423
+#: \resources\settings.xml:424
 msgctxt "#30157"
 msgid "Trakt Client Secret"
 msgstr "Trakt Client Secret"
 
-#: \resources\settings.xml:426
+#: \resources\settings.xml:427
 msgctxt "#30158"
 msgid "TVDB API Key"
 msgstr "Κλειδί TMDB API"
 
-#: \resources\settings.xml:383
+#: \resources\settings.xml:384
 msgctxt "#30159"
 msgid "Sort & Filter"
 msgstr "Ταξινόμηση & Φιλτράρισμα"
 
-#: \resources\settings.xml:394
+#: \resources\settings.xml:395
 msgctxt "#30160"
 msgid "Hide 3D Items"
 msgstr "Κρύψτε 3D Αντικείμενα"
 
-#: \resources\settings.xml:401
+#: \resources\settings.xml:402
 msgctxt "#30161"
 msgid "Source Sorting"
 msgstr "Ταξινόμηση Πηγών"
 
-#: \resources\settings.xml:335
+#: \resources\settings.xml:336
 msgctxt "#30162"
 msgid "Authorize Real-Debrid..."
 msgstr "Εξουσιοδότηση Real-Debrid..."
 
-#: \resources\settings.xml:332
+#: \resources\settings.xml:333
 msgctxt "#30163"
 msgid "Real-Debrid Username"
 msgstr "Όνομα χρήστη Real-Debrid"
 
-#: \resources\settings.xml:331
+#: \resources\settings.xml:332
 msgctxt "#30164"
 msgid "Enable Real-Debrid"
 msgstr "Ενεργοποίηση Real-Debrid"
 
-#: \resources\settings.xml:337
+#: \resources\settings.xml:338
 msgctxt "#30165"
 msgid "Real-Debrid Priority"
 msgstr "Προτεραιότητα Real-Debrid"
 
-#: \resources\settings.xml:313 \resources\settings.xml:339
-#: \resources\settings.xml:357
+#: \resources\settings.xml:314 \resources\settings.xml:340
+#: \resources\settings.xml:358
 msgctxt "#30166"
 msgid "Enable Torrents"
 msgstr "Ενεργοποίηση Torrents"
 
-#: \resources\settings.xml:315 \resources\settings.xml:340
-#: \resources\settings.xml:359
+#: \resources\settings.xml:316 \resources\settings.xml:341
+#: \resources\settings.xml:360
 msgctxt "#30167"
 msgid "Enable Hosters"
 msgstr "Ενεργοποίηση Hosters"
 
-#: \resources\settings.xml:341
+#: \resources\settings.xml:342
 msgctxt "#30168"
 msgid "Auto-Delete Torrents"
 msgstr "Αυτόματη Διαγραφή Torrent"
 
-#: \resources\settings.xml:323
+#: \resources\settings.xml:324
 msgctxt "#30169"
 msgid "Max Storage Space Used Before Deletion (GB)"
 msgstr "Μέγιστος Χώρος Αποθήκευσης που Χρησιμοποιήθηκε Πριν την Διαγραφή (GB)"
 
-#: \resources\settings.xml:321
+#: \resources\settings.xml:322
 msgctxt "#30170"
 msgid "Automatic Cloud Removal"
 msgstr "Αυτόματη Αφαίρεση Cloud"
 
-#: \resources\settings.xml:317
+#: \resources\settings.xml:318
 msgctxt "#30171"
 msgid "Prefer Transcoded Files"
 msgstr "Προτιμήστε Αρχεία με Κωδικοποίηση"
 
-#: \resources\settings.xml:307
+#: \resources\settings.xml:308
 msgctxt "#30172"
 msgid "Premiumize Customer ID"
 msgstr "Premiumize Customer ID"
 
-#: \resources\settings.xml:311
+#: \resources\settings.xml:312
 msgctxt "#30173"
 msgid "Premiumize Priority"
 msgstr "Προτεραιότητα Premiumize"
 
-#: \resources\settings.xml:304
+#: \resources\settings.xml:305
 msgctxt "#30174"
 msgid "Enable Premiumize"
 msgstr "Ενεργοποίηση Premiumize"
 
-#: \resources\settings.xml:396
+#: \resources\settings.xml:397
 msgctxt "#30175"
 msgid "Hide Common Undesirable Items"
 msgstr "Κρύψτε Συχνά Ανεπιθύμητα Αντικείμενα"
 
-#: \resources\settings.xml:407
+#: \resources\settings.xml:408
 msgctxt "#30176"
 msgid "Enable Quaternary Low Quality Sort Preference"
 msgstr "Ενεργοποίηση Τέταρτης Προτίμησης Ταξινόμησης ως Χαμηλής Ποιότητας"
@@ -977,13 +977,13 @@ msgstr ""
 "Παρακαλώ ελέγξτε την κατάσταση διακοπής του Trakt στο:\n"
 "http://status.trakt.tv"
 
-#: \resources\settings.xml:121
+#: \resources\settings.xml:122
 msgctxt "#30179"
 msgid "Fanart.TV API Key"
 msgstr "Κλειδί Fanart.TV API"
 
-#: \resources\settings.xml:119 \resources\settings.xml:127
-#: \resources\settings.xml:160
+#: \resources\settings.xml:120 \resources\settings.xml:128
+#: \resources\settings.xml:161
 msgctxt "#30180"
 msgid "Fanart.TV"
 msgstr "Fanart.TV"
@@ -1020,7 +1020,7 @@ msgstr ""
 "Ένα άλλο πρόσθετο επιχειρεί να απεεγκαταστήσει τον {} πάροχο από το Seren\n"
 "Επιθυμείτε να το επιτρέψετε?"
 
-#: \resources\settings.xml:397
+#: \resources\settings.xml:398
 msgctxt "#30185"
 msgid "Hide SD quality sources"
 msgstr "Κρύψτε πηγές ποιότητας SD"
@@ -1050,35 +1050,35 @@ msgctxt "#30190"
 msgid "My Files"
 msgstr "Τα Αρχεία μου"
 
-#: \resources\settings.xml:210
+#: \resources\settings.xml:211
 msgctxt "#30191"
 msgid "Scraper Display Style"
 msgstr "Στυλ Προβολής Scraper"
 
-#: \resources\settings.xml:108
+#: \resources\settings.xml:109
 msgctxt "#30192"
 msgid "Resolve Display Style"
 msgstr "Στυλ Προβολής Resolve"
 
-#: \resources\settings.xml:108 \resources\settings.xml:108
-#: \resources\settings.xml:210 \resources\settings.xml:256
-#: \resources\settings.xml:267
+#: \resources\settings.xml:109 \resources\settings.xml:109
+#: \resources\settings.xml:211 \resources\settings.xml:257
+#: \resources\settings.xml:268
 msgctxt "#30193"
 msgid "Fancy"
 msgstr "Προσκήνιο"
 
-#: \resources\settings.xml:108 \resources\settings.xml:210
-#: \resources\settings.xml:256
+#: \resources\settings.xml:109 \resources\settings.xml:211
+#: \resources\settings.xml:257
 msgctxt "#30194"
 msgid "Background Task"
 msgstr "Εργασία Παρασκηνίου"
 
-#: \resources\settings.xml:110
+#: \resources\settings.xml:111
 msgctxt "#30195"
 msgid "Auto-Select after (x) Seconds"
 msgstr "Αυτόματη Επιλογή μετά από (x) Δευτερόλεπτα"
 
-#: \resources\settings.xml:111
+#: \resources\settings.xml:112
 msgctxt "#30196"
 msgid "Auto Select Delay"
 msgstr "Αυτόματη Καθυστέρηση"
@@ -1095,7 +1095,7 @@ msgctxt "#30198"
 msgid "Starting Source Select"
 msgstr "Εκκίνηση Επιλογής Πηγών"
 
-#: \resources\lib\common\maintenance.py:67
+#: \resources\lib\common\maintenance.py:68
 msgctxt "#30199"
 msgid ""
 "A new verison of Seren is available from the repository. Please consider "
@@ -1109,8 +1109,8 @@ msgctxt "#30200"
 msgid "Notify Me About Available Updates"
 msgstr "Ειδοποίησε Με Για Διαθέσιμες Ενημερώσεις"
 
-#: \resources\lib\database\trakt_sync\__init__.py:403
-#: \resources\lib\database\trakt_sync\__init__.py:432
+#: \resources\lib\database\trakt_sync\__init__.py:406
+#: \resources\lib\database\trakt_sync\__init__.py:435
 msgctxt "#30201"
 msgid ""
 "[COLOR red]WARNING[/COLOR]\n"
@@ -1119,7 +1119,7 @@ msgstr ""
 "[COLOR red]ΠΡΟΕΙΔΟΠΟΙΗΣΗ[/COLOR]\n"
 "Αυτό θα διαγράψει όλες τις μετα-πληροφορίες, είστε σίγουροι?"
 
-#: \resources\settings.xml:442 \resources\lib\gui\homeMenu.py:79
+#: \resources\settings.xml:443 \resources\lib\gui\homeMenu.py:79
 #: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:374
 #: \resources\lib\gui\tvshowMenus.py:378
 msgctxt "#30202"
@@ -1136,7 +1136,7 @@ msgctxt "#30204"
 msgid "New Show Search..."
 msgstr "Νέα Αναζήτηση Σειράς..."
 
-#: \resources\settings.xml:319
+#: \resources\settings.xml:320
 msgctxt "#30205"
 msgid "Store resolved items in cloud"
 msgstr "Αποθήκευση ληφθέντων αντικειμένων στο cloud"
@@ -1151,6 +1151,7 @@ msgctxt "#30207"
 msgid "General Menu View ID"
 msgstr "ID Προβολής Γενικού Μενού"
 
+#: \resources\lib\modules\cacheAssist.py:439
 #: \resources\lib\modules\router.py:133
 msgctxt "#30208"
 msgid "[COLOR red]Error:[/COLOR] No Debrid accounts were identified."
@@ -1166,13 +1167,13 @@ msgstr ""
 "Παρακαλώ ρυθμίστε τους λογαριασμούς σας από το μενού ρυθμίσεων πριν "
 "δοκιμάσετε να παίξετε κάτι"
 
-#: \resources\settings.xml:235
+#: \resources\settings.xml:236
 msgctxt "#30210"
 msgid "Terminate if cloud sources are found"
 msgstr "Διακοπή όταν εντοπιστούν πηγές cloud"
 
-#: \resources\settings.xml:325 \resources\settings.xml:342
-#: \resources\settings.xml:361
+#: \resources\settings.xml:326 \resources\settings.xml:343
+#: \resources\settings.xml:362
 msgctxt "#30211"
 msgid "Inspect Cloud Files on Scrape"
 msgstr "Ελέγξτε τα Αρχεία Cloud όταν εκτελείται Scrape"
@@ -1182,12 +1183,12 @@ msgctxt "#30212"
 msgid "By Actor..."
 msgstr "Με βάση τον ηθοποιό..."
 
-#: \resources\settings.xml:251
+#: \resources\settings.xml:252
 msgctxt "#30213"
 msgid "Movie Play Style"
 msgstr "Στυλ Αναπαραγωγής Ταινίας"
 
-#: \resources\settings.xml:390
+#: \resources\settings.xml:391
 msgctxt "#30214"
 msgid "Movie File Size limit (GB)"
 msgstr "Όριο Μεγέθους Αρχέιου Ταινίας (GB)"
@@ -1206,13 +1207,13 @@ msgstr ""
 "Σημειώστε\n"
 "Έχετε εξουσιοδοτήσει έναν μη έγκυρο λογαριασμό premium και δεν θα μπορούν να αναπαραχθούν αντικείμενα χρησιμοποιώντας αυτόν τον λογαριασμό"
 
-#: \resources\settings.xml:253
+#: \resources\settings.xml:254
 msgctxt "#30217"
 msgid "Auto try next link on resolve failure (Source Select)"
 msgstr ""
 "Αναπαράγετε αυτόματα το επόμενο link σε περίπτωση αποτυχίας  (Επιλογη Πηγής)"
 
-#: \resources\lib\database\skinManager\__init__.py:360
+#: \resources\lib\database\skinManager\__init__.py:363
 msgctxt "#30218"
 msgid ""
 "Successfully installed {} - {}\n"
@@ -1221,12 +1222,12 @@ msgstr ""
 "Επιτυχής εγκατάσταση {} - {}\n"
 "Επιθυμείτε να αλλάξετε σε αυτό το θέμα?"
 
-#: \resources\lib\database\skinManager\__init__.py:404
+#: \resources\lib\database\skinManager\__init__.py:407
 msgctxt "#30219"
 msgid "Are you sure you wish to uninstall the theme {}?"
 msgstr "Είστε σίγουρος πως επιθυμείτε να απεγκαταστήσετε το θέμα {}?"
 
-#: \resources\lib\database\skinManager\__init__.py:429
+#: \resources\lib\database\skinManager\__init__.py:432
 msgctxt "#30220"
 msgid "Successfully uninstalled {}"
 msgstr "Επιτυχής απεγκατάσταση {}"
@@ -1256,7 +1257,7 @@ msgctxt "#30225"
 msgid "Install theme"
 msgstr "Εγκατάσταση Θέματος"
 
-#: \resources\lib\database\skinManager\__init__.py:413
+#: \resources\lib\database\skinManager\__init__.py:416
 msgctxt "#30226"
 msgid ""
 "You are attempting to uninstall the active theme, this will switch you to "
@@ -1265,12 +1266,12 @@ msgstr ""
 "Προσπαθείτε να απεγκαταστήσετε ένα ενεργό θέμα, αυτό θα σας επιστρέψει στο "
 "προεπιλεγμένο θέμα."
 
-#: \resources\lib\database\skinManager\__init__.py:386
+#: \resources\lib\database\skinManager\__init__.py:389
 msgctxt "#30227"
 msgid "Succesfully Switched to {}"
 msgstr "Επιτυχής Αλλάγη σε {}"
 
-#: \resources\lib\database\skinManager\__init__.py:350
+#: \resources\lib\database\skinManager\__init__.py:353
 #: \tests\integration\gui\test_skin_manager.py:55
 msgctxt "#30228"
 msgid "The theme name {} is not allowed"
@@ -1322,27 +1323,27 @@ msgctxt "#30236"
 msgid "My Show Lists"
 msgstr "Η Λίστα Σειρών Μου"
 
-#: \resources\settings.xml:448 \resources\lib\gui\homeMenu.py:91
+#: \resources\settings.xml:449 \resources\lib\gui\homeMenu.py:91
 msgctxt "#30237"
 msgid "Trakt Sync Tools"
 msgstr "Εργαλεία Συγχρονισμού Trakt"
 
-#: \resources\settings.xml:450 \resources\lib\gui\homeMenu.py:118
+#: \resources\settings.xml:451 \resources\lib\gui\homeMenu.py:118
 msgctxt "#30238"
 msgid "Clear last sync time"
 msgstr "Εκκαθάριση τελευταίας καταγραφής ώρας συγχρονισμού"
 
-#: \resources\settings.xml:452 \resources\lib\gui\homeMenu.py:122
+#: \resources\settings.xml:453 \resources\lib\gui\homeMenu.py:122
 msgctxt "#30239"
 msgid "Force a sync with Trakt"
 msgstr "Εξαναγκασμός συγχρονισμού με Trakt"
 
-#: \resources\settings.xml:454 \resources\lib\gui\homeMenu.py:126
+#: \resources\settings.xml:455 \resources\lib\gui\homeMenu.py:126
 msgctxt "#30240"
 msgid "Clear All Metadata"
 msgstr "Καθαρισμός Όλων των Μεταδεδομένων"
 
-#: \resources\settings.xml:456 \resources\lib\gui\homeMenu.py:130
+#: \resources\settings.xml:457 \resources\lib\gui\homeMenu.py:130
 msgctxt "#30241"
 msgid "Rebuild Database"
 msgstr "Ανακατασκευή Βάσης Δεδομένων"
@@ -1376,8 +1377,8 @@ msgstr "Προεπιλεγμένο"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:131
-#: \resources\settings.xml:164 \resources\settings.xml:188
+#: \resources\settings.xml:44 \resources\settings.xml:132
+#: \resources\settings.xml:165 \resources\settings.xml:189
 msgctxt "#30247"
 msgid "Poster"
 msgstr "Αφίσα"
@@ -1419,47 +1420,47 @@ msgstr "Τοίχος"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:137
-#: \resources\settings.xml:170 \resources\settings.xml:191
+#: \resources\settings.xml:44 \resources\settings.xml:138
+#: \resources\settings.xml:171 \resources\settings.xml:192
 msgctxt "#30253"
 msgid "Banner"
 msgstr "Πανό"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:134
-#: \resources\settings.xml:167 \resources\settings.xml:197
-#: \resources\settings.xml:200
+#: \resources\settings.xml:44 \resources\settings.xml:135
+#: \resources\settings.xml:168 \resources\settings.xml:198
+#: \resources\settings.xml:201
 msgctxt "#30254"
 msgid "Fanart"
 msgstr "Fanart"
 
-#: \resources\settings.xml:218 \resources\settings.xml:255
+#: \resources\settings.xml:219 \resources\settings.xml:256
 msgctxt "#30255"
 msgid "Automatic"
 msgstr "Αυτόματη"
 
-#: \resources\settings.xml:218
+#: \resources\settings.xml:219
 msgctxt "#30256"
 msgid "Manual Selection"
 msgstr "Χειροκίνητη Επιλογή"
 
-#: \resources\settings.xml:233 \resources\skins\Default\1080i\resolver.xml:86
+#: \resources\settings.xml:234 \resources\skins\Default\1080i\resolver.xml:86
 msgctxt "#30257"
 msgid "Torrents Only"
 msgstr "Μόνο Torrents"
 
-#: \resources\settings.xml:233
+#: \resources\settings.xml:234
 msgctxt "#30258"
 msgid "Hosters Only"
 msgstr "Μόνο Hosters"
 
-#: \resources\settings.xml:233
+#: \resources\settings.xml:234
 msgctxt "#30259"
 msgid "Torrents/Hosters"
 msgstr "Torrents/Hosters"
 
-#: \resources\settings.xml:403 \resources\skins\Default\1080i\resolver.xml:99
+#: \resources\settings.xml:404 \resources\skins\Default\1080i\resolver.xml:99
 #: \resources\skins\Default\1080i\source_select.xml:115
 #: \resources\skins\Default\1080i\source_select.xml:228
 msgctxt "#30260"
@@ -1553,34 +1554,34 @@ msgctxt "#30277"
 msgid "Source type"
 msgstr "Τύπος Πηγής"
 
-#: \resources\lib\common\maintenance.py:85
-#: \tests\integration\common\test_maintenance.py:203
+#: \resources\lib\common\maintenance.py:86
+#: \tests\integration\common\test_maintenance.py:204
 msgctxt "#30278"
 msgid "One or more providers have updates pending"
 msgstr "Ένας ή περισσότεροι πάροχοι έχουν ενημερώσεις σε εκκρεμότητα"
 
-#: \resources\settings.xml:127
+#: \resources\settings.xml:128
 msgctxt "#30279"
 msgid "Prefer Movie artwork from"
 msgstr "Προτιμήστε Εικονογραφίες Ταινιών από"
 
-#: \resources\settings.xml:160
+#: \resources\settings.xml:161
 msgctxt "#30280"
 msgid "Prefer TV Show artwork from"
 msgstr "Προτιμήστε Εικονογραφίες Τηλεοπτικών Σειρών από"
 
-#: \resources\settings.xml:80 \resources\settings.xml:127
-#: \resources\settings.xml:160
+#: \resources\settings.xml:80 \resources\settings.xml:128
+#: \resources\settings.xml:161
 msgctxt "#30281"
 msgid "TMDb"
 msgstr "TMDb"
 
-#: \resources\settings.xml:80 \resources\settings.xml:160
+#: \resources\settings.xml:80 \resources\settings.xml:161
 msgctxt "#30282"
 msgid "TVDB"
 msgstr "TVDB"
 
-#: \resources\settings.xml:247
+#: \resources\settings.xml:248
 msgctxt "#30283"
 msgid "Playback"
 msgstr "Αναπαραγωγή"
@@ -1590,7 +1591,7 @@ msgctxt "#30284"
 msgid "Interface"
 msgstr "Διασύνδεση"
 
-#: \resources\settings.xml:116
+#: \resources\settings.xml:117
 msgctxt "#30285"
 msgid "Artwork"
 msgstr "Εικονογραφίες"
@@ -1600,40 +1601,40 @@ msgctxt "#30286"
 msgid "Advanced"
 msgstr "Προχωρημένες"
 
-#: \resources\settings.xml:188 \resources\settings.xml:191
-#: \resources\settings.xml:194 \resources\settings.xml:197
+#: \resources\settings.xml:189 \resources\settings.xml:192
+#: \resources\settings.xml:195 \resources\settings.xml:198
 msgctxt "#30287"
 msgid "Season"
 msgstr "Σεζόν"
 
-#: \resources\settings.xml:200
+#: \resources\settings.xml:201
 msgctxt "#30288"
 msgid "Episode"
 msgstr "Επεισόδιο"
 
-#: \resources\settings.xml:164 \resources\settings.xml:167
-#: \resources\settings.xml:170 \resources\settings.xml:173
-#: \resources\settings.xml:176 \resources\settings.xml:179
-#: \resources\settings.xml:182 \resources\settings.xml:185
+#: \resources\settings.xml:165 \resources\settings.xml:168
+#: \resources\settings.xml:171 \resources\settings.xml:174
+#: \resources\settings.xml:177 \resources\settings.xml:180
+#: \resources\settings.xml:183 \resources\settings.xml:186
 msgctxt "#30289"
 msgid "TV Show"
 msgstr "Τηλεοπτική Σειρά"
 
-#: \resources\settings.xml:131 \resources\settings.xml:134
-#: \resources\settings.xml:137 \resources\settings.xml:140
-#: \resources\settings.xml:143 \resources\settings.xml:146
-#: \resources\settings.xml:149 \resources\settings.xml:152
-#: \resources\settings.xml:155 \resources\lib\indexers\trakt.py:749
+#: \resources\settings.xml:132 \resources\settings.xml:135
+#: \resources\settings.xml:138 \resources\settings.xml:141
+#: \resources\settings.xml:144 \resources\settings.xml:147
+#: \resources\settings.xml:150 \resources\settings.xml:153
+#: \resources\settings.xml:156 \resources\lib\indexers\trakt.py:749
 msgctxt "#30290"
 msgid "Movie"
 msgstr "Ταινία"
 
-#: \resources\settings.xml:129
+#: \resources\settings.xml:130
 msgctxt "#30291"
 msgid "Show Advanced Movie Artwork Settings"
 msgstr "Εμφάνιση Ρυθμίσεων Εικονογραφιών Ταινιών για Προχωρημένους"
 
-#: \resources\settings.xml:162
+#: \resources\settings.xml:163
 msgctxt "#30292"
 msgid "Show Advanced TV Artwork Settings"
 msgstr "Εμφάνιση Ρυθμίσεων Εικονογραφιών Τηλεοπτικών Έργων για Προχωρημένους"
@@ -1643,32 +1644,32 @@ msgctxt "#30293"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Είστε σίγουροι πως επιθυμείτε να αφαιρέσετε το {} πακέτο?"
 
-#: \resources\settings.xml:416
+#: \resources\settings.xml:417
 msgctxt "#30294"
 msgid "Show Advanced Settings..."
 msgstr "Δείξε Προχωρημένες Ρυθμίσεις..."
 
-#: \resources\settings.xml:125
+#: \resources\settings.xml:126
 msgctxt "#30295"
 msgid "Movie Artwork"
 msgstr "Εικονογραφίες Ταινίας"
 
-#: \resources\settings.xml:158
+#: \resources\settings.xml:159
 msgctxt "#30296"
 msgid "TV show Artwork"
 msgstr "Εικονογραφίες Τηλεοπτικής Σειράς"
 
-#: \resources\lib\database\trakt_sync\__init__.py:394
+#: \resources\lib\database\trakt_sync\__init__.py:397
 msgctxt "#30297"
 msgid "User information has been cleared"
 msgstr "Οι πληροφορίες χρήστη έχουν καταργηθεί"
 
-#: \resources\lib\database\trakt_sync\__init__.py:427
+#: \resources\lib\database\trakt_sync\__init__.py:430
 msgctxt "#30298"
 msgid "Metadata has been cleared"
 msgstr "Τα μεταδεδομένα έχουν καταργηθεί"
 
-#: \resources\lib\database\trakt_sync\__init__.py:454
+#: \resources\lib\database\trakt_sync\__init__.py:457
 msgctxt "#30299"
 msgid "Database has been rebuilt"
 msgstr "Η Βάση Δεδομένων έχει επαναδημιουργηθεί"
@@ -1859,7 +1860,7 @@ msgstr "Εισαγωγή Zip URL"
 
 #: \resources\lib\gui\windows\source_select.py:78
 #: \resources\lib\modules\cacheAssist.py:114
-#: \resources\lib\modules\getSources.py:340
+#: \resources\lib\modules\getSources.py:352
 msgctxt "#30335"
 msgid "Cache Assist"
 msgstr "Βοήθεια Μνήμης Cache"
@@ -1879,85 +1880,85 @@ msgctxt "#30338"
 msgid "Starting Playback"
 msgstr "Εκκίνηση Αναπαραγωγής"
 
-#: \resources\settings.xml:143 \resources\settings.xml:176
+#: \resources\settings.xml:144 \resources\settings.xml:177
 msgctxt "#30339"
 msgid "Keyart"
 msgstr "Keyart"
 
-#: \resources\settings.xml:146 \resources\settings.xml:179
+#: \resources\settings.xml:147 \resources\settings.xml:180
 msgctxt "#30340"
 msgid "Clear Logo"
 msgstr "Καθαρισμός Λογότυπου"
 
-#: \resources\settings.xml:140 \resources\settings.xml:173
-#: \resources\settings.xml:194
+#: \resources\settings.xml:141 \resources\settings.xml:174
+#: \resources\settings.xml:195
 msgctxt "#30341"
 msgid "Landscape"
 msgstr "Τοπίο"
 
-#: \resources\settings.xml:155 \resources\settings.xml:185
+#: \resources\settings.xml:156 \resources\settings.xml:186
 msgctxt "#30342"
 msgid "Character Art"
 msgstr "Character Art"
 
-#: \resources\settings.xml:149 \resources\settings.xml:182
+#: \resources\settings.xml:150 \resources\settings.xml:183
 msgctxt "#30343"
 msgid "Clear Art"
 msgstr "Clear Art"
 
-#: \resources\settings.xml:152
+#: \resources\settings.xml:153
 msgctxt "#30344"
 msgid "Disc Art"
 msgstr "Disc Art"
 
-#: \resources\settings.xml:256
+#: \resources\settings.xml:257
 msgctxt "#30345"
 msgid "Smart Play Display Style"
 msgstr "Στυλ εμφάνισης έξυπνης αναπαραγωγής"
 
-#: \resources\settings.xml:262
+#: \resources\settings.xml:263
 msgctxt "#30346"
 msgid "Smart Play Popup"
 msgstr "Αναδυόμενο στοιχείο έξυπνης αναπαραγωγής"
 
-#: \resources\settings.xml:267
+#: \resources\settings.xml:268
 msgctxt "#30347"
 msgid "Dialog Style"
 msgstr "Στυλ διαλόγου"
 
-#: \resources\settings.xml:267
+#: \resources\settings.xml:268
 msgctxt "#30348"
 msgid "Simple"
 msgstr "Απλό"
 
-#: \resources\settings.xml:268
+#: \resources\settings.xml:269
 msgctxt "#30349"
 msgid "Default Action if Nothing Selected"
 msgstr "Προεπιλεγμένη ενέργεια αν δεν έχει επιλεγεί τίποτα"
 
 #: \resources\settings.xml:78 \resources\settings.xml:79
-#: \resources\settings.xml:268 \resources\lib\gui\windows\source_select.py:79
+#: \resources\settings.xml:269 \resources\lib\gui\windows\source_select.py:79
 #: \resources\skins\Default\1080i\source_select.xml:363
 msgctxt "#30350"
 msgid "Play"
 msgstr "Αναπαραγωγή"
 
-#: \resources\settings.xml:268
+#: \resources\settings.xml:269
 msgctxt "#30351"
 msgid "Pause"
 msgstr "Παύση"
 
-#: \resources\settings.xml:272
+#: \resources\settings.xml:273
 msgctxt "#30352"
 msgid "Still Watching Dialog"
 msgstr "Διάλογος Παρακολούθησης"
 
-#: \resources\settings.xml:274
+#: \resources\settings.xml:275
 msgctxt "#30353"
 msgid "Enable Still Watching Dialog"
 msgstr "Ενεργοποίηση διαλόγου παρακολούθησης"
 
-#: \resources\settings.xml:275
+#: \resources\settings.xml:276
 msgctxt "#30354"
 msgid "Episodes Between Dialog Prompts"
 msgstr "Επεισόδια μεταξύ των παραμέτρων διαλόγου"
@@ -1987,17 +1988,17 @@ msgctxt "#30359"
 msgid "Search Shows By Actor..."
 msgstr "Αναζήτηση Σειρών ανά ηθοποιό ..."
 
-#: \resources\settings.xml:255
+#: \resources\settings.xml:256
 msgctxt "#30360"
 msgid "Ask"
 msgstr "Ερώτηση"
 
-#: \resources\settings.xml:255
+#: \resources\settings.xml:256
 msgctxt "#30361"
 msgid "Do not resume"
 msgstr "Να μην γίνει συνέχιση"
 
-#: \resources\lib\modules\smartPlay.py:403
+#: \resources\lib\modules\smartPlay.py:417
 msgctxt "#30362"
 msgid "Start From Beginning"
 msgstr "Έναρξη από την αρχή"
@@ -2011,7 +2012,7 @@ msgstr ""
 "Λόγω της εφαρμογής νέων χαρακτηριστικών στην τοπική βάση δεδομένων, "
 "απαιτείται τώρα μια ανακατασκευή"
 
-#: \resources\lib\database\trakt_sync\__init__.py:448
+#: \resources\lib\database\trakt_sync\__init__.py:451
 msgctxt "#30364"
 msgid ""
 "There were issues when processing the synchronization with Trakt, please "
@@ -2020,7 +2021,7 @@ msgstr ""
 "Υπήρχαν προβλήματα κατά την επεξεργασία του συγχρονισμού με το Trakt, "
 "ελέγξτε το αρχείο καταγραφής"
 
-#: \resources\settings.xml:220 \resources\settings.xml:347
+#: \resources\settings.xml:221 \resources\settings.xml:348
 msgctxt "#30365"
 msgid "AllDebrid"
 msgstr "AllDebrid"
@@ -2030,22 +2031,22 @@ msgctxt "#30366"
 msgid "AllDebrid Auth"
 msgstr "AllDebrid Auth"
 
-#: \resources\settings.xml:349
+#: \resources\settings.xml:350
 msgctxt "#30367"
 msgid "Enabled AllDebrid"
 msgstr "Ενεργοποιήθηκε AllDebrid"
 
-#: \resources\settings.xml:350
+#: \resources\settings.xml:351
 msgctxt "#30368"
 msgid "AllDebrid Username"
 msgstr "Όνομα χρήστη AllDebrid"
 
-#: \resources\settings.xml:353
+#: \resources\settings.xml:354
 msgctxt "#30369"
 msgid "Authorize AllDebrid..."
 msgstr "Εξουσιοδότηση του AllDebrid ..."
 
-#: \resources\settings.xml:355
+#: \resources\settings.xml:356
 msgctxt "#30370"
 msgid "AllDebrid Priority"
 msgstr "AllDebrid Προτεραιότητα"
@@ -2055,7 +2056,7 @@ msgctxt "#30371"
 msgid "Enable Automatic Theme Updates"
 msgstr "Ενεργοποιήστε τις Αυτόματες ενημερώσεις θεμάτων"
 
-#: \resources\settings.xml:305
+#: \resources\settings.xml:306
 msgctxt "#30372"
 msgid "Authorise Premiumize"
 msgstr "Εξουσιοδοτήστε το Premiumize"
@@ -2069,22 +2070,22 @@ msgstr ""
 "Φαίνεται ότι υπάρχει κάποιο πρόβλημα με την εξουσιοδότησή σας στο Trakt "
 "Παρακαλώ δοκιμάστε ξανά την έγκριση του λογαριασμού σας"
 
-#: \resources\settings.xml:122
+#: \resources\settings.xml:123
 msgctxt "#30374"
 msgid "Preferred artwork size"
 msgstr "Προτιμώμενο μέγεθος έργου τέχνης"
 
-#: \resources\settings.xml:122
+#: \resources\settings.xml:123
 msgctxt "#30375"
 msgid "Largest available"
 msgstr "Μεγαλύτερο διαθέσιμο"
 
-#: \resources\settings.xml:122
+#: \resources\settings.xml:123
 msgctxt "#30376"
 msgid "Medium"
 msgstr "Μέσο"
 
-#: \resources\settings.xml:122
+#: \resources\settings.xml:123
 msgctxt "#30377"
 msgid "Small"
 msgstr "Μικρό"
@@ -2695,7 +2696,7 @@ msgctxt "#30476"
 msgid "My recent watched episodes"
 msgstr "Τα πρόσφατα επεισόδια μου παρακολουθήθηκαν"
 
-#: \resources\lib\modules\getSources.py:357
+#: \resources\lib\modules\getSources.py:369
 #: \resources\lib\modules\helpers.py:52
 msgctxt "#30477"
 msgid ""
@@ -2715,13 +2716,13 @@ msgctxt "#30479"
 msgid "Show remaining unwatched season episodes in mixed lists"
 msgstr "Εμφάνιση υπολειπόμενων επεισοδίων εποχής σε μικτές λίστες"
 
-#: \resources\settings.xml:241 \resources\lib\modules\download_manager.py:604
+#: \resources\settings.xml:242 \resources\lib\modules\download_manager.py:604
 #: \resources\lib\modules\local_downloader.py:191
 msgctxt "#30480"
 msgid "Select Download Location"
 msgstr "Επιλέξτε Τοποθεσία αποθήκευσης"
 
-#: \resources\settings.xml:243
+#: \resources\settings.xml:244
 msgctxt "#30481"
 msgid "Folder"
 msgstr "Φάκελος"
@@ -2731,7 +2732,7 @@ msgctxt "#30482"
 msgid "Base List Type for Genres"
 msgstr "Τύπος βασικής λίστας για είδη"
 
-#: \resources\lib\modules\cacheAssist.py:461
+#: \resources\lib\modules\cacheAssist.py:469
 msgctxt "#30483"
 msgid "Cache Assist is attempting to build a torrent source"
 msgstr "Το Cache Assist προσπαθεί να δημιουργήσει μια πηγή torrent"
@@ -2776,7 +2777,7 @@ msgctxt "#30491"
 msgid "Show original titles"
 msgstr "Εμφάνιση πρωτότυπων τίτλων"
 
-#: \resources\settings.xml:429
+#: \resources\settings.xml:430
 msgctxt "#30492"
 msgid "OMDb API Key"
 msgstr "OMDb Κλειδί API"
@@ -2800,8 +2801,8 @@ msgctxt "#30495"
 msgid "Run in background"
 msgstr "Εκτελέστε στο παρασκήνιο"
 
-#: \resources\settings.xml:309 \resources\settings.xml:333
-#: \resources\settings.xml:351
+#: \resources\settings.xml:310 \resources\settings.xml:334
+#: \resources\settings.xml:352
 msgctxt "#30496"
 msgid "Premium Status"
 msgstr "Premium κατάσταση"
@@ -2815,7 +2816,6 @@ msgid "Close"
 msgstr "Κλείσιμο"
 
 #: \resources\lib\gui\homeMenu.py:157
-#: \resources\lib\modules\download_manager.py:429
 msgctxt "#30498"
 msgid "Test Manual Cache Window"
 msgstr "Εγχειρίδιο δοκιμής Cache Window"
@@ -2888,7 +2888,8 @@ msgctxt "#30510"
 msgid "Failed to create transfer at PM, please check the log"
 msgstr "Αποτυχία δημιουργίας μεταφοράς στις ΜΜ, ελέγξτε το αρχείο καταγραφής"
 
-#: \resources\lib\gui\windows\source_select.py:80
+#: \resources\settings.xml:241 \resources\lib\gui\windows\source_select.py:80
+#: \resources\lib\modules\download_manager.py:429
 #: \resources\skins\Default\1080i\source_select.xml:383
 msgctxt "#30511"
 msgid "Download"
@@ -2903,7 +2904,7 @@ msgstr ""
 "Τα φίλτρα σας φαίνεται να είναι περιοριστικά για αυτό το στοιχείο, θα θέλατε"
 " να δοκιμάσετε ξανά χωρίς αυτά;"
 
-#: \resources\settings.xml:398
+#: \resources\settings.xml:399
 msgctxt "#30513"
 msgid "Hide HDR Items"
 msgstr "Απόκρυψη στοιχείων HDR"
@@ -2936,12 +2937,12 @@ msgctxt "#30518"
 msgid "Force widget refresh after playback ends"
 msgstr "Αναγκαστική ανανέωση widget μετά τη λήξη της αναπαραγωγής"
 
-#: \resources\settings.xml:405
+#: \resources\settings.xml:406
 msgctxt "#30519"
 msgid "Reverse Size Sort (Low to High)"
 msgstr "Αντίστροφη ταξινόμηση μεγέθους (χαμηλή προς υψηλή)"
 
-#: \resources\settings.xml:236
+#: \resources\settings.xml:237
 msgctxt "#30520"
 msgid "Terminate if adaptive sources are found"
 msgstr "Τερματίστε αν βρεθούν προσαρμοστικές πηγές"
@@ -2958,17 +2959,18 @@ msgctxt "#30522"
 msgid "Torrent cache database successfully cleared"
 msgstr "Η βάση δεδομένων προσωρινής μνήμης Torrent διαγράφηκε με επιτυχία"
 
-#: \resources\settings.xml:294
+#: \resources\settings.xml:295
 msgctxt "#30523"
 msgid "Start scrobble after seconds."
 msgstr "Ξεκινήστε το scrobble μετά από δευτερόλεπτα."
 
-#: \resources\settings.xml:296
+#: \resources\settings.xml:297
 msgctxt "#30524"
 msgid "Minimum scrobble percentage before marked watched."
 msgstr "Ελάχιστο ποσοστό σκασίματος πριν από την επισήμανση."
 
 #: \resources\lib\gui\windows\source_select.py:81
+#: \resources\lib\modules\resolver\torrent_resolvers\base_resolver.py:77
 msgctxt "#30525"
 msgid "File Selection"
 msgstr "Επιλογή αρχείου"
@@ -2997,22 +2999,22 @@ msgstr ""
 "Το τελευταίο αρχείο αναπαραγωγής δεν επισημάνθηκε ως παρακολουθούμενο, θα "
 "θέλατε να το κάνετε τώρα;"
 
-#: \resources\settings.xml:403
+#: \resources\settings.xml:404
 msgctxt "#30529"
 msgid "No Grouping"
 msgstr "Χωρίς ομαδοποίηση"
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30530"
 msgid "On failure to resolve torrent file"
 msgstr "Σε αποτυχία επίλυσης αρχείου torrent"
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30531"
 msgid "Skip source"
 msgstr "Παράλειψη πηγής"
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30532"
 msgid "Ask for manual file selection"
 msgstr "Ζητήστε χειροκίνητη επιλογή αρχείων"
@@ -3213,12 +3215,44 @@ msgctxt "#30570"
 msgid "Western"
 msgstr "Δυτικός"
 
-#: \resources\lib\modules\metadataHandler.py:340
+#: \resources\lib\modules\metadataHandler.py:345
 msgctxt "#30571"
 msgid "Season {}"
 msgstr "Περίοδος {}"
 
-#: \resources\lib\modules\metadataHandler.py:342
+#: \resources\lib\modules\metadataHandler.py:347
 msgctxt "#30572"
 msgid "Episode {}"
 msgstr "Επεισόδιο {}"
+
+#: \resources\lib\modules\update_news.py:7
+msgctxt "#30573"
+msgid ""
+"Seren now uses a kodi feature to speed up menus drastically. This can cause instability on some devices\n"
+"If you experience crashes, you can disable this setting in the shortcuts section"
+msgstr ""
+"Η Seren χρησιμοποιεί τώρα μια λειτουργία kodi για να επιταχύνει δραστικά τα "
+"μενού. Αυτό μπορεί να προκαλέσει αστάθεια σε ορισμένες συσκευές&#10; Εάν "
+"αντιμετωπίσετε σφάλματα, μπορείτε να απενεργοποιήσετε αυτήν τη ρύθμιση στην "
+"ενότητα συντομεύσεων"
+
+#: \resources\lib\common\maintenance.py:221
+msgctxt "#30574"
+msgid "Language Invoker option has been changed, reloading kodi profile"
+msgstr ""
+"Η επιλογή Language Invoker έχει αλλάξει, φορτώνοντας ξανά το προφίλ kodi"
+
+#: \resources\settings.xml:460
+msgctxt "#30575"
+msgid "Language Invoker Options"
+msgstr "Επιλογές Invoker Γλώσσας"
+
+#: \resources\settings.xml:462
+msgctxt "#30576"
+msgid "Re-Use Language Invoker Status"
+msgstr "Επαναχρησιμοποίηση κατάστασης Invoker γλώσσας"
+
+#: \resources\settings.xml:463
+msgctxt "#30577"
+msgid "Toggle Re-Use Language Invoker"
+msgstr "Εναλλαγή επαναχρησιμοποίησης Language Invoker"

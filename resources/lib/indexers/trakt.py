@@ -187,10 +187,11 @@ class TraktAPI(ApiBase):
 
     _threading_lock = threading.Lock()
 
-    if os.name == "nt":
+    try:
         local_timezone = tz.tzwinlocal()
-    else:
+    except:
         local_timezone = tz.tzlocal()
+        
     gmt_timezone = tz.gettz("GMT")
     username_setting_key = "trakt.username"
 

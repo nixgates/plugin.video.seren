@@ -95,6 +95,7 @@ class CustomProviders(ProviderCache):
         self.execute_sql(
             "DELETE FROM providers where package not in ('{}')".format(predicate)
         )
+        self.known_packages = self.get_provider_packages()
 
     def update_known_providers(self):
         providers = self._try_add_providers_path()
@@ -103,6 +104,7 @@ class CustomProviders(ProviderCache):
             (provider[1], provider[2], "enabled", self.language, provider_type)
             for provider_type in self.provider_types
             for provider in all_providers.get(provider_type, [])
+            if any(provider[2] == package['pack_name'] for package in self.known_packages)
         ]
 
         self.execute_sql(self.provider_insert_query, providers)

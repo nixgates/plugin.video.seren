@@ -589,9 +589,9 @@ class MetadataHandler(object):
                 and not db_object.get("tvdb_object")
             )
         ) or (
-                    self.fanarttv_api.fanart_support and not
-                    media_type == "episode" and not
-                    db_object.get("fanart_object")
+            self.fanarttv_api.fanart_support and not
+            media_type == "episode" and not
+            db_object.get("fanart_object")
         ):
             g.log("Failed to lookup meta for {}".format(db_object.get("trakt_id")), "warning")
 

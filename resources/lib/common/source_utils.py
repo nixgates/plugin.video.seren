@@ -840,7 +840,7 @@ def get_accepted_resolution_list():
     resolutions = []
 
     max_res = g.get_int_setting("general.maxResolution")
-    if max_res == 3 or max_res < 3:
+    if max_res <= 3:
         resolutions.append("SD")
     if max_res < 3:
         resolutions.append("720p")

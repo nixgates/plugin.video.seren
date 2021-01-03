@@ -95,7 +95,7 @@ msgctxt "#30016"
 msgid "Next"
 msgstr "Næste"
 
-#: \resources\lib\modules\globals.py:679
+#: \resources\lib\modules\globals.py:680
 msgctxt "#30017"
 msgid "Color Picker"
 msgstr "Farvevælger"
@@ -169,13 +169,13 @@ msgctxt "#30028"
 msgid "Tools"
 msgstr "Værktøjer"
 
-#: \resources\settings.xml:436 \resources\settings.xml:438
+#: \resources\settings.xml:437 \resources\settings.xml:439
 #: \resources\lib\gui\homeMenu.py:71
 msgctxt "#30029"
 msgid "Clear Cache"
 msgstr "Ryd cache"
 
-#: \resources\lib\modules\globals.py:706
+#: \resources\lib\modules\globals.py:806
 msgctxt "#30030"
 msgid "Are you sure you wish to clear the cache?"
 msgstr "Er du sikker på, at du ønsker at rydde cachen?"
@@ -202,7 +202,7 @@ msgctxt "#30034"
 msgid "Silent Scraper Setting has been reset"
 msgstr "Indstilling af lydløs skraber er nulstillet"
 
-#: \resources\lib\common\maintenance.py:112
+#: \resources\lib\common\maintenance.py:113
 msgctxt "#30035"
 msgid ""
 "Please be aware this will completely wipe the following:\n"
@@ -211,13 +211,13 @@ msgstr ""
 "Vær opmærksom på, at dette vil tørre fuldstændigt af følgende: Bufrede data,"
 " indstillinger, installerede leverandører\n"
 
-#: \resources\lib\common\maintenance.py:113
+#: \resources\lib\common\maintenance.py:114
 msgctxt "#30036"
 msgid "ARE YOU SURE?"
 msgstr "ARE YOU SURE?"
 
-#: \resources\lib\common\maintenance.py:181
-#: \tests\integration\common\test_maintenance.py:108
+#: \resources\lib\common\maintenance.py:182
+#: \tests\integration\common\test_maintenance.py:109
 msgctxt "#30037"
 msgid "Your Real-Debrid Premium status has expired"
 msgstr "Din Real-Debrid Premium-status er udløbet"
@@ -232,7 +232,7 @@ msgctxt "#30039"
 msgid "Premium Services"
 msgstr "Premium-tjenester"
 
-#: \resources\settings.xml:440 \resources\lib\gui\homeMenu.py:75
+#: \resources\settings.xml:441 \resources\lib\gui\homeMenu.py:75
 msgctxt "#30040"
 msgid "Clear Local Torrent Cache"
 msgstr "Ryd lokal Torrent-cache"
@@ -242,7 +242,7 @@ msgctxt "#30041"
 msgid "Open Settings Menu"
 msgstr "Åbn menuen Indstillinger"
 
-#: \resources\settings.xml:444 \resources\lib\gui\homeMenu.py:87
+#: \resources\settings.xml:445 \resources\lib\gui\homeMenu.py:87
 msgctxt "#30042"
 msgid "Wipe Addon Data"
 msgstr "Tør Addon-data"
@@ -300,22 +300,22 @@ msgctxt "#30052"
 msgid "successfully uninstalled"
 msgstr "afinstalleret"
 
-#: \resources\lib\modules\globals.py:713
+#: \resources\lib\modules\globals.py:813
 msgctxt "#30053"
 msgid "All Cache Successfully Cleared"
 msgstr "Al cache er ryddet"
 
-#: \resources\lib\modules\getSources.py:180
+#: \resources\lib\modules\getSources.py:192
 msgctxt "#30054"
 msgid "Checking Local Database"
 msgstr "Kontrol af lokal database"
 
-#: \resources\lib\modules\getSources.py:104
+#: \resources\lib\modules\getSources.py:105
 msgctxt "#30055"
 msgid "Initializing Providers"
 msgstr "Initialisering af udbydere"
 
-#: \resources\lib\modules\getSources.py:200
+#: \resources\lib\modules\getSources.py:212
 msgctxt "#30056"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -324,36 +324,36 @@ msgstr ""
 "Der blev ikke fundet nogen kilder til det næste punkt i spillelisten. Rydder"
 " den aktuelle spilleliste"
 
-#: \resources\lib\modules\getSources.py:341
+#: \resources\lib\modules\getSources.py:353
 msgctxt "#30057"
 msgid ""
 "No Playable Sources were found.\n"
 "Would you like to attempt to cache a torrent?"
 msgstr "Ingen spilbare kilder blev fundet. Vil du prøve at cache en torrent?"
 
-#: \resources\settings.xml:403 \resources\lib\modules\getSources.py:719
+#: \resources\settings.xml:404 \resources\lib\modules\getSources.py:731
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30058"
 msgid "Torrents"
 msgstr "Torrents"
 
-#: \resources\settings.xml:403 \resources\lib\modules\getSources.py:724
+#: \resources\settings.xml:404 \resources\lib\modules\getSources.py:736
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30059"
 msgid "Hosters"
 msgstr "kro"
 
-#: \resources\lib\modules\getSources.py:730
+#: \resources\lib\modules\getSources.py:742
 msgctxt "#30060"
 msgid "Free Hosters"
 msgstr "Gratis hostere"
 
-#: \resources\lib\modules\getSources.py:732
+#: \resources\lib\modules\getSources.py:744
 msgctxt "#30061"
 msgid "Remaining Providers"
 msgstr "Resterende udbydere"
 
-#: \resources\lib\modules\smartPlay.py:400
+#: \resources\lib\modules\smartPlay.py:414
 msgctxt "#30062"
 msgid "Resume From: "
 msgstr "Genoptag fra: "
@@ -487,7 +487,7 @@ msgctxt "#30085"
 msgid "Checking for available package updates"
 msgstr "Tjekker for tilgængelige pakkeopdateringer"
 
-#: \resources\lib\common\maintenance.py:106
+#: \resources\lib\common\maintenance.py:107
 msgctxt "#30086"
 msgid ""
 "This will completely wipe your addon settings.\n"
@@ -496,40 +496,40 @@ msgstr ""
 "Dette vil udslette dine tilføjelsesindstillinger helt. Er du helt sikker på,"
 " at du vil gøre dette?"
 
-#: \resources\settings.xml:7 \resources\settings.xml:208
-#: \resources\settings.xml:250 \resources\settings.xml:283
-#: \resources\settings.xml:369
+#: \resources\settings.xml:7 \resources\settings.xml:209
+#: \resources\settings.xml:251 \resources\settings.xml:284
+#: \resources\settings.xml:370
 msgctxt "#30087"
 msgid "General"
 msgstr "Generelt"
 
-#: \resources\settings.xml:252
+#: \resources\settings.xml:253
 msgctxt "#30088"
 msgid "Episode Play Style"
 msgstr "Afsnit Play Style"
 
-#: \resources\settings.xml:251 \resources\settings.xml:252
+#: \resources\settings.xml:252 \resources\settings.xml:253
 msgctxt "#30089"
 msgid "Auto Play"
 msgstr "Automatisk afspilning"
 
-#: \resources\settings.xml:251 \resources\settings.xml:252
+#: \resources\settings.xml:252 \resources\settings.xml:253
 #: \resources\skins\Default\1080i\source_select.xml:32
 msgctxt "#30090"
 msgid "Source Select"
 msgstr "Kilde Vælg"
 
-#: \resources\settings.xml:109
+#: \resources\settings.xml:110
 msgctxt "#30091"
 msgid "Source Select View"
 msgstr "Kilde Vælg Vis"
 
-#: \resources\settings.xml:109
+#: \resources\settings.xml:110
 msgctxt "#30092"
 msgid "List"
 msgstr "Liste"
 
-#: \resources\settings.xml:109
+#: \resources\settings.xml:110
 msgctxt "#30093"
 msgid "Dialog"
 msgstr "Dialog"
@@ -619,209 +619,209 @@ msgctxt "#30110"
 msgid "Current Color"
 msgstr "Aktuel farve"
 
-#: \resources\settings.xml:264
+#: \resources\settings.xml:265
 msgctxt "#30111"
 msgid "Enable Playing Next Dialog"
 msgstr "Aktivér afspilning af næste dialog"
 
-#: \resources\settings.xml:265
+#: \resources\settings.xml:266
 msgctxt "#30112"
 msgid "Minimum Seconds Left Before Showing Dialog"
 msgstr "Minimum sekunder tilbage før dialog vises"
 
-#: \resources\settings.xml:257
+#: \resources\settings.xml:258
 msgctxt "#30113"
 msgid "Auto Playlist Creation"
 msgstr "Oprettelse af automatisk afspilningsliste"
 
-#: \resources\settings.xml:258
+#: \resources\settings.xml:259
 msgctxt "#30114"
 msgid "Force Auto Episode Resume"
 msgstr "Tving Auto Episode CV"
 
-#: \resources\settings.xml:259
+#: \resources\settings.xml:260
 msgctxt "#30115"
 msgid "Pre-emptive Scraping"
 msgstr "Forhindrende skrabning"
 
-#: \resources\settings.xml:255
+#: \resources\settings.xml:256
 msgctxt "#30116"
 msgid "Resume Style"
 msgstr "Genoptag stil"
 
-#: \resources\settings.xml:205
+#: \resources\settings.xml:206
 msgctxt "#30117"
 msgid "Scraping"
 msgstr "skrabning"
 
-#: \resources\settings.xml:211
+#: \resources\settings.xml:212
 msgctxt "#30118"
 msgid "Cache Torrent Info Locally"
 msgstr "Cache Torrentinformation lokalt"
 
-#: \resources\settings.xml:395
+#: \resources\settings.xml:396
 msgctxt "#30119"
 msgid "Hide HEVC Items"
 msgstr "Skjul HEVC-elementer"
 
-#: \resources\settings.xml:212
+#: \resources\settings.xml:213
 msgctxt "#30120"
 msgid "Timeout"
 msgstr "Timeout"
 
-#: \resources\settings.xml:215
+#: \resources\settings.xml:216
 msgctxt "#30121"
 msgid "Auto Caching Assistant"
 msgstr "Auto cacheassistent"
 
-#: \resources\settings.xml:217
+#: \resources\settings.xml:218
 msgctxt "#30122"
 msgid "Auto Add Un-Cached Sources to Debrid"
 msgstr "Tilføj automatisk ikke-cache-kilder til Debrid"
 
-#: \resources\settings.xml:218
+#: \resources\settings.xml:219
 msgctxt "#30123"
 msgid "Assist Mode"
 msgstr "Trædeassistance Mode"
 
-#: \resources\settings.xml:220
+#: \resources\settings.xml:221
 msgctxt "#30124"
 msgid "Preferred Cloud Location"
 msgstr "Foretrukket skyplacering"
 
-#: \resources\settings.xml:386
+#: \resources\settings.xml:387
 msgctxt "#30125"
 msgid "Source Filters"
 msgstr "Kildefiltre"
 
-#: \resources\settings.xml:389
+#: \resources\settings.xml:390
 msgctxt "#30126"
 msgid "Enable File Size Limit"
 msgstr "Aktivér filstørrelsesgrænse"
 
-#: \resources\settings.xml:392
+#: \resources\settings.xml:393
 msgctxt "#30127"
 msgid "Episode File Size limit (GB)"
 msgstr "Afsnit Filstørrelsesgrænse (GB)"
 
-#: \resources\settings.xml:403
+#: \resources\settings.xml:404
 msgctxt "#30128"
 msgid "Sort Sources Method"
 msgstr "Sorter kildemetode"
 
-#: \resources\settings.xml:404
+#: \resources\settings.xml:405
 msgctxt "#30129"
 msgid "Enable Secondary Filesize Sort"
 msgstr "Aktivér sekundær filstørrelse"
 
-#: \resources\settings.xml:406
+#: \resources\settings.xml:407
 msgctxt "#30130"
 msgid "Enable Tertiary HEVC Sort Preference"
 msgstr "Aktivér Tertiær HEVC-sorteringspræference"
 
-#: \resources\settings.xml:388
+#: \resources\settings.xml:389
 msgctxt "#30131"
 msgid "Max Resolution"
 msgstr "Maks. Opløsning"
 
-#: \resources\settings.xml:224
+#: \resources\settings.xml:225
 msgctxt "#30132"
 msgid "Preemptive Termination"
 msgstr "Forebyggende opsigelse"
 
-#: \resources\settings.xml:226
+#: \resources\settings.xml:227
 msgctxt "#30133"
 msgid "Enable Preemptive Termination"
 msgstr "Aktivér forebyggende opsigelse"
 
-#: \resources\settings.xml:227
+#: \resources\settings.xml:228
 msgctxt "#30134"
 msgid "Minimum Movie Resolution"
 msgstr "Minimum filmopløsning"
 
-#: \resources\settings.xml:229
+#: \resources\settings.xml:230
 msgctxt "#30135"
 msgid "Minimum TV Shows Resolution"
 msgstr "Minimum tv-showopløsning"
 
-#: \resources\settings.xml:231
+#: \resources\settings.xml:232
 msgctxt "#30136"
 msgid "Minimum Sources"
 msgstr "Minimumskilder"
 
-#: \resources\settings.xml:233
+#: \resources\settings.xml:234
 msgctxt "#30137"
 msgid "Terminate on... "
 msgstr "Afslut den ... "
 
-#: \resources\settings.xml:280
+#: \resources\settings.xml:281
 msgctxt "#30138"
 msgid "Accounts"
 msgstr "Konti"
 
-#: \resources\settings.xml:285
+#: \resources\settings.xml:286
 msgctxt "#30139"
 msgid "Enable Account Expiry Notifications"
 msgstr "Aktivér meddelelser om udløb af konto"
 
-#: \resources\settings.xml:80 \resources\settings.xml:288
+#: \resources\settings.xml:80 \resources\settings.xml:289
 msgctxt "#30140"
 msgid "Trakt"
 msgstr "Trakt"
 
-#: \resources\settings.xml:290
+#: \resources\settings.xml:291
 msgctxt "#30141"
 msgid "Trakt Username"
 msgstr "Trakt brugernavn"
 
-#: \resources\settings.xml:291
+#: \resources\settings.xml:292
 msgctxt "#30142"
 msgid "Authorize Trakt..."
 msgstr "Autoriser Trakt ..."
 
-#: \resources\settings.xml:293
+#: \resources\settings.xml:294
 msgctxt "#30143"
 msgid "Enable Trakt Scrobbling"
 msgstr "Aktivér traktscrobbling"
 
-#: \resources\settings.xml:298
+#: \resources\settings.xml:299
 msgctxt "#30144"
 msgid "Revoke Trakt Authentication..."
 msgstr "Oprette Trakt-godkendelse ..."
 
-#: \resources\settings.xml:220 \resources\settings.xml:302
+#: \resources\settings.xml:221 \resources\settings.xml:303
 msgctxt "#30145"
 msgid "Premiumize"
 msgstr "Premiumiser"
 
-#: \resources\settings.xml:220 \resources\settings.xml:329
+#: \resources\settings.xml:221 \resources\settings.xml:330
 msgctxt "#30146"
 msgid "Real-Debrid"
 msgstr "Real-Debrid"
 
-#: \resources\settings.xml:366
+#: \resources\settings.xml:367
 #: \resources\lib\modules\providers\install_manager.py:54
 msgctxt "#30147"
 msgid "Providers"
 msgstr "Behandlere"
 
-#: \resources\settings.xml:411 \resources\settings.xml:414
+#: \resources\settings.xml:412 \resources\settings.xml:415
 msgctxt "#30148"
 msgid "API Keys"
 msgstr "API-nøgler"
 
-#: \resources\settings.xml:371
+#: \resources\settings.xml:372
 msgctxt "#30149"
 msgid "Enable Automatic Provider Updates"
 msgstr "Aktivér automatiske udbyderopdateringer"
 
-#: \resources\settings.xml:63 \resources\settings.xml:376
+#: \resources\settings.xml:63 \resources\settings.xml:377
 #: \resources\lib\gui\homeMenu.py:105
 msgctxt "#30150"
 msgid "Check For Updates"
 msgstr "Tjek for opdateringer"
 
-#: \resources\settings.xml:374 \resources\settings.xml:378
+#: \resources\settings.xml:375 \resources\settings.xml:379
 #: \resources\lib\gui\homeMenu.py:109
 msgctxt "#30151"
 msgid "Manage Provider Packages"
@@ -832,7 +832,7 @@ msgctxt "#30152"
 msgid "Force view types on menus"
 msgstr "Tving visningstyper på menuer"
 
-#: \resources\settings.xml:433
+#: \resources\settings.xml:434
 msgctxt "#30153"
 msgid "Shortcuts"
 msgstr "Genveje"
@@ -842,114 +842,114 @@ msgctxt "#30154"
 msgid "Mixed Episode Lists Title Display Style"
 msgstr "Blandet episodelister Titelvisningstil"
 
-#: \resources\settings.xml:419
+#: \resources\settings.xml:420
 msgctxt "#30155"
 msgid "TMDb API Key"
 msgstr "TMDb API-nøgle"
 
-#: \resources\settings.xml:422
+#: \resources\settings.xml:423
 msgctxt "#30156"
 msgid "Trakt Client ID"
 msgstr "Trakt klient-id"
 
-#: \resources\settings.xml:423
+#: \resources\settings.xml:424
 msgctxt "#30157"
 msgid "Trakt Client Secret"
 msgstr "Trakt klienthemmelighed"
 
-#: \resources\settings.xml:426
+#: \resources\settings.xml:427
 msgctxt "#30158"
 msgid "TVDB API Key"
 msgstr "TVDB API-nøgle"
 
-#: \resources\settings.xml:383
+#: \resources\settings.xml:384
 msgctxt "#30159"
 msgid "Sort & Filter"
 msgstr "Sorter & Filter"
 
-#: \resources\settings.xml:394
+#: \resources\settings.xml:395
 msgctxt "#30160"
 msgid "Hide 3D Items"
 msgstr "Skjul 3D-genstande"
 
-#: \resources\settings.xml:401
+#: \resources\settings.xml:402
 msgctxt "#30161"
 msgid "Source Sorting"
 msgstr "Kildesortering"
 
-#: \resources\settings.xml:335
+#: \resources\settings.xml:336
 msgctxt "#30162"
 msgid "Authorize Real-Debrid..."
 msgstr "Autoriser Real-Debrid ..."
 
-#: \resources\settings.xml:332
+#: \resources\settings.xml:333
 msgctxt "#30163"
 msgid "Real-Debrid Username"
 msgstr "Real-Debrid brugernavn"
 
-#: \resources\settings.xml:331
+#: \resources\settings.xml:332
 msgctxt "#30164"
 msgid "Enable Real-Debrid"
 msgstr "Aktivér Real-Debrid"
 
-#: \resources\settings.xml:337
+#: \resources\settings.xml:338
 msgctxt "#30165"
 msgid "Real-Debrid Priority"
 msgstr "Real-Debrid Prioritet"
 
-#: \resources\settings.xml:313 \resources\settings.xml:339
-#: \resources\settings.xml:357
+#: \resources\settings.xml:314 \resources\settings.xml:340
+#: \resources\settings.xml:358
 msgctxt "#30166"
 msgid "Enable Torrents"
 msgstr "Aktivér Torrenter"
 
-#: \resources\settings.xml:315 \resources\settings.xml:340
-#: \resources\settings.xml:359
+#: \resources\settings.xml:316 \resources\settings.xml:341
+#: \resources\settings.xml:360
 msgctxt "#30167"
 msgid "Enable Hosters"
 msgstr "Aktivér hostere"
 
-#: \resources\settings.xml:341
+#: \resources\settings.xml:342
 msgctxt "#30168"
 msgid "Auto-Delete Torrents"
 msgstr "Slet Torrenter automatisk"
 
-#: \resources\settings.xml:323
+#: \resources\settings.xml:324
 msgctxt "#30169"
 msgid "Max Storage Space Used Before Deletion (GB)"
 msgstr "Maksimal lagerplads brugt inden sletning (GB)"
 
-#: \resources\settings.xml:321
+#: \resources\settings.xml:322
 msgctxt "#30170"
 msgid "Automatic Cloud Removal"
 msgstr "Automatisk fjernelse af skyen"
 
-#: \resources\settings.xml:317
+#: \resources\settings.xml:318
 msgctxt "#30171"
 msgid "Prefer Transcoded Files"
 msgstr "Foretrækker kodede filer"
 
-#: \resources\settings.xml:307
+#: \resources\settings.xml:308
 msgctxt "#30172"
 msgid "Premiumize Customer ID"
 msgstr "Præmie kunde-id"
 
-#: \resources\settings.xml:311
+#: \resources\settings.xml:312
 msgctxt "#30173"
 msgid "Premiumize Priority"
 msgstr "Prioriter prioritet"
 
-#: \resources\settings.xml:304
+#: \resources\settings.xml:305
 msgctxt "#30174"
 msgid "Enable Premiumize"
 msgstr "Aktivér Premium"
 
-#: \resources\settings.xml:396
+#: \resources\settings.xml:397
 msgctxt "#30175"
 msgid "Hide Common Undesirable Items"
 msgstr "Skjul almindelige uønskede genstande"
 
-#: \resources\settings.xml:407
+#: \resources\settings.xml:408
 msgctxt "#30176"
 msgid "Enable Quaternary Low Quality Sort Preference"
 msgstr "Aktivér sortering i kvartær lav kvalitet"
@@ -969,13 +969,13 @@ msgstr ""
 "Kan ikke kontakte Trakt. Kontroller Trakts-afbrydelsesstatus på: "
 "http://status.trakt.tv"
 
-#: \resources\settings.xml:121
+#: \resources\settings.xml:122
 msgctxt "#30179"
 msgid "Fanart.TV API Key"
 msgstr "Fanart.TV API-nøgle"
 
-#: \resources\settings.xml:119 \resources\settings.xml:127
-#: \resources\settings.xml:160
+#: \resources\settings.xml:120 \resources\settings.xml:128
+#: \resources\settings.xml:161
 msgctxt "#30180"
 msgid "Fanart.TV"
 msgstr "Fanart.TV"
@@ -1011,7 +1011,7 @@ msgstr ""
 "En anden tilføjelse forsøger at afinstallere {} udbyderen fra Seren Vil du "
 "tillade det?"
 
-#: \resources\settings.xml:397
+#: \resources\settings.xml:398
 msgctxt "#30185"
 msgid "Hide SD quality sources"
 msgstr "Skjul SD-kvalitetskilder"
@@ -1041,35 +1041,35 @@ msgctxt "#30190"
 msgid "My Files"
 msgstr "Mine filer"
 
-#: \resources\settings.xml:210
+#: \resources\settings.xml:211
 msgctxt "#30191"
 msgid "Scraper Display Style"
 msgstr "Skraber Display Style"
 
-#: \resources\settings.xml:108
+#: \resources\settings.xml:109
 msgctxt "#30192"
 msgid "Resolve Display Style"
 msgstr "Løs skærmstil"
 
-#: \resources\settings.xml:108 \resources\settings.xml:108
-#: \resources\settings.xml:210 \resources\settings.xml:256
-#: \resources\settings.xml:267
+#: \resources\settings.xml:109 \resources\settings.xml:109
+#: \resources\settings.xml:211 \resources\settings.xml:257
+#: \resources\settings.xml:268
 msgctxt "#30193"
 msgid "Fancy"
 msgstr "Fancy"
 
-#: \resources\settings.xml:108 \resources\settings.xml:210
-#: \resources\settings.xml:256
+#: \resources\settings.xml:109 \resources\settings.xml:211
+#: \resources\settings.xml:257
 msgctxt "#30194"
 msgid "Background Task"
 msgstr "Baggrund Task"
 
-#: \resources\settings.xml:110
+#: \resources\settings.xml:111
 msgctxt "#30195"
 msgid "Auto-Select after (x) Seconds"
 msgstr "Automatisk valg efter (x) sekunder"
 
-#: \resources\settings.xml:111
+#: \resources\settings.xml:112
 msgctxt "#30196"
 msgid "Auto Select Delay"
 msgstr "Auto Select Delay"
@@ -1084,7 +1084,7 @@ msgctxt "#30198"
 msgid "Starting Source Select"
 msgstr "Startkildevalg"
 
-#: \resources\lib\common\maintenance.py:67
+#: \resources\lib\common\maintenance.py:68
 msgctxt "#30199"
 msgid ""
 "A new verison of Seren is available from the repository. Please consider "
@@ -1098,8 +1098,8 @@ msgctxt "#30200"
 msgid "Notify Me About Available Updates"
 msgstr "Advisér mig om tilgængelige opdateringer"
 
-#: \resources\lib\database\trakt_sync\__init__.py:403
-#: \resources\lib\database\trakt_sync\__init__.py:432
+#: \resources\lib\database\trakt_sync\__init__.py:406
+#: \resources\lib\database\trakt_sync\__init__.py:435
 msgctxt "#30201"
 msgid ""
 "[COLOR red]WARNING[/COLOR]\n"
@@ -1108,7 +1108,7 @@ msgstr ""
 "[FARVE rød] ADVARSEL [/ FARVE] Dette nulstiller alle meta-oplysninger, er du"
 " sikker?"
 
-#: \resources\settings.xml:442 \resources\lib\gui\homeMenu.py:79
+#: \resources\settings.xml:443 \resources\lib\gui\homeMenu.py:79
 #: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:374
 #: \resources\lib\gui\tvshowMenus.py:378
 msgctxt "#30202"
@@ -1125,7 +1125,7 @@ msgctxt "#30204"
 msgid "New Show Search..."
 msgstr "New Vis søgefelt?..."
 
-#: \resources\settings.xml:319
+#: \resources\settings.xml:320
 msgctxt "#30205"
 msgid "Store resolved items in cloud"
 msgstr "Opbevar løste genstande i skyen"
@@ -1140,6 +1140,7 @@ msgctxt "#30207"
 msgid "General Menu View ID"
 msgstr "Generel menuvisning ID"
 
+#: \resources\lib\modules\cacheAssist.py:439
 #: \resources\lib\modules\router.py:133
 msgctxt "#30208"
 msgid "[COLOR red]Error:[/COLOR] No Debrid accounts were identified."
@@ -1155,13 +1156,13 @@ msgstr ""
 "Indstil dine konti i indstillingsmenuen, før du forsøger at spille et "
 "element"
 
-#: \resources\settings.xml:235
+#: \resources\settings.xml:236
 msgctxt "#30210"
 msgid "Terminate if cloud sources are found"
 msgstr "Afslut, hvis der findes skykilder"
 
-#: \resources\settings.xml:325 \resources\settings.xml:342
-#: \resources\settings.xml:361
+#: \resources\settings.xml:326 \resources\settings.xml:343
+#: \resources\settings.xml:362
 msgctxt "#30211"
 msgid "Inspect Cloud Files on Scrape"
 msgstr "Inspicér skyfiler på skrabe"
@@ -1171,12 +1172,12 @@ msgctxt "#30212"
 msgid "By Actor..."
 msgstr "Af skuespiller ..."
 
-#: \resources\settings.xml:251
+#: \resources\settings.xml:252
 msgctxt "#30213"
 msgid "Movie Play Style"
 msgstr "Filmafspilningsstil"
 
-#: \resources\settings.xml:390
+#: \resources\settings.xml:391
 msgctxt "#30214"
 msgid "Movie File Size limit (GB)"
 msgstr "Filstørrelsesgrænse (GB)"
@@ -1195,24 +1196,24 @@ msgstr ""
 "Bemærk! Det ser ud til, at du har autoriseret en ikke-premium-konto og vil "
 "ikke være i stand til at spille poster ved hjælp af denne konto"
 
-#: \resources\settings.xml:253
+#: \resources\settings.xml:254
 msgctxt "#30217"
 msgid "Auto try next link on resolve failure (Source Select)"
 msgstr "Prøv automatisk det næste link på løsningsfejl (Kilde Vælg)"
 
-#: \resources\lib\database\skinManager\__init__.py:360
+#: \resources\lib\database\skinManager\__init__.py:363
 msgctxt "#30218"
 msgid ""
 "Successfully installed {} - {}\n"
 "Would you like to switch to this theme?"
 msgstr "Installeret med succes {} - {} Vil du skifte til dette tema?"
 
-#: \resources\lib\database\skinManager\__init__.py:404
+#: \resources\lib\database\skinManager\__init__.py:407
 msgctxt "#30219"
 msgid "Are you sure you wish to uninstall the theme {}?"
 msgstr "Er du sikker på, at du vil afinstallere temaet {}?"
 
-#: \resources\lib\database\skinManager\__init__.py:429
+#: \resources\lib\database\skinManager\__init__.py:432
 msgctxt "#30220"
 msgid "Successfully uninstalled {}"
 msgstr "Afinstalleret {}"
@@ -1242,7 +1243,7 @@ msgctxt "#30225"
 msgid "Install theme"
 msgstr "Installer tema"
 
-#: \resources\lib\database\skinManager\__init__.py:413
+#: \resources\lib\database\skinManager\__init__.py:416
 msgctxt "#30226"
 msgid ""
 "You are attempting to uninstall the active theme, this will switch you to "
@@ -1251,12 +1252,12 @@ msgstr ""
 "Du forsøger at afinstallere det aktive tema, dette skifter dig til "
 "standardtemaet."
 
-#: \resources\lib\database\skinManager\__init__.py:386
+#: \resources\lib\database\skinManager\__init__.py:389
 msgctxt "#30227"
 msgid "Succesfully Switched to {}"
 msgstr "Succesly skiftet til {}"
 
-#: \resources\lib\database\skinManager\__init__.py:350
+#: \resources\lib\database\skinManager\__init__.py:353
 #: \tests\integration\gui\test_skin_manager.py:55
 msgctxt "#30228"
 msgid "The theme name {} is not allowed"
@@ -1308,27 +1309,27 @@ msgctxt "#30236"
 msgid "My Show Lists"
 msgstr "Mine showlister"
 
-#: \resources\settings.xml:448 \resources\lib\gui\homeMenu.py:91
+#: \resources\settings.xml:449 \resources\lib\gui\homeMenu.py:91
 msgctxt "#30237"
 msgid "Trakt Sync Tools"
 msgstr "Trakt-synkroniseringsværktøjer"
 
-#: \resources\settings.xml:450 \resources\lib\gui\homeMenu.py:118
+#: \resources\settings.xml:451 \resources\lib\gui\homeMenu.py:118
 msgctxt "#30238"
 msgid "Clear last sync time"
 msgstr "Ryd sidste synkroniseringstid"
 
-#: \resources\settings.xml:452 \resources\lib\gui\homeMenu.py:122
+#: \resources\settings.xml:453 \resources\lib\gui\homeMenu.py:122
 msgctxt "#30239"
 msgid "Force a sync with Trakt"
 msgstr "Tving en synkronisering med Trakt"
 
-#: \resources\settings.xml:454 \resources\lib\gui\homeMenu.py:126
+#: \resources\settings.xml:455 \resources\lib\gui\homeMenu.py:126
 msgctxt "#30240"
 msgid "Clear All Metadata"
 msgstr "Ryd alle metadata"
 
-#: \resources\settings.xml:456 \resources\lib\gui\homeMenu.py:130
+#: \resources\settings.xml:457 \resources\lib\gui\homeMenu.py:130
 msgctxt "#30241"
 msgid "Rebuild Database"
 msgstr "Genopbyg database"
@@ -1362,8 +1363,8 @@ msgstr "Standard"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:131
-#: \resources\settings.xml:164 \resources\settings.xml:188
+#: \resources\settings.xml:44 \resources\settings.xml:132
+#: \resources\settings.xml:165 \resources\settings.xml:189
 msgctxt "#30247"
 msgid "Poster"
 msgstr "Plakat"
@@ -1405,47 +1406,47 @@ msgstr "Væg"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:137
-#: \resources\settings.xml:170 \resources\settings.xml:191
+#: \resources\settings.xml:44 \resources\settings.xml:138
+#: \resources\settings.xml:171 \resources\settings.xml:192
 msgctxt "#30253"
 msgid "Banner"
 msgstr "Banner"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:134
-#: \resources\settings.xml:167 \resources\settings.xml:197
-#: \resources\settings.xml:200
+#: \resources\settings.xml:44 \resources\settings.xml:135
+#: \resources\settings.xml:168 \resources\settings.xml:198
+#: \resources\settings.xml:201
 msgctxt "#30254"
 msgid "Fanart"
 msgstr "Fan kunst"
 
-#: \resources\settings.xml:218 \resources\settings.xml:255
+#: \resources\settings.xml:219 \resources\settings.xml:256
 msgctxt "#30255"
 msgid "Automatic"
 msgstr "Automatisk"
 
-#: \resources\settings.xml:218
+#: \resources\settings.xml:219
 msgctxt "#30256"
 msgid "Manual Selection"
 msgstr "Manuelt valg"
 
-#: \resources\settings.xml:233 \resources\skins\Default\1080i\resolver.xml:86
+#: \resources\settings.xml:234 \resources\skins\Default\1080i\resolver.xml:86
 msgctxt "#30257"
 msgid "Torrents Only"
 msgstr "Kun Torrenter"
 
-#: \resources\settings.xml:233
+#: \resources\settings.xml:234
 msgctxt "#30258"
 msgid "Hosters Only"
 msgstr "Kun hostere"
 
-#: \resources\settings.xml:233
+#: \resources\settings.xml:234
 msgctxt "#30259"
 msgid "Torrents/Hosters"
 msgstr "Torrents / kro"
 
-#: \resources\settings.xml:403 \resources\skins\Default\1080i\resolver.xml:99
+#: \resources\settings.xml:404 \resources\skins\Default\1080i\resolver.xml:99
 #: \resources\skins\Default\1080i\source_select.xml:115
 #: \resources\skins\Default\1080i\source_select.xml:228
 msgctxt "#30260"
@@ -1539,34 +1540,34 @@ msgctxt "#30277"
 msgid "Source type"
 msgstr "Kilde type"
 
-#: \resources\lib\common\maintenance.py:85
-#: \tests\integration\common\test_maintenance.py:203
+#: \resources\lib\common\maintenance.py:86
+#: \tests\integration\common\test_maintenance.py:204
 msgctxt "#30278"
 msgid "One or more providers have updates pending"
 msgstr "En eller flere udbydere har afventede opdateringer"
 
-#: \resources\settings.xml:127
+#: \resources\settings.xml:128
 msgctxt "#30279"
 msgid "Prefer Movie artwork from"
 msgstr "Foretrækker filmkunst fra"
 
-#: \resources\settings.xml:160
+#: \resources\settings.xml:161
 msgctxt "#30280"
 msgid "Prefer TV Show artwork from"
 msgstr "Foretrækker tv-show-kunst fra"
 
-#: \resources\settings.xml:80 \resources\settings.xml:127
-#: \resources\settings.xml:160
+#: \resources\settings.xml:80 \resources\settings.xml:128
+#: \resources\settings.xml:161
 msgctxt "#30281"
 msgid "TMDb"
 msgstr "TMDb"
 
-#: \resources\settings.xml:80 \resources\settings.xml:160
+#: \resources\settings.xml:80 \resources\settings.xml:161
 msgctxt "#30282"
 msgid "TVDB"
 msgstr "TVDB"
 
-#: \resources\settings.xml:247
+#: \resources\settings.xml:248
 msgctxt "#30283"
 msgid "Playback"
 msgstr "Styring"
@@ -1576,7 +1577,7 @@ msgctxt "#30284"
 msgid "Interface"
 msgstr "Brugerflade"
 
-#: \resources\settings.xml:116
+#: \resources\settings.xml:117
 msgctxt "#30285"
 msgid "Artwork"
 msgstr "Illustrationer"
@@ -1586,40 +1587,40 @@ msgctxt "#30286"
 msgid "Advanced"
 msgstr "Avanceret"
 
-#: \resources\settings.xml:188 \resources\settings.xml:191
-#: \resources\settings.xml:194 \resources\settings.xml:197
+#: \resources\settings.xml:189 \resources\settings.xml:192
+#: \resources\settings.xml:195 \resources\settings.xml:198
 msgctxt "#30287"
 msgid "Season"
 msgstr "Sæson"
 
-#: \resources\settings.xml:200
+#: \resources\settings.xml:201
 msgctxt "#30288"
 msgid "Episode"
 msgstr "episode"
 
-#: \resources\settings.xml:164 \resources\settings.xml:167
-#: \resources\settings.xml:170 \resources\settings.xml:173
-#: \resources\settings.xml:176 \resources\settings.xml:179
-#: \resources\settings.xml:182 \resources\settings.xml:185
+#: \resources\settings.xml:165 \resources\settings.xml:168
+#: \resources\settings.xml:171 \resources\settings.xml:174
+#: \resources\settings.xml:177 \resources\settings.xml:180
+#: \resources\settings.xml:183 \resources\settings.xml:186
 msgctxt "#30289"
 msgid "TV Show"
 msgstr "TV show"
 
-#: \resources\settings.xml:131 \resources\settings.xml:134
-#: \resources\settings.xml:137 \resources\settings.xml:140
-#: \resources\settings.xml:143 \resources\settings.xml:146
-#: \resources\settings.xml:149 \resources\settings.xml:152
-#: \resources\settings.xml:155 \resources\lib\indexers\trakt.py:749
+#: \resources\settings.xml:132 \resources\settings.xml:135
+#: \resources\settings.xml:138 \resources\settings.xml:141
+#: \resources\settings.xml:144 \resources\settings.xml:147
+#: \resources\settings.xml:150 \resources\settings.xml:153
+#: \resources\settings.xml:156 \resources\lib\indexers\trakt.py:749
 msgctxt "#30290"
 msgid "Movie"
 msgstr "Film"
 
-#: \resources\settings.xml:129
+#: \resources\settings.xml:130
 msgctxt "#30291"
 msgid "Show Advanced Movie Artwork Settings"
 msgstr "Vis avancerede filmkunstindstillinger"
 
-#: \resources\settings.xml:162
+#: \resources\settings.xml:163
 msgctxt "#30292"
 msgid "Show Advanced TV Artwork Settings"
 msgstr "Vis avancerede tv-kunstindstillinger"
@@ -1629,32 +1630,32 @@ msgctxt "#30293"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Er du sikker på, at du vil fjerne pakken {}?"
 
-#: \resources\settings.xml:416
+#: \resources\settings.xml:417
 msgctxt "#30294"
 msgid "Show Advanced Settings..."
 msgstr "Show Avancerede indstillinger..."
 
-#: \resources\settings.xml:125
+#: \resources\settings.xml:126
 msgctxt "#30295"
 msgid "Movie Artwork"
 msgstr "Filmkunst"
 
-#: \resources\settings.xml:158
+#: \resources\settings.xml:159
 msgctxt "#30296"
 msgid "TV show Artwork"
 msgstr "Tv-show Artwork"
 
-#: \resources\lib\database\trakt_sync\__init__.py:394
+#: \resources\lib\database\trakt_sync\__init__.py:397
 msgctxt "#30297"
 msgid "User information has been cleared"
 msgstr "Brugeroplysninger er blevet ryddet"
 
-#: \resources\lib\database\trakt_sync\__init__.py:427
+#: \resources\lib\database\trakt_sync\__init__.py:430
 msgctxt "#30298"
 msgid "Metadata has been cleared"
 msgstr "Metadata er blevet ryddet"
 
-#: \resources\lib\database\trakt_sync\__init__.py:454
+#: \resources\lib\database\trakt_sync\__init__.py:457
 msgctxt "#30299"
 msgid "Database has been rebuilt"
 msgstr "Databasen er blevet genopbygget"
@@ -1845,7 +1846,7 @@ msgstr "Indtast zip-URL"
 
 #: \resources\lib\gui\windows\source_select.py:78
 #: \resources\lib\modules\cacheAssist.py:114
-#: \resources\lib\modules\getSources.py:340
+#: \resources\lib\modules\getSources.py:352
 msgctxt "#30335"
 msgid "Cache Assist"
 msgstr "Cache-hjælp"
@@ -1865,85 +1866,85 @@ msgctxt "#30338"
 msgid "Starting Playback"
 msgstr "Start afspilning"
 
-#: \resources\settings.xml:143 \resources\settings.xml:176
+#: \resources\settings.xml:144 \resources\settings.xml:177
 msgctxt "#30339"
 msgid "Keyart"
 msgstr "Keyart"
 
-#: \resources\settings.xml:146 \resources\settings.xml:179
+#: \resources\settings.xml:147 \resources\settings.xml:180
 msgctxt "#30340"
 msgid "Clear Logo"
 msgstr "Ryd Logo"
 
-#: \resources\settings.xml:140 \resources\settings.xml:173
-#: \resources\settings.xml:194
+#: \resources\settings.xml:141 \resources\settings.xml:174
+#: \resources\settings.xml:195
 msgctxt "#30341"
 msgid "Landscape"
 msgstr "Liggende"
 
-#: \resources\settings.xml:155 \resources\settings.xml:185
+#: \resources\settings.xml:156 \resources\settings.xml:186
 msgctxt "#30342"
 msgid "Character Art"
 msgstr "Karakter Art"
 
-#: \resources\settings.xml:149 \resources\settings.xml:182
+#: \resources\settings.xml:150 \resources\settings.xml:183
 msgctxt "#30343"
 msgid "Clear Art"
 msgstr "Gennemsigtig Art"
 
-#: \resources\settings.xml:152
+#: \resources\settings.xml:153
 msgctxt "#30344"
 msgid "Disc Art"
 msgstr "Disk Art"
 
-#: \resources\settings.xml:256
+#: \resources\settings.xml:257
 msgctxt "#30345"
 msgid "Smart Play Display Style"
 msgstr "Smart Play-skærmstil"
 
-#: \resources\settings.xml:262
+#: \resources\settings.xml:263
 msgctxt "#30346"
 msgid "Smart Play Popup"
 msgstr "Smart Play Popup"
 
-#: \resources\settings.xml:267
+#: \resources\settings.xml:268
 msgctxt "#30347"
 msgid "Dialog Style"
 msgstr "Dialogstil"
 
-#: \resources\settings.xml:267
+#: \resources\settings.xml:268
 msgctxt "#30348"
 msgid "Simple"
 msgstr "Simpel"
 
-#: \resources\settings.xml:268
+#: \resources\settings.xml:269
 msgctxt "#30349"
 msgid "Default Action if Nothing Selected"
 msgstr "Standardhandling, hvis intet er valgt"
 
 #: \resources\settings.xml:78 \resources\settings.xml:79
-#: \resources\settings.xml:268 \resources\lib\gui\windows\source_select.py:79
+#: \resources\settings.xml:269 \resources\lib\gui\windows\source_select.py:79
 #: \resources\skins\Default\1080i\source_select.xml:363
 msgctxt "#30350"
 msgid "Play"
 msgstr "Spil"
 
-#: \resources\settings.xml:268
+#: \resources\settings.xml:269
 msgctxt "#30351"
 msgid "Pause"
 msgstr "Pause"
 
-#: \resources\settings.xml:272
+#: \resources\settings.xml:273
 msgctxt "#30352"
 msgid "Still Watching Dialog"
 msgstr "Stadig ser dialog"
 
-#: \resources\settings.xml:274
+#: \resources\settings.xml:275
 msgctxt "#30353"
 msgid "Enable Still Watching Dialog"
 msgstr "Aktivér stadigvæk dialog"
 
-#: \resources\settings.xml:275
+#: \resources\settings.xml:276
 msgctxt "#30354"
 msgid "Episodes Between Dialog Prompts"
 msgstr "Episoder mellem dialogbøger"
@@ -1973,17 +1974,17 @@ msgctxt "#30359"
 msgid "Search Shows By Actor..."
 msgstr "Søg efter shows efter skuespiller ..."
 
-#: \resources\settings.xml:255
+#: \resources\settings.xml:256
 msgctxt "#30360"
 msgid "Ask"
 msgstr "Spørg"
 
-#: \resources\settings.xml:255
+#: \resources\settings.xml:256
 msgctxt "#30361"
 msgid "Do not resume"
 msgstr "Må ikke genstartes"
 
-#: \resources\lib\modules\smartPlay.py:403
+#: \resources\lib\modules\smartPlay.py:417
 msgctxt "#30362"
 msgid "Start From Beginning"
 msgstr "Start fra begyndelsen"
@@ -1997,7 +1998,7 @@ msgstr ""
 "På grund af implementeringen af nye funktioner til den lokale database er "
 "det nu nødvendigt med en genopbygning"
 
-#: \resources\lib\database\trakt_sync\__init__.py:448
+#: \resources\lib\database\trakt_sync\__init__.py:451
 msgctxt "#30364"
 msgid ""
 "There were issues when processing the synchronization with Trakt, please "
@@ -2006,7 +2007,7 @@ msgstr ""
 "Der opstod problemer under behandling af synkroniseringen med Trakt. "
 "Kontroller venligst loggen"
 
-#: \resources\settings.xml:220 \resources\settings.xml:347
+#: \resources\settings.xml:221 \resources\settings.xml:348
 msgctxt "#30365"
 msgid "AllDebrid"
 msgstr "AllDebrid"
@@ -2016,22 +2017,22 @@ msgctxt "#30366"
 msgid "AllDebrid Auth"
 msgstr "AllDebrid Auth"
 
-#: \resources\settings.xml:349
+#: \resources\settings.xml:350
 msgctxt "#30367"
 msgid "Enabled AllDebrid"
 msgstr "Aktiveret AllDebrid"
 
-#: \resources\settings.xml:350
+#: \resources\settings.xml:351
 msgctxt "#30368"
 msgid "AllDebrid Username"
 msgstr "AllDebrid-brugernavn"
 
-#: \resources\settings.xml:353
+#: \resources\settings.xml:354
 msgctxt "#30369"
 msgid "Authorize AllDebrid..."
 msgstr "Autoriser AllDebrid ..."
 
-#: \resources\settings.xml:355
+#: \resources\settings.xml:356
 msgctxt "#30370"
 msgid "AllDebrid Priority"
 msgstr "AllDebrid-prioritet"
@@ -2041,7 +2042,7 @@ msgctxt "#30371"
 msgid "Enable Automatic Theme Updates"
 msgstr "Aktivér automatiske temaopdateringer"
 
-#: \resources\settings.xml:305
+#: \resources\settings.xml:306
 msgctxt "#30372"
 msgid "Authorise Premiumize"
 msgstr "Autoriser Premium"
@@ -2055,22 +2056,22 @@ msgstr ""
 "Der ser ud til at være et problem med din Trakt-autorisation. Prøv at "
 "godkende din konto igen"
 
-#: \resources\settings.xml:122
+#: \resources\settings.xml:123
 msgctxt "#30374"
 msgid "Preferred artwork size"
 msgstr "Foretrukken kunststørrelse"
 
-#: \resources\settings.xml:122
+#: \resources\settings.xml:123
 msgctxt "#30375"
 msgid "Largest available"
 msgstr "Størst tilgængelig"
 
-#: \resources\settings.xml:122
+#: \resources\settings.xml:123
 msgctxt "#30376"
 msgid "Medium"
 msgstr "Medium"
 
-#: \resources\settings.xml:122
+#: \resources\settings.xml:123
 msgctxt "#30377"
 msgid "Small"
 msgstr "Lille"
@@ -2651,7 +2652,7 @@ msgctxt "#30476"
 msgid "My recent watched episodes"
 msgstr "Mine nyligt sete episoder"
 
-#: \resources\lib\modules\getSources.py:357
+#: \resources\lib\modules\getSources.py:369
 #: \resources\lib\modules\helpers.py:52
 msgctxt "#30477"
 msgid ""
@@ -2671,13 +2672,13 @@ msgctxt "#30479"
 msgid "Show remaining unwatched season episodes in mixed lists"
 msgstr "Vis de resterende uafsikrede sæsonepisoder i blandede lister"
 
-#: \resources\settings.xml:241 \resources\lib\modules\download_manager.py:604
+#: \resources\settings.xml:242 \resources\lib\modules\download_manager.py:604
 #: \resources\lib\modules\local_downloader.py:191
 msgctxt "#30480"
 msgid "Select Storage Location"
 msgstr "Vælg Lagringssted"
 
-#: \resources\settings.xml:243
+#: \resources\settings.xml:244
 msgctxt "#30481"
 msgid "Folder"
 msgstr "Mappe"
@@ -2687,7 +2688,7 @@ msgctxt "#30482"
 msgid "Base List Type for Genres"
 msgstr "Baselistetype for genrer"
 
-#: \resources\lib\modules\cacheAssist.py:461
+#: \resources\lib\modules\cacheAssist.py:469
 msgctxt "#30483"
 msgid "Cache Assist is attempting to build a torrent source"
 msgstr "Cache Assist forsøger at opbygge en torrentkilde"
@@ -2732,7 +2733,7 @@ msgctxt "#30491"
 msgid "Show original titles"
 msgstr "Vis originale titler"
 
-#: \resources\settings.xml:429
+#: \resources\settings.xml:430
 msgctxt "#30492"
 msgid "OMDb API Key"
 msgstr "OMDb API-nøgle"
@@ -2754,8 +2755,8 @@ msgctxt "#30495"
 msgid "Run in background"
 msgstr "Kør i baggrunden"
 
-#: \resources\settings.xml:309 \resources\settings.xml:333
-#: \resources\settings.xml:351
+#: \resources\settings.xml:310 \resources\settings.xml:334
+#: \resources\settings.xml:352
 msgctxt "#30496"
 msgid "Premium Status"
 msgstr "Premium-status"
@@ -2769,7 +2770,6 @@ msgid "Close"
 msgstr "Luk"
 
 #: \resources\lib\gui\homeMenu.py:157
-#: \resources\lib\modules\download_manager.py:429
 msgctxt "#30498"
 msgid "Test Manual Cache Window"
 msgstr "Test manuelt cache-vindue"
@@ -2841,7 +2841,8 @@ msgctxt "#30510"
 msgid "Failed to create transfer at PM, please check the log"
 msgstr "Kunne ikke oprette overførsel kl. PM, tjek loggen"
 
-#: \resources\lib\gui\windows\source_select.py:80
+#: \resources\settings.xml:241 \resources\lib\gui\windows\source_select.py:80
+#: \resources\lib\modules\download_manager.py:429
 #: \resources\skins\Default\1080i\source_select.xml:383
 msgctxt "#30511"
 msgid "Download"
@@ -2856,7 +2857,7 @@ msgstr ""
 "Dine filtre ser ud til at være begrænsende for denne vare. Vil du prøve igen"
 " uden dem?"
 
-#: \resources\settings.xml:398
+#: \resources\settings.xml:399
 msgctxt "#30513"
 msgid "Hide HDR Items"
 msgstr "Skjul HDR-emner"
@@ -2889,12 +2890,12 @@ msgctxt "#30518"
 msgid "Force widget refresh after playback ends"
 msgstr "Tving widgetopdatering efter afspilning slutter"
 
-#: \resources\settings.xml:405
+#: \resources\settings.xml:406
 msgctxt "#30519"
 msgid "Reverse Size Sort (Low to High)"
 msgstr "Omvendt størrelsessortering (lav til høj)"
 
-#: \resources\settings.xml:236
+#: \resources\settings.xml:237
 msgctxt "#30520"
 msgid "Terminate if adaptive sources are found"
 msgstr "Afslut, hvis der findes adaptive kilder"
@@ -2909,17 +2910,18 @@ msgctxt "#30522"
 msgid "Torrent cache database successfully cleared"
 msgstr "Torrent-cache-database blev ryddet"
 
-#: \resources\settings.xml:294
+#: \resources\settings.xml:295
 msgctxt "#30523"
 msgid "Start scrobble after seconds."
 msgstr "Start scrobble efter sekunder."
 
-#: \resources\settings.xml:296
+#: \resources\settings.xml:297
 msgctxt "#30524"
 msgid "Minimum scrobble percentage before marked watched."
 msgstr "Minimum scrobble-procentdel før markeret set."
 
 #: \resources\lib\gui\windows\source_select.py:81
+#: \resources\lib\modules\resolver\torrent_resolvers\base_resolver.py:77
 msgctxt "#30525"
 msgid "File Selection"
 msgstr "Filvalg"
@@ -2948,22 +2950,22 @@ msgstr ""
 "Den sidst afspillede fil blev ikke markeret som set, vil du gerne gøre dette"
 " nu?"
 
-#: \resources\settings.xml:403
+#: \resources\settings.xml:404
 msgctxt "#30529"
 msgid "No Grouping"
 msgstr "Ingen gruppering"
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30530"
 msgid "On failure to resolve torrent file"
 msgstr "Ved manglende løsning af torrentfil"
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30531"
 msgid "Skip source"
 msgstr "Spring kilde over"
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30532"
 msgid "Ask for manual file selection"
 msgstr "Bed om manuel filvalg"
@@ -3163,12 +3165,43 @@ msgctxt "#30570"
 msgid "Western"
 msgstr "Regionskommando Vest"
 
-#: \resources\lib\modules\metadataHandler.py:340
+#: \resources\lib\modules\metadataHandler.py:345
 msgctxt "#30571"
 msgid "Season {}"
 msgstr "Sæson {}"
 
-#: \resources\lib\modules\metadataHandler.py:342
+#: \resources\lib\modules\metadataHandler.py:347
 msgctxt "#30572"
 msgid "Episode {}"
 msgstr "episode {}"
+
+#: \resources\lib\modules\update_news.py:7
+msgctxt "#30573"
+msgid ""
+"Seren now uses a kodi feature to speed up menus drastically. This can cause instability on some devices\n"
+"If you experience crashes, you can disable this setting in the shortcuts section"
+msgstr ""
+"Seren bruger nu en kodi-funktion til at fremskynde menuerne drastisk. Dette "
+"kan forårsage ustabilitet på nogle enheder&#10; Hvis du oplever nedbrud, kan"
+" du deaktivere denne indstilling i sektionen genveje"
+
+#: \resources\lib\common\maintenance.py:221
+msgctxt "#30574"
+msgid "Language Invoker option has been changed, reloading kodi profile"
+msgstr ""
+"Sprog Invoker-indstillingen er blevet ændret og genindlæser kodi-profilen"
+
+#: \resources\settings.xml:460
+msgctxt "#30575"
+msgid "Language Invoker Options"
+msgstr "Indstillinger for sprogindkaldere"
+
+#: \resources\settings.xml:462
+msgctxt "#30576"
+msgid "Re-Use Language Invoker Status"
+msgstr "Genbrug sprogindkaldelsesstatus"
+
+#: \resources\settings.xml:463
+msgctxt "#30577"
+msgid "Toggle Re-Use Language Invoker"
+msgstr "Skift Genbrug sprogindkalderen"

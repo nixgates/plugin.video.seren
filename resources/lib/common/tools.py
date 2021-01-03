@@ -40,6 +40,11 @@ except NameError:
     xrange = range
 
 try:
+    FileExistsError = FileExistsError
+except NameError:
+    FileExistsError = Exception
+
+try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
     import xml.etree.ElementTree as ElementTree
@@ -594,7 +599,7 @@ def makedirs(name, mode=0o777, exist_ok=False):
     """
     try:
         os.makedirs(name, mode)
-    except OSError:
+    except (OSError, FileExistsError):
         if not exist_ok:
             raise
 

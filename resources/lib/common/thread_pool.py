@@ -136,13 +136,7 @@ class ThreadPool:
 
     def _worker_maintenance(self):
         self._cleanup_workers()
-        for i in range(
-            0,
-            min(
-                self.max_workers - len(self.workers),
-                self.tasks.qsize() - len(self.workers),
-            ),
-        ):
+        if len(self.workers) != self.max_workers:
             self.workers.append(
                 ThreadPoolWorker(self.tasks, self.exception_handler, self.stop_event,)
             )
@@ -183,39 +177,6 @@ class ThreadPool:
         if not self.stop_event.is_set():
             self.stop_event.set()
         self.tasks.clear()
-
-    def fetch_dict_and_clear_results(self):
-        """
-        Returns results and then clear the variable
-        :return: results from threads
-        :rtype: list,dict
-        """
-        self.result_threading_lock.acquire()
-        try:
-            if self.results and isinstance(self.results, dict):
-                return_value = self.results
-                self.results = {}
-                return return_value
-            else:
-                return {}
-        finally:
-            self.result_threading_lock.release()
-
-    def fetch_array_and_clear_results(self):
-        """
-        Returns results and then clear the variable
-        :return:
-        """
-        self.result_threading_lock.acquire()
-        try:
-            if self.results and isinstance(self.results, list):
-                return_value = self.results
-                self.results = []
-                return return_value
-            else:
-                return []
-        finally:
-            self.result_threading_lock.release()
 
     def wait_completion(self):
         """

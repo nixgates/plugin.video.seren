@@ -81,7 +81,11 @@ class AllDebrid:
     def get(self, url, **params):
         if not g.get_bool_setting(AD_ENABLED_KEY):
             return
-        params.update({"agent": self.agent_identifier, "apikey": self.apikey})
+
+        params.update({
+            "agent": self.agent_identifier,
+            "apikey": self.apikey if not params.pop("reauth", None) else None}
+        )
         return self.session.get(tools.urljoin(self.base_url, url), params=params)
 
     def get_json(self, url, **params):
@@ -106,7 +110,7 @@ class AllDebrid:
             return response
 
     def auth(self):
-        resp = self.get_json("pin/get")
+        resp = self.get_json("pin/get", reauth=True)
         expiry = pin_ttl = int(resp["expires_in"])
         auth_complete = False
         tools.copy2clip(resp["pin"])
@@ -155,12 +159,15 @@ class AllDebrid:
         return False, int(resp["expires_in"])
 
     def get_user_info(self):
-        return self.get_json("user")["user"]
+        return self._extract_data(self.get_json("user"))["user"]
 
     def store_user_info(self):
         user_information = self.get_user_info()
         if user_information is not None:
-            g.set_setting("alldebrid.username", user_information["user"]["username"])
+            g.set_setting("alldebrid.username", user_information["username"])
+            g.set_setting("alldebrid.premiumstatus",
+                          "Premium" if user_information.get("isPremium", False)
+                          else "Expired")
 
     def check_hash(self, hash_list):
         return self.post_json("magnet/instant", {"magnets[]": hash_list})
@@ -209,5 +216,4 @@ class AllDebrid:
         )
 
     def is_account_premium(self):
-        test = self.get_user_info()
-        return test.get("isPremium", False)
+        return self.get_user_info().get("isPremium", False)

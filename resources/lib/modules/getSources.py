@@ -93,28 +93,26 @@ class Sources(object):
         try:
             g.log('Starting Scraping', 'debug')
             self._handle_pre_scrape_modifiers()
-            self.window.create()
             self._get_imdb_info()
 
             self._check_local_torrent_database()
 
             self._update_progress()
-
             if self._prem_terminate():
                 return self._finalise_results()
 
-            self.window.set_text(g.get_language_string(30055), self.progress, self.sources_information, self.runtime)
             self._init_providers()
 
             # Add the users cloud inspection to the threads to be run
             self.torrent_threads.put(self._user_cloud_inspection)
 
             # Load threads for all sources
-
             self._create_torrent_threads()
             self._create_hoster_threads()
             self._create_adaptive_threads()
 
+            self.window.create()
+            self.window.set_text(g.get_language_string(30055), self.progress, self.sources_information, self.runtime)
             self.window.set_property('process_started', 'true')
 
             # Keep alive for gui display and threading
@@ -124,7 +122,7 @@ class Sources(object):
             while self.progress < 100 and not g.abort_requested():
                 g.log('Remaining Providers {}'.format(self.sources_information["remainingProviders"]))
                 if self._prem_terminate() is True or (len(self.sources_information["remainingProviders"]) == 0
-                                                     and self.runtime > 5):
+                                                      and self.runtime > 5):
                     # Give some time for scrapers to initiate
                     break
 
@@ -170,7 +168,7 @@ class Sources(object):
         if g.REQUEST_PARAMS.get('action', '') == "preScrape":
             self.silent = True
             self.timeout = 60
-            self._prem_terminate = lambda: False # pylint: disable=method-hidden
+            self._prem_terminate = lambda: False  # pylint: disable=method-hidden
 
     def _create_hoster_threads(self):
         if self._hosters_enabled():
@@ -351,7 +349,7 @@ class Sources(object):
                     'RunPlugin({}?action=cacheAssist&action_args={})'.format(g.BASE_URL, action_args))
         elif not self.silent:
             confirmation = xbmcgui.Dialog().yesno('{} - {}'.format(g.ADDON_NAME, g.get_language_string(30335)),
-                                                g.get_language_string(30057))
+                                                  g.get_language_string(30057))
             if confirmation:
                 window = ManualCacheWindow(*SkinManager().confirm_skin_path('manual_caching.xml'),
                                            item_information=self.item_information, sources=sources)
@@ -673,16 +671,16 @@ class Sources(object):
                 simple_info = self._build_simple_show_info(self.item_information)
             else:
                 simple_info = None
-                
+
             cloud_scrapers = [
-                {"setting": "premiumize.cloudInspection", "provider": PremiumizeCloudScaper, 
+                {"setting": "premiumize.cloudInspection", "provider": PremiumizeCloudScaper,
                  "enabled": g.premiumize_enabled()},
-                {"setting": "rd.cloudInspection", "provider": RealDebridCloudScraper, 
+                {"setting": "rd.cloudInspection", "provider": RealDebridCloudScraper,
                  "enabled": g.real_debrid_enabled()},
                 {"setting": "alldebrid.cloudInspection", "provider": AllDebridCloudScraper,
                  "enabled": g.all_debrid_enabled()},
             ]
-            
+
             for cloud_scraper in cloud_scrapers:
                 if cloud_scraper["enabled"] and g.get_bool_setting(cloud_scraper["setting"]):
                     thread_pool.put(cloud_scraper["provider"](self._prem_terminate).get_sources, self.item_information,
@@ -729,21 +727,21 @@ class Sources(object):
         ]
         self.sources_information["hosters_quality"] = list2
 
-        string1 = u'{} - 4K: {} | 1080: {} | 720: {} | SD: {}'.format(g.get_language_string(30058),
-                                                                     self._color_number(list1[0]),
-                                                                     self._color_number(list1[1]),
-                                                                     self._color_number(list1[2]),
-                                                                     self._color_number(list1[3]))
-        string2 = u'{} - 4k: {} | 1080: {} | 720: {} | SD: {}'.format(g.get_language_string(30059),
-                                                                     self._color_number(list2[0]),
-                                                                     self._color_number(list2[1]),
-                                                                     self._color_number(list2[2]),
-                                                                     self._color_number(list2[3]))
-
-        string4 = '{} - 4k: 0 | 1080: 0 | 720: 0 | SD: 0'.format(g.get_language_string(30060))
-        provider_string = ', '.join(g.color_string(i for i in self.sources_information["remainingProviders"]))
-        string3 = '{} - {}'.format(g.get_language_string(30061), provider_string[2:])
-        return [string1, string2, string3, string4]
+        # string1 = u'{} - 4K: {} | 1080: {} | 720: {} | SD: {}'.format(g.get_language_string(30058),
+        #                                                              self._color_number(list1[0]),
+        #                                                              self._color_number(list1[1]),
+        #                                                              self._color_number(list1[2]),
+        #                                                              self._color_number(list1[3]))
+        # string2 = u'{} - 4k: {} | 1080: {} | 720: {} | SD: {}'.format(g.get_language_string(30059),
+        #                                                              self._color_number(list2[0]),
+        #                                                              self._color_number(list2[1]),
+        #                                                              self._color_number(list2[2]),
+        #                                                              self._color_number(list2[3]))
+        #
+        # string4 = '{} - 4k: 0 | 1080: 0 | 720: 0 | SD: 0'.format(g.get_language_string(30060))
+        # provider_string = ', '.join(g.color_string(i for i in self.sources_information["remainingProviders"]))
+        # string3 = '{} - {}'.format(g.get_language_string(30061), provider_string[2:])
+        # return [string1, string2, string3, string4]
 
     @staticmethod
     def _build_simple_show_info(info):
@@ -767,11 +765,11 @@ class Sources(object):
 
         return simple_info
 
-    def _build_hoster_variables(self, info, type):
+    def _build_hoster_variables(self, info, media_type):
 
         info = copy.deepcopy(info)
 
-        if type == 'tvshow':
+        if media_type == 'tvshow':
             imdb = info['info'].get('imdb_id')
             tvdb = info['info'].get('tvdb_id')
             title = info['info'].get('tvshowtitle')
@@ -782,7 +780,7 @@ class Sources(object):
             year = str(info['info']['year'])
             return imdb, tvdb, title, localtitle, aliases, year
 
-        elif type == 'episode':
+        elif media_type == 'episode':
             imdb = info['info'].get('imdb_id')
             tvdb = info['info'].get('tvdb_id')
             title = info['info'].get('title')
@@ -790,14 +788,14 @@ class Sources(object):
             season = str(info['info'].get('season'))
             episode = str(info['info'].get('episode'))
             return imdb, tvdb, title, premiered, season, episode
-        elif type == 'movie':
+        elif media_type == 'movie':
             imdb = info['info'].get('imdb_id')
             title = info['info'].get('originaltitle')
             localtitle = info['info'].get('title')
             aliases = info['info'].get('aliases', [])
             year = str(info['info'].get('year'))
             return imdb, title, localtitle, aliases, year
-        elif type == 'sources':
+        elif media_type == 'sources':
             hostpr_dict = [host[0]
                            for debrid in self.hoster_domains['premium'].values()
                            for host in debrid]
@@ -826,10 +824,12 @@ class Sources(object):
         return prem_min
 
     def _get_sources_by_resolution(self, resolutions, source_type):
-        return [i for i in self.sources_information[source_type].values() if
+        return [i for i in self.sources_information[source_type].values()
+                if i and
+                'quality' in i and
                 i['quality'] in resolutions]
 
-    def _prem_terminate(self): # pylint: disable=method-hidden
+    def _prem_terminate(self):  # pylint: disable=method-hidden
         if self.canceled:
             monkey_requests.PRE_TERM_BLOCK = True
             return True
@@ -861,16 +861,14 @@ class Sources(object):
                 return True
             if type == 2:
                 # Terminating on both hosters and torrents
-                sources = [i for i in self.sources_information["hosterSources"].values()]
-                sources.append([i for i in self.sources_information["torrentCacheSources"].values()])
+                sources = self._get_sources_by_resolution(prem_resolutions, "hosterSources")
+                sources.append(self._get_sources_by_resolution(prem_resolutions, "torrentCacheSources"))
 
-                try:
-                    if len([i for i in sources if i['quality'] in prem_resolutions]) >= limit:
-                        g.log(pre_term_log_string, 'info')
-                        monkey_requests.PRE_TERM_BLOCK = True
-                        return True
-                except TypeError:
-                    return False
+                if len(sources) >= limit:
+                    g.log(pre_term_log_string, 'info')
+                    monkey_requests.PRE_TERM_BLOCK = True
+                    return True
+
         except (ValueError, KeyError, IndexError):
             pass
 
@@ -1031,6 +1029,7 @@ class SourceWindowAdapter(object):
     """
     Class to handle different window style for scraper module
     """
+
     def __init__(self, item_information, scraper_sclass):
         self.trakt_id = 0
         self.silent = g.get_bool_setting('general.tempSilent')

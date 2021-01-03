@@ -330,7 +330,10 @@ class Menus:
             "calendars/my/shows/{}/30".format(tomorrow), extended="full"
         )[: self.page_limit]
         self.list_builder.mixed_episode_builder(
-            upcoming_episodes, prepend_date=True, no_paging=True
+            upcoming_episodes,
+            prepend_date=True,
+            no_paging=True,
+            hide_unaired=False
         )
 
     def shows_networks(self):

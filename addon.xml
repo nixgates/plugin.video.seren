@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.0.6" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.0.7" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.python" version="2.26.0" />
         <import addon="script.module.future" version="0.17.1"/>
@@ -63,6 +63,17 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.0.7:
+            Fixed All debrid torrent resolving
+            Fixed movie resuming
+            Fixed issue with limited providers running at scrape
+            Fixed AD re-auth
+            Changes to attempt to fix XBOX support and ascii issues with timezones
+            Fixed unaired episodes showing blank
+            Fixed AD User info fetching
+            Fixed ghost providers
+            Fixed TypeError with pre-termination
+
             Changelog 2.0.6:
             Create Skins directory if missing
             Allow failure in pre-term until investigated
