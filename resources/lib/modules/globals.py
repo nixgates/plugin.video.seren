@@ -680,10 +680,15 @@ class GlobalVariables(object):
         color = xbmcgui.Dialog().select(
             "{}: {}".format(self.ADDON_NAME, self.get_language_string(30017)), select_list
         )
-        if color == -1:
+        if color == -1: 
             return
-        self.set_setting("general.textColor", colorChart[color])
-        self.set_setting("general.displayColor", colorChart[color])
+        if color == 0:
+            self.set_setting("general.textColor", "inherit")
+            self.set_setting("general.displayColor", "inherit")
+        else:
+            color -= 1
+            self.set_setting("general.textColor", colorChart[color])
+            self.set_setting("general.displayColor", colorChart[color])
         xbmc.executebuiltin("Addon.OpenSettings({})".format(self.ADDON_ID))
 
     @staticmethod

@@ -436,13 +436,13 @@ def get_filter_single_episode_fn(simple_info):
     for title in titles:
         clean_titles.append(re.escape(clean_title_with_simple_info(title, simple_info)))
 
-    pattern = r"^(?:{titles})+(?:{year} )?(?:s0?{ss}e0?{ep}(?: |e\d\d?)|season\ 0?{ss}\ episode\ 0?{ep})+".format(
+    pattern = r"^(?:{titles})+(?:{year} )? ?(?:s0?{ss}e0?{ep}(?: |e\d\d?)|season\ 0?{ss}\ episode\ 0?{ep})+".format(
         titles=" ?|".join(clean_titles),
         year=re.escape(simple_info["year"]),
         ss=re.escape(season),
         ep=re.escape(episode),
     )
-
+    g.log(pattern, "error")
     regex = re.compile(pattern)
 
     def filter_fn(release_title):

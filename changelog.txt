@@ -1,3 +1,11 @@
+Changelog 2.0.8:
+Temporary Workaround for trakt items not providing trakt_id
+Better RD episode resolving
+Better episode identification during resolving
+Catch WindowsError exception when handling skins
+Fix text highlight selection
+Cool down background service on failure
+
 Changelog 2.0.7:
 Fixed All debrid torrent resolving
 Fixed movie resuming

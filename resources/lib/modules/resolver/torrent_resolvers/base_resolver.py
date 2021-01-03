@@ -21,6 +21,8 @@ class TorrentResolverBase(ApiBase):
         self.pack_select = False
         self.debrid_module = None
         self._source_normalization = None
+        self.media_type = None
+        self.item_information = None
 
     def resolve_magnet(self, item_information, torrent, pack_select=False):
         """
@@ -30,10 +32,13 @@ class TorrentResolverBase(ApiBase):
         :param pack_select: allows manual selection of file within torrent
         :return:
         """
+        self.item_information = item_information
         self.pack_select = pack_select
         if "tvshowtitle" not in item_information["info"]:
+            self.media_type = "movie"
             return self._movie_resolve(item_information, torrent)
         else:
+            self.media_type = "episode"
             return self._multi_pack_resolve(item_information, torrent)
 
     @abc.abstractmethod
