@@ -662,7 +662,7 @@ class GlobalVariables(object):
             if self.KODI_VERSION >= 19:
                 xbmc.log(msg, level=xbmc.LOGINFO)
             else:
-                xbmc.log(msg, level=xbmc.LOGNOTICE)
+                xbmc.log(msg, level=xbmc.LOGNOTICE)# pylint: disable=no-member
         elif level == "warning":
             xbmc.log(msg, level=xbmc.LOGWARNING)
         else:

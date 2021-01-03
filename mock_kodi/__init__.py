@@ -301,16 +301,27 @@ class SerenStubs:
         @staticmethod
         def log(msg, level=xbmc.LOGDEBUG):
             """Write a string to XBMC's log file and the debug window"""
-            levels = [
-                "LOGDEBUG",
-                "LOGINFO",
-                "LOGNOTICE",
-                "LOGWARNING",
-                "LOGERROR",
-                "LOGSEVERE",
-                "LOGFATAL",
-                "LOGNONE",
-            ]
+            if PYTHON2:
+                levels = [
+                    "LOGDEBUG",
+                    "LOGINFO",
+                    "LOGNOTICE",
+                    "LOGWARNING",
+                    "LOGERROR",
+                    "LOGSEVERE",
+                    "LOGFATAL",
+                    "LOGNONE",
+                ]
+            else:
+                levels = [
+                    "LOGDEBUG",
+                    "LOGINFO",
+                    "LOGWARNING",
+                    "LOGERROR",
+                    "LOGSEVERE",
+                    "LOGFATAL",
+                    "LOGNONE",
+                ]
             value = "{} - {}".format(levels[level], msg)
             print(value)
             MOCK.LOG_HISTORY.append(value)

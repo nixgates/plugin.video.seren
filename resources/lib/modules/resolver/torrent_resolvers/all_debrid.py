@@ -24,8 +24,8 @@ class AllDebridResolver(TorrentResolverBase):
         self.magnet_id = None
 
     def _fetch_source_files(self, torrent, item_information):
-        self.magnet_id = self.debrid_module.upload_magnet(torrent['hash'])["id"]
-        status = self.debrid_module.magnet_status(self.magnet_id)
+        self.magnet_id = self.debrid_module.upload_magnet(torrent['hash'])["magnets"][0]["id"]
+        status = self.debrid_module.magnet_status(self.magnet_id)["magnets"]
         if status["status"] != "Ready":
             raise UnexpectedResponse(status)
         return status['links']
