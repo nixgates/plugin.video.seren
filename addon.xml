@@ -7,7 +7,7 @@
         <import addon="plugin.video.youtube" version="6.8.3"/>
         <import addon="script.module.dateutil" version="2.8.1"/>
         <import addon="script.module.beautifulsoup4" version="4.6.2"/>
-        <import addon="context.seren" version="1.0.3"/>
+        <import addon="context.seren" version="2.0.0"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
         <import addon="script.module.pycryptodome" version="3.4.3"/>
     </requires>
