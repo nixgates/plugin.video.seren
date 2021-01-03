@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, unicode_literals
 from resources.lib.debrid.real_debrid import RealDebrid
 from resources.lib.modules.exceptions import FileIdentification
 from resources.lib.modules.globals import g
+from resources.lib.common.source_utils import get_best_episode_match
 from resources.lib.modules.resolver.torrent_resolvers.base_resolver import (
     TorrentResolverBase,
 )
@@ -34,9 +35,13 @@ class RealDebridResolver(TorrentResolverBase):
                 storage_variant
                 for storage_variant in hash_check
                 if self.debrid_module.is_streamable_storage_type(storage_variant)
-            ][0]
+            ]
         except IndexError:
             raise FileIdentification(hash_check)
+        if self.media_type == "episode":
+            hash_check = [i for i in hash_check if get_best_episode_match("filename", i.values(), item_information)][0]
+        else:
+            hash_check = hash_check[0]
         [value.update({"idx": key}) for key, value in hash_check.items()]
         return hash_check.values()
 

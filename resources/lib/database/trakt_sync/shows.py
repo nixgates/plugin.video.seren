@@ -234,6 +234,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: list
         """
         g.log("Fetching show list from sync database", "debug")
+        trakt_list = [i for i in trakt_list if i.get("trakt_id")]
         self.insert_trakt_shows(
             self.filter_trakt_items_that_needs_updating(trakt_list, "shows")
         )

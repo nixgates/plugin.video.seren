@@ -43,6 +43,10 @@ try:
     FileExistsError = FileExistsError
 except NameError:
     FileExistsError = Exception
+try:
+    WindowsError = WindowsError
+except NameError:
+    WindowsError = Exception
 
 try:
     import xml.etree.cElementTree as ElementTree
@@ -599,7 +603,7 @@ def makedirs(name, mode=0o777, exist_ok=False):
     """
     try:
         os.makedirs(name, mode)
-    except (OSError, FileExistsError):
+    except (OSError, FileExistsError, WindowsError):
         if not exist_ok:
             raise
 

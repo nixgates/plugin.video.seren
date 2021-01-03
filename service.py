@@ -40,8 +40,16 @@ while not monitor.abortRequested():
     try:
         if g.get_bool_setting("general.checkAddonUpdates"):
             maintenance.check_for_addon_update()
-        maintenance.run_maintenance()
-        TraktSyncDatabase().sync_activities()
+        try:
+            maintenance.run_maintenance()
+            TraktSyncDatabase().sync_activities()
+        except Exception as e:
+            g.log("Background Service Failure, waiting 5 minutes to try again", "error")
+            g.log_stacktrace()
+            if monitor.waitForAbort(60 * 5):
+                break
+            else:
+                continue
         if monitor.waitForAbort(60 * randint(13, 17)):
             break
     except:  # pylint: disable=bare-except

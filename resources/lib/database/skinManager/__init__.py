@@ -314,7 +314,7 @@ class SkinManager(Database, ZipManager):
             self._active_skin_path, "resources", "skins", "Default"
         )
 
-        tools.makedirs(skins_folder, True)
+        tools.makedirs(skins_folder, exist_ok=True)
 
         for folder in [
             folder
