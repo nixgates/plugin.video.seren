@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.0.8" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.0.9" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.python" version="2.26.0" />
         <import addon="script.module.future" version="0.17.1"/>
@@ -7,7 +7,7 @@
         <import addon="plugin.video.youtube" version="6.8.3"/>
         <import addon="script.module.dateutil" version="2.8.1"/>
         <import addon="script.module.beautifulsoup4" version="4.6.2"/>
-        <import addon="context.seren" version="2.0.0"/>
+        <import addon="context.seren" version="1.0.3"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
         <import addon="script.module.pycryptodome" version="3.4.3"/>
     </requires>
@@ -63,6 +63,17 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.0.9:
+            Fixed RD cloud scraping
+            Fixed issue if all providers were disabled scraping would run as if all were enabled
+            Fixed smartplay and legacy paramas support
+            Fixed bug causing failure when checking art from TMDB
+            Fixed user lists menus
+            Added spanish translation
+            Fixed backing out from menu when opened from widget (having to backout multiple times)
+            Fixed season watch markers
+            Fixed hidden_items handling with New Shows menu
+
             Changelog 2.0.8:
             Temporary Workaround for trakt items not providing trakt_id
             Better RD episode resolving

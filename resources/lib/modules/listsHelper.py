@@ -57,7 +57,7 @@ class ListsHelper:
             self.lists_database.extract_trakt_page('lists/trending',
                                                    media_type,
                                                    page=g.PAGE,
-                                                   no_paging=self.no_paging),
+                                                   no_paging=True),
             no_paging=True,
             media_type=media_type)
 
@@ -66,7 +66,7 @@ class ListsHelper:
             self.lists_database.extract_trakt_page('lists/popular',
                                                    media_type,
                                                    page=g.PAGE,
-                                                   no_paging=self.no_paging),
+                                                   no_paging=True),
             no_paging=True,
             media_type=media_type)
 

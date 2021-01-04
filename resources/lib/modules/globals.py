@@ -367,7 +367,7 @@ class GlobalVariables(object):
             self.BASE_URL = ""
         self.PATH = self.decode_py2(tools.unquote(self.URL[2]))
         try:
-            self.PARAM_STRING = argv[2][1:]
+            self.PARAM_STRING = argv[2].lstrip('?/')
         except IndexError:
             self.PARAM_STRING = ""
         self.REQUEST_PARAMS = self._legacy_params_converter(
@@ -1188,7 +1188,8 @@ class GlobalVariables(object):
         if "action_args" in params and isinstance(params["action_args"], dict):
             params["action_args"] = json.dumps(params["action_args"], sort_keys=True)
         params["from_widget"] = "true" if not self.is_addon_visible() else "false"
-        return "{}?{}".format(base_url, tools.urlencode(sorted(params.items())))
+        sep = "/" if not self.is_addon_visible() else ""
+        return "{}{}?{}".format(base_url, sep, tools.urlencode(sorted(params.items())))
 
     @staticmethod
     def abort_requested():

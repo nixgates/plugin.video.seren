@@ -75,8 +75,8 @@ msgstr "Τα Top 10 του Box Office"
 #: \resources\lib\gui\homeMenu.py:29 \resources\lib\gui\movieMenus.py:144
 #: \resources\lib\gui\movieMenus.py:150 \resources\lib\gui\movieMenus.py:282
 #: \resources\lib\gui\movieMenus.py:341 \resources\lib\gui\tvshowMenus.py:152
-#: \resources\lib\gui\tvshowMenus.py:158 \resources\lib\gui\tvshowMenus.py:390
-#: \resources\lib\gui\tvshowMenus.py:422
+#: \resources\lib\gui\tvshowMenus.py:158 \resources\lib\gui\tvshowMenus.py:393
+#: \resources\lib\gui\tvshowMenus.py:425
 msgctxt "#30013"
 msgid "Search..."
 msgstr "Αναζήτηση..."
@@ -106,23 +106,23 @@ msgctxt "#30018"
 msgid "Real-Debrid Auth"
 msgstr "Εξουσιοδότηση Real-Debrid"
 
-#: \resources\lib\debrid\all_debrid.py:115
+#: \resources\lib\debrid\all_debrid.py:119
 #: \resources\lib\debrid\premiumize.py:62
 #: \resources\lib\debrid\real_debrid.py:86
-#: \resources\lib\indexers\trakt.py:438
+#: \resources\lib\indexers\trakt.py:439
 msgctxt "#30019"
 msgid "Open this link in a browser: {}"
 msgstr "Άνοιξε τον συγκεκριμένο σύνδεσμο στον browser: {}"
 
-#: \resources\lib\debrid\all_debrid.py:118
+#: \resources\lib\debrid\all_debrid.py:122
 #: \resources\lib\debrid\premiumize.py:65
 #: \resources\lib\debrid\real_debrid.py:89
-#: \resources\lib\indexers\trakt.py:441
+#: \resources\lib\indexers\trakt.py:442
 msgctxt "#30020"
 msgid "Enter the code: {}"
 msgstr "Εισήγαγε τον κωδικό: {}"
 
-#: \resources\lib\debrid\all_debrid.py:142
+#: \resources\lib\debrid\all_debrid.py:146
 #: \resources\lib\debrid\premiumize.py:84
 #: \resources\lib\debrid\real_debrid.py:145
 #: \tests\integration\debrid\test_premiumize.py:109
@@ -130,17 +130,17 @@ msgctxt "#30021"
 msgid "Authentication is completed"
 msgstr "Η πιστοποίηση ολοκληρώθηκε"
 
-#: \resources\lib\indexers\trakt.py:411
+#: \resources\lib\indexers\trakt.py:412
 msgctxt "#30022"
 msgid "Trakt Successfully Disconnected"
 msgstr "Επιτυχής Αποσύνδεση Trakt"
 
-#: \resources\lib\indexers\trakt.py:436
+#: \resources\lib\indexers\trakt.py:437
 msgctxt "#30023"
 msgid "Authorize Trakt"
 msgstr "Εξουσιοδότηση Trakt"
 
-#: \resources\lib\indexers\trakt.py:431 \resources\lib\indexers\trakt.py:497
+#: \resources\lib\indexers\trakt.py:432 \resources\lib\indexers\trakt.py:498
 msgctxt "#30024"
 msgid ""
 "Error while authenticating with Trakt.\n"
@@ -178,7 +178,7 @@ msgctxt "#30029"
 msgid "Clear Cache"
 msgstr "Εκκαθάριση Μνήμης Cache"
 
-#: \resources\lib\modules\globals.py:806
+#: \resources\lib\modules\globals.py:811
 msgctxt "#30030"
 msgid "Are you sure you wish to clear the cache?"
 msgstr "Σίγουρα θέλετε να καθαρίσετε την μνήμη cache?"
@@ -265,7 +265,7 @@ msgctxt "#30045"
 msgid "My Movie Lists"
 msgstr "Οι Λίστες Ταινιών μου"
 
-#: \resources\lib\gui\movieMenus.py:365 \resources\lib\gui\tvshowMenus.py:458
+#: \resources\lib\gui\movieMenus.py:365 \resources\lib\gui\tvshowMenus.py:461
 msgctxt "#30046"
 msgid "Multi Select..."
 msgstr "Πολλαπλή επιλογή..."
@@ -275,10 +275,10 @@ msgctxt "#30047"
 msgid "New TV Shows"
 msgstr "Νέες Σειρές"
 
-#: \resources\lib\debrid\all_debrid.py:119
+#: \resources\lib\debrid\all_debrid.py:123
 #: \resources\lib\debrid\premiumize.py:68
 #: \resources\lib\debrid\real_debrid.py:92
-#: \resources\lib\indexers\trakt.py:442
+#: \resources\lib\indexers\trakt.py:443
 msgctxt "#30048"
 msgid "This code has been copied to your clipboard"
 msgstr "Ο κωδικός έχει αντιγραφεί στο πρόχειρο"
@@ -303,22 +303,22 @@ msgctxt "#30052"
 msgid "successfully uninstalled"
 msgstr "απεγκαταστήθηκε επιτυχώς"
 
-#: \resources\lib\modules\globals.py:813
+#: \resources\lib\modules\globals.py:818
 msgctxt "#30053"
 msgid "All Cache Successfully Cleared"
 msgstr "Επιτυχής Εκκαθάριση Μνήμης Cache"
 
-#: \resources\lib\modules\getSources.py:192
+#: \resources\lib\modules\getSources.py:190
 msgctxt "#30054"
 msgid "Checking Local Database"
 msgstr "Έλεγχος Τοπικής Βάσης Δεδομένων"
 
-#: \resources\lib\modules\getSources.py:105
+#: \resources\lib\modules\getSources.py:114
 msgctxt "#30055"
 msgid "Initializing Providers"
 msgstr "Εγκατάσταση Παρόχων"
 
-#: \resources\lib\modules\getSources.py:212
+#: \resources\lib\modules\getSources.py:210
 msgctxt "#30056"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -327,7 +327,7 @@ msgstr ""
 "Δεν βρέθηκαν πηγές για το επόμενο στοιχείο στην λίστα αναπαραγωγής.\n"
 "Καθαρισμός τρέχουσας λίστας αναπαραγωγής"
 
-#: \resources\lib\modules\getSources.py:353
+#: \resources\lib\modules\getSources.py:351
 msgctxt "#30057"
 msgid ""
 "No Playable Sources were found.\n"
@@ -336,24 +336,24 @@ msgstr ""
 "Δεν βρέθηκαν πηγές που να μπορούν να αναπαραχθούν.\n"
 "Θα θέλατε να δοκιμάσετε αναζήτηση με torrent?"
 
-#: \resources\settings.xml:404 \resources\lib\modules\getSources.py:731
+#: \resources\settings.xml:404 \resources\lib\modules\getSources.py:729
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30058"
 msgid "Torrents"
 msgstr "Torrent"
 
-#: \resources\settings.xml:404 \resources\lib\modules\getSources.py:736
+#: \resources\settings.xml:404 \resources\lib\modules\getSources.py:734
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30059"
 msgid "Hosters"
 msgstr "Hosters"
 
-#: \resources\lib\modules\getSources.py:742
+#: \resources\lib\modules\getSources.py:740
 msgctxt "#30060"
 msgid "Free Hosters"
 msgstr "Δωρεάν Hosters"
 
-#: \resources\lib\modules\getSources.py:744
+#: \resources\lib\modules\getSources.py:742
 msgctxt "#30061"
 msgid "Remaining Providers"
 msgstr "Εναπομείναντες Πάροχοι"
@@ -966,7 +966,7 @@ msgctxt "#30177"
 msgid "Enable search history"
 msgstr "Ενεργοποίηση ιστορικού αναζήτησης"
 
-#: \resources\lib\indexers\trakt.py:421
+#: \resources\lib\indexers\trakt.py:422
 msgctxt "#30178"
 msgid ""
 "Unable to contact Trakt.\n"
@@ -1120,8 +1120,8 @@ msgstr ""
 "Αυτό θα διαγράψει όλες τις μετα-πληροφορίες, είστε σίγουροι?"
 
 #: \resources\settings.xml:443 \resources\lib\gui\homeMenu.py:79
-#: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:374
-#: \resources\lib\gui\tvshowMenus.py:378
+#: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:377
+#: \resources\lib\gui\tvshowMenus.py:381
 msgctxt "#30202"
 msgid "Clear Search History"
 msgstr "Καθαρισμός Ιστορικού Αναζήτησης"
@@ -1131,7 +1131,7 @@ msgctxt "#30203"
 msgid "New Movie Search..."
 msgstr "Νέα Αναζήτηση Ταινίας..."
 
-#: \resources\lib\gui\tvshowMenus.py:369
+#: \resources\lib\gui\tvshowMenus.py:372
 msgctxt "#30204"
 msgid "New Show Search..."
 msgstr "Νέα Αναζήτηση Σειράς..."
@@ -1624,7 +1624,7 @@ msgstr "Τηλεοπτική Σειρά"
 #: \resources\settings.xml:138 \resources\settings.xml:141
 #: \resources\settings.xml:144 \resources\settings.xml:147
 #: \resources\settings.xml:150 \resources\settings.xml:153
-#: \resources\settings.xml:156 \resources\lib\indexers\trakt.py:749
+#: \resources\settings.xml:156 \resources\lib\indexers\trakt.py:750
 msgctxt "#30290"
 msgid "Movie"
 msgstr "Ταινία"
@@ -1674,156 +1674,156 @@ msgctxt "#30299"
 msgid "Database has been rebuilt"
 msgstr "Η Βάση Δεδομένων έχει επαναδημιουργηθεί"
 
-#: \resources\lib\indexers\trakt.py:477
+#: \resources\lib\indexers\trakt.py:478
 msgctxt "#30300"
 msgid "Sucessfully authenticated with Trakt"
 msgstr "Επιτυχής Πιστοποίηση με Trakt"
 
-#: \resources\lib\indexers\trakt.py:994 \resources\lib\indexers\trakt.py:1079
-#: \resources\lib\indexers\trakt.py:1094
+#: \resources\lib\indexers\trakt.py:995 \resources\lib\indexers\trakt.py:1080
+#: \resources\lib\indexers\trakt.py:1095
 msgctxt "#30301"
 msgid "Add {} to Collection"
 msgstr "Προσθήκη {} στην Συλλογη"
 
-#: \resources\lib\indexers\trakt.py:998 \resources\lib\indexers\trakt.py:1075
-#: \resources\lib\indexers\trakt.py:1090
+#: \resources\lib\indexers\trakt.py:999 \resources\lib\indexers\trakt.py:1076
+#: \resources\lib\indexers\trakt.py:1091
 msgctxt "#30302"
 msgid "Remove {} from Collection"
 msgstr "Αφαίρεση {} από την Συλλογη"
 
-#: \resources\lib\indexers\trakt.py:1002 \resources\lib\indexers\trakt.py:1054
+#: \resources\lib\indexers\trakt.py:1003 \resources\lib\indexers\trakt.py:1055
 msgctxt "#30303"
 msgid "Add to Watchlist"
 msgstr "Προσθήκη στην Λίστα Παρακολούθησης"
 
-#: \resources\lib\indexers\trakt.py:1006 \resources\lib\indexers\trakt.py:1055
+#: \resources\lib\indexers\trakt.py:1007 \resources\lib\indexers\trakt.py:1056
 msgctxt "#30304"
 msgid "Remove from Watchlist"
 msgstr "Αφαίρεση από την Λίστα Παρακολούθησης"
 
-#: \resources\lib\indexers\trakt.py:1010 \resources\lib\indexers\trakt.py:1102
-#: \resources\lib\indexers\trakt.py:1105
+#: \resources\lib\indexers\trakt.py:1011 \resources\lib\indexers\trakt.py:1103
+#: \resources\lib\indexers\trakt.py:1106
 msgctxt "#30305"
 msgid "Mark as Watched"
 msgstr "Σημείωσε ως Προβεβλημένο"
 
-#: \resources\lib\indexers\trakt.py:1014 \resources\lib\indexers\trakt.py:1100
-#: \resources\lib\indexers\trakt.py:1107
+#: \resources\lib\indexers\trakt.py:1015 \resources\lib\indexers\trakt.py:1101
+#: \resources\lib\indexers\trakt.py:1108
 msgctxt "#30306"
 msgid "Mark as Unwatched"
 msgstr "Σημείωσε ως Μη-Προβεβλημένο"
 
-#: \resources\lib\indexers\trakt.py:972 \resources\lib\indexers\trakt.py:1018
+#: \resources\lib\indexers\trakt.py:973 \resources\lib\indexers\trakt.py:1019
 msgctxt "#30307"
 msgid "Add to List"
 msgstr "Προσθήκη σε μία λίστα"
 
-#: \resources\lib\indexers\trakt.py:973 \resources\lib\indexers\trakt.py:1022
+#: \resources\lib\indexers\trakt.py:974 \resources\lib\indexers\trakt.py:1023
 msgctxt "#30308"
 msgid "Remove From List"
 msgstr "Αφαίρεση από την Λίστα"
 
-#: \resources\lib\indexers\trakt.py:974 \resources\lib\indexers\trakt.py:1026
+#: \resources\lib\indexers\trakt.py:975 \resources\lib\indexers\trakt.py:1027
 msgctxt "#30309"
 msgid "Hide {}"
 msgstr "Κρύψε {}"
 
-#: \resources\lib\indexers\trakt.py:975 \resources\lib\indexers\trakt.py:1030
+#: \resources\lib\indexers\trakt.py:976 \resources\lib\indexers\trakt.py:1031
 msgctxt "#30310"
 msgid "Refresh Item Metadata"
 msgstr "Ανανεώστε τα μεταδεδομένα του αντικειμένου"
 
-#: \resources\lib\indexers\trakt.py:1034 \resources\lib\indexers\trakt.py:1064
+#: \resources\lib\indexers\trakt.py:1035 \resources\lib\indexers\trakt.py:1065
 msgctxt "#30311"
 msgid "Remove Playback Progress"
 msgstr "Αφαίρεση Προόδου Αναπαραγωγής"
 
-#: \resources\lib\indexers\trakt.py:751
+#: \resources\lib\indexers\trakt.py:752
 msgctxt "#30312"
 msgid "Show"
 msgstr "Εμφάνιση"
 
-#: \resources\lib\indexers\trakt.py:984 \resources\lib\indexers\trakt.py:1130
-#: \resources\lib\indexers\trakt.py:1144 \resources\lib\indexers\trakt.py:1206
-#: \resources\lib\indexers\trakt.py:1248 \resources\lib\indexers\trakt.py:1269
-#: \resources\lib\indexers\trakt.py:1292 \resources\lib\indexers\trakt.py:1300
-#: \resources\lib\indexers\trakt.py:1311 \resources\lib\indexers\trakt.py:1333
-#: \resources\lib\indexers\trakt.py:1356
+#: \resources\lib\indexers\trakt.py:985 \resources\lib\indexers\trakt.py:1131
+#: \resources\lib\indexers\trakt.py:1145 \resources\lib\indexers\trakt.py:1207
+#: \resources\lib\indexers\trakt.py:1249 \resources\lib\indexers\trakt.py:1270
+#: \resources\lib\indexers\trakt.py:1293 \resources\lib\indexers\trakt.py:1301
+#: \resources\lib\indexers\trakt.py:1312 \resources\lib\indexers\trakt.py:1334
+#: \resources\lib\indexers\trakt.py:1357
 msgctxt "#30313"
 msgid "Trakt manager"
 msgstr "Διαχειριστής Trakt"
 
-#: \resources\lib\indexers\trakt.py:1131 \resources\lib\indexers\trakt.py:1145
+#: \resources\lib\indexers\trakt.py:1132 \resources\lib\indexers\trakt.py:1146
 msgctxt "#30314"
 msgid "Failed to update status, please check the log"
 msgstr "Η ενημέρωση της κατάστασης απέτυχε, ελέγξτε το αρχείο καταγραφής"
 
-#: \resources\lib\indexers\trakt.py:1207
+#: \resources\lib\indexers\trakt.py:1208
 msgctxt "#30315"
 msgid "Item marked as watched"
 msgstr "Το αντικείμενο σημειώθηκε ως προβεβλημένο"
 
-#: \resources\lib\indexers\trakt.py:1249
+#: \resources\lib\indexers\trakt.py:1250
 msgctxt "#30316"
 msgid "Item marked as unwatched"
 msgstr "Το αντικείμενο σημειώθηκε ως μη-προβεβλημένο"
 
-#: \resources\lib\indexers\trakt.py:1270
+#: \resources\lib\indexers\trakt.py:1271
 msgctxt "#30317"
 msgid "Item added to Collection"
 msgstr "Το αντικείμενο προστέθηκε στη Συλλογή"
 
-#: \resources\lib\indexers\trakt.py:1293
+#: \resources\lib\indexers\trakt.py:1294
 msgctxt "#30318"
 msgid "Item removed from Collection"
 msgstr "Το αντικείμενο αφαιρέθηκε από την Συλλογή"
 
-#: \resources\lib\indexers\trakt.py:1301
+#: \resources\lib\indexers\trakt.py:1302
 msgctxt "#30319"
 msgid "Item added to Watchlist"
 msgstr "Το αντικείμενο προστέθηκε στην Λίστα Παρακολούθησης"
 
-#: \resources\lib\indexers\trakt.py:1312
+#: \resources\lib\indexers\trakt.py:1313
 msgctxt "#30320"
 msgid "Item removed from Watchlist"
 msgstr "Το αντικείμενο αφαιρέθηκε από την Λίστα Παρακολούθησης"
 
-#: \resources\lib\indexers\trakt.py:1334
+#: \resources\lib\indexers\trakt.py:1335
 msgctxt "#30321"
 msgid "Item added to {}"
 msgstr "Το αντικείμενο προστέθηκε στο {}"
 
-#: \resources\lib\indexers\trakt.py:1357
+#: \resources\lib\indexers\trakt.py:1358
 msgctxt "#30322"
 msgid "Item removed from {}"
 msgstr "Το αντικείμενο αφαιρέθηκε από το {}"
 
-#: \resources\lib\indexers\trakt.py:1321 \resources\lib\indexers\trakt.py:1343
+#: \resources\lib\indexers\trakt.py:1322 \resources\lib\indexers\trakt.py:1344
 msgctxt "#30323"
 msgid "Select a list"
 msgstr "Επιλογή μίας λίστας"
 
-#: \resources\lib\indexers\trakt.py:1364
+#: \resources\lib\indexers\trakt.py:1365
 msgctxt "#30324"
 msgid "Watched Progress"
 msgstr "Παρακολούθηση Προόδου"
 
-#: \resources\lib\indexers\trakt.py:1364
+#: \resources\lib\indexers\trakt.py:1365
 msgctxt "#30325"
 msgid "Calendar"
 msgstr "Ημερολόγιo"
 
-#: \resources\lib\indexers\trakt.py:1366
+#: \resources\lib\indexers\trakt.py:1367
 msgctxt "#30326"
 msgid "Select Menu type to hide from"
 msgstr "Επιλέξτε τύπο Μενού για να κρύψετε από"
 
-#: \resources\lib\indexers\trakt.py:1391
+#: \resources\lib\indexers\trakt.py:1392
 msgctxt "#30327"
 msgid "Item has been hidden from your {}"
 msgstr "Το αντικείμενο έχει κρυφτεί από τα {} σας"
 
-#: \resources\lib\indexers\trakt.py:1425
+#: \resources\lib\indexers\trakt.py:1426
 msgctxt "#30328"
 msgid "Item's Progress History has been removed"
 msgstr "Το Ιστορικό Προόδου του Αντικειμένου έχει αφαιρεθεί"
@@ -1833,7 +1833,7 @@ msgctxt "#30329"
 msgid "Silent scrape"
 msgstr "Αθόρυβο Scrape"
 
-#: \resources\lib\gui\movieMenus.py:388 \resources\lib\gui\tvshowMenus.py:485
+#: \resources\lib\gui\movieMenus.py:388 \resources\lib\gui\tvshowMenus.py:488
 msgctxt "#30330"
 msgid "Genre Selection"
 msgstr "Επιλογή Είδους"
@@ -1860,7 +1860,7 @@ msgstr "Εισαγωγή Zip URL"
 
 #: \resources\lib\gui\windows\source_select.py:78
 #: \resources\lib\modules\cacheAssist.py:114
-#: \resources\lib\modules\getSources.py:352
+#: \resources\lib\modules\getSources.py:350
 msgctxt "#30335"
 msgid "Cache Assist"
 msgstr "Βοήθεια Μνήμης Cache"
@@ -2026,7 +2026,7 @@ msgctxt "#30365"
 msgid "AllDebrid"
 msgstr "AllDebrid"
 
-#: \resources\lib\debrid\all_debrid.py:113
+#: \resources\lib\debrid\all_debrid.py:117
 msgctxt "#30366"
 msgid "AllDebrid Auth"
 msgstr "AllDebrid Auth"
@@ -2237,7 +2237,7 @@ msgid "Search for movies by title"
 msgstr "Αναζητήστε ταινίες ανά τίτλο"
 
 #: \resources\lib\gui\homeMenu.py:52 \resources\lib\gui\tvshowMenus.py:154
-#: \resources\lib\gui\tvshowMenus.py:371
+#: \resources\lib\gui\tvshowMenus.py:374
 msgctxt "#30405"
 msgid "Search for shows by title"
 msgstr "Αναζήτηση για σειρές ανά τίτλο"
@@ -2696,7 +2696,7 @@ msgctxt "#30476"
 msgid "My recent watched episodes"
 msgstr "Τα πρόσφατα επεισόδια μου παρακολουθήθηκαν"
 
-#: \resources\lib\modules\getSources.py:369
+#: \resources\lib\modules\getSources.py:367
 #: \resources\lib\modules\helpers.py:52
 msgctxt "#30477"
 msgid ""
@@ -2970,7 +2970,7 @@ msgid "Minimum scrobble percentage before marked watched."
 msgstr "Ελάχιστο ποσοστό σκασίματος πριν από την επισήμανση."
 
 #: \resources\lib\gui\windows\source_select.py:81
-#: \resources\lib\modules\resolver\torrent_resolvers\base_resolver.py:77
+#: \resources\lib\modules\resolver\torrent_resolvers\base_resolver.py:82
 msgctxt "#30525"
 msgid "File Selection"
 msgstr "Επιλογή αρχείου"

@@ -1143,9 +1143,9 @@ class MetadataHandler(object):
         try:
             if not item:
                 return False
-            if media_type in ["tvshow", "season", "movie"] and not item["art"].get(
-                "poster"
-            ):
+            if not item.get('art'):
+                return False
+            if media_type in ["tvshow", "season", "movie"] and not item["art"].get("poster"):
                 return False
             if media_type in ["tvshow", "movie"] and not item["art"].get("fanart"):
                 return False

@@ -50,9 +50,10 @@ class CloudScraper(ApiBase, object):
 
         cloud_items = [self._normalize_item(i) for i in cloud_items if not self.terminate_check()]
         cloud_items = [i for i in cloud_items if self._is_valid_pack(i) if not self.terminate_check()]
-        cloud_items = self._apply_general_filter(cloud_items)
         cloud_items = self._identify_items(cloud_items)
         cloud_items = [self._source_to_file(i) for i in cloud_items if not self.terminate_check()]
+        cloud_items = [i for i in cloud_items if i]
+        cloud_items = self._apply_general_filter(cloud_items)
         cloud_items = self._finalise_identified_items(cloud_items)
         g.log('{} cloud scraper found {} source'.format(self.debrid_provider, len(cloud_items)), 'info')
         return cloud_items
@@ -69,7 +70,10 @@ class CloudScraper(ApiBase, object):
 
         if self.media_type == 'episode':
             for item in cloud_items:
-                if self.episode_regex(source_utils.clean_title(item['release_title'])):
+                release_title = source_utils.clean_title(item["release_title"])
+                if self.episode_regex(release_title) or \
+                        self.show_regex(release_title) or \
+                        self.season_regex(release_title):
                     sources.append(item)
 
         else:
@@ -163,11 +167,14 @@ class RealDebridCloudScraper(CloudScraper):
         return self.api_adapter.list_torrents()
 
     def _source_to_file(self, source):
+        if "links" not in source:
+            return None
         source_files = self._normalize_item(self.api_adapter.torrent_info(source['id'])['files'])
+        source_files = [i for i in source_files if i["selected"]]
         [file.update({'idx': idx}) for idx, file in enumerate(source_files)]
         source_files = self._identify_items(source_files)
         [file.update({'url': source['links'][file['idx']]}) for file in source_files]
-        return source_files[0]
+        return source_files[0] if source_files else None
 
 
 class AllDebridCloudScraper(CloudScraper):

@@ -89,7 +89,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 return True
 
             if not self.requires_update(
-                remote_activites["all"], self.activities["all_activities"]
+                    remote_activites["all"], self.activities["all_activities"]
             ):
                 return
 
@@ -132,7 +132,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     for key in activity[1]:
                         last_activity_update = last_activity_update[key]
                     if not self.requires_update(
-                        last_activity_update, self.activities[activity[2]]
+                            last_activity_update, self.activities[activity[2]]
                     ):
                         g.log(
                             "Skipping {}, does not require update".format(activity[0])
@@ -149,9 +149,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def _check_for_first_run(self, silent, trakt_auth):
         if (
-            not silent
-            and str(self.activities["all_activities"]) == self.base_date
-            and trakt_auth is not None
+                not silent
+                and str(self.activities["all_activities"]) == self.base_date
+                and trakt_auth is not None
         ):
             g.notification(g.ADDON_NAME, g.get_language_string(30197))
             # Give the people time to read the damn notification
@@ -203,8 +203,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         [
             items.extend(paged_items)
             for paged_items in self.trakt_api.get_all_pages_json(
-                "users/hidden/{}".format(section)
-            )
+            "users/hidden/{}".format(section)
+        )
         ]
         return {section: items}
 
@@ -283,7 +283,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 ]
                 self.execute_sql(query_list)
             self.update_shows_statistics(trakt_watched)
-            self.update_season_statistics(trakt_watched)
+            self.update_season_statistics(self.execute_sql(
+                "select trakt_id from seasons where trakt_show_id in ({})"
+                .format(",".join({str(i.get("trakt_id")) for i in trakt_watched}))).fetchall())
         except Exception as e:
             raise ActivitySyncFailure(e)
 
@@ -323,7 +325,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 ]
                 self.execute_sql(query_list)
             self.update_shows_statistics(trakt_collection)
-            self.update_season_statistics(trakt_collection)
+            self.update_season_statistics(self.execute_sql(
+                "select trakt_id from seasons where trakt_show_id in ({})"
+                    .format(",".join({str(i.get("trakt_id")) for i in trakt_collection}))).fetchall())
+
         except Exception as e:
             raise ActivitySyncFailure(e)
 
@@ -368,7 +373,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self.execute_sql("DELETE FROM bookmarks WHERE type=?", (bookmark_type[:-1],))
         base_sql_statement = "REPLACE INTO bookmarks VALUES (?, ?, ?, ?, ?)"
         for progress in self.trakt_api.get_all_pages_json(
-            "sync/playback/{}".format(bookmark_type), extended="full", limit=100
+                "sync/playback/{}".format(bookmark_type), extended="full", limit=100
         ):
             if bookmark_type == "movies":
                 self.execute_sql(
@@ -383,7 +388,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         )
                         for i in progress
                         if get(i, "percentplayed") is not None
-                        and 0 < get(i, "percentplayed") < 100
+                           and 0 < get(i, "percentplayed") < 100
                     ),
                 )
             else:
