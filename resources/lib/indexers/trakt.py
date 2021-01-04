@@ -564,8 +564,7 @@ class TraktAPI(ApiBase):
         )
 
     def _try_add_default_paging(self, params):
-        if "no_paging" in params:
-            params.pop("no_paging", "")
+        if params.pop("no_paging", False):
             params.pop("limit", "")
             params.pop("page", "")
             return

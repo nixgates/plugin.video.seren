@@ -809,7 +809,6 @@ class TraktSyncDatabase(Database):
         )
 
         result = set(r["trakt_id"] for r in self.execute_sql(query).fetchall())
-        g.log(result)
         return [
             r for r in requested if r.get("trakt_id") and r.get("trakt_id") in result
         ]

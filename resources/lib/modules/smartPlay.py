@@ -335,10 +335,15 @@ class SmartPlay:
                 g.log("Cleaning up other addon items from playlsit", "debug")
                 playlist_uris = []
 
-            action_args = [dict(tools.parse_qsl(i.split("?")[-1]))["action_args"] for i in playlist_uris]
+            action_args = [dict(tools.parse_qsl(i.split("?")[-1])).get("action_args") for i in playlist_uris]
+            action_args = [i for i in action_args if i is not None]
+
+            if not action_args:
+                playlist_uris = []
+
             show_ids = set(tools.deconstruct_action_args(i).get('trakt_show_id') for i in action_args)
 
-            if len(show_ids) > 1 or self.show_trakt_id not in show_ids:
+            if len(show_ids) > 1 and self.show_trakt_id not in show_ids:
                 g.log("Cleaning up items from other shows", "debug")
                 playlist_uris = []
 
