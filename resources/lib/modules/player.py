@@ -271,7 +271,7 @@ class SerenPlayer(xbmc.Player):
         :return: None
         :rtype: None
         """
-        self.playback_ended = True
+        self.playback_ended = True if self.playback_started else False
         self._end_playback()
         if g.PLAYLIST.getposition() == g.PLAYLIST.size() or g.PLAYLIST.size() == 1:
             g.PLAYLIST.clear()
@@ -282,7 +282,7 @@ class SerenPlayer(xbmc.Player):
         :return: None
         :rtype: None
         """
-        self.playback_stopped = True
+        self.playback_stopped = True if self.playback_started else False
         g.PLAYLIST.clear()
         self._end_playback()
 
@@ -314,6 +314,7 @@ class SerenPlayer(xbmc.Player):
             return
 
         self.playback_started = True
+        self.plaback_stopped = False
         self.scrobbled = False
         self.playback_timestamp = time.time()
 
@@ -456,9 +457,12 @@ class SerenPlayer(xbmc.Player):
          ):
             return
 
-        post_data = self._build_trakt_object(offset=offset)
+        try:
+            post_data = self._build_trakt_object(offset=offset)
 
-        self._trakt_api.post("scrobble/start", post_data)
+            self._trakt_api.post("scrobble/start", post_data)
+        except:
+            g.log_stacktrace()
         self.scrobble_started = True
 
     def _trakt_stop_watching(self):
@@ -480,12 +484,20 @@ class SerenPlayer(xbmc.Player):
             post_data["progress"] = (
                 80 if post_data["progress"] < 80 else post_data["progress"]
              )
-            scrobble_response = self._trakt_api.post("scrobble/stop", post_data)
+            try:
+                scrobble_response = self._trakt_api.post("scrobble/stop", post_data)
+            except:
+                g.log_stacktrace()
+                return
             if scrobble_response.status_code in (201, 409):
                 self._trakt_mark_playing_item_watched()
                 self.scrobbled = True
         elif self.current_time > self.ignoreSecondsAtStart:
-            scrobble_response = self._trakt_api.post("scrobble/pause", post_data)
+            try:
+                scrobble_response = self._trakt_api.post("scrobble/pause", post_data)
+            except:
+                g.log_stacktrace()
+                return
         else:
             return
 
@@ -527,7 +539,7 @@ class SerenPlayer(xbmc.Player):
          ):
             xbmc.sleep(10000)
             g.set_global_setting("marked_watched_dialog_open", True)
-            if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30528)):
+            if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30526)):
                 self._force_marked_watched = True
             g.set_global_setting("marked_watched_dialog_open", False)
 
@@ -550,6 +562,7 @@ class SerenPlayer(xbmc.Player):
         self._add_subtitle_if_needed()
 
         while self._is_file_playing() and not g.abort_requested():
+
             self._update_progress()
 
             if not self.scrobble_started:

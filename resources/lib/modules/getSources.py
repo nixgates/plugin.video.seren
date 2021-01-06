@@ -92,6 +92,15 @@ class Sources(object):
         """
         try:
             g.log('Starting Scraping', 'debug')
+            g.log("Timeout: {}".format(self.timeout), 'debug')
+            g.log("Pre-term-enabled: {}".format(g.get_setting("preem.enabled")), 'debug')
+            g.log("Pre-term-limit: {}".format(g.get_setting("preem.limit")), 'debug')
+            g.log("Pre-term-movie-res: {}".format(g.get_setting("preem.movieres")), 'debug')
+            g.log("Pre-term-show-res: {}".format(g.get_setting("preem.tvres")), 'debug')
+            g.log("Pre-term-type: {}".format(g.get_setting("preem.type")), 'debug')
+            g.log("Pre-term-cloud-files: {}".format(g.get_setting("preem.cloudfiles")), 'debug')
+            g.log("Pre-term-adaptive-files: {}".format(g.get_setting("preem.adaptiveSources")), 'debug')
+
             self._handle_pre_scrape_modifiers()
             self._get_imdb_info()
 
@@ -310,7 +319,7 @@ class Sources(object):
     @staticmethod
     def _get_best_torrent_to_cache(sources):
         quality_list = ['1080p', '720p', 'SD']
-        sources = [i for i in sources if i.get('seeds', 0) != 0]
+        sources = [i for i in sources if i.get('seeds', 0) != 0 and i.get("magnet")]
 
         for quality in quality_list:
             quality_filter = [i for i in sources if i['quality'] == quality]
@@ -939,58 +948,61 @@ class TorrentCacheCheck:
         :return: None
         :rtype: None
         """
-        if g.get_bool_setting('realdebrid.enabled') and \
-                g.get_bool_setting('rd.torrents'):
+        if g.real_debrid_enabled() and g.get_bool_setting('rd.torrents'):
             self.threads.put(self._realdebrid_worker, copy.deepcopy(torrent_list), info)
 
-        if g.get_bool_setting('premiumize.enabled') and \
-                g.get_bool_setting('premiumize.torrents'):
+        if g.premiumize_enabled() and g.get_bool_setting('premiumize.torrents'):
             self.threads.put(self._premiumize_worker, copy.deepcopy(torrent_list))
 
-        if g.get_bool_setting('alldebrid.enabled') and \
-                g.get_bool_setting('alldebrid.torrents'):
+        if g.all_debrid_enabled() and g.get_bool_setting('alldebrid.torrents'):
             self.threads.put(self._all_debrid_worker, copy.deepcopy(torrent_list))
         self.threads.wait_completion()
 
     def _all_debrid_worker(self, torrent_list):
 
-        api = all_debrid.AllDebrid()
+        try:
+            api = all_debrid.AllDebrid()
 
-        if len(torrent_list) == 0:
-            return
-
-        cache_check = api.check_hash([i['hash'] for i in torrent_list])
-
-        if not cache_check:
-            return
-
-        for idx, i in enumerate(torrent_list):
-            try:
-                if cache_check['magnets'][idx]['instant'] is True:
-                    i['debrid_provider'] = 'all_debrid'
-                    self.store_torrent(i)
-            except KeyError:
-                g.log('KeyError in AllDebrid Cache check worker. '
-                      'Failed to walk AllDebrid cache check response, check your auth and account status', 'error')
+            if len(torrent_list) == 0:
                 return
+
+            cache_check = api.check_hash([i['hash'] for i in torrent_list])
+
+            if not cache_check:
+                return
+
+            for idx, i in enumerate(torrent_list):
+                try:
+                    if cache_check['magnets'][idx]['instant'] is True:
+                        i['debrid_provider'] = 'all_debrid'
+                        self.store_torrent(i)
+                except KeyError:
+                    g.log('KeyError in AllDebrid Cache check worker. '
+                          'Failed to walk AllDebrid cache check response, check your auth and account status', 'error')
+                    return
+        except:
+            g.log_stacktrace()
 
     def _realdebrid_worker(self, torrent_list, info):
 
-        hash_list = [i['hash'] for i in torrent_list]
-        api = real_debrid.RealDebrid()
-        real_debrid_cache = api.check_hash(hash_list)
+        try:
+            hash_list = [i['hash'] for i in torrent_list]
+            api = real_debrid.RealDebrid()
+            real_debrid_cache = api.check_hash(hash_list)
 
-        for i in torrent_list:
-            try:
-                if 'rd' not in real_debrid_cache.get(i['hash'], {}):
-                    continue
-                if len(real_debrid_cache[i['hash']]['rd']) >= 1:
-                    if self.scraper_class.media_type == 'episode':
-                        self._handle_episode_rd_worker(i, real_debrid_cache, info)
-                    else:
-                        self._handle_movie_rd_worker(i, real_debrid_cache)
-            except KeyError:
-                pass
+            for i in torrent_list:
+                try:
+                    if 'rd' not in real_debrid_cache.get(i['hash'], {}):
+                        continue
+                    if len(real_debrid_cache[i['hash']]['rd']) >= 1:
+                        if self.scraper_class.media_type == 'episode':
+                            self._handle_episode_rd_worker(i, real_debrid_cache, info)
+                        else:
+                            self._handle_movie_rd_worker(i, real_debrid_cache)
+                except KeyError:
+                    pass
+        except:
+            g.log_stacktrace()
 
     def _handle_movie_rd_worker(self, source, real_debrid_cache):
         for storage_variant in real_debrid_cache[source['hash']]['rd']:
@@ -1012,18 +1024,20 @@ class TorrentCacheCheck:
                 break
 
     def _premiumize_worker(self, torrent_list):
-        hash_list = [i['hash'] for i in torrent_list]
-        if len(hash_list) == 0:
-            return
-        premiumize_cache = premiumize.Premiumize().hash_check(hash_list)
-        premiumize_cache = premiumize_cache['response']
-        count = 0
-        for i in torrent_list:
-            if premiumize_cache[count] is True:
-                i['debrid_provider'] = 'premiumize'
-                self.store_torrent(i)
-            count += 1
-
+        try:
+            hash_list = [i['hash'] for i in torrent_list]
+            if len(hash_list) == 0:
+                return
+            premiumize_cache = premiumize.Premiumize().hash_check(hash_list)
+            premiumize_cache = premiumize_cache['response']
+            count = 0
+            for i in torrent_list:
+                if premiumize_cache[count] is True:
+                    i['debrid_provider'] = 'premiumize'
+                    self.store_torrent(i)
+                count += 1
+        except:
+            g.log_stacktrace()
 
 class SourceWindowAdapter(object):
     """

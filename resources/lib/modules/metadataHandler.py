@@ -69,45 +69,45 @@ class MetadataHandler(object):
         )
 
         self.genres = {
-            "action": g.get_language_string(30534),
-            "adventure": g.get_language_string(30535),
-            "animation": g.get_language_string(30536),
-            "anime": g.get_language_string(30537),
-            "biography": g.get_language_string(30538),
-            "children": g.get_language_string(30539),
-            "comedy": g.get_language_string(30540),
-            "crime": g.get_language_string(30541),
-            "documentary": g.get_language_string(30542),
-            "drama": g.get_language_string(30543),
-            "family": g.get_language_string(30544),
-            "fantasy": g.get_language_string(30545),
-            "game-show": g.get_language_string(30546),
-            "history": g.get_language_string(30547),
-            "holiday": g.get_language_string(30548),
-            "home-and-garden": g.get_language_string(30549),
-            "horror": g.get_language_string(30550),
-            "mini-series": g.get_language_string(30551),
-            "music": g.get_language_string(30552),
-            "musical": g.get_language_string(30553),
-            "mystery": g.get_language_string(30554),
-            "news": g.get_language_string(30555),
-            "none": g.get_language_string(30556),
-            "reality": g.get_language_string(30557),
-            "romance": g.get_language_string(30558),
-            "science-fiction": g.get_language_string(30559),
-            "sci-fi": g.get_language_string(30559),
-            "short": g.get_language_string(30560),
-            "soap": g.get_language_string(30561),
-            "special-interest": g.get_language_string(30562),
-            "sporting-event": g.get_language_string(30563),
-            "superhero": g.get_language_string(30564),
-            "suspense": g.get_language_string(30565),
-            "talk-show": g.get_language_string(30566),
-            "talkshow": g.get_language_string(30566),
-            "thriller": g.get_language_string(30567),
-            "tv-movie": g.get_language_string(30568),
-            "war": g.get_language_string(30569),
-            "western": g.get_language_string(30570),
+            "action": g.get_language_string(30532),
+            "adventure": g.get_language_string(30533),
+            "animation": g.get_language_string(30534),
+            "anime": g.get_language_string(30535),
+            "biography": g.get_language_string(30536),
+            "children": g.get_language_string(30537),
+            "comedy": g.get_language_string(30538),
+            "crime": g.get_language_string(30539),
+            "documentary": g.get_language_string(30540),
+            "drama": g.get_language_string(30541),
+            "family": g.get_language_string(30542),
+            "fantasy": g.get_language_string(30543),
+            "game-show": g.get_language_string(30544),
+            "history": g.get_language_string(30545),
+            "holiday": g.get_language_string(30546),
+            "home-and-garden": g.get_language_string(30547),
+            "horror": g.get_language_string(30548),
+            "mini-series": g.get_language_string(30549),
+            "music": g.get_language_string(30550),
+            "musical": g.get_language_string(30551),
+            "mystery": g.get_language_string(30552),
+            "news": g.get_language_string(30553),
+            "none": g.get_language_string(30554),
+            "reality": g.get_language_string(30555),
+            "romance": g.get_language_string(30556),
+            "science-fiction": g.get_language_string(30557),
+            "sci-fi": g.get_language_string(30557),
+            "short": g.get_language_string(30558),
+            "soap": g.get_language_string(30559),
+            "special-interest": g.get_language_string(30560),
+            "sporting-event": g.get_language_string(30561),
+            "superhero": g.get_language_string(30562),
+            "suspense": g.get_language_string(30563),
+            "talk-show": g.get_language_string(30564),
+            "talkshow": g.get_language_string(30564),
+            "thriller": g.get_language_string(30565),
+            "tv-movie": g.get_language_string(30566),
+            "war": g.get_language_string(30567),
+            "western": g.get_language_string(30568),
         }
 
         self.meta_hash = tools.md5_hash(
@@ -247,11 +247,10 @@ class MetadataHandler(object):
 
     @staticmethod
     def _thumb_fallback(art, fallback):
-        if not art or not fallback:
+        if not isinstance(art, dict) or not isinstance(fallback, dict):
             return
         if not art.get("thumb") and fallback.get("poster"):
             art.update({"thumb": fallback.get("poster")})
-
         elif not art.get("thumb") and fallback.get("banner"):
             art.update({"thumb": fallback.get("banner")})
 
@@ -343,9 +342,9 @@ class MetadataHandler(object):
             media_type = meta["info"]["mediatype"]
             title = None
             if media_type == "season":
-                title = g.get_language_string(30571).format(meta["info"]["season"])
+                title = g.get_language_string(30569).format(meta["info"]["season"])
             if media_type == "episode":
-                title = g.get_language_string(30572).format(meta["info"]["episode"])
+                title = g.get_language_string(30570).format(meta["info"]["episode"])
             if title:
                 meta["info"]["sorttitle"] = title
                 meta["info"]["title"] = title
@@ -1143,13 +1142,11 @@ class MetadataHandler(object):
         try:
             if not item:
                 return False
-            if not item.get('art'):
+            if media_type in ["tvshow", "season", "movie"] and not tools.safe_dict_get(item, "art", "poster"):
                 return False
-            if media_type in ["tvshow", "season", "movie"] and not item["art"].get("poster"):
+            if media_type in ["tvshow", "movie"] and not tools.safe_dict_get(item, "art", "fanart"):
                 return False
-            if media_type in ["tvshow", "movie"] and not item["art"].get("fanart"):
-                return False
-            if (media_type == "episode") and not item["art"].get("thumb"):
+            if (media_type == "episode") and not tools.safe_dict_get(item, "art", "thumb"):
                 return False
             return True
         except KeyError:

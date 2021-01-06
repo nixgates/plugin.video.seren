@@ -102,9 +102,13 @@ class SourceSorter:
         if g.get_bool_setting("general.enablesizelimit"):
             if self.media_type == "episode":
                 size_limit = g.get_int_setting("general.sizelimit.episode") * 1024
+                size_minimum = int(g.get_float_setting("general.sizeminimum.episode") * 1024)
             else:
                 size_limit = g.get_int_setting("general.sizelimit.movie") * 1024
-            self._filter_all_by_methods([lambda i: int(i.get("size", 0)) < size_limit])
+                size_minimum = int(g.get_float_setting("general.sizeminimum.movie") * 1024)
+            self._filter_all_by_methods(
+                [lambda i: size_limit > int(i.get("size", 0)) > size_minimum]
+                )
 
     def _apply_hevc_priority(self):
         if g.get_bool_setting("general.265sort"):
@@ -233,20 +237,25 @@ class SourceSorter:
          :return: sorted list of sources
          :rtype: list
          """
-        self.torrent_list = deepcopy([i for i in torrents]) if torrents else []
-        self.hoster_list = deepcopy([i for i in hosters]) if hosters else []
-        self.cloud_files = deepcopy([i for i in cloud]) if cloud else []
+        torrents = torrents if torrents else []
+        hosters = hosters if hosters else []
+        cloud = cloud if cloud else []
+
+        self.torrent_list = deepcopy(torrents)
+        self.hoster_list = deepcopy(hosters)
+        self.cloud_files = deepcopy(cloud)
+
         self._do_filters()
         if (
                 len(self.torrent_list + self.hoster_list + self.cloud_files) == 0
                 and len(torrents + hosters + cloud) > 0
         ):
             response = xbmcgui.Dialog().yesno(
-                g.ADDON_NAME, g.get_language_string(30512)
+                g.ADDON_NAME, g.get_language_string(30510)
                 )
             if response:
-                self.torrent_list = torrents
-                self.hoster_list = hosters
-                self.cloud_files = cloud
+                self.torrent_list = deepcopy(torrents)
+                self.hoster_list = deepcopy(hosters)
+                self.cloud_files = deepcopy(cloud)
         sorted_list = self._do_sorts()
         return sorted_list

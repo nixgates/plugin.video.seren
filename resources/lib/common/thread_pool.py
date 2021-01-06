@@ -143,9 +143,16 @@ class ThreadPool:
 
     def _cleanup_workers(self):
         [
-            self.workers.remove(worker)
+            self._safe_remove_worker(worker)
             for worker in [i for i in self.workers if not i.is_alive()]
         ]
+
+    def _safe_remove_worker(self, worker):
+        try:
+            self.workers.remove(worker)
+        except ValueError:
+            pass
+
 
     def map(self, func, args_list):
         """

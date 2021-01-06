@@ -139,6 +139,7 @@ class RealDebrid:
         g.set_setting(RD_AUTH_KEY, response["access_token"])
         g.set_setting(RD_REFRESH_KEY, response["refresh_token"])
         self.token = response["access_token"]
+        self.session.headers.update({"Authorization": "Bearer {}".format(self.token)})
         self.refresh = response["refresh_token"]
         g.set_setting(RD_EXPIRY_KEY, str(time.time() + int(response["expires_in"])))
         username = self.get_url("user").get("username")

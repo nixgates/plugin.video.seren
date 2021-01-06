@@ -44,7 +44,7 @@ def alldebird_guard_response(func):
         except requests.exceptions.ConnectionError:
             return None
         except:
-            xbmcgui.Dialog().ok(
+            xbmcgui.Dialog().notification(
                 g.ADDON_NAME, g.get_language_string(30025).format("AllDebrid")
             )
             raise

@@ -54,7 +54,7 @@ def tvdb_guard_response(func):
         except requests.exceptions.ConnectionError:
             return None
         except:
-            xbmcgui.Dialog().ok(
+            xbmcgui.Dialog().notification(
                 g.ADDON_NAME, g.get_language_string(30025).format("TVDB")
             )
             if g.get_global_setting("run.mode") == "test":

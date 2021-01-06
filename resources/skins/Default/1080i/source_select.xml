@@ -73,20 +73,9 @@
                     <control type="label">
                         <top>30</top>
                         <left>25</left>
-                        <width>350</width>
+                        <width>900</width>
                         <height>50</height>
                         <font>font37</font>
-                        <textcolor>66FFFFFF</textcolor>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <label>[B][UPPERCASE]$INFO[ListItem.Property(provider)][/UPPERCASE][/B]</label>
-                    </control>
-                    <control type="label">
-                        <top>40</top>
-                        <left>370</left>
-                        <width>500</width>
-                        <height>50</height>
-                        <font>font10</font>
                         <textcolor>66FFFFFF</textcolor>
                         <align>left</align>
                         <aligny>center</aligny>
@@ -173,13 +162,13 @@
                     <control type="label">
                         <top>75</top>
                         <left>210</left>
-                        <width>800</width>
+                        <width>1000</width>
                         <height>50</height>
                         <font>font45</font>
                         <textcolor>FFFFFFFF</textcolor>
                         <align>left</align>
                         <aligny>center</aligny>
-                        <label>[B][UPPERCASE]$INFO[ListItem.Property(provider)][/UPPERCASE][/B]</label>
+                        <label>[COLOR $INFO[Window().Property(settings.color)]][B][UPPERCASE]$INFO[ListItem.Property(release_title)][/UPPERCASE][/B][/COLOR]</label>
                     </control>
                     <control type="label">
                         <top>125</top>
@@ -191,7 +180,7 @@
                         <align>left</align>
                         <aligny>top</aligny>
                         <wrapmultiline>true</wrapmultiline>
-                        <label>[COLOR $INFO[Window().Property(settings.color)]][B][UPPERCASE]$INFO[ListItem.Property(release_title)][/UPPERCASE][/B][/COLOR]</label>
+                        <label>[B][UPPERCASE]$INFO[ListItem.Property(provider)][/UPPERCASE][/B]</label>
                     </control>
                     <control type="label">
                         <top>155</top>
@@ -371,7 +360,7 @@
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30499]</label>
+                        <label>$ADDON[plugin.video.seren 30497]</label>
                         <align>right</align>
                         <textcolor>white</textcolor>
                     </control>
@@ -381,7 +370,7 @@
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30511]</label>
+                        <label>$ADDON[plugin.video.seren 30509]</label>
                         <align>right</align>
                         <textcolor>white</textcolor>
                      </control>
@@ -465,7 +454,7 @@
 <!--                    <texturefocus colordiffuse="FFFFFFFF">white.png</texturefocus>-->
 <!--                    <texturenofocus colordiffuse="FF181818">white.png</texturenofocus>-->
 <!--                    <focusedcolor>FF000000</focusedcolor>-->
-<!--                    <label>$ADDON[plugin.video.seren 30499]</label>-->
+<!--                    <label>$ADDON[plugin.video.seren 30497]</label>-->
 <!--                    <align>center</align>-->
 <!--                </control>-->
 

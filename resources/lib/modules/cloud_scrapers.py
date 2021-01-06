@@ -34,6 +34,9 @@ class CloudScraper(ApiBase, object):
         self.regex = source_utils.get_filter_single_episode_fn(self.simple_show_info)
 
     def get_sources(self, item_information, simple_show_info=None):
+
+        if not self._is_enabled():
+            return []
         self.item_information = item_information
         self.media_type = self.item_information['info']['mediatype']
 
@@ -127,6 +130,9 @@ class CloudScraper(ApiBase, object):
             # Always return true on a movie item as packs do not count
             return True
 
+    def _is_enabled(self):
+        return False
+
 
 class PremiumizeCloudScaper(CloudScraper, ApiBase):
 
@@ -145,6 +151,9 @@ class PremiumizeCloudScaper(CloudScraper, ApiBase):
 
     def _is_valid_pack(self, item):
         return True
+
+    def _is_enabled(self):
+        return g.premiumize_enabled()
 
 
 class RealDebridCloudScraper(CloudScraper):
@@ -176,6 +185,8 @@ class RealDebridCloudScraper(CloudScraper):
         [file.update({'url': source['links'][file['idx']]}) for file in source_files]
         return source_files[0] if source_files else None
 
+    def _is_enabled(self):
+        return g.real_debrid_enabled()
 
 class AllDebridCloudScraper(CloudScraper):
 
@@ -196,3 +207,6 @@ class AllDebridCloudScraper(CloudScraper):
 
     def _is_valid_pack(self, item):
         return True
+
+    def _is_enabled(self):
+        return g.all_debrid_enabled()
