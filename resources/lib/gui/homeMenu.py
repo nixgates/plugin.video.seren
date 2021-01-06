@@ -136,24 +136,24 @@ class Menus:
 
     @staticmethod
     def test_windows():
-        g.add_directory_item(g.get_language_string(30500),
+        g.add_directory_item(g.get_language_string(30498),
                              action='testPlayingNext',
                              is_folder=False,
                              description=g.get_language_string(30425))
-        g.add_directory_item(g.get_language_string(30501),
+        g.add_directory_item(g.get_language_string(30499),
                              action='testStillWatching',
                              is_folder=False,
                              description=g.get_language_string(30426))
-        g.add_directory_item(g.get_language_string(30502),
+        g.add_directory_item(g.get_language_string(30500),
                              action='testResolverWindow',
                              is_folder=False,
                              description=g.get_language_string(30427))
-        g.add_directory_item(g.get_language_string(30503),
+        g.add_directory_item(g.get_language_string(30501),
                              action='testSourceSelectWindow',
                              is_folder=False,
                              description=g.get_language_string(30428))
-        g.add_directory_item(g.get_language_string(30504),
+        g.add_directory_item(g.get_language_string(30502),
                              action='testManualCacheWindow',
                              is_folder=False,
-                             description=g.get_language_string(30498))
+                             description=g.get_language_string(30496))
         g.close_directory(g.CONTENT_FOLDER)

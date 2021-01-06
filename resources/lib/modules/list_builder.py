@@ -21,8 +21,6 @@ class ListBuilder(object):
         self.title_appends_general = g.get_setting("general.appendepisodegeneral")
         self.flatten_episodes = g.get_bool_setting("general.flatten.episodes")
         self.page_limit = g.get_int_setting("item.limit")
-        self.movie_action = g.get_int_setting("general.movieDefaultAction")
-        self.episode_action = g.get_int_setting("general.episodeDefaultAction")
         self.hide_unaired = g.get_bool_setting("general.hideUnAired")
         self.list_title_appends = g.get_setting("general.appendListTitles")
 
@@ -52,17 +50,11 @@ class ListBuilder(object):
         params["is_playable"] = True
         action = "getSources"
 
-        if self.episode_action == 0:
-            params["original_action"] = action
-            params["is_playable"] = False
-            action = "info"
-
         return self._common_menu_builder(
             shows.TraktSyncDatabase().get_episode_list(
                 trakt_show_id,
                 trakt_season,
                 minimum_episode=params.pop("minimum_episode", None),
-                hide_unaired=params.pop("hide_unaired", False),
                 **params
             ),
             g.CONTENT_EPISODE,
@@ -81,11 +73,6 @@ class ListBuilder(object):
         params["is_playable"] = True
         params["mixed_list"] = True
         action = "getSources"
-
-        if not g.FROM_WIDGET and self.episode_action == 0:
-            params["original_action"] = action
-            params["is_playable"] = False
-            action = "info"
 
         return self._common_menu_builder(
             shows.TraktSyncDatabase().get_mixed_episode_list(trakt_list, **params),
@@ -124,10 +111,6 @@ class ListBuilder(object):
         params["is_folder"] = False
         params["is_playable"] = True
         action = "getSources"
-        if not g.FROM_WIDGET and self.movie_action == 0:
-            params["original_action"] = action
-            params["is_playable"] = False
-            action = "info"
 
         self._common_menu_builder(
             movies.TraktSyncDatabase().get_movie_list(trakt_list, **params),

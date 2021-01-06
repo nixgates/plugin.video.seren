@@ -29,7 +29,7 @@ def fanart_guard_response(func):
         except requests.exceptions.ConnectionError:
             return None
         except:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30025).format('Fanart'))
+            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30025).format('Fanart'))
             if g.get_global_setting("run.mode") == "test":
                 raise
             return None

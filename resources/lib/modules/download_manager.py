@@ -427,7 +427,7 @@ class _DebridDownloadBase(object):
         file_titles = [i[1] for i in available_files]
 
         selection = xbmcgui.Dialog().multiselect(
-            g.get_language_string(30511), file_titles
+            g.get_language_string(30509), file_titles
         )
         selection = [available_files[i] for i in selection]
         return selection

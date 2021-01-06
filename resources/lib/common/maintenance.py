@@ -219,7 +219,7 @@ def toggle_reuselanguageinvoker():
 
     with open(file_path, "w+") as addon_xml:
         addon_xml.writelines(file_lines)
-    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30574))
+    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30572))
     g.reload_profile()
 
 

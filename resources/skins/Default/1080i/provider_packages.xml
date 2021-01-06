@@ -177,7 +177,7 @@
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30515]</label>
+                        <label>$ADDON[plugin.video.seren 30513]</label>
                         <align>right</align>
                         <textcolor>white</textcolor>
                     </control>
@@ -227,7 +227,7 @@
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30497]</label>
+                        <label>$ADDON[plugin.video.seren 30495]</label>
                         <align>right</align>
                         <textcolor>white</textcolor>
                      </control>

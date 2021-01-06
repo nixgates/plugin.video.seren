@@ -306,6 +306,20 @@ class SmartPlay:
         g.PLAYLIST.add(url=playlist[0], listitem=playlist[1])
         xbmc.Player().play(g.PLAYLIST)
 
+    def create_single_item_playlist_from_info(self):
+        g.cancel_playback()
+        name = self.item_information["info"]["title"]
+        item = g.add_directory_item(
+            name,
+            action="getSources",
+            menu_item=self.item_information,
+            action_args=tools.construct_action_args(self.item_information),
+            bulk_add=True,
+            is_playable=True,
+            )
+        g.PLAYLIST.add(url=sys.argv[0] + sys.argv[2], listitem=item[1])
+        return g.PLAYLIST
+
     def playlist_present_check(self, ignore_setting=False):
         """
         Confirms if a playlist is currently present. If not or playlist is for a different item, clear current list
@@ -331,36 +345,32 @@ class SmartPlay:
             if len(playlist_uris) == 1 and playlist_uris[0].split('/')[-1] == sys.argv[2]:
                 return False
 
+            if g.PLAYLIST.getposition() == -1:
+                return self.create_single_item_playlist_from_info()
+
             if [i for i in playlist_uris if g.ADDON_NAME.lower() not in i]:
                 g.log("Cleaning up other addon items from playlsit", "debug")
                 playlist_uris = []
-
-            action_args = [dict(tools.parse_qsl(i.split("?")[-1])).get("action_args") for i in playlist_uris]
-            action_args = [i for i in action_args if i is not None]
-
-            if not action_args:
-                playlist_uris = []
-
+                
+            action_args = [
+                g.legacy_action_args_converter(
+                    g.legacy_params_converter(
+                        dict(tools.parse_qsl(i.split("?")[-1]))
+                        )
+                    )["action_args"]
+                for i in playlist_uris]
+  
             show_ids = set(tools.deconstruct_action_args(i).get('trakt_show_id') for i in action_args)
 
             if len(show_ids) > 1 and self.show_trakt_id not in show_ids:
                 g.log("Cleaning up items from other shows", "debug")
                 playlist_uris = []
 
-            if len(playlist_uris) == 0 or (len(playlist_uris) > 1 and
-                                          not any(sys.argv[2] in i for i in playlist_uris)):
-                g.cancel_playback()
-                name = self.item_information["info"]["title"]
-                item = g.add_directory_item(
-                    name,
-                    action="getSources",
-                    menu_item=self.item_information,
-                    action_args=tools.construct_action_args(self.item_information),
-                    bulk_add=True,
-                    is_playable=True,
-                )
-                g.PLAYLIST.add(url=sys.argv[0] + sys.argv[2], listitem=item[1])
-                return g.PLAYLIST
+            if (len(playlist_uris) == 0 or
+                (len(playlist_uris) > 1 and not any(sys.argv[2] in i for i in playlist_uris))) or \
+                    g.PLAYLIST.getposition() == -1:
+                return self.create_single_item_playlist_from_info()
+
         return False
 
     def is_season_final(self):

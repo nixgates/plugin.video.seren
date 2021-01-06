@@ -88,9 +88,9 @@ class _BaseCacheAssist(TorrentAssist):
     def prompt_download_style():
         return xbmcgui.Dialog().yesno(
             g.ADDON_NAME,
-            g.get_language_string(30494),
-            yeslabel=g.get_language_string(30495),
-            nolabel=g.get_language_string(30493),
+            g.get_language_string(30492),
+            yeslabel=g.get_language_string(30493),
+            nolabel=g.get_language_string(30491),
             )
 
     def _get_progress_string(self):
@@ -106,7 +106,7 @@ class _BaseCacheAssist(TorrentAssist):
         yesno = self.prompt_download_style()
 
         if yesno:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30506))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30504))
             self.thread_pool.put(self.status_update_loop)
             return {"result": "background", "source": None}
         else:
@@ -143,7 +143,7 @@ class _BaseCacheAssist(TorrentAssist):
 
     @staticmethod
     def _handle_cancellation():
-        return xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30506))
+        return xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30504))
 
     def status_update_loop(self):
         monitor = xbmc.Monitor()

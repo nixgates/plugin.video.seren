@@ -47,7 +47,7 @@
         <control type="label">
             <top>123</top>
             <left>60</left>
-            <label>$ADDON[plugin.video.seren 30517]</label>
+            <label>$ADDON[plugin.video.seren 30515]</label>
             <visible>!String.IsEqual(Window().Property(hassettings),true)</visible>
         </control>
         <control type="list" id="1000">
@@ -354,7 +354,7 @@
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30497]</label>
+                        <label>$ADDON[plugin.video.seren 30495]</label>
                         <align>right</align>
                         <textcolor>white</textcolor>
                      </control>

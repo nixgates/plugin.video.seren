@@ -33,12 +33,6 @@ def dispatch(params):
 
         homeMenu.Menus().home()
 
-    if action == "info" and g.get_global_setting(
-        "info.{}".format(action_args["trakt_id"])
-    ):
-        g.set_global_setting("info.{}".format(action_args["trakt_id"]), "false")
-        action = params.get("original_action")
-
     if action == "genericEndpoint":
         if mediatype == "movies":
             from resources.lib.gui.movieMenus import Menus
@@ -751,10 +745,6 @@ def dispatch(params):
         )
         window.doModal()
         del window
-
-    elif action == "info":
-        g.set_global_setting("info.{}".format(action_args["trakt_id"]), True)
-        xbmc.executebuiltin("Action(Info)")
 
     elif action == "longLifeServiceManager":
         from resources.lib.modules.providers.service_manager import (

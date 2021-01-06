@@ -183,7 +183,7 @@ class Menus:
         g.add_directory_item(
             g.get_language_string(30096),
             action="showsRecentlyWatched",
-            description=g.get_language_string(30521),
+            description=g.get_language_string(30519),
         )
         g.add_directory_item(
             g.get_language_string(30232),
@@ -288,7 +288,7 @@ class Menus:
             languages=self.language_code,
             extended="full",
         )
-        trakt_list = [i for i in trakt_list if i["trakt_show_id"] not in hidden_items]
+        trakt_list = [i.get("show") for i in trakt_list if i["trakt_show_id"] not in hidden_items]
         self.list_builder.show_list_builder(trakt_list[:40])
 
     def shows_recently_watched(self):

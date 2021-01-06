@@ -43,5 +43,5 @@ class PremiumizeResolver(TorrentResolverBase):
             if transfer.get("id"):
                 self.transfer_class.add_premiumize_transfer(transfer["id"])
             else:
-                xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30510))
+                xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30508))
                 g.log(transfer, "error")

@@ -5,7 +5,7 @@ from resources.lib.modules.globals import g
 last_update_required = "2.0"
 
 update_messages = [
-        g.get_language_string(30573)
+        g.get_language_string(30571)
     ]
 
 def do_update_news():

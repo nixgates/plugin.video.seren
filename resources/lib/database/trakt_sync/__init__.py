@@ -594,7 +594,7 @@ class TraktSyncDatabase(Database):
                     get(i, "tmdb_id"),
                     get(i, "tvdb_id"),
                     get(i, "imdb_id"),
-                    None,
+                    self.trakt_api.meta_hash,
                     get(i, "season_count"),
                     get(i, "episode_count"),
                     self._create_args(i),
@@ -631,7 +631,7 @@ class TraktSyncDatabase(Database):
                     self._create_args(i),
                     tools.validate_date(get(i, "last_watched_at")),
                     tools.validate_date(get(i, "collected_at")),
-                    None,
+                    self.trakt_api.meta_hash,
                     i.get("trakt_id"),
                 )
                 for i in episodes
@@ -655,7 +655,7 @@ class TraktSyncDatabase(Database):
                     tools.validate_date(get(i, "dateadded")),
                     get(i, "tmdb_id"),
                     get(i, "tvdb_id"),
-                    None,
+                    self.trakt_api.meta_hash,
                     None,
                     get(i, "season"),
                     self._create_args(i),
@@ -670,18 +670,32 @@ class TraktSyncDatabase(Database):
         if queue_wrapper is None:
             queue_wrapper = self._queue_mill_tasks
 
-        query = """select s.trakt_id, CASE WHEN (agg.episode_count is NULL or 
-        agg.episode_count != s.episode_count) or (agg.meta_count=0 or agg.meta_count!=s.episode_count) THEN 'True' 
-        ELSE 'False' END as needs_update from shows as s left join(select s.trakt_id, count(e.trakt_id) as 
-        episode_count, count(em.id) as meta_count from shows as s inner join episodes as e on s.trakt_id = 
-        e.trakt_show_id left join episodes_meta as em on em.id = e.trakt_id and em.type = 'trakt' and em.meta_hash = 
-        '{}' where e.season != 0 and Datetime(e.air_date) < Datetime('now') GROUP BY s.trakt_id) as agg on s.trakt_id == 
-        agg.trakt_id WHERE s.trakt_id in ({})""".format(
-            self.trakt_api.meta_hash,
-            ",".join(
-                str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
-            ),
-        )
+        if mill_episodes:
+            query = """select s.trakt_id, CASE WHEN (agg.episode_count is NULL or 
+            agg.episode_count != s.episode_count) or (agg.meta_count=0 or agg.meta_count!=s.episode_count) THEN 'True' 
+            ELSE 'False' END as needs_update from shows as s left join(select s.trakt_id, count(e.trakt_id) as 
+            episode_count, count(em.id) as meta_count from shows as s inner join episodes as e on s.trakt_id = 
+            e.trakt_show_id left join episodes_meta as em on em.id = e.trakt_id and em.type = 'trakt' and em.meta_hash = 
+            '{}' where e.season != 0 and Datetime(e.air_date) < Datetime('now') GROUP BY s.trakt_id) as agg on s.trakt_id == 
+            agg.trakt_id WHERE s.trakt_id in ({})""".format(
+                self.trakt_api.meta_hash,
+                ",".join(
+                    str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
+                ),
+            )
+        else:
+            query = """select s.trakt_id, agg.meta_count, s.season_count, CASE WHEN (agg.season_count is NULL or 
+                agg.season_count != s.season_count) or (agg.meta_count=0 or agg.meta_count!=s.season_count) THEN 'True' 
+                ELSE 'False' END as needs_update from shows as s left join(select s.trakt_id, count(se.trakt_id) as 
+                season_count, count(sm.id) as meta_count from shows as s inner join seasons as se on s.trakt_id = 
+                se.trakt_show_id left join seasons_meta as sm on sm.id = se.trakt_id and sm.type = 'trakt' and sm.meta_hash = 
+                '{}' where se.season != 0 and Datetime(se.air_date) < Datetime('now') 
+                GROUP BY s.trakt_id) as agg on s.trakt_id == agg.trakt_id WHERE s.trakt_id in ({})""".format(
+                self.trakt_api.meta_hash,
+                ",".join(
+                    str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
+                ),
+            )
         needs_update = self.execute_sql(query).fetchall()
         if needs_update is None or all(
             x["needs_update"] == "False" for x in needs_update
@@ -740,7 +754,7 @@ class TraktSyncDatabase(Database):
                     trakt_info(season).update({"tvshowtitle": get(show, "title")})
 
                     if not get(season, "season") == 0:
-                        show.update({"season_count": show.get("season_count", 0) + 1})
+                        show.update({"season_count": show.get("season_count", 0) + (1 if get(season, "aired_episodes", 0) > 0 else 0)})
                         show.update(
                             {
                                 'episode_count': show.get("episode_count", 0) + get(season, "aired_episodes", 0)
@@ -849,7 +863,6 @@ class TraktSyncDatabase(Database):
 
     def _queue_mill_tasks(self, func, args):
         for arg in args:
-            g.log("Requesting season info for show {} - mill_episodes={}".format(arg[0], arg[1]), "debug")
             self.mill_task_queue.put(func, *arg)
 
     def requires_update(self, new_date, old_date):

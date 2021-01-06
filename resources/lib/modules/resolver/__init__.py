@@ -80,7 +80,7 @@ class Resolver:
                     )
 
                 if not stream_link and self.torrent_resolve_failure_style == 1 and not pack_select and not silent:
-                    if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30533)):
+                    if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30531)):
                         stream_link = self._resolve_debrid_source(
                             self.resolvers[source["debrid_provider"]],
                             source,
@@ -234,6 +234,6 @@ class Resolver:
             thread_pool.wait_completion()
         except ValueError:
             g.log_stacktrace()
-            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30527))
+            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30525))
             return hosters
         return hosters

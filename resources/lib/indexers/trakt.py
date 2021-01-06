@@ -69,7 +69,7 @@ def trakt_auth_guard(func):
         """
         if g.get_setting("trakt.auth"):
             return func(*args, **kwargs)
-        elif xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30509)):
+        elif xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30507)):
             TraktAPI().auth()
         else:
             g.cancel_directory()
@@ -88,7 +88,7 @@ def _connection_failure_dialog():
         < time.time()
         and not xbmc.Player().isPlaying()
     ):
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30025).format("Trakt"))
+        xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30025).format("Trakt"))
         g.set_setting("general.trakt.failure.timeout", str(time.time()))
 
 

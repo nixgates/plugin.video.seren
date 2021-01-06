@@ -114,7 +114,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     @staticmethod
     def _handle_install_failure(exception):
         g.log(exception, "error")
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30516))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30514))
         return
 
     def install_package(self, install_style, url=None):

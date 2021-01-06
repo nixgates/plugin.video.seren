@@ -370,7 +370,7 @@ class GlobalVariables(object):
             self.PARAM_STRING = argv[2].lstrip('?/')
         except IndexError:
             self.PARAM_STRING = ""
-        self.REQUEST_PARAMS = self._legacy_params_converter(
+        self.REQUEST_PARAMS = self.legacy_params_converter(
             dict(tools.parse_qsl(self.PARAM_STRING))
         )
         if "action_args" in self.REQUEST_PARAMS:
@@ -381,14 +381,14 @@ class GlobalVariables(object):
             except:
                 pass
             if isinstance(self.REQUEST_PARAMS["action_args"], dict):
-                self.REQUEST_PARAMS["action_args"] = self._legacy_action_args_converter(
+                self.REQUEST_PARAMS["action_args"] = self.legacy_action_args_converter(
                     self.REQUEST_PARAMS["action_args"]
                 )
         self.FROM_WIDGET = self.REQUEST_PARAMS.get("from_widget", "true") == "true"
         self.PAGE = int(g.REQUEST_PARAMS.get("page", 1))
 
     @staticmethod
-    def _legacy_action_args_converter(action_args):
+    def legacy_action_args_converter(action_args):
         if "item_type" in action_args:
             if "season" in action_args["item_type"]:
                 from resources.lib.database.trakt_sync import shows
@@ -412,7 +412,7 @@ class GlobalVariables(object):
         return action_args
 
     @staticmethod
-    def _legacy_params_converter(params):
+    def legacy_params_converter(params):
         if "actionArgs" in params:
             params["action_args"] = params.pop("actionArgs")
         if "action" in params:
@@ -787,6 +787,8 @@ class GlobalVariables(object):
                 color = skin_color
         if color == "inherit":
             color = skin_color
+        if not color:
+            color = "deepskyblue"
         return color
 
     def color_string(self, text, color=None):
@@ -1013,7 +1015,7 @@ class GlobalVariables(object):
         )
         [
             item.setRating(
-                i.split(".")[1], float(info[i]["rating"]), int(info[i]["votes"]), False
+                i.split(".")[1], float(info[i].get("rating", 0.0)), int(info[i].get("votes", 0)), False
             )
             for i in info.keys()
             if i.startswith("rating.")
