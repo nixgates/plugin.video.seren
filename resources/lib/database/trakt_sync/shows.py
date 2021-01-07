@@ -790,11 +790,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self._format_seasons(seasons_to_update)
         self._format_episodes(episodes_to_update)
 
-    def get_nextup_episodes(self, sort_by_last_watched=False):
+    def get_nextup_episodes(self, sort_by_last_watched=False, sort_reverse=False):
         """
         Fetches a mock trakt response of items that a user should watch next for each show
         :param sort_by_last_watched: Optional sorting by last_watched_at column
         :type sort_by_last_watched: bool
+        :param sort_reverse: Optional reverse sorting
+        :type sort_reverse: bool
         :return: List of mixed episode/show pairs
         :rtype: list
         """
@@ -819,10 +821,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         inner.trakt_show_id AND e.season == inner.season AND e.number == inner.number LEFT JOIN episodes_meta AS em 
         ON e.trakt_id = em.id AND em.TYPE = 'trakt' LEFT JOIN shows_meta AS sm ON e.trakt_show_id = sm.id AND sm.TYPE 
         = 'trakt' """
-        if sort_by_last_watched:
+        if sort_by_last_watched and not sort_reverse:
             query += " ORDER BY inner.last_watched_at DESC"
-        else:
+        elif sort_by_last_watched and sort_reverse:
+            query += " ORDER BY inner.last_watched_at ASC"
+        elif not sort_by_last_watched and not sort_reverse:
             query += " ORDER BY e.air_date DESC"
+        elif not sort_by_last_watched and sort_reverse:
+            query += " ORDER BY e.air_date ASC"
         results = self.execute_sql(query).fetchall()
         return self.wrap_in_trakt_object(results)
 
