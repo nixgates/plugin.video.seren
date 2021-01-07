@@ -751,11 +751,6 @@ msgctxt "#30135"
 msgid "Minimum TV Shows Resolution"
 msgstr "Minimum TV Shows Resolution"
 
-#: \resources\settings.xml:230
-msgctxt "#30136"
-msgid "Minimum Sources"
-msgstr "Minimum Sources"
-
 #: \resources\settings.xml:232
 msgctxt "#30137"
 msgid "Terminate on... "
@@ -3201,3 +3196,13 @@ msgstr "Movie minimum File Size (GB)"
 msgctxt "#30577"
 msgid "Episode minimum File Size (GB)"
 msgstr "Episode minimum File Size (GB)"
+
+#: \resources\settings.xml:230
+msgctxt "#30136"
+msgid "Minimum Movie Sources"
+msgstr "Minimum Movie Sources"
+
+#: \resources\settings.xml:231
+msgctxt "#30579"
+msgid "Minimum TV Shows Sources"
+msgstr "Minimum TV Shows Sources"

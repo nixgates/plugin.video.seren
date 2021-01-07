@@ -94,7 +94,8 @@ class Sources(object):
             g.log('Starting Scraping', 'debug')
             g.log("Timeout: {}".format(self.timeout), 'debug')
             g.log("Pre-term-enabled: {}".format(g.get_setting("preem.enabled")), 'debug')
-            g.log("Pre-term-limit: {}".format(g.get_setting("preem.limit")), 'debug')
+            g.log("Pre-term-movie-limit: {}".format(g.get_setting("preem.movie.limit")), 'debug')
+            g.log("Pre-term-tv-limit: {}".format(g.get_setting("preem.tv.limit")), 'debug')
             g.log("Pre-term-movie-res: {}".format(g.get_setting("preem.movieres")), 'debug')
             g.log("Pre-term-show-res: {}".format(g.get_setting("preem.tvres")), 'debug')
             g.log("Pre-term-type: {}".format(g.get_setting("preem.type")), 'debug')
@@ -857,7 +858,10 @@ class Sources(object):
 
         approved_resolutions = source_utils.get_accepted_resolution_list()
         prem_resolutions = approved_resolutions[prem_min:]
-        limit = g.get_int_setting('preem.limit')
+        if self.media_type == 'episode':
+            limit = g.get_int_setting('preem.tv.limit')
+        else:
+            limit = g.get_int_setting('preem.movie.limit')
         type = g.get_int_setting('preem.type')
         try:
             if type == 0 and len(self._get_sources_by_resolution(prem_resolutions, "torrentCacheSources")) >= limit:
