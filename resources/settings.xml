@@ -14,6 +14,7 @@
         <setting id="general.datedelay" type="bool" label="30181" default="false"/>
         <setting id="trakt.auth" type="text" default="" visible="false"/>
         <setting id="nextup.sort" type="enum" label="30094" default="0" lvalues="30095|30096" enable="!eq(-1,)"/>
+		<setting id="nextup.reverse.sort" type="bool" label="30578" default="false"/>		
         <setting id="general.sourceselectlines" type="bool" label="30097" default="true" visible="false"/>
         <setting id="general.textColorSelect" type="action" label="30109" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=colorPicker)"/>
