@@ -827,9 +827,9 @@ class Sources(object):
 
     def _get_pre_term_min(self):
         if self.media_type == 'episode':
-            prem_min = g.get_int_setting('preem.tvres') + 1
+            prem_min = g.get_int_setting('preem.tvres')
         else:
-            prem_min = g.get_int_setting('preem.movieres') + 1
+            prem_min = g.get_int_setting('preem.movieres')
         return prem_min
 
     def _get_sources_by_resolution(self, resolutions, source_type):
@@ -856,7 +856,8 @@ class Sources(object):
         pre_term_log_string = 'Pre-emptively Terminated'
 
         approved_resolutions = source_utils.get_accepted_resolution_list()
-        prem_resolutions = approved_resolutions[prem_min:]
+        approved_resolutions.reverse()
+        prem_resolutions = approved_resolutions[prem_min]
         limit = g.get_int_setting('preem.limit')
         type = g.get_int_setting('preem.type')
         try:
