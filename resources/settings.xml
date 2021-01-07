@@ -229,10 +229,12 @@
                  visible="eq(-1,true)"/>
         <setting id="preem.tvres" type="enum" subsetting="true" label="30135" values="4K|1080p|720p|SD" default="1"
                  visible="eq(-2,true)"/>
-        <setting id="preem.limit" type="slider" subsetting="true" label="30136" option="int" range="0,20" default="5"
+        <setting id="preem.movie.limit" type="slider" subsetting="true" label="30136" option="int" range="0,20" default="5"
                  visible="eq(-3,true)"/>
-        <setting id="preem.type" type="enum" subsetting="true" label="30137" lvalues="30257|30258|30259" default="0"
+        <setting id="preem.tv.limit" type="slider" subsetting="true" label="30579" option="int" range="0,20" default="5"
                  visible="eq(-4,true)"/>
+        <setting id="preem.type" type="enum" subsetting="true" label="30137" lvalues="30257|30258|30259" default="0"
+                 visible="eq(-5,true)"/>
         <setting id="preem.cloudfiles" type="bool" label="30210" default="true"/>
         <setting id="preem.adaptiveSources" type="bool" label="30518" default="true"/>
     </category>

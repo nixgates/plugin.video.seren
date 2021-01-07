@@ -3206,3 +3206,13 @@ msgstr "Episode minimum File Size (GB)"
 msgctxt "#30578"
 msgid "Next Up Reverse Sort"
 msgstr "Next Up Reverse Sort"
+
+#: \resources\settings.xml:230
+msgctxt "#30136"
+msgid "Minimum Movie Sources"
+msgstr "Minimum Movie Sources"
+
+#: \resources\settings.xml:231
+msgctxt "#30579"
+msgid "Minimum TV Shows Sources"
+msgstr "Minimum TV Shows Sources"
