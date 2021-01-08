@@ -764,11 +764,6 @@ msgctxt "#30135"
 msgid "Minimum TV Shows Resolution"
 msgstr "Resolución Mínima de Series de TV"
 
-#: \resources\settings.xml:230
-msgctxt "#30136"
-msgid "Minimum Sources"
-msgstr "Número de Fuentes Mínimas"
-
 #: \resources\settings.xml:232
 msgctxt "#30137"
 msgid "Terminate on... "
@@ -3246,3 +3241,18 @@ msgstr "Tamaño de archivo mínimo de película (GB)"
 msgctxt "#30577"
 msgid "Episode minimum File Size (GB)"
 msgstr "Tamaño de archivo mínimo del episodio (GB)"
+
+#: \resources\settings.xml:396 \resources\lib\gui\tvshowMenus.py:184
+msgctxt "#30578"
+msgid "Next Up Reverse Sort"
+msgstr "Ordenación inversa Next Up"
+
+#: \resources\settings.xml:230
+msgctxt "#30136"
+msgid "Minimum Movie Sources"
+msgstr "Fuentes Mínima de Películas"
+
+#: \resources\settings.xml:231
+msgctxt "#30579"
+msgid "Minimum TV Shows Sources"
+msgstr "Fuentes Mínima de Series de TV"

@@ -751,11 +751,6 @@ msgctxt "#30135"
 msgid "Minimum TV Shows Resolution"
 msgstr "Ελάχιστη Ανάλυση Τηλεοπτικών Σειρών"
 
-#: \resources\settings.xml:230
-msgctxt "#30136"
-msgid "Minimum Sources"
-msgstr "Ελάχιστες Πηγές"
-
 #: \resources\settings.xml:232
 msgctxt "#30137"
 msgid "Terminate on... "
@@ -3255,3 +3250,18 @@ msgstr "Ελάχιστο μέγεθος αρχείου ταινίας (GB)"
 msgctxt "#30577"
 msgid "Episode minimum File Size (GB)"
 msgstr "Ελάχιστο μέγεθος αρχείου επεισοδίου (GB)"
+
+#: \resources\settings.xml:396 \resources\lib\gui\tvshowMenus.py:184
+msgctxt "#30578"
+msgid "Next Up Reverse Sort"
+msgstr "αντίστροφη ταξινόμηση Next Up"
+
+#: \resources\settings.xml:230
+msgctxt "#30136"
+msgid "Minimum Movie Sources"
+msgstr "Ελάχιστες πηγές ταινιών"
+
+#: \resources\settings.xml:231
+msgctxt "#30579"
+msgid "Minimum TV Shows Sources"
+msgstr "Ελάχιστες πηγές τηλεοπτικών εκπομπών"
