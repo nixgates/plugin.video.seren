@@ -59,6 +59,18 @@
                         <colordiffuse>99362e33</colordiffuse>
                     </control>
                     <control type="label">
+                        <top>57</top>
+                        <left>25</left>
+                        <width>800</width>
+                        <height>200</height>
+                        <font>font10</font>
+                        <textcolor>66FFFFFF</textcolor>
+                        <align>left</align>
+                        <aligny>top</aligny>
+                        <wrapmultiline>true</wrapmultiline>
+                        <label>[B][UPPERCASE]$INFO[ListItem.Property(debrid_provider)][/UPPERCASE][/B]</label>
+                    </control>
+                    <control type="label">
                         <top>20</top>
                         <left>25</left>
                         <width>1100</width>
@@ -72,55 +84,39 @@
                     <control type="group">
                         <left>0</left>
                         <top>55</top>
-                        <control type="group">
-                            <left>25</left>
-                            <control type="label">
-                                <top>9</top>
-                                <left>0</left>
-                                <width>200</width>
-                                <height>20</height>
-                                <font>font12</font>
-                                <textcolor>66FFFFFF</textcolor>
-                                <align>left</align>
-                                <label>[B][UPPERCASE]$INFO[ListItem.Property(debrid_provider)][/UPPERCASE][/B]</label>
-                            </control>
-                            <control type="group">
-                                <left>200</left>
-                                <control type="label">
-                                    <top>8</top>
-                                    <left>0</left>
-                                    <width>200</width>
-                                    <height>20</height>
-                                    <font>font12</font>
-                                    <textcolor>AAFFFFFF</textcolor>
-                                    <align>left</align>
-                                    <label>$ADDON[plugin.video.seren 30276]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR]</label>
-                                </control>
-                                <control type="label">
-                                    <top>10</top>
-                                    <left>200</left>
-                                    <width>350</width>
-                                    <height>20</height>
-                                    <font>font12</font>
-                                    <align>left</align>
-                                    <textcolor>AAFFFFFF</textcolor>
-                                    <label>$ADDON[plugin.video.seren 30260]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR]</label>
-                                </control>
-                                <control type="label">
-                                    <top>10</top>
-                                    <left>500</left>
-                                    <width>350</width>
-                                    <height>20</height>
-                                    <font>font12</font>
-                                    <align>left</align>
-                                    <textcolor>AAFFFFFF</textcolor>
-                                    <label>$ADDON[plugin.video.seren 30277]: [CAPITALIZE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/CAPITALIZE]
-                                    </label>
-                                </control>
-                            </control>
+                        <control type="label">
+                            <top>0</top>
+                            <left>0</left>
+                            <width>350</width>
+                            <height>20</height>
+                            <font>font12</font>
+                            <textcolor>AAFFFFFF</textcolor>
+                            <align>right</align>
+                            <label>$ADDON[plugin.video.seren 30276]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR]</label>
                         </control>
                         <control type="label">
-                            <top>40</top>
+                            <top>0</top>
+                            <left>300</left>
+                            <width>350</width>
+                            <height>20</height>
+                            <font>font12</font>
+                            <align>right</align>
+                            <textcolor>AAFFFFFF</textcolor>
+                            <label>$ADDON[plugin.video.seren 30260]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR]</label>
+                        </control>
+                        <control type="label">
+                            <top>0</top>
+                            <left>600</left>
+                            <width>350</width>
+                            <height>20</height>
+                            <font>font12</font>
+                            <align>right</align>
+                            <textcolor>AAFFFFFF</textcolor>
+                            <label>$ADDON[plugin.video.seren 30277]: [CAPITALIZE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/CAPITALIZE]
+                            </label>
+                        </control>
+                        <control type="label">
+                            <top>30</top>
                             <left>25</left>
                             <width>900</width>
                             <height>20</height>
