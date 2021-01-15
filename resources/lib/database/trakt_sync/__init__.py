@@ -5,6 +5,7 @@ import collections
 import datetime
 import json
 import threading
+import time
 
 import xbmcgui
 
@@ -230,6 +231,7 @@ schema = {
                 ("lists_sync", ["TEXT", "NOT NULL", "DEFAULT '1970-01-01T00:00:00'"]),
                 ("seren_version", ["TEXT", "NOT NULL"]),
                 ("trakt_username", ["TEXT", "NULL"]),
+                ("last_activities_call", ["INTEGER", "NOT NULL", "DEFAULT 1"]),
             ]
         ),
         "table_constraints": ["UNIQUE(sync_id)"],
@@ -327,6 +329,13 @@ class TraktSyncDatabase(Database):
             "".format(media_type),
             (trakt_id,),
         )
+
+    def _update_last_activities_call(self):
+        self.execute_sql("UPDATE activities SET last_activities_call=? WHERE sync_id=1", (int(time.time()),))
+        self.refresh_activities()
+
+    def _insert_last_activities_column(self):
+        self.execute_sql("ALTER TABLE activities ADD last_activities_call INTEGER NOT NULL DEFAULT 1")
 
     @staticmethod
     def _get_datetime_now():
@@ -844,7 +853,7 @@ class TraktSyncDatabase(Database):
             "trakt_id": get(item, "trakt_id", info(item).get("trakt_id")),
             "mediatype": get(item, "mediatype", info(item).get("mediatype")),
         }
-        if args["trakt_id"] == None:
+        if args["trakt_id"] is None:
             import inspect
             g.log(inspect.stack())
             g.log(item)
@@ -865,7 +874,8 @@ class TraktSyncDatabase(Database):
         for arg in args:
             self.mill_task_queue.put(func, *arg)
 
-    def requires_update(self, new_date, old_date):
+    @staticmethod
+    def requires_update(new_date, old_date):
         if tools.parse_datetime(
             new_date, tools.DATE_FORMAT, False
         ) > tools.parse_datetime(old_date, "%Y-%m-%dT%H:%M:%S", False):
@@ -1003,6 +1013,21 @@ class TraktSyncDatabase(Database):
             )
         )
 
+    def _update_all_shows_statisics(self):
+        self.execute_sql(
+            """INSERT or REPLACE into shows (trakt_id, info, art, cast, air_date, last_updated, tmdb_id, tvdb_id,             
+            imdb_id, meta_hash, season_count, episode_count, watched_episodes, unwatched_episodes, args, is_airing) 
+            SELECT old.trakt_id, old.info, old.art, old.cast, old.air_date, old.last_updated, old.tmdb_id, 
+            old.tvdb_id, old.imdb_id, old.meta_hash, old.season_count, old.episode_count, COALESCE( 
+            new.watched_episodes, old.watched_episodes), COALESCE(new.unwatched_episodes, old.unwatched_episodes), 
+            old.args, old.is_airing FROM (select sh.trakt_id, sh.episode_count - sum(CASE WHEN e.watched > 0 AND 
+            e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 ELSE 0 END) as unwatched_episodes, 
+            sum(CASE WHEN e.watched > 0 AND e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 ELSE 0 
+            END) as watched_episodes from shows as sh left join episodes as e on e.trakt_show_id = sh.trakt_id group 
+            by sh.trakt_id) AS new LEFT JOIN (SELECT * FROM shows) AS old on old.trakt_id = new.trakt_id where 
+            old.trakt_id in (SELECT trakt_id from shows where 1=1)"""
+        )
+
     def update_season_statistics(self, trakt_list):
         to_update = ",".join({str(i.get("trakt_id")) for i in trakt_list})
 
@@ -1022,6 +1047,23 @@ class TraktSyncDatabase(Database):
              old.trakt_id in ({})""".format(
                 to_update
             )
+        )
+
+    def _update_all_season_statistics(self):
+        self.execute_sql(
+            """INSERT or REPLACE into seasons ( trakt_show_id, trakt_id, info, art, cast, air_date, last_updated,
+             tmdb_id, tvdb_id, meta_hash, episode_count, watched_episodes, unwatched_episodes, is_airing, season, args
+             ) SELECT old.trakt_show_id, old.trakt_id, old.info, old.art, old.cast, old.air_date, old.last_updated,
+             old.tmdb_id, old.tvdb_id, old.meta_hash, COALESCE(new.episode_count, old.episode_count),
+             COALESCE(new.watched_episodes, old.watched_episodes), COALESCE(new.unwatched_episodes,
+             old.unwatched_episodes), COALESCE(new.is_airing, old.is_airing), old.season, old.args FROM ( SELECT
+             se.trakt_id,  sum( CASE WHEN datetime(e.air_date) < datetime('now') THEN 1 ELSE 0 END) AS episode_count,
+             sum( CASE WHEN e.watched == 0 AND datetime(e.air_date) < datetime('now') THEN 1 ELSE 0 END) AS
+             unwatched_episodes, sum( CASE WHEN e.watched > 0 AND datetime(e.air_date) < datetime('now') THEN 1 ELSE 0
+             END) AS watched_episodes, CASE WHEN max(e.air_date) > datetime('now') THEN 1 ELSE 0 END AS is_airing FROM
+             seasons AS se INNER JOIN episodes AS e ON e.trakt_season_id = se.trakt_id WHERE se.season != 0 GROUP BY
+             se.trakt_id) AS new LEFT JOIN ( SELECT * FROM seasons) AS old ON new.trakt_id = old.trakt_id where
+             old.trakt_id in (SELECT trakt_id from seasons where 1==1)"""
         )
 
     @property

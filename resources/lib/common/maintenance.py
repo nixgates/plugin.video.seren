@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+import os
 import re
 import time
-import os
 
 import requests
 import xbmcgui
@@ -19,7 +19,6 @@ from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.indexers.tvdb import TVDBAPI
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.install_manager import ProviderInstallManager
-from resources.lib.modules.settings_helper import SettingsHelper
 
 
 def update_themes():

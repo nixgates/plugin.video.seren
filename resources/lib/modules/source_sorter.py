@@ -6,6 +6,7 @@ from copy import deepcopy
 
 import xbmcgui
 
+from resources.lib.common import tools
 from resources.lib.common.source_utils import get_accepted_resolution_list
 from resources.lib.debrid import get_debrid_priorities
 from resources.lib.modules.globals import g
@@ -39,7 +40,7 @@ class SourceSorter:
             self._group_method_zero,
             self._group_method_one,
             self._group_method_two,
-            lambda: self.torrent_list + self.hoster_list
+            lambda: self.torrent_list + self.hoster_list + self.cloud_files
             ]
 
     def _apply_sort_to_all_types(self, **kwargs):
@@ -144,7 +145,7 @@ class SourceSorter:
 
         for resolution in self.resolution_list:
             sorted_list += self._resolution_sort_helper(
-                resolution, self._resolution_lambda, self.torrent_list
+                resolution, self._resolution_lambda,  tools.extend_array(self.torrent_list, self.cloud_files)
                 )
             sorted_list += self._resolution_sort_helper(
                 resolution, self._resolution_lambda, self.hoster_list
@@ -185,7 +186,7 @@ class SourceSorter:
                     sorted_list.append(file)
 
         sorted_list += self._stacked_for_loops_filter(
-            [self.resolution_list, self.debrid_priorities, self.torrent_list],
+            [self.resolution_list, self.debrid_priorities, tools.extend_array(self.torrent_list, self.cloud_files)],
             [self._resolution_lambda],
             )
 
@@ -196,7 +197,7 @@ class SourceSorter:
 
         for resolution in self.resolution_list:
             sorted_list += self._resolution_sort_helper(
-                resolution, self._resolution_lambda, self.torrent_list
+                resolution, self._resolution_lambda, tools.extend_array(self.torrent_list, self.cloud_files)
                 )
             sorted_list += self._resolution_sort_helper(
                 resolution, self._resolution_lambda, self.hoster_list
@@ -212,18 +213,20 @@ class SourceSorter:
         self._filter_3d()
         self._filter_cam_quality()
         self._apply_size_limits()
-        self._apply_hevc_priority()
         self._low_cam_sort()
         self._filter_sd()
         self._filter_hevc()
         self._filter_hdr()
 
+    def _do_priorities(self):
+        self._apply_hevc_priority()
+
     def _do_sorts(self):
-        sorted_list = []
-        [sorted_list.append(i) for i in self.cloud_files]
         self._size_sort()
-        sorted_list += self.group_style[self.sort_method]()
-        return sorted_list
+        self._do_priorities()
+        sorted_list = self.group_style[self.sort_method]()
+        return [i for i in sorted_list if i.get("type") == "cloud"] +\
+               [i for i in sorted_list if i.get("type") != "cloud"]
 
     def sort_sources(self, torrents=None, hosters=None, cloud=None):
         """Takes in multiple optional lists of sources and sorts them according to Seren's sort settings
@@ -257,5 +260,4 @@ class SourceSorter:
                 self.torrent_list = deepcopy(torrents)
                 self.hoster_list = deepcopy(hosters)
                 self.cloud_files = deepcopy(cloud)
-        sorted_list = self._do_sorts()
-        return sorted_list
+        return self._do_sorts()

@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import xbmcgui
 
+from resources.lib.common import tools
 from resources.lib.database.cache import use_cache
 from resources.lib.database.providerCache import ProviderCache
 from resources.lib.database.skinManager import SkinManager
@@ -10,7 +11,7 @@ from resources.lib.gui.windows.resolver_window import ResolverWindow
 from resources.lib.modules.getSources import Sources
 from resources.lib.modules.globals import g
 from resources.lib.modules.resolver import Resolver
-from resources.lib.common import tools
+
 
 class Resolverhelper(object):
     """

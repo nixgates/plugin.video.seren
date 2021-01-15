@@ -15,6 +15,11 @@ from resources.lib.modules.exceptions import UnsafeZipStructure
 from resources.lib.modules.globals import g
 
 try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
+try:
     from StringIO import StringIO as BytesIO
 except ImportError:
     # Python 3 Support

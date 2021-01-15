@@ -9,8 +9,8 @@ import xbmcgui
 
 from resources.lib.common import tools
 from resources.lib.database.skinManager import SkinManager
-from resources.lib.gui.windows.persistent_background import PersistentBackground
 from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
+from resources.lib.gui.windows.persistent_background import PersistentBackground
 from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.modules.globals import g
 from resources.lib.modules.list_builder import ListBuilder
@@ -133,6 +133,7 @@ class SmartPlay:
         :rtype: tuple
         """
         get = MetadataHandler().get_trakt_info
+        info = MetadataHandler().info
         try:
             playback_history = self.trakt_api.get_json(
                 "sync/history/shows/{}".format(self.show_trakt_id), limit=1
@@ -147,15 +148,13 @@ class SmartPlay:
             season = 1
             episode = 1
 
-        if action == "watch":
-            return season, episode
-        else:
+        if action != "watch":
             episode += 1
 
         all_seasons = self.get_season_info()
-        season_info = [i for i in all_seasons if get(i, "season") == season][0]
+        season_info = [i for i in all_seasons if info(i).get("season") == season][0]
 
-        if episode >= get(season_info, "episode_count"):
+        if episode >= info(season_info).get("episode_count"):
             season += 1
             episode = 1
 
@@ -163,9 +162,8 @@ class SmartPlay:
             season = 1
             episode = 1
 
-        season_id = get(
-            [i for i in all_seasons if get(i, "season") == season][0], "trakt_id"
-        )
+        season_id = info(
+            [i for i in all_seasons if info(i).get("season") == season][0]).get("trakt_id")
 
         return season_id, episode
 

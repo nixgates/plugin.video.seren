@@ -45,6 +45,10 @@ class LanguageAnalyzer(object):
     def _walk_project(self, func, **params):
         start = os.path.dirname(self.project_path)
         for root, dirs, files in os.walk(start):
+            if '.idea' in root or \
+                    '.git' in root or \
+                    'tests' in root:
+                continue
             for f in files:
                 if not f.endswith('.py') and not f.endswith('.xml') \
                         or f == 'language.py' \

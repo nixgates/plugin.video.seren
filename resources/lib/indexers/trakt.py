@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import inspect
-import os
 import threading
 import time
 from collections import OrderedDict
@@ -11,7 +10,6 @@ from functools import wraps
 import requests
 import xbmc
 import xbmcgui
-from dateutil import tz
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -25,8 +23,11 @@ from resources.lib.indexers.apibase import (
 )
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
+from resources.lib.third_party import pytz
 
 CLOUDFLARE_ERROR_MSG = "Service Unavailable - Cloudflare error"
+
+API_LOCK = threading.Lock()
 
 TRAKT_STATUS_CODES = {
     200: "Success",
@@ -92,6 +93,13 @@ def _connection_failure_dialog():
         g.set_setting("general.trakt.failure.timeout", str(time.time()))
 
 
+def _reset_trakt_auth():
+    settings = ["trakt.refresh", "trakt.auth", "trakt.expires", "trakt.username"]
+    for i in settings:
+        g.set_setting(i, "")
+    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30578))
+
+
 def trakt_guard_response(func):
     """
     Decorator for Trakt API requests, handles retries and error responses
@@ -110,7 +118,6 @@ def trakt_guard_response(func):
         method_class = args[0]
         try:
             response = func(*args, **kwargs)
-
             if response.status_code in [200, 201, 204]:
                 return response
 
@@ -119,6 +126,19 @@ def trakt_guard_response(func):
                 and response.url == "https://api.trakt.tv/oauth/device/token"
             ):
                 return response
+            if (
+                response.status_code == 400
+                and response.url == "https://api.trakt.tv/oauth/token"
+            ):
+                _reset_trakt_auth()
+                raise Exception("Unable to refresh Trakt auth")
+
+
+            if response.status_code == 403:
+                g.log("Trakt: invalid API key or unapproved app, resetting auth", "error")
+                _reset_trakt_auth()
+                g.cancel_directory()
+                return None
 
             if response.status_code == 401:
                 if inspect.stack(1)[1][3] == "try_refresh_token":
@@ -129,13 +149,9 @@ def trakt_guard_response(func):
                         "Attempts to refresh Trakt token have failed. User intervention is required",
                         "error",
                     )
-                    return
                 else:
-                    with GlobalLock(
-                        "trakt.oauth",
-                        run_once=True,
-                        check_sum=method_class.access_token,
-                    ) as lock:
+                    with GlobalLock("trakt.oauth", run_once=True, check_sum=method_class.access_token,
+                                    threading_lock=API_LOCK) as lock:
                         if not lock.runned_once():
                             if method_class.refresh_token is not None:
                                 method_class.try_refresh_token(True)
@@ -187,22 +203,18 @@ class TraktAPI(ApiBase):
 
     _threading_lock = threading.Lock()
 
-    try:
-        local_timezone = tz.tzwinlocal()
-    except:
-        local_timezone = tz.tzlocal()
-        
-    gmt_timezone = tz.gettz("GMT")
+    gmt_timezone = pytz.timezone('UTC')
+    local_timezone = tools.local_timezone()
     username_setting_key = "trakt.username"
 
     def __init__(self):
         self.client_id = g.get_setting(
             "trakt.clientid",
-            "4dd60d1ccb4b5c79aba64313467f6fefbda570605a927639549e8668558ce37e",
+            "0c9a30819e4af6ffaf3b954cbeae9b54499088513863c03c02911de00ac2de79",
         )
         self.client_secret = g.get_setting(
             "trakt.secret",
-            "d4dd35c0c1b0ec21b7b0cc7085011833c32bc28a0a62b454f4777d745aea07aa",
+            "bf02417f27b514cee6a8d135f2ddc261a15eecfb6ed6289c36239826dcdd1842",
         )
         self.redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
         self.access_token = g.get_setting("trakt.auth")
@@ -384,6 +396,7 @@ class TraktAPI(ApiBase):
             "Content-Type": "application/json",
             "trakt-api-key": self.client_id,
             "trakt-api-version": "2",
+            "User-Agent": "{} - {}".format(g.ADDON_NAME, g.VERSION)
         }
         if self.access_token:
             headers["Authorization"] = "Bearer {}".format(self.access_token)
@@ -945,7 +958,7 @@ class TraktAPI(ApiBase):
             return None
 
         gmt = tools.parse_datetime(gmt_string, tools.DATE_FORMAT, False)
-        gmt = gmt.replace(tzinfo=TraktAPI.gmt_timezone)
+        gmt = TraktAPI.gmt_timezone.localize(gmt)
         gmt = gmt.astimezone(TraktAPI.local_timezone)
         return gmt.strftime(tools.DATE_FORMAT)
 
