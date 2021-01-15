@@ -3208,6 +3208,6 @@ msgctxt "#30579"
 msgid "Minimum TV Shows Sources"
 msgstr "Minimum TV Shows Sources"
 
-msgctxt "#30579"
+msgctxt "#30580"
 msgid "Invalid Trakt API keys, your authentication has been reset.\nPlease re-auth your Trakt account."
 msgstr "Invalid Trakt API keys, your authentication has been reset.\nPlease re-auth your Trakt account."
