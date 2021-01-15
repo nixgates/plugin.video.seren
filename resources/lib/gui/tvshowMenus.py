@@ -285,7 +285,7 @@ class Menus:
         date_string = datetime.datetime.today() - datetime.timedelta(days=29)
         trakt_list = self.trakt.get_json(
             "calendars/all/shows/new/{}/30".format(date_string.strftime("%d-%m-%Y")),
-            languages=self.language_code,
+            languages=','.join({'en', self.language_code}),
             extended="full",
         )
         trakt_list = [i.get("show") for i in trakt_list if i["trakt_show_id"] not in hidden_items]
@@ -301,7 +301,7 @@ class Menus:
             g.get_int_setting("nextup.sort") == 1,
 			g.get_bool_setting("nextup.reverse.sort") == 1
         )
-        self.list_builder.mixed_episode_builder(episodes)
+        self.list_builder.mixed_episode_builder(episodes, no_paging=True)
 
     @trakt_auth_guard
     def my_recent_episodes(self):
@@ -412,6 +412,9 @@ class Menus:
             extended="full",
             field="title",
         )
+        if not trakt_list:
+            g.cancel_directory()
+            return
         self.list_builder.show_list_builder(
             [
                 show

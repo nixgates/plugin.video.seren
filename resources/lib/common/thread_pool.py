@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import threading
-import time
 
 from resources.lib.common import tools
 from resources.lib.modules.globals import g

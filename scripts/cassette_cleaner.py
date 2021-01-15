@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals, print_function
+
 import getopt
 import gzip
+import io
 import json
 import os
 import re
@@ -7,11 +11,19 @@ import subprocess
 import sys
 import traceback
 import zlib
+from gzip import GzipFile
 
 import requests
 from requests.structures import CaseInsensitiveDict
 from vcr.serialize import deserialize, serialize
 from vcr.serializers import yamlserializer
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+PYTHON2 = True if sys.version_info.major == 2 else False
 
 #####################################################################################################################
 # SETUP DATA
@@ -38,6 +50,23 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 CASSETTES_PATH = os.path.join(PROJECT_PATH, "tests", "cassettes")
 
 #####################################################################################################################
+
+
+def gzip_decompress(data):
+    if PYTHON2:
+        return GzipFile(fileobj=StringIO(data)).read()
+    else:
+        return gzip.decompress(data)
+
+
+def gzip_compress(data):
+    if PYTHON2:
+        out = StringIO()
+        with gzip.GzipFile(fileobj=out, mode="w") as f:
+            f.write(data)
+        return out.getvalue()
+    else:
+        return gzip.compress(data)
 
 
 class VcrObject:
@@ -82,13 +111,13 @@ class VcrResponse:
 
     def _decompress_body(self, value):
         if self.encoding == "gzip":
-            return gzip.decompress(value)
+            return gzip_decompress(value)
         else:
             return zlib.decompress(value)
 
     def _compress_body(self, value):
         if self.encoding == "gzip":
-            return gzip.compress(value)
+            return gzip_compress(value)
         else:
             return zlib.compress(value)
 
@@ -217,7 +246,7 @@ class CassetteCleaner:
     def _output_response(self, vcr_object):
         self.print("Outputing file: {}".format(vcr_object.file_path))
 
-        with open(vcr_object.file_path, "w+", encoding="utf-8") as output:
+        with io.open(vcr_object.file_path, "w+", encoding="utf-8") as output:
             output.write(serialize(vcr_object.to_dict(), yamlserializer))
 
     def _poll_for_censoring(self, items, item_type):

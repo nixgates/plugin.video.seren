@@ -285,6 +285,7 @@ class GlobalVariables(object):
         self.PLAYLIST = None
         self.HOME_WINDOW = None
         self.KODI_VERSION = None
+        self.PLATFORM = self._get_system_platform()
 
     def init_globals(self, argv=None, addon_id=None):
         self.IS_ADDON_FIRSTRUN = self.IS_ADDON_FIRSTRUN is None
@@ -305,6 +306,26 @@ class GlobalVariables(object):
         self.PLAYLIST = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.HOME_WINDOW = xbmcgui.Window(10000)
         self.KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion")[:2])
+
+    @staticmethod
+    def _get_system_platform():
+        """
+        get platform on which xbmc run
+        """
+        platform = "unknown"
+        if xbmc.getCondVisibility("system.platform.linux"):
+            platform = "linux"
+        elif xbmc.getCondVisibility("system.platform.xbox"):
+            platform = "xbox"
+        elif xbmc.getCondVisibility("system.platform.windows"):
+            if "Users\\UserMgr" in os.environ.get("TMP"):
+                platform = "xbox"
+            else:
+                platform = "windows"
+        elif xbmc.getCondVisibility("system.platform.osx"):
+            platform = "osx"
+
+        return platform
 
     def _init_cache(self):
         from resources.lib.database.cache import Cache

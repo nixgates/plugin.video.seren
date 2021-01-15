@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-
 from resources.lib.database import trakt_sync
 from resources.lib.modules.globals import g
 from resources.lib.modules.guard_decorators import (

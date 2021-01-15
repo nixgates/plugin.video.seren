@@ -276,6 +276,7 @@ class MetadataHandler(object):
                 result.get("art", {}),
                 tmdb_object.get("art", {}),
                 not self._is_tmdb_artwork_selected(media_type),
+                False
             )
 
         if tvdb_object:
@@ -283,6 +284,7 @@ class MetadataHandler(object):
                 result.get("art", {}),
                 tvdb_object.get("art", {}),
                 not self._is_tvdb_artwork_selected(media_type),
+                False
             )
 
         if fanart_object:
@@ -290,6 +292,7 @@ class MetadataHandler(object):
                 result.get("art", {}),
                 fanart_object.get("art", {}),
                 not self._is_fanart_artwork_selected(media_type),
+                False
             )
 
         result["art"] = self._handle_art(media_type, result.get("art", {}))
@@ -415,6 +418,7 @@ class MetadataHandler(object):
 
     @staticmethod
     def _sort_art(art):
+        art.sort(key=lambda i: i["url"])
         art.sort(key=lambda i: i["rating"], reverse=True)
         art.sort(key=lambda i: i["size"], reverse=True)
         return art

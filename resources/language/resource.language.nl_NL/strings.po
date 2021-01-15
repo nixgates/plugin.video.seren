@@ -134,7 +134,6 @@ msgstr "Voer de code in: "
 #: \resources\lib\debrid\all_debrid.py:146
 #: \resources\lib\debrid\premiumize.py:84
 #: \resources\lib\debrid\real_debrid.py:146
-#: \tests\integration\debrid\test_premiumize.py:109
 msgctxt "#30021"
 msgid "Authentication is completed"
 msgstr "Authenticatie is voltooid"
@@ -181,7 +180,7 @@ msgctxt "#30028"
 msgid "Tools"
 msgstr "Gereedschap"
 
-#: \resources\settings.xml:439 \resources\settings.xml:441
+#: \resources\settings.xml:440 \resources\settings.xml:442
 #: \resources\lib\gui\homeMenu.py:71
 msgctxt "#30029"
 msgid "Clear Cache"
@@ -229,7 +228,6 @@ msgid "ARE YOU SURE?"
 msgstr "WEET JE HET ZEKER?"
 
 #: \resources\lib\common\maintenance.py:182
-#: \tests\integration\common\test_maintenance.py:109
 msgctxt "#30037"
 msgid "Your Real-Debrid Premium status has expired"
 msgstr "Uw Real-Debrid Premium-status is verlopen"
@@ -244,7 +242,7 @@ msgctxt "#30039"
 msgid "Premium Services"
 msgstr "Premium diensten"
 
-#: \resources\settings.xml:443 \resources\lib\gui\homeMenu.py:75
+#: \resources\settings.xml:444 \resources\lib\gui\homeMenu.py:75
 msgctxt "#30040"
 msgid "Clear Local Torrent Cache"
 msgstr "Wis lokale torrentcache"
@@ -254,7 +252,7 @@ msgctxt "#30041"
 msgid "Open Settings Menu"
 msgstr "Open het instellingenmenu"
 
-#: \resources\settings.xml:447 \resources\lib\gui\homeMenu.py:87
+#: \resources\settings.xml:448 \resources\lib\gui\homeMenu.py:87
 msgctxt "#30042"
 msgid "Wipe Addon Data"
 msgstr "Wis add-ongegevens"
@@ -317,17 +315,17 @@ msgctxt "#30053"
 msgid "All Cache Successfully Cleared"
 msgstr "Alle cache succesvol gewist"
 
-#: \resources\lib\modules\getSources.py:190
+#: \resources\lib\modules\getSources.py:199
 msgctxt "#30054"
 msgid "Checking Local Database"
 msgstr "Lokale database controleren"
 
-#: \resources\lib\modules\getSources.py:114
+#: \resources\lib\modules\getSources.py:123
 msgctxt "#30055"
 msgid "Initializing Providers"
 msgstr "Providers initialiseren"
 
-#: \resources\lib\modules\getSources.py:210
+#: \resources\lib\modules\getSources.py:219
 msgctxt "#30056"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -336,7 +334,7 @@ msgstr ""
 "Geen bronnen gevonden voor het volgende item in de afspeellijst.\n"
 "Huidige afspeellijst wordt gewist"
 
-#: \resources\lib\modules\getSources.py:351
+#: \resources\lib\modules\getSources.py:360
 msgctxt "#30057"
 msgid ""
 "No Playable Sources were found.\n"
@@ -345,29 +343,29 @@ msgstr ""
 "Er zijn geen afspeelbare bronnen gevonden.\n"
 "Wil je proberen een torrent te cachen?"
 
-#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:729
+#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:738
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30058"
 msgid "Torrents"
 msgstr "Torrents"
 
-#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:734
+#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:743
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30059"
 msgid "Hosters"
 msgstr "Hosters"
 
-#: \resources\lib\modules\getSources.py:740
+#: \resources\lib\modules\getSources.py:749
 msgctxt "#30060"
 msgid "Free Hosters"
 msgstr "Gratis Hosters"
 
-#: \resources\lib\modules\getSources.py:742
+#: \resources\lib\modules\getSources.py:751
 msgctxt "#30061"
 msgid "Remaining Providers"
 msgstr "Resterende providers"
 
-#: \resources\lib\modules\smartPlay.py:421
+#: \resources\lib\modules\smartPlay.py:429
 msgctxt "#30062"
 msgid "Resume From: "
 msgstr "Hervatten van: "
@@ -730,7 +728,7 @@ msgctxt "#30129"
 msgid "Enable Secondary Filesize Sort"
 msgstr "Secundaire bestandsgrootte sorteren inschakelen"
 
-#: \resources\settings.xml:409
+#: \resources\settings.xml:410
 msgctxt "#30130"
 msgid "Enable Tertiary HEVC Sort Preference"
 msgstr "Tertiaire HEVC sorteervoorkeuren inschakelen"
@@ -816,7 +814,7 @@ msgctxt "#30147"
 msgid "Providers"
 msgstr "Bronnen"
 
-#: \resources\settings.xml:414 \resources\settings.xml:417
+#: \resources\settings.xml:415 \resources\settings.xml:418
 msgctxt "#30148"
 msgid "API Keys"
 msgstr "API-sleutels"
@@ -843,7 +841,7 @@ msgctxt "#30152"
 msgid "Force view types on menus"
 msgstr "Weergaves forceren in menu's"
 
-#: \resources\settings.xml:436
+#: \resources\settings.xml:437
 msgctxt "#30153"
 msgid "Shortcuts"
 msgstr "Snelkoppelingen"
@@ -853,22 +851,22 @@ msgctxt "#30154"
 msgid "Append show info to mixed episode lists"
 msgstr "Showinformatie toevoegen aan lijsten met gemengde afleveringen"
 
-#: \resources\settings.xml:422
+#: \resources\settings.xml:423
 msgctxt "#30155"
 msgid "TMDb API Key"
 msgstr "TMDb API-sleutel"
 
-#: \resources\settings.xml:425
+#: \resources\settings.xml:426
 msgctxt "#30156"
 msgid "Trakt Client ID"
 msgstr "Trakt-client-ID"
 
-#: \resources\settings.xml:426
+#: \resources\settings.xml:427
 msgctxt "#30157"
 msgid "Trakt Client Secret"
 msgstr "Trakt Client Geheim"
 
-#: \resources\settings.xml:429
+#: \resources\settings.xml:430
 msgctxt "#30158"
 msgid "TVDB API Key"
 msgstr "TVDB API-sleutel"
@@ -960,7 +958,7 @@ msgctxt "#30175"
 msgid "Hide Common Undesirable Items"
 msgstr "Veelvoorkomende ongewenste items verbergen"
 
-#: \resources\settings.xml:410
+#: \resources\settings.xml:411
 msgctxt "#30176"
 msgid "Enable Quaternary Low Quality Sort Preference"
 msgstr "Schakel Quartaire sorteervoorkeur van lage kwaliteit in"
@@ -1135,7 +1133,7 @@ msgstr ""
 "[COLOR red]WAARSCHUWING[/COLOR]\n"
 "Hiermee wordt alle meta-informatie gereset, weet je het zeker?"
 
-#: \resources\settings.xml:445 \resources\lib\gui\homeMenu.py:79
+#: \resources\settings.xml:446 \resources\lib\gui\homeMenu.py:79
 #: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:375
 #: \resources\lib\gui\tvshowMenus.py:379
 msgctxt "#30202"
@@ -1287,7 +1285,6 @@ msgid "Succesfully Switched to {}"
 msgstr "Met succes overgeschakeld naar {}"
 
 #: \resources\lib\database\skinManager\__init__.py:353
-#: \tests\integration\gui\test_skin_manager.py:55
 msgctxt "#30228"
 msgid "The theme name {} is not allowed"
 msgstr "De themanaam {} is niet toegestaan"
@@ -1338,27 +1335,27 @@ msgctxt "#30236"
 msgid "My Show Lists"
 msgstr "Mijn lijsten"
 
-#: \resources\settings.xml:451 \resources\lib\gui\homeMenu.py:91
+#: \resources\settings.xml:452 \resources\lib\gui\homeMenu.py:91
 msgctxt "#30237"
 msgid "Trakt Sync Tools"
 msgstr "Trakt synchronisatie gereedschap"
 
-#: \resources\settings.xml:453 \resources\lib\gui\homeMenu.py:118
+#: \resources\settings.xml:454 \resources\lib\gui\homeMenu.py:118
 msgctxt "#30238"
 msgid "Flush Activities"
 msgstr "Flush-activiteiten"
 
-#: \resources\settings.xml:455 \resources\lib\gui\homeMenu.py:122
+#: \resources\settings.xml:456 \resources\lib\gui\homeMenu.py:122
 msgctxt "#30239"
 msgid "Force Sync Activities"
 msgstr "Activiteiten synchronisatie afdwingen"
 
-#: \resources\settings.xml:457 \resources\lib\gui\homeMenu.py:126
+#: \resources\settings.xml:458 \resources\lib\gui\homeMenu.py:126
 msgctxt "#30240"
 msgid "Clear All Metadata"
 msgstr "Wis alle metagegevens"
 
-#: \resources\settings.xml:459 \resources\lib\gui\homeMenu.py:130
+#: \resources\settings.xml:460 \resources\lib\gui\homeMenu.py:130
 msgctxt "#30241"
 msgid "Rebuild Database"
 msgstr "Database opnieuw opbouwen"
@@ -1570,7 +1567,6 @@ msgid "Source type"
 msgstr "Bron type"
 
 #: \resources\lib\common\maintenance.py:86
-#: \tests\integration\common\test_maintenance.py:204
 msgctxt "#30278"
 msgid "One or more providers have updates pending"
 msgstr "Een of meer providers hebben updates beschikbaar"
@@ -1659,7 +1655,7 @@ msgctxt "#30293"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Weet u zeker dat u het {}-pakket wilt verwijderen?"
 
-#: \resources\settings.xml:419
+#: \resources\settings.xml:420
 msgctxt "#30294"
 msgid "Show Advanced Settings..."
 msgstr "Geavanceerde instellingen weergeven..."
@@ -1875,7 +1871,7 @@ msgstr "Voer een zip-URL in"
 
 #: \resources\lib\gui\windows\source_select.py:78
 #: \resources\lib\modules\cacheAssist.py:114
-#: \resources\lib\modules\getSources.py:350
+#: \resources\lib\modules\getSources.py:359
 msgctxt "#30335"
 msgid "Cache Assist"
 msgstr "Cache-assistentie"
@@ -2012,7 +2008,7 @@ msgctxt "#30361"
 msgid "Do not resume"
 msgstr "Niet hervatten"
 
-#: \resources\lib\modules\smartPlay.py:424
+#: \resources\lib\modules\smartPlay.py:432
 msgctxt "#30362"
 msgid "Start From Beginning"
 msgstr "Begin vanaf het begin"
@@ -2696,7 +2692,7 @@ msgctxt "#30476"
 msgid "My recent watched episodes"
 msgstr "Mijn recent bekeken afleveringen"
 
-#: \resources\lib\modules\getSources.py:367
+#: \resources\lib\modules\getSources.py:376
 #: \resources\lib\modules\helpers.py:52
 msgctxt "#30477"
 msgid ""
@@ -2769,7 +2765,7 @@ msgctxt "#30489"
 msgid "Show original titles"
 msgstr "Toon originele titels"
 
-#: \resources\settings.xml:432
+#: \resources\settings.xml:433
 msgctxt "#30490"
 msgid "OMDb API Key"
 msgstr "OMDb API sleutel"
@@ -2979,7 +2975,7 @@ msgstr ""
 "Er is een probleem opgetreden bij het ophalen van geaccepteerde "
 "hosterdomeinen, dit kan vreemde schraapresultaten veroorzaken"
 
-#: \resources\lib\modules\player.py:540
+#: \resources\lib\modules\player.py:541
 msgctxt "#30526"
 msgid ""
 "The last playing file was not marked as watched, would you like to do this "
@@ -3204,12 +3200,12 @@ msgctxt "#30568"
 msgid "Western"
 msgstr "Westers"
 
-#: \resources\lib\modules\metadataHandler.py:345
+#: \resources\lib\modules\metadataHandler.py:344
 msgctxt "#30569"
 msgid "Season {}"
 msgstr "Seizoen {}"
 
-#: \resources\lib\modules\metadataHandler.py:347
+#: \resources\lib\modules\metadataHandler.py:346
 msgctxt "#30570"
 msgid "Episode {}"
 msgstr "Aflevering {}"
@@ -3232,17 +3228,17 @@ msgstr ""
 "De optie Language Invoker is gewijzigd, waarbij het kodi-profiel opnieuw "
 "wordt geladen"
 
-#: \resources\settings.xml:462
+#: \resources\settings.xml:463
 msgctxt "#30573"
 msgid "Language Invoker Options"
 msgstr "Language Invoker-opties"
 
-#: \resources\settings.xml:464
+#: \resources\settings.xml:465
 msgctxt "#30574"
 msgid "Re-Use Language Invoker Status"
 msgstr "Status van de Language Invoker"
 
-#: \resources\settings.xml:465
+#: \resources\settings.xml:466
 msgctxt "#30575"
 msgid "Toggle Re-Use Language Invoker"
 msgstr "Schakel Language Invoker in of uit."

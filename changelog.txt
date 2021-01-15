@@ -1,3 +1,20 @@
+Changelog 2.0.11
+Take preventative measures to reduce overloading Trakt servers
+Increase local show/season statistic refreshing
+Fixed cloud source sorting
+Fixed HEVC source sorting
+New shows api call now pulls english and local language from Trakt
+Modified database commit method to allow for xbox support
+Reformat source select screen again to allow better filename displaying
+Fixed next button showing on next up menu
+Removed pycryptodome dependency, this will need to be requested on a per provider basis
+Fixed pre-term
+Fixed empty search results raising exception
+Fixed auto episode resuming
+Fixed superficial exceptions in play dialogs
+Updated danish language strings
+
+
 Changelog 2.0.10
 Fixed issue with milling seasons to often
 Added checks when attempting to cache magnet

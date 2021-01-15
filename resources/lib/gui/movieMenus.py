@@ -300,6 +300,9 @@ class Menus:
         trakt_list = self.trakt.get_json_paged(
             "search/movie", query=tools.unquote(query), extended="full", page=g.PAGE
         )
+        if not trakt_list:
+            g.cancel_directory()
+            return
         self.list_builder.movie_menu_builder(
             [
                 movie

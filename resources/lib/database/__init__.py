@@ -183,15 +183,6 @@ class Database(object):
     # endregion
 
     # region public methods
-    @staticmethod
-    def chunkify_list_for_query(list_of_expressions):
-        chunked_list = []
-        while len(list_of_expressions) > 900:
-            chunked_list.append(list_of_expressions[:900])
-            del list_of_expressions[:900]
-        chunked_list.append(list_of_expressions)
-        return chunked_list
-
     def close(self):
         self._exit = True
 
@@ -218,10 +209,17 @@ class Database(object):
                     if isinstance(query, list) or isinstance(
                         query, types.GeneratorType
                     ):
-                        return [
-                            self._execute_query(data, connection.cursor(), i)
-                            for i in query
-                        ]
+                        if g.PLATFORM == 'xbox':
+                            results = []
+                            for i in query:
+                                results.append(self._execute_query(data, connection.cursor(), i))
+                                connection.commit()
+                            return results
+                        else:
+                            return [
+                                self._execute_query(data, connection.cursor(), i)
+                                for i in query
+                                ]
                     return self._execute_query(data, connection.cursor(), query)
                 except sqlite3.OperationalError as error:
                     if "database is locked" in str(error):
@@ -252,4 +250,38 @@ class Database(object):
         else:
             g.log(query, "error")
 
+    def create_temp_table(self, table_name, columns):
+        return TempTable(self, table_name, columns)
+
     # endregion
+
+
+class TempTable:
+    def __init__(self, database, table_name, columns):
+        self.database = database
+        self.columns = columns
+        self.table_name = table_name
+
+    def __enter__(self):
+        self._drop_table()
+        self._create_table()
+        return self
+
+    def insert_data(self, data):
+        columns = ','.join("[{}]".format(c) for c in self.columns)
+        placeholder = ','.join('?' for _ in self.columns)
+
+        self.database.execute_sql('INSERT OR IGNORE INTO [{}] ({}) VALUES ({})'
+                                  .format(self.table_name, columns, placeholder),
+                                  (tuple(row[i] for i in self.columns) for row in data))
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._drop_table()
+
+    def _create_table(self):
+        self.database.execute_sql('CREATE TABLE IF NOT EXISTS [{}] ({})'
+                         .format(self.table_name,
+                                 ','.join("[{}] VARCHAR".format(c) for c in self.columns)))
+
+    def _drop_table(self):
+        self.database.execute_sql("drop table if exists [{}]".format(self.table_name))

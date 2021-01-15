@@ -125,7 +125,6 @@ msgstr "Εισήγαγε τον κωδικό: {}"
 #: \resources\lib\debrid\all_debrid.py:146
 #: \resources\lib\debrid\premiumize.py:84
 #: \resources\lib\debrid\real_debrid.py:146
-#: \tests\integration\debrid\test_premiumize.py:109
 msgctxt "#30021"
 msgid "Authentication is completed"
 msgstr "Η πιστοποίηση ολοκληρώθηκε"
@@ -172,7 +171,7 @@ msgctxt "#30028"
 msgid "Tools"
 msgstr "Εργαλεία"
 
-#: \resources\settings.xml:439 \resources\settings.xml:441
+#: \resources\settings.xml:440 \resources\settings.xml:442
 #: \resources\lib\gui\homeMenu.py:71
 msgctxt "#30029"
 msgid "Clear Cache"
@@ -220,7 +219,6 @@ msgid "ARE YOU SURE?"
 msgstr "ΕΙΣΤΕ ΣΙΓΟΥΡΟΣ?"
 
 #: \resources\lib\common\maintenance.py:182
-#: \tests\integration\common\test_maintenance.py:109
 msgctxt "#30037"
 msgid "Your {} Premium status has expired"
 msgstr "Η κατάσταση του {} Premium σας έχει λήξει"
@@ -235,7 +233,7 @@ msgctxt "#30039"
 msgid "Premium Services"
 msgstr "Premium υπηρεσίες"
 
-#: \resources\settings.xml:443 \resources\lib\gui\homeMenu.py:75
+#: \resources\settings.xml:444 \resources\lib\gui\homeMenu.py:75
 msgctxt "#30040"
 msgid "Clear Local Torrent Cache"
 msgstr "Καθαρισμός Cache Μνήμης Torrent"
@@ -245,7 +243,7 @@ msgctxt "#30041"
 msgid "Open Settings Menu"
 msgstr "Άνοιγμα Μενού Ρυθμίσεων"
 
-#: \resources\settings.xml:447 \resources\lib\gui\homeMenu.py:87
+#: \resources\settings.xml:448 \resources\lib\gui\homeMenu.py:87
 msgctxt "#30042"
 msgid "Wipe Addon Data"
 msgstr "Καθαρισμός Δεδομένων Προσθέτου"
@@ -308,17 +306,17 @@ msgctxt "#30053"
 msgid "All Cache Successfully Cleared"
 msgstr "Επιτυχής Εκκαθάριση Μνήμης Cache"
 
-#: \resources\lib\modules\getSources.py:190
+#: \resources\lib\modules\getSources.py:199
 msgctxt "#30054"
 msgid "Checking Local Database"
 msgstr "Έλεγχος Τοπικής Βάσης Δεδομένων"
 
-#: \resources\lib\modules\getSources.py:114
+#: \resources\lib\modules\getSources.py:123
 msgctxt "#30055"
 msgid "Initializing Providers"
 msgstr "Εγκατάσταση Παρόχων"
 
-#: \resources\lib\modules\getSources.py:210
+#: \resources\lib\modules\getSources.py:219
 msgctxt "#30056"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -327,7 +325,7 @@ msgstr ""
 "Δεν βρέθηκαν πηγές για το επόμενο στοιχείο στην λίστα αναπαραγωγής.\n"
 "Καθαρισμός τρέχουσας λίστας αναπαραγωγής"
 
-#: \resources\lib\modules\getSources.py:351
+#: \resources\lib\modules\getSources.py:360
 msgctxt "#30057"
 msgid ""
 "No Playable Sources were found.\n"
@@ -336,29 +334,29 @@ msgstr ""
 "Δεν βρέθηκαν πηγές που να μπορούν να αναπαραχθούν.\n"
 "Θα θέλατε να δοκιμάσετε αναζήτηση με torrent?"
 
-#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:729
+#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:738
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30058"
 msgid "Torrents"
 msgstr "Torrent"
 
-#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:734
+#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:743
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30059"
 msgid "Hosters"
 msgstr "Hosters"
 
-#: \resources\lib\modules\getSources.py:740
+#: \resources\lib\modules\getSources.py:749
 msgctxt "#30060"
 msgid "Free Hosters"
 msgstr "Δωρεάν Hosters"
 
-#: \resources\lib\modules\getSources.py:742
+#: \resources\lib\modules\getSources.py:751
 msgctxt "#30061"
 msgid "Remaining Providers"
 msgstr "Εναπομείναντες Πάροχοι"
 
-#: \resources\lib\modules\smartPlay.py:421
+#: \resources\lib\modules\smartPlay.py:429
 msgctxt "#30062"
 msgid "Resume From: "
 msgstr "Συνέχεια από: "
@@ -721,7 +719,7 @@ msgctxt "#30129"
 msgid "Enable Secondary Filesize Sort"
 msgstr "Ενεργοποιήστε Δευτερεύων Ταξινόμηση Μεγέθους Αρχείων"
 
-#: \resources\settings.xml:409
+#: \resources\settings.xml:410
 msgctxt "#30130"
 msgid "Enable Tertiary HEVC Sort Preference"
 msgstr "Ενεργοποιήστε Τρίτη Προτιμώμενη Σειρά Ταξινόμησης HEVC"
@@ -807,7 +805,7 @@ msgctxt "#30147"
 msgid "Providers"
 msgstr "Πάροχοι"
 
-#: \resources\settings.xml:414 \resources\settings.xml:417
+#: \resources\settings.xml:415 \resources\settings.xml:418
 msgctxt "#30148"
 msgid "API Keys"
 msgstr "Κλειδιά API"
@@ -834,7 +832,7 @@ msgctxt "#30152"
 msgid "Force view types on menus"
 msgstr "Ώθησε τους τύπους εμφάνισης στα μενού"
 
-#: \resources\settings.xml:436
+#: \resources\settings.xml:437
 msgctxt "#30153"
 msgid "Shortcuts"
 msgstr "Συντομεύσεις"
@@ -844,22 +842,22 @@ msgctxt "#30154"
 msgid "Mixed Episode Lists Title Display Style"
 msgstr "Στυλ εμφάνισης τίτλων στη μικτή λίστα επεισοδίων"
 
-#: \resources\settings.xml:422
+#: \resources\settings.xml:423
 msgctxt "#30155"
 msgid "TMDb API Key"
 msgstr "Κλειδί TMDb API"
 
-#: \resources\settings.xml:425
+#: \resources\settings.xml:426
 msgctxt "#30156"
 msgid "Trakt Client ID"
 msgstr "Αναγνωριστικό πελάτη Trakt"
 
-#: \resources\settings.xml:426
+#: \resources\settings.xml:427
 msgctxt "#30157"
 msgid "Trakt Client Secret"
 msgstr "Trakt Client Secret"
 
-#: \resources\settings.xml:429
+#: \resources\settings.xml:430
 msgctxt "#30158"
 msgid "TVDB API Key"
 msgstr "Κλειδί TMDB API"
@@ -951,7 +949,7 @@ msgctxt "#30175"
 msgid "Hide Common Undesirable Items"
 msgstr "Κρύψτε Συχνά Ανεπιθύμητα Αντικείμενα"
 
-#: \resources\settings.xml:410
+#: \resources\settings.xml:411
 msgctxt "#30176"
 msgid "Enable Quaternary Low Quality Sort Preference"
 msgstr "Ενεργοποίηση Τέταρτης Προτίμησης Ταξινόμησης ως Χαμηλής Ποιότητας"
@@ -1114,7 +1112,7 @@ msgstr ""
 "[COLOR red]ΠΡΟΕΙΔΟΠΟΙΗΣΗ[/COLOR]\n"
 "Αυτό θα διαγράψει όλες τις μετα-πληροφορίες, είστε σίγουροι?"
 
-#: \resources\settings.xml:445 \resources\lib\gui\homeMenu.py:79
+#: \resources\settings.xml:446 \resources\lib\gui\homeMenu.py:79
 #: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:375
 #: \resources\lib\gui\tvshowMenus.py:379
 msgctxt "#30202"
@@ -1267,7 +1265,6 @@ msgid "Succesfully Switched to {}"
 msgstr "Επιτυχής Αλλάγη σε {}"
 
 #: \resources\lib\database\skinManager\__init__.py:353
-#: \tests\integration\gui\test_skin_manager.py:55
 msgctxt "#30228"
 msgid "The theme name {} is not allowed"
 msgstr "Το όνομα θέματος {} δεν επιτρέπεται"
@@ -1318,27 +1315,27 @@ msgctxt "#30236"
 msgid "My Show Lists"
 msgstr "Η Λίστα Σειρών Μου"
 
-#: \resources\settings.xml:451 \resources\lib\gui\homeMenu.py:91
+#: \resources\settings.xml:452 \resources\lib\gui\homeMenu.py:91
 msgctxt "#30237"
 msgid "Trakt Sync Tools"
 msgstr "Εργαλεία Συγχρονισμού Trakt"
 
-#: \resources\settings.xml:453 \resources\lib\gui\homeMenu.py:118
+#: \resources\settings.xml:454 \resources\lib\gui\homeMenu.py:118
 msgctxt "#30238"
 msgid "Clear last sync time"
 msgstr "Εκκαθάριση τελευταίας καταγραφής ώρας συγχρονισμού"
 
-#: \resources\settings.xml:455 \resources\lib\gui\homeMenu.py:122
+#: \resources\settings.xml:456 \resources\lib\gui\homeMenu.py:122
 msgctxt "#30239"
 msgid "Force a sync with Trakt"
 msgstr "Εξαναγκασμός συγχρονισμού με Trakt"
 
-#: \resources\settings.xml:457 \resources\lib\gui\homeMenu.py:126
+#: \resources\settings.xml:458 \resources\lib\gui\homeMenu.py:126
 msgctxt "#30240"
 msgid "Clear All Metadata"
 msgstr "Καθαρισμός Όλων των Μεταδεδομένων"
 
-#: \resources\settings.xml:459 \resources\lib\gui\homeMenu.py:130
+#: \resources\settings.xml:460 \resources\lib\gui\homeMenu.py:130
 msgctxt "#30241"
 msgid "Rebuild Database"
 msgstr "Ανακατασκευή Βάσης Δεδομένων"
@@ -1550,7 +1547,6 @@ msgid "Source type"
 msgstr "Τύπος Πηγής"
 
 #: \resources\lib\common\maintenance.py:86
-#: \tests\integration\common\test_maintenance.py:204
 msgctxt "#30278"
 msgid "One or more providers have updates pending"
 msgstr "Ένας ή περισσότεροι πάροχοι έχουν ενημερώσεις σε εκκρεμότητα"
@@ -1639,7 +1635,7 @@ msgctxt "#30293"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Είστε σίγουροι πως επιθυμείτε να αφαιρέσετε το {} πακέτο?"
 
-#: \resources\settings.xml:419
+#: \resources\settings.xml:420
 msgctxt "#30294"
 msgid "Show Advanced Settings..."
 msgstr "Δείξε Προχωρημένες Ρυθμίσεις..."
@@ -1855,7 +1851,7 @@ msgstr "Εισαγωγή Zip URL"
 
 #: \resources\lib\gui\windows\source_select.py:78
 #: \resources\lib\modules\cacheAssist.py:114
-#: \resources\lib\modules\getSources.py:350
+#: \resources\lib\modules\getSources.py:359
 msgctxt "#30335"
 msgid "Cache Assist"
 msgstr "Βοήθεια Μνήμης Cache"
@@ -1992,7 +1988,7 @@ msgctxt "#30361"
 msgid "Do not resume"
 msgstr "Να μην γίνει συνέχιση"
 
-#: \resources\lib\modules\smartPlay.py:424
+#: \resources\lib\modules\smartPlay.py:432
 msgctxt "#30362"
 msgid "Start From Beginning"
 msgstr "Έναρξη από την αρχή"
@@ -2690,7 +2686,7 @@ msgctxt "#30476"
 msgid "My recent watched episodes"
 msgstr "Τα πρόσφατα επεισόδια μου παρακολουθήθηκαν"
 
-#: \resources\lib\modules\getSources.py:367
+#: \resources\lib\modules\getSources.py:376
 #: \resources\lib\modules\helpers.py:52
 msgctxt "#30477"
 msgid ""
@@ -2761,7 +2757,7 @@ msgctxt "#30489"
 msgid "Show original titles"
 msgstr "Εμφάνιση πρωτότυπων τίτλων"
 
-#: \resources\settings.xml:432
+#: \resources\settings.xml:433
 msgctxt "#30490"
 msgid "OMDb API Key"
 msgstr "OMDb Κλειδί API"
@@ -2974,7 +2970,7 @@ msgstr ""
 "Παρουσιάστηκε πρόβλημα κατά τη λήψη αποδεκτών τομέων φιλοξενίας, κάτι που "
 "μπορεί να προκαλέσει περίεργα αποτελέσματα απόξεσης"
 
-#: \resources\lib\modules\player.py:540
+#: \resources\lib\modules\player.py:541
 msgctxt "#30526"
 msgid ""
 "The last playing file was not marked as watched, would you like to do this "
@@ -3199,12 +3195,12 @@ msgctxt "#30568"
 msgid "Western"
 msgstr "Δυτικός"
 
-#: \resources\lib\modules\metadataHandler.py:345
+#: \resources\lib\modules\metadataHandler.py:344
 msgctxt "#30569"
 msgid "Season {}"
 msgstr "Περίοδος {}"
 
-#: \resources\lib\modules\metadataHandler.py:347
+#: \resources\lib\modules\metadataHandler.py:346
 msgctxt "#30570"
 msgid "Episode {}"
 msgstr "Επεισόδιο {}"
@@ -3226,17 +3222,17 @@ msgid "Language Invoker option has been changed, reloading kodi profile"
 msgstr ""
 "Η επιλογή Language Invoker έχει αλλάξει, φορτώνοντας ξανά το προφίλ kodi"
 
-#: \resources\settings.xml:462
+#: \resources\settings.xml:463
 msgctxt "#30573"
 msgid "Language Invoker Options"
 msgstr "Επιλογές Invoker Γλώσσας"
 
-#: \resources\settings.xml:464
+#: \resources\settings.xml:465
 msgctxt "#30574"
 msgid "Re-Use Language Invoker Status"
 msgstr "Επαναχρησιμοποίηση κατάστασης Invoker γλώσσας"
 
-#: \resources\settings.xml:465
+#: \resources\settings.xml:466
 msgctxt "#30575"
 msgid "Toggle Re-Use Language Invoker"
 msgstr "Εναλλαγή επαναχρησιμοποίησης Language Invoker"

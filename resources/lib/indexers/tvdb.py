@@ -81,7 +81,7 @@ def tvdb_art_sorter(item):
             continue
 
         item["art"][art_type] = sorted(
-            item["art"][art_type], key=lambda k: (k["rating"], k["url"]), reverse=True
+            item["art"][art_type], key=lambda k: (k["language"], k["rating"], k["url"]), reverse=True
         )
     return item
 
