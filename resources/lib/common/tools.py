@@ -11,9 +11,10 @@ import re
 import sys
 import time
 
-import dateutil.parser
 import xbmc
 import xbmcvfs
+
+from resources.lib.third_party import pytz
 
 try:
     from urlparse import parse_qsl, parse_qs, unquote, urlparse, urljoin
@@ -116,13 +117,13 @@ def copy2clip(txt):
             log("Failure to copy to clipboard, \n{}".format(e), "error")
 
 
-def parse_datetime(string_date, format="%Y-%m-%d", date_only=True):
+def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True):
     """
     Attempts to pass over provided string and return a date or datetime object
     :param string_date: String to parse
     :type string_date: str
-    :param format: Format of str
-    :type format: str
+    :param format_string: Format of str
+    :type format_string: str
     :param date_only: Whether to return a date only object or not
     :type date_only: bool
     :return: Datetime.Datetime or Datetime.Date object
@@ -130,17 +131,16 @@ def parse_datetime(string_date, format="%Y-%m-%d", date_only=True):
     """
     if not string_date:
         return None
-    string_date = string_date.split(".000Z")[0]
     try:
         if date_only:
-            res = dateutil.parser.parse(string_date).date()
+            res = datetime.datetime.strptime(string_date, format_string).date()
         else:
-            res = dateutil.parser.parse(string_date)
+            res = datetime.datetime.strptime(string_date, format_string)
     except TypeError:
         if date_only:
-            res = datetime.datetime(*(time.strptime(string_date, format)[0:6])).date()
+            res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6])).date()
         else:
-            res = datetime.datetime(*(time.strptime(string_date, format)[0:6]))
+            res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6]))
 
     return res
 
@@ -189,7 +189,7 @@ def paginate_list(list_items, page, limit):
     :return: items on page
     :rtype: list
     """
-    pages = [list_items[i : i + limit] for i in xrange(0, len(list_items), limit)]
+    pages = [list_items[i: i + limit] for i in xrange(0, len(list_items), limit)]
     if len(pages) > page - 1:
         return pages[page - 1]
     else:
@@ -318,7 +318,7 @@ def extend_array(array1, array2):
     return result
 
 
-def smart_merge_dictionary(dictionary, merge_dict, keep_original=False):
+def smart_merge_dictionary(dictionary, merge_dict, keep_original=False, extend_array=True):
     """Method for merging large multi typed dictionaries, it has support for handling arrays.
 
     :param dictionary:Original dictionary to merge the second on into.
@@ -327,6 +327,8 @@ def smart_merge_dictionary(dictionary, merge_dict, keep_original=False):
     :type merge_dict:dict
     :param keep_original:Boolean that indicates if there are duplicated values to keep the original one.
     :type keep_original:bool
+    :param extend_array:Boolean that indicates if we need to extend existing arrays with the enw values..
+    :type extend_array:bool
     :return:Merged dictionary
     :rtype:dict
     """
@@ -341,13 +343,14 @@ def smart_merge_dictionary(dictionary, merge_dict, keep_original=False):
         else:
             if original_value and keep_original:
                 continue
-            if isinstance(original_value, (list, set)) and isinstance(
-                new_value, (list, set)
+            if extend_array and isinstance(original_value, (list, set)) and isinstance(
+                    new_value, (list, set)
             ):
                 original_value.extend(x for x in new_value if x not in original_value)
                 try:
                     new_value = sorted(original_value)
                 except TypeError:  # Sorting of complex array doesn't work.
+                    new_value = original_value
                     pass
         if new_value:
             dictionary[new_key] = new_value
@@ -656,3 +659,11 @@ def safe_dict_get(dictionary, *path):
         return safe_dict_get(result, *path[1:])
     else:
         return dictionary.get(current_path)
+
+
+def local_timezone():
+    if time.daylight:
+        offsetHour = time.altzone / 3600
+    else:
+        offsetHour = time.timezone / 3600
+    return pytz.timezone('Etc/GMT%+d' % offsetHour)

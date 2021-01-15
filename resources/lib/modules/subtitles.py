@@ -5,8 +5,6 @@ import importlib
 import os
 import sys
 
-import xbmc
-
 from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.modules.globals import g

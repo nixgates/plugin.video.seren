@@ -198,8 +198,13 @@ class SerenPlayer(xbmc.Player):
         :return: Path to file
         :rtype: str/None
         """
+        g.log("123")
         if self.isPlaying():
-            return xbmc.Player().getPlayingFile()
+            try:
+                return xbmc.Player().getPlayingFile()
+            except RuntimeError:
+                # seems that we have a racing condition between isPlaying() and getPlayingFile()
+                return None
         else:
             return None
 
@@ -547,6 +552,7 @@ class SerenPlayer(xbmc.Player):
 
     def _keep_alive(self):
         for i in range(0, 480):
+            g.log("waiting")
             self._running_path = self.getPlayingFile()
             if self._is_file_playing() or self._playback_has_stopped():
                 break
@@ -560,6 +566,7 @@ class SerenPlayer(xbmc.Player):
 
         self._log_debug_information()
         self._add_subtitle_if_needed()
+        xbmc.sleep(5000)
 
         while self._is_file_playing() and not g.abort_requested():
 
@@ -649,7 +656,7 @@ class PlayerDialogs(xbmc.Player):
     def __init__(self):
         super(PlayerDialogs, self).__init__()
         self._min_time = g.get_int_setting("playingnext.time")
-        self.playing_file = self.getPlayingFile()
+        self.playing_file = None
 
     def display_dialog(self):
         """
@@ -657,13 +664,15 @@ class PlayerDialogs(xbmc.Player):
         :return: None
         :rtype: None
         """
+        try:
+            self.playing_file = self.getPlayingFile()
+        except RuntimeError:
+            g.log("Kodi did not return a playing file, killing playback dialogs", "error")
+            return
         if g.PLAYLIST.size() > 0 and g.PLAYLIST.getposition() != (
                 g.PLAYLIST.size() - 1
          ):
-            if (
-                    g.get_bool_setting("smartplay.stillwatching")
-                    and self._still_watching_calc()
-             ):
+            if g.get_bool_setting("smartplay.stillwatching") and self._still_watching_calc():
                 target = self._show_still_watching
             elif g.get_bool_setting("smartplay.playingnextdialog"):
                 target = self._show_playing_next

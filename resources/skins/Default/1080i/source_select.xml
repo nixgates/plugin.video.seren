@@ -59,7 +59,7 @@
                         <colordiffuse>99362e33</colordiffuse>
                     </control>
                     <control type="label">
-                        <top>65</top>
+                        <top>57</top>
                         <left>25</left>
                         <width>800</width>
                         <height>200</height>
@@ -71,22 +71,22 @@
                         <label>[B][UPPERCASE]$INFO[ListItem.Property(debrid_provider)][/UPPERCASE][/B]</label>
                     </control>
                     <control type="label">
-                        <top>30</top>
+                        <top>20</top>
                         <left>25</left>
-                        <width>900</width>
+                        <width>1100</width>
                         <height>50</height>
-                        <font>font37</font>
+                        <font>font10</font>
                         <textcolor>66FFFFFF</textcolor>
                         <align>left</align>
                         <aligny>center</aligny>
                         <label>[COLOR $INFO[Window().Property(settings.color)]][B][UPPERCASE]$INFO[ListItem.Property(release_title)][/UPPERCASE][/B][/COLOR]</label>
                     </control>
                     <control type="group">
-                        <right>20</right>
-                        <top>5</top>
+                        <left>0</left>
+                        <top>55</top>
                         <control type="label">
                             <top>0</top>
-                            <right>0</right>
+                            <left>0</left>
                             <width>350</width>
                             <height>20</height>
                             <font>font12</font>
@@ -95,8 +95,8 @@
                             <label>$ADDON[plugin.video.seren 30276]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR]</label>
                         </control>
                         <control type="label">
-                            <top>30</top>
-                            <right>0</right>
+                            <top>0</top>
+                            <left>300</left>
                             <width>350</width>
                             <height>20</height>
                             <font>font12</font>
@@ -105,8 +105,8 @@
                             <label>$ADDON[plugin.video.seren 30260]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR]</label>
                         </control>
                         <control type="label">
-                            <top>60</top>
-                            <right>0</right>
+                            <top>0</top>
+                            <left>600</left>
                             <width>350</width>
                             <height>20</height>
                             <font>font12</font>
@@ -116,13 +116,13 @@
                             </label>
                         </control>
                         <control type="label">
-                            <top>90</top>
-                            <right>0</right>
-                            <width>350</width>
+                            <top>30</top>
+                            <left>25</left>
+                            <width>900</width>
                             <height>20</height>
                             <font>font12</font>
                             <textcolor>AAFFFFFF</textcolor>
-                            <align>right</align>
+                            <align>left</align>
                             <label>[COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(info)][/COLOR]</label>
                         </control>
                     </control>
@@ -164,7 +164,7 @@
                         <left>210</left>
                         <width>1000</width>
                         <height>50</height>
-                        <font>font45</font>
+                        <font>font10</font>
                         <textcolor>FFFFFFFF</textcolor>
                         <align>left</align>
                         <aligny>center</aligny>

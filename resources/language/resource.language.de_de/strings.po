@@ -125,7 +125,6 @@ msgstr "Code eingeben:"
 #: \resources\lib\debrid\all_debrid.py:146
 #: \resources\lib\debrid\premiumize.py:84
 #: \resources\lib\debrid\real_debrid.py:146
-#: \tests\integration\debrid\test_premiumize.py:109
 msgctxt "#30021"
 msgid "Authentication is completed"
 msgstr "Authentifizierung fertig"
@@ -170,7 +169,7 @@ msgctxt "#30028"
 msgid "Tools"
 msgstr "Werkzeuge"
 
-#: \resources\settings.xml:439 \resources\settings.xml:441
+#: \resources\settings.xml:440 \resources\settings.xml:442
 #: \resources\lib\gui\homeMenu.py:71
 msgctxt "#30029"
 msgid "Clear Cache"
@@ -218,7 +217,6 @@ msgid "ARE YOU SURE?"
 msgstr "Bist Du sicher"
 
 #: \resources\lib\common\maintenance.py:182
-#: \tests\integration\common\test_maintenance.py:109
 msgctxt "#30037"
 msgid "Your Real Debrid Premium status has expired"
 msgstr "Dein Real Debrid Konto ist abgelaufen"
@@ -233,7 +231,7 @@ msgctxt "#30039"
 msgid "Premium Services"
 msgstr "Premium Service"
 
-#: \resources\settings.xml:443 \resources\lib\gui\homeMenu.py:75
+#: \resources\settings.xml:444 \resources\lib\gui\homeMenu.py:75
 msgctxt "#30040"
 msgid "Clear Local Result Cache"
 msgstr "Suchverlauf löschen"
@@ -243,7 +241,7 @@ msgctxt "#30041"
 msgid "Open Settings Menu"
 msgstr "Öffne Einstellungs Menü"
 
-#: \resources\settings.xml:447 \resources\lib\gui\homeMenu.py:87
+#: \resources\settings.xml:448 \resources\lib\gui\homeMenu.py:87
 msgctxt "#30042"
 msgid "Wipe Addon Data"
 msgstr "Lösche Addon Daten"
@@ -306,17 +304,17 @@ msgctxt "#30053"
 msgid "All Cache Successfully Cleared"
 msgstr "Alle Cache erfolgreich geleert"
 
-#: \resources\lib\modules\getSources.py:190
+#: \resources\lib\modules\getSources.py:199
 msgctxt "#30054"
 msgid "Checking Local Database"
 msgstr "Prüfe Lokale Datenbank"
 
-#: \resources\lib\modules\getSources.py:114
+#: \resources\lib\modules\getSources.py:123
 msgctxt "#30055"
 msgid "Initializing Providers"
 msgstr "Initialisiere Anbieter"
 
-#: \resources\lib\modules\getSources.py:210
+#: \resources\lib\modules\getSources.py:219
 msgctxt "#30056"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -325,7 +323,7 @@ msgstr ""
 "Keine Quellen zum abspielen in der Playlist gefuden.\n"
 "Leere aktuelle Playlist"
 
-#: \resources\lib\modules\getSources.py:351
+#: \resources\lib\modules\getSources.py:360
 msgctxt "#30057"
 msgid ""
 "No Playable Sources were found.\n"
@@ -334,29 +332,29 @@ msgstr ""
 "Keine abspielbare Quellen gefunden.\n"
 "Möchten Sie Torrent Suche versuchen"
 
-#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:729
+#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:738
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30058"
 msgid "Torrents"
 msgstr "Torrents"
 
-#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:734
+#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:743
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30059"
 msgid "Hosters"
 msgstr "Anbieter"
 
-#: \resources\lib\modules\getSources.py:740
+#: \resources\lib\modules\getSources.py:749
 msgctxt "#30060"
 msgid "Free Hosters"
 msgstr "Freie Anbieter"
 
-#: \resources\lib\modules\getSources.py:742
+#: \resources\lib\modules\getSources.py:751
 msgctxt "#30061"
 msgid "Remaining Providers"
 msgstr "Verbleibende Anbieter"
 
-#: \resources\lib\modules\smartPlay.py:421
+#: \resources\lib\modules\smartPlay.py:429
 msgctxt "#30062"
 msgid "Resume From: "
 msgstr "Lebenslauf von: "
@@ -721,7 +719,7 @@ msgctxt "#30129"
 msgid "Enable Secondary Filesize Sort"
 msgstr "Aktiviere (zweitens) Dateigrößen Sortierung"
 
-#: \resources\settings.xml:409
+#: \resources\settings.xml:410
 msgctxt "#30130"
 msgid "Enable Tertiary HEVC Sort Preference"
 msgstr "Aktiviere (drittens) HEVC Sortierung bevorzugt"
@@ -812,7 +810,7 @@ msgctxt "#30147"
 msgid "Providers"
 msgstr "Indexseiten"
 
-#: \resources\settings.xml:414 \resources\settings.xml:417
+#: \resources\settings.xml:415 \resources\settings.xml:418
 msgctxt "#30148"
 msgid "API Keys"
 msgstr "API Schlüssel"
@@ -839,7 +837,7 @@ msgctxt "#30152"
 msgid "Force view types on menus"
 msgstr "Erzwinge Anzeige-Typen im Menü"
 
-#: \resources\settings.xml:436
+#: \resources\settings.xml:437
 msgctxt "#30153"
 msgid "Shortcuts"
 msgstr "Schnellzugriff"
@@ -849,22 +847,22 @@ msgctxt "#30154"
 msgid "Append show info to mixed episode lists"
 msgstr "Serien Information bei gemischter Episoden Liste anzeigen"
 
-#: \resources\settings.xml:422
+#: \resources\settings.xml:423
 msgctxt "#30155"
 msgid "TMDB API Key"
 msgstr "TMDB API-Schlüssel"
 
-#: \resources\settings.xml:425
+#: \resources\settings.xml:426
 msgctxt "#30156"
 msgid "Trakt Client ID"
 msgstr "Trakt Client v2 API Key"
 
-#: \resources\settings.xml:426
+#: \resources\settings.xml:427
 msgctxt "#30157"
 msgid "Trakt Client Secret"
 msgstr "Trakt Client Geheimnis"
 
-#: \resources\settings.xml:429
+#: \resources\settings.xml:430
 msgctxt "#30158"
 msgid "TVDB API Key"
 msgstr "TVDB API-Schlüssel"
@@ -956,7 +954,7 @@ msgctxt "#30175"
 msgid "Hide Low Quality Items"
 msgstr "Einträge mit schlechter Qualität ausblenden"
 
-#: \resources\settings.xml:410
+#: \resources\settings.xml:411
 msgctxt "#30176"
 msgid "Enable Quaternary Low Quality Sort Preference"
 msgstr "Aktiviere (viertens) schlechte Qualität Sortierung bevorzugen"
@@ -1130,7 +1128,7 @@ msgstr ""
 "[COLOR red]WARNUNG[/COLOR]\n"
 "Dies löscht alle Meta Informationen, sind Sie sicher?"
 
-#: \resources\settings.xml:445 \resources\lib\gui\homeMenu.py:79
+#: \resources\settings.xml:446 \resources\lib\gui\homeMenu.py:79
 #: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:375
 #: \resources\lib\gui\tvshowMenus.py:379
 msgctxt "#30202"
@@ -1279,7 +1277,6 @@ msgid "Succesfully Switched to {}"
 msgstr "Erfolgreich auf {} umgestellt"
 
 #: \resources\lib\database\skinManager\__init__.py:353
-#: \tests\integration\gui\test_skin_manager.py:55
 msgctxt "#30228"
 msgid "The theme name {} is not allowed"
 msgstr "Der Themenname {} ist nicht zulässig"
@@ -1330,27 +1327,27 @@ msgctxt "#30236"
 msgid "My Show Lists"
 msgstr "Meine Showlisten"
 
-#: \resources\settings.xml:451 \resources\lib\gui\homeMenu.py:91
+#: \resources\settings.xml:452 \resources\lib\gui\homeMenu.py:91
 msgctxt "#30237"
 msgid "Trakt Sync Tools"
 msgstr "Trakt Sync Tools"
 
-#: \resources\settings.xml:453 \resources\lib\gui\homeMenu.py:118
+#: \resources\settings.xml:454 \resources\lib\gui\homeMenu.py:118
 msgctxt "#30238"
 msgid "Clear last sync time"
 msgstr "Letzte Synchronisierungszeit löschen"
 
-#: \resources\settings.xml:455 \resources\lib\gui\homeMenu.py:122
+#: \resources\settings.xml:456 \resources\lib\gui\homeMenu.py:122
 msgctxt "#30239"
 msgid "Force a sync with Trakt"
 msgstr "Erzwingen Sie eine Synchronisierung mit Trakt"
 
-#: \resources\settings.xml:457 \resources\lib\gui\homeMenu.py:126
+#: \resources\settings.xml:458 \resources\lib\gui\homeMenu.py:126
 msgctxt "#30240"
 msgid "Clear All Metadata"
 msgstr "Alle Metadaten löschen"
 
-#: \resources\settings.xml:459 \resources\lib\gui\homeMenu.py:130
+#: \resources\settings.xml:460 \resources\lib\gui\homeMenu.py:130
 msgctxt "#30241"
 msgid "Rebuild Database"
 msgstr "Datenbank neu erstellen"
@@ -1562,7 +1559,6 @@ msgid "Source type"
 msgstr "Quellen Typ"
 
 #: \resources\lib\common\maintenance.py:86
-#: \tests\integration\common\test_maintenance.py:204
 msgctxt "#30278"
 msgid "One or more providers have updates pending"
 msgstr "Bei einem oder mehreren Anbietern stehen Aktualisierungen aus"
@@ -1651,7 +1647,7 @@ msgctxt "#30293"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Möchten Sie das {} -Paket wirklich entfernen?"
 
-#: \resources\settings.xml:419
+#: \resources\settings.xml:420
 msgctxt "#30294"
 msgid "Show Advanced Settings..."
 msgstr "Erweitere Einstellungen anzeigen..."
@@ -1867,7 +1863,7 @@ msgstr "Postleitzahl eingeben URL"
 
 #: \resources\lib\gui\windows\source_select.py:78
 #: \resources\lib\modules\cacheAssist.py:114
-#: \resources\lib\modules\getSources.py:350
+#: \resources\lib\modules\getSources.py:359
 msgctxt "#30335"
 msgid "Cache Assist"
 msgstr "Cache-Assistent"
@@ -2004,7 +2000,7 @@ msgctxt "#30361"
 msgid "Do not resume"
 msgstr "Keine Fortsetzung der Behandlung"
 
-#: \resources\lib\modules\smartPlay.py:424
+#: \resources\lib\modules\smartPlay.py:432
 msgctxt "#30362"
 msgid "Start From Beginning"
 msgstr "Start From Beginning"
@@ -2710,7 +2706,7 @@ msgctxt "#30476"
 msgid "My recent watched episodes"
 msgstr "Meine letzten Folgen"
 
-#: \resources\lib\modules\getSources.py:367
+#: \resources\lib\modules\getSources.py:376
 #: \resources\lib\modules\helpers.py:52
 msgctxt "#30477"
 msgid ""
@@ -2783,7 +2779,7 @@ msgctxt "#30489"
 msgid "Show original titles"
 msgstr "Originaltitel anzeigen"
 
-#: \resources\settings.xml:432
+#: \resources\settings.xml:433
 msgctxt "#30490"
 msgid "OMDb API Key"
 msgstr "OMDb API-Schlüssel"
@@ -2997,7 +2993,7 @@ msgstr ""
 "Es gab ein Problem beim Akzeptieren akzeptierter Hoster-Domains. Dies kann "
 "zu merkwürdigen Scrape-Ergebnissen führen"
 
-#: \resources\lib\modules\player.py:540
+#: \resources\lib\modules\player.py:541
 msgctxt "#30526"
 msgid ""
 "The last playing file was not marked as watched, would you like to do this "
@@ -3222,12 +3218,12 @@ msgctxt "#30568"
 msgid "Western"
 msgstr "Westlich"
 
-#: \resources\lib\modules\metadataHandler.py:345
+#: \resources\lib\modules\metadataHandler.py:344
 msgctxt "#30569"
 msgid "Season {}"
 msgstr "Jahreszeit {}"
 
-#: \resources\lib\modules\metadataHandler.py:347
+#: \resources\lib\modules\metadataHandler.py:346
 msgctxt "#30570"
 msgid "Episode {}"
 msgstr "Episode {}"
@@ -3250,17 +3246,17 @@ msgstr ""
 "Die Option &quot;Sprachaufrufer&quot; wurde geändert und das Kodi-Profil neu"
 " geladen"
 
-#: \resources\settings.xml:462
+#: \resources\settings.xml:463
 msgctxt "#30573"
 msgid "Language Invoker Options"
 msgstr "Sprachaufrufoptionen"
 
-#: \resources\settings.xml:464
+#: \resources\settings.xml:465
 msgctxt "#30574"
 msgid "Re-Use Language Invoker Status"
 msgstr "Status des Sprachaufrufers wiederverwenden"
 
-#: \resources\settings.xml:465
+#: \resources\settings.xml:466
 msgctxt "#30575"
 msgid "Toggle Re-Use Language Invoker"
 msgstr "Aktivieren Sie den Sprachaufrufer für die Wiederverwendung"

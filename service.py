@@ -25,6 +25,7 @@ g.log("##################  STARTING SERVICE  ######################")
 g.log(
     "### {} {}-{}".format(g.ADDON_ID, g.VERSION, g.read_all_text(".gitsha") or "local")
 )
+g.log("PLATFORM: {}".format(g.PLATFORM))
 g.set_setting("general.tempSilent", "false")
 g.log("#############  SERVICE ENTERED KEEP ALIVE  #################")
 g.HOME_WINDOW.setProperty("SerenDownloadManagerIndex", "{}")
@@ -44,18 +45,14 @@ while not monitor.abortRequested():
             maintenance.run_maintenance()
             TraktSyncDatabase().sync_activities()
         except Exception as e:
-            g.log("Background Service Failure, waiting 5 minutes to try again", "error")
+            g.log("Background Service Failure", "error")
             g.log_stacktrace()
-            if monitor.waitForAbort(60 * 5):
-                break
-            else:
-                continue
         if monitor.waitForAbort(60 * randint(13, 17)):
             break
     except:  # pylint: disable=bare-except
         g.log("Background service failure", "error")
         g.log_stacktrace()
-        if monitor.waitForAbort(10):
+        if monitor.waitForAbort(60 * randint(13, 17)):
             break
         continue
 

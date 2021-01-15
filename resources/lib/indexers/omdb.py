@@ -22,10 +22,6 @@ from resources.lib.database.cache import use_cache
 from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
 from resources.lib.modules.globals import g
 
-try:
-    from dateutil import tz
-except:
-    pass
 
 OMDB_STATUS_CODES = {
     200: "Success",

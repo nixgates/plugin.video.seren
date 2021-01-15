@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+from resources.lib.common.source_utils import get_best_episode_match
 from resources.lib.debrid.real_debrid import RealDebrid
 from resources.lib.modules.exceptions import FileIdentification
 from resources.lib.modules.globals import g
-from resources.lib.common.source_utils import get_best_episode_match
 from resources.lib.modules.resolver.torrent_resolvers.base_resolver import (
     TorrentResolverBase,
 )

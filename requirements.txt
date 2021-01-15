@@ -3,9 +3,8 @@ chardet==3.0.4
 idna==2.9
 requests==2.23.0
 urllib3==1.25.9
-dateutils==0.6.8
+pytz
 polib~=1.1.0
-python-dateutil~=2.8.1
 future~=0.17.1
 bs4
 pytest
@@ -18,5 +17,6 @@ parameterized
 darglint; python_version>"3.5"
 kodistubs==18.0.0; python_version<"3.7"
 kodistubs==19.0.1; python_version>="3.7"
+contextlib2; python_version<"3"
 requests-mock
 Mock

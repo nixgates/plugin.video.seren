@@ -836,7 +836,7 @@ class Sources(object):
         return [i for i in self.sources_information[source_type].values()
                 if i and
                 'quality' in i and
-                i['quality'] in resolutions]
+                any(i['quality'].lower() == r.lower() for r in resolutions)]
 
     def _prem_terminate(self):  # pylint: disable=method-hidden
         if self.canceled:
@@ -856,19 +856,20 @@ class Sources(object):
         pre_term_log_string = 'Pre-emptively Terminated'
 
         approved_resolutions = source_utils.get_accepted_resolution_list()
-        prem_resolutions = approved_resolutions[prem_min:]
+        approved_resolutions.reverse()
+        prem_resolutions = approved_resolutions[:prem_min]
         limit = g.get_int_setting('preem.limit')
-        type = g.get_int_setting('preem.type')
+        preem_type = g.get_int_setting('preem.type')
         try:
-            if type == 0 and len(self._get_sources_by_resolution(prem_resolutions, "torrentCacheSources")) >= limit:
+            if preem_type == 0 and len(self._get_sources_by_resolution(prem_resolutions, "torrentCacheSources")) >= limit:
                 g.log(pre_term_log_string, 'info')
                 monkey_requests.PRE_TERM_BLOCK = True
                 return True
-            if type == 1 and len(self._get_sources_by_resolution(prem_resolutions, "hosterSources")) >= limit:
+            if preem_type == 1 and len(self._get_sources_by_resolution(prem_resolutions, "hosterSources")) >= limit:
                 g.log(pre_term_log_string, 'info')
                 monkey_requests.PRE_TERM_BLOCK = True
                 return True
-            if type == 2:
+            if preem_type == 2:
                 # Terminating on both hosters and torrents
                 sources = self._get_sources_by_resolution(prem_resolutions, "hosterSources")
                 sources.append(self._get_sources_by_resolution(prem_resolutions, "torrentCacheSources"))

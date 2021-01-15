@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.0.10" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.0.11" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.python" version="2.26.0" />
         <import addon="script.module.future" version="0.17.1"/>
         <import addon="script.module.requests" version="2.22.0" />
         <import addon="plugin.video.youtube" version="6.8.3"/>
-        <import addon="script.module.dateutil" version="2.8.1"/>
         <import addon="script.module.beautifulsoup4" version="4.6.2"/>
         <import addon="context.seren" version="1.0.3"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-        <import addon="script.module.pycryptodome" version="3.4.3"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="seren.py">
         <provides>video</provides>
@@ -63,6 +61,22 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.0.11
+            Take preventative measures to reduce overloading Trakt servers
+            Increase local show/season statistic refreshing
+            Fixed cloud source sorting
+            Fixed HEVC source sorting
+            New shows api call now pulls english and local language from Trakt
+            Modified database commit method to allow for xbox support
+            Reformat source select screen again to allow better filename displaying
+            Fixed next button showing on next up menu
+            Removed pycryptodome dependency, this will need to be requested on a per provider basis
+            Fixed pre-term
+            Fixed empty search results raising exception
+            Fixed auto episode resuming
+            Fixed superficial exceptions in play dialogs
+            Updated danish language strings
+
             Changelog 2.0.10
             Fixed issue with milling seasons to often
             Added checks when attempting to cache magnet

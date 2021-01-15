@@ -291,10 +291,10 @@
         <setting id="trakt.authtrakt" type="action" label="30142" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=authTrakt)"/>
         <setting id="trakt.scrobbling" type="bool" label="30143" default="true" visible="!eq(-2,)"/>
-        <setting id="trakt.ignoreSecondsAtStart" type="slider" subsetting="true" label="30521" option="int" range="30,360" default="180"
-                 visible="!eq(-3,) + eq(-1,true)"/>
-        <setting id="trakt.playCountMinimumPercent" type="slider" subsetting="true" label="30522" option="int" range="80,95" default="80"
-                 visible="!eq(-4,) + eq(-2,true)"/>
+        <setting id="trakt.ignoreSecondsAtStart" type="slider" subsetting="true" label="30521" option="int"
+                 range="30,360" default="180" visible="!eq(-3,) + eq(-1,true)"/>
+        <setting id="trakt.playCountMinimumPercent" type="slider" subsetting="true" label="30522" option="int"
+                 range="80,95" default="80" visible="!eq(-4,) + eq(-2,true)"/>
         <setting id="trakt.revoketrakt" type="action" label="30144" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=revokeTrakt)" visible="!eq(-5,)"/>
 
@@ -391,8 +391,8 @@
                  default="10" visible="eq(-1,true)"/>
         <setting id="general.sizelimit.episode" type="slider" subsetting="true" label="30127" option="int"
                  range="0,1,300" default="10" visible="eq(-2,true)"/>
-        <setting id="general.sizeminimum.movie" type="slider" subsetting="true" label="30576" option="float" range="0.0,0.1,30.0"
-                 default="0" visible="eq(-3,true)"/>
+        <setting id="general.sizeminimum.movie" type="slider" subsetting="true" label="30576" option="float"
+                 range="0.0,0.1,30.0" default="0" visible="eq(-3,true)"/>
         <setting id="general.sizeminimum.episode" type="slider" subsetting="true" label="30577" option="float"
                  range="0.0,0.1,30.0" default="0" visible="eq(-4,true)"/>
         <setting id="general.disable3d" type="bool" label="30160" default="true"/>
@@ -406,7 +406,8 @@
         <setting type="sep"/>
         <setting id="general.sortsources" type="enum" label="30128" lvalues="30058|30059|30260|30527" default="0"/>
         <setting id="general.sizesort" type="bool" label="30129" default="true"/>
-        <setting id="general.reversesizesort" type="bool" label="30517" default="false"/>
+        <setting id="general.reversesizesort" type="bool" subsetting="true" label="30517" default="false"
+                 visible="eq(-1,true)"/>
         <setting id="general.265sort" type="bool" label="30130" default="false"/>
         <setting id="general.lowQualitysort" label="30176" type="bool" default="false"/>
     </category>

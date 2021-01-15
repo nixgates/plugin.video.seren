@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import os
 import abc
+import os
 from copy import deepcopy
 
 import xbmc
@@ -107,24 +107,29 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
 
         if 'aired' in self.item_information['info']:
             aired_date = self.item_information['info']['aired']
-            aired_date = tools.parse_datetime(aired_date)
+            aired_date = tools.parse_datetime(aired_date, tools.DATE_FORMAT)
             aired_date = aired_date.strftime(xbmc.getRegion('dateshort'))
-            self.item_information['info']['aired'] = aired_date
+            try:
+                aired_date = aired_date[:10]
+            except IndexError:
+                aired_date = "TBA"
+            self.setProperty('item.info.premiered', str(aired_date))
 
         if 'premiered' in self.item_information['info']:
             premiered = self.item_information['info']['premiered']
-            premiered = tools.parse_datetime(premiered)
+            premiered = tools.parse_datetime(premiered, tools.DATE_FORMAT)
             premiered = premiered.strftime(xbmc.getRegion('dateshort'))
-            self.item_information['info']['premiered'] = premiered
+            try:
+                premiered = premiered[:10]
+            except IndexError:
+                premiered = "TBA"
+            self.setProperty('item.info.premiered', str(premiered))
 
     def add_info_properties(self):
         for i in self.item_information['info'].keys():
             value = self.item_information['info'][i]
             if i == 'aired' or i == 'premiered':
-                try:
-                    value = value[:10]
-                except IndexError:
-                    value = 'TBA'
+                continue
             if i == 'duration':
                 hours, minutes = divmod(value, 60 * 60)
                 self.setProperty('item.info.{}.minutes'.format(i), str(minutes // 60))
@@ -135,7 +140,7 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
                 self.setProperty('item.info.{}'.format(i), value)
 
     def add_item_information_to_window(self, item_information):
-        self.item_information = item_information
+        self.item_information = deepcopy(item_information)
         self.add_id_properties()
         self.add_art_properties()
         self.add_date_properties()

@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import sys
-import os
 
 from resources.lib.common import tools
 
