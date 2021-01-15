@@ -858,7 +858,7 @@ class Sources(object):
 
         approved_resolutions = source_utils.get_accepted_resolution_list()
         approved_resolutions.reverse()
-        prem_resolutions = approved_resolutions[:prem_min]
+        prem_resolutions = approved_resolutions[prem_min]
         if self.media_type == 'episode':
             limit = g.get_int_setting('preem.tv.limit')
         else:
