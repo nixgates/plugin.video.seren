@@ -97,7 +97,7 @@ def _reset_trakt_auth():
     settings = ["trakt.refresh", "trakt.auth", "trakt.expires", "trakt.username"]
     for i in settings:
         g.set_setting(i, "")
-    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30578))
+    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30579))
 
 
 def trakt_guard_response(func):
