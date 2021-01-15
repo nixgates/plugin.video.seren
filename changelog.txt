@@ -1,3 +1,6 @@
+Changelog 2.0.12
+Fix for source select, tested on 4 skins
+
 Changelog 2.0.11
 Take preventative measures to reduce overloading Trakt servers
 Increase local show/season statistic refreshing
