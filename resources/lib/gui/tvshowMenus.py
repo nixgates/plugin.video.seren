@@ -289,7 +289,7 @@ class Menus:
             extended="full",
         )
         trakt_list = [i.get("show") for i in trakt_list if i["trakt_show_id"] not in hidden_items]
-        self.list_builder.show_list_builder(trakt_list[:40])
+        self.list_builder.show_list_builder(trakt_list, no_paging=True)
 
     def shows_recently_watched(self):
         self.list_builder.show_list_builder(

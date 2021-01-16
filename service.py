@@ -37,6 +37,8 @@ xbmc.executebuiltin(
 
 do_update_news()
 
+maintenance.toggle_reuselanguageinvoker(True if g.get_setting("reuselanguageinvoker.status") == "Enabled" else False)
+
 while not monitor.abortRequested():
     try:
         if g.get_bool_setting("general.checkAddonUpdates"):

@@ -413,7 +413,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             self.execute_sql(
                 """select s.season_count, s.episode_count as show_episode_count, 
         se.episode_count, se.is_airing, a.absoluteNumber from episodes as e INNER JOIN seasons as se on se.trakt_id = 
-        e.trakt_season_id and se.season > 0 INNER JOIN shows as s on s.trakt_id = e.trakt_show_id INNER JOIN 
+        e.trakt_season_id INNER JOIN shows as s on s.trakt_id = e.trakt_show_id INNER JOIN 
         (select e.trakt_show_id, count(distinct e.trakt_id) as absoluteNumber from episodes as e inner join 
         (select e.trakt_show_id, (e.season*10 + e.number) as identifier from episodes as e where e.trakt_id = ?) as 
         agg on agg.trakt_show_id = e.trakt_show_id and agg.identifier >= (e.season*10 + number) group by 

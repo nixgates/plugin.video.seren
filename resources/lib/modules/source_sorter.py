@@ -182,7 +182,7 @@ class SourceSorter:
                 )
 
             for file in self.hoster_list:
-                if "debrid_provider" not in file and file["quality"] == resolution:
+                if "debrid_provider" not in file and file["quality"] == resolution and file.get("direct"):
                     sorted_list.append(file)
 
         sorted_list += self._stacked_for_loops_filter(
@@ -204,7 +204,7 @@ class SourceSorter:
                 )
 
             for file in self.hoster_list:
-                if "debrid_provider" not in file and file["quality"] == resolution:
+                if "debrid_provider" not in file and file["quality"] == resolution and file.get("direct"):
                     sorted_list.append(file)
 
         return sorted_list

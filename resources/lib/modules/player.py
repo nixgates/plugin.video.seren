@@ -198,7 +198,6 @@ class SerenPlayer(xbmc.Player):
         :return: Path to file
         :rtype: str/None
         """
-        g.log("123")
         if self.isPlaying():
             try:
                 return xbmc.Player().getPlayingFile()
@@ -552,7 +551,6 @@ class SerenPlayer(xbmc.Player):
 
     def _keep_alive(self):
         for i in range(0, 480):
-            g.log("waiting")
             self._running_path = self.getPlayingFile()
             if self._is_file_playing() or self._playback_has_stopped():
                 break
