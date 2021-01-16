@@ -200,26 +200,31 @@ def account_premium_status_checks():
                 set_settings_status(service[2], False)
 
 
-def toggle_reuselanguageinvoker():
+def toggle_reuselanguageinvoker(forced_state=None):
+
+    def _store_and_reload(output):
+        with open(file_path, "w+") as addon_xml:
+            addon_xml.writelines(output)
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30572))
+        g.reload_profile()
+
     file_path = os.path.join(g.ADDON_DATA_PATH, "addon.xml")
 
     with open(file_path, "r") as addon_xml:
         file_lines = addon_xml.readlines()
 
     for i in range(len(file_lines)):
+        line_string = file_lines[i]
         if "reuselanguageinvoker" in file_lines[i]:
-            if "false" in file_lines[i]:
+            if ("false" in line_string and forced_state is None) or ("false" in line_string and forced_state):
                 file_lines[i] = file_lines[i].replace("false", "true")
                 g.set_setting("reuselanguageinvoker.status", "Enabled")
-            else:
+                _store_and_reload(file_lines)
+            elif ("true" in line_string and forced_state is None) or ("true" in line_string and forced_state is False):
                 file_lines[i] = file_lines[i].replace("true", "false")
                 g.set_setting("reuselanguageinvoker.status", "Disabled")
+                _store_and_reload(file_lines)
             break
-
-    with open(file_path, "w+") as addon_xml:
-        addon_xml.writelines(file_lines)
-    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30572))
-    g.reload_profile()
 
 
 # def clean_deprecated_settings():

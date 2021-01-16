@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, unicode_literals
 import inspect
 import threading
 import time
+import re
 from collections import OrderedDict
 from functools import wraps
 
@@ -195,8 +196,8 @@ class TraktAPI(ApiBase):
     ApiUrl = "https://api.trakt.tv/"
     session = requests.Session()
     retries = Retry(
-        total=10,
-        backoff_factor=0.2,
+        total=4,
+        backoff_factor=0.3,
         status_forcelist=[429, 500, 503, 504, 520, 521, 522, 524],
     )
     session.mount("https://", HTTPAdapter(max_retries=retries))
@@ -568,12 +569,13 @@ class TraktAPI(ApiBase):
         :param params: URL params for request
         :return: request response
         """
+        timeout = params.pop("timeout", 10)
         self._try_add_default_paging(params)
         return self.session.get(
             tools.urljoin(self.ApiUrl, url),
             params=params,
             headers=self._get_headers(),
-            timeout=10,
+            timeout=timeout,
         )
 
     def _try_add_default_paging(self, params):
@@ -828,7 +830,8 @@ class TraktAPI(ApiBase):
 
     @staticmethod
     def _title_sorter(item):
-        title = item[item["type"]].get("title", "").lower()
+        title = re.sub(r"^a |^the |^an ", "", item[item["type"]].get("title", "").lower())
+
         for i in tools.SORT_TOKENS:
             title.replace(i, "")
         return title

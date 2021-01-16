@@ -464,7 +464,7 @@
         <setting type="lsep" label="30573"/>
         <setting type="sep"/>
         <setting id="reuselanguageinvoker.status" label="30574" type="text" default="Enabled" enable="false"/>
-        <setting id="reuselanguageinvoker.toggle" label="30575" type="action"
+        <setting id="reuselanguageinvoker.toggle" label="30575" type="action" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=toggleLanguageInvoker)"/>
 
     </category>

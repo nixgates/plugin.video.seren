@@ -402,7 +402,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self.execute_sql("DELETE FROM bookmarks WHERE type=?", (bookmark_type[:-1],))
         base_sql_statement = "REPLACE INTO bookmarks VALUES (?, ?, ?, ?, ?)"
         for progress in self.trakt_api.get_all_pages_json(
-                "sync/playback/{}".format(bookmark_type), extended="full", limit=100
+                "sync/playback/{}".format(bookmark_type), extended="full", timeout=60
         ):
             if bookmark_type == "movies":
                 self.execute_sql(

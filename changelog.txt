@@ -1,3 +1,16 @@
+Changelog 2.0.13
+Fixed settings not sticking when using reuselanguageinvoker
+Fixed reuselanguageinvoke status not sticking after toggling
+Reuselangugageinvoker state now forced on startup
+Reduced Trakt retries on server failures
+Increased backoff timeout for retries
+Fixed playback for special episodes failing
+Eased timeout issues for bookmarks
+Fixed non-direct, non-debrid hosters appearing in source select
+Fix spanish translation file name
+Fixed title sorting for lists with articles
+Fixed paging on new shows
+
 Changelog 2.0.12
 Fix for source select, tested on 4 skins
 

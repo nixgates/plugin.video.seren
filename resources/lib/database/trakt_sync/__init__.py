@@ -560,7 +560,7 @@ class TraktSyncDatabase(Database):
             return result
 
     def insert_trakt_movies(self, movies):
-        g.log("Inserting Movies into sync database: {}".format([i.get("trakt_id") for i in movies]))
+        g.log("Inserting Movies into sync database: {}".format(len(movies)))
         get = MetadataHandler.get_trakt_info
         self.execute_sql(
             self.upsert_movie_query,
@@ -588,7 +588,7 @@ class TraktSyncDatabase(Database):
         self.save_to_meta_table(movies, "movies", "trakt", "trakt_id")
 
     def insert_trakt_shows(self, shows):
-        g.log("Inserting Shows into sync database: {}".format([i.get("trakt_id") for i in shows]))
+        g.log("Inserting Shows into sync database: {}".format(len(shows)))
         get = MetadataHandler.get_trakt_info
         self.execute_sql(
             self.upsert_show_query,
@@ -616,7 +616,7 @@ class TraktSyncDatabase(Database):
         self.save_to_meta_table(shows, "shows", "trakt", "trakt_id")
 
     def insert_trakt_episodes(self, episodes):
-        g.log("Inserting episodes into sync database: {}".format([i.get("trakt_id") for i in episodes]))
+        g.log("Inserting episodes into sync database: {}".format(len(episodes)))
         get = MetadataHandler.get_trakt_info
         self.execute_sql(
             self.upsert_episode_query,
@@ -649,7 +649,7 @@ class TraktSyncDatabase(Database):
         self.save_to_meta_table(episodes, "episodes", "trakt", "trakt_id")
 
     def insert_trakt_seasons(self, seasons):
-        g.log("Inserting seasons into sync database: {}".format([i.get("trakt_id") for i in seasons]))
+        g.log("Inserting seasons into sync database: {}".format(len(seasons)))
         get = MetadataHandler.get_trakt_info
         self.execute_sql(
             self.upsert_season_query,
