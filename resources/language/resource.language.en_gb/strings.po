@@ -3202,3 +3202,11 @@ msgctxt "#30578"
 msgid "Invalid Trakt API keys, your authentication has been reset.\nPlease re-auth your Trakt account."
 msgstr "Invalid Trakt API keys, your authentication has been reset.\nPlease re-auth your Trakt account."
 
+msgctxt "#40233"
+msgid "Debrid"
+msgstr ""
+
+msgctxt "#40235"
+msgid "Provider"
+msgstr ""
+
