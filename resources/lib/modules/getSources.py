@@ -209,7 +209,6 @@ class Sources(object):
         monkey_requests.allow_provider_requests = False
         self._send_provider_stop_event()
 
-        self._debrid_hoster_duplicates()
         uncached = [i for i in self.sources_information["allTorrents"].values()
                     if i['hash'] not in self.sources_information['cached_hashes']]
 
@@ -221,8 +220,8 @@ class Sources(object):
             return uncached, [], self.item_information
 
         sorted_sources = SourceSorter(self.media_type).sort_sources(
-            self.sources_information["torrentCacheSources"].values(),
-            self.sources_information['hosterSources'].values(),
+            list(self.sources_information["torrentCacheSources"].values()),
+            list(self.sources_information['hosterSources'].values()),
             self.sources_information['cloudFiles'])
         sorted_sources = self.sources_information['adaptiveSources'] + sorted_sources
         return uncached, sorted_sources, self.item_information
@@ -230,7 +229,10 @@ class Sources(object):
     def _get_imdb_info(self):
         if self.media_type == 'movie':
             # Confirm movie year against IMDb's information
-            resp = self._imdb_suggestions(self.item_information['info']['imdb_id'])
+            imdb_id = self.item_information["info"].get("imdb_id")
+            if imdb_id is None:
+                return
+            resp = self._imdb_suggestions(imdb_id)
             year = resp.get('y', self.item_information['info']['year'])
             # title = resp['l']
             # if title != self.item_information['info']['title']:
@@ -654,16 +656,11 @@ class Sources(object):
                 source['provider'] = source.get('provider_name_override', provider_name.upper())
 
             sources1 = [i for i in sources for host in self.host_domains if host in i['url']]
-            sources2 = [i for i in sources if i['source'].lower() in self.host_names or i['direct']]
+            sources2 = [i for i in sources if i['source'].lower() not in self.host_names and i['direct']]
 
             sources = sources1 + sources2
 
-            for hoster in sources:
-                try:
-                    self.sources_information["hosterSources"].update({str(hoster['url']): hoster})
-                except AttributeError:
-                    break
-
+            self._debrid_hoster_duplicates(sources)
             self._exit_thread(provider_name)
 
         finally:
@@ -811,18 +808,14 @@ class Sources(object):
             host_dict = self.hoster_domains['free']
             return host_dict, hostpr_dict
 
-    def _debrid_hoster_duplicates(self):
-        if len(self.sources_information["hosterSources"]) == 0:
-            return
-
+    def _debrid_hoster_duplicates(self, sources):
         updated_sources = {}
         for provider in self.hoster_domains['premium'].keys():
-            hoster_sources = copy.deepcopy(self.sources_information["hosterSources"]).values()
             for hoster in self.hoster_domains['premium'][provider]:
-                for file in hoster_sources:
-                    if hoster[1].lower() == file['source'].lower() or hoster[0].lower() in str(file['url']).lower():
-                        file['debrid_provider'] = provider
-                        updated_sources.update({provider: file})
+                for source in sources:
+                    if hoster[1].lower() == source['source'].lower() or hoster[0].lower() in str(source['url']).lower():
+                        source['debrid_provider'] = provider
+                        updated_sources.update({"{}_{}".format(provider, source["url"].lower()): source})
         self.sources_information["hosterSources"].update(updated_sources)
 
     def _get_pre_term_min(self):
@@ -833,7 +826,7 @@ class Sources(object):
         return prem_min
 
     def _get_sources_by_resolution(self, resolutions, source_type):
-        return [i for i in self.sources_information[source_type].values()
+        return [i for i in list(self.sources_information[source_type].values())
                 if i and
                 'quality' in i and
                 any(i['quality'].lower() == r.lower() for r in resolutions)]

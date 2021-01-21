@@ -56,7 +56,7 @@ class ResolverWindow(BaseWindow):
         self.setProperty("debrid_provider", debrid_provider)
         self.setProperty("source_provider", source["provider"])
         self.setProperty("source_resolution", source["quality"])
-        self.setProperty("source_info", " ".join(source["info"]))
+        self.setProperty("source_info", " ".join(source["info"] + [tools.source_size_display(source["size"])]))
         self.setProperty("source_type", source["type"])
 
     def doModal(self, sources=None, item_information=None, pack_select=False):

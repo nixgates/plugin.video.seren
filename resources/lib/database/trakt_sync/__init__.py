@@ -291,7 +291,7 @@ class TraktSyncDatabase(Database):
         # You will need to update the below version number to match the new addon version
         # This will ensure that the metadata required for operations is available
 
-        self.last_meta_update = "2.0.0"
+        self.last_meta_update = "2.0.14"
         if self.activities is None:
             self.clear_all_meta(False)
             self.set_base_activities()
@@ -339,7 +339,7 @@ class TraktSyncDatabase(Database):
 
     @staticmethod
     def _get_datetime_now():
-        return datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        return datetime.datetime.utcnow().strftime(g.DATE_TIME_FORMAT)
 
     def refresh_activities(self):
         self.activities = self.execute_sql(
@@ -877,8 +877,8 @@ class TraktSyncDatabase(Database):
     @staticmethod
     def requires_update(new_date, old_date):
         if tools.parse_datetime(
-            new_date, tools.DATE_FORMAT, False
-        ) > tools.parse_datetime(old_date, "%Y-%m-%dT%H:%M:%S", False):
+            new_date, g.DATE_TIME_FORMAT_ZULU, False
+        ) > tools.parse_datetime(old_date, g.DATE_TIME_FORMAT, False):
             return True
         else:
             return False

@@ -73,9 +73,9 @@ msgstr "Box Office Top 10"
 
 #: \resources\lib\gui\homeMenu.py:29 \resources\lib\gui\movieMenus.py:144
 #: \resources\lib\gui\movieMenus.py:150 \resources\lib\gui\movieMenus.py:282
-#: \resources\lib\gui\movieMenus.py:341 \resources\lib\gui\tvshowMenus.py:152
+#: \resources\lib\gui\movieMenus.py:344 \resources\lib\gui\tvshowMenus.py:152
 #: \resources\lib\gui\tvshowMenus.py:158 \resources\lib\gui\tvshowMenus.py:391
-#: \resources\lib\gui\tvshowMenus.py:423
+#: \resources\lib\gui\tvshowMenus.py:426
 msgctxt "#30013"
 msgid "Search..."
 msgstr "Søg..."
@@ -95,7 +95,7 @@ msgctxt "#30016"
 msgid "Next"
 msgstr "Næste"
 
-#: \resources\lib\modules\globals.py:680
+#: \resources\lib\modules\globals.py:708
 msgctxt "#30017"
 msgid "Color Picker"
 msgstr "Farve Vælger"
@@ -108,7 +108,7 @@ msgstr "Real-Debrid Auth"
 #: \resources\lib\debrid\all_debrid.py:119
 #: \resources\lib\debrid\premiumize.py:62
 #: \resources\lib\debrid\real_debrid.py:86
-#: \resources\lib\indexers\trakt.py:439
+#: \resources\lib\indexers\trakt.py:432
 msgctxt "#30019"
 msgid "Open this link in a browser: {}"
 msgstr "Åbn dette link i en browser: {}"
@@ -116,7 +116,7 @@ msgstr "Åbn dette link i en browser: {}"
 #: \resources\lib\debrid\all_debrid.py:122
 #: \resources\lib\debrid\premiumize.py:65
 #: \resources\lib\debrid\real_debrid.py:89
-#: \resources\lib\indexers\trakt.py:442
+#: \resources\lib\indexers\trakt.py:435
 msgctxt "#30020"
 msgid "Enter the code: {}"
 msgstr "Indtast koden: {}"
@@ -128,17 +128,17 @@ msgctxt "#30021"
 msgid "Authentication is completed"
 msgstr "Autentificering er afsluttet"
 
-#: \resources\lib\indexers\trakt.py:412
+#: \resources\lib\indexers\trakt.py:405
 msgctxt "#30022"
 msgid "Trakt Successfully Disconnected"
 msgstr "Trakt Blev Succesfuldt Afbrudt"
 
-#: \resources\lib\indexers\trakt.py:437
+#: \resources\lib\indexers\trakt.py:430
 msgctxt "#30023"
 msgid "Authorize Trakt"
 msgstr "Autoriser Trakt"
 
-#: \resources\lib\indexers\trakt.py:432 \resources\lib\indexers\trakt.py:498
+#: \resources\lib\indexers\trakt.py:425 \resources\lib\indexers\trakt.py:491
 msgctxt "#30024"
 msgid ""
 "Error while authenticating with Trakt.\n"
@@ -148,8 +148,8 @@ msgstr ""
 "Prøv venligst igen."
 
 #: \resources\lib\debrid\all_debrid.py:47
-#: \resources\lib\indexers\fanarttv.py:31 \resources\lib\indexers\omdb.py:67
-#: \resources\lib\indexers\tmdb.py:53 \resources\lib\indexers\trakt.py:90
+#: \resources\lib\indexers\fanarttv.py:31 \resources\lib\indexers\omdb.py:63
+#: \resources\lib\indexers\tmdb.py:53 \resources\lib\indexers\trakt.py:89
 #: \resources\lib\indexers\tvdb.py:57
 msgctxt "#30025"
 msgid "Unknown Error Connecting to {}"
@@ -176,12 +176,12 @@ msgctxt "#30029"
 msgid "Clear Cache"
 msgstr "Ryd Cache"
 
-#: \resources\lib\modules\globals.py:813
+#: \resources\lib\modules\globals.py:841
 msgctxt "#30030"
 msgid "Are you sure you wish to clear the cache?"
 msgstr "Er du sikker på, at du ønsker at rydde cachen?"
 
-#: \resources\lib\modules\helpers.py:73
+#: \resources\lib\modules\helpers.py:74
 msgctxt "#30031"
 msgid "Starting Engines"
 msgstr "Starter Motorer"
@@ -192,7 +192,7 @@ msgid "Starting Resolver..."
 msgstr "Starter Resolver..."
 
 #: \resources\lib\gui\windows\source_select.py:129
-#: \resources\lib\modules\helpers.py:58 \resources\lib\modules\router.py:178
+#: \resources\lib\modules\helpers.py:59 \resources\lib\modules\router.py:178
 #: \resources\lib\modules\sourceSelect.py:27
 msgctxt "#30033"
 msgid "No playable sources found for item"
@@ -203,7 +203,7 @@ msgctxt "#30034"
 msgid "Silent Scraper Setting has been reset"
 msgstr "Lydløs Scraper Indstilling er nulstillet"
 
-#: \resources\lib\common\maintenance.py:113
+#: \resources\lib\common\maintenance.py:112
 msgctxt "#30035"
 msgid ""
 "Please be aware this will completely wipe the following:\n"
@@ -212,12 +212,12 @@ msgstr ""
 "Vær opmærksom på, at dette vil rydde følgende permanent: Cached "
 "Data,Indstillinger, Installerede Udbydere\n"
 
-#: \resources\lib\common\maintenance.py:114
+#: \resources\lib\common\maintenance.py:113
 msgctxt "#30036"
 msgid "ARE YOU SURE?"
 msgstr "ER DU SIKKER?"
 
-#: \resources\lib\common\maintenance.py:182
+#: \resources\lib\common\maintenance.py:181
 msgctxt "#30037"
 msgid "Your Real-Debrid Premium status has expired"
 msgstr "Din Real-Debrid Premium-status er udløbet"
@@ -262,7 +262,7 @@ msgctxt "#30045"
 msgid "My Movie Lists"
 msgstr "Mine Film Lister"
 
-#: \resources\lib\gui\movieMenus.py:365 \resources\lib\gui\tvshowMenus.py:459
+#: \resources\lib\gui\movieMenus.py:368 \resources\lib\gui\tvshowMenus.py:462
 msgctxt "#30046"
 msgid "Multi Select..."
 msgstr "Vælg Flere..."
@@ -275,7 +275,7 @@ msgstr "Nye TV Serier"
 #: \resources\lib\debrid\all_debrid.py:123
 #: \resources\lib\debrid\premiumize.py:68
 #: \resources\lib\debrid\real_debrid.py:92
-#: \resources\lib\indexers\trakt.py:443
+#: \resources\lib\indexers\trakt.py:436
 msgctxt "#30048"
 msgid "This code has been copied to your clipboard"
 msgstr "Denne kode er blevet kopieret til dit udklipsholder"
@@ -300,7 +300,7 @@ msgctxt "#30052"
 msgid "successfully uninstalled"
 msgstr "afinstalleret"
 
-#: \resources\lib\modules\globals.py:820
+#: \resources\lib\modules\globals.py:848
 msgctxt "#30053"
 msgid "All Cache Successfully Cleared"
 msgstr "Al Cache Er Ryddet"
@@ -355,7 +355,7 @@ msgctxt "#30061"
 msgid "Remaining Providers"
 msgstr "Resterende Udbydere"
 
-#: \resources\lib\modules\smartPlay.py:429
+#: \resources\lib\modules\smartPlay.py:427
 msgctxt "#30062"
 msgid "Resume From: "
 msgstr "Genoptag Fra: "
@@ -371,18 +371,18 @@ msgid "Identifying Resume Point"
 msgstr "Identificering af Genoptagelsespunkt"
 
 #: \resources\lib\modules\smartPlay.py:75
-#: \resources\lib\modules\smartPlay.py:250
+#: \resources\lib\modules\smartPlay.py:248
 msgctxt "#30065"
 msgid "Building Playlist"
 msgstr "Bygger Afspilningsliste"
 
 #: \resources\lib\modules\smartPlay.py:77
-#: \resources\lib\modules\smartPlay.py:258
+#: \resources\lib\modules\smartPlay.py:256
 msgctxt "#30066"
 msgid "Building List Items"
 msgstr "Bygger Liste Punkter"
 
-#: \resources\lib\modules\smartPlay.py:276
+#: \resources\lib\modules\smartPlay.py:274
 msgctxt "#30067"
 msgid "Starting Scraping"
 msgstr "Begynder Scraping"
@@ -491,7 +491,7 @@ msgctxt "#30085"
 msgid "Checking for available package updates"
 msgstr "Tjekker for tilgængelige pakke opdateringer"
 
-#: \resources\lib\common\maintenance.py:107
+#: \resources\lib\common\maintenance.py:106
 msgctxt "#30086"
 msgid ""
 "This will completely wipe your addon settings.\n"
@@ -963,7 +963,7 @@ msgctxt "#30177"
 msgid "Enable search history"
 msgstr "Aktivér søgehistorik"
 
-#: \resources\lib\indexers\trakt.py:422
+#: \resources\lib\indexers\trakt.py:415
 msgctxt "#30178"
 msgid ""
 "Unable to contact Trakt.\n"
@@ -1078,7 +1078,7 @@ msgctxt "#30196"
 msgid "Auto Select Delay"
 msgstr "Auto Select Delay"
 
-#: \resources\lib\database\trakt_sync\activities.py:155
+#: \resources\lib\database\trakt_sync\activities.py:159
 msgctxt "#30197"
 msgid "Rebuilding Trakt Sync Database, please be patient"
 msgstr "Genopbygning af Trakt Sync-databasen, vær tålmodig"
@@ -1088,7 +1088,7 @@ msgctxt "#30198"
 msgid "Starting Source Select"
 msgstr "Startkildevalg"
 
-#: \resources\lib\common\maintenance.py:68
+#: \resources\lib\common\maintenance.py:67
 msgctxt "#30199"
 msgid ""
 "A new verison of Seren is available from the repository. Please consider "
@@ -1543,7 +1543,7 @@ msgctxt "#30277"
 msgid "Source type"
 msgstr "Kilde type"
 
-#: \resources\lib\common\maintenance.py:86
+#: \resources\lib\common\maintenance.py:85
 msgctxt "#30278"
 msgid "One or more providers have updates pending"
 msgstr "En eller flere udbydere har afventede opdateringer"
@@ -1612,7 +1612,7 @@ msgstr "TV show"
 #: \resources\settings.xml:136 \resources\settings.xml:139
 #: \resources\settings.xml:142 \resources\settings.xml:145
 #: \resources\settings.xml:148 \resources\settings.xml:151
-#: \resources\settings.xml:154 \resources\lib\indexers\trakt.py:749
+#: \resources\settings.xml:154 \resources\lib\indexers\trakt.py:742
 msgctxt "#30290"
 msgid "Movie"
 msgstr "Film"
@@ -1662,156 +1662,156 @@ msgctxt "#30299"
 msgid "Database has been rebuilt"
 msgstr "Databasen er blevet genopbygget"
 
-#: \resources\lib\indexers\trakt.py:478
+#: \resources\lib\indexers\trakt.py:471
 msgctxt "#30300"
 msgid "Sucessfully authenticated with Trakt"
 msgstr "Godkendt godkendelse med Trakt"
 
-#: \resources\lib\indexers\trakt.py:994 \resources\lib\indexers\trakt.py:1079
-#: \resources\lib\indexers\trakt.py:1094
+#: \resources\lib\indexers\trakt.py:967 \resources\lib\indexers\trakt.py:1052
+#: \resources\lib\indexers\trakt.py:1067
 msgctxt "#30301"
 msgid "Add {} to Collection"
 msgstr "Føj {} til samling"
 
-#: \resources\lib\indexers\trakt.py:998 \resources\lib\indexers\trakt.py:1075
-#: \resources\lib\indexers\trakt.py:1090
+#: \resources\lib\indexers\trakt.py:971 \resources\lib\indexers\trakt.py:1048
+#: \resources\lib\indexers\trakt.py:1063
 msgctxt "#30302"
 msgid "Remove {} from Collection"
 msgstr "Fjern {} fra samlingen"
 
-#: \resources\lib\indexers\trakt.py:1002 \resources\lib\indexers\trakt.py:1054
+#: \resources\lib\indexers\trakt.py:975 \resources\lib\indexers\trakt.py:1027
 msgctxt "#30303"
 msgid "Add to Watchlist"
 msgstr "Tilføj til overvågningsliste"
 
-#: \resources\lib\indexers\trakt.py:1006 \resources\lib\indexers\trakt.py:1055
+#: \resources\lib\indexers\trakt.py:979 \resources\lib\indexers\trakt.py:1028
 msgctxt "#30304"
 msgid "Remove from Watchlist"
 msgstr "Remove from Watchlist"
 
-#: \resources\lib\indexers\trakt.py:1010 \resources\lib\indexers\trakt.py:1102
-#: \resources\lib\indexers\trakt.py:1105
+#: \resources\lib\indexers\trakt.py:983 \resources\lib\indexers\trakt.py:1075
+#: \resources\lib\indexers\trakt.py:1078
 msgctxt "#30305"
 msgid "Mark as Watched"
 msgstr "Markér som overvåget"
 
-#: \resources\lib\indexers\trakt.py:1014 \resources\lib\indexers\trakt.py:1100
-#: \resources\lib\indexers\trakt.py:1107
+#: \resources\lib\indexers\trakt.py:987 \resources\lib\indexers\trakt.py:1073
+#: \resources\lib\indexers\trakt.py:1080
 msgctxt "#30306"
 msgid "Mark as Unwatched"
 msgstr "Marker som uovervåget"
 
-#: \resources\lib\indexers\trakt.py:972 \resources\lib\indexers\trakt.py:1018
+#: \resources\lib\indexers\trakt.py:945 \resources\lib\indexers\trakt.py:991
 msgctxt "#30307"
 msgid "Add to List"
 msgstr "Tilføj til liste"
 
-#: \resources\lib\indexers\trakt.py:973 \resources\lib\indexers\trakt.py:1022
+#: \resources\lib\indexers\trakt.py:946 \resources\lib\indexers\trakt.py:995
 msgctxt "#30308"
 msgid "Remove From List"
 msgstr "Fjern fra liste"
 
-#: \resources\lib\indexers\trakt.py:974 \resources\lib\indexers\trakt.py:1026
+#: \resources\lib\indexers\trakt.py:947 \resources\lib\indexers\trakt.py:999
 msgctxt "#30309"
 msgid "Hide {}"
 msgstr "Skjul {}"
 
-#: \resources\lib\indexers\trakt.py:975 \resources\lib\indexers\trakt.py:1030
+#: \resources\lib\indexers\trakt.py:948 \resources\lib\indexers\trakt.py:1003
 msgctxt "#30310"
 msgid "Refresh Item Metadata"
 msgstr "Opdater metadata for varen"
 
-#: \resources\lib\indexers\trakt.py:1034 \resources\lib\indexers\trakt.py:1064
+#: \resources\lib\indexers\trakt.py:1007 \resources\lib\indexers\trakt.py:1037
 msgctxt "#30311"
 msgid "Remove Playback Progress"
 msgstr "Fjern afspilningsforløb"
 
-#: \resources\lib\indexers\trakt.py:751
+#: \resources\lib\indexers\trakt.py:744
 msgctxt "#30312"
 msgid "Show"
 msgstr "Vis"
 
-#: \resources\lib\indexers\trakt.py:984 \resources\lib\indexers\trakt.py:1130
-#: \resources\lib\indexers\trakt.py:1144 \resources\lib\indexers\trakt.py:1206
-#: \resources\lib\indexers\trakt.py:1248 \resources\lib\indexers\trakt.py:1269
-#: \resources\lib\indexers\trakt.py:1292 \resources\lib\indexers\trakt.py:1300
-#: \resources\lib\indexers\trakt.py:1311 \resources\lib\indexers\trakt.py:1333
-#: \resources\lib\indexers\trakt.py:1356
+#: \resources\lib\indexers\trakt.py:957 \resources\lib\indexers\trakt.py:1103
+#: \resources\lib\indexers\trakt.py:1117 \resources\lib\indexers\trakt.py:1179
+#: \resources\lib\indexers\trakt.py:1221 \resources\lib\indexers\trakt.py:1242
+#: \resources\lib\indexers\trakt.py:1265 \resources\lib\indexers\trakt.py:1273
+#: \resources\lib\indexers\trakt.py:1284 \resources\lib\indexers\trakt.py:1306
+#: \resources\lib\indexers\trakt.py:1329
 msgctxt "#30313"
 msgid "Trakt manager"
 msgstr "Trakt manager"
 
-#: \resources\lib\indexers\trakt.py:1131 \resources\lib\indexers\trakt.py:1145
+#: \resources\lib\indexers\trakt.py:1104 \resources\lib\indexers\trakt.py:1118
 msgctxt "#30314"
 msgid "Failed to update status, please check the log"
 msgstr "Kunne ikke opdatere status. Kontroller loggen"
 
-#: \resources\lib\indexers\trakt.py:1207
+#: \resources\lib\indexers\trakt.py:1180
 msgctxt "#30315"
 msgid "Item marked as watched"
 msgstr "Element markeret som overvåget"
 
-#: \resources\lib\indexers\trakt.py:1249
+#: \resources\lib\indexers\trakt.py:1222
 msgctxt "#30316"
 msgid "Item marked as unwatched"
 msgstr "Varen er markeret som ikke sendt"
 
-#: \resources\lib\indexers\trakt.py:1270
+#: \resources\lib\indexers\trakt.py:1243
 msgctxt "#30317"
 msgid "Item added to Collection"
 msgstr "Vare føjet til samling"
 
-#: \resources\lib\indexers\trakt.py:1293
+#: \resources\lib\indexers\trakt.py:1266
 msgctxt "#30318"
 msgid "Item removed from Collection"
 msgstr "Element fjernet fra samlingen"
 
-#: \resources\lib\indexers\trakt.py:1301
+#: \resources\lib\indexers\trakt.py:1274
 msgctxt "#30319"
 msgid "Item added to Watchlist"
 msgstr "Elementet er tilføjet til overvågningslisten"
 
-#: \resources\lib\indexers\trakt.py:1312
+#: \resources\lib\indexers\trakt.py:1285
 msgctxt "#30320"
 msgid "Item removed from Watchlist"
 msgstr "Element fjernet fra overvågningslisten"
 
-#: \resources\lib\indexers\trakt.py:1334
+#: \resources\lib\indexers\trakt.py:1307
 msgctxt "#30321"
 msgid "Item added to {}"
 msgstr "Vare tilføjet til {}"
 
-#: \resources\lib\indexers\trakt.py:1357
+#: \resources\lib\indexers\trakt.py:1330
 msgctxt "#30322"
 msgid "Item removed from {}"
 msgstr "Element fjernet fra {}"
 
-#: \resources\lib\indexers\trakt.py:1321 \resources\lib\indexers\trakt.py:1343
+#: \resources\lib\indexers\trakt.py:1294 \resources\lib\indexers\trakt.py:1316
 msgctxt "#30323"
 msgid "Select a list"
 msgstr "Vælg list"
 
-#: \resources\lib\indexers\trakt.py:1364
+#: \resources\lib\indexers\trakt.py:1337
 msgctxt "#30324"
 msgid "Watched Progress"
 msgstr "Så fremskridt"
 
-#: \resources\lib\indexers\trakt.py:1364
+#: \resources\lib\indexers\trakt.py:1337
 msgctxt "#30325"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: \resources\lib\indexers\trakt.py:1366
+#: \resources\lib\indexers\trakt.py:1339
 msgctxt "#30326"
 msgid "Select Menu type to hide from"
 msgstr "Vælg menytype for at skjule fra"
 
-#: \resources\lib\indexers\trakt.py:1391
+#: \resources\lib\indexers\trakt.py:1364
 msgctxt "#30327"
 msgid "Item has been hidden from your {}"
 msgstr "Varen er blevet skjult for din {}"
 
-#: \resources\lib\indexers\trakt.py:1425
+#: \resources\lib\indexers\trakt.py:1398
 msgctxt "#30328"
 msgid "Item's Progress History has been removed"
 msgstr "Elementets fremskridtshistorie er blevet fjernet"
@@ -1821,27 +1821,27 @@ msgctxt "#30329"
 msgid "Silent scrape"
 msgstr "Støj skrabe"
 
-#: \resources\lib\gui\movieMenus.py:388 \resources\lib\gui\tvshowMenus.py:486
+#: \resources\lib\gui\movieMenus.py:391 \resources\lib\gui\tvshowMenus.py:489
 msgctxt "#30330"
 msgid "Genre Selection"
 msgstr "Genrevalg"
 
-#: \resources\lib\modules\zip_manager.py:48
+#: \resources\lib\modules\zip_manager.py:53
 msgctxt "#30331"
 msgid "Browse..."
 msgstr "Gennemse..."
 
-#: \resources\lib\modules\zip_manager.py:48
+#: \resources\lib\modules\zip_manager.py:53
 msgctxt "#30332"
 msgid "Web Location..."
 msgstr "Webplacering ..."
 
-#: \resources\lib\modules\zip_manager.py:61
+#: \resources\lib\modules\zip_manager.py:66
 msgctxt "#30333"
 msgid "Locate {} Zip"
 msgstr "Find {} Zip"
 
-#: \resources\lib\modules\zip_manager.py:69
+#: \resources\lib\modules\zip_manager.py:74
 msgctxt "#30334"
 msgid "Enter Zip URL"
 msgstr "Indtast zip-URL"
@@ -1985,7 +1985,7 @@ msgctxt "#30361"
 msgid "Do not resume"
 msgstr "Må ikke genstartes"
 
-#: \resources\lib\modules\smartPlay.py:432
+#: \resources\lib\modules\smartPlay.py:430
 msgctxt "#30362"
 msgid "Start From Beginning"
 msgstr "Start fra begyndelsen"
@@ -2048,7 +2048,7 @@ msgctxt "#30372"
 msgid "Authorise Premiumize"
 msgstr "Autoriser Premium"
 
-#: \resources\lib\indexers\trakt.py:125 \resources\lib\indexers\trakt.py:146
+#: \resources\lib\indexers\trakt.py:124 \resources\lib\indexers\trakt.py:145
 msgctxt "#30373"
 msgid ""
 "There appears to be a problem with your Trakt Authorization \n"
@@ -2654,7 +2654,7 @@ msgid "My recent watched episodes"
 msgstr "Mine nyligt sete episoder"
 
 #: \resources\lib\modules\getSources.py:376
-#: \resources\lib\modules\helpers.py:52
+#: \resources\lib\modules\helpers.py:53
 msgctxt "#30477"
 msgid ""
 "It seems you have no providers installed\n"
@@ -2817,7 +2817,7 @@ msgctxt "#30506"
 msgid "Adaptive"
 msgstr "Fleksibel"
 
-#: \resources\lib\indexers\trakt.py:71
+#: \resources\lib\indexers\trakt.py:70
 msgctxt "#30507"
 msgid ""
 "Trakt is currently not authorized\n"
@@ -2839,7 +2839,7 @@ msgctxt "#30509"
 msgid "Download"
 msgstr "Download"
 
-#: \resources\lib\modules\source_sorter.py:253
+#: \resources\lib\modules\source_sorter.py:256
 msgctxt "#30510"
 msgid ""
 "Your filters appear to be to restrictive for this item, would you like to "
@@ -2932,7 +2932,7 @@ msgstr ""
 "Der opstod et problem med at få accepterede hosterdomæner, dette kan medføre"
 " ulige skrabresultater"
 
-#: \resources\lib\modules\player.py:541
+#: \resources\lib\modules\player.py:546
 msgctxt "#30526"
 msgid ""
 "The last playing file was not marked as watched, would you like to do this "
@@ -3156,12 +3156,12 @@ msgctxt "#30568"
 msgid "Western"
 msgstr "Regionskommando Vest"
 
-#: \resources\lib\modules\metadataHandler.py:344
+#: \resources\lib\modules\metadataHandler.py:347
 msgctxt "#30569"
 msgid "Season {}"
 msgstr "Sæson {}"
 
-#: \resources\lib\modules\metadataHandler.py:346
+#: \resources\lib\modules\metadataHandler.py:349
 msgctxt "#30570"
 msgid "Episode {}"
 msgstr "episode {}"
@@ -3176,7 +3176,7 @@ msgstr ""
 "kan forårsage ustabilitet på nogle enheder&#10; Hvis du oplever nedbrud, kan"
 " du deaktivere denne indstilling i sektionen genveje"
 
-#: \resources\lib\common\maintenance.py:221
+#: \resources\lib\common\maintenance.py:220
 msgctxt "#30572"
 msgid "Language Invoker option has been changed, reloading kodi profile"
 msgstr ""

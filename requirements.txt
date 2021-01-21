@@ -20,3 +20,4 @@ kodistubs==19.0.1; python_version>="3.7"
 contextlib2; python_version<"3"
 requests-mock
 Mock
+tzlocal

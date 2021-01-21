@@ -1,3 +1,19 @@
+Changelog 2.0.14:
+Fixed scraping issue if title is not present at IMDB
+Added workarounds for syncing trakt database on xbox
+Fixed Trending/Popular Trakt lists repeating
+Seperated sort and pagination setting for Trakt collection
+Applied sort and pagination settings for collection to unfinished shows in collection
+Re-worked date handling to use UTC for all internal uses and convert to local on display
+Fixed pagination on recently watched shows menu
+Fixed source sorting issue for py3
+Fixed race condition in pre-term for py3
+File size now displayed on resolver dialog
+Updated some dutch translations
+Fixed hosters not being handled correctly at scrape
+Fix reuselanguageinvoker default
+Fixed background sync attempting to run when no Trakt auth present
+
 Changelog 2.0.13
 Fixed settings not sticking when using reuselanguageinvoker
 Fixed reuselanguageinvoke status not sticking after toggling

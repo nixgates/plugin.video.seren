@@ -56,18 +56,14 @@ class ListsHelper:
         self._create_list_menu(
             self.lists_database.extract_trakt_page('lists/trending',
                                                    media_type,
-                                                   page=g.PAGE,
-                                                   no_paging=True),
-            no_paging=True,
+                                                   page=g.PAGE),
             media_type=media_type)
 
     def popular_lists(self, media_type):
         self._create_list_menu(
             self.lists_database.extract_trakt_page('lists/popular',
                                                    media_type,
-                                                   page=g.PAGE,
-                                                   no_paging=True),
-            no_paging=True,
+                                                   page=g.PAGE),
             media_type=media_type)
 
     def _create_list_menu(self, trakt_lists, **params):

@@ -25,6 +25,7 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ElementTree
 
+
 viewTypes = [
     ("Default", 50),
     ("Poster", 51),
@@ -230,6 +231,13 @@ info_labels = [
     "dbid",
 ]
 
+info_dates = [
+    "premiered",
+    "aired",
+    "lastplayed",
+    "dateadded",
+]
+
 listitem_properties = [
     ("awards", "Awards"),
     ("oscar_wins", "Oscar_Wins"),
@@ -264,6 +272,16 @@ class GlobalVariables(object):
     CONTENT_EPISODE = "episodes"
     CONTENT_GENRES = "genres"
     CONTENT_YEARS = "years"
+    MEDIA_FOLDER = "file"
+    MEDIA_MOVIE = "movie"
+    MEDIA_SHOW = "tvshow"
+    MEDIA_SEASON = "season"
+    MEDIA_EPISODE = "episode"
+
+
+    DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+    DATE_TIME_FORMAT_ZULU = DATE_TIME_FORMAT + ".000Z"
+    DATE_FORMAT = "%Y-%m-%d"
 
     PYTHON3 = True if sys.version_info.major == 3 else False
 
@@ -639,7 +657,7 @@ class GlobalVariables(object):
         return self.decode_py2(text)
 
     def get_view_type(self, content_type):
-        view_type = 0
+        no_view_type = 0
 
         if not self.get_bool_setting("general.viewidswitch"):
             if content_type == self.CONTENT_FOLDER:
@@ -652,7 +670,7 @@ class GlobalVariables(object):
                 view_type = self.get_setting("episode.view")
             if content_type == self.CONTENT_SEASON:
                 view_type = self.get_setting("season.view")
-            if view_type > 0:
+            if view_type.isdigit() and int(view_type) > 0:
                 view_name, view_type = viewTypes[int(view_type)]
                 return view_type
         else:
@@ -666,11 +684,10 @@ class GlobalVariables(object):
                 view_type = self.get_setting("episode.view.id")
             if content_type == self.CONTENT_SEASON:
                 view_type = self.get_setting("season.view.id")
-            if view_type > 0:
-                view_type = int(view_type)
-                return view_type
+            if view_type.isdigit() and int(view_type) > 0:
+                return int(view_type)
 
-        return view_type
+        return no_view_type
 
     def log(self, msg, level="info"):
         msg = g.encode_py2(g.decode_py2(msg))
@@ -959,8 +976,9 @@ class GlobalVariables(object):
 
         item = xbmcgui.ListItem(label=name, offscreen=True)
         item.setContentLookup(False)
-        item.addStreamInfo("video", {})
+
         info = menu_item.pop("info", {})
+        item.addStreamInfo("video", {})
 
         if info is None or not isinstance(info, dict):
             info = {}
@@ -1071,6 +1089,13 @@ class GlobalVariables(object):
 
         # Clear out keys not relevant to Kodi info labels
         self.clean_info_keys(info)
+        media_type=info.get("mediatype", None)
+        # Only TV shows/seasons/episodes have associated times, movies just have dates.
+        g.log("Media type: {}".format(media_type), "debug")
+        if media_type in [g.MEDIA_SHOW, g.MEDIA_SEASON, g.MEDIA_EPISODE]:
+            # Convert dates to localtime for display
+            g.log("Converting TV Info Dates to local time for display", "debug")
+            self.convert_info_dates(info)
 
         item.setInfo("video", info)
 
@@ -1097,6 +1122,20 @@ class GlobalVariables(object):
         keys_to_remove = [i for i in info_dict.keys() if i not in info_labels]
         [info_dict.pop(key) for key in keys_to_remove]
 
+        return info_dict
+
+    @staticmethod
+    def convert_info_dates(info_dict):
+        if info_dict is None:
+            return None
+
+        if not isinstance(info_dict, dict):
+            return info_dict
+
+        dates_to_convert = [i for i in info_dict.keys() if i in info_dates]
+        converted_dates = {key: tools.utc_to_local(info_dict.get(key))
+                           for key in dates_to_convert if info_dict.get(key)}
+        info_dict.update(converted_dates)
         return info_dict
 
     def close_directory(self, content_type, sort=False, cache=False):

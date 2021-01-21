@@ -220,7 +220,12 @@ class Database(object):
                                 self._execute_query(data, connection.cursor(), i)
                                 for i in query
                                 ]
-                    return self._execute_query(data, connection.cursor(), query)
+                    if g.PLATFORM == "xbox":
+                        results = self._execute_query(data, connection.cursor(), query)
+                        connection.commit()
+                        return results
+                    else:
+                        return self._execute_query(data, connection.cursor(), query)
                 except sqlite3.OperationalError as error:
                     if "database is locked" in str(error):
                         g.log(
@@ -252,6 +257,15 @@ class Database(object):
 
     def create_temp_table(self, table_name, columns):
         return TempTable(self, table_name, columns)
+
+    @staticmethod
+    def chunkify_list_for_query(list_of_expressions):
+        chunked_list = []
+        while len(list_of_expressions) > 900:
+            chunked_list.append(list_of_expressions[:900])
+            del list_of_expressions[:900]
+        chunked_list.append(list_of_expressions)
+        return chunked_list
 
     # endregion
 

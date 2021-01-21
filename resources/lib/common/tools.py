@@ -14,7 +14,7 @@ import time
 import xbmc
 import xbmcvfs
 
-from resources.lib.third_party import pytz
+from resources.lib.third_party import pytz, tzlocal
 
 try:
     from urlparse import parse_qsl, parse_qs, unquote, urlparse, urljoin
@@ -69,7 +69,6 @@ except ImportError:
     mapping_type = collections.Mapping
 
 DIGIT_REGEX = re.compile(r"\d")
-DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.000Z"
 SORT_TOKENS = [
     "a ",
     "das ",
@@ -88,7 +87,6 @@ SORT_TOKENS = [
     "o ",
     "the ",
 ]
-
 
 def copy2clip(txt):
     """
@@ -562,18 +560,26 @@ def validate_date(date_string):
     :return:formatted datetime or none
     :rtype:str
     """
+    from resources.lib.modules.globals import g
+
     result = None
     if not date_string:
         return date_string
 
     try:
-        result = parse_datetime(date_string, "%Y-%m-%d", False)
+        result = parse_datetime(date_string, g.DATE_FORMAT, False)
     except ValueError:
         pass
 
     if not result:
         try:
-            result = parse_datetime(date_string, DATE_FORMAT, False)
+            result = parse_datetime(date_string, g.DATE_TIME_FORMAT_ZULU, False)
+        except ValueError:
+            pass
+
+    if not result:
+        try:
+            result = parse_datetime(date_string, g.DATE_TIME_FORMAT, False)
         except ValueError:
             pass
 
@@ -584,8 +590,34 @@ def validate_date(date_string):
             pass
 
     if result and result.year > 1900:
-        return result.strftime(DATE_FORMAT)
+        return result.strftime(g.DATE_TIME_FORMAT)
     return None
+
+
+def utc_to_local(utc_string):
+    """
+    Converts a UTC style datetime string to the localtimezone
+    :param utc_string: UTC datetime string
+    :return: localized datetime string
+    """
+    from resources.lib.modules.globals import g
+
+    if utc_string is None:
+        return None
+
+    utc_string = validate_date(utc_string)
+
+    if not utc_string:
+        return None
+
+    utc_timezone = pytz.timezone('UTC')
+    local_tz = tzlocal.get_localzone()  # If this fails we should get UTC back
+
+    utc = parse_datetime(utc_string, g.DATE_TIME_FORMAT, False)
+    utc = utc_timezone.localize(utc)
+    local_time = utc.astimezone(local_tz)
+    g.log("Original utc_string: {}  local_time: {}".format(utc_string, local_time.strftime(g.DATE_TIME_FORMAT)), "debug")
+    return local_time.strftime(g.DATE_TIME_FORMAT)
 
 
 def makedirs(name, mode=0o777, exist_ok=False):
@@ -660,10 +692,3 @@ def safe_dict_get(dictionary, *path):
     else:
         return dictionary.get(current_path)
 
-
-def local_timezone():
-    if time.daylight:
-        offsetHour = time.altzone / 3600
-    else:
-        offsetHour = time.timezone / 3600
-    return pytz.timezone('Etc/GMT%+d' % offsetHour)

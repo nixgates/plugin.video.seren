@@ -5,6 +5,7 @@ import datetime
 
 import xbmcplugin
 
+import resources.lib.modules.globals
 from resources.lib.common import tools
 from resources.lib.database.trakt_sync import movies, shows
 from resources.lib.modules.globals import g
@@ -201,10 +202,10 @@ class ListBuilder(object):
         if int(air_date[:4]) < 1970:
             return True
 
-        time_format = tools.DATE_FORMAT
+        time_format = g.DATE_TIME_FORMAT
 
         if len(air_date) == 10:
-            time_format = "%Y-%m-%d"
+            time_format = g.DATE_FORMAT
 
         if self.date_delay:
             air_date = tools.parse_datetime(air_date, time_format, False)
@@ -212,7 +213,7 @@ class ListBuilder(object):
         else:
             air_date = tools.parse_datetime(air_date, time_format, False)
 
-        if air_date >= datetime.datetime.now():
+        if air_date >= datetime.datetime.utcnow():
             return False
         else:
             return True

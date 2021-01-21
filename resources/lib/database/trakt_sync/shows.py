@@ -175,13 +175,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of show records
         :rtype: list
         """
-        paginate = g.get_bool_setting("general.paginatecollection")
 
         query = """select sm.id as trakt_id, sm.value as trakt_object, MAX(ep.last_watched_at) as lw from shows_meta as
         sm left join episodes as ep on ep.trakt_show_id = sm.id and sm.type = 'trakt' where last_watched_at not NULL
         GROUP BY trakt_show_id ORDER BY last_watched_at DESC"""
 
-        if paginate and not force_all:
+        if not force_all:
             query += " LIMIT {} OFFSET {}".format(
                 self.page_limit, self.page_limit * (page - 1)
             )
@@ -200,16 +199,17 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: list
         """
         paginate = g.get_bool_setting("general.paginatecollection")
+        sort = g.get_int_setting("general.sortcollection")
 
         query = """select e.trakt_show_id as trakt_id, m.value as trakt_object from episodes as e left 
         join shows as sh on sh.trakt_id = e.trakt_show_id left join shows_meta as m on m.id = e.trakt_show_id and 
-        m.type='trakt' where e.collected = 1 group by e.trakt_show_id
-        """
+        m.type='trakt' where e.collected = 1 group by e.trakt_show_id"""
 
-        if paginate and not force_all:
-            query += "ORDER BY max(e.collected_at) desc LIMIT {} OFFSET {}".format(
-                self.page_limit, self.page_limit * (page - 1)
-            )
+        if sort == 0:
+            query += " ORDER BY max(e.collected_at) desc"
+
+        if paginate and not (force_all or sort == 1):
+            query += " LIMIT {} OFFSET {}".format(self.page_limit, self.page_limit * (page - 1))
 
         return self.execute_sql(query).fetchall()
 
@@ -807,7 +807,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         mw.last_watched_at AS last_watched_at FROM episodes e LEFT JOIN (SELECT mw_se.trakt_show_id, 
         Max(mw_se.season) AS max_watched_season, mw_ep.number AS max_watched_episode_number, mw_ep.last_watched_at AS 
         last_watched_at FROM episodes AS mw_se INNER JOIN (SELECT trakt_show_id, season, Max(number) AS number, 
-        Max(last_watched_at) AS last_watched_at FROM episodes WHERE watched = 1 AND season > 0 GROUP BY 
+        Max(last_watched_at) AS last_watched_at FROM episodes WHERE watched >= 1 AND season > 0 GROUP BY 
         trakt_show_id, season) AS mw_ep ON mw_se.trakt_show_id = mw_ep.trakt_show_id AND mw_se.season = mw_ep.season 
         GROUP BY mw_se.trakt_show_id) AS mw ON e.trakt_show_id = mw.trakt_show_id WHERE (e.season = 
         mw.max_watched_season AND e.number = mw.max_watched_episode_number + 1 AND watched = 0) OR (e.season = 
@@ -853,14 +853,21 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of show objects
         :rtype: list
         """
-        return self.execute_sql(
-            """select m.id as trakt_id, value as trakt_object from shows_meta as m inner join(
+        paginate = g.get_bool_setting("general.paginatecollection")
+        sort = g.get_int_setting("general.sortcollection")
+
+        query = """select m.id as trakt_id, value as trakt_object from shows_meta as m inner join(
         select ep.trakt_show_id, max(ep.collected_at) as collected_at from episodes as ep where ep.season != 0 and 
         ep.watched = 0 and ep.collected = 1 GROUP BY ep.trakt_show_id HAVING count(*) > 0) as u on u.trakt_show_id = 
-        m.id and m.type='trakt' ORDER BY u.collected_at LIMIT {} OFFSET {} """.format(
-                self.page_limit, self.page_limit * (page - 1)
-            )
-        ).fetchall()
+        m.id and m.type='trakt'"""
+
+        if sort == 0:
+            query += " ORDER BY collected_at desc"
+
+        if paginate and not sort == 1:
+            query += " LIMIT {} OFFSET {}".format(self.page_limit, self.page_limit * (page - 1))
+
+        return self.execute_sql(query).fetchall()
 
     @guard_against_none()
     def get_season_action_args(self, trakt_show_id, season):

@@ -204,8 +204,6 @@ class TraktAPI(ApiBase):
 
     _threading_lock = threading.Lock()
 
-    gmt_timezone = pytz.timezone('UTC')
-    local_timezone = tools.local_timezone()
     username_setting_key = "trakt.username"
 
     def __init__(self):
@@ -260,15 +258,15 @@ class TraktAPI(ApiBase):
                         else 0,
                     ),
                 ),
-                ("updated_at", "dateadded", lambda t: TraktAPI.gmt_to_local(t)),
-                ("last_updated_at", "dateadded", lambda t: TraktAPI.gmt_to_local(t)),
-                ("collected_at", "collected_at", lambda t: TraktAPI.gmt_to_local(t)),
+                ("updated_at", "dateadded", lambda t: tools.validate_date(t)),
+                ("last_updated_at", "dateadded", lambda t: tools.validate_date(t)),
+                ("collected_at", "collected_at", lambda t: tools.validate_date(t)),
                 (
                     "last_watched_at",
                     "last_watched_at",
-                    lambda t: TraktAPI.gmt_to_local(t),
+                    lambda t: tools.validate_date(t),
                 ),
-                ("paused_at", "paused_at", lambda t: TraktAPI.gmt_to_local(t)),
+                ("paused_at", "paused_at", lambda t: tools.validate_date(t)),
                 (
                     "rating",
                     "rating",
@@ -321,12 +319,12 @@ class TraktAPI(ApiBase):
 
         self.ShowNormalization = tools.extend_array(
             [
-                ("first_aired", "year", lambda t: TraktAPI.gmt_to_local(t)[:4]),
+                ("first_aired", "year", lambda t: tools.validate_date(t)[:4]),
                 ("title", "tvshowtitle", None),
                 (
                     "first_aired",
                     ("premiered", "aired"),
-                    lambda t: TraktAPI.gmt_to_local(t),
+                    lambda t: tools.validate_date(t),
                 ),
                 ("status", "status", None),
                 ("status", "is_airing", lambda t: not t == "ended"),
@@ -340,7 +338,7 @@ class TraktAPI(ApiBase):
                 (
                     "first_aired",
                     ("premiered", "aired"),
-                    lambda t: TraktAPI.gmt_to_local(t),
+                    lambda t: tools.validate_date(t),
                 ),
                 ("episode_count", "episode_count", None),
                 ("aired_episodes", "aired_episodes", None),
@@ -355,7 +353,7 @@ class TraktAPI(ApiBase):
                 (
                     "first_aired",
                     ("premiered", "aired"),
-                    lambda t: TraktAPI.gmt_to_local(t),
+                    lambda t: tools.validate_date(t),
                 ),
                 ("collected_at", "collected", lambda t: 1),
                 ("plays", "playcount", None),
@@ -364,7 +362,7 @@ class TraktAPI(ApiBase):
         )
 
         self.ListNormalization = [
-            ("updated_at", "dateadded", lambda t: TraktAPI.gmt_to_local(t)),
+            ("updated_at", "dateadded", lambda t: tools.validate_date(t)),
             (("ids", "trakt"), "trakt_id", None),
             (("ids", "slug"), "slug", None),
             ("sort_by", "sort_by", None),
@@ -944,26 +942,6 @@ class TraktAPI(ApiBase):
                 and item.get("title")
                 and str(item.get("number", 0)) not in item.get("title")
             ]
-
-    @staticmethod
-    def gmt_to_local(gmt_string):
-        """
-        Converts a GMT style datetime string to the localtimezone
-        :param gmt_string: GMT datetime string
-        :return: localized datetime string
-        """
-        if gmt_string is None:
-            return None
-
-        gmt_string = tools.validate_date(gmt_string)
-
-        if not gmt_string:
-            return None
-
-        gmt = tools.parse_datetime(gmt_string, tools.DATE_FORMAT, False)
-        gmt = TraktAPI.gmt_timezone.localize(gmt)
-        gmt = gmt.astimezone(TraktAPI.local_timezone)
-        return gmt.strftime(tools.DATE_FORMAT)
 
 
 class TraktManager(TraktAPI):

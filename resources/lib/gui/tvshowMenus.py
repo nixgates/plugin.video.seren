@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import datetime
-
+import re
 import xbmc
 import xbmcgui
 import xbmcplugin
@@ -250,10 +250,15 @@ class Menus:
 
     @trakt_auth_guard
     def my_shows_collection(self):
-        paginate = not g.get_bool_setting("general.paginatecollection")
-        sort = "title" if paginate else False
+        no_paging = not g.get_bool_setting("general.paginatecollection")
+        sort = "title" if g.get_int_setting("general.sortcollection") == 1 else False
         trakt_list = self.trakt_database.get_collected_shows(g.PAGE)
-        self.list_builder.show_list_builder(trakt_list, no_paging=paginate, sort=sort)
+        if sort == "title" and not no_paging:
+            trakt_list = sorted(trakt_list, key=lambda k: re.sub(r"^a |^the |^an ", "",
+                                                                 k["trakt_object"]["info"].get('title').lower()))
+            offset = (g.PAGE - 1) * self.page_limit
+            trakt_list = trakt_list[offset:offset + self.page_limit]
+        self.list_builder.show_list_builder(trakt_list, no_paging=no_paging, sort=sort)
 
     @trakt_auth_guard
     def my_shows_watchlist(self):
@@ -270,8 +275,15 @@ class Menus:
 
     @trakt_auth_guard
     def my_show_progress(self):
+        no_paging = not g.get_bool_setting("general.paginatecollection")
+        sort = "title" if g.get_int_setting("general.sortcollection") == 1 else False
         trakt_list = self.trakt_database.get_unfinished_collected_shows(g.PAGE)
-        self.list_builder.show_list_builder(trakt_list)
+        if sort == "title" and not no_paging:
+            trakt_list = sorted(trakt_list, key=lambda k: re.sub(r"^a |^the |^an ", "",
+                                                                 k["trakt_object"]["info"].get('title').lower()))
+            offset = (g.PAGE - 1) * self.page_limit
+            trakt_list = trakt_list[offset:offset + self.page_limit]
+        self.list_builder.show_list_builder(trakt_list, no_paging=no_paging, sort=sort)
 
     @trakt_auth_guard
     def shows_recommended(self):
@@ -288,12 +300,12 @@ class Menus:
             languages=','.join({'en', self.language_code}),
             extended="full",
         )
-        trakt_list = [i.get("show") for i in trakt_list if i["trakt_show_id"] not in hidden_items]
+        trakt_list = [i.get("show") for i in trakt_list if i["trakt_show_id"] not in hidden_items][:self.page_limit]
         self.list_builder.show_list_builder(trakt_list, no_paging=True)
 
     def shows_recently_watched(self):
         self.list_builder.show_list_builder(
-            self.trakt_database.get_recently_watched_shows()
+            self.trakt_database.get_recently_watched_shows(), no_paging=True
         )
 
     def my_next_up(self):
@@ -322,7 +334,7 @@ class Menus:
     @trakt_auth_guard
     def my_upcoming_episodes(self):
         tomorrow = (datetime.date.today() + datetime.timedelta(days=1)).strftime(
-            "%Y-%m-%d"
+            g.DATE_FORMAT
         )
         upcoming_episodes = self.trakt.get_json(
             "calendars/my/shows/{}/30".format(tomorrow), extended="full"
@@ -358,7 +370,7 @@ class Menus:
 
     def shows_updated(self):
         date = datetime.date.today() - datetime.timedelta(days=31)
-        date = date.strftime("%Y-%m-%d")
+        date = date.strftime(g.DATE_FORMAT)
         trakt_list = self.trakt.get_json(
             "shows/updates/{}".format(date), extended="full"
         )
@@ -522,7 +534,7 @@ class Menus:
         if year is None:
             current_year = int(
                 tools.parse_datetime(
-                    datetime.datetime.today().strftime("%Y-%m-%d")
+                    datetime.datetime.today().strftime(g.DATE_FORMAT)
                 ).year
             )
             all_years = reversed([year for year in range(1900, current_year + 1)])

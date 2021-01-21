@@ -25,9 +25,6 @@ def _monkey_check(method):
         :param kwargs: kwargs
         :return: func results
         """
-        _provider_path = os.path.join(g.ADDON_USERDATA_PATH, 'providers')
-        _provider_modules_path = os.path.join(g.ADDON_USERDATA_PATH, 'providerModules')
-
         if (any([True for i in inspect.stack() if "providerModules" in i[1]]) or \
                 any([True for i in inspect.stack() if "providers" in i[1]])) and PRE_TERM_BLOCK:
             raise PreemptiveCancellation('Pre-emptive termination has stopped this request')
