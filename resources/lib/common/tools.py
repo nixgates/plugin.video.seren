@@ -217,12 +217,14 @@ def compare_version_numbers(current, new):
     :return: True if new version number is higher than the current, else False
     :rtype: bool
     """
-    current = current.split(".")
-    new = new.split(".")
+    current = current.replace("+matrix", "").split(".")
+    new = new.replace("+matrix", "").split(".")
     step = 0
     if int(current[0]) > int(new[0]):
         return False
     for i in current:
+        if len(new) - 1 < step:
+            return False
         if int(new[step]) > int(i):
             return True
         if int(i) < int(new[step]):

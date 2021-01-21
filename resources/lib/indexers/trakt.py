@@ -536,13 +536,10 @@ class TraktAPI(ApiBase):
         :param force: Set to True to avoid Global Lock and forces refresh
         :return: None
         """
-        if not force and (
-            self.refresh_token is None or self.token_expires >= float(time.time())
-        ):
+        if not force and (not self.refresh_token or self.token_expires >= float(time.time())):
             return
-        with GlobalLock(
-            self.__class__.__name__, self._threading_lock, True, self.access_token
-        ) as lock:
+
+        with GlobalLock(self.__class__.__name__, self._threading_lock, True, self.access_token) as lock:
             if lock.runned_once():
                 return
             g.log("Trakt Token requires refreshing...")

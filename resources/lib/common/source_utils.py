@@ -442,7 +442,6 @@ def get_filter_single_episode_fn(simple_info):
         ss=re.escape(season),
         ep=re.escape(episode),
     )
-    g.log(pattern, "error")
     regex = re.compile(pattern)
 
     def filter_fn(release_title):

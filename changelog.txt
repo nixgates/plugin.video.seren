@@ -1,3 +1,10 @@
+Changelog 2.0.16:
+Fix addon update check
+Fix trakt module attempting to refresh when not authorised
+
+Changelog 2.0.15:
+Fixed python depend
+
 Changelog 2.0.14:
 Fixed scraping issue if title is not present at IMDB
 Added workarounds for syncing trakt database on xbox
