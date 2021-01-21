@@ -49,7 +49,7 @@ def check_for_addon_update():
 
     if time.time() > (update_timestamp + (24 * (60 * 60))):
         repo_xml = requests.get(
-            "https://raw.githubusercontent.com/nixgates/nixgates/master/packages/addons.xml"
+            "https://raw.githubusercontent.com/nixgates/nixgates/master/packages/leia/plugin.video.seren/addon.xml"
         )
         if not repo_xml.status_code == 200:
             g.log(

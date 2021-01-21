@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.0.14" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.0.16" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.python" version="2.26.0" />
         <import addon="script.module.future" version="0.17.1"/>
@@ -61,6 +61,13 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.0.16:
+            Fix addon update check
+            Fix trakt module attempting to refresh when not authorised
+
+            Changelog 2.0.15:
+            Fixed python depend
+
             Changelog 2.0.14:
             Fixed scraping issue if title is not present at IMDB
             Added workarounds for syncing trakt database on xbox
