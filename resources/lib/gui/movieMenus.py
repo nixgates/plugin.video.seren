@@ -252,7 +252,7 @@ class Menus:
         import datetime
 
         date = datetime.date.today() - datetime.timedelta(days=31)
-        date = date.strftime("%Y-%m-%d")
+        date = date.strftime(g.DATE_FORMAT)
         trakt_list = self.movies_database.extract_trakt_page(
             "movies/updates/{}".format(date), page=g.PAGE, extended="full"
         )

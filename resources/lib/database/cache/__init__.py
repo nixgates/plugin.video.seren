@@ -49,7 +49,7 @@ class CacheBase(object):
 
     @staticmethod
     def _get_timestamp(timedelta=None):
-        date_time = datetime.datetime.now()
+        date_time = datetime.datetime.utcnow()
         if timedelta:
             date_time = date_time + timedelta
         return int(time.mktime(date_time.timetuple()))
@@ -182,7 +182,7 @@ class Cache(CacheBase):
         :return:
         :rtype:
         """
-        cur_time = datetime.datetime.now()
+        cur_time = datetime.datetime.utcnow()
         lastexecuted = self._win.getProperty(self._create_key("clean.lastexecuted"))
         if not lastexecuted:
             self._win.setProperty(self._create_key("clean.lastexecuted"), repr(cur_time))
@@ -201,7 +201,7 @@ class Cache(CacheBase):
             return
         self._win.setProperty(self._create_key("clean.busy"), "busy")
 
-        cur_time = datetime.datetime.now()
+        cur_time = datetime.datetime.utcnow()
 
         self._db_cache.do_cleanup()
         self._mem_cache.do_cleanup()
@@ -252,7 +252,7 @@ class DatabaseCache(Database, CacheBase):
         monitor = xbmc.Monitor()
         if self._exit or monitor.abortRequested():
             return
-        cur_time = datetime.datetime.now()
+        cur_time = datetime.datetime.utcnow()
         if self._win.getProperty(self._create_key("cache.db.clean.busy")):
             return
         self._win.setProperty(self._create_key("cache.db.clean.busy"), "busy")
@@ -397,7 +397,7 @@ class MemCache(CacheBase):
         if self._exit:
             return
         self._get_index()
-        cur_time = datetime.datetime.now()
+        cur_time = datetime.datetime.utcnow()
         cur_timestamp = self._get_timestamp()
         if self._win.getProperty(self._create_key("cache.mem.clean.busy")):
             return

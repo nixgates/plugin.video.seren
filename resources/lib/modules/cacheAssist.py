@@ -166,8 +166,7 @@ class _BaseCacheAssist(TorrentAssist):
                     self._notify_user_of_completion()
                     self._update_database()
                     break
-
-                if self.status == "downloading":
+                elif self.status == "downloading":
                     self._do_download_frame()
                 else:
                     self._handle_failure("Unkonown Failure at Debrid Provider")

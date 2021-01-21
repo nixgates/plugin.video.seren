@@ -8,6 +8,7 @@ from copy import deepcopy
 import xbmc
 import xbmcgui
 
+import resources.lib.modules.globals
 from resources.lib.common import tools
 from resources.lib.database.skinManager import SkinManager
 from resources.lib.modules.globals import g
@@ -107,7 +108,7 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
 
         if 'aired' in self.item_information['info']:
             aired_date = self.item_information['info']['aired']
-            aired_date = tools.parse_datetime(aired_date, tools.DATE_FORMAT)
+            aired_date = tools.parse_datetime(aired_date, g.DATE_TIME_FORMAT)
             aired_date = aired_date.strftime(xbmc.getRegion('dateshort'))
             try:
                 aired_date = aired_date[:10]
@@ -117,7 +118,7 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
 
         if 'premiered' in self.item_information['info']:
             premiered = self.item_information['info']['premiered']
-            premiered = tools.parse_datetime(premiered, tools.DATE_FORMAT)
+            premiered = tools.parse_datetime(premiered, g.DATE_TIME_FORMAT)
             premiered = premiered.strftime(xbmc.getRegion('dateshort'))
             try:
                 premiered = premiered[:10]
