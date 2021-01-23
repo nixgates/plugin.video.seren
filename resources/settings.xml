@@ -49,6 +49,7 @@
         <setting id="general.paginatetraktlists" type="bool" label="30355" default="true"/>
         <setting id="general.paginatecollection" type="bool" label="30478" default="true"/>
         <setting id="general.sortcollection" type="enum" label="30579" default="0" lvalues="30580|30581"/>
+        <setting id="general.sortcollection.direction" type="enum" label="30582" default="0" lvalues="30583|30584"/>
         <setting id="general.genres.endpoint" type="enum" label="30482" default="0" lvalues="30006|30004"/>
         <setting id="general.subtitle.enable" type="bool" label="30486" default="true"/>
         <setting id="general.widget.hide_next" type="bool" label="30488" default="false"/>
