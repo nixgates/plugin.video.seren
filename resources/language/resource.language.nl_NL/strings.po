@@ -165,7 +165,7 @@ msgstr "Films zoeken ..."
 #: \resources\lib\gui\homeMenu.py:43 \resources\lib\gui\homeMenu.py:50
 msgctxt "#30027"
 msgid "Search Shows..."
-msgstr "Zoek shows ..."
+msgstr "Shows zoeken ..."
 
 #: \resources\lib\gui\homeMenu.py:32
 msgctxt "#30028"
@@ -1258,7 +1258,7 @@ msgstr "Dit themapakket lijkt ongeldig te zijn, raadpleeg het logboek voor meer 
 #: \resources\skins\Default\1080i\still_watching.xml:114
 msgctxt "#30232"
 msgid "Next Up"
-msgstr "Next Up"
+msgstr "Volgende afleveringen"
 
 #: \resources\lib\gui\tvshowMenus.py:193
 msgctxt "#30233"
@@ -1625,7 +1625,7 @@ msgstr "Succesvol geverifieerd met Trakt"
 #: \resources\lib\indexers\trakt.py:1067
 msgctxt "#30301"
 msgid "Add to Collection"
-msgstr "Voeg toe aan collectie"
+msgstr "Toevoegen aan collectie"
 
 #: \resources\lib\indexers\trakt.py:971 \resources\lib\indexers\trakt.py:1048
 #: \resources\lib\indexers\trakt.py:1063
@@ -1653,7 +1653,7 @@ msgstr "Markeer als bekeken"
 #: \resources\lib\indexers\trakt.py:1080
 msgctxt "#30306"
 msgid "Mark as Unwatched"
-msgstr "Markeren als onbewaakt"
+msgstr "Markeren als niet bekeken"
 
 #: \resources\lib\indexers\trakt.py:945 \resources\lib\indexers\trakt.py:991
 msgctxt "#30307"
@@ -1778,7 +1778,7 @@ msgstr "Stil schrapen"
 #: \resources\lib\gui\movieMenus.py:391 \resources\lib\gui\tvshowMenus.py:489
 msgctxt "#30330"
 msgid "Genre Selection"
-msgstr "Genreselectie"
+msgstr "Genre selectie"
 
 #: \resources\lib\modules\zip_manager.py:53
 msgctxt "#30331"
@@ -1890,12 +1890,12 @@ msgstr "Pauze"
 #: \resources\settings.xml:271
 msgctxt "#30352"
 msgid "Still Watching Dialog"
-msgstr "Still Watching dialoog"
+msgstr "Nog steeds kijken naar dialoog "
 
 #: \resources\settings.xml:273
 msgctxt "#30353"
 msgid "Enable Still Watching Dialog"
-msgstr "Schakel het dialoogvenster Still Watching in"
+msgstr "Schakel het dialoogvenster Kijkt nog steeds in"
 
 #: \resources\settings.xml:274
 msgctxt "#30354"
@@ -2059,42 +2059,42 @@ msgstr "Mijn Liked filmlijsten"
 #: \resources\lib\gui\tvshowMenus.py:105
 msgctxt "#30385"
 msgid "Trending Show Lists"
-msgstr "Trending showlijsten"
+msgstr "Trending show lijsten"
 
 #: \resources\lib\gui\movieMenus.py:96
 msgctxt "#30386"
 msgid "Trending Movie Lists"
-msgstr "Trending filmlijsten"
+msgstr "Trending film lijsten"
 
 #: \resources\lib\gui\tvshowMenus.py:111
 msgctxt "#30387"
 msgid "Popular Show Lists"
-msgstr "Populaire showlijsten"
+msgstr "Populaire show lijsten"
 
 #: \resources\lib\gui\movieMenus.py:102
 msgctxt "#30388"
 msgid "Popular Movie Lists"
-msgstr "Populaire filmlijsten"
+msgstr "Populaire film lijsten"
 
 #: \resources\settings.xml:71 \resources\settings.xml:73
 msgctxt "#30389"
 msgid "EpisodeTitle"
-msgstr "AfleveringTitel"
+msgstr "Aflevering Titel"
 
 #: \resources\settings.xml:71 \resources\settings.xml:73
 msgctxt "#30390"
 msgid "01x01. EpisodeTitle"
-msgstr "01x01. AfleveringTitel"
+msgstr "01x01. Aflevering Titel"
 
 #: \resources\settings.xml:71 \resources\settings.xml:73
 msgctxt "#30391"
 msgid "ShowTitle: EpisodeTitle"
-msgstr "ShowTitel: AfleveringTitel"
+msgstr "ShowTitel: Aflevering Titel"
 
 #: \resources\settings.xml:71 \resources\settings.xml:73
 msgctxt "#30392"
 msgid "ShowTitle: 01x01. EpisodeTitle"
-msgstr "ShowTitel: 01x01. AfleveringTitel"
+msgstr "ShowTitel: 01x01. Aflevering Titel"
 
 #: \resources\settings.xml:75
 msgctxt "#30393"
@@ -2389,7 +2389,7 @@ msgstr "Een lijst met films waarvan u hebt aangegeven dat ze deze willen bekijke
 #: \resources\lib\gui\movieMenus.py:178
 msgctxt "#30447"
 msgid "My movie Trakt Lists"
-msgstr "Mijn Trakt filmlijsten"
+msgstr "Mijn Trakt film lijsten"
 
 #: \resources\lib\gui\movieMenus.py:184
 msgctxt "#30448"
@@ -2671,12 +2671,12 @@ msgstr "Bekijk niet gecachet"
 #: \resources\lib\gui\homeMenu.py:138
 msgctxt "#30498"
 msgid "Test Playing Next"
-msgstr "Test Playing Next"
+msgstr "Test volgende afspelen"
 
 #: \resources\lib\gui\homeMenu.py:142
 msgctxt "#30499"
 msgid "Test Still Watching"
-msgstr "Test Still Watching"
+msgstr "Test nog steeds aan het kijken"
 
 #: \resources\lib\gui\homeMenu.py:146
 msgctxt "#30500"
