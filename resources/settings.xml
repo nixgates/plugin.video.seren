@@ -266,7 +266,7 @@
         <setting id="playingnext.time" type="slider" subsetting="true" label="30112" option="int" range="10,180"
                  default="30" visible="eq(-1,true)"/>
         <!--<setting id="playingnext.dialogstyle" type="enum" subsetting="true" label="30347" lvalues="30193|30348" default="0" visible="eq(-2,true)" />-->
-        <setting id="playingnext.defaultaction" type="enum" subsetting="true" label="30349" lvalues="30350|30351"
+        <setting id="playingnext.defaultaction" type="enum" subsetting="true" label="30349" lvalues="30350|30351|30582"
                  default="0" visible="eq(-2,true)"/>
 
         <!-- Still Watching Dialog -->
