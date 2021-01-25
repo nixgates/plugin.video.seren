@@ -1925,14 +1925,14 @@ msgstr "Simple"
 
 #: \resources\settings.xml:267
 msgctxt "#30349"
-msgid "Default Action if Nothing Selected"
-msgstr "Default Action if Nothing Selected"
+msgid "Default Action if Playback Ended"
+msgstr "Default Action if Playback Ended"
 
 #: \resources\settings.xml:267 \resources\lib\gui\windows\source_select.py:79
 #: \resources\skins\Default\1080i\source_select.xml:352
 msgctxt "#30350"
-msgid "Play"
-msgstr "Play"
+msgid "Continue Watching"
+msgstr "Continue Watching"
 
 #: \resources\settings.xml:267
 msgctxt "#30351"
@@ -3215,5 +3215,5 @@ msgid "Alphabetically"
 msgstr "Alphabetically"
 
 msgctxt "#30582"
-msgid "Exit player"
-msgstr "Exit player"
+msgid "Exit Player"
+msgstr "Exit Player"
