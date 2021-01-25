@@ -652,7 +652,7 @@ class SerenPlayer(xbmc.Player):
     def _default_action(self):
         
         if (
-            int(self.getTotalTime()) - int(self.getTime()) <= 1
+            int(self.getTotalTime()) - int(self.getTime()) == 1
          ):
             if (
                 self.default_action == 1
