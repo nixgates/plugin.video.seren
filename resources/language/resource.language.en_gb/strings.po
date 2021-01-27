@@ -1931,8 +1931,8 @@ msgstr "Default Action if Playback Ended"
 #: \resources\settings.xml:267 \resources\lib\gui\windows\source_select.py:79
 #: \resources\skins\Default\1080i\source_select.xml:352
 msgctxt "#30350"
-msgid "Continue Watching"
-msgstr "Continue Watching"
+msgid "Play"
+msgstr "Play"
 
 #: \resources\settings.xml:267
 msgctxt "#30351"
@@ -3222,3 +3222,7 @@ msgstr "Exit Player"
 msgctxt "#30583"
 msgid "Smart Play"
 msgstr "Smart Play"
+
+msgctxt "#30584"
+msgid "Continue Watching"
+msgstr "Continue Watching"
