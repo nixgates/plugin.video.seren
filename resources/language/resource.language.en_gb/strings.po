@@ -3214,4 +3214,22 @@ msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
 
+msgctxt "#30582"
+msgid "Skip Intro"
+msgstr "Skip Intro"
 
+msgctxt "#30583"
+msgid "Enable Intro Skipping"
+msgstr "Enable Intro Skipping"
+
+msgctxt "#30584"
+msgid "Skip From"
+msgstr "Skip From"
+
+msgctxt "#30585"
+msgid "Skip To"
+msgstr "Skip To"
+
+msgctxt "#30586"
+msgid "Force Skip Always"
+msgstr "Force Skip Always"

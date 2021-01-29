@@ -48,6 +48,10 @@ class SerenPlayer(xbmc.Player):
             ) or g.get_bool_setting("smartplay.stillwatching")
         self.pre_scrape_enabled = g.get_bool_setting("smartPlay.preScrape")
         self.playing_next_time = g.get_int_setting("playingnext.time")
+        self.skip_intro = g.get_bool_setting("skip.intro")
+        self.skip_intro_from = g.get_int_setting("skip.intro.from")
+        self.skip_intro_to = g.get_int_setting("skip.intro.to")
+        self.force_skip = g.get_bool_setting("skip.intro.force")
         self.bookmark_sync = bookmark.TraktSyncDatabase()
         self.trakt_enabled = True if g.get_setting("trakt.auth", "") else False
         self._running_path = None
@@ -64,6 +68,7 @@ class SerenPlayer(xbmc.Player):
         self.dialogs_triggered = False
         self.pre_scrape_initiated = False
         self.playback_timestamp = 0
+        self.intro_skipped = False
 
     def play_source(self, stream_link, item_information, resume_time=None):
         """Method for handling playing of sources.
@@ -321,6 +326,22 @@ class SerenPlayer(xbmc.Player):
         self.plaback_stopped = False
         self.scrobbled = False
         self.playback_timestamp = time.time()
+        
+        while self._is_file_playing() and not g.abort_requested():
+            if (
+                int(self.getTime()) == self.skip_intro_from
+                and self.skip_intro
+             ):
+                if (
+                    self.force_skip == 0
+                    and not self.intro_skipped
+                 ):
+                    self.seekTime(self.skip_intro_to)
+                    self.intro_skipped = True
+                elif (
+                    self.force_skip == 1
+                 ):
+                    self.seekTime(self.skip_intro_to)
 
         g.close_all_dialogs()
 
@@ -569,6 +590,15 @@ class SerenPlayer(xbmc.Player):
         while self._is_file_playing() and not g.abort_requested():
 
             self._update_progress()
+
+            if (
+                int(self.getTime()) == self.skip_intro_from
+                and self.skip_intro
+             ):
+                if (
+                    self.force_skip == 1
+                 ):
+                    self.seekTime(self.skip_intro_to)
 
             if not self.scrobble_started:
                 self._trakt_start_watching()
