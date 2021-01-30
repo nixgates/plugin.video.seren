@@ -280,10 +280,12 @@
         <setting type="lsep" label="30582"/>
         <setting type="sep"/>
         <setting id="skip.intro.dialog" type="bool" label="30583" default="true"/>
-        <setting id="skip.intro.time" type="slider" subsetting="true" label="30584" option="int" range="0,180"
-                 default="30" visible="eq(-1,true)"/>
-        <setting id="skip.intro.open.time" type="slider" subsetting="true" label="30585" option="int" range="0,30"
-                 default="15" visible="eq(-2,true)"/>
+        <setting id="skip.intro.dialog.delay" type="slider" subsetting="true" label="30584" option="int" range="0,180"
+                 default="0" visible="eq(-1,true)"/>
+        <setting id="skip.intro.time" type="slider" subsetting="true" label="30585" option="int" range="0,180"
+                 default="30" visible="eq(-2,true)"/>
+        <setting id="skip.intro.open.time" type="slider" subsetting="true" label="30586" option="int" range="0,30"
+                 default="15" visible="eq(-3,true)"/>
     </category>
 
     <!-- Accounts -->
