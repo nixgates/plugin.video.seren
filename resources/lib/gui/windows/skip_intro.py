@@ -11,11 +11,11 @@ class SkipIntro(BaseWindow):
     """
     Dialog to provide quick skipping to next playlist item if available.
     """
-    def __init__(self, xml_file, xml_location, item_information=None):
+    def __init__(self, xml_file, xml_location):
 
         try:
             super(SkipIntro, self).__init__(
-                xml_file, xml_location, item_information=item_information
+                xml_file, xml_location
             )
             self.playing_file = self.getPlayingFile()
             self.duration = self.getTotalTime() - self.getTime()
