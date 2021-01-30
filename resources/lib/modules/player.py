@@ -338,10 +338,12 @@ class SerenPlayer(xbmc.Player):
                  ):
                     self.seekTime(self.skip_intro_to)
                     self.intro_skipped = True
+                    break
                 elif (
                     self.force_skip == 1
                  ):
                     self.seekTime(self.skip_intro_to)
+                    break
 
         g.close_all_dialogs()
 
