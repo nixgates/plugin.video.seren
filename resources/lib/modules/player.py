@@ -575,6 +575,8 @@ class SerenPlayer(xbmc.Player):
                     )
                 self.intro_dialog_triggered = True
                 break
+            else:
+                break
 
         self.total_time = self.getTotalTime()
 
