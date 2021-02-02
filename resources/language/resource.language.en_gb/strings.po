@@ -3214,4 +3214,15 @@ msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
 
+#: \resources\settings.xml:396 \resources\lib\gui\tvshowMenus.py:184
+msgctxt "#30582"
+msgid "Next Up Sort Direction"
+msgstr "Next Up Sort Direction"
 
+msgctxt "#30583"
+msgid "Ascending"
+msgstr "Ascending"
+
+msgctxt "#30584"
+msgid "Descending"
+msgstr "Descending"

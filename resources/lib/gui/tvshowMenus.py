@@ -310,7 +310,8 @@ class Menus:
 
     def my_next_up(self):
         episodes = self.trakt_database.get_nextup_episodes(
-            g.get_int_setting("nextup.sort") == 1
+            g.get_int_setting("nextup.sort"),
+            g.get_int_setting("nextup.sort.direction")
         )
         self.list_builder.mixed_episode_builder(episodes, no_paging=True)
 
