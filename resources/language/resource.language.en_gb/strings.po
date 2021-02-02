@@ -3214,4 +3214,15 @@ msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
 
+#: \resources\settings.xml:396
+msgctxt "#30582"
+msgid "Collection Sort Direction"
+msgstr "Collection Sort Direction"
 
+msgctxt "#30583"
+msgid "Ascending"
+msgstr "Ascending"
+
+msgctxt "#30584"
+msgid "Descending"
+msgstr "Descending"

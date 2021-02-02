@@ -252,12 +252,15 @@ class Menus:
     def my_shows_collection(self):
         no_paging = not g.get_bool_setting("general.paginatecollection")
         sort = "title" if g.get_int_setting("general.sortcollection") == 1 else False
+        sort_direction = g.get_int_setting("general.sortcollection.direction")
         trakt_list = self.trakt_database.get_collected_shows(g.PAGE)
         if sort == "title" and not no_paging:
             trakt_list = sorted(trakt_list, key=lambda k: re.sub(r"^a |^the |^an ", "",
                                                                  k["trakt_object"]["info"].get('title').lower()))
             offset = (g.PAGE - 1) * self.page_limit
             trakt_list = trakt_list[offset:offset + self.page_limit]
+        if sort == "title" and sort_direction == 1:
+            trakt_list.reverse()
         self.list_builder.show_list_builder(trakt_list, no_paging=no_paging, sort=sort)
 
     @trakt_auth_guard
@@ -277,12 +280,15 @@ class Menus:
     def my_show_progress(self):
         no_paging = not g.get_bool_setting("general.paginatecollection")
         sort = "title" if g.get_int_setting("general.sortcollection") == 1 else False
+        sort_direction = g.get_int_setting("general.sortcollection.direction")
         trakt_list = self.trakt_database.get_unfinished_collected_shows(g.PAGE)
         if sort == "title" and not no_paging:
             trakt_list = sorted(trakt_list, key=lambda k: re.sub(r"^a |^the |^an ", "",
                                                                  k["trakt_object"]["info"].get('title').lower()))
             offset = (g.PAGE - 1) * self.page_limit
             trakt_list = trakt_list[offset:offset + self.page_limit]
+        if sort == "title" and sort_direction == 1:
+            trakt_list.reverse()
         self.list_builder.show_list_builder(trakt_list, no_paging=no_paging, sort=sort)
 
     @trakt_auth_guard
