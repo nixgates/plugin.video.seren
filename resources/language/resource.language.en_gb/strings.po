@@ -3214,4 +3214,22 @@ msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
 
+msgctxt "#30582"
+msgid "Skip Intro Dialog"
+msgstr "Skip Intro Dialog"
 
+msgctxt "#30583"
+msgid "Enable Skip Intro Dialog"
+msgstr "Enable Skip Intro Dialog"
+
+msgctxt "#30584"
+msgid "Open Skip Intro Dialog At Seconds"
+msgstr "Open Skip Intro Dialog At Seconds"
+
+msgctxt "#30585"
+msgid "Number Of Seconds To Skip"
+msgstr "Number Of Seconds To Skip"
+
+msgctxt "#30586"
+msgid "Auto Close Dialog After Seconds"
+msgstr "Auto Close Dialog After Seconds"

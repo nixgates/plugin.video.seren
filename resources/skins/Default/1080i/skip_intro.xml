@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">3001</defaultcontrol>
+    <onload>Dialog.Close(fullscreeninfo,true)</onload>
+    <onload>Dialog.Close(videoosd,true)</onload>
+    <controls>
+        <control type="group">
+            <animation type="WindowOpen" reversible="false">
+                <effect type="fade" start="0" end="100" time="300"/>
+                <effect type="slide" start="400%,0" end="0,0" time="400"/>
+            </animation>
+            <animation type="WindowClose" reversible="false">
+                <effect type="fade" start="100" end="0" time="400"/>
+                <effect type="slide" start="0,0" end="400%,0" time="400"/>
+            </animation>
+            <control type="group">
+                <height>25%</height>
+                <width>25%</width>
+                <right>0</right>
+                <bottom>10%</bottom>
+
+                    <!-- Buttons -->
+                    <control type="grouplist">
+                        <orientation>horizontal</orientation>
+                        <height>56</height>
+                        <bottom>20</bottom>
+                        <left>25%</left>
+                        <itemgap>10</itemgap>
+                        <width>100%</width>
+                        <control type="button" id="3001">
+                            <label>Skip Intro</label>
+                            <height>56</height>
+                            <width min="50">auto</width>
+                            <font>font20_title</font>
+                            <textoffsetx>55</textoffsetx>
+                            <textcolor>ddffffff</textcolor>
+                            <focusedcolor>eeffffff</focusedcolor>
+                            <selectedcolor>ddffffff</selectedcolor>
+                            <shadowcolor>22000000</shadowcolor>
+                            <aligny>center</aligny>
+                            <align>center</align>
+                            <texturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</texturefocus>
+                            <texturenofocus border="10" colordiffuse="AA212121">white.png</texturenofocus>
+                            <alttexturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</alttexturefocus>
+                            <alttexturenofocus border="10" colordiffuse="AA212121">white.png</alttexturenofocus>
+                            <pulseonselect>no</pulseonselect>
+                        </control>
+                        <control type="button" id="3002">
+                            <label>Close</label>
+                            <height>56</height>
+                            <width min="50">auto</width>
+                            <font>font20_title</font>
+                            <textoffsetx>15</textoffsetx>
+                            <textcolor>ddffffff</textcolor>
+                            <focusedcolor>eeffffff</focusedcolor>
+                            <selectedcolor>ddffffff</selectedcolor>
+                            <shadowcolor>22000000</shadowcolor>
+                            <aligny>center</aligny>
+                            <align>center</align>
+                            <texturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</texturefocus>
+                            <texturenofocus border="10" colordiffuse="AA212121">white.png</texturenofocus>
+                            <alttexturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</alttexturefocus>
+                            <alttexturenofocus border="10" colordiffuse="AA212121">white.png</alttexturenofocus>
+                            <pulseonselect>no</pulseonselect>
+                        </control>
+                    </control>
+            </control>
+        </control>
+    </controls>
+</window>

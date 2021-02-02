@@ -665,6 +665,11 @@ def dispatch(params):
         from resources.lib.modules.player import PlayerDialogs
 
         PlayerDialogs().display_dialog()
+        
+    elif action == "runIntroDialog":
+        from resources.lib.modules.player import PlayerDialogs
+
+        PlayerDialogs().display_intro_dialog()
 
     elif action == "authAllDebrid":
         from resources.lib.debrid.all_debrid import AllDebrid
