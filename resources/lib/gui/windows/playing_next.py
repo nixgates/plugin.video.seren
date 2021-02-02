@@ -20,7 +20,6 @@ class PlayingNext(BaseWindow):
             self.playing_file = self.getPlayingFile()
             self.duration = self.getTotalTime() - self.getTime()
             self.closed = False
-            self.default_action = g.get_int_setting("playingnext.defaultaction")
         except:
             g.log_stacktrace()
 
@@ -123,12 +122,6 @@ class PlayingNext(BaseWindow):
                 if progress_bar is not None:
                     progress_bar.setPercent(self.calculate_percent())
 
-            if (
-                self.default_action == 1
-                and self.playing_file == self.getPlayingFile()
-                and not self.closed
-            ):
-                self.pause()
         except:
             import traceback
 

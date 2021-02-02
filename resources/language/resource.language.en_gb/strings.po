@@ -1910,8 +1910,8 @@ msgstr "Smart Play Display Style"
 
 #: \resources\settings.xml:261
 msgctxt "#30346"
-msgid "Smart Play Popup"
-msgstr "Smart Play Popup"
+msgid "Playing Next Dialog"
+msgstr "Playing Next Dialog"
 
 #: \resources\settings.xml:266
 msgctxt "#30347"
@@ -1925,8 +1925,8 @@ msgstr "Simple"
 
 #: \resources\settings.xml:267
 msgctxt "#30349"
-msgid "Default Action if Nothing Selected"
-msgstr "Default Action if Nothing Selected"
+msgid "Default Action if Playback Ended"
+msgstr "Default Action if Playback Ended"
 
 #: \resources\settings.xml:267 \resources\lib\gui\windows\source_select.py:79
 #: \resources\skins\Default\1080i\source_select.xml:352
@@ -3214,4 +3214,15 @@ msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
 
+msgctxt "#30582"
+msgid "Exit Player"
+msgstr "Exit Player"
 
+#: \resources\settings.xml:261
+msgctxt "#30583"
+msgid "Smart Play"
+msgstr "Smart Play"
+
+msgctxt "#30584"
+msgid "Continue Watching"
+msgstr "Continue Watching"

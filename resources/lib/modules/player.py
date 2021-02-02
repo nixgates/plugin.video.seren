@@ -34,6 +34,7 @@ class SerenPlayer(xbmc.Player):
         self.scrobbling_enabled = g.get_bool_setting("trakt.scrobbling")
         self.item_information = None
         self.smart_playlists = g.get_bool_setting("smartplay.playlistcreate")
+        self.default_action = g.get_int_setting("smartplay.defaultaction")
         self.smart_module = None
         self.current_time = 0
         self.total_time = 0
@@ -53,6 +54,8 @@ class SerenPlayer(xbmc.Player):
         self._running_path = None
 
         # Flags
+        self.default_pause = False
+        self.default_exit = False
         self.resumed = False
         self.playback_started = False
         self.playback_error = False
@@ -569,6 +572,7 @@ class SerenPlayer(xbmc.Player):
         while self._is_file_playing() and not g.abort_requested():
 
             self._update_progress()
+            self._default_action()
 
             if not self.scrobble_started:
                 self._trakt_start_watching()
@@ -644,7 +648,27 @@ class SerenPlayer(xbmc.Player):
 
         playing_file = self.getPlayingFile()
         return self._running_path == playing_file
-
+        
+    def _default_action(self):
+        
+        if (
+            int(self.getTotalTime()) - int(self.getTime()) == 1
+         ):
+            if (
+                self.default_action == 1
+                and not self.default_pause
+             ):
+                self.pause()
+                self.default_pause = True
+            elif (
+                self.default_action == 2
+                and not self.default_exit
+                and self.smart_playlists
+             ):
+                g.PLAYLIST.clear()
+                self._end_playback()
+                g.cancel_playback()
+                self.default_exit = True
 
 class PlayerDialogs(xbmc.Player):
     """
