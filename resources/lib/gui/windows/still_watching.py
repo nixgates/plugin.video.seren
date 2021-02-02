@@ -16,7 +16,9 @@ class StillWatching(BaseWindow):
             self.player = xbmc.Player()
             self.playing_file = self.player.getPlayingFile()
             self.closed = False
-            self.duration = self.player.getTotalTime() - self.player.getTime()
+            self.duration = 30
+            self.dialog_opened_time = int(self.player.getTime())
+            self.is_paused = False
             super(StillWatching, self).__init__(
                 xml_file, xml_location, item_information=item_information
             )
@@ -38,7 +40,7 @@ class StillWatching(BaseWindow):
         :rtype: int
         """
         return (
-            (int(self.player.getTotalTime()) - int(self.player.getTime()))
+            (int(self.dialog_opened_time + 30) - int(self.player.getTime()))
             / float(self.duration)
         ) * 100
 
@@ -64,8 +66,10 @@ class StillWatching(BaseWindow):
                 if progress_bar is not None:
                     progress_bar.setPercent(self.calculate_percent())
 
-            if not self.closed:
-                self.player.pause()
+                if int(self.player.getTime()) == self.dialog_opened_time + 30 and not self.closed and not self.is_paused:
+                    self.player.pause()
+                    self.is_paused = True
+
         except:
             g.log_stacktrace()
 
@@ -121,6 +125,9 @@ class StillWatching(BaseWindow):
             self.player.playnext()
             self.close()
         if control_id == 3002:
+            if self.is_paused:
+                self.player.pause()
+                self.is_paused = False
             self.close()
         if control_id == 3003:
             self.player.stop()
