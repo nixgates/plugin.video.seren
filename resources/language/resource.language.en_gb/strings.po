@@ -749,11 +749,6 @@ msgctxt "#30135"
 msgid "Minimum TV Shows Resolution"
 msgstr "Minimum TV Shows Resolution"
 
-#: \resources\settings.xml:230
-msgctxt "#30136"
-msgid "Minimum Sources"
-msgstr "Minimum Sources"
-
 #: \resources\settings.xml:232
 msgctxt "#30137"
 msgid "Terminate on... "
@@ -3214,4 +3209,12 @@ msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
 
+#: \resources\settings.xml:230
+msgctxt "#30582"
+msgid "Minimum Movie Sources"
+msgstr "Minimum Movie Sources"
 
+#: \resources\settings.xml:231
+msgctxt "#30583"
+msgid "Minimum TV Shows Sources"
+msgstr "Minimum TV Shows Sources"
