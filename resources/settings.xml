@@ -275,6 +275,16 @@
         <setting id="smartplay.stillwatching" type="bool" label="30353" default="false"/>
         <setting id="stillwatching.numepisodes" type="slider" subsetting="true" label="30354" option="int" range="1,10"
                  default="3" visible="eq(-1,true)"/>
+
+        <!-- Skip Intro -->
+        <setting type="lsep" label="30582"/>
+        <setting type="sep"/>
+        <setting id="skip.intro" type="bool" label="30583" default="false"/>
+        <setting id="skip.intro.from" type="slider" subsetting="true" label="30584" option="int" range="0,180"
+                 default="0" visible="eq(-1,true)"/>
+        <setting id="skip.intro.to" type="slider" subsetting="true" label="30585" option="int" range="0,180"
+                 default="30" visible="eq(-2,true)"/>
+        <setting id="skip.intro.force" type="bool" subsetting="true" label="30586" default="true" visible="eq(-3,true)"/>
     </category>
 
     <!-- Accounts -->
