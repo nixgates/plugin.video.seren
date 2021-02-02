@@ -16,6 +16,7 @@ from resources.lib.database.trakt_sync import bookmark
 from resources.lib.indexers import trakt
 from resources.lib.modules import smartPlay, database, subtitles
 from resources.lib.modules.globals import g
+from random import randint
 
 
 class SerenPlayer(xbmc.Player):
@@ -43,9 +44,8 @@ class SerenPlayer(xbmc.Player):
         self.playCountMinimumPercent = g.get_int_setting(
             "trakt.playCountMinimumPercent"
             )
-        self.dialogs_enabled = g.get_bool_setting(
-            "smartplay.playingnextdialog"
-            ) or g.get_bool_setting("smartplay.stillwatching")
+        self.playing_next_dialog_enabled = g.get_bool_setting("smartplay.playingnextdialog")
+        self.still_watching_dialog_enabled = g.get_bool_setting("smartplay.stillwatching")
         self.pre_scrape_enabled = g.get_bool_setting("smartPlay.preScrape")
         self.playing_next_time = g.get_int_setting("playingnext.time")
         self.bookmark_sync = bookmark.TraktSyncDatabase()
@@ -61,7 +61,8 @@ class SerenPlayer(xbmc.Player):
         self.scrobbled = False
         self.scrobble_started = False
         self._force_marked_watched = False
-        self.dialogs_triggered = False
+        self.playing_next_dialog_triggered = False
+        self.still_watching_dialog_triggered = False
         self.pre_scrape_initiated = False
         self.playback_timestamp = 0
 
@@ -440,7 +441,8 @@ class SerenPlayer(xbmc.Player):
         g.log("IgnoringSecondsAtStart: {}".format(self.ignoreSecondsAtStart), "debug")
         g.log("PreScrapeSeconds: {}".format(self.min_time_before_scrape), "debug")
         g.log("PlayCountMin: {}".format(self.playCountMinimumPercent), "debug")
-        g.log("DialogsEnabled: {}".format(self.dialogs_enabled), "debug")
+        g.log("PlayingNextDialogEnabled: {}".format(self.playing_next_dialog_enabled), "debug")
+        g.log("StillWatchingDialogEnabled: {}".format(self.still_watching_dialog_enabled), "debug")
         g.log("TraktEnabled: {}".format(self.trakt_enabled), "debug")
         g.log("DialogSeconds: {}".format(self.playing_next_time), "debug")
         g.log("TotalMediaLength: {}".format(self.getTotalTime()), "debug")
@@ -582,12 +584,19 @@ class SerenPlayer(xbmc.Player):
                 self._trakt_stop_watching()
                 self._handle_bookmark()
 
-            if self.dialogs_enabled and not self.dialogs_triggered:
+            if self.playing_next_dialog_enabled and not self.playing_next_dialog_triggered:
                 if time_left <= self.playing_next_time:
                     xbmc.executebuiltin(
-                        'RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")'
+                        'RunPlugin("plugin://plugin.video.seren/?action=runPlayingNextDialog")'
                         )
-                    self.dialogs_triggered = True
+                    self.playing_next_dialog_triggered = True
+                    
+            if self.still_watching_dialog_enabled and not self.still_watching_dialog_triggered:
+                if self.watched_percentage == randint(75, self.playCountMinimumPercent):
+                    xbmc.executebuiltin(
+                        'RunPlugin("plugin://plugin.video.seren/?action=runStillWatchingDialog")'
+                        )
+                    self.still_watching_dialog_triggered = True
 
             xbmc.sleep(100)
 
@@ -656,7 +665,7 @@ class PlayerDialogs(xbmc.Player):
         self._min_time = g.get_int_setting("playingnext.time")
         self.playing_file = None
 
-    def display_dialog(self):
+    def display_playing_next_dialog(self):
         """
         Handles the initiating of dialogs and deciding which dialog to display if required
         :return: None
@@ -670,10 +679,36 @@ class PlayerDialogs(xbmc.Player):
         if g.PLAYLIST.size() > 0 and g.PLAYLIST.getposition() != (
                 g.PLAYLIST.size() - 1
          ):
+            if g.get_bool_setting("smartplay.playingnextdialog"):
+                target = self._show_playing_next
+            else:
+                return
+
+            if self.playing_file != self.getPlayingFile():
+                return
+
+            if not self.isPlayingVideo():
+                return
+
+            if not self._is_video_window_open():
+                return
+
+            target()
+
+    def display_still_watching_dialog(self):
+        """
+        Handles the initiating of dialogs and deciding which dialog to display if required
+        :return: None
+        :rtype: None
+        """
+        try:
+            self.playing_file = self.getPlayingFile()
+        except RuntimeError:
+            g.log("Kodi did not return a playing file, killing playback dialogs", "error")
+            return
+        if g.PLAYLIST.size() > 0:
             if g.get_bool_setting("smartplay.stillwatching") and self._still_watching_calc():
                 target = self._show_still_watching
-            elif g.get_bool_setting("smartplay.playingnextdialog"):
-                target = self._show_playing_next
             else:
                 return
 
@@ -716,7 +751,7 @@ class PlayerDialogs(xbmc.Player):
 
         window = StillWatching(
             *SkinManager().confirm_skin_path("still_watching.xml"),
-            item_information=self._get_next_item_item_information()
+            item_information=self._get_current_item_item_information()
             )
         window.doModal()
         del window
@@ -726,6 +761,17 @@ class PlayerDialogs(xbmc.Player):
         current_position = g.PLAYLIST.getposition()
         url = g.PLAYLIST[  # pylint: disable=unsubscriptable-object
             current_position + 1
+            ].getPath()
+        params = dict(tools.parse_qsl(tools.unquote(url.split("?")[1])))
+        return tools.get_item_information(
+            tools.deconstruct_action_args(params.get("action_args"))
+            )
+            
+    @staticmethod
+    def _get_current_item_item_information():
+        current_position = g.PLAYLIST.getposition()
+        url = g.PLAYLIST[  # pylint: disable=unsubscriptable-object
+            current_position
             ].getPath()
         params = dict(tools.parse_qsl(tools.unquote(url.split("?")[1])))
         return tools.get_item_information(
