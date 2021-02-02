@@ -129,6 +129,14 @@ class PlayingNext(BaseWindow):
                 and not self.closed
             ):
                 self.pause()
+            elif (
+                self.default_action == 2
+                and self.playing_file == self.getPlayingFile()
+                and not self.closed
+            ):
+                g.PLAYLIST.clear()
+                self._end_playback()
+                g.cancel_playback()
         except:
             import traceback
 
