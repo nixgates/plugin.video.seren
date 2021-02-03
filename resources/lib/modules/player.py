@@ -772,7 +772,8 @@ class PlayerDialogs(xbmc.Player):
         from resources.lib.database.skinManager import SkinManager
 
         window = SkipIntro(
-            *SkinManager().confirm_skin_path("skip_intro.xml")
+            *SkinManager().confirm_skin_path("skip_intro.xml"),
+            item_information=self._get_current_item_item_information()
             )
         window.doModal()
         del window
@@ -782,6 +783,17 @@ class PlayerDialogs(xbmc.Player):
         current_position = g.PLAYLIST.getposition()
         url = g.PLAYLIST[  # pylint: disable=unsubscriptable-object
             current_position + 1
+            ].getPath()
+        params = dict(tools.parse_qsl(tools.unquote(url.split("?")[1])))
+        return tools.get_item_information(
+            tools.deconstruct_action_args(params.get("action_args"))
+            )
+
+    @staticmethod
+    def _get_current_item_item_information():
+        current_position = g.PLAYLIST.getposition()
+        url = g.PLAYLIST[  # pylint: disable=unsubscriptable-object
+            current_position
             ].getPath()
         params = dict(tools.parse_qsl(tools.unquote(url.split("?")[1])))
         return tools.get_item_information(
