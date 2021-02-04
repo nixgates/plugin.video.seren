@@ -18,7 +18,7 @@ class SkipIntro(BaseWindow):
                 xml_file, xml_location, item_information=item_information
             )
             self.playing_file = self.getPlayingFile()
-            self.duration = self.getTotalTime() - self.getTime()
+            self.duration = g.get_int_setting("skip.intro.open.time")
             self.closed = False
             self.skip_intro = g.get_bool_setting("skip.intro.dialog")
             self.skip_intro_open_time = g.get_int_setting("skip.intro.open.time")
@@ -102,7 +102,7 @@ class SkipIntro(BaseWindow):
         :rtype: int
         """
         return (
-            (int(self.getTotalTime()) - int(self.getTime())) / float(self.duration)
+            (int(self.skip_intro_activated_time + self.skip_intro_open_time) - int(self.getTime())) / float(self.duration)
         ) * 100
 
     def background_tasks(self):

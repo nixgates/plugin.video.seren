@@ -48,6 +48,7 @@ class SerenPlayer(xbmc.Player):
             ) or g.get_bool_setting("smartplay.stillwatching")
         self.intro_dialog_enabled = g.get_bool_setting("skip.intro.dialog")
         self.intro_dialog_delay = g.get_int_setting("skip.intro.dialog.delay")
+        self.intro_dialog_open_time = g.get_int_setting("skip.intro.open.time")
         self.pre_scrape_enabled = g.get_bool_setting("smartPlay.preScrape")
         self.playing_next_time = g.get_int_setting("playingnext.time")
         self.bookmark_sync = bookmark.TraktSyncDatabase()
@@ -568,14 +569,16 @@ class SerenPlayer(xbmc.Player):
                     int(self.getTime()) == self.intro_dialog_delay
                     and self.intro_dialog_enabled
                     and not self.intro_dialog_triggered
-                    and not self.resumed
              ):
                 xbmc.executebuiltin(
                     'RunPlugin("plugin://plugin.video.seren/?action=runIntroDialog")'
                     )
                 self.intro_dialog_triggered = True
                 break
-            else:
+            elif (
+                    int(self.getTime()) >= self.intro_dialog_delay + self.intro_dialog_open_time
+                    or not self.intro_dialog_enabled
+             ):
                 break
 
         self.total_time = self.getTotalTime()
