@@ -1158,8 +1158,12 @@ class TVDBAPI(ApiBase):
         return self.get_json("series/{}".format(tvdb_id), language=language)
 
     def _get_series_cast(self, tvdb_id):
+        try:
+            cast = self._handle_cast(self.get_json("series/{}/actors".format(tvdb_id)))
+        except:
+            cast = None
         return {
-            "cast": self._handle_cast(self.get_json("series/{}/actors".format(tvdb_id)))
+            "cast": cast
         }
 
     @wrap_tvdb_object
