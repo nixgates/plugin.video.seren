@@ -26,6 +26,8 @@ class Menus:
         self.shows_database = shows.TraktSyncDatabase()
         self.list_builder = ListBuilder()
         self.page_limit = g.get_int_setting("item.limit")
+        self.page_start = (g.PAGE-1)*self.page_limit
+        self.page_end = g.PAGE*self.page_limit
 
     ######################################################
     # MENUS
@@ -40,7 +42,7 @@ class Menus:
             i
             for i in self.bookmark_database.get_all_bookmark_items("episode")
             if i["trakt_show_id"] not in hidden_shows
-        ][: self.page_limit]
+        ][self.page_start:self.page_end]
         self.list_builder.mixed_episode_builder(bookmarked_items)
 
     @staticmethod
@@ -508,21 +510,20 @@ class Menus:
             for selection in genre_multiselect:
                 genre_string += ", {}".format(genres[selection]["slug"])
             genre_string = genre_string[2:]
-
         else:
-            genre_string = args
+            genre_string = tools.unquote(args)
 
         trakt_list = self.shows_database.extract_trakt_page(
             "shows/{}".format(trakt_endpoint),
-            genres=genre_string,
             page=g.PAGE,
-            extended="full",
+            extended="full"
         )
+
         if trakt_list is None:
             g.cancel_directory()
             return
 
-        self.list_builder.show_list_builder(trakt_list)
+        self.list_builder.show_list_builder(trakt_list, next_args=genre_string)
 
     def shows_related(self, args):
         trakt_list = self.trakt.get_json(

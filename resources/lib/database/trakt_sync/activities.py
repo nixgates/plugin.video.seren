@@ -464,7 +464,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     (
                         (
                             i.get("trakt_id"),
-                            get(i, "resumetime"),
+                            int(
+                                float(get(i, "percentplayed") / 100)
+                                * get(i, "duration")
+                                ),
                             get(i, "percentplayed"),
                             bookmark_type[:-1],
                             get(i, "paused_at"),

@@ -90,5 +90,11 @@ class A4kSubtitlesAdapter:
         :return: Path to subtitle
         :rtype: str
         """
-        settings = extra.pop("settings", None)
-        return self.service.download(request, settings)
+        try:
+            settings = extra.pop("settings", None)
+            return self.service.download(request, settings)
+        except (OSError, IOError):
+            g.log("Unable to download subtitle, file already exists", "error")
+        except Exception as e:
+            g.log("Unknown error acquiring subtitle: {}".format(e), "error")
+            g.log_stacktrace()

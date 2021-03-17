@@ -118,7 +118,7 @@ class StillWatching(BaseWindow):
             return
 
         if control_id == 3001:
-            self.player.playnext()
+            xbmc.executebuiltin('PlayerControl(BigSkipForward)')
             self.close()
         if control_id == 3002:
             self.close()

@@ -84,6 +84,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
         try:
             self._remove_package_directories(package_name)
+            self._remove_legacy_meta_file(package_name)
             self.remove_provider_package(package_name)
             self.provider_settings.remove_package_settings(package_name)
 
@@ -208,7 +209,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         self.pre_update_collection = [
             i for i in self.get_providers() if i["package"] == pack_name
         ]
-        meta_output_location = os.path.join(g.ADDON_USERDATA_PATH, "providerMeta", pack_name)
+        meta_output_location = os.path.join(self.meta_path, pack_name)
 
         self._output_meta_file(meta_output_location)
 
@@ -225,6 +226,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
         self._extract_package_folders(pack_name)
         self._destroy_created_temp_items()
+        self._remove_legacy_meta_file(pack_name)
 
         if install_progress:
             install_progress.close()
@@ -246,6 +248,13 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
         ProvidersServiceManager().start_package_services(pack_name)
         return True
+
+    def _remove_legacy_meta_file(self, pack_name):
+        legacy_meta_file = os.path.join(self.meta_path, pack_name + ".json")
+        try:
+            os.remove(legacy_meta_file)
+        except OSError:
+            pass
 
     def _remove_root_directory_from_file_paths(self):
         if not self._root_directory:

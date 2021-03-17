@@ -21,6 +21,12 @@ BROWSER_AGENTS = [
 ]
 
 exclusions = ["soundtrack", "gesproken"]
+_APOSTROPHE_SUBS = re.compile(r"\\'s|'s|&#039;s| 039 s")
+_SEPARATORS = re.compile(r'[:|/,!?()"+[\]\-_.{}]')
+_WHITESPACE = re.compile(r'\s+')
+_SINGLE_QUOTE = re.compile(r"['`]")
+_AMPERSAND = re.compile(r'&#038;|&amp;|&')
+_EPISODE_NUMBERS = re.compile(r'.*((?:s\d+ ?e\d+ )|(?:season ?\d+ ?(?:episode|ep) ?\d+)|(?: \d+ ?x ?\d+ ))')
 
 
 class CannotGenerateRegexFilterException(Exception):
@@ -198,7 +204,6 @@ def strip_non_ascii_and_unprintable(text):
     result = "".join(char for char in text if char in string.printable)
     return result.encode("ascii", errors="ignore").decode("ascii", errors="ignore")
 
-
 def clean_title(title, broken=None):
     """
     Returns a cleaned version of the provided title
@@ -216,15 +221,12 @@ def clean_title(title, broken=None):
     elif broken == 2:
         apostrophe_replacement = " s"
 
-    title = title.replace("\\'s", apostrophe_replacement)
-    title = title.replace("'s", apostrophe_replacement)
-    title = title.replace("&#039;s", apostrophe_replacement)
-    title = title.replace(" 039 s", apostrophe_replacement)
+    title = _APOSTROPHE_SUBS.sub(apostrophe_replacement, title)
 
-    title = re.sub(r"'|’", "", title)
-    title = re.sub(r':|\\|/|,|!|\?|\(|\)|"|\+|\[|]|-|_|\.|{|}', " ", title)
-    title = re.sub(r"\s+", " ", title)
-    title = re.sub(r"&", "and", title)
+    title = _SINGLE_QUOTE.sub("", title)
+    title = _SEPARATORS.sub(" ", title)
+    title = _WHITESPACE.sub(" ", title)
+    title = _AMPERSAND.sub("and", title)
 
     return title.strip()
 
@@ -292,10 +294,10 @@ def _get_regex_pattern(titles, suffixes_list, non_escaped_suffixes=None):
     for suffix in suffixes_list:
         suffix = suffix.strip()
         if len(suffix) > 0:
-            pattern += re.escape(suffix) + r" |"
+            pattern += re.escape(suffix) + r"|"
     if non_escaped_suffixes:
         for suffix in non_escaped_suffixes:
-            pattern += suffix + r" |"
+            pattern += suffix + r"|"
     pattern = pattern[:-1] + r")+"
     regex_pattern = re.compile(pattern)
     return regex_pattern
@@ -327,18 +329,7 @@ def check_episode_number_match(release_title):
     :param release_title: Release title of source
     :return: True if present else False
     """
-
-    episode_number_match = len(re.findall(r"(s\d+ ?e\d+ )", release_title)) > 0
-    if episode_number_match:
-        return True
-
-    episode_number_match = (
-        len(re.findall(r"(season \d+ episode \d+)", release_title)) > 0
-    )
-    if episode_number_match:
-        return True
-
-    return False
+    return _EPISODE_NUMBERS.match(release_title) is not None
 
 
 def check_episode_title_match(show_titles, release_title, simple_info):
@@ -407,8 +398,8 @@ def clean_title_with_simple_info(title, simple_info):
     title = remove_country(title, country)
     year = simple_info.get("year", "")
     title = remove_from_title(title, year)
-    title = re.sub(r"\s+", " ", title)
-    return re.sub(r"\s$", "", title)
+    title = _WHITESPACE.sub(" ", title)
+    return title.rstrip()
 
 
 def get_filter_single_episode_fn(simple_info):
@@ -478,10 +469,10 @@ def get_filter_season_pack_fn(simple_info):
     titles.insert(0, show_title)
 
     season_fill = season.zfill(2)
-    season_check = "s%s" % season
-    season_fill_check = "s%s" % season_fill
-    season_full_check = "season %s" % season
-    season_full_fill_check = "season %s" % season_fill
+    season_check = "s{}".format(season)
+    season_fill_check = "s%{}".format(season_fill)
+    season_full_check = "season {}".format(season)
+    season_full_fill_check = "season {}".format(season_fill)
 
     clean_titles = []
     for title in titles:
@@ -537,8 +528,8 @@ def get_filter_show_pack_fn(simple_info):
     all_seasons = "1 "
     season_count = 2
     while season_count <= int(no_seasons):
-        all_season_ranges.append(all_seasons + "and %s" % str(season_count))
-        all_seasons += "%s " % str(season_count)
+        all_season_ranges.append(all_seasons + "and {}".format(season_count))
+        all_seasons += "{} ".format(season_count)
         all_season_ranges.append(all_seasons)
         season_count += 1
 
@@ -555,24 +546,24 @@ def get_filter_show_pack_fn(simple_info):
         no_seasons_minus_one_fill = no_seasons_minus_one.zfill(2)
 
         results = [
-            'all %s seasons' % no_seasons,
-            'all %s seasons' % no_seasons_fill,
-            'all %s seasons' % no_seasons_minus_one,
-            'all %s seasons' % no_seasons_minus_one_fill,
-            "all of serie %s seasons" % no_seasons,
-            "all of serie %s seasons" % no_seasons_fill,
-            "all of serie %s seasons" % no_seasons_minus_one,
-            "all of serie %s seasons" % no_seasons_minus_one_fill,
-            "all torrent of serie %s seasons" % no_seasons,
-            "all torrent of serie %s seasons" % no_seasons_fill,
-            "all torrent of serie %s seasons" % no_seasons_minus_one,
-            "all torrent of serie %s seasons" % no_seasons_minus_one_fill,
+            'all {} seasons'.format(no_seasons),
+            'all {} seasons'.format(no_seasons_fill),
+            'all {} seasons'.format(no_seasons_minus_one),
+            'all {} seasons'.format(no_seasons_minus_one_fill),
+            "all of serie {} seasons".format(no_seasons),
+            "all of serie {} seasons".format(no_seasons_fill),
+            "all of serie {} seasons".format(no_seasons_minus_one),
+            "all of serie {} seasons".format(no_seasons_minus_one_fill),
+            "all torrent of serie {} seasons".format(no_seasons),
+            "all torrent of serie {} seasons".format(no_seasons_fill),
+            "all torrent of serie {} seasons".format(no_seasons_minus_one),
+            "all torrent of serie {} seasons".format(no_seasons_minus_one_fill),
         ]
 
         for season_range in all_season_ranges:
-            results.append("%s" % season_range)
-            results.append("season %s" % season_range)
-            results.append("seasons %s" % season_range)
+            results.append("{}".format(season_range))
+            results.append("season {}".format(season_range))
+            results.append("seasons {}".format(season_range))
 
         if "series" not in release_title:
             results.append("series")
@@ -706,21 +697,22 @@ def _full_meta_episode_regex(args):
         episode_title = None
 
     reg_string = (
-        "(?#SHOW TITLE)(?:%s)"
-        "? ?"
-        "(?#COUNTRY)(?:%s)"
-        "? ?"
-        "(?#YEAR)(?:%s)"
-        "? ?(?:(?:s?|\[?)0?"
-        "(?#SEASON)%s"
-        "[x .e]|(?:season 0?"
-        "(?#SEASON)%s "
-        "(?:episode )|(?: ep)))(?:\d?\d?e)?0?"
-        "(?#EPSIDOE)%s"
-        "(?:e\d\d)?\]? "
+        r"(?#SHOW TITLE)(?:{show_title})"
+        r"? ?"
+        r"(?#COUNTRY)(?:{country})"
+        r"? ?"
+        r"(?#YEAR)(?:{year})"
+        r"? ?"
+        r"(?:(?:[s[]?)0?"
+        r"(?#SEASON){season}"
+        r"[x .e]|(?:season 0?"
+        r"(?#SEASON){season} "
+        r"(?:episode )|(?: ep ?)))(?:\d?\d?e)?0?"
+        r"(?#EPISODE){episode}"
+        r"(?:e\d\d)?\]? "
     )
 
-    reg_string = reg_string % (show_title, country, year, season, season, episode)
+    reg_string = reg_string.format(show_title=show_title, country=country, year=year, season=season, episode=episode)
 
     if episode_title:
         reg_string += "|{eptitle}".format(eptitle=episode_title)

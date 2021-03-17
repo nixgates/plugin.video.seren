@@ -204,7 +204,7 @@
                         <colordiffuse>FF362e33</colordiffuse>
                     </control>
                     <control type="image">
-                        <visible>!String.IsEmpty($INFO[ListItem.Property(provider.image)])</visible>
+                        <visible>!String.IsEmpty(ListItem.Property(provider.image))</visible>
                         <texture>$INFO[ListItem.Property(provider.image)]</texture>
                     </control>
                     <control type="image">

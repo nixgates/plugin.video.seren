@@ -119,10 +119,9 @@ class SmartPlay:
                 )
             ]
         except TypeError:
-            g.log_stacktrace()
             g.log(
                 "Unable to add more episodes to the playlist, they may not be available for the requested season",
-                "error",
+                "warning",
             )
             return
 

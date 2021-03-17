@@ -24,6 +24,8 @@ class Menus:
         self.movies_database = movies.TraktSyncDatabase()
         self.list_builder = ListBuilder()
         self.page_limit = g.get_int_setting("item.limit")
+        self.page_start = (g.PAGE-1)*self.page_limit
+        self.page_end = g.PAGE*self.page_limit
 
     ######################################################
     # MENUS
@@ -37,7 +39,7 @@ class Menus:
             i
             for i in bookmark_sync.get_all_bookmark_items("movie")
             if i["trakt_id"] not in hidden_movies
-        ][: self.page_limit]
+        ][self.page_start:self.page_end]
         self.list_builder.movie_menu_builder(bookmarked_items)
 
     @staticmethod
@@ -400,11 +402,15 @@ class Menus:
 
         trakt_list = self.trakt.get_json_cached(
             "movies/{}".format(trakt_endpoint),
-            genres=genre_string,
             page=g.PAGE,
-            extended="full",
+            extended="full"
         )
-        self.list_builder.movie_menu_builder(trakt_list)
+
+        if trakt_list is None:
+            g.cancel_directory()
+            return
+
+        self.list_builder.movie_menu_builder(trakt_list, next_args=genre_string)
 
     @trakt_auth_guard
     def my_watched_movies(self):

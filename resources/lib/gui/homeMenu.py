@@ -98,6 +98,7 @@ class Menus:
         #                      description=g.get_language_string(30418))
         g.add_directory_item('Download Manager',
                              action='downloadManagerView',
+                             is_folder=False,
                              description='View Current Downloads')
         g.close_directory(g.CONTENT_FOLDER)
 

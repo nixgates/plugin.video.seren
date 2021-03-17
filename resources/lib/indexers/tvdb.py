@@ -931,7 +931,7 @@ class TVDBAPI(ApiBase):
         if "data" in response:
             response = response["data"]
         if not response:
-            return None
+            return []
         return response
 
     def get_json(self, url, **params):

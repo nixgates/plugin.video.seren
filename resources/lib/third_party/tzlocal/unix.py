@@ -32,7 +32,7 @@ def _try_tz_from_env():
     tzenv = os.environ.get('TZ')
     if tzenv:
         try:
-            return _tz_from_env(tzenv)
+            return _tz_from_env(str(tzenv))
         except pytz.UnknownTimeZoneError:
             pass
 
@@ -56,7 +56,11 @@ def _get_localzone(_root='/'):
     if os.path.exists('/system/bin/getprop'):
         import subprocess
         androidtz = subprocess.check_output(['getprop', 'persist.sys.timezone']).strip().decode()
-        return pytz.timezone(androidtz)
+        try:
+            return pytz.timezone(androidtz)
+        except pytz.UnknownTimeZoneError:
+            warnings.warn("Invalid timezone value from getprop persist.sys.timezone")
+            pass
 
     # Now look for distribution specific configuration files
     # that contain the timezone name.
