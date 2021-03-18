@@ -3221,3 +3221,7 @@ msgstr "Date Collected"
 msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
+
+msgctxt "#30582"
+msgid "Exit player"
+msgstr "Exit player"
