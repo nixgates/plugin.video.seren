@@ -191,7 +191,7 @@ class PlayingNext(BaseWindow):
         if control_id is None:
             control_id = self.getFocusId()
         if control_id == 3001:
-            self.seekTime(self.getTotalTime())
+            xbmc.executebuiltin('PlayerControl(BigSkipForward)')
             self.close()
         if control_id == 3002:
             self.close()

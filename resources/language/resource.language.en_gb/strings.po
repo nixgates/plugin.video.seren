@@ -25,7 +25,7 @@ msgctxt "#30003"
 msgid "My Shows"
 msgstr "My Shows"
 
-#: \resources\settings.xml:50 \resources\lib\gui\movieMenus.py:45
+#: \resources\settings.xml:51 \resources\lib\gui\movieMenus.py:45
 #: \resources\lib\gui\tvshowMenus.py:49
 msgctxt "#30004"
 msgid "Most Popular"
@@ -36,7 +36,7 @@ msgctxt "#30005"
 msgid "Recommended For You"
 msgstr "Recommended For You"
 
-#: \resources\settings.xml:50 \resources\lib\gui\movieMenus.py:63
+#: \resources\settings.xml:51 \resources\lib\gui\movieMenus.py:63
 #: \resources\lib\gui\tvshowMenus.py:67
 msgctxt "#30006"
 msgid "Trending"
@@ -75,8 +75,8 @@ msgstr "Box Office Top 10"
 #: \resources\lib\gui\homeMenu.py:29 \resources\lib\gui\movieMenus.py:144
 #: \resources\lib\gui\movieMenus.py:150 \resources\lib\gui\movieMenus.py:282
 #: \resources\lib\gui\movieMenus.py:344 \resources\lib\gui\tvshowMenus.py:152
-#: \resources\lib\gui\tvshowMenus.py:158 \resources\lib\gui\tvshowMenus.py:391
-#: \resources\lib\gui\tvshowMenus.py:426
+#: \resources\lib\gui\tvshowMenus.py:158 \resources\lib\gui\tvshowMenus.py:403
+#: \resources\lib\gui\tvshowMenus.py:438
 msgctxt "#30013"
 msgid "Search..."
 msgstr "Search..."
@@ -91,12 +91,12 @@ msgctxt "#30015"
 msgid "Watchlist"
 msgstr "Watchlist"
 
-#: \resources\lib\modules\list_builder.py:186
+#: \resources\lib\modules\list_builder.py:187
 msgctxt "#30016"
 msgid "Next"
 msgstr "Next"
 
-#: \resources\lib\modules\globals.py:708
+#: \resources\lib\modules\globals.py:718
 msgctxt "#30017"
 msgid "Color Picker"
 msgstr "Color Picker"
@@ -109,7 +109,7 @@ msgstr "Real-Debrid Auth"
 #: \resources\lib\debrid\all_debrid.py:119
 #: \resources\lib\debrid\premiumize.py:62
 #: \resources\lib\debrid\real_debrid.py:86
-#: \resources\lib\indexers\trakt.py:432
+#: \resources\lib\indexers\trakt.py:451
 msgctxt "#30019"
 msgid "Open this link in a browser: {}"
 msgstr "Open this link in a browser: {}"
@@ -117,7 +117,7 @@ msgstr "Open this link in a browser: {}"
 #: \resources\lib\debrid\all_debrid.py:122
 #: \resources\lib\debrid\premiumize.py:65
 #: \resources\lib\debrid\real_debrid.py:89
-#: \resources\lib\indexers\trakt.py:435
+#: \resources\lib\indexers\trakt.py:454
 msgctxt "#30020"
 msgid "Enter the code: {}"
 msgstr "Enter the code: {}"
@@ -129,17 +129,17 @@ msgctxt "#30021"
 msgid "Authentication is completed"
 msgstr "Authentication is completed"
 
-#: \resources\lib\indexers\trakt.py:405
+#: \resources\lib\indexers\trakt.py:424
 msgctxt "#30022"
 msgid "Trakt Successfully Disconnected"
 msgstr "Trakt Successfully Disconnected"
 
-#: \resources\lib\indexers\trakt.py:430
+#: \resources\lib\indexers\trakt.py:449
 msgctxt "#30023"
 msgid "Authorize Trakt"
 msgstr "Authorize Trakt"
 
-#: \resources\lib\indexers\trakt.py:425 \resources\lib\indexers\trakt.py:491
+#: \resources\lib\indexers\trakt.py:444 \resources\lib\indexers\trakt.py:510
 msgctxt "#30024"
 msgid ""
 "Error while authenticating with Trakt.\n"
@@ -150,7 +150,7 @@ msgstr ""
 
 #: \resources\lib\debrid\all_debrid.py:47
 #: \resources\lib\indexers\fanarttv.py:31 \resources\lib\indexers\omdb.py:63
-#: \resources\lib\indexers\tmdb.py:53 \resources\lib\indexers\trakt.py:89
+#: \resources\lib\indexers\tmdb.py:53 \resources\lib\indexers\trakt.py:92
 #: \resources\lib\indexers\tvdb.py:57
 msgctxt "#30025"
 msgid "Unknown Error Connecting to {}"
@@ -171,13 +171,13 @@ msgctxt "#30028"
 msgid "Tools"
 msgstr "Tools"
 
-#: \resources\settings.xml:440 \resources\settings.xml:442
+#: \resources\settings.xml:441 \resources\settings.xml:443
 #: \resources\lib\gui\homeMenu.py:71
 msgctxt "#30029"
 msgid "Clear Cache"
 msgstr "Clear Cache"
 
-#: \resources\lib\modules\globals.py:841
+#: \resources\lib\modules\globals.py:851
 msgctxt "#30030"
 msgid "Are you sure you wish to clear the cache?"
 msgstr "Are you sure you wish to clear the cache?"
@@ -233,7 +233,7 @@ msgctxt "#30039"
 msgid "Premium Services"
 msgstr "Premium Services"
 
-#: \resources\settings.xml:444 \resources\lib\gui\homeMenu.py:75
+#: \resources\settings.xml:445 \resources\lib\gui\homeMenu.py:75
 msgctxt "#30040"
 msgid "Clear Local Torrent Cache"
 msgstr "Clear Local Torrent Cache"
@@ -243,7 +243,7 @@ msgctxt "#30041"
 msgid "Open Settings Menu"
 msgstr "Open Settings Menu"
 
-#: \resources\settings.xml:448 \resources\lib\gui\homeMenu.py:87
+#: \resources\settings.xml:449 \resources\lib\gui\homeMenu.py:87
 msgctxt "#30042"
 msgid "Wipe Addon Data"
 msgstr "Wipe Addon Data"
@@ -263,7 +263,7 @@ msgctxt "#30045"
 msgid "My Movie Lists"
 msgstr "My Movie Lists"
 
-#: \resources\lib\gui\movieMenus.py:368 \resources\lib\gui\tvshowMenus.py:462
+#: \resources\lib\gui\movieMenus.py:368 \resources\lib\gui\tvshowMenus.py:474
 msgctxt "#30046"
 msgid "Multi Select..."
 msgstr "Multi Select..."
@@ -276,7 +276,7 @@ msgstr "New TV Shows"
 #: \resources\lib\debrid\all_debrid.py:123
 #: \resources\lib\debrid\premiumize.py:68
 #: \resources\lib\debrid\real_debrid.py:92
-#: \resources\lib\indexers\trakt.py:436
+#: \resources\lib\indexers\trakt.py:455
 msgctxt "#30048"
 msgid "This code has been copied to your clipboard"
 msgstr "This code has been copied to your clipboard"
@@ -301,7 +301,7 @@ msgctxt "#30052"
 msgid "successfully uninstalled"
 msgstr "successfully uninstalled"
 
-#: \resources\lib\modules\globals.py:848
+#: \resources\lib\modules\globals.py:858
 msgctxt "#30053"
 msgid "All Cache Successfully Cleared"
 msgstr "All Cache Successfully Cleared"
@@ -316,7 +316,7 @@ msgctxt "#30055"
 msgid "Initializing Providers"
 msgstr "Initializing Providers"
 
-#: \resources\lib\modules\getSources.py:219
+#: \resources\lib\modules\getSources.py:218
 msgctxt "#30056"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -325,7 +325,7 @@ msgstr ""
 "No Sources found for next item in playlist.\n"
 "Clearing current playlist"
 
-#: \resources\lib\modules\getSources.py:360
+#: \resources\lib\modules\getSources.py:362
 msgctxt "#30057"
 msgid ""
 "No Playable Sources were found.\n"
@@ -334,24 +334,24 @@ msgstr ""
 "No Playable Sources were found.\n"
 "Would you like to attempt to cache a torrent?"
 
-#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:738
+#: \resources\settings.xml:407 \resources\lib\modules\getSources.py:735
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30058"
 msgid "Torrents"
 msgstr "Torrents"
 
-#: \resources\settings.xml:406 \resources\lib\modules\getSources.py:743
+#: \resources\settings.xml:407 \resources\lib\modules\getSources.py:740
 #: \resources\skins\Default\1080i\get_sources.xml:243
 msgctxt "#30059"
 msgid "Hosters"
 msgstr "Hosters"
 
-#: \resources\lib\modules\getSources.py:749
+#: \resources\lib\modules\getSources.py:746
 msgctxt "#30060"
 msgid "Free Hosters"
 msgstr "Free Hosters"
 
-#: \resources\lib\modules\getSources.py:751
+#: \resources\lib\modules\getSources.py:748
 msgctxt "#30061"
 msgid "Remaining Providers"
 msgstr "Remaining Providers"
@@ -501,40 +501,40 @@ msgstr ""
 "This will completely wipe your addon settings.\n"
 "Are you completely sure you want to do this?"
 
-#: \resources\settings.xml:7 \resources\settings.xml:207
-#: \resources\settings.xml:249 \resources\settings.xml:282
-#: \resources\settings.xml:368
+#: \resources\settings.xml:7 \resources\settings.xml:208
+#: \resources\settings.xml:250 \resources\settings.xml:283
+#: \resources\settings.xml:369
 msgctxt "#30087"
 msgid "General"
 msgstr "General"
 
-#: \resources\settings.xml:251
+#: \resources\settings.xml:252
 msgctxt "#30088"
 msgid "Episode Play Style"
 msgstr "Episode Play Style"
 
-#: \resources\settings.xml:250 \resources\settings.xml:251
+#: \resources\settings.xml:251 \resources\settings.xml:252
 msgctxt "#30089"
 msgid "Auto Play"
 msgstr "Auto Play"
 
-#: \resources\settings.xml:250 \resources\settings.xml:251
+#: \resources\settings.xml:251 \resources\settings.xml:252
 #: \resources\skins\Default\1080i\source_select.xml:32
 msgctxt "#30090"
 msgid "Source Select"
 msgstr "Source Select"
 
-#: \resources\settings.xml:108
+#: \resources\settings.xml:109
 msgctxt "#30091"
 msgid "Source Select View"
 msgstr "Source Select View"
 
-#: \resources\settings.xml:108
+#: \resources\settings.xml:109
 msgctxt "#30092"
 msgid "List"
 msgstr "List"
 
-#: \resources\settings.xml:108
+#: \resources\settings.xml:109
 msgctxt "#30093"
 msgid "Dialog"
 msgstr "Dialog"
@@ -559,12 +559,12 @@ msgctxt "#30097"
 msgid "Multiline Source Select"
 msgstr "Multiline Source Select"
 
-#: \resources\settings.xml:78
+#: \resources\settings.xml:79
 msgctxt "#30098"
 msgid "Metadata location"
 msgstr "Metadata location"
 
-#: \resources\settings.xml:77
+#: \resources\settings.xml:78
 msgctxt "#30099"
 msgid "Page Item Limit"
 msgstr "Page Item Limit"
@@ -624,209 +624,209 @@ msgctxt "#30110"
 msgid "Current Color"
 msgstr "Current Color"
 
-#: \resources\settings.xml:263
+#: \resources\settings.xml:264
 msgctxt "#30111"
 msgid "Enable Playing Next Dialog"
 msgstr "Enable Playing Next Dialog"
 
-#: \resources\settings.xml:264
+#: \resources\settings.xml:265
 msgctxt "#30112"
 msgid "Minimum Seconds Left Before Showing Dialog"
 msgstr "Minimum Seconds Left Before Showing Dialog"
 
-#: \resources\settings.xml:256
+#: \resources\settings.xml:257
 msgctxt "#30113"
 msgid "Auto Playlist Creation"
 msgstr "Auto Playlist Creation"
 
-#: \resources\settings.xml:257
+#: \resources\settings.xml:258
 msgctxt "#30114"
 msgid "Force Auto Episode Resume"
 msgstr "Force Auto Episode Resume"
 
-#: \resources\settings.xml:258
+#: \resources\settings.xml:259
 msgctxt "#30115"
 msgid "Pre-emptive Scraping"
 msgstr "Pre-emptive Scraping"
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30116"
 msgid "Resume Style"
 msgstr "Resume Style"
 
-#: \resources\settings.xml:204
+#: \resources\settings.xml:205
 msgctxt "#30117"
 msgid "Scraping"
 msgstr "Scraping"
 
-#: \resources\settings.xml:210
+#: \resources\settings.xml:211
 msgctxt "#30118"
 msgid "Cache Torrent Info Locally"
 msgstr "Cache Torrent Info Locally"
 
-#: \resources\settings.xml:398
+#: \resources\settings.xml:399
 msgctxt "#30119"
 msgid "Hide HEVC Items"
 msgstr "Hide HEVC Items"
 
-#: \resources\settings.xml:211
+#: \resources\settings.xml:212
 msgctxt "#30120"
 msgid "Timeout"
 msgstr "Timeout"
 
-#: \resources\settings.xml:214
+#: \resources\settings.xml:215
 msgctxt "#30121"
 msgid "Auto Caching Assistant"
 msgstr "Auto Caching Assistant"
 
-#: \resources\settings.xml:216
+#: \resources\settings.xml:217
 msgctxt "#30122"
 msgid "Auto Add Un-Cached Sources to Debrid"
 msgstr "Auto Add Un-Cached Sources to Debrid"
 
-#: \resources\settings.xml:217
+#: \resources\settings.xml:218
 msgctxt "#30123"
 msgid "Assist Mode"
 msgstr "Assist Mode"
 
-#: \resources\settings.xml:219
+#: \resources\settings.xml:220
 msgctxt "#30124"
 msgid "Preferred Cloud Location"
 msgstr "Preferred Cloud Location"
 
-#: \resources\settings.xml:385
+#: \resources\settings.xml:386
 msgctxt "#30125"
 msgid "Source Filters"
 msgstr "Source Filters"
 
-#: \resources\settings.xml:388
+#: \resources\settings.xml:389
 msgctxt "#30126"
 msgid "Enable File Size Limit"
 msgstr "Enable File Size Limit"
 
-#: \resources\settings.xml:391
+#: \resources\settings.xml:392
 msgctxt "#30127"
 msgid "Episode File Size limit (GB)"
 msgstr "Episode File Size limit (GB)"
 
-#: \resources\settings.xml:406
+#: \resources\settings.xml:407
 msgctxt "#30128"
 msgid "Source grouping style"
 msgstr "Source grouping style"
 
-#: \resources\settings.xml:407
+#: \resources\settings.xml:408
 msgctxt "#30129"
 msgid "Enable Secondary Filesize Sort"
 msgstr "Enable Secondary Filesize Sort"
 
-#: \resources\settings.xml:410
+#: \resources\settings.xml:411
 msgctxt "#30130"
 msgid "Enable Tertiary HEVC Sort Preference"
 msgstr "Enable Tertiary HEVC Sort Preference"
 
-#: \resources\settings.xml:387
+#: \resources\settings.xml:388
 msgctxt "#30131"
 msgid "Max Resolution"
 msgstr "Max Resolution"
 
-#: \resources\settings.xml:223
+#: \resources\settings.xml:224
 msgctxt "#30132"
 msgid "Preemptive Termination"
 msgstr "Preemptive Termination"
 
-#: \resources\settings.xml:225
+#: \resources\settings.xml:226
 msgctxt "#30133"
 msgid "Enable Preemptive Termination"
 msgstr "Enable Preemptive Termination"
 
-#: \resources\settings.xml:226
+#: \resources\settings.xml:227
 msgctxt "#30134"
 msgid "Minimum Movie Resolution"
 msgstr "Minimum Movie Resolution"
 
-#: \resources\settings.xml:228
+#: \resources\settings.xml:229
 msgctxt "#30135"
 msgid "Minimum TV Shows Resolution"
 msgstr "Minimum TV Shows Resolution"
 
-#: \resources\settings.xml:230
+#: \resources\settings.xml:231
 msgctxt "#30136"
 msgid "Minimum Sources"
 msgstr "Minimum Sources"
 
-#: \resources\settings.xml:232
+#: \resources\settings.xml:233
 msgctxt "#30137"
 msgid "Terminate on... "
 msgstr "Terminate on... "
 
-#: \resources\settings.xml:279
+#: \resources\settings.xml:280
 msgctxt "#30138"
 msgid "Accounts"
 msgstr "Accounts"
 
-#: \resources\settings.xml:284
+#: \resources\settings.xml:285
 msgctxt "#30139"
 msgid "Enable Account Expiry Notifications"
 msgstr "Enable Account Expiry Notifications"
 
-#: \resources\settings.xml:78 \resources\settings.xml:287
+#: \resources\settings.xml:79 \resources\settings.xml:288
 msgctxt "#30140"
 msgid "Trakt"
 msgstr "Trakt"
 
-#: \resources\settings.xml:289
+#: \resources\settings.xml:290
 msgctxt "#30141"
 msgid "Trakt Username"
 msgstr "Trakt Username"
 
-#: \resources\settings.xml:290
+#: \resources\settings.xml:291
 msgctxt "#30142"
 msgid "Authorize Trakt..."
 msgstr "Authorize Trakt..."
 
-#: \resources\settings.xml:292
+#: \resources\settings.xml:293
 msgctxt "#30143"
 msgid "Enable Trakt Scrobbling"
 msgstr "Enable Trakt Scrobbling"
 
-#: \resources\settings.xml:297
+#: \resources\settings.xml:298
 msgctxt "#30144"
 msgid "Revoke Trakt Authentication..."
 msgstr "Revoke Trakt Authentication..."
 
-#: \resources\settings.xml:219 \resources\settings.xml:301
+#: \resources\settings.xml:220 \resources\settings.xml:302
 msgctxt "#30145"
 msgid "Premiumize"
 msgstr "Premiumize"
 
-#: \resources\settings.xml:219 \resources\settings.xml:328
+#: \resources\settings.xml:220 \resources\settings.xml:329
 msgctxt "#30146"
 msgid "Real-Debrid"
 msgstr "Real-Debrid"
 
-#: \resources\settings.xml:365
+#: \resources\settings.xml:366
 #: \resources\lib\modules\providers\install_manager.py:54
 msgctxt "#30147"
 msgid "Providers"
 msgstr "Providers"
 
-#: \resources\settings.xml:415 \resources\settings.xml:418
+#: \resources\settings.xml:416 \resources\settings.xml:419
 msgctxt "#30148"
 msgid "API Keys"
 msgstr "API Keys"
 
-#: \resources\settings.xml:370
+#: \resources\settings.xml:371
 msgctxt "#30149"
 msgid "Enable Automatic Provider Updates"
 msgstr "Enable Automatic Provider Updates"
 
-#: \resources\settings.xml:63 \resources\settings.xml:375
+#: \resources\settings.xml:64 \resources\settings.xml:376
 #: \resources\lib\gui\homeMenu.py:105
 msgctxt "#30150"
 msgid "Check For Updates"
 msgstr "Check For Updates"
 
-#: \resources\settings.xml:373 \resources\settings.xml:377
+#: \resources\settings.xml:374 \resources\settings.xml:378
 #: \resources\lib\gui\homeMenu.py:109
 msgctxt "#30151"
 msgid "Manage Provider Packages"
@@ -837,124 +837,124 @@ msgctxt "#30152"
 msgid "Force view types on menus"
 msgstr "Force view types on menus"
 
-#: \resources\settings.xml:437
+#: \resources\settings.xml:438
 msgctxt "#30153"
 msgid "Shortcuts"
 msgstr "Shortcuts"
 
-#: \resources\settings.xml:71
+#: \resources\settings.xml:72
 msgctxt "#30154"
 msgid "Mixed Episode Lists Title Display Style"
 msgstr "Mixed Episode Lists Title Display Style"
 
-#: \resources\settings.xml:423
+#: \resources\settings.xml:424
 msgctxt "#30155"
 msgid "TMDb API Key"
 msgstr "TMDb API Key"
 
-#: \resources\settings.xml:426
+#: \resources\settings.xml:427
 msgctxt "#30156"
 msgid "Trakt Client ID"
 msgstr "Trakt Client ID"
 
-#: \resources\settings.xml:427
+#: \resources\settings.xml:428
 msgctxt "#30157"
 msgid "Trakt Client Secret"
 msgstr "Trakt Client Secret"
 
-#: \resources\settings.xml:430
+#: \resources\settings.xml:431
 msgctxt "#30158"
 msgid "TVDB API Key"
 msgstr "TVDB API Key"
 
-#: \resources\settings.xml:382
+#: \resources\settings.xml:383
 msgctxt "#30159"
 msgid "Sort & Filter"
 msgstr "Sort & Filter"
 
-#: \resources\settings.xml:397
+#: \resources\settings.xml:398
 msgctxt "#30160"
 msgid "Hide 3D Items"
 msgstr "Hide 3D Items"
 
-#: \resources\settings.xml:404
+#: \resources\settings.xml:405
 msgctxt "#30161"
 msgid "Source Sorting"
 msgstr "Source Sorting"
 
-#: \resources\settings.xml:334
+#: \resources\settings.xml:335
 msgctxt "#30162"
 msgid "Authorize Real-Debrid..."
 msgstr "Authorize Real-Debrid..."
 
-#: \resources\settings.xml:331
+#: \resources\settings.xml:332
 msgctxt "#30163"
 msgid "Real-Debrid Username"
 msgstr "Real-Debrid Username"
 
-#: \resources\settings.xml:330
+#: \resources\settings.xml:331
 msgctxt "#30164"
 msgid "Enable Real-Debrid"
 msgstr "Enable Real-Debrid"
 
-#: \resources\settings.xml:336
+#: \resources\settings.xml:337
 msgctxt "#30165"
 msgid "Real-Debrid Priority"
 msgstr "Real-Debrid Priority"
 
-#: \resources\settings.xml:312 \resources\settings.xml:338
-#: \resources\settings.xml:356
+#: \resources\settings.xml:313 \resources\settings.xml:339
+#: \resources\settings.xml:357
 msgctxt "#30166"
 msgid "Enable Torrents"
 msgstr "Enable Torrents"
 
-#: \resources\settings.xml:314 \resources\settings.xml:339
-#: \resources\settings.xml:358
+#: \resources\settings.xml:315 \resources\settings.xml:340
+#: \resources\settings.xml:359
 msgctxt "#30167"
 msgid "Enable Hosters"
 msgstr "Enable Hosters"
 
-#: \resources\settings.xml:340
+#: \resources\settings.xml:341
 msgctxt "#30168"
 msgid "Auto-Delete Torrents"
 msgstr "Auto-Delete Torrents"
 
-#: \resources\settings.xml:322
+#: \resources\settings.xml:323
 msgctxt "#30169"
 msgid "Max Storage Space Used Before Deletion (GB)"
 msgstr "Max Storage Space Used Before Deletion (GB)"
 
-#: \resources\settings.xml:320
+#: \resources\settings.xml:321
 msgctxt "#30170"
 msgid "Automatic Cloud Removal"
 msgstr "Automatic Cloud Removal"
 
-#: \resources\settings.xml:316
+#: \resources\settings.xml:317
 msgctxt "#30171"
 msgid "Prefer Transcoded Files"
 msgstr "Prefer Transcoded Files"
 
-#: \resources\settings.xml:306
+#: \resources\settings.xml:307
 msgctxt "#30172"
 msgid "Premiumize Customer ID"
 msgstr "Premiumize Customer ID"
 
-#: \resources\settings.xml:310
+#: \resources\settings.xml:311
 msgctxt "#30173"
 msgid "Premiumize Priority"
 msgstr "Premiumize Priority"
 
-#: \resources\settings.xml:303
+#: \resources\settings.xml:304
 msgctxt "#30174"
 msgid "Enable Premiumize"
 msgstr "Enable Premiumize"
 
-#: \resources\settings.xml:399
+#: \resources\settings.xml:400
 msgctxt "#30175"
 msgid "Hide Common Undesirable Items"
 msgstr "Hide Common Undesirable Items"
 
-#: \resources\settings.xml:411
+#: \resources\settings.xml:412
 msgctxt "#30176"
 msgid "Enable Quaternary Low Quality Sort Preference"
 msgstr "Enable Quaternary Low Quality Sort Preference"
@@ -964,7 +964,7 @@ msgctxt "#30177"
 msgid "Enable search history"
 msgstr "Enable search history"
 
-#: \resources\lib\indexers\trakt.py:415
+#: \resources\lib\indexers\trakt.py:434
 msgctxt "#30178"
 msgid ""
 "Unable to contact Trakt.\n"
@@ -975,13 +975,13 @@ msgstr ""
 "Please check Trakts outage status at:\n"
 "http://status.trakt.tv"
 
-#: \resources\settings.xml:120
+#: \resources\settings.xml:121
 msgctxt "#30179"
 msgid "Fanart.TV API Key"
 msgstr "Fanart.TV API Key"
 
-#: \resources\settings.xml:118 \resources\settings.xml:126
-#: \resources\settings.xml:159
+#: \resources\settings.xml:119 \resources\settings.xml:127
+#: \resources\settings.xml:160
 msgctxt "#30180"
 msgid "Fanart.TV"
 msgstr "Fanart.TV"
@@ -1018,7 +1018,7 @@ msgstr ""
 "Another addon is attempting to uninstall the {} provider from Seren\n"
 "Do you wish to allow this?"
 
-#: \resources\settings.xml:400
+#: \resources\settings.xml:401
 msgctxt "#30185"
 msgid "Hide SD quality sources"
 msgstr "Hide SD quality sources"
@@ -1048,40 +1048,40 @@ msgctxt "#30190"
 msgid "My Files"
 msgstr "My Files"
 
-#: \resources\settings.xml:209
+#: \resources\settings.xml:210
 msgctxt "#30191"
 msgid "Scraper Display Style"
 msgstr "Scraper Display Style"
 
-#: \resources\settings.xml:107
+#: \resources\settings.xml:108
 msgctxt "#30192"
 msgid "Resolve Display Style"
 msgstr "Resolve Display Style"
 
-#: \resources\settings.xml:107 \resources\settings.xml:107
-#: \resources\settings.xml:209 \resources\settings.xml:255
-#: \resources\settings.xml:266
+#: \resources\settings.xml:108 \resources\settings.xml:108
+#: \resources\settings.xml:210 \resources\settings.xml:256
+#: \resources\settings.xml:267
 msgctxt "#30193"
 msgid "Fancy"
 msgstr "Fancy"
 
-#: \resources\settings.xml:107 \resources\settings.xml:209
-#: \resources\settings.xml:255
+#: \resources\settings.xml:108 \resources\settings.xml:210
+#: \resources\settings.xml:256
 msgctxt "#30194"
 msgid "Background Task"
 msgstr "Background Task"
 
-#: \resources\settings.xml:109
+#: \resources\settings.xml:110
 msgctxt "#30195"
 msgid "Auto-Select after (x) Seconds"
 msgstr "Auto-Select after (x) Seconds"
 
-#: \resources\settings.xml:110
+#: \resources\settings.xml:111
 msgctxt "#30196"
 msgid "Auto Select Delay"
 msgstr "Auto Select Delay"
 
-#: \resources\lib\database\trakt_sync\activities.py:159
+#: \resources\lib\database\trakt_sync\activities.py:174
 msgctxt "#30197"
 msgid "Rebuilding Trakt Sync Database, please be patient"
 msgstr "Rebuilding Trakt Sync Database, please be patient"
@@ -1100,13 +1100,13 @@ msgstr ""
 "A new verison of Seren is available from the repository. Please consider "
 "updating to v{}"
 
-#: \resources\settings.xml:69
+#: \resources\settings.xml:70
 msgctxt "#30200"
 msgid "Notify Me About Available Updates"
 msgstr "Notify Me About Available Updates"
 
-#: \resources\lib\database\trakt_sync\__init__.py:406
-#: \resources\lib\database\trakt_sync\__init__.py:435
+#: \resources\lib\database\trakt_sync\__init__.py:415
+#: \resources\lib\database\trakt_sync\__init__.py:444
 msgctxt "#30201"
 msgid ""
 "[COLOR red]WARNING[/COLOR]\n"
@@ -1115,9 +1115,9 @@ msgstr ""
 "[COLOR red]WARNING[/COLOR]\n"
 "This will reset all meta information, are you sure?"
 
-#: \resources\settings.xml:446 \resources\lib\gui\homeMenu.py:79
-#: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:375
-#: \resources\lib\gui\tvshowMenus.py:379
+#: \resources\settings.xml:447 \resources\lib\gui\homeMenu.py:79
+#: \resources\lib\gui\movieMenus.py:269 \resources\lib\gui\tvshowMenus.py:387
+#: \resources\lib\gui\tvshowMenus.py:391
 msgctxt "#30202"
 msgid "Clear Search History"
 msgstr "Clear Search History"
@@ -1127,12 +1127,12 @@ msgctxt "#30203"
 msgid "New Movie Search..."
 msgstr "New Movie Search..."
 
-#: \resources\lib\gui\tvshowMenus.py:370
+#: \resources\lib\gui\tvshowMenus.py:382
 msgctxt "#30204"
 msgid "New Show Search..."
 msgstr "New Show Search..."
 
-#: \resources\settings.xml:318
+#: \resources\settings.xml:319
 msgctxt "#30205"
 msgid "Store resolved items in cloud"
 msgstr "Store resolved items in cloud"
@@ -1162,13 +1162,13 @@ msgstr ""
 "Please setup your accounts in the settings menu before attempting to play an"
 " item"
 
-#: \resources\settings.xml:234
+#: \resources\settings.xml:235
 msgctxt "#30210"
 msgid "Terminate if cloud sources are found"
 msgstr "Terminate if cloud sources are found"
 
-#: \resources\settings.xml:324 \resources\settings.xml:341
-#: \resources\settings.xml:360
+#: \resources\settings.xml:325 \resources\settings.xml:342
+#: \resources\settings.xml:361
 msgctxt "#30211"
 msgid "Inspect Cloud Files on Scrape"
 msgstr "Inspect Cloud Files on Scrape"
@@ -1178,17 +1178,17 @@ msgctxt "#30212"
 msgid "By Actor..."
 msgstr "By Actor..."
 
-#: \resources\settings.xml:250
+#: \resources\settings.xml:251
 msgctxt "#30213"
 msgid "Movie Play Style"
 msgstr "Movie Play Style"
 
-#: \resources\settings.xml:389
+#: \resources\settings.xml:390
 msgctxt "#30214"
 msgid "Movie File Size limit (GB)"
 msgstr "Movie File Size limit (GB)"
 
-#: \resources\settings.xml:70
+#: \resources\settings.xml:71
 msgctxt "#30215"
 msgid "Enable Kodi Menu Caching"
 msgstr "Enable Kodi Menu Caching"
@@ -1202,7 +1202,7 @@ msgstr ""
 "Please Note\n"
 "You appear to have authorized a non-premium account and will not be able to play items using this account"
 
-#: \resources\settings.xml:252
+#: \resources\settings.xml:253
 msgctxt "#30217"
 msgid "Auto try next link on resolve failure (Source Select)"
 msgstr "Auto try next link on resolve failure (Source Select)"
@@ -1226,27 +1226,27 @@ msgctxt "#30220"
 msgid "Successfully uninstalled {}"
 msgstr "Successfully uninstalled {}"
 
-#: \resources\settings.xml:54
+#: \resources\settings.xml:55
 msgctxt "#30221"
 msgid "Themes"
 msgstr "Themes"
 
-#: \resources\settings.xml:56
+#: \resources\settings.xml:57
 msgctxt "#30222"
 msgid "Active theme"
 msgstr "Active theme"
 
-#: \resources\settings.xml:61
+#: \resources\settings.xml:62
 msgctxt "#30223"
 msgid "Switch theme"
 msgstr "Switch theme"
 
-#: \resources\settings.xml:59
+#: \resources\settings.xml:60
 msgctxt "#30224"
 msgid "Uninstall theme"
 msgstr "Uninstall theme"
 
-#: \resources\settings.xml:57
+#: \resources\settings.xml:58
 msgctxt "#30225"
 msgid "Install theme"
 msgstr "Install theme"
@@ -1316,27 +1316,27 @@ msgctxt "#30236"
 msgid "My Show Lists"
 msgstr "My Show Lists"
 
-#: \resources\settings.xml:452 \resources\lib\gui\homeMenu.py:91
+#: \resources\settings.xml:453 \resources\lib\gui\homeMenu.py:91
 msgctxt "#30237"
 msgid "Trakt Sync Tools"
 msgstr "Trakt Sync Tools"
 
-#: \resources\settings.xml:454 \resources\lib\gui\homeMenu.py:118
+#: \resources\settings.xml:455 \resources\lib\gui\homeMenu.py:118
 msgctxt "#30238"
 msgid "Clear last sync time"
 msgstr "Clear last sync time"
 
-#: \resources\settings.xml:456 \resources\lib\gui\homeMenu.py:122
+#: \resources\settings.xml:457 \resources\lib\gui\homeMenu.py:122
 msgctxt "#30239"
 msgid "Force a sync with Trakt"
 msgstr "Force a sync with Trakt"
 
-#: \resources\settings.xml:458 \resources\lib\gui\homeMenu.py:126
+#: \resources\settings.xml:459 \resources\lib\gui\homeMenu.py:126
 msgctxt "#30240"
 msgid "Clear All Metadata"
 msgstr "Clear All Metadata"
 
-#: \resources\settings.xml:460 \resources\lib\gui\homeMenu.py:130
+#: \resources\settings.xml:461 \resources\lib\gui\homeMenu.py:130
 msgctxt "#30241"
 msgid "Rebuild Database"
 msgstr "Rebuild Database"
@@ -1370,8 +1370,8 @@ msgstr "Default"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:130
-#: \resources\settings.xml:163 \resources\settings.xml:187
+#: \resources\settings.xml:44 \resources\settings.xml:131
+#: \resources\settings.xml:164 \resources\settings.xml:188
 msgctxt "#30247"
 msgid "Poster"
 msgstr "Poster"
@@ -1413,49 +1413,49 @@ msgstr "Wall"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:136
-#: \resources\settings.xml:169 \resources\settings.xml:190
+#: \resources\settings.xml:44 \resources\settings.xml:137
+#: \resources\settings.xml:170 \resources\settings.xml:191
 msgctxt "#30253"
 msgid "Banner"
 msgstr "Banner"
 
 #: \resources\settings.xml:24 \resources\settings.xml:29
 #: \resources\settings.xml:34 \resources\settings.xml:39
-#: \resources\settings.xml:44 \resources\settings.xml:133
-#: \resources\settings.xml:166 \resources\settings.xml:196
-#: \resources\settings.xml:199
+#: \resources\settings.xml:44 \resources\settings.xml:134
+#: \resources\settings.xml:167 \resources\settings.xml:197
+#: \resources\settings.xml:200
 msgctxt "#30254"
 msgid "Fanart"
 msgstr "Fanart"
 
-#: \resources\settings.xml:217 \resources\settings.xml:254
+#: \resources\settings.xml:218 \resources\settings.xml:255
 msgctxt "#30255"
 msgid "Automatic"
 msgstr "Automatic"
 
-#: \resources\settings.xml:217
+#: \resources\settings.xml:218
 msgctxt "#30256"
 msgid "Manual Selection"
 msgstr "Manual Selection"
 
-#: \resources\settings.xml:232 \resources\skins\Default\1080i\resolver.xml:86
+#: \resources\settings.xml:233 \resources\skins\Default\1080i\resolver.xml:86
 msgctxt "#30257"
 msgid "Torrents Only"
 msgstr "Torrents Only"
 
-#: \resources\settings.xml:232
+#: \resources\settings.xml:233
 msgctxt "#30258"
 msgid "Hosters Only"
 msgstr "Hosters Only"
 
-#: \resources\settings.xml:232
+#: \resources\settings.xml:233
 msgctxt "#30259"
 msgid "Torrents/Hosters"
 msgstr "Torrents/Hosters"
 
-#: \resources\settings.xml:406 \resources\skins\Default\1080i\resolver.xml:99
-#: \resources\skins\Default\1080i\source_select.xml:104
-#: \resources\skins\Default\1080i\source_select.xml:217
+#: \resources\settings.xml:407 \resources\skins\Default\1080i\resolver.xml:99
+#: \resources\skins\Default\1080i\source_select.xml:106
+#: \resources\skins\Default\1080i\source_select.xml:221
 msgctxt "#30260"
 msgid "Resolution"
 msgstr "Resolution"
@@ -1535,14 +1535,14 @@ msgctxt "#30275"
 msgid "Info"
 msgstr "Info"
 
-#: \resources\skins\Default\1080i\source_select.xml:94
-#: \resources\skins\Default\1080i\source_select.xml:207
+#: \resources\skins\Default\1080i\source_select.xml:96
+#: \resources\skins\Default\1080i\source_select.xml:211
 msgctxt "#30276"
 msgid "Size"
 msgstr "Size"
 
-#: \resources\skins\Default\1080i\source_select.xml:114
-#: \resources\skins\Default\1080i\source_select.xml:227
+#: \resources\skins\Default\1080i\source_select.xml:116
+#: \resources\skins\Default\1080i\source_select.xml:231
 msgctxt "#30277"
 msgid "Source type"
 msgstr "Source type"
@@ -1552,28 +1552,28 @@ msgctxt "#30278"
 msgid "One or more providers have updates pending"
 msgstr "One or more providers have updates pending"
 
-#: \resources\settings.xml:126
+#: \resources\settings.xml:127
 msgctxt "#30279"
 msgid "Prefer Movie artwork from"
 msgstr "Prefer Movie artwork from"
 
-#: \resources\settings.xml:159
+#: \resources\settings.xml:160
 msgctxt "#30280"
 msgid "Prefer TV Show artwork from"
 msgstr "Prefer TV Show artwork from"
 
-#: \resources\settings.xml:78 \resources\settings.xml:126
-#: \resources\settings.xml:159
+#: \resources\settings.xml:79 \resources\settings.xml:127
+#: \resources\settings.xml:160
 msgctxt "#30281"
 msgid "TMDb"
 msgstr "TMDb"
 
-#: \resources\settings.xml:78 \resources\settings.xml:159
+#: \resources\settings.xml:79 \resources\settings.xml:160
 msgctxt "#30282"
 msgid "TVDB"
 msgstr "TVDB"
 
-#: \resources\settings.xml:246
+#: \resources\settings.xml:247
 msgctxt "#30283"
 msgid "Playback"
 msgstr "Playback"
@@ -1583,50 +1583,50 @@ msgctxt "#30284"
 msgid "Interface"
 msgstr "Interface"
 
-#: \resources\settings.xml:115
+#: \resources\settings.xml:116
 msgctxt "#30285"
 msgid "Artwork"
 msgstr "Artwork"
 
-#: \resources\settings.xml:67
+#: \resources\settings.xml:68
 msgctxt "#30286"
 msgid "Advanced"
 msgstr "Advanced"
 
-#: \resources\settings.xml:187 \resources\settings.xml:190
-#: \resources\settings.xml:193 \resources\settings.xml:196
+#: \resources\settings.xml:188 \resources\settings.xml:191
+#: \resources\settings.xml:194 \resources\settings.xml:197
 msgctxt "#30287"
 msgid "Season"
 msgstr "Season"
 
-#: \resources\settings.xml:199
+#: \resources\settings.xml:200
 msgctxt "#30288"
 msgid "Episode"
 msgstr "Episode"
 
-#: \resources\settings.xml:163 \resources\settings.xml:166
-#: \resources\settings.xml:169 \resources\settings.xml:172
-#: \resources\settings.xml:175 \resources\settings.xml:178
-#: \resources\settings.xml:181 \resources\settings.xml:184
+#: \resources\settings.xml:164 \resources\settings.xml:167
+#: \resources\settings.xml:170 \resources\settings.xml:173
+#: \resources\settings.xml:176 \resources\settings.xml:179
+#: \resources\settings.xml:182 \resources\settings.xml:185
 msgctxt "#30289"
 msgid "TV Show"
 msgstr "TV Show"
 
-#: \resources\settings.xml:130 \resources\settings.xml:133
-#: \resources\settings.xml:136 \resources\settings.xml:139
-#: \resources\settings.xml:142 \resources\settings.xml:145
-#: \resources\settings.xml:148 \resources\settings.xml:151
-#: \resources\settings.xml:154 \resources\lib\indexers\trakt.py:742
+#: \resources\settings.xml:131 \resources\settings.xml:134
+#: \resources\settings.xml:137 \resources\settings.xml:140
+#: \resources\settings.xml:143 \resources\settings.xml:146
+#: \resources\settings.xml:149 \resources\settings.xml:152
+#: \resources\settings.xml:155 \resources\lib\indexers\trakt.py:762
 msgctxt "#30290"
 msgid "Movie"
 msgstr "Movie"
 
-#: \resources\settings.xml:128
+#: \resources\settings.xml:129
 msgctxt "#30291"
 msgid "Show Advanced Movie Artwork Settings"
 msgstr "Show Advanced Movie Artwork Settings"
 
-#: \resources\settings.xml:161
+#: \resources\settings.xml:162
 msgctxt "#30292"
 msgid "Show Advanced TV Artwork Settings"
 msgstr "Show Advanced TV Artwork Settings"
@@ -1636,186 +1636,186 @@ msgctxt "#30293"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Are you sure you wish to remove the {} package?"
 
-#: \resources\settings.xml:420
+#: \resources\settings.xml:421
 msgctxt "#30294"
 msgid "Show Advanced Settings..."
 msgstr "Show Advanced Settings..."
 
-#: \resources\settings.xml:124
+#: \resources\settings.xml:125
 msgctxt "#30295"
 msgid "Movie Artwork"
 msgstr "Movie Artwork"
 
-#: \resources\settings.xml:157
+#: \resources\settings.xml:158
 msgctxt "#30296"
 msgid "TV show Artwork"
 msgstr "TV show Artwork"
 
-#: \resources\lib\database\trakt_sync\__init__.py:397
+#: \resources\lib\database\trakt_sync\__init__.py:406
 msgctxt "#30297"
 msgid "Previous user information has been cleared"
 msgstr "Previous user information has been cleared"
 
-#: \resources\lib\database\trakt_sync\__init__.py:430
+#: \resources\lib\database\trakt_sync\__init__.py:439
 msgctxt "#30298"
 msgid "Metadata has been cleared"
 msgstr "Metadata has been cleared"
 
-#: \resources\lib\database\trakt_sync\__init__.py:457
+#: \resources\lib\database\trakt_sync\__init__.py:466
 msgctxt "#30299"
 msgid "Database has been rebuilt"
 msgstr "Database has been rebuilt"
 
-#: \resources\lib\indexers\trakt.py:471
+#: \resources\lib\indexers\trakt.py:490
 msgctxt "#30300"
 msgid "Sucessfully authenticated with Trakt"
 msgstr "Sucessfully authenticated with Trakt"
 
-#: \resources\lib\indexers\trakt.py:967 \resources\lib\indexers\trakt.py:1052
-#: \resources\lib\indexers\trakt.py:1067
+#: \resources\lib\indexers\trakt.py:988 \resources\lib\indexers\trakt.py:1073
+#: \resources\lib\indexers\trakt.py:1088
 msgctxt "#30301"
 msgid "Add {} to Collection"
 msgstr "Add {} to Collection"
 
-#: \resources\lib\indexers\trakt.py:971 \resources\lib\indexers\trakt.py:1048
-#: \resources\lib\indexers\trakt.py:1063
+#: \resources\lib\indexers\trakt.py:992 \resources\lib\indexers\trakt.py:1069
+#: \resources\lib\indexers\trakt.py:1084
 msgctxt "#30302"
 msgid "Remove {} from Collection"
 msgstr "Remove {} from Collection"
 
-#: \resources\lib\indexers\trakt.py:975 \resources\lib\indexers\trakt.py:1027
+#: \resources\lib\indexers\trakt.py:996 \resources\lib\indexers\trakt.py:1048
 msgctxt "#30303"
 msgid "Add to Watchlist"
 msgstr "Add to Watchlist"
 
-#: \resources\lib\indexers\trakt.py:979 \resources\lib\indexers\trakt.py:1028
+#: \resources\lib\indexers\trakt.py:1000 \resources\lib\indexers\trakt.py:1049
 msgctxt "#30304"
 msgid "Remove from Watchlist"
 msgstr "Remove from Watchlist"
 
-#: \resources\lib\indexers\trakt.py:983 \resources\lib\indexers\trakt.py:1075
-#: \resources\lib\indexers\trakt.py:1078
+#: \resources\lib\indexers\trakt.py:1004 \resources\lib\indexers\trakt.py:1096
+#: \resources\lib\indexers\trakt.py:1099
 msgctxt "#30305"
 msgid "Mark as Watched"
 msgstr "Mark as Watched"
 
-#: \resources\lib\indexers\trakt.py:987 \resources\lib\indexers\trakt.py:1073
-#: \resources\lib\indexers\trakt.py:1080
+#: \resources\lib\indexers\trakt.py:1008 \resources\lib\indexers\trakt.py:1094
+#: \resources\lib\indexers\trakt.py:1101
 msgctxt "#30306"
 msgid "Mark as Unwatched"
 msgstr "Mark as Unwatched"
 
-#: \resources\lib\indexers\trakt.py:945 \resources\lib\indexers\trakt.py:991
+#: \resources\lib\indexers\trakt.py:966 \resources\lib\indexers\trakt.py:1012
 msgctxt "#30307"
 msgid "Add to List"
 msgstr "Add to List"
 
-#: \resources\lib\indexers\trakt.py:946 \resources\lib\indexers\trakt.py:995
+#: \resources\lib\indexers\trakt.py:967 \resources\lib\indexers\trakt.py:1016
 msgctxt "#30308"
 msgid "Remove From List"
 msgstr "Remove From List"
 
-#: \resources\lib\indexers\trakt.py:947 \resources\lib\indexers\trakt.py:999
+#: \resources\lib\indexers\trakt.py:968 \resources\lib\indexers\trakt.py:1020
 msgctxt "#30309"
 msgid "Hide {}"
 msgstr "Hide {}"
 
-#: \resources\lib\indexers\trakt.py:948 \resources\lib\indexers\trakt.py:1003
+#: \resources\lib\indexers\trakt.py:969 \resources\lib\indexers\trakt.py:1024
 msgctxt "#30310"
 msgid "Refresh Item Metadata"
 msgstr "Refresh Item Metadata"
 
-#: \resources\lib\indexers\trakt.py:1007 \resources\lib\indexers\trakt.py:1037
+#: \resources\lib\indexers\trakt.py:1028 \resources\lib\indexers\trakt.py:1058
 msgctxt "#30311"
 msgid "Remove Playback Progress"
 msgstr "Remove Playback Progress"
 
-#: \resources\lib\indexers\trakt.py:744
+#: \resources\lib\indexers\trakt.py:764
 msgctxt "#30312"
 msgid "Show"
 msgstr "Show"
 
-#: \resources\lib\indexers\trakt.py:957 \resources\lib\indexers\trakt.py:1103
-#: \resources\lib\indexers\trakt.py:1117 \resources\lib\indexers\trakt.py:1179
-#: \resources\lib\indexers\trakt.py:1221 \resources\lib\indexers\trakt.py:1242
-#: \resources\lib\indexers\trakt.py:1265 \resources\lib\indexers\trakt.py:1273
-#: \resources\lib\indexers\trakt.py:1284 \resources\lib\indexers\trakt.py:1306
-#: \resources\lib\indexers\trakt.py:1329
+#: \resources\lib\indexers\trakt.py:978 \resources\lib\indexers\trakt.py:1124
+#: \resources\lib\indexers\trakt.py:1138 \resources\lib\indexers\trakt.py:1200
+#: \resources\lib\indexers\trakt.py:1242 \resources\lib\indexers\trakt.py:1263
+#: \resources\lib\indexers\trakt.py:1286 \resources\lib\indexers\trakt.py:1294
+#: \resources\lib\indexers\trakt.py:1305 \resources\lib\indexers\trakt.py:1327
+#: \resources\lib\indexers\trakt.py:1350
 msgctxt "#30313"
 msgid "Trakt manager"
 msgstr "Trakt manager"
 
-#: \resources\lib\indexers\trakt.py:1104 \resources\lib\indexers\trakt.py:1118
+#: \resources\lib\indexers\trakt.py:1125 \resources\lib\indexers\trakt.py:1139
 msgctxt "#30314"
 msgid "Failed to update status, please check the log"
 msgstr "Failed to update status, please check the log"
 
-#: \resources\lib\indexers\trakt.py:1180
+#: \resources\lib\indexers\trakt.py:1201
 msgctxt "#30315"
 msgid "Item marked as watched"
 msgstr "Item marked as watched"
 
-#: \resources\lib\indexers\trakt.py:1222
+#: \resources\lib\indexers\trakt.py:1243
 msgctxt "#30316"
 msgid "Item marked as unwatched"
 msgstr "Item marked as unwatched"
 
-#: \resources\lib\indexers\trakt.py:1243
+#: \resources\lib\indexers\trakt.py:1264
 msgctxt "#30317"
 msgid "Item added to Collection"
 msgstr "Item added to Collection"
 
-#: \resources\lib\indexers\trakt.py:1266
+#: \resources\lib\indexers\trakt.py:1287
 msgctxt "#30318"
 msgid "Item removed from Collection"
 msgstr "Item removed from Collection"
 
-#: \resources\lib\indexers\trakt.py:1274
+#: \resources\lib\indexers\trakt.py:1295
 msgctxt "#30319"
 msgid "Item added to Watchlist"
 msgstr "Item added to Watchlist"
 
-#: \resources\lib\indexers\trakt.py:1285
+#: \resources\lib\indexers\trakt.py:1306
 msgctxt "#30320"
 msgid "Item removed from Watchlist"
 msgstr "Item removed from Watchlist"
 
-#: \resources\lib\indexers\trakt.py:1307
+#: \resources\lib\indexers\trakt.py:1328
 msgctxt "#30321"
 msgid "Item added to {}"
 msgstr "Item added to {}"
 
-#: \resources\lib\indexers\trakt.py:1330
+#: \resources\lib\indexers\trakt.py:1351
 msgctxt "#30322"
 msgid "Item removed from {}"
 msgstr "Item removed from {}"
 
-#: \resources\lib\indexers\trakt.py:1294 \resources\lib\indexers\trakt.py:1316
+#: \resources\lib\indexers\trakt.py:1315 \resources\lib\indexers\trakt.py:1337
 msgctxt "#30323"
 msgid "Select a list"
 msgstr "Select a list"
 
-#: \resources\lib\indexers\trakt.py:1337
+#: \resources\lib\indexers\trakt.py:1358
 msgctxt "#30324"
 msgid "Watched Progress"
 msgstr "Watched Progress"
 
-#: \resources\lib\indexers\trakt.py:1337
+#: \resources\lib\indexers\trakt.py:1358
 msgctxt "#30325"
 msgid "Calendar"
 msgstr "Calendar"
 
-#: \resources\lib\indexers\trakt.py:1339
+#: \resources\lib\indexers\trakt.py:1360
 msgctxt "#30326"
 msgid "Select Menu type to hide from"
 msgstr "Select Menu type to hide from"
 
-#: \resources\lib\indexers\trakt.py:1364
+#: \resources\lib\indexers\trakt.py:1385
 msgctxt "#30327"
 msgid "Item has been hidden from your {}"
 msgstr "Item has been hidden from your {}"
 
-#: \resources\lib\indexers\trakt.py:1398
+#: \resources\lib\indexers\trakt.py:1419
 msgctxt "#30328"
 msgid "Item's Progress History has been removed"
 msgstr "Item's Progress History has been removed"
@@ -1825,7 +1825,7 @@ msgctxt "#30329"
 msgid "Silent scrape"
 msgstr "Silent scrape"
 
-#: \resources\lib\gui\movieMenus.py:391 \resources\lib\gui\tvshowMenus.py:489
+#: \resources\lib\gui\movieMenus.py:391 \resources\lib\gui\tvshowMenus.py:501
 msgctxt "#30330"
 msgid "Genre Selection"
 msgstr "Genre Selection"
@@ -1852,7 +1852,7 @@ msgstr "Enter Zip URL"
 
 #: \resources\lib\gui\windows\source_select.py:78
 #: \resources\lib\modules\cacheAssist.py:114
-#: \resources\lib\modules\getSources.py:359
+#: \resources\lib\modules\getSources.py:361
 msgctxt "#30335"
 msgid "Cache Assist"
 msgstr "Cache Assist"
@@ -1872,84 +1872,84 @@ msgctxt "#30338"
 msgid "Starting Playback"
 msgstr "Starting Playback"
 
-#: \resources\settings.xml:142 \resources\settings.xml:175
+#: \resources\settings.xml:143 \resources\settings.xml:176
 msgctxt "#30339"
 msgid "Keyart"
 msgstr "Keyart"
 
-#: \resources\settings.xml:145 \resources\settings.xml:178
+#: \resources\settings.xml:146 \resources\settings.xml:179
 msgctxt "#30340"
 msgid "Clear Logo"
 msgstr "Clear Logo"
 
-#: \resources\settings.xml:139 \resources\settings.xml:172
-#: \resources\settings.xml:193
+#: \resources\settings.xml:140 \resources\settings.xml:173
+#: \resources\settings.xml:194
 msgctxt "#30341"
 msgid "Landscape"
 msgstr "Landscape"
 
-#: \resources\settings.xml:154 \resources\settings.xml:184
+#: \resources\settings.xml:155 \resources\settings.xml:185
 msgctxt "#30342"
 msgid "Character Art"
 msgstr "Character Art"
 
-#: \resources\settings.xml:148 \resources\settings.xml:181
+#: \resources\settings.xml:149 \resources\settings.xml:182
 msgctxt "#30343"
 msgid "Clear Art"
 msgstr "Clear Art"
 
-#: \resources\settings.xml:151
+#: \resources\settings.xml:152
 msgctxt "#30344"
 msgid "Disc Art"
 msgstr "Disc Art"
 
-#: \resources\settings.xml:255
+#: \resources\settings.xml:256
 msgctxt "#30345"
 msgid "Smart Play Display Style"
 msgstr "Smart Play Display Style"
 
-#: \resources\settings.xml:261
+#: \resources\settings.xml:262
 msgctxt "#30346"
 msgid "Smart Play Popup"
 msgstr "Smart Play Popup"
 
-#: \resources\settings.xml:266
+#: \resources\settings.xml:267
 msgctxt "#30347"
 msgid "Dialog Style"
 msgstr "Dialog Style"
 
-#: \resources\settings.xml:266
+#: \resources\settings.xml:267
 msgctxt "#30348"
 msgid "Simple"
 msgstr "Simple"
 
-#: \resources\settings.xml:267
+#: \resources\settings.xml:268
 msgctxt "#30349"
 msgid "Default Action if Nothing Selected"
 msgstr "Default Action if Nothing Selected"
 
-#: \resources\settings.xml:267 \resources\lib\gui\windows\source_select.py:79
-#: \resources\skins\Default\1080i\source_select.xml:352
+#: \resources\settings.xml:268 \resources\lib\gui\windows\source_select.py:79
+#: \resources\skins\Default\1080i\source_select.xml:356
 msgctxt "#30350"
 msgid "Play"
 msgstr "Play"
 
-#: \resources\settings.xml:267
+#: \resources\settings.xml:268
 msgctxt "#30351"
 msgid "Pause"
 msgstr "Pause"
 
-#: \resources\settings.xml:271
+#: \resources\settings.xml:272
 msgctxt "#30352"
 msgid "Still Watching Dialog"
 msgstr "Still Watching Dialog"
 
-#: \resources\settings.xml:273
+#: \resources\settings.xml:274
 msgctxt "#30353"
 msgid "Enable Still Watching Dialog"
 msgstr "Enable Still Watching Dialog"
 
-#: \resources\settings.xml:274
+#: \resources\settings.xml:275
 msgctxt "#30354"
 msgid "Episodes Between Dialog Prompts"
 msgstr "Episodes Between Dialog Prompts"
@@ -1979,12 +1979,12 @@ msgctxt "#30359"
 msgid "Search Shows By Actor..."
 msgstr "Search Shows By Actor..."
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30360"
 msgid "Ask"
 msgstr "Ask"
 
-#: \resources\settings.xml:254
+#: \resources\settings.xml:255
 msgctxt "#30361"
 msgid "Do not resume"
 msgstr "Do not resume"
@@ -1994,7 +1994,7 @@ msgctxt "#30362"
 msgid "Start From Beginning"
 msgstr "Start From Beginning"
 
-#: \resources\lib\database\trakt_sync\__init__.py:355
+#: \resources\lib\database\trakt_sync\__init__.py:364
 msgctxt "#30363"
 msgid ""
 "Due to the implementation of new features to the local database, a rebuild "
@@ -2003,7 +2003,7 @@ msgstr ""
 "Due to the implementation of new features to the local database, a rebuild "
 "is now required"
 
-#: \resources\lib\database\trakt_sync\__init__.py:451
+#: \resources\lib\database\trakt_sync\__init__.py:460
 msgctxt "#30364"
 msgid ""
 "There were issues when processing the synchronization with Trakt, please "
@@ -2012,7 +2012,7 @@ msgstr ""
 "There were issues when processing the synchronization with Trakt, please "
 "check the log"
 
-#: \resources\settings.xml:219 \resources\settings.xml:346
+#: \resources\settings.xml:220 \resources\settings.xml:347
 msgctxt "#30365"
 msgid "AllDebrid"
 msgstr "AllDebrid"
@@ -2022,37 +2022,37 @@ msgctxt "#30366"
 msgid "AllDebrid Auth"
 msgstr "AllDebrid Auth"
 
-#: \resources\settings.xml:348
+#: \resources\settings.xml:349
 msgctxt "#30367"
 msgid "Enabled AllDebrid"
 msgstr "Enabled AllDebrid"
 
-#: \resources\settings.xml:349
+#: \resources\settings.xml:350
 msgctxt "#30368"
 msgid "AllDebrid Username"
 msgstr "AllDebrid Username"
 
-#: \resources\settings.xml:352
+#: \resources\settings.xml:353
 msgctxt "#30369"
 msgid "Authorize AllDebrid..."
 msgstr "Authorize AllDebrid..."
 
-#: \resources\settings.xml:354
+#: \resources\settings.xml:355
 msgctxt "#30370"
 msgid "AllDebrid Priority"
 msgstr "AllDebrid Priority"
 
-#: \resources\settings.xml:55
+#: \resources\settings.xml:56
 msgctxt "#30371"
 msgid "Enable Automatic Theme Updates"
 msgstr "Enable Automatic Theme Updates"
 
-#: \resources\settings.xml:304
+#: \resources\settings.xml:305
 msgctxt "#30372"
 msgid "Authorise Premiumize"
 msgstr "Authorise Premiumize"
 
-#: \resources\lib\indexers\trakt.py:124 \resources\lib\indexers\trakt.py:145
+#: \resources\lib\indexers\trakt.py:146 \resources\lib\indexers\trakt.py:163
 msgctxt "#30373"
 msgid ""
 "There appears to be a problem with your Trakt Authorization \n"
@@ -2061,22 +2061,22 @@ msgstr ""
 "There appears to be a problem with your Trakt Authorization \n"
 "Please try re-authorizing your account"
 
-#: \resources\settings.xml:121
+#: \resources\settings.xml:122
 msgctxt "#30374"
 msgid "Preferred artwork size"
 msgstr "Preferred artwork size"
 
-#: \resources\settings.xml:121
+#: \resources\settings.xml:122
 msgctxt "#30375"
 msgid "Largest available"
 msgstr "Largest available"
 
-#: \resources\settings.xml:121
+#: \resources\settings.xml:122
 msgctxt "#30376"
 msgid "Medium"
 msgstr "Medium"
 
-#: \resources\settings.xml:121
+#: \resources\settings.xml:122
 msgctxt "#30377"
 msgid "Small"
 msgstr "Small"
@@ -2136,42 +2136,42 @@ msgctxt "#30388"
 msgid "Popular Movie Lists"
 msgstr "Popular Movie Lists"
 
-#: \resources\settings.xml:71 \resources\settings.xml:73
+#: \resources\settings.xml:72 \resources\settings.xml:74
 msgctxt "#30389"
 msgid "EpisodeTitle"
 msgstr "EpisodeTitle"
 
-#: \resources\settings.xml:71 \resources\settings.xml:73
+#: \resources\settings.xml:72 \resources\settings.xml:74
 msgctxt "#30390"
 msgid "01x01. EpisodeTitle"
 msgstr "01x01. EpisodeTitle"
 
-#: \resources\settings.xml:71 \resources\settings.xml:73
+#: \resources\settings.xml:72 \resources\settings.xml:74
 msgctxt "#30391"
 msgid "ShowTitle: EpisodeTitle"
 msgstr "ShowTitle: EpisodeTitle"
 
-#: \resources\settings.xml:71 \resources\settings.xml:73
+#: \resources\settings.xml:72 \resources\settings.xml:74
 msgctxt "#30392"
 msgid "ShowTitle: 01x01. EpisodeTitle"
 msgstr "ShowTitle: 01x01. EpisodeTitle"
 
-#: \resources\settings.xml:75
+#: \resources\settings.xml:76
 msgctxt "#30393"
 msgid "Disable Notification Sound"
 msgstr "Disable Notification Sound"
 
-#: \resources\settings.xml:74
+#: \resources\settings.xml:75
 msgctxt "#30394"
 msgid "Lists Title Display Style"
 msgstr "Lists Title Display Style"
 
-#: \resources\settings.xml:74
+#: \resources\settings.xml:75
 msgctxt "#30395"
 msgid "ListTitle"
 msgstr "ListTitle"
 
-#: \resources\settings.xml:74
+#: \resources\settings.xml:75
 msgctxt "#30396"
 msgid "ListTitle - Creator"
 msgstr "ListTitle - Creator"
@@ -2222,7 +2222,7 @@ msgid "Search for movies by title"
 msgstr "Search for movies by title"
 
 #: \resources\lib\gui\homeMenu.py:52 \resources\lib\gui\tvshowMenus.py:154
-#: \resources\lib\gui\tvshowMenus.py:372
+#: \resources\lib\gui\tvshowMenus.py:384
 msgctxt "#30405"
 msgid "Search for shows by title"
 msgstr "Search for shows by title"
@@ -2644,7 +2644,7 @@ msgctxt "#30476"
 msgid "My recent watched episodes"
 msgstr "My recent watched episodes"
 
-#: \resources\lib\modules\getSources.py:376
+#: \resources\lib\modules\getSources.py:378
 #: \resources\lib\modules\helpers.py:53
 msgctxt "#30477"
 msgid ""
@@ -2659,23 +2659,23 @@ msgctxt "#30478"
 msgid "Paginate Trakt Collection"
 msgstr "Paginate Trakt Collection"
 
-#: \resources\settings.xml:76
+#: \resources\settings.xml:77
 msgctxt "#30479"
 msgid "Show remaining unwatched season episodes in mixed lists"
 msgstr "Show remaining unwatched season episodes in mixed lists"
 
-#: \resources\settings.xml:240 \resources\lib\modules\download_manager.py:604
+#: \resources\settings.xml:241 \resources\lib\modules\download_manager.py:604
 #: \resources\lib\modules\local_downloader.py:191
 msgctxt "#30480"
 msgid "Select Download Location"
 msgstr "Select Download Location"
 
-#: \resources\settings.xml:242
+#: \resources\settings.xml:243
 msgctxt "#30481"
 msgid "Folder"
 msgstr "Folder"
 
-#: \resources\settings.xml:50
+#: \resources\settings.xml:51
 msgctxt "#30482"
 msgid "Base List Type for Genres"
 msgstr "Base List Type for Genres"
@@ -2695,7 +2695,7 @@ msgctxt "#30485"
 msgid "Cache assist for %s has failed"
 msgstr "Cache assist for %s has failed"
 
-#: \resources\settings.xml:51
+#: \resources\settings.xml:52
 msgctxt "#30486"
 msgid "Auto download subtitles if available"
 msgstr "Auto download subtitles if available"
@@ -2705,17 +2705,17 @@ msgctxt "#30487"
 msgid "Hide watched items"
 msgstr "Hide watched items"
 
-#: \resources\settings.xml:52
+#: \resources\settings.xml:53
 msgctxt "#30488"
 msgid "Hide next item in widgets"
 msgstr "Hide next item in widgets"
 
-#: \resources\settings.xml:79
+#: \resources\settings.xml:80
 msgctxt "#30489"
 msgid "Show original titles"
 msgstr "Show original titles"
 
-#: \resources\settings.xml:433
+#: \resources\settings.xml:434
 msgctxt "#30490"
 msgid "OMDb API Key"
 msgstr "OMDb API Key"
@@ -2739,8 +2739,8 @@ msgctxt "#30493"
 msgid "Run in background"
 msgstr "Run in background"
 
-#: \resources\settings.xml:308 \resources\settings.xml:332
-#: \resources\settings.xml:350
+#: \resources\settings.xml:309 \resources\settings.xml:333
+#: \resources\settings.xml:351
 msgctxt "#30494"
 msgid "Premium Status"
 msgstr "Premium Status"
@@ -2758,8 +2758,8 @@ msgctxt "#30496"
 msgid "Test Manual Cache Window"
 msgstr "Test Manual Cache Window"
 
-#: \resources\skins\Default\1080i\source_select.xml:362
-#: \resources\skins\Default\1080i\source_select.xml:456
+#: \resources\skins\Default\1080i\source_select.xml:366
+#: \resources\skins\Default\1080i\source_select.xml:460
 msgctxt "#30497"
 msgid "View Uncached"
 msgstr "View Uncached"
@@ -2789,7 +2789,7 @@ msgctxt "#30502"
 msgid "Test Manual Cache"
 msgstr "Test Manual Cache"
 
-#: \resources\settings.xml:72
+#: \resources\settings.xml:73
 msgctxt "#30503"
 msgid "General episode title display style"
 msgstr "General episode title display style"
@@ -2810,7 +2810,7 @@ msgctxt "#30506"
 msgid "Adaptive"
 msgstr "Adaptive"
 
-#: \resources\lib\indexers\trakt.py:70
+#: \resources\lib\indexers\trakt.py:73
 msgctxt "#30507"
 msgid ""
 "Trakt is currently not authorized\n"
@@ -2826,9 +2826,9 @@ msgctxt "#30508"
 msgid "Failed to create transfer at PM, please check the log"
 msgstr "Failed to create transfer at PM, please check the log"
 
-#: \resources\settings.xml:239 \resources\lib\gui\windows\source_select.py:80
+#: \resources\settings.xml:240 \resources\lib\gui\windows\source_select.py:80
 #: \resources\lib\modules\download_manager.py:429
-#: \resources\skins\Default\1080i\source_select.xml:372
+#: \resources\skins\Default\1080i\source_select.xml:376
 msgctxt "#30509"
 msgid "Download"
 msgstr "Download"
@@ -2842,7 +2842,7 @@ msgstr ""
 "Your filters appear to be to restrictive for this item, would you like to "
 "try again without them?"
 
-#: \resources\settings.xml:401
+#: \resources\settings.xml:402
 msgctxt "#30511"
 msgid "Hide HDR Items"
 msgstr "Hide HDR Items"
@@ -2869,17 +2869,17 @@ msgctxt "#30515"
 msgid "No settings available for this provider package"
 msgstr "No settings available for this provider package"
 
-#: \resources\settings.xml:80
+#: \resources\settings.xml:81
 msgctxt "#30516"
 msgid "Force widget refresh after playback ends"
 msgstr "Force widget refresh after playback ends"
 
-#: \resources\settings.xml:408
+#: \resources\settings.xml:409
 msgctxt "#30517"
 msgid "Reverse Size Sort (Low to High)"
 msgstr "Reverse Size Sort (Low to High)"
 
-#: \resources\settings.xml:235
+#: \resources\settings.xml:236
 msgctxt "#30518"
 msgid "Terminate if adaptive sources are found"
 msgstr "Terminate if adaptive sources are found"
@@ -2894,12 +2894,12 @@ msgctxt "#30520"
 msgid "Torrent cache database successfully cleared"
 msgstr "Torrent cache database successfully cleared"
 
-#: \resources\settings.xml:293
+#: \resources\settings.xml:294
 msgctxt "#30521"
 msgid "Start scrobble after seconds."
 msgstr "Start scrobble after seconds."
 
-#: \resources\settings.xml:295
+#: \resources\settings.xml:296
 msgctxt "#30522"
 msgid "Minimum scrobble percentage before marked watched."
 msgstr "Minimum scrobble percentage before marked watched."
@@ -2910,7 +2910,7 @@ msgctxt "#30523"
 msgid "File Selection"
 msgstr "File Selection"
 
-#: \resources\settings.xml:68
+#: \resources\settings.xml:69
 msgctxt "#30524"
 msgid "Disable Seren fanart fallback on items missing fanart"
 msgstr "Disable Seren fanart fallback on items missing fanart"
@@ -2924,7 +2924,7 @@ msgstr ""
 "There was an issue getting accepted hoster domains, this may cause odd "
 "scrape results"
 
-#: \resources\lib\modules\player.py:546
+#: \resources\lib\modules\player.py:545
 msgctxt "#30526"
 msgid ""
 "The last playing file was not marked as watched, would you like to do this "
@@ -2933,22 +2933,22 @@ msgstr ""
 "The last playing file was not marked as watched, would you like to do this "
 "now?"
 
-#: \resources\settings.xml:406
+#: \resources\settings.xml:407
 msgctxt "#30527"
 msgid "No Grouping"
 msgstr "No Grouping"
 
-#: \resources\settings.xml:253
+#: \resources\settings.xml:254
 msgctxt "#30528"
 msgid "On failure to resolve torrent file"
 msgstr "On failure to resolve torrent file"
 
-#: \resources\settings.xml:253
+#: \resources\settings.xml:254
 msgctxt "#30529"
 msgid "Skip source"
 msgstr "Skip source"
 
-#: \resources\settings.xml:253
+#: \resources\settings.xml:254
 msgctxt "#30530"
 msgid "Ask for manual file selection"
 msgstr "Ask for manual file selection"
@@ -3168,48 +3168,56 @@ msgstr ""
 "Seren now uses a kodi feature to speed up menus drastically. This can cause instability on some devices\n"
 "If you experience crashes, you can disable this setting in the shortcuts section"
 
-#: \resources\lib\common\maintenance.py:220
+#: \resources\lib\common\maintenance.py:207
 msgctxt "#30572"
 msgid "Language Invoker option has been changed, reloading kodi profile"
 msgstr "Language Invoker option has been changed, reloading kodi profile"
 
-#: \resources\settings.xml:463
+#: \resources\settings.xml:464
 msgctxt "#30573"
 msgid "Language Invoker Options"
 msgstr "Language Invoker Options"
 
-#: \resources\settings.xml:465
+#: \resources\settings.xml:466
 msgctxt "#30574"
 msgid "Re-Use Language Invoker Status"
 msgstr "Re-Use Language Invoker Status"
 
-#: \resources\settings.xml:466
+#: \resources\settings.xml:467
 msgctxt "#30575"
 msgid "Toggle Re-Use Language Invoker"
 msgstr "Toggle Re-Use Language Invoker"
 
-#: \resources\settings.xml:393
+#: \resources\settings.xml:394
 msgctxt "#30576"
 msgid "Movie minimum File Size (GB)"
 msgstr "Movie minimum File Size (GB)"
 
-#: \resources\settings.xml:395
+#: \resources\settings.xml:396
 msgctxt "#30577"
 msgid "Episode minimum File Size (GB)"
 msgstr "Episode minimum File Size (GB)"
 
+#: \resources\lib\indexers\trakt.py:100
 msgctxt "#30578"
-msgid "Invalid Trakt API keys, your authentication has been reset.\nPlease re-auth your Trakt account."
-msgstr "Invalid Trakt API keys, your authentication has been reset.\nPlease re-auth your Trakt account."
+msgid ""
+"Invalid Trakt API keys, your authentication has been reset.\n"
+"Please re-auth your Trakt account."
+msgstr ""
+"Invalid Trakt API keys, your authentication has been reset.\n"
+"Please re-auth your Trakt account."
 
+#: \resources\settings.xml:50
 msgctxt "#30579"
 msgid "Collection Sort Style"
 msgstr "Collection Sort Style"
 
+#: \resources\settings.xml:50
 msgctxt "#30580"
 msgid "Date Collected"
 msgstr "Date Collected"
 
+#: \resources\settings.xml:50
 msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
