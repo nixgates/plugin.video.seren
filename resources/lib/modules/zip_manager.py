@@ -14,10 +14,6 @@ from resources.lib.common import tools
 from resources.lib.modules.exceptions import UnsafeZipStructure
 from resources.lib.modules.globals import g
 
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
 
 try:
     from StringIO import StringIO as BytesIO
@@ -165,7 +161,7 @@ class ZipManager:
 
     def _get_file_member_contents(self, member_path):
         if member_path.endswith("/"):
-            raise FileNotFoundError(member_path)
+            raise IOError(member_path)
         contents = self._zip_file.open(member_path)
         contents = contents.readlines()
         contents = "".join(

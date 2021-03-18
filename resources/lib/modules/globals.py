@@ -428,26 +428,33 @@ class GlobalVariables(object):
 
     @staticmethod
     def legacy_action_args_converter(action_args):
-        if "item_type" in action_args:
-            if "season" in action_args["item_type"]:
-                from resources.lib.database.trakt_sync import shows
+        if "item_type" not in action_args:
+            return action_args
 
-                action_args.update(
-                    shows.TraktSyncDatabase().get_season_action_args(
-                        action_args["trakt_id"], action_args["season"]
-                    )
-                )
-            if "episode" in action_args["item_type"]:
-                from resources.lib.database.trakt_sync import shows
+        if "season" in action_args["item_type"]:
+            from resources.lib.database.trakt_sync import shows
 
-                action_args.update(
-                    shows.TraktSyncDatabase().get_episode_action_args(
-                        action_args["trakt_id"],
-                        action_args["season"],
-                        action_args["episode"],
-                    )
+            action_args.update(
+                shows.TraktSyncDatabase().get_season_action_args(
+                    action_args["trakt_id"], action_args["season"]
                 )
-            action_args["mediatype"] = action_args.pop("item_type")
+            )
+
+        if "episode" in action_args["item_type"]:
+            from resources.lib.database.trakt_sync import shows
+
+            action_args.update(
+                shows.TraktSyncDatabase().get_episode_action_args(
+                    action_args["trakt_id"],
+                    action_args["season"],
+                    action_args["episode"],
+                )
+            )
+
+        if "show" in action_args["item_type"]:
+            action_args["item_type"] = "shows"
+
+        action_args["mediatype"] = action_args.pop("item_type")
         return action_args
 
     @staticmethod
@@ -590,8 +597,10 @@ class GlobalVariables(object):
         )
         if self.KODI_VERSION == 17:
             database_path = os.path.join(database_path, "MyVideos107.db")
-        elif self.KODI_VERSION >= 18:
+        elif self.KODI_VERSION == 18:
             database_path = os.path.join(database_path, "MyVideos116.db")
+        elif self.KODI_VERSION == 19:
+            database_path = os.path.join(database_path, "MyVideos119.db")
 
         return database_path
 
@@ -658,6 +667,7 @@ class GlobalVariables(object):
 
     def get_view_type(self, content_type):
         no_view_type = 0
+        view_type = None
 
         if not self.get_bool_setting("general.viewidswitch"):
             if content_type == self.CONTENT_FOLDER:
@@ -670,7 +680,7 @@ class GlobalVariables(object):
                 view_type = self.get_setting("episode.view")
             if content_type == self.CONTENT_SEASON:
                 view_type = self.get_setting("season.view")
-            if view_type.isdigit() and int(view_type) > 0:
+            if view_type is not None and view_type.isdigit() and int(view_type) > 0:
                 view_name, view_type = viewTypes[int(view_type)]
                 return view_type
         else:
@@ -684,7 +694,7 @@ class GlobalVariables(object):
                 view_type = self.get_setting("episode.view.id")
             if content_type == self.CONTENT_SEASON:
                 view_type = self.get_setting("season.view.id")
-            if view_type.isdigit() and int(view_type) > 0:
+            if view_type is not None and view_type.isdigit() and int(view_type) > 0:
                 return int(view_type)
 
         return no_view_type
@@ -1015,6 +1025,7 @@ class GlobalVariables(object):
             if int(menu_item.get("resume_time", 0)) > 0:
                 params["resume"] = str(menu_item["resume_time"])
                 item.setProperty("resumetime", str(menu_item["resume_time"]))
+                item.setProperty("totaltime", str(info["duration"]))
         if "play_count" in menu_item and menu_item.get("play_count") is not None:
             info["playcount"] = menu_item["play_count"]
         if "description" in params:

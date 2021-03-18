@@ -114,7 +114,7 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
                 aired_date = aired_date[:10]
             except IndexError:
                 aired_date = "TBA"
-            self.setProperty('item.info.premiered', str(aired_date))
+            self.setProperty('item.info.aired', str(aired_date))
 
         if 'premiered' in self.item_information['info']:
             premiered = self.item_information['info']['premiered']
