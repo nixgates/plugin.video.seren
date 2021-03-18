@@ -137,12 +137,14 @@ class ListBuilder(object):
             g.cancel_directory()
             return
 
+        list_items = []
         smart_play = params.pop("smart_play", False)
         no_paging = params.pop("no_paging", False)
         sort = params.pop("sort", False)
-        list_items = []
         prepend_date = params.pop("prepend_date", False)
         mixed_list = params.pop("mixed_list", False)
+        next_args = params.pop("next_args", None)
+
         params.pop("hide_unaired", None)
         params.pop("hide_watched", None)
         try:
@@ -183,6 +185,10 @@ class ListBuilder(object):
                     and len(list_items) >= self.page_limit
                 ):
                     g.REQUEST_PARAMS["page"] = g.PAGE + 1
+                    if next_args:
+                        g.REQUEST_PARAMS["action_args"] = next_args
+                    elif g.REQUEST_PARAMS.get("action_args") is not None:
+                        g.REQUEST_PARAMS["action_args"] = g.REQUEST_PARAMS.get("action_args")
                     params = g.REQUEST_PARAMS
                     params.update({"special_sort": "bottom"})
                     g.add_directory_item(g.get_language_string(30016), **params)
