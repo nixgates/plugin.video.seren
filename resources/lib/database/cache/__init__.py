@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import abc
+import calendar
 import codecs
 import collections
 import datetime
@@ -52,7 +53,7 @@ class CacheBase(object):
         date_time = datetime.datetime.utcnow()
         if timedelta:
             date_time = date_time + timedelta
-        return int(time.mktime(date_time.timetuple()))
+        return calendar.timegm(date_time.timetuple())
 
     def _get_checksum(self, checksum):
         if not checksum and not self.global_checksum:

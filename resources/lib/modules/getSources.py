@@ -56,6 +56,7 @@ class Sources(object):
         self.adaptive_threads = ThreadPool(workers=30)
         self.item_information = item_information
         self.media_type = self.item_information['info']['mediatype']
+        self.item_information['info']['year'] = self.item_information['info'].get('year', None)
         self.torrent_providers = []
         self.hoster_providers = []
         self.adaptive_providers = []
@@ -239,7 +240,7 @@ class Sources(object):
             #     self.item_information['info'].get('aliases', []).append(self.item_information['info']['title'])
             #     self.item_information['info']['title'] = title
             #     self.item_information['info']['originaltitle'] = title
-            if year != self.item_information['info']['year']:
+            if year is not None and year != self.item_information['info']['year']:
                 self.item_information['info']['year'] = str(year)
 
         # else:
