@@ -133,7 +133,7 @@ class TMDBAPI(ApiBase):
                 "year",
                 lambda t: tools.validate_date(t)[:4]
                 if tools.validate_date(t)
-                else None,
+                else None
             ),
             (
                 "networks",
@@ -242,7 +242,13 @@ class TMDBAPI(ApiBase):
         [
             ("title", ("title", "sorttitle"), None),
             ("original_title", "originaltitle", None),
-            ("premiered", "year", lambda t: t[:4]),
+            (
+                "premiered",
+                "year",
+                lambda t: tools.validate_date(t)[:4]
+                if tools.validate_date(t)
+                else None
+            ),
         ],
         normalization,
     )
