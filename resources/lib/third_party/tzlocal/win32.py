@@ -4,9 +4,10 @@ except ImportError:
     import winreg
 
 import os
+import warnings
 
 from .. import pytz
-from windows_tz import win_tz
+from .windows_tz import win_tz
 from . import utils
 
 _cache_tz = None
@@ -31,7 +32,7 @@ def _try_tz_from_env():
     tzenv = os.environ.get('TZ')
     if tzenv:
         try:
-            return _tz_from_env(tzenv)
+            return _tz_from_env(str(tzenv))
         except pytz.UnknownTimeZoneError:
             pass
 
@@ -47,11 +48,6 @@ def valuestodict(key):
 
 
 def get_localzone_name():
-    # Try to get timezone from environment to support forced override
-    tzenv = _try_tz_from_env()
-    if tzenv:
-        return tzenv
-
     # Windows is special. It has unique time zone names (in several
     # meanings of the word) available, but unfortunately, they can be
     # translated to the language of the operating system, so we need to
@@ -115,14 +111,27 @@ def get_localzone_name():
 
     return timezone
 
+def _get_localzone():
+    # Try to get timezone from environment to support forced override
+    tzenv = _try_tz_from_env()
+    if tzenv:
+        return tzenv
+    try:
+        tz = pytz.timezone(get_localzone_name())
+        utils.assert_tz_offset(tz)
+        return tz
+    except pytz.UnknownTimeZoneError as e:
+        warnings.warn(repr(e))
+        warnings.warn('Can not find any timezone configuration, defaulting to UTC.')
+        return pytz.utc
+
 
 def get_localzone():
     """Returns the zoneinfo-based tzinfo object that matches the Windows-configured timezone."""
     global _cache_tz
     if _cache_tz is None:
-        _cache_tz = pytz.timezone(get_localzone_name())
+        _cache_tz = _get_localzone()
 
-    utils.assert_tz_offset(_cache_tz)
     return _cache_tz
 
 
@@ -130,5 +139,4 @@ def reload_localzone():
     """Reload the cached localzone. You need to call this if the timezone has changed."""
     global _cache_tz
     _cache_tz = pytz.timezone(get_localzone_name())
-    utils.assert_tz_offset(_cache_tz)
     return _cache_tz
