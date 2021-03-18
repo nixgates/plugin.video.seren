@@ -11,7 +11,10 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 try:
-    from json.decoder import JSONDecodeError
+    try:
+        from simplejson.errors import JSONDecodeError
+    except ImportError:
+        from json.decoder import JSONDecodeError
 except ImportError:
     JSONDecodeError = ValueError
 

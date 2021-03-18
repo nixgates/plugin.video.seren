@@ -66,7 +66,7 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
         service_info['running'] = False
 
     def _start_package_services(self, package):
-        g.log('Request to start services for package: {}'.format(package['pack_name']))
+        g.log('Request to start services for package: {} v{}'.format(package['pack_name'], package['version']))
         for service in package['services'].split('|'):
             if not service:
                 continue

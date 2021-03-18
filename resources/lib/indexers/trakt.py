@@ -248,16 +248,6 @@ class TraktAPI(ApiBase):
                 ("network", "studio", None),
                 ("runtime", "duration", lambda d: d * 60),
                 ("progress", "percentplayed", None),
-                (
-                    None,
-                    "resumetime",
-                    (
-                        ("runtime", "progress"),
-                        lambda d, p: int((float(p / 100) * d))
-                        if d is not None and p is not None
-                        else 0,
-                    ),
-                ),
                 ("updated_at", "dateadded", lambda t: tools.validate_date(t)),
                 ("last_updated_at", "dateadded", lambda t: tools.validate_date(t)),
                 ("collected_at", "collected_at", lambda t: tools.validate_date(t)),
@@ -319,7 +309,13 @@ class TraktAPI(ApiBase):
 
         self.ShowNormalization = tools.extend_array(
             [
-                ("first_aired", "year", lambda t: tools.validate_date(t)[:4]),
+                (
+                    "first_aired",
+                    "year",
+                    lambda t: tools.validate_date(t)[:4]
+                    if tools.validate_date(t)
+                    else None
+                ),
                 ("title", "tvshowtitle", None),
                 (
                     "first_aired",
