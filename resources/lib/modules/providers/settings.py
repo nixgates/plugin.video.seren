@@ -57,4 +57,4 @@ class SettingsManager(ProviderCache):
     def set_setting(self, package_name, setting_id, value):
         setting = self._get_package_setting(package_name, setting_id)
         self._cast_setting(setting, forced_value=value)
-        self._set_package_setting(package_name, setting_id, str(value))
+        self._set_package_setting(package_name, setting_id, g.UNICODE(value))
