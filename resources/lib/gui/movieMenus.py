@@ -402,6 +402,7 @@ class Menus:
 
         trakt_list = self.trakt.get_json_cached(
             "movies/{}".format(trakt_endpoint),
+            genres=genre_string,
             page=g.PAGE,
             extended="full"
         )

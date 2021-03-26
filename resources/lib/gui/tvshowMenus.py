@@ -515,6 +515,7 @@ class Menus:
 
         trakt_list = self.shows_database.extract_trakt_page(
             "shows/{}".format(trakt_endpoint),
+            genres=genre_string,
             page=g.PAGE,
             extended="full"
         )
