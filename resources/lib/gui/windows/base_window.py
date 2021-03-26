@@ -8,7 +8,6 @@ from copy import deepcopy
 import xbmc
 import xbmcgui
 
-import resources.lib.modules.globals
 from resources.lib.common import tools
 from resources.lib.database.skinManager import SkinManager
 from resources.lib.modules.globals import g
@@ -87,18 +86,21 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
         [id_dict.update({i.split('_')[0]: self.item_information['info'][i]})
          for i in self.item_information['info'].keys() if i.endswith('id')]
         for id, value in id_dict.items():
-            self.setProperty('item.ids.{}_id'.format(id), str(value))
+            self.setProperty('item.ids.{}_id'.format(id), g.UNICODE(value))
 
     def add_art_properties(self):
         for i in self.item_information['art'].keys():
-            self.setProperty('item.art.{}'.format(i), str(self.item_information['art'][i]))
+            self.setProperty('item.art.{}'.format(i), g.UNICODE(self.item_information['art'][i]))
 
     def add_date_properties(self):
+        info = deepcopy(self.item_information['info'])
+        media_type = info.get("mediatype", None)
+        if media_type in [g.MEDIA_SHOW, g.MEDIA_SEASON, g.MEDIA_EPISODE]:
+            # Convert dates to localtime for display
+            g.log("Converting TV Info Dates to local time for display", "debug")
+            g.convert_info_dates(info)
         try:
-            try:
-                year, month, day = self.item_information['info'].get('aired', '0000-00-00').split('-')
-            except ValueError:
-                year, month, day = self.item_information['info'].get('aired', '00/00/0000').split('/')
+            year, month, day = self.item_information['info'].get('aired', '0000-00-00').split('-')
 
             self.setProperty('item.info.aired.year', year)
             self.setProperty('item.info.aired.month', month)
@@ -106,25 +108,25 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
         except ValueError:
             pass
 
-        if 'aired' in self.item_information['info']:
-            aired_date = self.item_information['info']['aired']
+        if 'aired' in info:
+            aired_date = info['aired']
             aired_date = tools.parse_datetime(aired_date, g.DATE_TIME_FORMAT)
             aired_date = aired_date.strftime(xbmc.getRegion('dateshort'))
             try:
                 aired_date = aired_date[:10]
             except IndexError:
                 aired_date = "TBA"
-            self.setProperty('item.info.aired', str(aired_date))
+            self.setProperty('item.info.aired', g.UNICODE(aired_date))
 
-        if 'premiered' in self.item_information['info']:
-            premiered = self.item_information['info']['premiered']
+        if 'premiered' in info:
+            premiered = info['premiered']
             premiered = tools.parse_datetime(premiered, g.DATE_TIME_FORMAT)
             premiered = premiered.strftime(xbmc.getRegion('dateshort'))
             try:
                 premiered = premiered[:10]
             except IndexError:
                 premiered = "TBA"
-            self.setProperty('item.info.premiered', str(premiered))
+            self.setProperty('item.info.premiered', g.UNICODE(premiered))
 
     def add_info_properties(self):
         for i in self.item_information['info'].keys():
@@ -133,10 +135,10 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
                 continue
             if i == 'duration':
                 hours, minutes = divmod(value, 60 * 60)
-                self.setProperty('item.info.{}.minutes'.format(i), str(minutes // 60))
-                self.setProperty('item.info.{}.hours'.format(i), str(hours))
+                self.setProperty('item.info.{}.minutes'.format(i), g.UNICODE(minutes // 60))
+                self.setProperty('item.info.{}.hours'.format(i), g.UNICODE(hours))
             try:
-                self.setProperty('item.info.{}'.format(i), str(value))
+                self.setProperty('item.info.{}'.format(i), g.UNICODE(value))
             except UnicodeEncodeError:
                 self.setProperty('item.info.{}'.format(i), value)
 

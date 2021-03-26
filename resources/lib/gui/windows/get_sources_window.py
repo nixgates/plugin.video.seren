@@ -18,24 +18,24 @@ class GetSourcesWindow(BaseWindow):
 
     def update_properties(self, sources_information):
         # Set Resolution count properties
-        self.setProperty('4k_sources', str(sources_information["torrents_quality"][0] +
+        self.setProperty('4k_sources', g.UNICODE(sources_information["torrents_quality"][0] +
                                            sources_information["hosters_quality"][0]))
-        self.setProperty('1080p_sources', str(sources_information["torrents_quality"][1] +
+        self.setProperty('1080p_sources', g.UNICODE(sources_information["torrents_quality"][1] +
                                               sources_information["hosters_quality"][1]))
-        self.setProperty('720p_sources', str(sources_information["torrents_quality"][2] +
+        self.setProperty('720p_sources', g.UNICODE(sources_information["torrents_quality"][2] +
                                              sources_information["hosters_quality"][2]))
-        self.setProperty('SD_sources', str(sources_information["torrents_quality"][3] +
+        self.setProperty('SD_sources', g.UNICODE(sources_information["torrents_quality"][3] +
                                            sources_information["hosters_quality"][3]))
 
         # Set total source type counts
-        self.setProperty('total_torrents', str(len(sources_information["allTorrents"])))
-        self.setProperty('cached_torrents', str(len(sources_information["torrentCacheSources"])))
-        self.setProperty('hosters_sources', str(len(sources_information["hosterSources"])))
-        self.setProperty('cloud_sources', str(len(sources_information["cloudFiles"])))
-        self.setProperty('adaptive_sources', str(len(sources_information["adaptiveSources"])))
+        self.setProperty('total_torrents', g.UNICODE(len(sources_information["allTorrents"])))
+        self.setProperty('cached_torrents', g.UNICODE(len(sources_information["torrentCacheSources"])))
+        self.setProperty('hosters_sources', g.UNICODE(len(sources_information["hosterSources"])))
+        self.setProperty('cloud_sources', g.UNICODE(len(sources_information["cloudFiles"])))
+        self.setProperty('adaptive_sources', g.UNICODE(len(sources_information["adaptiveSources"])))
 
         # Set remaining providers string
-        self.setProperty("remaining_providers_count", str((len(sources_information["remainingProviders"]))))
+        self.setProperty("remaining_providers_count", g.UNICODE((len(sources_information["remainingProviders"]))))
 
         self.setProperty("remaining_providers_list", g.color_string(' | ')
                          .join([i.upper() for i in sources_information["remainingProviders"]]))
@@ -51,7 +51,7 @@ class GetSourcesWindow(BaseWindow):
         self.setProperty(key, value)
 
     def setProgress(self, progress):
-        self.setProperty('progress', str(progress))
+        self.setProperty('progress', g.UNICODE(progress))
 
     def __del__(self):
         self.close()

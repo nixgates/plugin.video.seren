@@ -362,8 +362,8 @@ class SkinManager(Database, ZipManager):
             switch_skin = xbmcgui.Dialog().yesno(
                 g.ADDON_NAME,
                 g.get_language_string(30218).format(
-                    g.encode_py2(skin_meta["skin_name"]),
-                    g.encode_py2(skin_meta["version"]),
+                    skin_meta["skin_name"],
+                    skin_meta["version"],
                 ),
             )
             if not switch_skin:

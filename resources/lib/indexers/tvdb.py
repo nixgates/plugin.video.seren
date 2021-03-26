@@ -900,7 +900,7 @@ class TVDBAPI(ApiBase):
             g.set_setting("tvdb.jw", response["token"])
             self.jwToken = response["token"]
             self.tokenExpires = time.time() + (24 * (60 * 60))
-            g.set_setting("tvdb.expiry", str(self.tokenExpires))
+            g.set_setting("tvdb.expiry", g.UNICODE(self.tokenExpires))
 
     def init_token(self):
         with GlobalLock(self.__class__.__name__, self._threading_lock, True) as lock:
@@ -1023,7 +1023,7 @@ class TVDBAPI(ApiBase):
                 for i in item
                 if "fileName" in i
                 and i.get("keyType") == key_name
-                and (sub_key is None or i.get("subKey") == str(sub_key))
+                and (sub_key is None or i.get("subKey") == g.UNICODE(sub_key))
             ]
 
             if len(art) > 0:

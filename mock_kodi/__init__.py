@@ -13,6 +13,7 @@ import types
 import polib
 
 from resources.lib.common import tools
+from resources.lib.modules.globals import g
 
 try:
     import xml.etree.cElementTree as ElementTree
@@ -274,9 +275,9 @@ class SerenStubs:
             """
             if value == "System.BuildVersion":
                 if PYTHON2:
-                    return "18"
+                    return "18.9 (18.9.0) Git:20201023-0655c2c718"
                 if PYTHON3:
-                    return "19"
+                    return "19.0 (19.0.0) Git:19.0-Matrix"
             print("Couldn't find the infolabel")
 
         @staticmethod
@@ -494,7 +495,7 @@ class SerenStubs:
             def setSetting(self, key, value):
                 if not self._current_user_settings:
                     self._load_user_settings()
-                self._current_user_settings.update({key: {"value": str(value)}})
+                self._current_user_settings.update({key: {"value": g.UNICODE(value)}})
 
     class xbmcplugin:
         @staticmethod

@@ -52,7 +52,7 @@ class ResolverWindow(BaseWindow):
         if "size" in source and source["size"] != "Variable":
             self.setProperty("source_size", tools.source_size_display(source["size"]))
 
-        self.setProperty("release_title", g.display_string(source["release_title"]))
+        self.setProperty("release_title", source["release_title"])
         self.setProperty("debrid_provider", debrid_provider)
         self.setProperty("source_provider", source["provider"])
         self.setProperty("source_resolution", source["quality"])

@@ -7,7 +7,6 @@ import json
 import os
 import sys
 import threading
-
 import xbmcvfs
 
 from resources.lib.common import tools
@@ -154,6 +153,6 @@ class CustomProviders(ProviderCache):
             os.path.join(g.ADDON_USERDATA_PATH, "providers", "__init__.py"), "w+"
         )
         provider_init.write(
-            str(base64.b64decode(g.decode_py2(INIT_BASE64)).decode("utf-8"))
+            str(base64.b64decode(INIT_BASE64).decode("utf-8"))
         )
         provider_init.close()

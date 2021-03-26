@@ -101,8 +101,8 @@ class ProviderCache(Database):
     def get_single_package(self, package_name):
         """
         Fetches a single package details from the database
-        :param provider_name: Name of package
-        :type provider_name: str
+        :param package_name: Name of package
+        :type package_name: str
         :return: Package record
         :rtype: dict
         """

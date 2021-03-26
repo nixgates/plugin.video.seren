@@ -33,10 +33,10 @@ class ManualCacheWindow(BaseWindow):
                 try:
                     value = i[info]
                     if isinstance(value, list):
-                        value = ' '.join(sorted([str(k) for k in value]))
+                        value = ' '.join(sorted([g.UNICODE(k) for k in value]))
                     if info == 'size':
                         value = tools.source_size_display(value)
-                    menu_item.setProperty(info, str(value).replace('_', ' '))
+                    menu_item.setProperty(info, g.UNICODE(value).replace('_', ' '))
                 except UnicodeEncodeError:
                     menu_item.setProperty(info, i[info])
 

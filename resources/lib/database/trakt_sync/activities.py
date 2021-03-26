@@ -290,11 +290,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         "episode": get(episode, "episode"),
                         "last_watched_at": get(episode, "last_watched_at"),
                         "watched": get(episode, "playcount")
-                        }
+                    }
                         for show in trakt_watched
                         for season in get(show, "seasons", [])
                         for episode in get(season, "episodes", [])
-                        ])
+                    ])
                     self.execute_sql(
                         'INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, season, '
                         'tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, collected, '
@@ -340,11 +340,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         "episode": get(episode, "episode"),
                         "collected_at": get(episode, "collected_at"),
                         "collected": get(episode, "collected")
-                        }
+                    }
                         for show in trakt_collection
                         for season in get(show, "seasons", [])
                         for episode in get(season, "episodes", [])
-                        ])
+                    ])
                     self.execute_sql('INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, '
                                      'season, tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, '
                                      'collected, watched, "number", args, air_date, last_watched_at, collected_at) '
@@ -375,18 +375,18 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         str(get(episode, "episode"))
                         for episode in get(season, "episodes", [])
                         if get(episode, "playcount") > 0
-                        ]
-                    ),
-                )
+                    ]
+                ),
+            )
             for show in trakt_watched
             for season in get(show, "seasons", [])
-            ]
+        ]
         if len(watched_expressions) > 0:
             watched_queries = self.chunkify_list_for_query(watched_expressions)
             query_list += [
                 watched_query.format(" OR ".join(chunk))
                 for chunk in watched_queries
-                ]
+            ]
             self.execute_sql(query_list)
 
     def _xbox_collected_workaround(self, trakt_collection):
@@ -401,18 +401,18 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     [
                         str(get(episode, "episode"))
                         for episode in get(season, "episodes", [])
-                        ]
-                    ),
-                )
+                    ]
+                ),
+            )
             for show in trakt_collection
             for season in get(show, "seasons", [])
-            ]
+        ]
         if len(collected_expressions) > 0:
             collected_queries = self.chunkify_list_for_query(collected_expressions)
             query_list += [
                 collected_query.format(" OR ".join(chunk))
                 for chunk in collected_queries
-                ]
+            ]
             self.execute_sql(query_list)
 
     def _filter_lists_items_that_needs_updating(self, requested):
@@ -467,14 +467,15 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                             int(
                                 float(get(i, "percentplayed") / 100)
                                 * get(i, "duration")
-                                ),
+                            ),
                             get(i, "percentplayed"),
                             bookmark_type[:-1],
                             get(i, "paused_at"),
                         )
                         for i in progress
-                        if get(i, "percentplayed") is not None
+                        if get(i, "percentplayed")
                            and 0 < get(i, "percentplayed") < 100
+                           and get(i, "duration")
                     ),
                 )
             else:
@@ -492,7 +493,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                             i.get("paused_at"),
                         )
                         for i in progress
-                        if i.get("progress") is not None and 0 < i.get("progress") < 100
+                        if i.get("progress")
+                           and 0 < i.get("progress") < 100
+                           and get(i["episode"], "duration")
                     ),
                 )
 

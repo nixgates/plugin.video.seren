@@ -141,13 +141,6 @@ class TMDBAPI(ApiBase):
                 lambda t: sorted(OrderedDict.fromkeys(v["name"] for v in t)),
             ),
             (
-                "origin_country",
-                "studio",
-                lambda t: sorted(
-                    OrderedDict.fromkeys(v["name"] if "name" in v else v for v in t)
-                ),
-            ),
-            (
                 ("credits", "crew"),
                 "director",
                 lambda t: sorted(
@@ -516,12 +509,7 @@ class TMDBAPI(ApiBase):
                 ]:
                     if t.get("title") not in [None, ""]:
                         item["aliases"].append(t["title"])
-                if "iso_3166_1" in t and t["iso_3166_1"] in [self.lang_region_code]:
-                    if t.get("title") not in [None, ""] and t.get("type") not in [
-                        None,
-                        "",
-                    ]:
-                        item.update({"title": t["title"]})
+
         return item
 
     def _apply_trailers(self, item):

@@ -6,10 +6,11 @@ from __future__ import absolute_import, division, unicode_literals
 import _strptime
 import json
 import os
+import re
 import sys
 import time
 import traceback
-import unicodedata
+
 
 import xbmc
 import xbmcaddon
@@ -19,6 +20,7 @@ import xbmcvfs
 
 from resources.lib.common import tools
 from resources.lib.third_party.cached_property import cached_property
+from resources.lib.third_party.unidecode import unidecode
 
 try:
     import xml.etree.cElementTree as ElementTree
@@ -278,12 +280,13 @@ class GlobalVariables(object):
     MEDIA_SEASON = "season"
     MEDIA_EPISODE = "episode"
 
-
     DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
     DATE_TIME_FORMAT_ZULU = DATE_TIME_FORMAT + ".000Z"
     DATE_FORMAT = "%Y-%m-%d"
 
     PYTHON3 = True if sys.version_info.major == 3 else False
+    UNICODE = tools.unicode
+    SEMVER_REGEX = re.compile(r"^((?:\d+\.){2}\d+)")
 
     def __init__(self):
         self.IS_ADDON_FIRSTRUN = None
@@ -292,6 +295,8 @@ class GlobalVariables(object):
         self.ADDON_ID = None
         self.ADDON_NAME = None
         self.VERSION = None
+        self.CLEAN_VERSION = None
+        self.USER_AGENT = None
         self.DEFAULT_FANART = None
         self.DEFAULT_ICON = None
         self.ADDON = xbmcaddon.Addon()
@@ -302,6 +307,7 @@ class GlobalVariables(object):
         self.LANGUAGE_CACHE = {}
         self.PLAYLIST = None
         self.HOME_WINDOW = None
+        self.KODI_FULL_VERSION = None
         self.KODI_VERSION = None
         self.PLATFORM = self._get_system_platform()
 
@@ -313,6 +319,8 @@ class GlobalVariables(object):
         self.ADDON_ID = addon_id if addon_id else self.ADDON.getAddonInfo("id")
         self.ADDON_NAME = self.ADDON.getAddonInfo("name")
         self.VERSION = self.ADDON.getAddonInfo("version")
+        self.CLEAN_VERSION = self.SEMVER_REGEX.findall(self.VERSION)[0]
+        self.USER_AGENT = "{} - {}".format(self.ADDON_NAME, self.CLEAN_VERSION)
         self.DEFAULT_FANART = self.ADDON.getAddonInfo("fanart")
         self.DEFAULT_ICON = self.ADDON.getAddonInfo("icon")
         self._init_kodi()
@@ -323,7 +331,13 @@ class GlobalVariables(object):
     def _init_kodi(self):
         self.PLAYLIST = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.HOME_WINDOW = xbmcgui.Window(10000)
-        self.KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion")[:2])
+        self.KODI_FULL_VERSION = xbmc.getInfoLabel("System.BuildVersion")
+        version = re.findall(r'(?:\(((?:\d+\.?){2,3})\))', self.KODI_FULL_VERSION)
+        if version:
+            self.KODI_FULL_VERSION = version[0]
+        else:
+            self.KODI_FULL_VERSION = self.KODI_FULL_VERSION.split(' ')[0]
+        self.KODI_VERSION = int(self.KODI_FULL_VERSION[:2])
 
     @staticmethod
     def _get_system_platform():
@@ -370,7 +384,7 @@ class GlobalVariables(object):
 
     def add_dictionary_to_window(self, key_prepend, dictionary):
         for k, v in list(dictionary.items()):
-            key = "{}.{}".format(key_prepend, str(k))
+            key = "{}.{}".format(key_prepend, g.UNICODE(k))
             if isinstance(v, dict):
                 self.add_dictionary_to_window(key, v)
             else:
@@ -378,7 +392,7 @@ class GlobalVariables(object):
 
     def remove_dictionary_from_window(self, key_prepend, dictionary):
         for k, v in list(dictionary.items()):
-            key = "{}_{}".format(key_prepend, str(k))
+            key = "{}_{}".format(key_prepend, g.UNICODE(k))
             if isinstance(v, dict):
                 self.remove_dictionary_from_window(key, v)
             else:
@@ -404,7 +418,7 @@ class GlobalVariables(object):
             )
         else:
             self.BASE_URL = ""
-        self.PATH = self.decode_py2(tools.unquote(self.URL[2]))
+        self.PATH = tools.unquote(self.URL[2])
         try:
             self.PARAM_STRING = argv[2].lstrip('?/')
         except IndexError:
@@ -513,72 +527,58 @@ class GlobalVariables(object):
         return params
 
     def _init_paths(self):
-        self.ADDONS_PATH = self.decode_py2(
-            tools.translate_path(os.path.join("special://home/", "addons/"))
+        self.ADDONS_PATH = tools.translate_path(
+            os.path.join("special://home/", "addons/")
         )
-        self.ADDON_PATH = self.decode_py2(
-            tools.translate_path(
-                os.path.join(
-                    "special://home/", "addons/{}".format(self.ADDON_ID.lower())
-                )
+        self.ADDON_PATH = tools.translate_path(
+            os.path.join(
+                "special://home/", "addons/{}".format(self.ADDON_ID.lower())
             )
         )
-        self.ADDON_DATA_PATH = self.decode_py2(
-            tools.translate_path(self.ADDON.getAddonInfo("path"))
+        self.ADDON_DATA_PATH = tools.translate_path(
+            self.ADDON.getAddonInfo("path")
         )  # Addon folder
-        self.ADDON_USERDATA_PATH = self.decode_py2(
-            tools.translate_path(
-                "special://profile/addon_data/{}/".format(self.ADDON_ID)
-            )
+        self.ADDON_USERDATA_PATH = tools.translate_path(
+            "special://profile/addon_data/{}/".format(self.ADDON_ID)
         )  # Addon user data folder
-        self.SETTINGS_PATH = self.decode_py2(
-            tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "settings.xml"))
+        self.SETTINGS_PATH = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "settings.xml")
         )
-        self.ADVANCED_SETTINGS_PATH = self.decode_py2(
-            tools.translate_path("special://home/userdata/advancedsettings.xml")
+        self.ADVANCED_SETTINGS_PATH = tools.translate_path(
+            "special://home/userdata/advancedsettings.xml"
         )
-        self.GUI_PATH = self.decode_py2(
-            tools.translate_path(
-                os.path.join(self.ADDON_DATA_PATH, "resources", "lib", "gui")
-            )
+        self.GUI_PATH = tools.translate_path(
+            os.path.join(self.ADDON_DATA_PATH, "resources", "lib", "gui")
         )
-        self.IMAGES_PATH = self.decode_py2(
-            tools.translate_path(
-                os.path.join(self.ADDON_DATA_PATH, "resources", "images")
-            )
+        self.IMAGES_PATH = tools.translate_path(
+            os.path.join(self.ADDON_DATA_PATH, "resources", "images")
         )
-        self.SKINS_PATH = self.decode_py2(
-            tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "skins"))
+        self.SKINS_PATH = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "skins")
         )
-        self.CACHE_DB_PATH = self.decode_py2(
-            tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "cache.db"))
+        self.CACHE_DB_PATH = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "cache.db")
         )
-        self.TORRENT_CACHE = self.decode_py2(
-            tools.translate_path(
-                os.path.join(self.ADDON_USERDATA_PATH, "torrentCache.db")
-            )
+        self.TORRENT_CACHE = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "torrentCache.db")
         )
-        self.TORRENT_ASSIST = self.decode_py2(
-            tools.translate_path(
-                os.path.join(self.ADDON_USERDATA_PATH, "torentAssist.db")
-            )
+        self.TORRENT_ASSIST = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "torentAssist.db")
         )
-        self.PROVIDER_CACHE_DB_PATH = self.decode_py2(
-            tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "providers.db"))
+        self.PROVIDER_CACHE_DB_PATH = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "providers.db")
         )
-        self.PREMIUMIZE_DB_PATH = self.decode_py2(
-            tools.translate_path(
-                os.path.join(self.ADDON_USERDATA_PATH, "premiumize.db")
-            )
+        self.PREMIUMIZE_DB_PATH = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "premiumize.db")
         )
-        self.TRAKT_SYNC_DB_PATH = self.decode_py2(
-            tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "traktSync.db"))
+        self.TRAKT_SYNC_DB_PATH = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "traktSync.db")
         )
-        self.SEARCH_HISTORY_DB_PATH = self.decode_py2(
-            tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "search.db"))
+        self.SEARCH_HISTORY_DB_PATH = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "search.db")
         )
-        self.SKINS_DB_PATH = self.decode_py2(
-            tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "skins.db"))
+        self.SKINS_DB_PATH = tools.translate_path(
+            os.path.join(self.ADDON_USERDATA_PATH, "skins.db")
         )
         self._confirm_and_init_download_path()
 
@@ -603,18 +603,6 @@ class GlobalVariables(object):
             database_path = os.path.join(database_path, "MyVideos119.db")
 
         return database_path
-
-    def decode_py2(self, value):
-        if not self.PYTHON3 and isinstance(value, tools.basestring):
-            return self.encode_py2(value).decode("utf-8")
-        return value
-
-    def encode_py2(self, value):
-        if not value:
-            return value
-        if not self.PYTHON3 and isinstance(value, tools.unicode):
-            return value.encode("utf-8")
-        return value
 
     # region KODI setting
     def set_setting(self, setting_id, value):
@@ -663,7 +651,7 @@ class GlobalVariables(object):
             language_id, self.ADDON.getLocalizedString(language_id)
         )
         self.LANGUAGE_CACHE.update({language_id: text})
-        return self.decode_py2(text)
+        return text
 
     def get_view_type(self, content_type):
         no_view_type = 0
@@ -700,7 +688,7 @@ class GlobalVariables(object):
         return no_view_type
 
     def log(self, msg, level="info"):
-        msg = g.encode_py2(g.decode_py2(msg))
+        msg = msg
         msg = "{}: {}".format(self.ADDON_NAME.upper(), msg)
         if level == "error":
             xbmc.log(msg, level=xbmc.LOGERROR)
@@ -849,9 +837,6 @@ class GlobalVariables(object):
         :return:Text wrapped in a Kodi color tag.
         :rtype:str
         """
-        if not isinstance(text, (int, float)):
-            text = self.display_string(text)
-
         if color == "default" or not color or color == "inherit":
             color = self.get_user_text_color()
 
@@ -889,21 +874,9 @@ class GlobalVariables(object):
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         xbmc.executebuiltin("Dialog.Close(busydialognocancel)")
 
-    def display_string(self, value):
-        if isinstance(value, (tools.basestring, tools.unicode)):
-            return self.deaccent_string(value)
-        if isinstance(value, int):
-            return "{}".format(value)
-        if isinstance(value, bytes):
-            return "".join(chr(x) for x in value)
-        return value
-
     def deaccent_string(self, text):
-        text = self.decode_py2(text)
-        text = unicodedata.normalize("NFD", text)
-        text = text.encode("ascii", "ignore")
-        text = text.decode("utf-8")
-        return str(text)
+        text = unidecode(text)
+        return g.UNICODE(text)
 
     def premium_check(self):
         if self.PLAYLIST.getposition() <= 0 and not self.debrid_available():
@@ -972,7 +945,7 @@ class GlobalVariables(object):
         ]
 
     def add_directory_item(self, name, **params):
-        [params.update({key: g.encode_py2(value)}) for key, value in params.items()]
+        [params.update({key: value}) for key, value in params.items()]
         menu_item = params.pop("menu_item", {})
         if not isinstance(menu_item, dict):
             menu_item = {}
@@ -996,9 +969,9 @@ class GlobalVariables(object):
         self._apply_listitem_properties(item, info)
 
         if "unwatched_episodes" in menu_item:
-            item.setProperty("UnWatchedEpisodes", str(menu_item["unwatched_episodes"]))
+            item.setProperty("UnWatchedEpisodes", g.UNICODE(menu_item["unwatched_episodes"]))
         if "watched_episodes" in menu_item:
-            item.setProperty("WatchedEpisodes", str(menu_item["watched_episodes"]))
+            item.setProperty("WatchedEpisodes", g.UNICODE(menu_item["watched_episodes"]))
         if menu_item.get("episode_count", 0) > 0 and menu_item.get(
             "episode_count", 0
         ) == menu_item.get("watched_episodes", 0):
@@ -1007,25 +980,25 @@ class GlobalVariables(object):
             menu_item.get("watched_episodes", 0) == 0
             and menu_item.get("episode_count", 0) > 0
         ):
-            item.setProperty("WatchedEpisodes", str(0))
+            item.setProperty("WatchedEpisodes", g.UNICODE(0))
             item.setProperty(
-                "UnWatchedEpisodes", str(menu_item.get("episode_count", 0))
+                "UnWatchedEpisodes", g.UNICODE(menu_item.get("episode_count", 0))
             )
         if "episode_count" in menu_item:
-            item.setProperty("TotalEpisodes", str(menu_item["episode_count"]))
+            item.setProperty("TotalEpisodes", g.UNICODE(menu_item["episode_count"]))
         if "season_count" in menu_item:
-            item.setProperty("TotalSeasons", str(menu_item["season_count"]))
+            item.setProperty("TotalSeasons", g.UNICODE(menu_item["season_count"]))
         if (
             "percent_played" in menu_item
             and menu_item.get("percent_played") is not None
         ):
             if float(menu_item.get("percent_played", 0)) > 0:
-                item.setProperty("percentplayed", str(menu_item["percent_played"]))
+                item.setProperty("percentplayed", g.UNICODE(menu_item["percent_played"]))
         if "resume_time" in menu_item and menu_item.get("resume_time") is not None:
             if int(menu_item.get("resume_time", 0)) > 0:
-                params["resume"] = str(menu_item["resume_time"])
-                item.setProperty("resumetime", str(menu_item["resume_time"]))
-                item.setProperty("totaltime", str(info["duration"]))
+                params["resume"] = g.UNICODE(menu_item["resume_time"])
+                item.setProperty("resumetime", g.UNICODE(menu_item["resume_time"]))
+                item.setProperty("totaltime", g.UNICODE(info["duration"]))
         if "play_count" in menu_item and menu_item.get("play_count") is not None:
             info["playcount"] = menu_item["play_count"]
         if "description" in params:
@@ -1033,7 +1006,7 @@ class GlobalVariables(object):
                 "description", None
             )
         if "special_sort" in params:
-            item.setProperty("SpecialSort", str(params["special_sort"]))
+            item.setProperty("SpecialSort", g.UNICODE(params["special_sort"]))
         label2 = params.pop("label2", None)
         if label2 is not None:
             item.setLabel2(label2)
@@ -1051,7 +1024,7 @@ class GlobalVariables(object):
         item.setCast(cast)
 
         [
-            item.setProperty(key, str(value))
+            item.setProperty(key, g.UNICODE(value))
             for key, value in info.items()
             if key.endswith("_id")
         ]
@@ -1241,7 +1214,7 @@ class GlobalVariables(object):
             return subtitle_language["value"]
 
     def convert_language_iso(self, from_value):
-        return xbmc.convertLanguage(self.decode_py2(from_value), xbmc.ISO_639_1)
+        return xbmc.convertLanguage(from_value, xbmc.ISO_639_1)
 
     @staticmethod
     def _apply_listitem_properties(item, info):
@@ -1251,9 +1224,9 @@ class GlobalVariables(object):
                 for subkey in i[0]:
                     value = value.get(subkey, {})
                 if value:
-                    item.setProperty(i[1], str(g.encode_py2(value)))
+                    item.setProperty(i[1], g.UNICODE(value))
             elif i[0] in info:
-                item.setProperty(i[1], str(g.encode_py2(info[i[0]])))
+                item.setProperty(i[1], g.UNICODE(info[i[0]]))
 
     def create_url(self, base_url, params):
         if params is None:

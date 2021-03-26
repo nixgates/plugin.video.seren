@@ -411,10 +411,10 @@ class Menus:
                 g.cancel_directory()
                 return
 
-        query = g.decode_py2(query)
+        query = query
         if g.get_bool_setting("searchHistory"):
             SearchHistory().add_search_history("tvshow", query)
-        query = g.deaccent_string(g.display_string(query))
+        query = g.deaccent_string(query)
         self.shows_search_results(query)
 
     def shows_search_results(self, query):
@@ -515,6 +515,7 @@ class Menus:
 
         trakt_list = self.shows_database.extract_trakt_page(
             "shows/{}".format(trakt_endpoint),
+            genres=genre_string,
             page=g.PAGE,
             extended="full"
         )
@@ -543,7 +544,7 @@ class Menus:
             for year in all_years:
                 menu_items.append(
                     g.add_directory_item(
-                        str(year), action="showYears", action_args=year, bulk_add=True
+                        g.UNICODE(year), action="showYears", action_args=year, bulk_add=True
                     )
                 )
             xbmcplugin.addDirectoryItems(g.PLUGIN_HANDLE, menu_items, len(menu_items))

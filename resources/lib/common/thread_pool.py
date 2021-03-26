@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import threading
+from time import sleep
 
 from resources.lib.common import tools
 from resources.lib.modules.globals import g
@@ -23,7 +24,6 @@ class ClearableQueue(Queue):
 
     def clear(self):
         """Clears all items from the queue."""
-
         with self.mutex:
             unfinished = self.unfinished_tasks - len(self.queue)
             if unfinished <= 0:
@@ -39,7 +39,7 @@ class ThreadPoolWorker(Thread):
     """Worker thread that handles the execution of the consumes tasks from the main queue."""
 
     def __init__(self, tasks, exception_handler, stop_flag=None):
-        Thread.__init__(self)
+        super(ThreadPoolWorker, self).__init__()
         self.exception_handler = exception_handler
         self.tasks = tasks
         self.stop_flag = stop_flag
@@ -55,7 +55,7 @@ class ThreadPoolWorker(Thread):
 
             try:
                 func, result_callback, args, kwargs = self.tasks.get(timeout=0.1)
-                self.name = str(func)
+                self.name = g.UNICODE(func)
                 result_callback(func(*args, **kwargs))
             except Empty:
                 break
@@ -66,14 +66,14 @@ class ThreadPoolWorker(Thread):
             finally:
                 try:
                     self.tasks.task_done()
-                except ValueError:
+                except Exception as e:
+                    print("task done error: {}".format(repr(e)))
                     pass
 
 
 class ThreadPool:
-
     """
-    Helper class to simplify raising workers
+    Helper class to simplify raising worker_pool
     """
 
     def __init__(self, workers=40):
@@ -81,10 +81,11 @@ class ThreadPool:
         self.tasks = ClearableQueue(2 * workers)
         self.stop_event = threading.Event()
         self.results = None
-        self.workers = []
+        self.worker_pool = []
         self.max_workers = 1 if self.limiter else workers
         self.exception = None
         self.result_threading_lock = threading.Lock()
+        self.workers_threading_lock = threading.Lock()
 
     def _handle_result(self, result):
         self.result_threading_lock.acquire()
@@ -134,38 +135,20 @@ class ThreadPool:
         self._worker_maintenance()
 
     def _worker_maintenance(self):
-        self._cleanup_workers()
-        if len(self.workers) != self.max_workers:
-            self.workers.append(
-                ThreadPoolWorker(self.tasks, self.exception_handler, self.stop_event,)
-            )
-
-    def _cleanup_workers(self):
-        [
-            self._safe_remove_worker(worker)
-            for worker in [i for i in self.workers if not i.is_alive()]
-        ]
-
-    def _safe_remove_worker(self, worker):
         try:
-            self.workers.remove(worker)
-        except ValueError:
-            pass
+            self.workers_threading_lock.acquire()
+            # Shrink worker pool
+            for worker in [i for i in self.worker_pool if not i.is_alive()]:
+                self.worker_pool.remove(worker)
+            # Expand worker pool
+            if len(self.worker_pool) < self.max_workers:
+                self.worker_pool.append(
+                    ThreadPoolWorker(self.tasks, self._exception_handler, self.stop_event)
+                )
+        finally:
+            self.workers_threading_lock.release()
 
-
-    def map(self, func, args_list):
-        """
-        Maps arguments to the specified func
-        :param func: method to use against arguments
-        :type func: object
-        :param args_list: List of arguments, each ran against the supplied method
-        :type args_list: iterable
-        :return:
-        :rtype:
-        """
-        [self.put(func, args) for args in args_list]
-
-    def exception_handler(self, exception):
+    def _exception_handler(self, exception):
         """
         Terminates all threads and sets ThreadPool exception
         :param exception:
@@ -192,8 +175,12 @@ class ThreadPool:
         :rtype:
         """
         self._try_raise()
-        self._worker_maintenance()
-        [i.join() for i in self.workers]
+
+        while not self.tasks.empty():
+            self._worker_maintenance()
+            sleep(0.001)
+
+        [i.join() for i in self.worker_pool]
         self._try_raise()
 
         try:

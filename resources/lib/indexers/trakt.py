@@ -2,9 +2,9 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import inspect
+import re
 import threading
 import time
-import re
 from collections import OrderedDict
 from functools import wraps
 
@@ -24,7 +24,6 @@ from resources.lib.indexers.apibase import (
 )
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
-from resources.lib.third_party import pytz
 
 CLOUDFLARE_ERROR_MSG = "Service Unavailable - Cloudflare error"
 
@@ -91,7 +90,7 @@ def _connection_failure_dialog():
         and not xbmc.Player().isPlaying()
     ):
         xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30025).format("Trakt"))
-        g.set_setting("general.trakt.failure.timeout", str(time.time()))
+        g.set_setting("general.trakt.failure.timeout", g.UNICODE(time.time()))
 
 
 def _reset_trakt_auth():
@@ -391,7 +390,7 @@ class TraktAPI(ApiBase):
             "Content-Type": "application/json",
             "trakt-api-key": self.client_id,
             "trakt-api-version": "2",
-            "User-Agent": "{} - {}".format(g.ADDON_NAME, g.VERSION)
+            "User-Agent": g.USER_AGENT
         }
         if self.access_token:
             headers["Authorization"] = "Bearer {}".format(self.access_token)
@@ -522,7 +521,7 @@ class TraktAPI(ApiBase):
             self.refresh_token = response["refresh_token"]
         if "expires_in" in response and "created_at" in response:
             g.set_setting(
-                "trakt.expires", str(response["created_at"] + response["expires_in"])
+                "trakt.expires", g.UNICODE(response["created_at"] + response["expires_in"])
             )
             self.token_expires = float(response["created_at"] + response["expires_in"])
 

@@ -241,14 +241,14 @@ class Sources(object):
             #     self.item_information['info']['title'] = title
             #     self.item_information['info']['originaltitle'] = title
             if year is not None and year != self.item_information['info']['year']:
-                self.item_information['info']['year'] = str(year)
+                self.item_information['info']['year'] = g.UNICODE(year)
 
         # else:
         #     resp = self._imdb_suggestions(self.item_information['info']['tvshow.imdb_id'])
         #     year = resp['y']
         #     title = resp['l']
         #     if year != self.item_information['info']['year']:
-        #         self.item_information['info']['year'] = str(year)
+        #         self.item_information['info']['year'] = g.UNICODE(year)
         #     if self.item_information['info']['tvshowtitle'] != title:
         #         self.item_information['info'].get('aliases', []).append(
         #             self.item_information['info']['tvshowtitle'])
@@ -463,12 +463,12 @@ class Sources(object):
                 results = provider_source.episode(simple_info, info)
             else:
                 try:
-                    results = provider_source.movie(info['info']['originaltitle'],
-                                                    str(info['info']['year']),
+                    results = provider_source.movie(info['info']['title'],
+                                                    g.UNICODE(info['info']['year']),
                                                     info['info'].get('imdb_id'))
                 except TypeError:
-                    results = provider_source.movie(info['info']['originaltitle'],
-                                                    str(info['info']['year']))
+                    results = provider_source.movie(info['info']['title'],
+                                                    g.UNICODE(info['info']['year']))
 
             if results is None:
                 self.sources_information["remainingProviders"].remove(provider_name)
@@ -530,12 +530,12 @@ class Sources(object):
                 torrent_results = provider_source.episode(simple_info, info)
             else:
                 try:
-                    torrent_results = provider_source.movie(info['info']['originaltitle'],
-                                                            str(info['info']['year']),
+                    torrent_results = provider_source.movie(info['info']['title'],
+                                                            g.UNICODE(info['info']['year']),
                                                             info['info'].get('imdb_id'))
                 except TypeError:
-                    torrent_results = provider_source.movie(info['info']['originaltitle'],
-                                                            str(info['info']['year']))
+                    torrent_results = provider_source.movie(info['info']['title'],
+                                                            g.UNICODE(info['info']['year']))
 
             if torrent_results is None:
                 self.sources_information["remainingProviders"].remove(provider_name)
@@ -754,15 +754,15 @@ class Sources(object):
     def _build_simple_show_info(info):
         simple_info = {'show_title': info['info'].get('tvshowtitle', ''),
                        'episode_title': info['info'].get('originaltitle', ''),
-                       'year': str(info['info'].get('year', '')),
-                       'season_number': str(info['info']['season']),
-                       'episode_number': str(info['info']['episode']),
+                       'year': g.UNICODE(info['info'].get('year', '')),
+                       'season_number': g.UNICODE(info['info']['season']),
+                       'episode_number': g.UNICODE(info['info']['episode']),
                        'show_aliases': info['info'].get('aliases', []),
                        'country': info['info'].get('country_origin', ''),
-                       'no_seasons': str(info.get('season_count', '')),
-                       'absolute_number': str(info.get('absoluteNumber', '')),
+                       'no_seasons': g.UNICODE(info.get('season_count', '')),
+                       'absolute_number': g.UNICODE(info.get('absoluteNumber', '')),
                        'is_airing': info.get('is_airing', False),
-                       'no_episodes': str(info.get('episode_count', '')),
+                       'no_episodes': g.UNICODE(info.get('episode_count', '')),
                        'isanime': False}
 
         if '.' in simple_info['show_title']:
@@ -784,7 +784,7 @@ class Sources(object):
             aliases = info['info'].get('aliases', [])
             if '.' in title:
                 aliases.append(source_utils.clean_title(title.replace('.', '')))
-            year = str(info['info']['year'])
+            year = g.UNICODE(info['info']['year'])
             return imdb, tvdb, title, localtitle, aliases, year
 
         elif media_type == 'episode':
@@ -792,15 +792,15 @@ class Sources(object):
             tvdb = info['info'].get('tvdb_id')
             title = info['info'].get('title')
             premiered = info['info'].get('premiered')
-            season = str(info['info'].get('season'))
-            episode = str(info['info'].get('episode'))
+            season = g.UNICODE(info['info'].get('season'))
+            episode = g.UNICODE(info['info'].get('episode'))
             return imdb, tvdb, title, premiered, season, episode
         elif media_type == 'movie':
             imdb = info['info'].get('imdb_id')
             title = info['info'].get('originaltitle')
             localtitle = info['info'].get('title')
             aliases = info['info'].get('aliases', [])
-            year = str(info['info'].get('year'))
+            year = g.UNICODE(info['info'].get('year'))
             return imdb, title, localtitle, aliases, year
         elif media_type == 'sources':
             hostpr_dict = [host[0]
@@ -814,7 +814,7 @@ class Sources(object):
         for provider in self.hoster_domains['premium'].keys():
             for hoster in self.hoster_domains['premium'][provider]:
                 for source in sources:
-                    if hoster[1].lower() == source['source'].lower() or hoster[0].lower() in str(source['url']).lower():
+                    if hoster[1].lower() == source['source'].lower() or hoster[0].lower() in g.UNICODE(source['url']).lower():
                         source['debrid_provider'] = provider
                         updated_sources.update({"{}_{}".format(provider, source["url"].lower()): source})
         self.sources_information["hosterSources"].update(updated_sources)
@@ -1082,8 +1082,8 @@ class SourceWindowAdapter(object):
             if text is not None:
                 self.dialog.set_property('notification_text', text)
             self.dialog.update_properties(sources_information)
-            self.dialog.set_property('progress', str(progress))
-            self.dialog.set_property('runtime', str(runtime))
+            self.dialog.set_property('progress', g.UNICODE(progress))
+            self.dialog.set_property('runtime', g.UNICODE(runtime))
         elif self.display_style == 1 and self.background_dialog:
             self.background_dialog.update(progress, message=text)
 
@@ -1091,7 +1091,7 @@ class SourceWindowAdapter(object):
         if self.silent:
             return
         if self.display_style == 0 and self.dialog:
-            self.dialog.set_property(key, str(value))
+            self.dialog.set_property(key, g.UNICODE(value))
         elif self.display_style == 1:
             return
 
@@ -1099,7 +1099,7 @@ class SourceWindowAdapter(object):
         if self.silent:
             return
         if self.display_style == 0 and self.dialog:
-            self.dialog.set_property('progress', str(progress))
+            self.dialog.set_property('progress', g.UNICODE(progress))
         elif self.display_style == 1 and self.background_dialog:
             self.background_dialog.update(progress)
 

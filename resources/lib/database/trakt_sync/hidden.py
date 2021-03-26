@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.database import trakt_sync
+from resources.lib.modules.globals import g
 
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
@@ -27,5 +28,5 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def remove_item(self, section, trakt_id):
         self.execute_sql(
             "DELETE FROM hidden WHERE section=? AND trakt_id=?",
-            (str(section), int(trakt_id)),
+            (g.UNICODE(section), int(trakt_id)),
         )

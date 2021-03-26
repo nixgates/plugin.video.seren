@@ -5,7 +5,6 @@ import datetime
 
 import xbmcplugin
 
-import resources.lib.modules.globals
 from resources.lib.common import tools
 from resources.lib.database.trakt_sync import movies, shows
 from resources.lib.modules.globals import g
@@ -23,7 +22,10 @@ class ListBuilder(object):
         self.flatten_episodes = g.get_bool_setting("general.flatten.episodes")
         self.page_limit = g.get_int_setting("item.limit")
         self.hide_unaired = g.get_bool_setting("general.hideUnAired")
-        self.list_title_appends = g.get_setting("general.appendListTitles")
+        self.list_title_appends = g.get_int_setting("general.appendListTitles")
+        self.show_original_title = g.get_bool_setting(
+            "general.meta.showoriginaltitle", False
+        )
 
     def season_list_builder(self, show_id, **params):
         """
@@ -233,7 +235,10 @@ class ListBuilder(object):
         if not item:
             return
 
-        name = g.decode_py2(item.get("info", {}).get("title"))
+        if self.show_original_title and item.get("info", {}).get("originaltitle"):
+            name = item.get("info", {}).get("originaltitle")
+        else:
+            name = item.get("info", {}).get("title")
 
         if not name:
             g.log("Item has no title: {}".format(item), "error")
@@ -255,16 +260,16 @@ class ListBuilder(object):
                     name, item, self.title_appends_general
                 )
 
-        if item["info"]["mediatype"] == "list" and self.list_title_appends == "1":
+        if item["info"]["mediatype"] == "list" and self.list_title_appends == 1:
             name += " - {}".format(
-                g.color_string(g.encode_py2(item["info"]["username"]))
+                g.color_string(item["info"]["username"])
             )
 
         if not item["info"]["mediatype"] == "list" and prepend_date:
-            release_day = tools.parse_datetime(item["info"]["aired"][:10])
-            if release_day:
-                release_day = release_day.strftime("%d %b")
-                name = "[{}] {}".format(release_day, g.encode_py2(name))
+            release_date = tools.utc_to_local(item["info"].get("aired", None))
+            if release_date:
+                release_day = tools.parse_datetime(release_date, g.DATE_TIME_FORMAT).strftime("%d %b")
+                name = "[{}] {}".format(release_day, name)
         item.update({"name": name})
         item["info"]["title"] = name
 
@@ -274,22 +279,22 @@ class ListBuilder(object):
     def _handle_episode_title_appending(name, item, title_append_style):
         if title_append_style == "1":
             name = "{}x{} {}".format(
-                g.display_string(item["info"]["season"]).zfill(2),
-                g.display_string(item["info"]["episode"]).zfill(2),
-                g.display_string(name),
+                g.UNICODE(item["info"]["season"]).zfill(2),
+                g.UNICODE(item["info"]["episode"]).zfill(2),
+                name,
             )
 
         elif title_append_style == "2":
             name = "{}: {}".format(
-                g.color_string(item["info"]["tvshowtitle"]), g.display_string(name)
+                g.color_string(item["info"]["tvshowtitle"]), name
             )
 
         elif title_append_style == "3":
             name = "{}: {}x{} {}".format(
                 g.color_string(item["info"]["tvshowtitle"]),
-                g.display_string(item["info"]["season"]).zfill(2),
-                g.display_string(item["info"]["episode"]).zfill(2),
-                g.display_string(name),
+                g.UNICODE(item["info"]["season"]).zfill(2),
+                g.UNICODE(item["info"]["episode"]).zfill(2),
+                name,
             )
 
         return name

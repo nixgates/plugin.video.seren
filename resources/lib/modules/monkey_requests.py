@@ -6,12 +6,10 @@ Set PRE_TERM_BLOCK to True when you want to force providers from making requests
 from __future__ import absolute_import, division, unicode_literals
 
 import inspect
-import os
 
 import requests
 
 from resources.lib.modules.exceptions import PreemptiveCancellation
-from resources.lib.modules.globals import g
 
 PRE_TERM_BLOCK = False
 
@@ -25,8 +23,8 @@ def _monkey_check(method):
         :param kwargs: kwargs
         :return: func results
         """
-        if (any([True for i in inspect.stack() if "providerModules" in i[1]]) or \
-                any([True for i in inspect.stack() if "providers" in i[1]])) and PRE_TERM_BLOCK:
+        if (any([True for i in inspect.stack() if "providerModules" in i[1]]) or
+            any([True for i in inspect.stack() if "providers" in i[1]])) and PRE_TERM_BLOCK:
             raise PreemptiveCancellation('Pre-emptive termination has stopped this request')
 
         return method(*args, **kwargs)
