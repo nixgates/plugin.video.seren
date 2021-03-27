@@ -46,6 +46,9 @@ class SerenPlayer(xbmc.Player):
         self.dialogs_enabled = g.get_bool_setting(
             "smartplay.playingnextdialog"
             ) or g.get_bool_setting("smartplay.stillwatching")
+        self.intro_dialog_enabled = g.get_bool_setting("skip.intro.dialog")
+        self.intro_dialog_delay = g.get_int_setting("skip.intro.dialog.delay")
+        self.intro_dialog_open_time = g.get_int_setting("skip.intro.open.time")
         self.pre_scrape_enabled = g.get_bool_setting("smartPlay.preScrape")
         self.playing_next_time = g.get_int_setting("playingnext.time")
         self.bookmark_sync = bookmark.TraktSyncDatabase()
@@ -62,6 +65,7 @@ class SerenPlayer(xbmc.Player):
         self.scrobble_started = False
         self._force_marked_watched = False
         self.dialogs_triggered = False
+        self.intro_dialog_triggered = False
         self.pre_scrape_initiated = False
         self.playback_timestamp = 0
 
@@ -557,11 +561,28 @@ class SerenPlayer(xbmc.Player):
                 break
             xbmc.sleep(250)
 
-        self.total_time = self.getTotalTime()
-
         if self.offset and not self.resumed:
             self.seekTime(self.offset)
             self.resumed = True
+
+        while self._is_file_playing() and not g.abort_requested():
+            if (
+                    int(self.getTime()) == self.intro_dialog_delay
+                    and self.intro_dialog_enabled
+                    and not self.intro_dialog_triggered
+             ):
+                xbmc.executebuiltin(
+                    'RunPlugin("plugin://plugin.video.seren/?action=runIntroDialog")'
+                    )
+                self.intro_dialog_triggered = True
+                break
+            elif (
+                    int(self.getTime()) >= self.intro_dialog_delay + self.intro_dialog_open_time
+                    or not self.intro_dialog_enabled
+             ):
+                break
+
+        self.total_time = self.getTotalTime()
 
         self._log_debug_information()
         self._add_subtitle_if_needed()
@@ -689,6 +710,34 @@ class PlayerDialogs(xbmc.Player):
 
             target()
 
+    def display_intro_dialog(self):
+        """
+        Handles the initiating of skip intro dialog
+        :return: None
+        :rtype: None
+        """
+        try:
+            self.playing_file = self.getPlayingFile()
+        except RuntimeError:
+            g.log("Kodi did not return a playing file, killing playback dialogs", "error")
+            return
+
+        if g.get_bool_setting("skip.intro.dialog"):
+            target = self._show_skip_intro
+        else:
+            return
+
+        if self.playing_file != self.getPlayingFile():
+            return
+
+        if not self.isPlayingVideo():
+            return
+
+        if not self._is_video_window_open():
+            return
+
+        target()
+
     @staticmethod
     def _still_watching_calc():
         calculation = float(g.PLAYLIST.getposition() + 1) / g.get_float_setting(
@@ -722,11 +771,33 @@ class PlayerDialogs(xbmc.Player):
         window.doModal()
         del window
 
+    def _show_skip_intro(self):
+        from resources.lib.gui.windows.skip_intro import SkipIntro
+        from resources.lib.database.skinManager import SkinManager
+
+        window = SkipIntro(
+            *SkinManager().confirm_skin_path("skip_intro.xml"),
+            item_information=self._get_current_item_item_information()
+            )
+        window.doModal()
+        del window
+
     @staticmethod
     def _get_next_item_item_information():
         current_position = g.PLAYLIST.getposition()
         url = g.PLAYLIST[  # pylint: disable=unsubscriptable-object
             current_position + 1
+            ].getPath()
+        params = dict(tools.parse_qsl(tools.unquote(url.split("?")[1])))
+        return tools.get_item_information(
+            tools.deconstruct_action_args(params.get("action_args"))
+            )
+
+    @staticmethod
+    def _get_current_item_item_information():
+        current_position = g.PLAYLIST.getposition()
+        url = g.PLAYLIST[  # pylint: disable=unsubscriptable-object
+            current_position
             ].getPath()
         params = dict(tools.parse_qsl(tools.unquote(url.split("?")[1])))
         return tools.get_item_information(
