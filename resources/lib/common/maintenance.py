@@ -33,23 +33,22 @@ def update_themes():
 
 def check_for_addon_update():
     """
-    Perform checks for addon updates and notify uesr of any available updates
+    Perform checks for addon updates and notify user of any available updates
     :return: None
     :rtype: None
     """
     if not g.get_bool_setting("general.checkAddonUpdates"):
-        return
+         return
 
-    local_verison = g.VERSION
-    if "-" in local_verison:
-        g.set_setting("addon.updateCheckTimeStamp", str(time.time()))
+    if "-" in g.VERSION:
+        g.set_setting("addon.updateCheckTimeStamp", g.UNICODE(time.time()))
         return
 
     update_timestamp = g.get_float_setting("addon.updateCheckTimeStamp")
 
     if time.time() > (update_timestamp + (24 * (60 * 60))):
         repo_xml = requests.get(
-            "https://raw.githubusercontent.com/nixgates/nixgates/master/packages/leia/plugin.video.seren/addon.xml"
+            "https://github.com/nixgates/nixgates/raw/master/packages/addons.xml"
         )
         if not repo_xml.status_code == 200:
             g.log(
@@ -59,15 +58,63 @@ def check_for_addon_update():
                 "error",
             )
             return
-        repo_version = re.findall(
-            r"<addon id=\"plugin.video.seren\" version=\"(\d*.\d*.\d*)\"", repo_xml.text
-        )[0]
+        try:
+            xml = tools.ElementTree.fromstring(repo_xml.text)
 
-        if tools.compare_version_numbers(local_verison, repo_version):
-            xbmcgui.Dialog().ok(
-                g.ADDON_NAME, g.get_language_string(30199).format(repo_version)
-            )
-        g.set_setting("addon.updateCheckTimeStamp", str(time.time()))
+            for dir_tag in xml.iterfind("./addon[@id='repository.nixgates']/extension/dir"):
+                minversion = dir_tag.get('minversion')
+                maxversion = dir_tag.get('maxversion')
+                if (
+                        (
+                            minversion is None and maxversion is None
+                        ) or
+                        (
+                                minversion and maxversion and
+                                tools.compare_version_numbers(minversion, g.KODI_FULL_VERSION, include_same=True) and
+                                tools.compare_version_numbers(g.KODI_FULL_VERSION, maxversion, include_same=True)
+                        ) or
+                        (
+                            maxversion is None and minversion and
+                            tools.compare_version_numbers(minversion, g.KODI_FULL_VERSION, include_same=True)
+                        ) or
+                        (
+                            minversion is None and maxversion and
+                            tools.compare_version_numbers(g.KODI_FULL_VERSION, maxversion, include_same=True)
+                        )
+                ):
+                    repo_version = _get_latest_repo_version(dir_tag.find('info').text)
+                    if tools.compare_version_numbers(g.CLEAN_VERSION, repo_version):
+                        xbmcgui.Dialog().ok(
+                            g.ADDON_NAME, g.get_language_string(30199).format(repo_version)
+                        )
+        except tools.ElementTree.ParseError as pe:
+            g.log("Could not parse repo XML", "error")
+        finally:
+            g.set_setting("addon.updateCheckTimeStamp", str(time.time()))
+
+
+def _get_latest_repo_version(repo_url):
+    repo_xml = requests.get(repo_url)
+    if not repo_xml.status_code == 200:
+        g.log(
+            "Could not connect to repo XML, status: {}".format(
+                repo_xml.status_code
+            ),
+            "error",
+        )
+        return
+    try:
+        xml = tools.ElementTree.fromstring(repo_xml.text)
+        max_version = g.CLEAN_VERSION
+        repo_versions = [ver.get('version') for ver in xml.iterfind("./addon[@id='plugin.video.seren']")]
+        for version in repo_versions:
+            if version and tools.compare_version_numbers(max_version, version):
+                max_version = version
+    except tools.ElementTree.ParseError as pe:
+        g.log("Could not parse repo XML", "error")
+
+    return max_version
+
 
 
 def update_provider_packages():

@@ -32,12 +32,12 @@ class DownloadManager(BaseWindow):
     @staticmethod
     def _set_menu_item_properties(menu_item, download_info):
         menu_item.setProperty('speed', download_info['speed'])
-        menu_item.setProperty('progress', str(download_info['progress']))
+        menu_item.setProperty('progress', g.UNICODE(download_info['progress']))
         menu_item.setProperty('filename', download_info['filename'])
         menu_item.setProperty('eta', download_info['eta'])
-        menu_item.setProperty('filesize', str(download_info['filesize']))
-        menu_item.setProperty('downloaded', str(download_info['downloaded']))
-        menu_item.setProperty('hash', str(download_info.get('hash', '')))
+        menu_item.setProperty('filesize', g.UNICODE(download_info['filesize']))
+        menu_item.setProperty('downloaded', g.UNICODE(download_info['downloaded']))
+        menu_item.setProperty('hash', g.UNICODE(download_info.get('hash', '')))
 
     def _populate_menu_items(self):
 
