@@ -395,6 +395,7 @@ class SerenPlayer(xbmc.Player):
     def _create_list_item(self, stream_link):
         info = copy.deepcopy(self.item_information["info"])
         g.clean_info_keys(info)
+        g.convert_info_dates(info)
 
         if isinstance(stream_link, dict) and stream_link["type"] == "Adaptive":
             provider = stream_link["provider_imports"]

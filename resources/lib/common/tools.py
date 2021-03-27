@@ -31,8 +31,10 @@ except ImportError:
         urljoin,
     )
 
+
 try:
     basestring = basestring  # noqa # pylint: disable=undefined-variable
+
     unicode = unicode  # noqa # pylint: disable=undefined-variable
     xrange = xrange  # noqa # pylint: disable=undefined-variable
 except NameError:
@@ -116,7 +118,7 @@ def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True):
     :type format_string: str
     :param date_only: Whether to return a date only object or not
     :type date_only: bool
-    :return: Datetime.Datetime or Datetime.Date object
+    :return: datetime.datetime or datetime.date object
     :rtype: object
     """
     if not string_date:
@@ -194,33 +196,36 @@ def italic_string(text):
     :return: Formatted string
     :rtype: str
     """
-    from resources.lib.modules.globals import g
 
-    return "[I]{}[/I]".format(g.decode_py2(text))
+    return "[I]{}[/I]".format(text)
 
 
-def compare_version_numbers(current, new):
+def compare_version_numbers(current, new, include_same=False):
     """
-    Comapres provided version numbers and returns True if new version is higher
+    Compares provided version numbers and returns True if new version is higher
+    If include_same = True will also return true if the new and old versions match
     :param current: Version number to check against
     :type current: str
     :param new: Remote/New version number to check against
     :type new: str
+    :param include_same: Whether to additionally return True if versions match
+    :type new: bool
     :return: True if new version number is higher than the current, else False
     :rtype: bool
     """
-    current = current.replace("+matrix", "").split(".")
-    new = new.replace("+matrix", "").split(".")
+    if include_same and new == current:
+        return True
+
+    current = current.split(".")
+    new = new.split(".")
     step = 0
-    if int(current[0]) > int(new[0]):
-        return False
-    for i in current:
-        if len(new) - 1 < step:
-            return False
-        if int(new[step]) > int(i):
+    for i in new:
+        if len(current) - 1 < step:
             return True
-        if int(i) < int(new[step]):
+        if int(current[step]) > int(i):
             return False
+        if int(current[step]) < int(i):
+            return True
         step += 1
     return False
 
@@ -374,7 +379,7 @@ def md5_hash(value):
     :return: Hexdigest of hash
     :rtype: str
     """
-    return hashlib.md5(str(repr(value)).encode()).hexdigest()
+    return hashlib.md5(unicode(value).encode("utf-8")).hexdigest()
 
 
 # Re-added for provider backwards compatibility support

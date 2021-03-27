@@ -8,7 +8,6 @@ import collections
 import datetime
 import pickle
 import threading
-import time
 from functools import reduce, wraps
 
 import xbmc
@@ -361,7 +360,7 @@ class MemCache(CacheBase):
         return result
 
     def _win_get_property(self, key):
-        return g.encode_py2(self._win.getProperty(key))
+        return self._win.getProperty(key)
 
     def set(
             self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)
@@ -382,8 +381,8 @@ class MemCache(CacheBase):
         expires = self._get_timestamp(expiration)
         cached = (expires, data, checksum)
         self._win.setProperty(
-            g.encode_py2(cache_id),
-            g.encode_py2(codecs.encode(pickle.dumps(cached), "base64").decode()),
+            cache_id,
+            codecs.encode(pickle.dumps(cached), "base64").decode(),
             )
         self._get_index()
         self._index.add((cache_id, expires))
@@ -407,7 +406,7 @@ class MemCache(CacheBase):
         self._get_index()
         for cache_id, expires in self._index:
             if expires < cur_timestamp:
-                self._win.clearProperty(g.encode_py2(cache_id))
+                self._win.clearProperty(cache_id)
 
         self._win.setProperty(self._create_key("cache.mem.clean.busy"), repr(cur_time))
         self._win.clearProperty(self._create_key("cache.mem.clean.busy"))
@@ -420,7 +419,7 @@ class MemCache(CacheBase):
         """
         self._get_index()
         for cache_id, expires in self._index:
-            self._win.clearProperty(g.encode_py2(cache_id))
+            self._win.clearProperty(cache_id)
 
     def close(self):
         self._exit = True
