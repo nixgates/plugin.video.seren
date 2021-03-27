@@ -247,7 +247,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         g.log("Show list update and milling compelete", "debug")
         statement = """SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes, 
         s.episode_count, s.season_count FROM shows as s WHERE s.trakt_id in ({}) """.format(
-            ",".join((str(i.get("trakt_id")) for i in trakt_list))
+            ",".join((g.UNICODE(i.get("trakt_id")) for i in trakt_list))
         )
         if params.pop("hide_unaired", self.hide_unaired):
             statement += " AND Datetime(s.air_date) < Datetime('now')"
@@ -347,7 +347,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         g.log("Fetching mixed episode list from sync database", "debug")
         self._try_update_mixed_episodes(trakt_items)
         in_predicate = ",".join(
-            [str(i["trakt_id"]) for i in trakt_items if i["trakt_id"] is not None]
+            [g.UNICODE(i["trakt_id"]) for i in trakt_items if i["trakt_id"] is not None]
         )
         if g.get_bool_setting("general.showRemainingUnwatched"):
             query = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count, b.resume_time as 
@@ -757,7 +757,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         shows = self.execute_sql(
             """SELECT value as trakt_object, s.trakt_id, s.tvdb_id, s.tmdb_id FROM shows as s 
         INNER JOIN shows_meta as m on m.id = s.trakt_id and  m.type='trakt' where s.trakt_id in ({})""".format(
-                ",".join(str(i.get("trakt_show_id")) for i in trakt_items)
+                ",".join(g.UNICODE(i.get("trakt_show_id")) for i in trakt_items)
             )
         ).fetchall()
 
@@ -769,7 +769,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     sh.tvdb_id as tvdb_show_id FROM seasons as se INNER JOIN shows as sh on se.trakt_show_id = 
                     sh.trakt_id INNER JOIN seasons_meta as sm on sm.id = se.trakt_id and sm.type='trakt' where 
                     se.trakt_id in (select e.trakt_season_id FROM episodes e where e.trakt_id in ({}))""".format(
-                        ",".join(str(i.get("trakt_id")) for i in trakt_items)
+                        ",".join(g.UNICODE(i.get("trakt_id")) for i in trakt_items)
                     )
                 ).fetchall(),
                 "seasons",
@@ -781,7 +781,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         e.trakt_id, e.trakt_show_id, sh.tmdb_id as tmdb_show_id, sh.tvdb_id as tvdb_show_id FROM episodes as e INNER 
         JOIN shows as sh on e.trakt_show_id = sh.trakt_id INNER JOIN episodes_meta as em on em.id = e.trakt_id and 
         em.type='trakt' where e.trakt_id in ({})""".format(
-                        ",".join(str(i.get("trakt_id")) for i in trakt_items)
+                        ",".join(g.UNICODE(i.get("trakt_id")) for i in trakt_items)
                     )
                 ).fetchall(),
                 "episodes",

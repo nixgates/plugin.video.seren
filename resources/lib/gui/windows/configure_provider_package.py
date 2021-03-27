@@ -46,7 +46,7 @@ class PackageConfiguration(BaseWindow):
 
     @staticmethod
     def _set_setting_item_properties(menu_item, setting):
-        value = str(setting["value"])
+        value = g.UNICODE(setting["value"])
         if setting["definition"].get("sensitive"):
             value = "*******"
         menu_item.setProperty("Label", setting["label"])

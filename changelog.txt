@@ -1,3 +1,15 @@
+Changelog 2.0.18
+Fix the thread pool issues
+Added logic to push down the country_origin to be used by the scrapers
+Original title swap now only occurs for display, use unicode everywhere
+Fixed normalization function retuning unnormalized values
+Fix for genre multi-select always showing same items
+Fixed local TZ conversion for dates in Upcoming, Source Select and OSD
+Real Debrid use status_codes to determine what are good requests
+Make sure we have all parts for the calculation of the bookmarks
+Added regex to parse semver out of version label
+Re-implemented update checker that will work regardless of repo changes
+
 Changelog 2.0.17:
 Fix for shows search and TVDB empty data
 Fix handling of timestamp creation to be UTC compliant

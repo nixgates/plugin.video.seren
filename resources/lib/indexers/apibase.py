@@ -46,10 +46,10 @@ def handle_single_item_or_list_threaded(func):
 
 class ApiBase(object):
     @staticmethod
-    def _do_transform_single(info, transform, key, item, value):
-        if info.get(key, value):
+    def _do_transform_single(info, transform, key, item, value, data_key):
+        if info.get(data_key, value):
             value = ApiBase._when_list_extend(
-                info.get(key), transform(info.get(key, value))
+                info.get(data_key), transform(info.get(data_key, value))
             )
         elif isinstance(transform, tuple):
             values = tuple(item[k] for k in transform[0] if k in item)
@@ -105,7 +105,7 @@ class ApiBase(object):
                 if not transform:
                     continue
                 if isinstance(key, basestring):
-                    self._do_transform_single(info, transform, key, item, value)
+                    self._do_transform_single(info, transform, key, item, value, data_key)
                 elif isinstance(key, tuple):
                     self._do_transform_multiple(
                         info, transform, key, item, value, data_key

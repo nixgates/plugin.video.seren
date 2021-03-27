@@ -290,10 +290,10 @@ class Menus:
                 g.cancel_directory()
                 return
 
-        query = g.decode_py2(query)
+        query = query
         if g.get_bool_setting("searchHistory"):
             SearchHistory().add_search_history("movie", query)
-        query = g.deaccent_string(g.display_string(query))
+        query = g.deaccent_string(query)
         query = tools.quote(query)
 
         self.movies_search_results(query)
@@ -402,6 +402,7 @@ class Menus:
 
         trakt_list = self.trakt.get_json_cached(
             "movies/{}".format(trakt_endpoint),
+            genres=genre_string,
             page=g.PAGE,
             extended="full"
         )

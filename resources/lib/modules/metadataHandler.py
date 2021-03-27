@@ -64,9 +64,6 @@ class MetadataHandler(object):
         self.movies_preferred_art_source = g.get_int_setting("movies.preferedsource", 1)
         self.metadata_location = g.get_int_setting("general.metalocation", 1)
         self.preferred_artwork_size = g.get_int_setting("artwork.preferredsize", 1)
-        self.show_original_title = g.get_bool_setting(
-            "general.meta.showoriginaltitle", False
-        )
 
         self.genres = {
             "action": g.get_language_string(30532),
@@ -139,8 +136,7 @@ class MetadataHandler(object):
                 self.tvshows_preferred_art_source,
                 self.metadata_location,
                 self.fanarttv_api.fanart_support,
-                self.preferred_artwork_size,
-                self.show_original_title,
+                self.preferred_artwork_size
             ]
         )
 
@@ -192,6 +188,8 @@ class MetadataHandler(object):
                 result["info"]["year"] = show_info.get("year")
             if not result["info"].get("studio"):
                 result["info"]["studio"] = show_info.get("studio")
+            if not result["info"].get("country_origin"):
+                result["info"]["country_origin"] = show_info.get("country_origin")
             result["info"].update(
                 {
                     "tvshow.{}".format(key): value
@@ -324,7 +322,6 @@ class MetadataHandler(object):
             )
 
         self._normalize_genres(result)
-        self._show_original_title(result)
         self._title_fallback(result)
 
     def _normalize_genres(self, meta):
@@ -336,10 +333,6 @@ class MetadataHandler(object):
                 ]
             )
         )
-
-    def _show_original_title(self, meta):
-        if meta["info"].get('originaltitle') and self.show_original_title:
-            meta["info"]["sorttitle"] = meta["info"]["title"] = meta["info"].get('originaltitle')
 
     @staticmethod
     def _title_fallback(meta):
