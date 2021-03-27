@@ -78,7 +78,7 @@ class Database(object):
         retries = 0
         while retries < 2:
             try:
-                return pickle.loads(g.encode_py2(value))
+                return pickle.loads(value)
             except pickle.UnpicklingError:
                 return None
             except RuntimeError:
@@ -227,7 +227,7 @@ class Database(object):
                     else:
                         return self._execute_query(data, connection.cursor(), query)
                 except sqlite3.OperationalError as error:
-                    if "database is locked" in str(error):
+                    if "database is locked" in g.UNICODE(error):
                         g.log(
                             "database is locked waiting: {}".format(self._db_file),
                             "warning",
