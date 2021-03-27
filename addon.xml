@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.0.17-DoNothingExitPlayer" name="Seren" provider-name="inb4after">
+<addon id="plugin.video.seren" version="2.0.18-DoNothingExitPlayer" name="Seren" provider-name="inb4after">
     <requires>
         <import addon="xbmc.python" version="2.26.0" />
         <import addon="script.module.future" version="0.17.1"/>
         <import addon="script.module.requests" version="2.22.0" />
-        <import addon="plugin.video.youtube" version="6.8.3"/>
-        <import addon="script.module.beautifulsoup4" version="4.6.2"/>
-        <import addon="context.seren" version="2.0.0"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+        <import addon="plugin.video.youtube" version="6.8.10"/>
+        <import addon="script.module.beautifulsoup4" version="4.9.3"/>
+        <import addon="context.seren" version="2.0.1"/>
+        <import addon="script.module.inputstreamhelper" version="0.5.2"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="seren.py">
         <provides>video</provides>
@@ -61,6 +61,18 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.0.18
+            Fix the thread pool issues
+            Added logic to push down the country_origin to be used by the scrapers
+            Original title swap now only occurs for display, use unicode everywhere
+            Fixed normalization function retuning unnormalized values
+            Fix for genre multi-select always showing same items
+            Fixed local TZ conversion for dates in Upcoming, Source Select and OSD
+            Real Debrid use status_codes to determine what are good requests
+            Make sure we have all parts for the calculation of the bookmarks
+            Added regex to parse semver out of version label
+            Re-implemented update checker that will work regardless of repo changes
+
             Changelog 2.0.17:
             Fix for shows search and TVDB empty data
             Fix handling of timestamp creation to be UTC compliant

@@ -10,14 +10,6 @@ import xbmcgui
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
-try:
-    try:
-        from simplejson.errors import JSONDecodeError
-    except ImportError:
-        from json.decoder import JSONDecodeError
-except ImportError:
-    JSONDecodeError = ValueError
-
 from resources.lib.common import source_utils
 from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
@@ -157,13 +149,11 @@ class RealDebrid:
         g.log(response.request.url)
 
     def _is_response_ok(self, response):
-        try:
-            if "error" in response.json():
-                self._handle_error(response)
-                return False
+        if 200 <= response.status_code < 400:
             return True
-        except JSONDecodeError:
-            return True
+        if response.status_code > 400:
+            self._handle_error(response)
+            return False
 
     def try_refresh_token(self):
         if not self.token or float(time.time()) < (self.expiry - (15 * 60)):

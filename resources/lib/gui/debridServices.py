@@ -47,7 +47,7 @@ class Menus:
             return
         for i in transfer_list['transfers']:
             title = '{} - {}% : {}' \
-                .format(g.color_string(i['status'].title()), str(i['progress'] * 100), i['name'][:50] + "...")
+                .format(g.color_string(i['status'].title()), g.UNICODE(i['progress'] * 100), i['name'][:50] + "...")
             g.add_directory_item(title)
         g.close_directory(self.view_type)
 
@@ -60,6 +60,6 @@ class Menus:
             return
         for i in transfer_list:
             title = '{} - {}% : {}' \
-                .format(g.color_string(i['status'].title()), str(i['progress']), i['filename'][:50] + "...")
+                .format(g.color_string(i['status'].title()), g.UNICODE(i['progress']), i['filename'][:50] + "...")
             g.add_directory_item(title)
         g.close_directory(self.view_type)
