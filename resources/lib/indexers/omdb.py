@@ -96,7 +96,7 @@ class OmdbApi(ApiBase):
         self.normalization = [
             (
                 "@title",
-                ("title", "originaltitle", "sorttitle"),
+                ("title", "sorttitle"),
                 lambda d: d if not self._is_value_none(d) else None,
             ),
             ("@rated", "mpaa", lambda d: d if not self._is_value_none(d) else None),
