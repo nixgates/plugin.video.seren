@@ -3221,3 +3221,9 @@ msgstr "Date Collected"
 msgctxt "#30581"
 msgid "Alphabetically"
 msgstr "Alphabetically"
+
+#: \resources\settings.xml:214
+msgctxt "#30582"
+msgid "Thread Workers"
+msgstr "Thread Workers"
+

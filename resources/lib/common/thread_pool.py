@@ -77,6 +77,7 @@ class ThreadPool:
     """
 
     def __init__(self, workers=40):
+        workers = g.get_int_setting('general.workers')
         self.limiter = g.get_global_setting("threadpool.limiter") == "true"
         self.tasks = ClearableQueue(2 * workers)
         self.stop_event = threading.Event()
