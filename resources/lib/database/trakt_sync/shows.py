@@ -200,13 +200,19 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         """
         paginate = g.get_bool_setting("general.paginatecollection")
         sort = g.get_int_setting("general.sortcollection")
+        sort_direction = g.get_int_setting("general.sortcollection.direction")
 
         query = """select e.trakt_show_id as trakt_id, m.value as trakt_object from episodes as e left 
         join shows as sh on sh.trakt_id = e.trakt_show_id left join shows_meta as m on m.id = e.trakt_show_id and 
         m.type='trakt' where e.collected = 1 group by e.trakt_show_id"""
 
+        if sort_direction == 0:
+            sort_direction = "asc"
+        elif sort_direction == 1:
+            sort_direction = "desc"
+        
         if sort == 0:
-            query += " ORDER BY max(e.collected_at) desc"
+            query += " ORDER BY max(e.collected_at) " + sort_direction
 
         if paginate and not (force_all or sort == 1):
             query += " LIMIT {} OFFSET {}".format(self.page_limit, self.page_limit * (page - 1))
@@ -855,14 +861,20 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         """
         paginate = g.get_bool_setting("general.paginatecollection")
         sort = g.get_int_setting("general.sortcollection")
+        sort_direction = g.get_int_setting("general.sortcollection.direction")
 
         query = """select m.id as trakt_id, value as trakt_object from shows_meta as m inner join(
         select ep.trakt_show_id, max(ep.collected_at) as collected_at from episodes as ep where ep.season != 0 and 
         ep.watched = 0 and ep.collected = 1 GROUP BY ep.trakt_show_id HAVING count(*) > 0) as u on u.trakt_show_id = 
         m.id and m.type='trakt'"""
 
+        if sort_direction == 0:
+            sort_direction = "asc"
+        if sort_direction == 1:
+            sort_direction = "desc"
+        
         if sort == 0:
-            query += " ORDER BY collected_at desc"
+            query += " ORDER BY collected_at " + sort_direction
 
         if paginate and not sort == 1:
             query += " LIMIT {} OFFSET {}".format(self.page_limit, self.page_limit * (page - 1))
@@ -913,4 +925,3 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         and number=?""",
             (trakt_show_id, season, episode),
         ).fetchone()
-
