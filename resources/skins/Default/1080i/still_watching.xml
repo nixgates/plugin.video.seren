@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
-    <defaultcontrol always="true">3001</defaultcontrol>
+    <defaultcontrol always="true">3002</defaultcontrol>
     <onload>Dialog.Close(fullscreeninfo,true)</onload>
     <onload>Dialog.Close(videoosd,true)</onload>
     <controls>
@@ -103,16 +103,6 @@
                         <textcolor>eeffffff</textcolor>
                         <shadowcolor>00000000</shadowcolor>
                         <label>Are you still watching?</label>
-                        <visible>!Integer.IsGreater(Player.TimeRemaining,59)</visible>
-                    </control>
-                    <control type="label">
-                        <width>auto</width>
-                        <height>35</height>
-                        <aligny>center</aligny>
-                        <font>font25_title</font>
-                        <textcolor>eeffffff</textcolor>
-                        <shadowcolor>00000000</shadowcolor>
-                        <label>$ADDON[plugin.video.seren 30232]</label>
                         <visible>Integer.IsGreater(Player.TimeRemaining,59)</visible>
                     </control>
                     <!-- Details -->
@@ -186,6 +176,7 @@
                             <alttexturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</alttexturefocus>
                             <alttexturenofocus border="10" colordiffuse="AA212121">white.png</alttexturenofocus>
                             <pulseonselect>no</pulseonselect>
+                            <visible>false</visible>
                         </control>
                         <control type="button" id="3002">
                             <label>I'm Here</label>
