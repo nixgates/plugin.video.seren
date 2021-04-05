@@ -177,7 +177,7 @@ class Sources(object):
         """
         if g.REQUEST_PARAMS.get('action', '') == "preScrape":
             self.silent = True
-            self.timeout = 60
+            self.timeout = 240
             self._prem_terminate = lambda: False  # pylint: disable=method-hidden
 
     def _create_hoster_threads(self):
