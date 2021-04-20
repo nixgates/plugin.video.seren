@@ -34,7 +34,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def _update_shows_statistics_from_show_id(self, trakt_show_id):
         self.update_shows_statistics([{"trakt_id": trakt_show_id}])
         self.update_season_statistics(
-            self.execute_sql(
+            self.fetchall(
                 "select trakt_id from seasons where trakt_show_id=?", (trakt_show_id,)
             )
         )
@@ -111,11 +111,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: None
         """
         g.log("Marking episode {} S{}E{} as watched in sync database".format(show_id, season, number), "debug")
-        play_count = self.execute_sql(
+        play_count = self.fetchone(
             "SELECT watched from episodes "
             "where trakt_show_id=? and season=? and number=?",
             (show_id, season, number),
-        ).fetchone()["watched"]
+        )["watched"]
         self._mark_episode_record("watched", play_count + 1, show_id, season, number)
         self._update_shows_statistics_from_show_id(show_id)
 
@@ -185,7 +185,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 self.page_limit, self.page_limit * (page - 1)
             )
 
-        return self.execute_sql(query).fetchall()
+        return self.fetchall(query)
 
     @guard_against_none(list)
     def get_collected_shows(self, page=1, force_all=False):
@@ -211,7 +211,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if paginate and not (force_all or sort == 1):
             query += " LIMIT {} OFFSET {}".format(self.page_limit, self.page_limit * (page - 1))
 
-        return self.execute_sql(query).fetchall()
+        return self.fetchall(query)
 
     def get_collected_episodes(self):
         """
@@ -219,9 +219,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of episode objects
         :rtype: list
         """
-        return self.execute_sql(
+        return self.fetchall(
             """SELECT trakt_id as trakt_id FROM episodes WHERE collected=1"""
-        ).fetchall()
+        )
 
     @guard_against_none(list)
     def get_show_list(self, trakt_list, **params):
@@ -249,7 +249,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             statement += " AND s.watched_episodes < s.episode_count"
 
         return MetadataHandler.sort_list_items(
-            self.execute_sql(statement).fetchall(), trakt_list
+            self.fetchall(statement), trakt_list
         )
 
     @guard_against_none(list, 1)
@@ -279,7 +279,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if params.pop("hide_watched", self.hide_watched):
             statement += " AND s.watched_episodes < s.episode_count"
         statement += " order by s.Season"
-        return self.execute_sql(statement).fetchall()
+        return self.fetchall(statement)
 
     @guard_against_none(list, 1, 2, 4)
     def get_episode_list(
@@ -327,7 +327,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if minimum_episode:
             statement += " AND e.number >= {}".format(int(minimum_episode))
         statement += " order by e.season, e.number "
-        return self.execute_sql(statement).fetchall()
+        return self.fetchall(statement)
 
     @guard_against_none(list)
     def get_mixed_episode_list(self, trakt_items, **params):
@@ -365,7 +365,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             query += " AND e.watched = 0"
 
         return MetadataHandler.sort_list_items(
-            self.execute_sql(query).fetchall(), trakt_items
+            self.fetchall(query), trakt_items
         )
 
     @guard_against_none()
@@ -407,10 +407,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Episode object with full meta
         :rtype: dict
         """
-        result = self.get_episode_list(trakt_show_id, trakt_id=trakt_id)
-        result = result[0]
+        result = self.get_episode_list(trakt_show_id, trakt_id=trakt_id)[0]
         result.update(
-            self.execute_sql(
+            self.fetchone(
                 """select s.season_count, s.episode_count as show_episode_count, 
         se.episode_count, se.is_airing, a.absoluteNumber from episodes as e INNER JOIN seasons as se on se.trakt_id = 
         e.trakt_season_id INNER JOIN shows as s on s.trakt_id = e.trakt_show_id INNER JOIN 
@@ -419,7 +418,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         agg on agg.trakt_show_id = e.trakt_show_id and agg.identifier >= (e.season*10 + number) group by 
         e.trakt_show_id) as a on a.trakt_show_id = e.trakt_show_id WHERE e.trakt_id = ?""",
                 (trakt_id, trakt_id),
-            ).fetchone()
+            )
         )
         return result
 
@@ -515,7 +514,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             )
         )
 
-        db_list_to_update = self.execute_sql(sql_statement).fetchall()
+        db_list_to_update = self.fetchall(sql_statement)
         updated_items = self._update_objects(
             list_to_update, db_list_to_update, "shows"
         )
@@ -580,7 +579,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             )
         )
 
-        return self.execute_sql(sql_statement).fetchall()
+        return self.fetchall(sql_statement)
 
     @guard_against_none_or_empty()
     def _update_seasons(self, list_to_update):
@@ -644,7 +643,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             )
         )
 
-        return self.execute_sql(query).fetchall()
+        return self.fetchall(query)
 
     @guard_against_none_or_empty()
     def _update_episodes(self, list_to_update):
@@ -704,7 +703,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             query += "sh.trakt_id = {}".format(trakt_show_id)
 
         seasons_to_update = self.filter_items_that_needs_updating(
-            self.execute_sql(query).fetchall(), "seasons"
+            self.fetchall(query), "seasons"
             )
 
         self._update_seasons(seasons_to_update)
@@ -726,7 +725,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             query += "sh.trakt_id = {}".format(trakt_show_id)
 
         episodes_to_update = self.filter_items_that_needs_updating(
-            self.execute_sql(query).fetchall(), "episodes"
+            self.fetchall(query), "episodes"
             )
 
         self._update_episodes(episodes_to_update)
@@ -748,36 +747,36 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             ]
             self.task_queue.wait_completion()
 
-        shows = self.execute_sql(
+        shows = self.fetchall(
             """SELECT value as trakt_object, s.trakt_id, s.tvdb_id, s.tmdb_id FROM shows as s 
         INNER JOIN shows_meta as m on m.id = s.trakt_id and  m.type='trakt' where s.trakt_id in ({})""".format(
                 ",".join(g.UNICODE(i.get("trakt_show_id")) for i in trakt_items)
             )
-        ).fetchall()
+        )
 
         self._update_mill_format_shows(shows, True)
 
         seasons_to_update = self.filter_items_that_needs_updating(
-                self.execute_sql(
+                self.fetchall(
                     """SELECT value as trakt_object, se.trakt_id, se.trakt_show_id, sh.tmdb_id as tmdb_show_id, 
                     sh.tvdb_id as tvdb_show_id FROM seasons as se INNER JOIN shows as sh on se.trakt_show_id = 
                     sh.trakt_id INNER JOIN seasons_meta as sm on sm.id = se.trakt_id and sm.type='trakt' where 
                     se.trakt_id in (select e.trakt_season_id FROM episodes e where e.trakt_id in ({}))""".format(
                         ",".join(g.UNICODE(i.get("trakt_id")) for i in trakt_items)
                     )
-                ).fetchall(),
+                ),
                 "seasons",
             )
 
         episodes_to_update = self.filter_items_that_needs_updating(
-            self.execute_sql(
+            self.fetchall(
                 """SELECT value as trakt_object, 
         e.trakt_id, e.trakt_show_id, sh.tmdb_id as tmdb_show_id, sh.tvdb_id as tvdb_show_id FROM episodes as e INNER 
         JOIN shows as sh on e.trakt_show_id = sh.trakt_id INNER JOIN episodes_meta as em on em.id = e.trakt_id and 
         em.type='trakt' where e.trakt_id in ({})""".format(
                         ",".join(g.UNICODE(i.get("trakt_id")) for i in trakt_items)
                     )
-                ).fetchall(),
+                ),
                 "episodes",
             )
 
@@ -822,8 +821,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             query += " ORDER BY inner.last_watched_at DESC"
         else:
             query += " ORDER BY e.air_date DESC"
-        results = self.execute_sql(query).fetchall()
-        return self.wrap_in_trakt_object(results)
+
+        return self.wrap_in_trakt_object(self.fetchall(query))
 
     def get_watched_episodes(self, page=1):
         """
@@ -834,7 +833,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: list
         """
         return self.wrap_in_trakt_object(
-            self.execute_sql(
+            self.fetchall(
                 """SELECT e.trakt_id, e.number as episode_x, e.season as 
         season_x, e.trakt_show_id, em.value AS episode, sm.value AS show, s.tmdb_id AS tmdb_show_id, s.tvdb_id AS 
         tvdb_show_id, e.last_watched_at FROM episodes AS e inner join shows AS s ON s.trakt_id = e.trakt_show_id left 
@@ -842,7 +841,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         e.trakt_show_id = sm.id AND sm.TYPE = 'trakt' order by e.last_watched_at desc LIMIT {} OFFSET {} """.format(
                     self.page_limit, self.page_limit * (page - 1)
                 )
-            ).fetchall()
+            )
         )
 
     def get_unfinished_collected_shows(self, page=1):
@@ -867,7 +866,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if paginate and not sort == 1:
             query += " LIMIT {} OFFSET {}".format(self.page_limit, self.page_limit * (page - 1))
 
-        return self.execute_sql(query).fetchall()
+        return self.fetchall(query)
 
     @guard_against_none()
     def get_season_action_args(self, trakt_show_id, season):
@@ -885,10 +884,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             self.filter_trakt_items_that_needs_updating(show, "shows")
         )
         self._mill_if_needed(show)
-        return self.execute_sql(
+        return self.fetchone(
             """select trakt_id, trakt_show_id from seasons where trakt_show_id=? and season =? """,
             (trakt_show_id, season),
-        ).fetchone()
+        )
 
     @guard_against_none()
     def get_episode_action_args(self, trakt_show_id, season, episode):
@@ -908,9 +907,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             self.filter_trakt_items_that_needs_updating(show, "shows")
         )
         self._mill_if_needed(show)
-        return self.execute_sql(
+        return self.fetchone(
             """select trakt_id, trakt_show_id from episodes where trakt_show_id=? and season =? 
         and number=?""",
             (trakt_show_id, season, episode),
-        ).fetchone()
+        )
 

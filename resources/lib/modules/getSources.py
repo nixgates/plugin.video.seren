@@ -51,12 +51,11 @@ class Sources(object):
         self.hash_regex = re.compile(r'btih:(.*?)(?:&|$)')
         self.canceled = False
         self.torrent_cache = TorrentCache()
-        self.torrent_threads = ThreadPool(workers=30)
-        self.hoster_threads = ThreadPool(workers=30)
-        self.adaptive_threads = ThreadPool(workers=30)
+        self.torrent_threads = ThreadPool()
+        self.hoster_threads = ThreadPool()
+        self.adaptive_threads = ThreadPool()
         self.item_information = item_information
         self.media_type = self.item_information['info']['mediatype']
-        self.item_information['info']['year'] = self.item_information['info'].get('year', None)
         self.torrent_providers = []
         self.hoster_providers = []
         self.adaptive_providers = []
@@ -177,7 +176,7 @@ class Sources(object):
         """
         if g.REQUEST_PARAMS.get('action', '') == "preScrape":
             self.silent = True
-            self.timeout = 60
+            self.timeout = 180
             self._prem_terminate = lambda: False  # pylint: disable=method-hidden
 
     def _create_hoster_threads(self):
@@ -353,8 +352,8 @@ class Sources(object):
 
         sources = [i for i in self.sources_information['allTorrents'].values() if i['package'] in valid_packages]
 
-        if g.get_int_setting('general.cacheAssistMode') == 0:
-            sources = [self._get_best_torrent_to_cache(sources)]
+        if g.get_bool_setting("general.autocache") and g.get_int_setting('general.cacheAssistMode') == 0:
+            sources = self._get_best_torrent_to_cache(sources)
             if sources:
                 action_args = tools.quote(json.dumps(sources))
                 xbmc.executebuiltin(
@@ -754,7 +753,7 @@ class Sources(object):
     def _build_simple_show_info(info):
         simple_info = {'show_title': info['info'].get('tvshowtitle', ''),
                        'episode_title': info['info'].get('originaltitle', ''),
-                       'year': g.UNICODE(info['info'].get('year', '')),
+                       'year': g.UNICODE(info['info'].get('tvshow.year', info['info'].get('year', ''))),
                        'season_number': g.UNICODE(info['info']['season']),
                        'episode_number': g.UNICODE(info['info']['episode']),
                        'show_aliases': info['info'].get('aliases', []),

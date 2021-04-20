@@ -138,10 +138,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             try:
                 update_time = str(datetime.utcnow().strftime(g.DATE_TIME_FORMAT))
 
-                monitor = xbmc.Monitor()
-                if monitor.abortRequested():
+                if g.abort_requested():
                     return
-                del monitor
                 self.current_dialog_text = "Syncing {}".format(activity[0])
                 self._update_progress(int(float(idx + 1) / total_activities * 100))
 
@@ -278,37 +276,34 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             )
             self._mill_if_needed(trakt_watched, self._queue_with_progress)
             self.execute_sql("UPDATE episodes SET watched=0")
-            if g.PLATFORM == "xbox":
-                self._xbox_watched_workaround(trakt_watched)
-            else:
-                with self.create_temp_table("_episodes_watched",
-                                            ["trakt_show_id", "season", "episode", "last_watched_at",
-                                             "watched"]) as temp_table:
-                    temp_table.insert_data([{
-                        "trakt_show_id": show.get("trakt_id"),
-                        "season": get(season, "season"),
-                        "episode": get(episode, "episode"),
-                        "last_watched_at": get(episode, "last_watched_at"),
-                        "watched": get(episode, "playcount")
-                    }
-                        for show in trakt_watched
-                        for season in get(show, "seasons", [])
-                        for episode in get(season, "episodes", [])
-                    ])
-                    self.execute_sql(
-                        'INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, season, '
-                        'tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, collected, '
-                        'watched, "number", args, air_date, last_watched_at, collected_at) SELECT trakt_id, '
-                        'e.trakt_show_id, trakt_season_id, e.season, tvdb_id, tmdb_id, imdb_id, info, '
-                        '"cast", art, meta_hash, last_updated, collected, ew.watched, ew.episode as '
-                        '"number", args, air_date, ew.last_watched_at, collected_at FROM episodes as e INNER '
-                        'JOIN _episodes_watched as ew on e.trakt_show_id = ew.trakt_show_id AND e.season = '
-                        'ew.season and e.number = ew.episode')
+            with self.create_temp_table("_episodes_watched",
+                                        ["trakt_show_id", "season", "episode", "last_watched_at",
+                                         "watched"]) as temp_table:
+                temp_table.insert_data([{
+                    "trakt_show_id": show.get("trakt_id"),
+                    "season": get(season, "season"),
+                    "episode": get(episode, "episode"),
+                    "last_watched_at": get(episode, "last_watched_at"),
+                    "watched": get(episode, "playcount")
+                }
+                    for show in trakt_watched
+                    for season in get(show, "seasons", [])
+                    for episode in get(season, "episodes", [])
+                ])
+                self.execute_sql(
+                    'INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, season, '
+                    'tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, collected, '
+                    'watched, "number", args, air_date, last_watched_at, collected_at) SELECT trakt_id, '
+                    'e.trakt_show_id, trakt_season_id, e.season, tvdb_id, tmdb_id, imdb_id, info, '
+                    '"cast", art, meta_hash, last_updated, collected, ew.watched, ew.episode as '
+                    '"number", args, air_date, ew.last_watched_at, collected_at FROM episodes as e INNER '
+                    'JOIN _episodes_watched as ew on e.trakt_show_id = ew.trakt_show_id AND e.season = '
+                    'ew.season and e.number = ew.episode')
 
             self.update_shows_statistics(trakt_watched)
-            self.update_season_statistics(self.execute_sql(
+            self.update_season_statistics(self.fetchall(
                 "select trakt_id from seasons where trakt_show_id in ({})"
-                    .format(",".join({str(i.get("trakt_id")) for i in trakt_watched}))).fetchall())
+                    .format(",".join({str(i.get("trakt_id")) for i in trakt_watched}))))
         except Exception as e:
             raise ActivitySyncFailure(e)
 
@@ -328,92 +323,36 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
             self.execute_sql("UPDATE episodes SET collected=0")
 
-            if g.PLATFORM == "xbox":
-                self._xbox_collected_workaround(trakt_collection)
-            else:
-                with self.create_temp_table("_episodes_collected",
-                                            ["trakt_show_id", "season", "episode", "collected_at",
-                                             "collected"]) as temp_table:
-                    temp_table.insert_data([{
-                        "trakt_show_id": show.get("trakt_id"),
-                        "season": get(season, "season"),
-                        "episode": get(episode, "episode"),
-                        "collected_at": get(episode, "collected_at"),
-                        "collected": get(episode, "collected")
-                    }
-                        for show in trakt_collection
-                        for season in get(show, "seasons", [])
-                        for episode in get(season, "episodes", [])
-                    ])
-                    self.execute_sql('INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, '
-                                     'season, tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, '
-                                     'collected, watched, "number", args, air_date, last_watched_at, collected_at) '
-                                     'SELECT trakt_id, e.trakt_show_id, trakt_season_id, e.season, tvdb_id, tmdb_id, '
-                                     'imdb_id, info, "cast", art, meta_hash, last_updated, ec.collected, watched, '
-                                     'ec.episode as "number", args, air_date, last_watched_at, ec.collected_at FROM '
-                                     'episodes as e INNER JOIN _episodes_collected as ec on e.trakt_show_id = '
-                                     'ec.trakt_show_id AND e.season = ec.season and e.number = ec.episode').fetchall()
+            with self.create_temp_table("_episodes_collected",
+                                        ["trakt_show_id", "season", "episode", "collected_at",
+                                         "collected"]) as temp_table:
+                temp_table.insert_data([{
+                    "trakt_show_id": show.get("trakt_id"),
+                    "season": get(season, "season"),
+                    "episode": get(episode, "episode"),
+                    "collected_at": get(episode, "collected_at"),
+                    "collected": get(episode, "collected")
+                }
+                    for show in trakt_collection
+                    for season in get(show, "seasons", [])
+                    for episode in get(season, "episodes", [])
+                ])
+                self.execute_sql('INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, '
+                                 'season, tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, '
+                                 'collected, watched, "number", args, air_date, last_watched_at, collected_at) '
+                                 'SELECT trakt_id, e.trakt_show_id, trakt_season_id, e.season, tvdb_id, tmdb_id, '
+                                 'imdb_id, info, "cast", art, meta_hash, last_updated, ec.collected, watched, '
+                                 'ec.episode as "number", args, air_date, last_watched_at, ec.collected_at FROM '
+                                 'episodes as e INNER JOIN _episodes_collected as ec on e.trakt_show_id = '
+                                 'ec.trakt_show_id AND e.season = ec.season and e.number = ec.episode')
 
             self.update_shows_statistics(trakt_collection)
-            self.update_season_statistics(self.execute_sql(
+            self.update_season_statistics(self.fetchall(
                 "select trakt_id from seasons where trakt_show_id in ({})"
-                    .format(",".join({str(i.get("trakt_id")) for i in trakt_collection}))).fetchall())
+                    .format(",".join({str(i.get("trakt_id")) for i in trakt_collection}))))
 
         except Exception as e:
             raise ActivitySyncFailure(e)
-
-    def _xbox_watched_workaround(self, trakt_watched):
-        get = MetadataHandler.get_trakt_info
-        query_list = ["UPDATE episodes SET watched=0"]
-        watched_query = "UPDATE episodes SET watched=1 where {}"
-        watched_expressions = [
-            "(trakt_show_id={} and season={} and number in ({}))".format(
-                show.get("trakt_id"),
-                get(season, "season"),
-                ",".join(
-                    [
-                        str(get(episode, "episode"))
-                        for episode in get(season, "episodes", [])
-                        if get(episode, "playcount") > 0
-                    ]
-                ),
-            )
-            for show in trakt_watched
-            for season in get(show, "seasons", [])
-        ]
-        if len(watched_expressions) > 0:
-            watched_queries = self.chunkify_list_for_query(watched_expressions)
-            query_list += [
-                watched_query.format(" OR ".join(chunk))
-                for chunk in watched_queries
-            ]
-            self.execute_sql(query_list)
-
-    def _xbox_collected_workaround(self, trakt_collection):
-        get = MetadataHandler.get_trakt_info
-        query_list = ["UPDATE episodes SET collected=0"]
-        collected_query = "UPDATE episodes SET collected=1 where {}"
-        collected_expressions = [
-            "(trakt_show_id={} and season={} and number in ({}))".format(
-                show.get("trakt_id"),
-                get(season, "season"),
-                ",".join(
-                    [
-                        str(get(episode, "episode"))
-                        for episode in get(season, "episodes", [])
-                    ]
-                ),
-            )
-            for show in trakt_collection
-            for season in get(show, "seasons", [])
-        ]
-        if len(collected_expressions) > 0:
-            collected_queries = self.chunkify_list_for_query(collected_expressions)
-            query_list += [
-                collected_query.format(" OR ".join(chunk))
-                for chunk in collected_queries
-            ]
-            self.execute_sql(query_list)
 
     def _filter_lists_items_that_needs_updating(self, requested):
         if len(requested) == 0:
@@ -434,7 +373,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             )
         )
 
-        result = set(r["trakt_id"] for r in self.execute_sql(query).fetchall())
+        result = set(r["trakt_id"] for r in self.fetchall(query))
         return [
             r for r in requested if r.get("trakt_id") and r.get("trakt_id") in result
         ]

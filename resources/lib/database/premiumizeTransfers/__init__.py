@@ -34,7 +34,7 @@ class PremiumizeTransfers(Database):
         :return: List of all transfers
         :rtype: list
         """
-        return self.execute_sql("SELECT * FROM transfers").fetchall()
+        return self.fetchall("SELECT * FROM transfers")
 
     def add_premiumize_transfer(self, transfer_id):
         """

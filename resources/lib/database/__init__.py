@@ -4,9 +4,12 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import sqlite3
 import types
-from sqlite3 import InterfaceError
+from abc import ABCMeta, abstractmethod
 
-import xbmc
+from contextlib import contextmanager
+from functools import wraps
+
+import mysql.connector
 import xbmcvfs
 from requests import Response
 
@@ -19,75 +22,82 @@ try:
 except:
     import pickle
 
+try:
+    pickletype = buffer  # noqa: F821  pylint: disable=undefined-variable
+except:
+    pickletype = bytes
+
+
+def _handle_single_item_or_list(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if isinstance(args[-1], (list, types.GeneratorType)):
+            return [func(*args[:-1] + (i,), **kwargs) for i in args[-1]]
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+@_handle_single_item_or_list
+def _dumps(obj):
+    """Pickling method.
+
+    :param obj:Object to be pickled
+    :type obj:any
+    :return:Bytes with the pickled content
+    :rtype:bytes
+    """
+    if obj is None:
+        return None
+
+    return tuple(sqlite3.Binary(pickle.dumps(i, protocol=pickle.HIGHEST_PROTOCOL))
+                 if isinstance(i, PICKLE_TYPES) else i for i in obj)
+
+
+def _loads(value):
+    """ Depickling method.
+
+    :param value:Bytes with the pickled object
+    :type value:str|bytes
+    :return:Depickled value
+    :rtype:any
+    """
+    try:
+        if g.PYTHON3:
+            return pickle.loads(value) if isinstance(value, pickletype) else value
+        else:
+            return pickle.loads(str(value)) if isinstance(value, pickletype) else value
+    except pickle.UnpicklingError:
+        return value
+
+
+PICKLE_TYPES = (
+    list,
+    set,
+    dict,
+    tuple,
+    Response
+)
+
+
+def _register_pickler_adapters():
+    sqlite3.register_adapter(bool, int)  # pylint: disable=no-member
+    sqlite3.register_converter(str("BOOLEAN"), lambda v: bool(int(v)))  # pylint: disable=no-member
+
 
 class Database(object):
     def __init__(self, db_file, database_layout, threading_lock):
         self._db_file = db_file
-        self._create_db_path()
-        self._monitor = xbmc.Monitor()
-        self._exit = False
-        self._database_layout = database_layout
         self._threading_lock = threading_lock
-        self._register_pickler_adapters()
+        self._database_layout = database_layout
         self._integrity_check_db()
 
+    # region DatabaseSchema
     # region private methods
-    def _register_pickler_adapters(self):
-        sqlite3.register_adapter(list, self._dumps)
-        sqlite3.register_adapter(set, self._dumps)
-        sqlite3.register_adapter(dict, self._dumps)
-        sqlite3.register_adapter(tuple, self._dumps)
-        sqlite3.register_adapter(Response, self._dumps)
-        sqlite3.register_converter(str("PICKLE"), self._loads)
-        sqlite3.register_adapter(bool, int)
-        sqlite3.register_converter(str("BOOLEAN"), lambda v: bool(int(v)))
-
-    @staticmethod
-    def _dumps(obj):
-        """Pickling method.
-
-        :param obj:Object to be pickled
-        :type obj:any
-        :return:Bytes with the pickled content
-        :rtype:bytes
-        """
-        if obj is None:
-            return None
-        retries = 0
-        while retries < 2:
-            try:
-                return sqlite3.Binary(
-                    pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
-                )
-            except RuntimeError:
-                retries += 1
-                continue
-
-    @staticmethod
-    def _loads(value):
-        """ Depickling method.
-
-        :param value:Bytes with the pickled object
-        :type value:str|bytes
-        :return:Depickled value
-        :rtype:any
-        """
-        if value is None:
-            return None
-
-        retries = 0
-        while retries < 2:
-            try:
-                return pickle.loads(value)
-            except pickle.UnpicklingError:
-                return None
-            except RuntimeError:
-                retries += 1
-                continue
-
     def _create_tables(self, connection):
         for table_name, data in self._database_layout.items():
             self._create_table(connection, table_name, data)
+        return connection
 
     def _create_table(self, connection, table_name, data):
         table_data = [
@@ -115,44 +125,14 @@ class Database(object):
     def _create_column_expression(column_name, column_declaration):
         return "{} {}".format(column_name, " ".join(column_declaration))
 
-    def __del__(self):
-        if not self._exit:
-            self.close()
-
-    def _create_db_path(self):
-        if not xbmcvfs.exists(os.path.dirname(self._db_file)):
-            xbmcvfs.mkdirs(os.path.dirname(self._db_file))
-
-    def _get_connection(self):
-        try:
-            connection = self.__create_connection()
-            return connection
-        except Exception:
-            self._create_db_path()
-            try:
-                connection = self.__create_connection()
-                self._create_tables(connection)
-                connection.commit()
-                return connection
-            except Exception:
-                self.close()
-                return None
-
-    def __create_connection(self):
-        connection = sqlite3.connect(
-            self._db_file, timeout=30, detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        self._set_connection_settings(connection)
-        return connection
-
     def _integrity_check_db(self):
         db_file_checksum = tools.md5_hash(self._database_layout)
         with GlobalLock(
-            self.__class__.__name__, self._threading_lock, True, db_file_checksum
+                self.__class__.__name__, self._threading_lock, True, db_file_checksum
         ) as lock:
             if lock.runned_once():
                 return
-            if g.read_all_text("{}.md5".format(self._db_file)) == db_file_checksum:
+            if xbmcvfs.exists(self._db_file) and g.read_all_text("{}.md5".format(self._db_file)) == db_file_checksum:
                 return
             g.log(
                 "Integrity checked failed - {} - {} - rebuilding db".format(
@@ -162,91 +142,120 @@ class Database(object):
             self.rebuild_database()
             g.write_all_text("{}.md5".format(self._db_file), db_file_checksum)
 
-    @staticmethod
-    def _set_connection_settings(connection):
-        connection.row_factory = lambda c, r: dict(
-            zip([col[0] for col in c.description], r)
-        )
-        connection.execute("PRAGMA foreign_keys = ON")
-        connection.commit()
+    # endregion
 
-    @staticmethod
-    def _execute_query(data, cursor, query):
-        if isinstance(data, list) or isinstance(data, types.GeneratorType):
-            result = cursor.executemany(query, data)
-        elif data:
-            result = cursor.execute(query, data)
-        else:
-            result = cursor.execute(query)
-        return result
+    def rebuild_database(self):
+        g.log("Rebuilding database: {}".format(self._db_file))
+        with SQLiteConnection(self._db_file) as sqlite:
+            with sqlite.transaction():
+                database_schema = sqlite._connection.execute(
+                    "SELECT m.name from sqlite_master m where type = 'table'"
+                ).fetchall()
+
+            for q in ["DROP TABLE IF EXISTS [{}]".format(t["name"]) for t in database_schema]:
+                sqlite._connection.execute(q)
+
+            self._create_tables(sqlite._connection)
 
     # endregion
 
     # region public methods
-    def close(self):
-        self._exit = True
 
-    def rebuild_database(self):
-        g.log("Rebuilding database: {}".format(self._db_file))
-        database_schema = self.execute_sql(
-            "SELECT m.name from sqlite_master m where type = 'table'"
-        ).fetchall()
+    def fetchall(self, query, data=None):
+        with SQLiteConnection(self._db_file) as connection:
+            return connection.fetchall(query, data)
 
-        self.execute_sql(
-            ["DROP TABLE IF EXISTS [{}]".format(t["name"]) for t in database_schema]
-        )
-        self.execute_sql("VACUUM")
-        with self._get_connection() as connection:
-            self._create_tables(connection)
+    def fetchone(self, query, data=None):
+        with SQLiteConnection(self._db_file) as connection:
+            return connection.fetchone(query, data)
 
     def execute_sql(self, query, data=None):
-        retries = 0
-        self._register_pickler_adapters()
-        monitor = xbmc.Monitor()
-        with self._get_connection() as connection:
-            while not retries == 50 and not monitor.abortRequested() and not self._exit:
-                try:
-                    if isinstance(query, list) or isinstance(
-                        query, types.GeneratorType
-                    ):
-                        if g.PLATFORM == 'xbox':
-                            results = []
-                            for i in query:
-                                results.append(self._execute_query(data, connection.cursor(), i))
-                                connection.commit()
-                            return results
-                        else:
-                            return [
-                                self._execute_query(data, connection.cursor(), i)
-                                for i in query
-                                ]
-                    if g.PLATFORM == "xbox":
-                        results = self._execute_query(data, connection.cursor(), query)
-                        connection.commit()
-                        return results
-                    else:
-                        return self._execute_query(data, connection.cursor(), query)
-                except sqlite3.OperationalError as error:
-                    if "database is locked" in g.UNICODE(error):
-                        g.log(
-                            "database is locked waiting: {}".format(self._db_file),
-                            "warning",
-                        )
-                        monitor.waitForAbort(0.1)
-                    else:
-                        self._log_error(query, data)
-                        raise
-                except (RuntimeError, InterfaceError):
-                    if retries >= 2:
-                        self._log_error(query, data)
-                        raise
-                    monitor.waitForAbort(0.1)
-                except:
-                    self._log_error(query, data)
-                    raise
-                retries += 1
-            connection.commit()
-            return None
+        with SQLiteConnection(self._db_file) as connection:
+            return connection.execute_sql(query, data)
+
+    def create_temp_table(self, table_name, columns):
+        return TempTable(self, table_name, columns)
+
+    # endregion
+
+
+class _connection:
+    __metaclass__ = ABCMeta
+
+    def __init__(self, keep_alive=False):
+        self._keep_alive = keep_alive
+        self._connection = None
+        self._cursor = None
+
+    def __enter__(self):
+        self._connection = self._create_connection()
+        self._cursor = self._create_cursor()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._cursor.close()
+        if not self._keep_alive:
+            self._connection.close()
+
+    @abstractmethod
+    def _create_connection(self):
+        return
+
+    @abstractmethod
+    def _create_cursor(self):
+        return
+
+    @contextmanager
+    def smart_transaction(self, query):
+        no_transaction_keywords = ["select ", "vacuum"]
+
+        if isinstance(query, list) and any(
+                k for k in no_transaction_keywords if any(q for q in query if k in q.lower())) \
+                or not isinstance(query, list) and any(k for k in no_transaction_keywords if k in query.lower()):
+            yield
+        else:
+            yield self.transaction()
+
+    @contextmanager
+    def transaction(self):
+        self._cursor.execute('BEGIN')
+        try:
+            yield self._cursor
+        except:
+            self._connection.rollback()
+            raise
+        else:
+            self._connection.commit()
+
+    def fetchall(self, query, data=None):
+        return self._execute_query(_dumps(data), "fetchall", query)
+
+    def fetchone(self, query, data=None):
+        return self._execute_query(_dumps(data), "fetchone", query)
+
+    def execute_sql(self, query, data=None):
+        return self._execute_query(_dumps(data), None, query)
+
+    @_handle_single_item_or_list
+    def _execute_query(self, data, result_method, query):
+        try:
+            with self.smart_transaction(query):
+                if isinstance(data, list) or isinstance(data, types.GeneratorType):
+                    self._cursor.executemany(query, data)
+                elif data:
+                    self._cursor.execute(query, data)
+                else:
+                    self._cursor.execute(query)
+
+                if result_method == "fetchone":
+                    return self._cursor.fetchone()
+                elif result_method == "fetchall":
+                    return self._cursor.fetchall()
+                else:
+                    return self._cursor
+        except:
+            self._log_error(query, data)
+            raise
 
     @staticmethod
     def _log_error(query, data):
@@ -255,19 +264,73 @@ class Database(object):
         else:
             g.log(query, "error")
 
-    def create_temp_table(self, table_name, columns):
-        return TempTable(self, table_name, columns)
+
+class SQLiteConnection(_connection):
+    def __init__(self, path):
+        _connection.__init__(self)
+        self.path = path
+        self._create_db_path()
+
+    def _create_connection(self):
+        retries = 0
+        while not retries == 50 and not g.abort_requested():
+            import sqlite3
+            try:
+                connection = sqlite3.connect(  # pylint: disable=no-member
+                    self.path,
+                    timeout=30,
+                    detect_types=sqlite3.PARSE_DECLTYPES,  # pylint: disable=no-member
+                    isolation_level=None,
+                    check_same_thread=False
+                )
+                self._set_connection_settings(connection)
+                return connection
+            except sqlite3.OperationalError as error:  # pylint: disable=no-member
+                if "database is locked" in g.UNICODE(error):
+                    g.log(
+                        "database is locked waiting: {}".format(self.path),
+                        "warning",
+                    )
+                    g.wait_for_abort(0.1)
+            retries += 1
+
+    def _create_cursor(self):
+        return self._connection.cursor()
 
     @staticmethod
-    def chunkify_list_for_query(list_of_expressions):
-        chunked_list = []
-        while len(list_of_expressions) > 900:
-            chunked_list.append(list_of_expressions[:900])
-            del list_of_expressions[:900]
-        chunked_list.append(list_of_expressions)
-        return chunked_list
+    def _set_connection_settings(connection):
+        connection.row_factory = lambda c, r: dict([(col[0], _loads(r[idx])) for idx, col in enumerate(c.description)])
+        connection.execute("PRAGMA foreign_keys = ON")
+        connection.execute("PRAGMA journal_mode = WAL")
+        connection.execute("PRAGMA synchronous = normal")
+        connection.execute("PRAGMA temp_store = memory")
+        connection.execute("PRAGMA mmap_size = 30000000000")
+        connection.execute("PRAGMA page_size = 32768")
 
-    # endregion
+    def _create_db_path(self):
+        if not xbmcvfs.exists(os.path.dirname(self.path)):
+            xbmcvfs.mkdirs(os.path.dirname(self.path))
+
+
+class MySqlConnection(_connection):
+    def __init__(self, config):
+        _connection.__init__(self, True)
+        self.config = {
+            'user': config.get("user"),
+            'password': config.get("password"),
+            'host': config.get("host"),
+            'port': config.get("port"),
+            'database': config.get("database"),
+            'autocommit': True,
+            'charset': 'utf8',
+            'use_unicode': True
+        }
+
+    def _create_connection(self):
+        return mysql.connector.connect(**self.config)
+
+    def _create_cursor(self):
+        return self._connection.cursor(dictionary=True)
 
 
 class TempTable:
@@ -294,8 +357,8 @@ class TempTable:
 
     def _create_table(self):
         self.database.execute_sql('CREATE TABLE IF NOT EXISTS [{}] ({})'
-                         .format(self.table_name,
-                                 ','.join("[{}] VARCHAR".format(c) for c in self.columns)))
+                                  .format(self.table_name,
+                                          ','.join("[{}] VARCHAR".format(c) for c in self.columns)))
 
     def _drop_table(self):
         self.database.execute_sql("drop table if exists [{}]".format(self.table_name))

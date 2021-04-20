@@ -32,6 +32,8 @@ def fanart_guard_response(func):
             xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30025).format('Fanart'))
             if g.get_global_setting("run.mode") == "test":
                 raise
+            else:
+                g.log_stacktrace()
             return None
 
     return wrapper
@@ -48,11 +50,6 @@ def wrap_fanart_object(func):
 class FanartTv(ApiBase):
     base_url = "http://webservice.fanart.tv/v3/"
     api_key = "dfe6380e34f49f9b2b9518184922b49c"
-    session = requests.Session()
-    retries = Retry(total=5,
-                    backoff_factor=0.1,
-                    status_forcelist=[500, 502, 503, 504])
-    session.mount('http://', HTTPAdapter(max_retries=retries))
 
     http_codes = {
         200: 'Success',
@@ -80,6 +77,15 @@ class FanartTv(ApiBase):
         self.meta_hash = tools.md5_hash(
             [self.language, self.fanart_support, self.normalization, self.show_normalization, self.meta_objects,
              self.base_url])
+
+        self.session = requests.Session()
+        retries = Retry(total=5,
+                        backoff_factor=0.1,
+                        status_forcelist=[500, 502, 503, 504])
+        self.session.mount('http://', HTTPAdapter(max_retries=retries))
+
+    def __del__(self):
+        self.session.close()
 
     @staticmethod
     def build_image(url, art, image):

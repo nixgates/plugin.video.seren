@@ -342,18 +342,18 @@ class TraktSyncDatabase(Database):
         return datetime.datetime.utcnow().strftime(g.DATE_TIME_FORMAT)
 
     def refresh_activities(self):
-        self.activities = self.execute_sql(
+        self.activities = self.fetchone(
             "SELECT * FROM activities WHERE sync_id=1"
-        ).fetchone()
+        )
 
     def set_base_activities(self):
         self.execute_sql(
             "INSERT OR REPLACE INTO activities(sync_id, seren_version, trakt_username) VALUES(1, ?, ?)",
             (self.last_meta_update, g.get_setting("trakt.username")),
         )
-        self.activities = self.execute_sql(
+        self.activities = self.fetchone(
             "SELECT * FROM activities WHERE sync_id=1"
-        ).fetchone()
+        )
 
     def _check_database_version(self):
         # If we are updating from a database prior to database versioning, we must clear the meta data
@@ -483,7 +483,7 @@ class TraktSyncDatabase(Database):
             ),
             media_type,
         )
-        result = set(r["trakt_id"] for r in self.execute_sql(query).fetchall())
+        result = set(r["trakt_id"] for r in self.fetchall(query))
         return [r for r in requested if r.get("trakt_id") in result]
 
     def save_to_meta_table(self, items, meta_type, provider_type, id_column):
@@ -705,7 +705,7 @@ class TraktSyncDatabase(Database):
                     str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
                 ),
             )
-        needs_update = self.execute_sql(query).fetchall()
+        needs_update = self.fetchall(query)
         if needs_update is None or all(
             x["needs_update"] == "False" for x in needs_update
         ):
@@ -831,7 +831,7 @@ class TraktSyncDatabase(Database):
             media_type,
         )
 
-        result = set(r["trakt_id"] for r in self.execute_sql(query).fetchall())
+        result = set(r["trakt_id"] for r in self.fetchall(query))
         return [
             r for r in requested if r.get("trakt_id") and r.get("trakt_id") in result
         ]
@@ -901,13 +901,13 @@ class TraktSyncDatabase(Database):
     def _get_single_meta(self, trakt_url, trakt_id, media_type):
         return self._update_single_meta(
             trakt_url,
-            self.execute_sql(
+            self.fetchone(
                 """select id as trakt_id, value as trakt_object from 
         {}_meta where id = ? and type = 'trakt' """.format(
                     media_type
                 ),
                 (int(trakt_id),),
-            ).fetchone(),
+            ),
             media_type,
         )
 
@@ -968,7 +968,7 @@ class TraktSyncDatabase(Database):
                     query += " AND watched = 0"
                 if media_type == "shows":
                     query += " AND watched_episodes < episode_count"
-            result.extend(self.execute_sql(query).fetchall())
+            result.extend(self.fetchall(query))
 
         no_paging = params.get("no_paging", False)
         pull_all = params.pop("pull_all", False)

@@ -108,8 +108,10 @@ def _get_latest_repo_version(repo_url):
         max_version = g.CLEAN_VERSION
         repo_versions = [ver.get('version') for ver in xml.iterfind("./addon[@id='plugin.video.seren']")]
         for version in repo_versions:
-            if version and tools.compare_version_numbers(max_version, version):
-                max_version = version
+            if version:
+                clean_version = g.SEMVER_REGEX.findall(version)[0]
+                if clean_version and tools.compare_version_numbers(max_version, clean_version):
+                    max_version = clean_version
     except tools.ElementTree.ParseError as pe:
         g.log("Could not parse repo XML", "error")
 

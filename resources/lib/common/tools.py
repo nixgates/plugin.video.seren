@@ -17,9 +17,7 @@ import xbmcvfs
 from resources.lib.third_party import pytz, tzlocal
 
 try:
-    from urlparse import parse_qsl, parse_qs, unquote, urlparse, urljoin
-    from urllib import urlencode, quote_plus, quote
-except ImportError:
+    # Try to get Python 3 versions
     from urllib.parse import (
         parse_qsl,
         urlencode,
@@ -30,7 +28,18 @@ except ImportError:
         urlparse,
         urljoin,
     )
-
+except ImportError:
+    # Fall back on future.backports to ensure we get unicode compatible PY3 versions in PY2
+    from future.backports.urllib.parse import (
+        parse_qsl,
+        urlencode,
+        quote_plus,
+        parse_qs,
+        quote,
+        unquote,
+        urlparse,
+        urljoin,
+    )
 
 try:
     basestring = basestring  # noqa # pylint: disable=undefined-variable
@@ -82,6 +91,8 @@ SORT_TOKENS = [
     "the ",
 ]
 
+PYTHON3 = True if sys.version_info.major == 3 else False
+
 def copy2clip(txt):
     """
     Takes a text string and attempts to copy it to the clipboard of the device
@@ -123,16 +134,15 @@ def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True):
     """
     if not string_date:
         return None
-    try:
-        if date_only:
-            res = datetime.datetime.strptime(string_date, format_string).date()
-        else:
-            res = datetime.datetime.strptime(string_date, format_string)
-    except TypeError:
-        if date_only:
-            res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6])).date()
-        else:
-            res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6]))
+
+    # Don't use datetime.datetime.strptime()
+    # Workaround for python bug caching of strptime in datetime module.
+    # Don't just try to detect TypeError because it breaks meta handler lambda calls occasionally, particularly
+    # with unix style threading.
+    if date_only:
+        res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6])).date()
+    else:
+        res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6]))
 
     return res
 
@@ -280,10 +290,14 @@ def deconstruct_action_args(action_args):
     Attempts to create a dictionary from the calls action args
     :param action_args: potential url quoted, stringed dict
     :type action_args:  str
-    :return: unquoted and loaded dictionary
-    :rtype: dict, NoneType
+    :return: unquoted and loaded dictionary or str if not json
+    :rtype: dict, str
     """
-    return json.loads(unquote(action_args))
+    action_args = unquote(action_args)
+    try:
+        return json.loads(action_args)
+    except ValueError:
+        return action_args
 
 
 def construct_action_args(action_args):
@@ -503,10 +517,10 @@ def validate_path(path):
     :return:Translated path
     :rtype:str
     """
-    if hasattr(xbmc, "validatePath"):
-        path = xbmc.validatePath(path)  # pylint: disable=no-member
-    else:
+    if hasattr(xbmcvfs, "validatePath"):
         path = xbmcvfs.validatePath(path)  # pylint: disable=no-member
+    else:
+        path = xbmc.validatePath(path)  # pylint: disable=no-member
     return path
 
 
@@ -518,10 +532,10 @@ def translate_path(path):
     :return:Verified and cleaned path
     :rtype:str
     """
-    if hasattr(xbmc, "translatePath"):
-        path = xbmc.translatePath(path)  # pylint: disable=no-member
-    else:
+    if hasattr(xbmcvfs, "translatePath"):
         path = xbmcvfs.translatePath(path)  # pylint: disable=no-member
+    else:
+        path = xbmc.translatePath(path)  # pylint: disable=no-member
     return path
 
 
@@ -589,7 +603,7 @@ def validate_date(date_string):
             pass
 
     if result and result.year > 1900:
-        return result.strftime(g.DATE_TIME_FORMAT)
+        return g.UNICODE(result.strftime(g.DATE_TIME_FORMAT))
     return None
 
 

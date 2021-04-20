@@ -23,9 +23,6 @@ class Premiumize:
     """
     client_id = "288300453"
     client_secret = "2jw9suzfdue2t7eq46"
-    session = requests.Session()
-    retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-    session.mount("https://", HTTPAdapter(max_retries=retries))
 
     def __init__(self):
         self.headers = {
@@ -33,6 +30,13 @@ class Premiumize:
         }
         self.premiumize_transfers = PremiumizeTransfers()
         self.progress_dialog = xbmcgui.DialogProgress()
+
+        self.session = requests.Session()
+        retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+
+    def __del__(self):
+        self.session.close()
 
     @staticmethod
     def _error_handler(request):

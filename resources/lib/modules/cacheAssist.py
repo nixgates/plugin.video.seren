@@ -96,7 +96,7 @@ class _BaseCacheAssist(TorrentAssist):
     def _get_progress_string(self):
         return self.progress_message.format(
             g.color_string(self.status.title()),
-            g.color_string(self.current_percent),
+            g.color_string(g.UNICODE(self.current_percent) + ' %'),
             g.color_string(self.get_display_speed()),
             g.color_string(self.seeds),
             )
@@ -110,45 +110,58 @@ class _BaseCacheAssist(TorrentAssist):
             self.thread_pool.put(self.status_update_loop)
             return {"result": "background", "source": None}
         else:
-            progress_dialog = xbmcgui.DialogProgress()
-            progress_dialog.create(
-                g.get_language_string(30335),
-                tools.create_multiline_message(
-                    line1="Title: {}".format(
-                        g.color_string(self.uncached_source["release_title"].upper())
+            try:
+                progress_dialog = xbmcgui.DialogProgress()
+                progress_dialog.create(
+                    g.get_language_string(30335),
+                    tools.create_multiline_message(
+                        line1="Title: {}".format(
+                            g.color_string(self.uncached_source["release_title"].upper())
+                            ),
+                        line2=self._get_progress_string(),
                         ),
-                    line2=self._get_progress_string(),
-                    ),
                 )
 
-            monitor = xbmc.Monitor()
-            while not progress_dialog.iscanceled() and not monitor.abortRequested():
-                xbmc.sleep(5000)
-                self.run_single_status_cycle()
-                progress_dialog.update(
-                    int(self.current_percent), self._get_progress_string()
-                    )
-                if self.current_percent == 100:
-                    progress_dialog.close()
-                    break
+                while not progress_dialog.iscanceled() and not g.abort_requested():
+                    xbmc.sleep(5000)
+                    self.run_single_status_cycle()
+                    if g.KODI_VERSION >= 19:
+                        progress_dialog.update(  # pylint: disable=unexpected-keyword-arg
+                            int(self.current_percent),
+                            message=tools.create_multiline_message(
+                                line1="Title: {}".format(
+                                    g.color_string(self.uncached_source["release_title"].upper())
+                                ),
+                                line2=self._get_progress_string(),
+                            ),
+                        )
+                    else:
+                        progress_dialog.update(  # pylint: disable=unexpected-keyword-arg
+                            int(self.current_percent),
+                            line2=self._get_progress_string(),
+                        )
+                    if self.current_percent == 100:
+                        progress_dialog.close()
+                        break
 
-            if progress_dialog.iscanceled() and self.current_percent != 100:
+                if progress_dialog.iscanceled() and self.current_percent != 100:
 
-                self._handle_cancellation()
-                self.cancel_process()
-                return {"result": "error", "source": None}
-            else:
-                self.uncached_source["debrid_provider"] = self.debrid_slug
-                return {"result": "success", "source": self.uncached_source}
+                    self._handle_cancellation()
+                    self.cancel_process()
+                    return {"result": "error", "source": None}
+                else:
+                    self.uncached_source["debrid_provider"] = self.debrid_slug
+                    return {"result": "success", "source": self.uncached_source}
+            finally:
+                del progress_dialog
 
     @staticmethod
     def _handle_cancellation():
         return xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30504))
 
     def status_update_loop(self):
-        monitor = xbmc.Monitor()
-        while not monitor.abortRequested() and not self.cancelled:
-            if monitor.waitForAbort(10):
+        while not g.abort_requested() and not self.cancelled:
+            if g.wait_for_abort(10):
                 raise KodiShutdownException(
                     "Kodi Shutdown requested, cancelling download"
                     )
@@ -170,7 +183,7 @@ class _BaseCacheAssist(TorrentAssist):
                 if self.status == "downloading":
                     self._do_download_frame()
                 else:
-                    self._handle_failure("Unkonown Failure at Debrid Provider")
+                    self._handle_failure("Unknown Failure at Debrid Provider")
 
             except KodiShutdownException:
                 self._delete_transfer()
@@ -248,23 +261,21 @@ class _PremiumizeCacheAssist(_BaseCacheAssist):
             for i in self.debrid.list_transfers()["transfers"]
             if i["id"] == self.transfer_id
             ][0]
-        if transfer_status["status"] == "running":
-            transfer_status["status"] = "downloading"
+        self.status = "downloading" if transfer_status["status"] == "running" else transfer_status["status"]
 
         self.previous_percent = self.current_percent
         self.current_percent = tools.safe_round(transfer_status["progress"] * 100, 2)
-        message = re.findall(
-            r"(\d*.\d* .{1,2}\/s) from (\d*)", transfer_status["message"]
+
+        if transfer_status["message"]:
+            message = re.findall(
+                r"(\d+\.\d+\s+[a-zA-Z]{1,2}/s)\s+from\s+(\d+)", transfer_status["message"]
             )
-
-        try:
-            self.download_speed = message[0][0]
-            self.seeds = message[0][1]
-        except IndexError:
-            self.download_speed = "0.00 B/s"
-            self.seeds = "0"
-
-        self.status = transfer_status["status"]
+            try:
+                self.download_speed = message[0][0].replace('\\', '')
+                self.seeds = message[0][1]
+            except IndexError:
+                self.download_speed = "0.00 B/s"
+                self.seeds = "0"
 
     def _delete_transfer(self):
         self.debrid.delete_transfer(self.transfer_id)

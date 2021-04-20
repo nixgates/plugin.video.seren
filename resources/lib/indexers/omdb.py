@@ -65,6 +65,8 @@ def omdb_guard_response(func):
             )
             if g.get_global_setting("run.mode") == "test":
                 raise
+            else:
+                g.log_stacktrace()
             return None
 
     return wrapper
@@ -80,13 +82,6 @@ def wrap_omdb_object(func):
 
 class OmdbApi(ApiBase):
     ApiUrl = "https://www.omdbapi.com/"
-    session = requests.Session()
-    retries = Retry(
-        total=5,
-        backoff_factor=0.1,
-        status_forcelist=[500, 503, 504, 520, 521, 522, 524],
-    )
-    session.mount("https://", HTTPAdapter(max_retries=retries))
 
     def __init__(self):
         self.api_key = g.get_setting("omdb.apikey", None)
@@ -245,6 +240,17 @@ class OmdbApi(ApiBase):
                 else None,
             ),
         ]
+
+        self.session = requests.Session()
+        retries = Retry(
+            total=5,
+            backoff_factor=0.1,
+            status_forcelist=[500, 503, 504, 520, 521, 522, 524],
+        )
+        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+
+    def __del__(self):
+        self.session.close()
 
     def _extract_awards(self, value, *params):
         try:

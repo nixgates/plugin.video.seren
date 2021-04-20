@@ -27,9 +27,6 @@ RD_USERNAME_KEY = "rd.username"
 
 
 class RealDebrid:
-    session = requests.Session()
-    retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-    session.mount("https://", HTTPAdapter(max_retries=retries))
     _threading_lock = threading.Lock()
 
     def __init__(self):
@@ -41,7 +38,6 @@ class RealDebrid:
         self.device_credentials_url = "device/credentials?{}"
         self.token_url = "token"
         self.token = g.get_setting(RD_AUTH_KEY)
-        self.session.headers.update({"Authorization": "Bearer {}".format(self.token)})
         self.refresh = g.get_setting(RD_REFRESH_KEY)
         self.expiry = g.get_float_setting(RD_EXPIRY_KEY)
         self.device_code = ""
@@ -51,6 +47,13 @@ class RealDebrid:
         self.base_url = "https://api.real-debrid.com/rest/1.0/"
         self.cache_check_results = {}
         self.progress_dialog = xbmcgui.DialogProgress()
+        self.session = requests.Session()
+        retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+        self.session.headers.update({"Authorization": "Bearer {}".format(self.token)})
+
+    def __del__(self):
+        self.session.close()
 
     def _auth_loop(self):
         url = "client_id={}&code={}".format(self.client_id, self.device_code)

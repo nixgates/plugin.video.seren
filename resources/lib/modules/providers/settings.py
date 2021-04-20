@@ -49,10 +49,10 @@ class SettingsManager(ProviderCache):
         return self._cast_setting(setting)
 
     def get_all_package_settings(self, package):
-        return self.execute_sql("SELECT * FROM package_settings WHERE package=?", (package,)).fetchall()
+        return self.fetchall("SELECT * FROM package_settings WHERE package=?", (package,))
 
     def get_all_visible_package_settings(self, package):
-        return self.execute_sql("SELECT * FROM package_settings WHERE package=? AND visible=1", (package,)).fetchall()
+        return self.fetchall("SELECT * FROM package_settings WHERE package=? AND visible=1", (package,))
 
     def set_setting(self, package_name, setting_id, value):
         setting = self._get_package_setting(package_name, setting_id)

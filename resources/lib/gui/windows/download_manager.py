@@ -63,8 +63,7 @@ class DownloadManager(BaseWindow):
     def _background_info_updater(self):
         self.update_download_info()
         self.list_control.reset()
-        monitor = xbmc.Monitor()
-        while not self.exit_requested and not monitor.abortRequested():
+        while not self.exit_requested and not g.abort_requested():
             xbmc.sleep(1000)
             self.update_download_info()
             self._populate_menu_items()

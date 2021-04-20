@@ -63,9 +63,8 @@ class Downloader:
         self.progress = 0
         self.speed = 0
 
-        monitor = xbmc.Monitor()
         for chunk in requests.get(url, stream=True).iter_content(1024 * 1024):
-            if monitor.abortRequested():
+            if g.abort_requested():
                 self.cancel_download()
             if self._canceled:
                 return False

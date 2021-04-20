@@ -14,7 +14,6 @@ class MessageServer:
 
     def __init__(self, index_id, prefix):
         self._base_prefix = "SEREN_MESSAGING_"
-        self._win = g.HOME_WINDOW
         self._index_id = index_id
         self._index = []
         self._prefix = "{}_{}".format(self._base_prefix, prefix)
@@ -27,18 +26,18 @@ class MessageServer:
             self._index = index_value.split("|") if index_value else []
 
     def _get_property(self, message_id):
-        value = self._win.getProperty(self._prefix + message_id)
+        value = g.HOME_WINDOW.getProperty(self._prefix + message_id)
         if not value:
             return None
         return base64.b64decode(value).decode("utf-8")
 
     def _clear_message(self, message_id):
-        self._win.clearProperty(self._base_prefix + message_id)
+        g.HOME_WINDOW.clearProperty(self._base_prefix + message_id)
         self._index.remove(message_id)
         self._update_window_index()
 
     def _set_property(self, message_id, value):
-        self._win.setProperty(
+        g.HOME_WINDOW.setProperty(
             self._prefix + message_id, base64.b64encode(value.encode("utf-8"))
         )
 

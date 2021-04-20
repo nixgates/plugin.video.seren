@@ -43,25 +43,25 @@ class TorrentCache(Database):
             episode = item_meta["info"]["episode"]
             trakt_id = item_meta["info"]["trakt_show_id"]
 
-            torrent_list = self.execute_sql(
+            torrent_list = self.fetchall(
                 "SELECT * FROM cache WHERE trakt_id=? AND package=?",
                 (trakt_id, "tvshow"),
-            ).fetchall()
-            torrent_list += self.execute_sql(
+            )
+            torrent_list += self.fetchall(
                 "SELECT * FROM cache WHERE trakt_id=? AND package=? AND season=?",
                 (trakt_id, "season", season),
-            ).fetchall()
-            torrent_list += self.execute_sql(
+            )
+            torrent_list += self.fetchall(
                 "SELECT * FROM cache WHERE trakt_id=? AND package=? AND season=? "
                 "AND episode=?",
                 (trakt_id, "single", season, episode),
-            ).fetchall()
+            )
 
         else:
             trakt_id = item_meta["trakt_id"]
-            torrent_list = self.execute_sql(
+            torrent_list = self.fetchall(
                 "SELECT * FROM cache WHERE trakt_id=?", (trakt_id,)
-            ).fetchall()
+            )
 
         return [i["meta"] for i in torrent_list]
 

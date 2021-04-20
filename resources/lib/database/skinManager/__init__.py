@@ -67,23 +67,22 @@ class SkinManager(Database, ZipManager):
             return os.path.join(g.ADDON_USERDATA_PATH, "skins", active_skin_name)
 
     def _get_active_skin(self):
-        active_skin = self.execute_sql(
+        active_skin = self.fetchone(
             "SELECT * FROM skins WHERE active = 1"
-        ).fetchone()
+        )
         if active_skin is None:
             g.log("Failed to identify active skin, resetting to Default", "error")
             self.execute_sql(
                 "UPDATE skins SET active=1 WHERE skin_name == ?", (DEFAULT_SKIN_NAME,)
             )
-            active_skin = self.execute_sql("SELECT * FROM skins WHERE active = 1")
+            active_skin = self.fetchone("SELECT * FROM skins WHERE active = 1")
         return active_skin["skin_name"]
 
     def _is_skin_active(self, skin_name):
         return (
-            self.execute_sql(
-                "SELECT * FROM skins WHERE skin_name=?", (skin_name,)
-            ).fetchone()["active"]
-            == "1"
+                self.fetchone(
+                    "SELECT * FROM skins WHERE skin_name=?", (skin_name,)
+                )["active"] == "1"
         )
 
     def _select_installed_skin(self, hide_default=False):
@@ -134,7 +133,7 @@ class SkinManager(Database, ZipManager):
         )
 
     def _get_all_installed(self):
-        return self.execute_sql("SELECT * FROM skins").fetchall()
+        return self.fetchall("SELECT * FROM skins")
 
     def _mark_skin_active(self, skin_name):
         self.execute_sql("UPDATE skins SET active=? WHERE active=?", ("0", "1"))
@@ -144,10 +143,10 @@ class SkinManager(Database, ZipManager):
         g.set_setting(
             "skin.active",
             "{skin_name} - {version}".format(
-                **self.execute_sql(
+                **self.fetchone(
                     "SELECT skin_name, version FROM skins WHERE skin_name=?",
                     (skin_name,),
-                ).fetchone()
+                )
             ),
         )
         self._active_skin_path = self._get_active_skin_path()
@@ -157,25 +156,27 @@ class SkinManager(Database, ZipManager):
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30337))
             return
 
-        update = self.execute_sql(
-            "UPDATE skins SET "
-            "version=?, "
-            "author=?, "
-            "remote_meta=?, "
-            "update_directory=? "
-            "WHERE skin_name=?",
-            (
-                skin_meta["version"],
-                skin_meta["author"],
-                skin_meta.get("remote_meta", None),
-                skin_meta.get("update_directory", None),
-                skin_meta["skin_name"],
-            ),
-        )
+        exists = self.fetchone("select * from skins where skin_name=?", (skin_meta["skin_name"],))
 
-        if update.rowcount == 0:
+        if exists:
             self.execute_sql(
-                "INSERT INTO skins VALUES (?,?,?,?,?,?)",
+                "UPDATE skins SET "
+                "version=?, "
+                "author=?, "
+                "remote_meta=?, "
+                "update_directory=? "
+                "WHERE skin_name=?",
+                (
+                    skin_meta["version"],
+                    skin_meta["author"],
+                    skin_meta.get("remote_meta", None),
+                    skin_meta.get("update_directory", None),
+                    skin_meta["skin_name"],
+                ),
+            )
+        else:
+            self.execute_sql(
+                "INSERT OR REPLACE INTO skins VALUES (?,?,?,?,?,?)",
                 (
                     skin_meta["skin_name"],
                     skin_meta["version"],
@@ -187,7 +188,6 @@ class SkinManager(Database, ZipManager):
             )
 
         self.installed_skins = self._get_all_installed()
-
 
     def _remove_skin_from_database(self, skin_name):
         self.execute_sql("DELETE FROM skins WHERE skin_name=?", (skin_name,))

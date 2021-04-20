@@ -1,8 +1,8 @@
 ﻿certifi==2020.4.5.1
 chardet==3.0.4
-idna==2.9
-requests==2.23.0
-urllib3==1.25.9
+idna==2.8
+requests==2.22.0
+urllib3==1.25.8
 pytz
 polib~=1.1.0
 future~=0.17.1
@@ -21,3 +21,4 @@ contextlib2; python_version<"3"
 requests-mock
 Mock~=3.0.5
 tzlocal
+mysql-connector-python

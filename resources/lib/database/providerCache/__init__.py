@@ -95,8 +95,7 @@ class ProviderCache(Database):
         :return: Provider record
         :rtype: dict
         """
-        return self.execute_sql("SELECT * FROM providers WHERE provider_name=? AND package=?",
-                                (provider_name, package)).fetchone()
+        return self.fetchone("SELECT * FROM providers WHERE provider_name=? AND package=?", (provider_name, package))
 
     def get_single_package(self, package_name):
         """
@@ -106,7 +105,7 @@ class ProviderCache(Database):
         :return: Package record
         :rtype: dict
         """
-        return self.execute_sql("SELECT * FROM packages WHERE pack_name=?", (package_name,)).fetchone()
+        return self.fetchone("SELECT * FROM packages WHERE pack_name=?", (package_name,))
 
     def get_providers(self):
         """
@@ -114,7 +113,7 @@ class ProviderCache(Database):
         :return: List of all provider records
         :rtype: list
         """
-        return self.execute_sql("SELECT * FROM providers").fetchall()
+        return self.fetchall("SELECT * FROM providers")
 
     def get_provider_packages(self):
         """
@@ -122,7 +121,7 @@ class ProviderCache(Database):
         :return: List of all package records
         :rtype: list
         """
-        return self.execute_sql("SELECT * FROM packages").fetchall()
+        return self.fetchall("SELECT * FROM packages")
 
     def add_provider_package(self, pack_name, author, remote_meta, version, services):
         """
@@ -225,5 +224,5 @@ class ProviderCache(Database):
                          (value, package_name, setting_id))
 
     def _get_package_setting(self, package_name, setting_id):
-        return self.execute_sql("SELECT type, value FROM package_settings WHERE package=? and id=?",
-                                (package_name, setting_id)).fetchone()
+        return self.fetchone("SELECT type, value FROM package_settings WHERE package=? and id=?",
+                                (package_name, setting_id))
