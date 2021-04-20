@@ -30,7 +30,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             query += " AND watched = 0"
 
         return MetadataHandler.sort_list_items(
-            self.execute_sql(query).fetchall(), trakt_list
+            self.fetchall(query), trakt_list
         )
 
     @guard_against_none(list)
@@ -46,29 +46,29 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 self.page_limit, self.page_limit * (page - 1)
             )
 
-        return self.execute_sql(query).fetchall()
+        return self.fetchall(query)
 
     @guard_against_none(list)
     def get_watched_movies(self, page):
-        return self.execute_sql(
+        return self.fetchall(
             """SELECT m.trakt_id, meta.value as trakt_object FROM movies as m LEFT JOIN 
         movies_meta as meta on m.trakt_id = meta.id and meta.type = 'trakt' WHERE watched = 1 
         ORDER BY last_watched_at desc LIMIT {} OFFSET {}""".format(
                 self.page_limit, self.page_limit * (page - 1)
             )
-        ).fetchall()
+        )
 
     def get_all_collected_movies(self):
-        return self.execute_sql(
+        return self.fetchall(
             """SELECT m.trakt_id, meta.value as trakt_object FROM movies as m LEFT JOIN 
         movies_meta as meta on m.trakt_id = meta.id and meta.type = 'trakt' WHERE collected = 1"""
         )
 
     @guard_against_none()
     def mark_movie_watched(self, trakt_id):
-        play_count = self.execute_sql(
+        play_count = self.fetchone(
             "select watched from movies where trakt_id=?", (trakt_id,)
-        ).fetchone()["watched"]
+        )["watched"]
         self._mark_movie_record("watched", play_count + 1, trakt_id)
 
     @guard_against_none()
@@ -110,13 +110,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def get_movie(self, trakt_id):
         return self.get_movie_list(
             [
-                self.execute_sql(
+                self.fetchone(
                     """WITH requested(trakt_id) AS (VALUES ({})) select r.trakt_id as 
         trakt_id, db.value as trakt_object from requested as r left join movies_meta as db on r.trakt_id == db.id and 
         type = 'trakt' """.format(
                         trakt_id
                     )
-                ).fetchone()
+                )
             ]
         )[0]
 
@@ -158,7 +158,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             )
         )
 
-        db_list_to_update = self.execute_sql(sql_statement).fetchall()
+        db_list_to_update = self.fetchall(sql_statement)
 
         self.update_missing_trakt_objects(db_list_to_update, list_to_update)
 

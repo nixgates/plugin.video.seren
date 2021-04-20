@@ -198,6 +198,7 @@ class SerenStubs:
                 "mkdirs": os.makedirs,
                 "rmdir": shutil.rmtree,
                 "validatePath": lambda t: t,
+                "translatePath": SerenStubs.xbmc.translatePath,
             },
         }
 

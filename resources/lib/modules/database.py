@@ -3,9 +3,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 # This whole file is for backwards compatibility
 import datetime
-import sqlite3
-
-import xbmcvfs
 
 from resources.lib.modules.globals import g
 
@@ -38,27 +35,3 @@ def get(func, duration, *args, **kwargs):
                 cache_str, result, expiration=datetime.timedelta(hours=duration)
             )
         return result
-
-
-def _get_connection_cursor(file_path):
-    conn = _get_connection(file_path)
-    return conn.cursor()
-
-
-def _get_connection(file_path):
-    xbmcvfs.mkdirs(g.ADDON_USERDATA_PATH)
-    conn = sqlite3.connect(file_path)
-    conn.row_factory = lambda c, r: dict(zip([col[0] for col in c.description], r))
-    return conn
-
-
-def clear_local_bookmarks():
-    cursor = _get_connection_cursor(g.get_video_database_path())
-    cursor.execute("SELECT * FROM files WHERE strFilename LIKE '%plugin.video.seren%'")
-    file_ids = [str(i["idFile"]) for i in cursor.fetchall()]
-    for table in ["bookmark", "streamdetails", "files"]:
-        cursor.execute(
-            "DELETE FROM {} WHERE idFile IN ({})".format(table, ",".join(file_ids))
-        )
-    cursor.connection.commit()
-    cursor.close()

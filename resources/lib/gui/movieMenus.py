@@ -282,25 +282,19 @@ class Menus:
 
     def movies_search(self, query=None):
         if query is None:
-            k = xbmc.Keyboard("", g.get_language_string(30013))
-            k.doModal()
-            query = k.getText() if k.isConfirmed() else None
-            del k
+            query = g.get_keyboard_input(heading=g.get_language_string(30013))
             if not query:
                 g.cancel_directory()
                 return
 
-        query = query
         if g.get_bool_setting("searchHistory"):
             SearchHistory().add_search_history("movie", query)
-        query = g.deaccent_string(query)
-        query = tools.quote(query)
 
         self.movies_search_results(query)
 
     def movies_search_results(self, query):
         trakt_list = self.trakt.get_json_paged(
-            "search/movie", query=tools.unquote(query), extended="full", page=g.PAGE
+            "search/movie", query=query, extended="full", page=g.PAGE
         )
         if not trakt_list:
             g.cancel_directory()
@@ -342,27 +336,41 @@ class Menus:
         )
         self.list_builder.movie_menu_builder(trakt_list)
 
-    def movies_by_actor(self, actor):
-        if actor is None:
-            k = xbmc.Keyboard("", g.get_language_string(30013))
-            k.doModal()
-            query = k.getText() if k.isConfirmed() else None
+    def movies_by_actor(self, query):
+        if query is None:
+            query = g.get_keyboard_input(g.get_language_string(30013))
             if not query:
                 g.cancel_directory()
                 return
-        else:
-            query = tools.unquote(actor)
 
         if g.get_bool_setting("searchHistory"):
             SearchHistory().add_search_history("movieActor", query)
-        query = g.deaccent_string(query)
-        query = query.replace(" ", "-")
-        query = tools.quote_plus(query)
 
-        self.list_builder.movie_menu_builder(
-            self.trakt.get_json_paged(
+        query = g.transliterate_string(query)
+        # Try to deal with transliterated chinese actor names as some character -> word transliterations can be joined
+        # I have no idea of the rules and it could well be arbitrary
+        # This approach will only work if only one pair of adjoining transliterated chars are joined
+        name_parts = query.split()
+        for i in range(len(name_parts), 0, -1):
+            query = "-".join(name_parts[:i]) + "-".join(name_parts[i:i+1])
+            query = tools.quote_plus(query)
+
+            trakt_list = self.trakt.get_json_paged(
                 "people/{}/movies".format(query), extended="full", page=g.PAGE
-            ),
+            )
+            if not trakt_list:
+                continue
+            else:
+                break
+
+        try:
+            if not trakt_list or 'trakt_id' not in trakt_list[0]:
+                raise KeyError
+        except KeyError:
+            g.cancel_directory()
+            return
+        self.list_builder.movie_menu_builder(
+            trakt_list,
             hide_watched=False,
             hide_unaired=False,
         )

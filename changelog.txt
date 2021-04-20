@@ -1,3 +1,28 @@
+Changelog 2.0.19
+Fix handling of unicode in URLs, TV Networks and Searching issues on Leia
+Fix TV show years
+Fix PM CacheAssist status updates
+Only try to auto-cache if auto-cache is actually enabled
+Change default threadpool size and provide user settings
+Increase timeout configuration setting maximum permitted value
+Make pre-scrape respect new maximum value for timeout
+Change approach for deaccenting clean_title and transliterate actor names
+During prescrape, don't pop up the too restrictive filters window and just use unfiltered list for sorting
+Fix Kodi Bookmark Clearing with MySQL DB support
+Temporarily disable totaltime progress indicators as they break our resume on Matrix
+Fix TVDB session issues
+Fix XBOX Database Issues
+Fix database pickling issues
+Fix Kodi crashes in Leia
+Fix Kodi crashes in Matrix (with exception of reuselanguageinvoker enabled when stopping playback combined with widgets)
+Change default value of reuselanguageinvoker to False and force use addon provided value on upgrade
+Ensure we release all Kodi objects to prevent memory leaks and crashes
+Ensure we close all requests sessions to prevent memory leaks
+Workaround occasional python bug with strptime in lambda functions
+Made Kodi version detection algorithm more resilient and cover pre-release versions
+Logging enhancements
+Added Arabic translations
+
 Changelog 2.0.18
 Fix the thread pool issues
 Added logic to push down the country_origin to be used by the scrapers

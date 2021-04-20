@@ -20,7 +20,6 @@ from resources.lib.database.cache import use_cache
 from resources.lib.indexers.apibase import (
     ApiBase,
     handle_single_item_or_list,
-    handle_single_item_or_list_threaded,
 )
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
@@ -193,13 +192,6 @@ class TraktAPI(ApiBase):
     """
 
     ApiUrl = "https://api.trakt.tv/"
-    session = requests.Session()
-    retries = Retry(
-        total=4,
-        backoff_factor=0.3,
-        status_forcelist=[429, 500, 503, 504, 520, 521, 522, 524],
-    )
-    session.mount("https://", HTTPAdapter(max_retries=retries))
 
     _threading_lock = threading.Lock()
 
@@ -308,6 +300,9 @@ class TraktAPI(ApiBase):
 
         self.ShowNormalization = tools.extend_array(
             [
+                ("status", "status", None),
+                ("status", "is_airing", lambda t: not t == "ended"),
+                ("title", "tvshowtitle", None),
                 (
                     "first_aired",
                     "year",
@@ -315,14 +310,11 @@ class TraktAPI(ApiBase):
                     if tools.validate_date(t)
                     else None
                 ),
-                ("title", "tvshowtitle", None),
                 (
                     "first_aired",
                     ("premiered", "aired"),
                     lambda t: tools.validate_date(t),
                 ),
-                ("status", "status", None),
-                ("status", "is_airing", lambda t: not t == "ended"),
             ],
             self.Normalization,
         )
@@ -330,13 +322,20 @@ class TraktAPI(ApiBase):
         self.SeasonNormalization = tools.extend_array(
             [
                 ("number", ("season", "sortseason"), None),
+                ("episode_count", "episode_count", None),
+                ("aired_episodes", "aired_episodes", None),
+                (
+                    "first_aired",
+                    "year",
+                    lambda t: tools.validate_date(t)[:4]
+                    if tools.validate_date(t)
+                    else None
+                ),
                 (
                     "first_aired",
                     ("premiered", "aired"),
                     lambda t: tools.validate_date(t),
                 ),
-                ("episode_count", "episode_count", None),
-                ("aired_episodes", "aired_episodes", None),
             ],
             self.Normalization,
         )
@@ -345,13 +344,20 @@ class TraktAPI(ApiBase):
             [
                 ("number", ("episode", "sortepisode"), None),
                 ("season", ("season", "sortseason"), None),
+                ("collected_at", "collected", lambda t: 1),
+                ("plays", "playcount", None),
+                (
+                    "first_aired",
+                    "year",
+                    lambda t: tools.validate_date(t)[:4]
+                    if tools.validate_date(t)
+                    else None
+                ),
                 (
                     "first_aired",
                     ("premiered", "aired"),
                     lambda t: tools.validate_date(t),
                 ),
-                ("collected_at", "collected", lambda t: 1),
-                ("plays", "playcount", None),
             ],
             self.Normalization,
         )
@@ -384,6 +390,17 @@ class TraktAPI(ApiBase):
         }
 
         self.MetaCollections = ("movies", "shows", "seasons", "episodes")
+
+        self.session = requests.Session()
+        retries = Retry(
+            total=4,
+            backoff_factor=0.3,
+            status_forcelist=[429, 500, 503, 504, 520, 521, 522, 524],
+        )
+        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+
+    def __del__(self):
+        self.session.close()
 
     def _get_headers(self):
         headers = {
@@ -912,7 +929,7 @@ class TraktAPI(ApiBase):
             ],
         )
 
-    @handle_single_item_or_list_threaded
+    @handle_single_item_or_list
     def _handle_translation(self, item):
         if "language" in item and item.get("language") == self.language:
             return item

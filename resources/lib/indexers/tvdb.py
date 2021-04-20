@@ -59,6 +59,8 @@ def tvdb_guard_response(func):
             )
             if g.get_global_setting("run.mode") == "test":
                 raise
+            else:
+                g.log_stacktrace()
             return None
 
     return wrapper
@@ -167,10 +169,6 @@ class TVDBAPI(ApiBase):
         503: "Service Unavailable",
         504: "Gateway Timeout",
     }
-
-    session = requests.Session()
-    retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-    session.mount("https://", HTTPAdapter(max_retries=retries))
 
     imageBaseUrl = "https://www.thetvdb.com/banners/"
     _threading_lock = threading.Lock()
@@ -828,8 +826,12 @@ class TVDBAPI(ApiBase):
         },
         {"id": 262, "abbreviation": "zu", "name": "isiZulu", "englishName": "Zulu"},
     ]
-
+    retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+    
     def __init__(self):
+        self.session = requests.Session()
+        self.session.mount("https://", HTTPAdapter(max_retries=self.retries))
+
         self.apiKey = g.get_setting("tvdb.apikey", "43VPI0R8323FB7TI")
         self.jwToken = g.get_setting("tvdb.jw")
         self.tokenExpires = g.get_float_setting("tvdb.expiry")
@@ -859,6 +861,9 @@ class TVDBAPI(ApiBase):
                 self.preferred_artwork_size,
             )
         )
+
+    def __del__(self):
+        self.session.close()
 
     def _get_headers(self, lang=None):
         headers = {"content-type": "application/json"}
@@ -1235,3 +1240,4 @@ class TVDBAPI(ApiBase):
             splitted_path = relative_path.split(".")
             relative_path = "{}_t.{}".format(splitted_path[0], splitted_path[1])
         return "/".join([self.imageBaseUrl.strip("/"), relative_path.strip("/")])
+

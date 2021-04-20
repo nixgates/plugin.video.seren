@@ -36,9 +36,9 @@ class SearchHistory(Database):
         :return: List of all search terms
         :rtype: list
         """
-        return [i['value'] for i in self.execute_sql(
+        return [i['value'] for i in self.fetchall(
             "SELECT * FROM search_history where type = ? order by RowID desc LIMIT 50",
-            (media_type,)).fetchall()]
+            (media_type,))]
 
     def add_search_history(self, media_type, search_string):
         """

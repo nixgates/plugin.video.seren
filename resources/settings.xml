@@ -210,7 +210,9 @@
         <setting type="sep"/>
         <setting id="general.scrapedisplay" type="enum" label="30191" lvalues="30193|30194" default="0"/>
         <setting id="general.torrentCache" type="bool" label="30118" default="true"/>
-        <setting id="general.timeout" type="slider" label="30120" option="int" range="10,60" default="60"/>
+        <setting id="general.threadpoolScale" type="enum" label="30582"
+                 lvalues="30583|30584|30585|30586" default="1"/>
+        <setting id="general.timeout" type="slider" label="30120" option="int" range="10,180" default="60"/>
 
         <!-- Auto Caching Assistant -->
         <setting type="lsep" label="30121"/>

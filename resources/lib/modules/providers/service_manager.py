@@ -38,8 +38,7 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
         self._service_trigger_loop()
 
     def _service_trigger_loop(self):
-        monitor = xbmc.Monitor()
-        while not monitor.abortRequested():
+        while not g.abort_requested():
             xbmc.sleep(500)
             self._handle_messages(self.get_messages())
 
@@ -58,8 +57,7 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
     def _run_service(service_info):
         # We only allow 5 failures in a service script before we stop trying to run the script.
         count = 0
-        monitor = xbmc.Monitor()
-        while not monitor.abortRequested() and count < 5:
+        while not g.abort_requested() and count < 5:
             count += 1
             service_info['run_method'](service_info['config'])
 

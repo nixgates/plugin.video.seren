@@ -46,7 +46,6 @@ class Manager:
 
     def __init__(self):
         self.index = "SerenDownloadManagerIndex"
-        self._win = g.HOME_WINDOW
         self.download_ids = []
         self.downloads = {}
 
@@ -57,7 +56,7 @@ class Manager:
         :return:
         """
         self.download_ids.remove(url_hash)
-        self._win.setProperty("SDMIndex", ",".join(self.download_ids))
+        g.HOME_WINDOW.setProperty("SDMIndex", ",".join(self.download_ids))
 
     def get_all_tasks_info(self):
         """
@@ -77,7 +76,7 @@ class Manager:
         :return:
         """
         self.download_ids = [
-            i for i in self._win.getProperty("SDMIndex").split(",") if i
+            i for i in g.HOME_WINDOW.getProperty("SDMIndex").split(",") if i
         ]
 
     def _insert_into_index(self):
@@ -85,7 +84,7 @@ class Manager:
         Inserts new ID into window index
         :return:
         """
-        self._win.setProperty("SDMIndex", ",".join(self.download_ids))
+        g.HOME_WINDOW.setProperty("SDMIndex", ",".join(self.download_ids))
 
     def update_task_info(self, url_hash, download_dict):
         """
@@ -94,7 +93,7 @@ class Manager:
         :param download_dict: dict
         :return:
         """
-        self._win.setProperty(
+        g.HOME_WINDOW.setProperty(
             "sdm.{}".format(url_hash), tools.construct_action_args(download_dict)
         )
 
@@ -106,7 +105,7 @@ class Manager:
         """
         try:
             return tools.deconstruct_action_args(
-                self._win.getProperty("sdm.{}".format(url_hash))
+                g.HOME_WINDOW.getProperty("sdm.{}".format(url_hash))
             )
         except Exception:
             raise TaskDoesNotExist(url_hash)
@@ -152,7 +151,7 @@ class Manager:
         self._get_download_index()
         with GlobalLock("SerenDownloaderUpdate"):
             self._get_download_index()
-            self._win.clearProperty("sdm.{}".format(url_hash))
+            g.HOME_WINDOW.clearProperty("sdm.{}".format(url_hash))
             if url_hash in self.download_ids:
                 self.remove_from_index(url_hash)
 
@@ -223,9 +222,8 @@ class _DownloadTask:
         self.speed = 0
         self.status = "downloading"
 
-        monitor = xbmc.Monitor()
         for chunk in requests.get(url, stream=True).iter_content(1024 * 1024):
-            if monitor.abortRequested():
+            if g.abort_requested():
                 self._handle_failure()
                 g.log(
                     "Shutdown requested - Cancelling download: {}".format(

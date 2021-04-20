@@ -15,5 +15,8 @@ from resources.lib.modules.timeLogger import TimeLogger
 
 g.init_globals(sys.argv)
 
-with TimeLogger('{}'.format(g.REQUEST_PARAMS.get('action', ''))):
-    router.dispatch(g.REQUEST_PARAMS)
+try:
+    with TimeLogger('{}'.format(g.REQUEST_PARAMS.get('action', ''))):
+        router.dispatch(g.REQUEST_PARAMS)
+finally:
+    g.deinit()

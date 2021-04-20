@@ -10,8 +10,6 @@ import pickle
 import threading
 from functools import reduce, wraps
 
-import xbmc
-
 from resources.lib.common.tools import freeze_object
 from resources.lib.database import Database
 from resources.lib.modules.globals import g
@@ -42,7 +40,6 @@ class CacheBase(object):
     def __init__(self):
         self.global_checksum = None
         self.cache_prefix = "seren"
-        self._win = g.HOME_WINDOW
 
     def _create_key(self, value):
         return "{}.{}".format(self.cache_prefix, value)
@@ -183,9 +180,9 @@ class Cache(CacheBase):
         :rtype:
         """
         cur_time = datetime.datetime.utcnow()
-        lastexecuted = self._win.getProperty(self._create_key("clean.lastexecuted"))
+        lastexecuted = g.HOME_WINDOW.getProperty(self._create_key("clean.lastexecuted"))
         if not lastexecuted:
-            self._win.setProperty(self._create_key("clean.lastexecuted"), repr(cur_time))
+            g.HOME_WINDOW.setProperty(self._create_key("clean.lastexecuted"), repr(cur_time))
         elif self._cleanup_required_check(lastexecuted, cur_time):
             self.do_cleanup()
 
@@ -197,17 +194,17 @@ class Cache(CacheBase):
         """
         if self._exit:
             return
-        if self._win.getProperty(self._create_key("clean.busy")):
+        if g.HOME_WINDOW.getProperty(self._create_key("clean.busy")):
             return
-        self._win.setProperty(self._create_key("clean.busy"), "busy")
+        g.HOME_WINDOW.setProperty(self._create_key("clean.busy"), "busy")
 
         cur_time = datetime.datetime.utcnow()
 
         self._db_cache.do_cleanup()
         self._mem_cache.do_cleanup()
 
-        self._win.setProperty(self._create_key("clean.lastexecuted"), repr(cur_time))
-        self._win.clearProperty(self._create_key("clean.busy"))
+        g.HOME_WINDOW.setProperty(self._create_key("clean.lastexecuted"), repr(cur_time))
+        g.HOME_WINDOW.clearProperty(self._create_key("clean.busy"))
 
     def clear_all(self):
         """
@@ -225,8 +222,6 @@ class Cache(CacheBase):
         :rtype:
         """
         self._exit = True
-        self._db_cache.close()
-        del self._win
 
     def __del__(self):
         if not self._exit:
@@ -249,18 +244,16 @@ class DatabaseCache(Database, CacheBase):
         :return:
         :rtype:
         """
-        monitor = xbmc.Monitor()
-        if self._exit or monitor.abortRequested():
+        if g.abort_requested():
             return
         cur_time = datetime.datetime.utcnow()
-        if self._win.getProperty(self._create_key("cache.db.clean.busy")):
+        if g.HOME_WINDOW.getProperty(self._create_key("cache.db.clean.busy")):
             return
-        self._win.setProperty(self._create_key("cache.db.clean.busy"), "busy")
+        g.HOME_WINDOW.setProperty(self._create_key("cache.db.clean.busy"), "busy")
         query = "DELETE FROM {} where expires < ?".format(self.cache_table_name)
         self.execute_sql(query, (self._get_timestamp(),))
-        self.execute_sql("VACUUM")
-        self._win.setProperty(self._create_key("cache.mem.clean.busy"), repr(cur_time))
-        self._win.clearProperty(self._create_key("cache.mem.clean.busy"))
+        g.HOME_WINDOW.setProperty(self._create_key("cache.mem.clean.busy"), repr(cur_time))
+        g.HOME_WINDOW.clearProperty(self._create_key("cache.mem.clean.busy"))
 
     def get(self, cache_id, checksum=None):
         """
@@ -278,7 +271,7 @@ class DatabaseCache(Database, CacheBase):
         query = "SELECT expires, data, checksum FROM {} WHERE id = ?".format(
             self.cache_table_name
             )
-        cache_data = self.execute_sql(query, (cache_id,)).fetchone()
+        cache_data = self.fetchone(query, (cache_id,))
         if (
                 cache_data
                 and cache_data["expires"] > cur_time
@@ -327,17 +320,17 @@ class MemCache(CacheBase):
         self._get_index()
 
     def _get_index(self):
-        index = self._win_get_property(self._index_key)
+        index = g.HOME_WINDOW.getProperty(self._index_key)
         if index:
             self._index = eval(index)
 
     def _save_index(self):
         if not g.PYTHON3:
             cached_string = repr(self._index).encode("utf-8")
-            self._win.setProperty(self._index_key.encode("utf-8"), cached_string)
+            g.HOME_WINDOW.setProperty(self._index_key.encode("utf-8"), cached_string)
         else:
             cached_string = repr(self._index)
-            self._win.setProperty(self._index_key, cached_string)
+            g.HOME_WINDOW.setProperty(self._index_key, cached_string)
 
     def get(self, cache_id, checksum=None):
         """
@@ -350,7 +343,7 @@ class MemCache(CacheBase):
         :rtype: Any
         """
         result = None
-        cached = self._win_get_property(cache_id)
+        cached = g.HOME_WINDOW.getProperty(cache_id)
         cur_time = self._get_timestamp()
         if cached:
             cached = pickle.loads(codecs.decode(cached.encode(), "base64"))
@@ -358,9 +351,6 @@ class MemCache(CacheBase):
                 if not checksum or checksum == cached[2]:
                     return cached[1]
         return result
-
-    def _win_get_property(self, key):
-        return self._win.getProperty(key)
 
     def set(
             self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)
@@ -380,7 +370,7 @@ class MemCache(CacheBase):
         """
         expires = self._get_timestamp(expiration)
         cached = (expires, data, checksum)
-        self._win.setProperty(
+        g.HOME_WINDOW.setProperty(
             cache_id,
             codecs.encode(pickle.dumps(cached), "base64").decode(),
             )
@@ -399,17 +389,17 @@ class MemCache(CacheBase):
         self._get_index()
         cur_time = datetime.datetime.utcnow()
         cur_timestamp = self._get_timestamp()
-        if self._win.getProperty(self._create_key("cache.mem.clean.busy")):
+        if g.HOME_WINDOW.getProperty(self._create_key("cache.mem.clean.busy")):
             return
-        self._win.setProperty(self._create_key("cache.mem.clean.busy"), "busy")
+        g.HOME_WINDOW.setProperty(self._create_key("cache.mem.clean.busy"), "busy")
 
         self._get_index()
         for cache_id, expires in self._index:
             if expires < cur_timestamp:
-                self._win.clearProperty(cache_id)
+                g.HOME_WINDOW.clearProperty(cache_id)
 
-        self._win.setProperty(self._create_key("cache.mem.clean.busy"), repr(cur_time))
-        self._win.clearProperty(self._create_key("cache.mem.clean.busy"))
+        g.HOME_WINDOW.setProperty(self._create_key("cache.mem.clean.busy"), repr(cur_time))
+        g.HOME_WINDOW.clearProperty(self._create_key("cache.mem.clean.busy"))
 
     def clear_all(self):
         """
@@ -419,7 +409,7 @@ class MemCache(CacheBase):
         """
         self._get_index()
         for cache_id, expires in self._index:
-            self._win.clearProperty(cache_id)
+            g.HOME_WINDOW.clearProperty(cache_id)
 
     def close(self):
         self._exit = True

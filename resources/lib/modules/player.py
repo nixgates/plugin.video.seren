@@ -611,8 +611,9 @@ class SerenPlayer(xbmc.Player):
             return
 
         try:
-            database.clear_local_bookmarks()
-        except OperationalError:
+            g.clear_kodi_bookmarks()
+        except:
+            g.log_stacktrace()
             pass
 
         if self.current_time == 0 or self.total_time == 0:

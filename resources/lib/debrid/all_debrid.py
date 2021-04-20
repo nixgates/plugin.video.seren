@@ -53,11 +53,6 @@ def alldebird_guard_response(func):
 
 
 class AllDebrid:
-    session = requests.Session()
-    retries = Retry(
-        total=5, backoff_factor=0.1, status_forcelist=[429, 500, 502, 503, 504]
-    )
-    session.mount("https://", HTTPAdapter(max_retries=retries))
     base_url = "https://api.alldebrid.com/v4/"
 
     http_codes = {
@@ -76,6 +71,15 @@ class AllDebrid:
         self.agent_identifier = g.ADDON_NAME
         self.apikey = g.get_setting(AD_AUTH_KEY)
         self.progress_dialog = xbmcgui.DialogProgress()
+
+        self.session = requests.Session()
+        retries = Retry(
+            total=5, backoff_factor=0.1, status_forcelist=[429, 500, 502, 503, 504]
+        )
+        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+
+    def __del__(self):
+        self.session.close()
 
     @alldebird_guard_response
     def get(self, url, **params):

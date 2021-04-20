@@ -6,9 +6,9 @@ from resources.lib.database import trakt_sync
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def get_bookmark(self, trakt_id):
-        return self.execute_sql(
+        return self.fetchone(
             "SELECT * FROM bookmarks WHERE trakt_id=?", (trakt_id,)
-        ).fetchone()
+        )
 
     def set_bookmark(self, trakt_id, time_in_seconds, media_type, percent_played):
         paused_at = self._get_datetime_now()
@@ -32,4 +32,4 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             left join movies_meta as mm on bm.trakt_id = mm.id and mm.type = 'trakt' WHERE bm.type = 'movie'
              ORDER BY bm.paused_at desc """
 
-        return self.wrap_in_trakt_object(self.execute_sql(query).fetchall())
+        return self.wrap_in_trakt_object(self.fetchall(query))

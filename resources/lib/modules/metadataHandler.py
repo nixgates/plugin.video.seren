@@ -186,6 +186,8 @@ class MetadataHandler(object):
                 result["info"]["tvdb_show_id"] = show_info.get("tvdb_id")
             if not result["info"].get("year"):
                 result["info"]["year"] = show_info.get("year")
+            if not result["info"].get("tvshow.year"):
+                result["info"]["tvshow.year"] = show_info.get("year")
             if not result["info"].get("studio"):
                 result["info"]["studio"] = show_info.get("studio")
             if not result["info"].get("country_origin"):

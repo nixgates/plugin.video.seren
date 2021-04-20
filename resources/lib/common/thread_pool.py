@@ -75,14 +75,17 @@ class ThreadPool:
     """
     Helper class to simplify raising worker_pool
     """
+    # Default, Low, Medium, High, Extreme
+    scaled_workers = [20, 10, 20, 40, 80]
 
-    def __init__(self, workers=40):
+    def __init__(self):
         self.limiter = g.get_global_setting("threadpool.limiter") == "true"
-        self.tasks = ClearableQueue(2 * workers)
+        self.workers = self.scaled_workers[g.get_int_setting("general.threadpoolScale", -1) + 1]
+        self.tasks = ClearableQueue(2 * self.workers)
         self.stop_event = threading.Event()
         self.results = None
         self.worker_pool = []
-        self.max_workers = 1 if self.limiter else workers
+        self.max_workers = 1 if self.limiter else self.workers
         self.exception = None
         self.result_threading_lock = threading.Lock()
         self.workers_threading_lock = threading.Lock()

@@ -38,7 +38,7 @@ class TorrentAssist(Database):
         :return: List of transfer records
         :rtype: list
         """
-        return self.execute_sql("SELECT * FROM torrents").fetchall()
+        return self.fetchall("SELECT * FROM torrents")
 
     def clear_non_active_assist(self):
         """

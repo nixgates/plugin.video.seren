@@ -305,7 +305,7 @@ def _get_regex_pattern(titles, suffixes_list, non_escaped_suffixes=None):
 
 def check_title_match(title_parts, release_title, simple_info):
     """
-    Perofrms cleaning of title and attempts to do a simple matching of title
+    Performs cleaning of title and attempts to do a simple matching of title
     :param title_parts: stringed/listed version of title
     :param release_title: sources release title
     :param simple_info: simplified meta data of item

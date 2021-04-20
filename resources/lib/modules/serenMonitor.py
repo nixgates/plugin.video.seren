@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import xbmcaddon
-
 from resources.lib.modules.globals import g
 
 try:
@@ -14,7 +12,7 @@ except ImportError:
 class SerenMonitor(xbmc.Monitor):
     def onSettingsChanged(self):
         super(SerenMonitor, self).onSettingsChanged()
-        g.ADDON = xbmcaddon.Addon()
+        g.log("SETTINGS UPDATED", "info")
         if not g.is_addon_visible():
             return
         g.trigger_widget_refresh()

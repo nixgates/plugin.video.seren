@@ -55,6 +55,8 @@ def tmdb_guard_response(func):
             )
             if g.get_global_setting("run.mode") == "test":
                 raise
+            else:
+                g.log_stacktrace()
             return None
 
     return wrapper
@@ -265,10 +267,6 @@ class TMDBAPI(ApiBase):
         504: "Gateway Timeout",
     }
 
-    session = requests.Session()
-    retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-    session.mount("https://", HTTPAdapter(max_retries=retries))
-
     append_to_response = [
         "credits",
         "images",
@@ -320,6 +318,13 @@ class TMDBAPI(ApiBase):
                 self.imageBaseUrl,
             )
         )
+
+        self.session = requests.Session()
+        retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+
+    def __del__(self):
+        self.session.close()
 
     def _set_artwork(self):
         if self.preferred_artwork_size == 0:

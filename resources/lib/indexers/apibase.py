@@ -17,7 +17,7 @@ if g.PYTHON3:
 def handle_single_item_or_list(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if isinstance(args[-1], list) or isinstance(args[-1], types.GeneratorType):
+        if isinstance(args[-1], (list, types.GeneratorType)):
             results = []
             for i in args[-1]:
                 try:
@@ -27,20 +27,6 @@ def handle_single_item_or_list(func):
                     continue
             return results
         return func(*args, **kwargs)
-
-    return wrapper
-
-
-def handle_single_item_or_list_threaded(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        pool = ThreadPool()
-        if isinstance(args[-1], list) or isinstance(args[-1], types.GeneratorType):
-            [pool.put(func, *args[:-1] + (i,), **kwargs) for i in args[-1]]
-            return pool.wait_completion()
-        else:
-            return func(*args, **kwargs)
-
     return wrapper
 
 

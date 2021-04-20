@@ -7,10 +7,9 @@ import _strptime
 import json
 import os
 import re
-import sys
 import time
 import traceback
-
+import unicodedata
 
 import xbmc
 import xbmcaddon
@@ -21,12 +20,6 @@ import xbmcvfs
 from resources.lib.common import tools
 from resources.lib.third_party.cached_property import cached_property
 from resources.lib.third_party.unidecode import unidecode
-
-try:
-    import xml.etree.cElementTree as ElementTree
-except ImportError:
-    import xml.etree.ElementTree as ElementTree
-
 
 viewTypes = [
     ("Default", 50),
@@ -284,7 +277,7 @@ class GlobalVariables(object):
     DATE_TIME_FORMAT_ZULU = DATE_TIME_FORMAT + ".000Z"
     DATE_FORMAT = "%Y-%m-%d"
 
-    PYTHON3 = True if sys.version_info.major == 3 else False
+    PYTHON3 = tools.PYTHON3
     UNICODE = tools.unicode
     SEMVER_REGEX = re.compile(r"^((?:\d+\.){2}\d+)")
 
@@ -299,9 +292,6 @@ class GlobalVariables(object):
         self.USER_AGENT = None
         self.DEFAULT_FANART = None
         self.DEFAULT_ICON = None
-        self.ADDON = xbmcaddon.Addon()
-        self.ADDON_ID = self.ADDON.getAddonInfo("id")
-        self.ADDON_NAME = self.ADDON.getAddonInfo("name")
         self.ADDON_USERDATA_PATH = None
         self.SETTINGS_CACHE = {}
         self.LANGUAGE_CACHE = {}
@@ -310,6 +300,26 @@ class GlobalVariables(object):
         self.KODI_FULL_VERSION = None
         self.KODI_VERSION = None
         self.PLATFORM = self._get_system_platform()
+        self.URL = None
+        self.PLUGIN_HANDLE = 0
+        self.IS_SERVICE = True
+        self.BASE_URL = None
+        self.PATH = None
+        self.PARAM_STRING = None
+        self.REQUEST_PARAMS = None
+        self.FROM_WIDGET = False
+        self.PAGE = 1
+
+    def __del__(self):
+        self.deinit()
+
+    def deinit(self):
+        self.ADDON = None
+        del self.ADDON
+        self.PLAYLIST = None
+        del self.PLAYLIST
+        self.HOME_WINDOW = None
+        del self.HOME_WINDOW
 
     def init_globals(self, argv=None, addon_id=None):
         self.IS_ADDON_FIRSTRUN = self.IS_ADDON_FIRSTRUN is None
@@ -332,12 +342,21 @@ class GlobalVariables(object):
         self.PLAYLIST = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.HOME_WINDOW = xbmcgui.Window(10000)
         self.KODI_FULL_VERSION = xbmc.getInfoLabel("System.BuildVersion")
-        version = re.findall(r'(?:\(((?:\d+\.?){2,3})\))', self.KODI_FULL_VERSION)
+        version = re.findall(r'(?:(?:((?:\d+\.?){1,3}\S+))?\s+\(((?:\d+\.?){2,3})\))', self.KODI_FULL_VERSION)
         if version:
-            self.KODI_FULL_VERSION = version[0]
+            self.KODI_FULL_VERSION = version[0][1]
+            if len(version[0][0]) > 1:
+                pre_ver = version[0][0][:2]
+                full_ver = version[0][1][:2]
+                if pre_ver > full_ver:
+                    self.KODI_VERSION = int(pre_ver[:2])
+                else:
+                    self.KODI_VERSION = int(full_ver[:2])
+            else:
+                self.KODI_VERSION = int(version[0][1][:2])
         else:
             self.KODI_FULL_VERSION = self.KODI_FULL_VERSION.split(' ')[0]
-        self.KODI_VERSION = int(self.KODI_FULL_VERSION[:2])
+            self.KODI_VERSION = int(self.KODI_FULL_VERSION[:2])
 
     @staticmethod
     def _get_system_platform():
@@ -427,12 +446,9 @@ class GlobalVariables(object):
             dict(tools.parse_qsl(self.PARAM_STRING))
         )
         if "action_args" in self.REQUEST_PARAMS:
-            try:
-                self.REQUEST_PARAMS["action_args"] = tools.deconstruct_action_args(
-                    self.REQUEST_PARAMS["action_args"]
-                )
-            except:
-                pass
+            self.REQUEST_PARAMS["action_args"] = tools.deconstruct_action_args(
+                self.REQUEST_PARAMS["action_args"]
+            )
             if isinstance(self.REQUEST_PARAMS["action_args"], dict):
                 self.REQUEST_PARAMS["action_args"] = self.legacy_action_args_converter(
                     self.REQUEST_PARAMS["action_args"]
@@ -545,8 +561,9 @@ class GlobalVariables(object):
             os.path.join(self.ADDON_USERDATA_PATH, "settings.xml")
         )
         self.ADVANCED_SETTINGS_PATH = tools.translate_path(
-            "special://home/userdata/advancedsettings.xml"
+            "special://profile/advancedsettings.xml"
         )
+        self.KODI_DATABASE_PATH = tools.translate_path("special://database/")
         self.GUI_PATH = tools.translate_path(
             os.path.join(self.ADDON_DATA_PATH, "resources", "lib", "gui")
         )
@@ -591,18 +608,58 @@ class GlobalVariables(object):
         if not xbmcvfs.exists(self.DOWNLOAD_PATH):
             xbmcvfs.mkdirs(self.DOWNLOAD_PATH)
 
-    def get_video_database_path(self):
-        database_path = os.path.abspath(
-            os.path.join(self.ADDON_DATA_PATH, "..", "..", "Database",)
-        )
-        if self.KODI_VERSION == 17:
-            database_path = os.path.join(database_path, "MyVideos107.db")
-        elif self.KODI_VERSION == 18:
-            database_path = os.path.join(database_path, "MyVideos116.db")
-        elif self.KODI_VERSION == 19:
-            database_path = os.path.join(database_path, "MyVideos119.db")
+    def get_kodi_video_db_connection(self):
+        config = self.get_kodi_video_db_config()
+        if config["type"] == "sqlite3":
+            from resources.lib.database import SQLiteConnection
+            return SQLiteConnection(os.path.join(self.KODI_DATABASE_PATH, "{}.db".format(config["database"])))
+        elif config["type"] == "mysql":
+            from resources.lib.database import MySqlConnection
+            return MySqlConnection(config)
 
-        return database_path
+    def get_kodi_database_version(self):
+        if self.KODI_VERSION == 17:
+            return "107"
+        elif self.KODI_VERSION == 18:
+            return "116"
+        elif self.KODI_VERSION == 19:
+            return "119"
+
+        raise KeyError("Unsupported kodi version")
+
+    def get_kodi_video_db_config(self):
+        result = {
+            "type": "sqlite3",
+            "database": "MyVideos{}".format(self.get_kodi_database_version())
+        }
+
+        if xbmcvfs.exists(self.ADVANCED_SETTINGS_PATH):
+            advanced_settings = tools.ElementTree.fromstring(g.read_all_text(self.ADVANCED_SETTINGS_PATH))
+            settings = advanced_settings.find("videodatabase")
+            if settings:
+                for setting in settings:
+                    if setting.tag == 'type':
+                        result["type"] = setting.text
+                    elif setting.tag == 'host':
+                        result["host"] = setting.text
+                    elif setting.tag == 'port':
+                        result["port"] = setting.text
+                    elif setting.tag == 'name':
+                        result["database"] = setting.text
+                    elif setting.tag == 'user':
+                        result["user"] = setting.text
+                    elif setting.tag == 'pass':
+                        result["password"] = setting.text
+        return result
+
+    def clear_kodi_bookmarks(self):
+        with self.get_kodi_video_db_connection() as video_database:
+            file_ids = [str(i["idFile"]) for i in video_database.fetchall(
+                "SELECT * FROM files WHERE strFilename LIKE '%plugin.video.seren%'")]
+            if not file_ids:
+                return
+            video_database.execute_sql(["DELETE FROM {} WHERE idFile IN ({})".format(table, ",".join(file_ids))
+                                        for table in ["bookmark", "streamdetails", "files"]])
 
     # region KODI setting
     def set_setting(self, setting_id, value):
@@ -698,7 +755,7 @@ class GlobalVariables(object):
             if self.KODI_VERSION >= 19:
                 xbmc.log(msg, level=xbmc.LOGINFO)
             else:
-                xbmc.log(msg, level=xbmc.LOGNOTICE)# pylint: disable=no-member
+                xbmc.log(msg, level=xbmc.LOGNOTICE)  # pylint: disable=no-member
         elif level == "warning":
             xbmc.log(msg, level=xbmc.LOGWARNING)
         else:
@@ -716,7 +773,7 @@ class GlobalVariables(object):
         color = xbmcgui.Dialog().select(
             "{}: {}".format(self.ADDON_NAME, self.get_language_string(30017)), select_list
         )
-        if color == -1: 
+        if color == -1:
             return
         if color == 0:
             self.set_setting("general.textColor", "inherit")
@@ -874,9 +931,35 @@ class GlobalVariables(object):
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         xbmc.executebuiltin("Dialog.Close(busydialognocancel)")
 
-    def deaccent_string(self, text):
-        text = unidecode(text)
-        return g.UNICODE(text)
+    @staticmethod
+    def deaccent_string(text):
+        """Deaccent the provided text leaving other unicode characters intact
+        Example: Mîxéd ДљфӭЖ Tëst -> Mixed ДљфэЖ Test
+        :param: text: Text to deaccent
+        :type text: str|unicode
+        :return: Deaccented string
+        :rtype:str|unicode
+        """
+        nfkd_form = unicodedata.normalize('NFKD', text)  # pylint: disable=c-extension-no-member
+        deaccented_text = g.UNICODE("").join(
+            [c for c in nfkd_form if not unicodedata.combining(c)]  # pylint: disable=c-extension-no-member
+        )
+        return deaccented_text
+
+    @staticmethod
+    def transliterate_string(text):
+        """Transliterate the provided text into ascii equivalents
+        Example: 张新成 -> Zhang Xincheng
+        Note that this method will remove any extra whitespace leaving only single spaces *between* characters
+        :param: text: Text to transliterate
+        :type text: str|unicode
+        :return: Transliterated string
+        :rtype:str|unicode
+        """
+        transliterted_text = unidecode(text)
+        # Remove extra whitespace
+        transliterted_text = g.UNICODE(" ").join(transliterted_text.split())
+        return transliterted_text
 
     def premium_check(self):
         if self.PLAYLIST.getposition() <= 0 and not self.debrid_available():
@@ -886,14 +969,14 @@ class GlobalVariables(object):
 
     def debrid_available(self):
         return (
-            self.premiumize_enabled()
-            or self.real_debrid_enabled()
-            or self.all_debrid_enabled()
+                self.premiumize_enabled()
+                or self.real_debrid_enabled()
+                or self.all_debrid_enabled()
         )
 
     def premiumize_enabled(self):
         if self.get_setting("premiumize.token") != "" and self.get_bool_setting(
-            "premiumize.enabled"
+                "premiumize.enabled"
         ):
             return True
         else:
@@ -907,7 +990,7 @@ class GlobalVariables(object):
 
     def all_debrid_enabled(self):
         if self.get_setting("alldebrid.apikey") != "" and self.get_bool_setting(
-            "alldebrid.enabled"
+                "alldebrid.enabled"
         ):
             return True
         else:
@@ -950,13 +1033,6 @@ class GlobalVariables(object):
         if not isinstance(menu_item, dict):
             menu_item = {}
 
-        if "info" in menu_item:
-            [
-                menu_item["info"].update({key: value.decode("utf-8")})
-                for key, value in menu_item["info"].items()
-                if isinstance(value, bytes)
-            ]
-
         item = xbmcgui.ListItem(label=name, offscreen=True)
         item.setContentLookup(False)
 
@@ -973,12 +1049,12 @@ class GlobalVariables(object):
         if "watched_episodes" in menu_item:
             item.setProperty("WatchedEpisodes", g.UNICODE(menu_item["watched_episodes"]))
         if menu_item.get("episode_count", 0) > 0 and menu_item.get(
-            "episode_count", 0
+                "episode_count", 0
         ) == menu_item.get("watched_episodes", 0):
             info["playcount"] = 1
         if (
-            menu_item.get("watched_episodes", 0) == 0
-            and menu_item.get("episode_count", 0) > 0
+                menu_item.get("watched_episodes", 0) == 0
+                and menu_item.get("episode_count", 0) > 0
         ):
             item.setProperty("WatchedEpisodes", g.UNICODE(0))
             item.setProperty(
@@ -989,8 +1065,8 @@ class GlobalVariables(object):
         if "season_count" in menu_item:
             item.setProperty("TotalSeasons", g.UNICODE(menu_item["season_count"]))
         if (
-            "percent_played" in menu_item
-            and menu_item.get("percent_played") is not None
+                "percent_played" in menu_item
+                and menu_item.get("percent_played") is not None
         ):
             if float(menu_item.get("percent_played", 0)) > 0:
                 item.setProperty("percentplayed", g.UNICODE(menu_item["percent_played"]))
@@ -998,7 +1074,8 @@ class GlobalVariables(object):
             if int(menu_item.get("resume_time", 0)) > 0:
                 params["resume"] = g.UNICODE(menu_item["resume_time"])
                 item.setProperty("resumetime", g.UNICODE(menu_item["resume_time"]))
-                item.setProperty("totaltime", g.UNICODE(info["duration"]))
+                # Temporarily disabling total time for pregoress indicators as it breaks resume
+                # item.setProperty("totaltime", g.UNICODE(info["duration"]))
         if "play_count" in menu_item and menu_item.get("play_count") is not None:
             info["playcount"] = menu_item["play_count"]
         if "description" in params:
@@ -1053,13 +1130,13 @@ class GlobalVariables(object):
         if art is None or not isinstance(art, dict):
             art = {}
         if (
-            art.get("fanart", art.get("season.fanart", art.get("tvshow.fanart", None)))
-            is None
+                art.get("fanart", art.get("season.fanart", art.get("tvshow.fanart", None)))
+                is None
         ) and not self.get_bool_setting("general.fanart.fallback", False):
             art["fanart"] = self.DEFAULT_FANART
         if (
-            art.get("poster", art.get("season.poster", art.get("tvshow.poster", None)))
-            is None
+                art.get("poster", art.get("season.poster", art.get("tvshow.poster", None)))
+                is None
         ):
             art["poster"] = self.DEFAULT_ICON
         if art.get("icon") is None:
@@ -1073,7 +1150,7 @@ class GlobalVariables(object):
 
         # Clear out keys not relevant to Kodi info labels
         self.clean_info_keys(info)
-        media_type=info.get("mediatype", None)
+        media_type = info.get("mediatype", None)
         # Only TV shows/seasons/episodes have associated times, movies just have dates.
         g.log("Media type: {}".format(media_type), "debug")
         if media_type in [g.MEDIA_SHOW, g.MEDIA_SEASON, g.MEDIA_EPISODE]:
@@ -1134,17 +1211,21 @@ class GlobalVariables(object):
         xbmcplugin.setContent(self.PLUGIN_HANDLE, content_type)
         menu_caching = self.get_bool_setting("general.menucaching") or cache
         xbmcplugin.endOfDirectory(self.PLUGIN_HANDLE, cacheToDisc=menu_caching)
-        tools.run_threaded(self.set_view_type, content_type)
+        self.set_view_type(content_type)
 
     def set_view_type(self, content_type):
+        def _execute_set_view_mode(view):
+            xbmc.sleep(200)
+            xbmc.executebuiltin("Container.SetViewMode({})".format(view))
+
         if self.get_bool_setting("general.setViews") and self.is_addon_visible():
             view_type = self.get_view_type(content_type)
             if view_type > 0:
-                xbmc.sleep(200)
-                xbmc.executebuiltin("Container.SetViewMode({})".format(view_type))
+                tools.run_threaded(_execute_set_view_mode, view_type)
 
-    def is_addon_visible(self):
-        return xbmc.getCondVisibility("Window.IsMedia") == 1
+    @staticmethod
+    def is_addon_visible():
+        return xbmc.getCondVisibility("Window.IsMedia")
 
     def cancel_directory(self):
         xbmcplugin.setContent(self.PLUGIN_HANDLE, g.CONTENT_FOLDER)
@@ -1177,7 +1258,18 @@ class GlobalVariables(object):
     def notification(self, heading, message, time=5000, sound=True):
         if self.get_bool_setting("general.disableNotificationSound"):
             sound = False
-        return xbmcgui.Dialog().notification(heading, message, time=time, sound=sound)
+        dialogue = xbmcgui.Dialog()
+        dialogue.notification(heading, message, time=time, sound=sound)
+        del dialogue
+
+    def get_keyboard_input(self, heading=None, default=None, hidden=False):
+        k = xbmc.Keyboard(default, heading, hidden)
+        k.doModal()
+        input_value = k.getText() if k.isConfirmed() else None
+        if not self.PYTHON3 and input_value:
+            input_value = input_value.decode("utf-8")
+        del k
+        return input_value
 
     def json_rpc(self, method, params=None):
         request_data = {
@@ -1234,12 +1326,21 @@ class GlobalVariables(object):
         if "action_args" in params and isinstance(params["action_args"], dict):
             params["action_args"] = json.dumps(params["action_args"], sort_keys=True)
         params["from_widget"] = "true" if not self.is_addon_visible() else "false"
-        sep = "/" if not self.is_addon_visible() else ""
-        return "{}{}?{}".format(base_url, sep, tools.urlencode(sorted(params.items())))
+        return "{}/?{}".format(base_url, tools.urlencode(sorted(params.items())))
 
     @staticmethod
     def abort_requested():
-        return xbmc.Monitor().abortRequested()
+        monitor = xbmc.Monitor()
+        abort_requested = monitor.abortRequested()
+        del monitor
+        return abort_requested
+
+    @staticmethod
+    def wait_for_abort(timeout=1.0):
+        monitor = xbmc.Monitor()
+        abort_requested = monitor.waitForAbort(timeout)
+        del monitor
+        return abort_requested
 
     @staticmethod
     def reload_profile():
