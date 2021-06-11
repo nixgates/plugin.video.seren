@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import inspect
-import re
 import threading
 import time
 from collections import OrderedDict
@@ -21,12 +20,11 @@ from resources.lib.indexers.apibase import (
     ApiBase,
     handle_single_item_or_list,
 )
+from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
 
 CLOUDFLARE_ERROR_MSG = "Service Unavailable - Cloudflare error"
-
-API_LOCK = threading.Lock()
 
 TRAKT_STATUS_CODES = {
     200: "Success",
@@ -132,7 +130,6 @@ def trakt_guard_response(func):
                 _reset_trakt_auth()
                 raise Exception("Unable to refresh Trakt auth")
 
-
             if response.status_code == 403:
                 g.log("Trakt: invalid API key or unapproved app, resetting auth", "error")
                 _reset_trakt_auth()
@@ -149,9 +146,8 @@ def trakt_guard_response(func):
                         "error",
                     )
                 else:
-                    with GlobalLock("trakt.oauth", run_once=True, check_sum=method_class.access_token,
-                                    threading_lock=API_LOCK) as lock:
-                        if not lock.runned_once():
+                    try:
+                        with GlobalLock("trakt.oauth", run_once=True, check_sum=method_class.access_token):
                             if method_class.refresh_token is not None:
                                 method_class.try_refresh_token(True)
                             if (
@@ -161,8 +157,10 @@ def trakt_guard_response(func):
                                 xbmcgui.Dialog().ok(
                                     g.ADDON_NAME, g.get_language_string(30373)
                                 )
-                        if method_class.refresh_token is not None:
-                            return func(*args, **kwargs)
+                    except RanOnceAlready:
+                        pass
+                    if method_class.refresh_token is not None:
+                        return func(*args, **kwargs)
 
             g.log(
                 "Trakt returned a {} ({}): while requesting {}".format(
@@ -172,7 +170,6 @@ def trakt_guard_response(func):
                 ),
                 "error",
             )
-            g.log(response.request.headers)
 
             return response
         except requests.exceptions.ConnectionError as e:
@@ -192,8 +189,6 @@ class TraktAPI(ApiBase):
     """
 
     ApiUrl = "https://api.trakt.tv/"
-
-    _threading_lock = threading.Lock()
 
     username_setting_key = "trakt.username"
 
@@ -236,18 +231,18 @@ class TraktAPI(ApiBase):
                 (("ids", "tmdb"), "tmdb_id", None),
                 ("id", "playback_id", None),
                 (("show", "ids", "trakt"), "trakt_show_id", None),
-                ("network", "studio", None),
+                ("network", "studio", lambda n: [n]),
                 ("runtime", "duration", lambda d: d * 60),
                 ("progress", "percentplayed", None),
-                ("updated_at", "dateadded", lambda t: tools.validate_date(t)),
-                ("last_updated_at", "dateadded", lambda t: tools.validate_date(t)),
-                ("collected_at", "collected_at", lambda t: tools.validate_date(t)),
+                ("updated_at", "dateadded", lambda t: g.validate_date(t)),
+                ("last_updated_at", "dateadded", lambda t: g.validate_date(t)),
+                ("collected_at", "collected_at", lambda t: g.validate_date(t)),
                 (
                     "last_watched_at",
                     "last_watched_at",
-                    lambda t: tools.validate_date(t),
+                    lambda t: g.validate_date(t),
                 ),
-                ("paused_at", "paused_at", lambda t: tools.validate_date(t)),
+                ("paused_at", "paused_at", lambda t: g.validate_date(t)),
                 (
                     "rating",
                     "rating",
@@ -293,7 +288,7 @@ class TraktAPI(ApiBase):
             [
                 ("plays", "playcount", None),
                 ("year", "year", None),
-                ("released", ("premiered", "aired"), lambda t: tools.validate_date(t)),
+                ("released", ("premiered", "aired"), lambda t: g.validate_date(t)),
             ],
             self.Normalization,
         )
@@ -306,14 +301,14 @@ class TraktAPI(ApiBase):
                 (
                     "first_aired",
                     "year",
-                    lambda t: tools.validate_date(t)[:4]
-                    if tools.validate_date(t)
+                    lambda t: g.validate_date(t)[:4]
+                    if g.validate_date(t)
                     else None
                 ),
                 (
                     "first_aired",
                     ("premiered", "aired"),
-                    lambda t: tools.validate_date(t),
+                    lambda t: g.validate_date(t),
                 ),
             ],
             self.Normalization,
@@ -327,14 +322,14 @@ class TraktAPI(ApiBase):
                 (
                     "first_aired",
                     "year",
-                    lambda t: tools.validate_date(t)[:4]
-                    if tools.validate_date(t)
+                    lambda t: g.validate_date(t)[:4]
+                    if g.validate_date(t)
                     else None
                 ),
                 (
                     "first_aired",
                     ("premiered", "aired"),
-                    lambda t: tools.validate_date(t),
+                    lambda t: g.validate_date(t),
                 ),
             ],
             self.Normalization,
@@ -349,21 +344,21 @@ class TraktAPI(ApiBase):
                 (
                     "first_aired",
                     "year",
-                    lambda t: tools.validate_date(t)[:4]
-                    if tools.validate_date(t)
+                    lambda t: g.validate_date(t)[:4]
+                    if g.validate_date(t)
                     else None
                 ),
                 (
                     "first_aired",
                     ("premiered", "aired"),
-                    lambda t: tools.validate_date(t),
+                    lambda t: g.validate_date(t),
                 ),
             ],
             self.Normalization,
         )
 
         self.ListNormalization = [
-            ("updated_at", "dateadded", lambda t: tools.validate_date(t)),
+            ("updated_at", "dateadded", lambda t: g.validate_date(t)),
             (("ids", "trakt"), "trakt_id", None),
             (("ids", "slug"), "slug", None),
             ("sort_by", "sort_by", None),
@@ -551,22 +546,24 @@ class TraktAPI(ApiBase):
         if not force and (not self.refresh_token or self.token_expires >= float(time.time())):
             return
 
-        with GlobalLock(self.__class__.__name__, self._threading_lock, True, self.access_token) as lock:
-            if lock.runned_once():
-                return
-            g.log("Trakt Token requires refreshing...")
-            response = self.post(
-                "/oauth/token",
-                {
-                    "refresh_token": self.refresh_token,
-                    "client_id": self.client_id,
-                    "client_secret": self.client_secret,
-                    "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
-                    "grant_type": "refresh_token",
-                },
-            ).json()
-            self._save_settings(response)
-            g.log("Refreshed Trakt Token")
+        try:
+            with GlobalLock(self.__class__.__name__, True, self.access_token):
+                g.log("Trakt Token requires refreshing...")
+                response = self.post(
+                    "/oauth/token",
+                    {
+                        "refresh_token": self.refresh_token,
+                        "client_id": self.client_id,
+                        "client_secret": self.client_secret,
+                        "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+                        "grant_type": "refresh_token",
+                    },
+                ).json()
+                self._save_settings(response)
+                g.log("Refreshed Trakt Token")
+        except RanOnceAlready:
+            return
+
 
     @trakt_guard_response
     def get(self, url, **params):
@@ -578,6 +575,7 @@ class TraktAPI(ApiBase):
         """
         timeout = params.pop("timeout", 10)
         self._try_add_default_paging(params)
+        self._clean_params(params)
         return self.session.get(
             tools.urljoin(self.ApiUrl, url),
             params=params,
@@ -594,6 +592,13 @@ class TraktAPI(ApiBase):
             params.update({"page": 1})
         if "page" in params and "limit" not in params:
             params.update({"limit": self.default_limit})
+
+    @staticmethod
+    def _clean_params(params):
+        if "hide_watched" in params:
+            del params["hide_watched"]
+        if "hide_unaired" in params:
+            del params["hide_unaired"]
 
     def get_json(self, url, **params):
         """
@@ -621,14 +626,6 @@ class TraktAPI(ApiBase):
                 "error",
             )
             return None
-
-    def get_json_paged(self, url, **params):
-        page = params.pop("page", 1) - 1
-        limit = params.pop("limit", self.default_limit)
-        result = self.get_json_cached(url, **params)
-        if isinstance(result, (set, list)):
-            return result[page * limit : (page * limit) + limit]
-        return result
 
     @use_cache()
     def get_cached(self, url, **params):
@@ -661,6 +658,9 @@ class TraktAPI(ApiBase):
                 if meta in item
             ]
             single_type.update(item)
+            if single_type.get("trakt_id"):
+                single_type["episode"]["trakt_show_id"] = single_type.get("trakt_show_id")
+                single_type["episode"]["trakt_object"]["info"]["trakt_show_id"] = single_type.get("trakt_show_id")
             return single_type
         return self._create_trakt_object(self._handle_single_type(item))
 
@@ -716,6 +716,8 @@ class TraktAPI(ApiBase):
         :return: Yields trakt pages
         """
         for response in self._get_all_pages(self.get_cached, url, **params):
+            if not response:
+                return
             yield self._handle_response(
                 self._try_sort(
                     response.headers.get("X-Sort-By"),
@@ -837,11 +839,7 @@ class TraktAPI(ApiBase):
 
     @staticmethod
     def _title_sorter(item):
-        title = re.sub(r"^a |^the |^an ", "", item[item["type"]].get("title", "").lower())
-
-        for i in tools.SORT_TOKENS:
-            title.replace(i, "")
-        return title
+        return tools.SORT_TOKEN_REGEX.sub("", item[item["type"]].get("title", "").lower())
 
     @staticmethod
     def _released_sorter(item):
@@ -878,9 +876,9 @@ class TraktAPI(ApiBase):
             ("movie", lambda x: "movie" in x),
             (
                 "movie",
-                lambda x: "title" in x and "year" in x and x["ids"].get("tvdb") is None,
+                lambda x: "title" in x and "year" in x and "network" not in x,
             ),
-            ("show", lambda x: "title" in x and "year" in x and x["ids"].get("tvdb")),
+            ("show", lambda x: "title" in x and "year" in x and "network" in x),
             (
                 "episode",
                 lambda x: "number" in x
@@ -892,11 +890,16 @@ class TraktAPI(ApiBase):
             ),
             ("season", lambda x: "number" in x),
             ("castcrew", lambda x: "cast" in x and "crew" in x),
+            ("sync", lambda x: "all" in x),
+            ("genre", lambda x: "name" in x and "slug" in x),
+            ("network", lambda x: "name")
         ]
         for item_type in item_types:
             if item_type[1](item):
                 item.update({"type": item_type[0]})
                 break
+        if "type" not in item:
+            g.log("Error detecting trakt item type for: {}".format(item), "error")
         return item
 
     def get_show_aliases(self, trakt_show_id):
@@ -908,15 +911,15 @@ class TraktAPI(ApiBase):
         return sorted(
             {
                 i["title"]
-                for i in self.get_json("/shows/{}/aliases".format(trakt_show_id))
-                if i["country"] == self.country
+                for i in self.get_json_cached("/shows/{}/aliases".format(trakt_show_id))
+                if i["country"] in [self.country, 'us']
             }
         )
 
     def get_show_translation(self, trakt_id):
         return self._normalize_info(
             self.TranslationNormalization,
-            self.get_json("shows/{}/translations/{}".format(trakt_id, self.language))[
+            self.get_json_cached("shows/{}/translations/{}".format(trakt_id, self.language))[
                 0
             ],
         )
@@ -924,7 +927,7 @@ class TraktAPI(ApiBase):
     def get_movie_translation(self, trakt_id):
         return self._normalize_info(
             self.TranslationNormalization,
-            self.get_json("movies/{}/translations/{}".format(trakt_id, self.language))[
+            self.get_json_cached("movies/{}/translations/{}".format(trakt_id, self.language))[
                 0
             ],
         )

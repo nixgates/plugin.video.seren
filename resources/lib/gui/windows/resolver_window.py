@@ -2,7 +2,6 @@ import threading
 
 from resources.lib.common import tools
 from resources.lib.gui.windows.base_window import BaseWindow
-from resources.lib.modules.globals import g
 from resources.lib.modules.resolver import Resolver
 
 
@@ -74,8 +73,12 @@ class ResolverWindow(BaseWindow):
         self.sources = sources if sources else []
         self.item_information = item_information if item_information else {}
         self.pack_select = pack_select
+
+        if not self.sources:
+            return
+            
         self.resolver = Resolver()
-        self._update_window_properties(sources[0])
+        self._update_window_properties(self.sources[0])
 
         super(ResolverWindow, self).doModal()
 

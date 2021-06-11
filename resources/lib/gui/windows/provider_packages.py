@@ -12,7 +12,7 @@ class ProviderPackages(BaseWindow):
     providers_class = ProviderInstallManager()
 
     def __init__(self, xml_file, xml_location):
-        BaseWindow.__init__(self, xml_file, xml_location)
+        super(ProviderPackages, self).__init__(xml_file, xml_location)
         self.packages = self.providers_class.known_packages
         self.providers = self.providers_class.known_providers
         self.package_list = None

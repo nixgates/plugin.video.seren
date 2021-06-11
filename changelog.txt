@@ -1,3 +1,27 @@
+Changelog 2.1.0
+Major re-work of metadata updates and merging
+Fix air dates not being updated
+Fix missing artwork not being updated
+Fix meta data merging
+Improved meta data fallback processing
+Improve global and sync locks, reduce thread locking
+Improve caching code to reduce required requests.
+Additional caching for metadata indexer endpoints
+Improve database handling code
+Improve timezone detection fallback handling
+Make Seren python version agnostic
+Implemented a true settings cache
+Brought back test windows feature for skin developers
+Moved to kodi module version of unidecode
+Updated pytz to latest release
+Fix mysql Kodi database support under Leia
+Removed youtube dependency
+Workaround for type error in CacheAssist quality filter
+Fix resolver window error when no sources found
+Remove argv usage from SmartPlay
+Reworked forced widget refresh approach
+Logging cleanup
+
 Changelog 2.0.19
 Fix handling of unicode in URLs, TV Networks and Searching issues on Leia
 Fix TV show years

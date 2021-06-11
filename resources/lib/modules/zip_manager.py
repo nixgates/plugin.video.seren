@@ -14,7 +14,6 @@ from resources.lib.common import tools
 from resources.lib.modules.exceptions import UnsafeZipStructure
 from resources.lib.modules.globals import g
 
-
 try:
     from StringIO import StringIO as BytesIO
 except ImportError:

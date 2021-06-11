@@ -7,8 +7,6 @@ import threading
 from resources.lib.database import Database
 from resources.lib.modules.globals import g
 
-migrate_db_lock = threading.Lock()
-
 schema = {
     'packages': {
         'columns': collections.OrderedDict([
@@ -53,7 +51,7 @@ class ProviderCache(Database):
     Database class for handling calls to the database file
     """
     def __init__(self):
-        super(ProviderCache, self).__init__(g.PROVIDER_CACHE_DB_PATH, schema, migrate_db_lock)
+        super(ProviderCache, self).__init__(g.PROVIDER_CACHE_DB_PATH, schema)
         self.table_name = next(iter(schema))
 
     @property

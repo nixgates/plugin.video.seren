@@ -7,14 +7,13 @@ import codecs
 import collections
 import datetime
 import pickle
-import threading
+import types
 from functools import reduce, wraps
 
-from resources.lib.common.tools import freeze_object
+from resources.lib.common import tools
 from resources.lib.database import Database
+from resources.lib.modules.exceptions import UnsupportedCacheParamException
 from resources.lib.modules.globals import g
-
-migrate_db_lock = threading.Lock()
 
 schema = {
     "cache": {
@@ -22,7 +21,7 @@ schema = {
             [
                 ("id", ["TEXT", "PRIMARY KEY"]),
                 ("expires", ["INTEGER", "NOT NULL"]),
-                ("data", ["PICKLE", "NOT NULL"]),
+                ("data", ["PICKLE"]),
                 ("checksum", ["INTEGER"]),
                 ]
             ),
@@ -32,14 +31,17 @@ schema = {
     }
 
 
-class CacheBase(object):
+class CacheBase:
     """
     Base Class for handling cache calls
     """
+    __metaclass__ = abc.ABCMeta
+    NOT_CACHED = "____NO_CACHED_OBJECT____"
+    _exit = False
 
     def __init__(self):
         self.global_checksum = None
-        self.cache_prefix = "seren"
+        self.cache_prefix = "cache"
 
     def _create_key(self, value):
         return "{}.{}".format(self.cache_prefix, value)
@@ -68,7 +70,8 @@ class CacheBase(object):
         :type cache_id: str
         :param checksum: Optional checksum to compare against
         :type checksum: str,int
-        :return: Value of cache object if valid
+        :return: Value of cache object if valid and not expired
+                 CacheBase.NOT_CACHED if invalid or expired
         :rtype: Any
         """
 
@@ -104,6 +107,14 @@ class CacheBase(object):
         :rtype:
         """
 
+    def close(self):
+        """
+        Close connections to cache location
+        :return:
+        :rtype:
+        """
+        self._exit = True
+
 
 class Cache(CacheBase):
     """
@@ -112,10 +123,9 @@ class Cache(CacheBase):
 
     def __init__(self):
         super(Cache, self).__init__()
-        self._exit = False
         self.enable_mem_cache = True
         self._mem_cache = MemCache()
-        self._db_cache = DatabaseCache(g.CACHE_DB_PATH, schema, migrate_db_lock)
+        self._db_cache = DatabaseCache(g.CACHE_DB_PATH, schema)
         self._auto_clean_interval = datetime.timedelta(hours=4)
 
     def set_auto_clean_interval(self, interval):
@@ -129,41 +139,19 @@ class Cache(CacheBase):
         self._auto_clean_interval = datetime.timedelta(hours=4) if not interval else interval
 
     def get(self, cache_id, checksum=None):
-        """
-        Method for fetching values from cache locations
-        :param cache_id: ID of cache item to fetch
-        :type cache_id: str
-        :param checksum: Optional checksum to compare against
-        :type checksum: str,int
-        :return: Value of cache object if valid
-        :rtype: Any
-        """
         checksum = self._get_checksum(checksum)
-        result = None
+        result = self.NOT_CACHED
         if self.enable_mem_cache:
             result = self._mem_cache.get(cache_id, checksum)
-        if result is None:
-            result, expires = self._db_cache.get(cache_id, checksum)
-            if result and self.enable_mem_cache:
+        if result == self.NOT_CACHED:
+            result = self._db_cache.get(cache_id, checksum)
+            if not result == self.NOT_CACHED and self.enable_mem_cache:
                 self._mem_cache.set(cache_id, result, checksum)
         return result
 
     def set(
             self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)
             ):
-        """
-        Stores new value in cache location
-        :param cache_id: ID of cache to create
-        :type cache_id: str
-        :param data: value to store in cache
-        :type data: Any
-        :param checksum: Optional checksum to apply to item
-        :type checksum: str,int
-        :param expiration: Expiration of cache value in seconds since epoch
-        :type expiration: int
-        :return: None
-        :rtype:
-        """
         checksum = self._get_checksum(checksum)
         if self.enable_mem_cache and not self._exit:
             self._mem_cache.set(cache_id, data, checksum, expiration)
@@ -180,48 +168,30 @@ class Cache(CacheBase):
         :rtype:
         """
         cur_time = datetime.datetime.utcnow()
-        lastexecuted = g.HOME_WINDOW.getProperty(self._create_key("clean.lastexecuted"))
+        lastexecuted = g.get_runtime_setting(self._create_key("clean.lastexecuted"))
         if not lastexecuted:
-            g.HOME_WINDOW.setProperty(self._create_key("clean.lastexecuted"), repr(cur_time))
+            g.set_runtime_setting(self._create_key("clean.lastexecuted"), repr(cur_time))
         elif self._cleanup_required_check(lastexecuted, cur_time):
             self.do_cleanup()
 
     def do_cleanup(self):
-        """
-        Process cleaning up expired values from cache locations
-        :return:
-        :rtype:
-        """
-        if self._exit:
+        if self._exit or g.abort_requested():
             return
-        if g.HOME_WINDOW.getProperty(self._create_key("clean.busy")):
+        if g.get_runtime_setting(self._create_key("clean.busy")):
             return
-        g.HOME_WINDOW.setProperty(self._create_key("clean.busy"), "busy")
+        g.set_runtime_setting(self._create_key("clean.busy"), "busy")
 
         cur_time = datetime.datetime.utcnow()
 
         self._db_cache.do_cleanup()
         self._mem_cache.do_cleanup()
 
-        g.HOME_WINDOW.setProperty(self._create_key("clean.lastexecuted"), repr(cur_time))
-        g.HOME_WINDOW.clearProperty(self._create_key("clean.busy"))
+        g.set_runtime_setting(self._create_key("clean.lastexecuted"), repr(cur_time))
+        g.clear_runtime_setting(self._create_key("clean.busy"))
 
     def clear_all(self):
-        """
-        Drop all values in cache locations
-        :return:
-        :rtype:
-        """
         self._db_cache.clear_all()
         self._mem_cache.clear_all()
-
-    def close(self):
-        """
-        Close connections to cache location
-        :return:
-        :rtype:
-        """
-        self._exit = True
 
     def __del__(self):
         if not self._exit:
@@ -233,78 +203,48 @@ class DatabaseCache(Database, CacheBase):
     Handles disk stored caching
     """
 
-    def __init__(self, db_file, database_layout, threading_lock):
-        super(DatabaseCache, self).__init__(db_file, database_layout, threading_lock)
+    def __init__(self, db_file, database_layout):
+        super(DatabaseCache, self).__init__(db_file, database_layout)
         CacheBase.__init__(self)
         self.cache_table_name = next(iter(database_layout))
 
     def do_cleanup(self):
-        """
-        Process cleaning up expired values from cache locations
-        :return:
-        :rtype:
-        """
-        if g.abort_requested():
+        if self._exit or g.abort_requested():
             return
         cur_time = datetime.datetime.utcnow()
-        if g.HOME_WINDOW.getProperty(self._create_key("cache.db.clean.busy")):
+        if g.get_runtime_setting(self._create_key("cache.db.clean.busy")):
             return
-        g.HOME_WINDOW.setProperty(self._create_key("cache.db.clean.busy"), "busy")
+        g.set_runtime_setting(self._create_key("cache.db.clean.busy"), "busy")
         query = "DELETE FROM {} where expires < ?".format(self.cache_table_name)
         self.execute_sql(query, (self._get_timestamp(),))
-        g.HOME_WINDOW.setProperty(self._create_key("cache.mem.clean.busy"), repr(cur_time))
-        g.HOME_WINDOW.clearProperty(self._create_key("cache.mem.clean.busy"))
+        g.set_runtime_setting(self._create_key("cache.mem.clean.busy"), repr(cur_time))
+        g.clear_runtime_setting(self._create_key("cache.mem.clean.busy"))
 
     def get(self, cache_id, checksum=None):
-        """
-        Method for fetching values from cache locations
-        :param cache_id: ID of cache item to fetch
-        :type cache_id: str
-        :param checksum: Optional checksum to compare against
-        :type checksum: str,int
-        :return: Value of cache object if valid
-        :rtype: Any
-        """
-        result = None
-        expires = None
         cur_time = self._get_timestamp()
         query = "SELECT expires, data, checksum FROM {} WHERE id = ?".format(
             self.cache_table_name
-            )
+        )
         cache_data = self.fetchone(query, (cache_id,))
         if (
                 cache_data
                 and cache_data["expires"] > cur_time
-                and (not checksum or cache_data["checksum"] == checksum)):
-            result = cache_data["data"]
-        return result, expires
+                and (not checksum or cache_data["checksum"] == checksum)
+        ):
+            return cache_data["data"]
+        return self.NOT_CACHED
 
     def set(self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)):
-        """
-        Stores new value in cache location
-        :param cache_id: ID of cache to create
-        :type cache_id: str
-        :param data: value to store in cache
-        :type data: Any
-        :param checksum: Optional checksum to apply to item
-        :type checksum: str,int
-        :param expiration: Expiration of cache value in seconds since epoch
-        :type expiration: int
-        :return: None
-        :rtype:
-        """
         expires = self._get_timestamp(expiration)
         query = "INSERT OR REPLACE INTO {}( id, expires, data, checksum) " \
                 "VALUES (?, ?, ?, ?)".format(self.cache_table_name)
         self.execute_sql(query, (cache_id, expires, data, checksum))
 
     def clear_all(self):
-        """
-        Drop all values in cache locations
-        :return:
-        :rtype:
-        """
         self.rebuild_database()
+
+    def close(self):
+        super(DatabaseCache, self).close()
 
 
 class MemCache(CacheBase):
@@ -314,63 +254,42 @@ class MemCache(CacheBase):
 
     def __init__(self):
         super(MemCache, self).__init__()
-        self._exit = False
         self._index_key = self._create_key("cache.index")
         self._index = set()
         self._get_index()
 
     def _get_index(self):
-        index = g.HOME_WINDOW.getProperty(self._index_key)
+        index = g.get_runtime_setting(self._index_key)
         if index:
-            self._index = eval(index)
+            self._index = set(index)
 
     def _save_index(self):
-        if not g.PYTHON3:
-            cached_string = repr(self._index).encode("utf-8")
-            g.HOME_WINDOW.setProperty(self._index_key.encode("utf-8"), cached_string)
-        else:
-            cached_string = repr(self._index)
-            g.HOME_WINDOW.setProperty(self._index_key, cached_string)
+        cached_string = list(self._index)
+        g.set_runtime_setting(self._index_key, cached_string)
+
+    def _clear_index(self):
+        self._get_index()
+        g.clear_runtime_setting(self._index_key)
+        self.index = set()
 
     def get(self, cache_id, checksum=None):
-        """
-        Method for fetching values from cache locations
-        :param cache_id: ID of cache item to fetch
-        :type cache_id: str
-        :param checksum: Optional checksum to compare against
-        :type checksum: str,int
-        :return: Value of cache object if valid
-        :rtype: Any
-        """
-        result = None
-        cached = g.HOME_WINDOW.getProperty(cache_id)
+        cached = g.get_runtime_setting(cache_id)
         cur_time = self._get_timestamp()
         if cached:
             cached = pickle.loads(codecs.decode(cached.encode(), "base64"))
             if cached[0] > cur_time:
                 if not checksum or checksum == cached[2]:
                     return cached[1]
-        return result
+            else:
+                g.clear_runtime_setting(cache_id)
+        return self.NOT_CACHED
 
     def set(
             self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)
             ):
-        """
-        Stores new value in cache location
-        :param cache_id: ID of cache to create
-        :type cache_id: str
-        :param data: value to store in cache
-        :type data: Any
-        :param checksum: Optional checksum to apply to item
-        :type checksum: str,int
-        :param expiration: Expiration of cache value in seconds since epoch
-        :type expiration: int
-        :return: None
-        :rtype:
-        """
         expires = self._get_timestamp(expiration)
         cached = (expires, data, checksum)
-        g.HOME_WINDOW.setProperty(
+        g.set_runtime_setting(
             cache_id,
             codecs.encode(pickle.dumps(cached), "base64").decode(),
             )
@@ -379,40 +298,30 @@ class MemCache(CacheBase):
         self._save_index()
 
     def do_cleanup(self):
-        """
-        Process cleaning up expired values from cache locations
-        :return:
-        :rtype:
-        """
-        if self._exit:
+        if self._exit or g.abort_requested():
             return
-        self._get_index()
         cur_time = datetime.datetime.utcnow()
         cur_timestamp = self._get_timestamp()
-        if g.HOME_WINDOW.getProperty(self._create_key("cache.mem.clean.busy")):
+        if g.get_runtime_setting(self._create_key("cache.mem.clean.busy")):
             return
-        g.HOME_WINDOW.setProperty(self._create_key("cache.mem.clean.busy"), "busy")
+        g.set_runtime_setting(self._create_key("cache.mem.clean.busy"), "busy")
 
         self._get_index()
         for cache_id, expires in self._index:
             if expires < cur_timestamp:
-                g.HOME_WINDOW.clearProperty(cache_id)
+                g.clear_runtime_setting(cache_id)
 
-        g.HOME_WINDOW.setProperty(self._create_key("cache.mem.clean.busy"), repr(cur_time))
-        g.HOME_WINDOW.clearProperty(self._create_key("cache.mem.clean.busy"))
+        g.set_runtime_setting(self._create_key("cache.mem.clean.busy"), repr(cur_time))
+        g.clear_runtime_setting(self._create_key("cache.mem.clean.busy"))
 
     def clear_all(self):
-        """
-        Drop all values in cache locations
-        :return:
-        :rtype:
-        """
         self._get_index()
         for cache_id, expires in self._index:
-            g.HOME_WINDOW.clearProperty(cache_id)
+            g.clear_runtime_setting(cache_id)
+        self._clear_index()
 
     def close(self):
-        self._exit = True
+        super(MemCache, self).close()
 
 
 def use_cache(cache_hours=12):
@@ -438,9 +347,18 @@ def use_cache(cache_hours=12):
         @wraps(func)
         def _decorated(*args, **kwargs):
             method_class = args[0]
+
+            for a in args[1:]:
+                if isinstance(a, types.GeneratorType):
+                    raise UnsupportedCacheParamException("generator")
+
+            for k, v in kwargs.items():
+                if isinstance(v, types.GeneratorType):
+                    raise UnsupportedCacheParamException("generator")
+
             try:
-                global_cache_ignore = g.get_global_setting("ignore.cache") == "true"
-            except:
+                global_cache_ignore = g.get_runtime_setting("ignore.cache")
+            except Exception:
                 global_cache_ignore = False
             checksum = _get_checksum(method_class.__class__.__name__, func.__name__)
             ignore_cache = kwargs.pop("ignore_cache", False)
@@ -451,14 +369,13 @@ def use_cache(cache_hours=12):
             cache_str = "{}.{}.{}.{}".format(
                 method_class.__class__.__name__,
                 func.__name__,
-                hash(freeze_object(args[1:])),
-                hash(freeze_object(kwargs)))
+                tools.md5_hash(args[1:]),
+                tools.md5_hash(kwargs))
             cached_data = g.CACHE.get(cache_str, checksum=checksum)
-            if cached_data is None or overwrite_cache:
+            if cached_data == CacheBase.NOT_CACHED or overwrite_cache:
                 fresh_result = func(*args, **kwargs)
-                if not fresh_result or \
-                        (func.__name__ == "get_sources" and len(fresh_result[1]) == 0):
-                    return
+                if func.__name__ == "get_sources" and (not fresh_result or len(fresh_result[1]) == 0):
+                    return fresh_result
                 try:
                     g.CACHE.set(
                         cache_str,
@@ -466,7 +383,8 @@ def use_cache(cache_hours=12):
                         expiration=datetime.timedelta(hours=hours),
                         checksum=checksum,
                         )
-                except TypeError as e:
+                except TypeError:
+                    g.log_stacktrace()
                     pass
                 return fresh_result
             else:

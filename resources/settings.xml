@@ -6,6 +6,10 @@
 
         <!-- General -->
         <setting type="lsep" label="30087"/>
+        <setting id="general.localtimezone" type="text" label="30589" default="" enable="False"/>
+        <setting id="general.manualtimezone" type="bool" default="false" visible="false"/>
+        <setting id="general.choosetimezone" type="action" subsetting="true" label="30590"
+                 action="RunPlugin(plugin://plugin.video.seren/?action=chooseTimeZone)" visible="eq(-1,true)"/>
         <setting id="searchHistory" type="bool" label="30177" default="false"/>
         <setting id="general.flatten.episodes" type="bool" label="30230" default="false"/>
         <setting id="general.hideSpecials" type="bool" label="30189" default="false"/>
@@ -64,6 +68,7 @@
                  action="RunPlugin(plugin://plugin.video.seren/?action=switchSkin)"/>
         <setting id="skin.updates" type="action" label="30150"
                  action="RunPlugin(plugin://plugin.video.seren/?action=checkSkinUpdates)"/>
+        <setting id="skin.testmenu" type="bool" label="30587" default="false"/>
 
         <!-- Advanced -->
         <setting type="lsep" label="30286"/>
@@ -95,13 +100,11 @@
         <setting id="rd.expiry" type="text" default="0" visible="false"/>
         <setting id="rd.secret" type="text" default="" visible="false"/>
         <setting id="premiumize.token" type="text" default="" visible="false"/>
-        <setting id="general.tempSilent" type="text" default="false" visible="false"/>
+        <!--        <setting id="general.tempSilent" type="text" default="false" visible="false"/>-->
         <!--        <setting id="general.rdexpirycheck" type="text" default="" visible="false" />-->
         <!--        <setting id="general.pmexpirycheck" type="text" default="" visible="false" />-->
         <setting id="general.textColor" type="text" default="" visible="false"/>
         <!--        <setting id="general.fake" type="text" default="" visible="false" />-->
-        <setting id="provider.updateCheckTimeStamp" type="text" default="0" visible="false"/>
-        <setting id="addon.updateCheckTimeStamp" type="text" default="0" visible="false"/>
         <setting id="alldebrid.apikey" type="text" default="" visible="false"/>
         <setting id="general.trakt.failure.timeout" type="number" visible="false" default="0"/>
         <setting id="update.news.version" type="text" default="" visible="false"/>
@@ -464,11 +467,25 @@
         <setting id="traktdb.rebuild" type="action" label="30241"
                  action="RunPlugin(plugin://plugin.video.seren/?action=rebuildTraktDatabase)"/>
 
+        <!-- Reuse Language Invoker -->
         <setting type="lsep" label="30573"/>
         <setting type="sep"/>
         <setting id="reuselanguageinvoker.status" label="30574" type="text" default="Enabled" enable="false"/>
         <setting id="reuselanguageinvoker.toggle" label="30575" type="action" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=toggleLanguageInvoker)"/>
 
+        <!-- Window Tests -->
+        <setting type="lsep" label="30588"/>
+        <setting type="sep"/>
+        <setting id="windowtests.playingNext" type="action" label="30498"
+                 action="RunPlugin(plugin://plugin.video.seren/?action=testPlayingNext)"/>
+        <setting id="windowtests.stillWatching" type="action" label="30499"
+                 action="RunPlugin(plugin://plugin.video.seren/?action=testStillWatching)"/>
+        <setting id="windowtests.resolverWindow" type="action" label="30500"
+                 action="RunPlugin(plugin://plugin.video.seren/?action=testResolverWindow)"/>
+        <setting id="windowtests.sourceSelectWindow" type="action" label="30501"
+                 action="RunPlugin(plugin://plugin.video.seren/?action=testSourceSelectWindow)"/>
+        <setting id="windowtests.manualCacheWindow" type="action" label="30502"
+                 action="RunPlugin(plugin://plugin.video.seren/?action=testManualCacheWindow)"/>
     </category>
 </settings>

@@ -7,8 +7,6 @@ import threading
 from resources.lib.database import Database
 from resources.lib.modules.globals import g
 
-migrate_db_lock = threading.Lock()
-
 schema = {
     'transfers': {
         'columns': collections.OrderedDict([
@@ -25,7 +23,7 @@ class PremiumizeTransfers(Database):
     Databsae for recording background transfer created by Seren
     """
     def __init__(self):
-        super(PremiumizeTransfers, self).__init__(g.PREMIUMIZE_DB_PATH, schema, migrate_db_lock)
+        super(PremiumizeTransfers, self).__init__(g.PREMIUMIZE_DB_PATH, schema)
         self.table_name = next(iter(schema))
 
     def get_premiumize_transfers(self):

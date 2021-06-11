@@ -2,12 +2,10 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.database import trakt_sync
-from resources.lib.database.cache import use_cache
 from resources.lib.modules.metadataHandler import MetadataHandler
 
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
-    @use_cache()
     def extract_trakt_page(self, url, media_type, **params):
         result = []
         page_number = params.pop("page", 1)
@@ -44,7 +42,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             trakt_id: self.get_list_content(username, trakt_id, media_type, **params)
         }
 
-    @use_cache()
     def get_list_content(self, username, trakt_id, media_type, **params):
         list_item_url = "users/{}/lists/{}/items/{}".format(
             username, trakt_id, media_type

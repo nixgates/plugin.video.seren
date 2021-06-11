@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals, print_function
 
 import functools
+import io
 import json
 import os
 import re
@@ -31,7 +32,7 @@ PYTHON3 = True if sys.version_info.major == 3 else False
 PYTHON2 = not PYTHON3
 
 if PYTHON2:
-    get_input = raw_input  # noqa
+    get_input = raw_input  # noqa pylint: disable=undefined-variable
 else:
     get_input = input
 
@@ -97,7 +98,7 @@ class Directory:
     def _try_handle_menu_action(self, action):
         try:
             action = int(action) - 1
-        except:
+        except Exception:
             return False
         if action == -2:
             if self.history:
@@ -130,7 +131,7 @@ class Directory:
             try:
                 self.next_action[2] = re.findall(r"action (.*?)$", action)[0]
                 return True
-            except:
+            except Exception:
                 print("Failed to parse action {}".format(action))
         return False
 
@@ -174,6 +175,7 @@ class SerenStubs:
                 "Monitor": SerenStubs.xbmc.Monitor,
                 "validatePath": lambda t: t,
                 "sleep": lambda t: time.sleep(t / 1000),
+                "executeJSONRPC": SerenStubs.xbmc.executeJSONRPC,
             },
             "xbmcaddon": {"Addon": SerenStubs.xbmcaddon.Addon},
             "xbmcgui": {
@@ -192,7 +194,7 @@ class SerenStubs:
                 "setContent": SerenStubs.xbmcplugin.setContent,
             },
             "xbmcvfs": {
-                "File": SerenStubs.xbmcvfs.open,
+                "File": SerenStubs.File,
                 "exists": os.path.exists,
                 "mkdir": os.mkdir,
                 "mkdirs": os.makedirs,
@@ -347,6 +349,15 @@ class SerenStubs:
             """Execute a built in Kodi function"""
             print("EXECUTE BUILTIN: {} wait:{}".format(function, wait))
 
+        @staticmethod
+        def executeJSONRPC(json_string):
+            json_rpc = json.loads(json_string)
+            if json_rpc.get("method") == "Settings.GetSettingValue":
+                if json_rpc.get("params").get("setting") == "locale.timezone":
+                    return '{"result": {"value": "Asia/Taipei"}}'  # UTC+8 chosen as no DST
+
+            print("Call to unpatched JSON RPC: {}".format(json_string))
+
         class PlayList(xbmc.PlayList):
             def __init__(self, playList):
                 self.list = []
@@ -358,7 +369,7 @@ class SerenStubs:
                 return 0
 
             def clear(self):
-                self.list.clear()
+                self.list = []
 
             def size(self):
                 return len(self.list)
@@ -491,7 +502,7 @@ class SerenStubs:
                     self._load_user_settings()
                 if key in self._current_user_settings:
                     return self._current_user_settings[key].get("value")
-                return None
+                return ""
 
             def setSetting(self, key, value):
                 if not self._current_user_settings:
@@ -637,7 +648,7 @@ class SerenStubs:
                 key = key.lower()
                 if key in self._props:
                     return self._props[key]
-                return None
+                return ""
 
             def setProperty(self, key, value):
                 key = key.lower()
@@ -674,7 +685,7 @@ class SerenStubs:
                 while True:
                     try:
                         action = int(get_input())
-                    except:
+                    except Exception:
                         break
                 if action is None:
                     raise Exception
@@ -791,13 +802,34 @@ class SerenStubs:
             def isFinished(self):
                 return not self._created
 
-    class xbmcvfs:
-        @staticmethod
-        def open(filepath, mode="r"):
-            if sys.version_info.major == 3:
-                return open(filepath, mode, encoding="utf-8")
+    class File(xbmcvfs.File):
+        def __init__(self, filepath, mode='r'):
+            self._file = io.open(filepath, mode + 'b')
+
+        def read(self, numBytes=-1):
+            return self._file.read(numBytes).decode('utf-8')
+
+        def readBytes(self, numBytes=-1):
+            return self._file.read(numBytes)
+
+        def write(self, buffer):
+            if isinstance(buffer, (bytes, bytearray)):
+                bytes_written = self._file.write(buffer)
             else:
-                return open(filepath, mode)
+                bytes_written = self._file.write(buffer.encode())
+            return bytes_written == len(buffer)
+
+        def size(self):
+            return self._file.__sizeof__()
+
+        def seek(self, seekBytes, iWhence=0):
+            return self._file.seek(seekBytes, iWhence)
+
+        def tell(self):
+            return self._file.tell()
+
+        def close(self):
+            self._file.close()
 
 
 class MonkeyPatchKodiStub:
@@ -963,7 +995,7 @@ MOCK = MockKodi()
 class JsonEncoder(json.JSONEncoder):
     """Json encoder for serialising all objects"""
 
-    def default(self, o):
+    def default(self, o):  # pylint: disable=method-hidden
         """
 
         :param o:

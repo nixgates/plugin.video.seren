@@ -93,13 +93,14 @@ class Menus:
                              action='traktSyncTools',
                              is_folder=True,
                              description=g.get_language_string(30417))
-        # g.add_directory_item('Window Tests',
-        #                      action='testWindows',
-        #                      description=g.get_language_string(30418))
         g.add_directory_item('Download Manager',
                              action='downloadManagerView',
                              is_folder=False,
                              description='View Current Downloads')
+        if g.get_bool_setting("skin.testmenu", False):
+            g.add_directory_item('Window Tests',
+                                 action='testWindows',
+                                 description=g.get_language_string(30418))
         g.close_directory(g.CONTENT_FOLDER)
 
     @staticmethod

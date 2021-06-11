@@ -14,7 +14,7 @@ from resources.lib.third_party import xml_to_dict
 
 try:
     import xml.etree.cElementTree as ElementTree
-except:
+except ImportError:
     import xml.etree.ElementTree as ElementTree
 
 from resources.lib.common import tools
@@ -49,7 +49,7 @@ def omdb_guard_response(func):
                 "OMDb returned a {} ({}): while requesting {}".format(
                     response.status_code,
                     OMDB_STATUS_CODES[response.status_code],
-                    response.url,
+                    "&".join(x for x in response.url.split('&') if not x.lower().startswith("apikey")),
                 ),
                 "error",
             )
@@ -59,11 +59,11 @@ def omdb_guard_response(func):
             g.log("Connection Error to OMDb: {} - {}".format(args, kwarg), "error")
             g.log(e, "error")
             return None
-        except:
+        except Exception:
             xbmcgui.Dialog().notification(
                 g.ADDON_NAME, g.get_language_string(30025).format("OMDb")
             )
-            if g.get_global_setting("run.mode") == "test":
+            if g.get_runtime_setting("run.mode") == "test":
                 raise
             else:
                 g.log_stacktrace()
@@ -98,7 +98,7 @@ class OmdbApi(ApiBase):
             (
                 "@released",
                 ("premiered", "aired"),
-                lambda d: tools.validate_date(d)
+                lambda d: g.validate_date(d)
                 if not self._is_value_none(d)
                 else None,
             ),
@@ -250,7 +250,10 @@ class OmdbApi(ApiBase):
         self.session.mount("https://", HTTPAdapter(max_retries=retries))
 
     def __del__(self):
-        self.session.close()
+        try:
+            self.session.close()
+        except NameError:
+            pass
 
     def _extract_awards(self, value, *params):
         try:
@@ -281,7 +284,8 @@ class OmdbApi(ApiBase):
         params.update({"plot": "full"})
         params.update({"r": "xml"})
         params.update({"apikey": self.api_key})
-        return self.session.get(self.ApiUrl, params=params, timeout=10)
+        timeout = params.pop("timeout", 10)
+        return self.session.get(self.ApiUrl, params=params, timeout=timeout)
 
     @wrap_omdb_object
     def get_json(self, **params):

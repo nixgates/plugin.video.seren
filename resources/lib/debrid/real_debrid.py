@@ -14,7 +14,7 @@ from resources.lib.common import source_utils
 from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.database.cache import use_cache
-from resources.lib.modules.exceptions import UnexpectedResponse
+from resources.lib.modules.exceptions import UnexpectedResponse, RanOnceAlready
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
 
@@ -27,7 +27,6 @@ RD_USERNAME_KEY = "rd.username"
 
 
 class RealDebrid:
-    _threading_lock = threading.Lock()
 
     def __init__(self):
         self.client_id = g.get_setting("rd.client_id")
@@ -67,7 +66,7 @@ class RealDebrid:
                 self.client_secret = response["client_secret"]
                 self.client_id = response["client_id"]
                 return True
-            except:
+            except Exception:
                 xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30068))
                 raise
         return False
@@ -162,42 +161,43 @@ class RealDebrid:
         if not self.token or float(time.time()) < (self.expiry - (15 * 60)):
             return
 
-        with GlobalLock(
-            self.__class__.__name__, self._threading_lock, True, self.refresh
-        ):
-            url = self.oauth_url + "token"
-            response = self.session.post(
-                url,
-                data={
-                    "grant_type": "http://oauth.net/grant_type/device/1.0",
-                    "code": self.refresh,
-                    "client_secret": self.client_secret,
-                    "client_id": self.client_id,
-                },
-            )
-            if not self._is_response_ok(response):
+        try:
+            with GlobalLock(self.__class__.__name__, True, self.refresh):
+                url = self.oauth_url + "token"
+                response = self.session.post(
+                    url,
+                    data={
+                        "grant_type": "http://oauth.net/grant_type/device/1.0",
+                        "code": self.refresh,
+                        "client_secret": self.client_secret,
+                        "client_id": self.client_id,
+                    },
+                )
+                if not self._is_response_ok(response):
+                    response = response.json()
+                    g.notification(
+                        g.ADDON_NAME, "Failed to refresh RD token, please manually re-auth"
+                    )
+                    g.log("RD Refresh error: {}".format(response["error"]))
+                    g.log(
+                        "Invalid response from Real Debrid - {}".format(response), "error"
+                    )
+                    return False
                 response = response.json()
-                g.notification(
-                    g.ADDON_NAME, "Failed to refresh RD token, please manually re-auth"
-                )
-                g.log("RD Refresh error: {}".format(response["error"]))
-                g.log(
-                    "Invalid response from Real Debrid - {}".format(response), "error"
-                )
-                return False
-            response = response.json()
-            if "access_token" in response:
-                self.token = response["access_token"]
-            if "refresh_token" in response:
-                self.refresh = response["refresh_token"]
-            g.set_setting(RD_AUTH_KEY, self.token)
-            g.set_setting(RD_REFRESH_KEY, self.refresh)
-            g.set_setting(RD_EXPIRY_KEY, str(time.time() + int(response["expires_in"])))
-            g.log("Real Debrid Token Refreshed")
-            return True
-            ###############################################
-            # To be FINISHED FINISH ME
-            ###############################################
+                if "access_token" in response:
+                    self.token = response["access_token"]
+                if "refresh_token" in response:
+                    self.refresh = response["refresh_token"]
+                g.set_setting(RD_AUTH_KEY, self.token)
+                g.set_setting(RD_REFRESH_KEY, self.refresh)
+                g.set_setting(RD_EXPIRY_KEY, str(time.time() + int(response["expires_in"])))
+                g.log("Real Debrid Token Refreshed")
+                return True
+                ###############################################
+                # To be FINISHED FINISH ME
+                ###############################################
+        except RanOnceAlready:
+            return
 
     def post_url(self, url, post_data, fail_check=False):
         original_url = url

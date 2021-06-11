@@ -21,7 +21,7 @@ class PlayingNext(BaseWindow):
             self.duration = self.getTotalTime() - self.getTime()
             self.closed = False
             self.default_action = g.get_int_setting("playingnext.defaultaction")
-        except:
+        except Exception:
             g.log_stacktrace()
 
     # region player methods
@@ -110,7 +110,7 @@ class PlayingNext(BaseWindow):
         try:
             try:
                 progress_bar = self.getControlProgress(3014)
-            except:
+            except Exception:
                 progress_bar = None
 
             while (
@@ -129,7 +129,7 @@ class PlayingNext(BaseWindow):
                 and not self.closed
             ):
                 self.pause()
-        except:
+        except Exception:
             import traceback
 
             g.log_stacktrace()
@@ -144,7 +144,7 @@ class PlayingNext(BaseWindow):
         """
         try:
             super(PlayingNext, self).doModal()
-        except:
+        except Exception:
             g.log_stacktrace()
 
     def close(self):

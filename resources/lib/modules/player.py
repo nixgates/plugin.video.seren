@@ -5,7 +5,6 @@ import copy
 import json
 import sys
 import time
-from sqlite3 import OperationalError
 
 import xbmc
 import xbmcgui
@@ -14,7 +13,7 @@ import xbmcplugin
 from resources.lib.common import tools
 from resources.lib.database.trakt_sync import bookmark
 from resources.lib.indexers import trakt
-from resources.lib.modules import smartPlay, database, subtitles
+from resources.lib.modules import smartPlay, subtitles
 from resources.lib.modules.globals import g
 
 
@@ -466,7 +465,7 @@ class SerenPlayer(xbmc.Player):
             post_data = self._build_trakt_object(offset=offset)
 
             self._trakt_api.post("scrobble/start", post_data)
-        except:
+        except Exception:
             g.log_stacktrace()
         self.scrobble_started = True
 
@@ -475,7 +474,7 @@ class SerenPlayer(xbmc.Player):
                 not self.trakt_enabled
                 or not self.scrobbling_enabled
                 or self.scrobbled
-                or g.get_global_setting("marked_watched_dialog_open")
+                or g.get_runtime_setting("marked_watched_dialog_open")
                 or self.current_time < self.ignoreSecondsAtStart
          ):
             return
@@ -491,7 +490,7 @@ class SerenPlayer(xbmc.Player):
              )
             try:
                 scrobble_response = self._trakt_api.post("scrobble/stop", post_data)
-            except:
+            except Exception:
                 g.log_stacktrace()
                 return
             if scrobble_response.status_code in (201, 409):
@@ -500,7 +499,7 @@ class SerenPlayer(xbmc.Player):
         elif self.current_time > self.ignoreSecondsAtStart:
             try:
                 scrobble_response = self._trakt_api.post("scrobble/pause", post_data)
-            except:
+            except Exception:
                 g.log_stacktrace()
                 return
         else:
@@ -532,7 +531,7 @@ class SerenPlayer(xbmc.Player):
         return post_data
 
     def _mark_watched_dialog(self):
-        if g.get_global_setting("marked_watched_dialog_open"):
+        if g.get_runtime_setting("marked_watched_dialog_open"):
             return
 
         if (
@@ -543,10 +542,10 @@ class SerenPlayer(xbmc.Player):
                 and (time.time() - self.playback_timestamp) > 600
          ):
             xbmc.sleep(10000)
-            g.set_global_setting("marked_watched_dialog_open", True)
+            g.set_runtime_setting("marked_watched_dialog_open", True)
             if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30526)):
                 self._force_marked_watched = True
-            g.set_global_setting("marked_watched_dialog_open", False)
+            g.set_runtime_setting("marked_watched_dialog_open", False)
 
     # endregion
 
@@ -607,12 +606,12 @@ class SerenPlayer(xbmc.Player):
         self.offset = bm["resumeTime"] if bm is not None else None
 
     def _handle_bookmark(self):
-        if g.get_global_setting("marked_watched_dialog_open"):
+        if g.get_runtime_setting("marked_watched_dialog_open"):
             return
 
         try:
             g.clear_kodi_bookmarks()
-        except:
+        except Exception:
             g.log_stacktrace()
             pass
 

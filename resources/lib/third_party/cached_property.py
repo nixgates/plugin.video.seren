@@ -8,7 +8,6 @@ __version__ = "1.5.1"
 __license__ = "BSD"
 
 import threading
-from functools import wraps
 from time import time
 
 class cached_property(object):

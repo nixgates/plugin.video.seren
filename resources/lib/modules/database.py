@@ -8,11 +8,13 @@ from resources.lib.modules.globals import g
 
 
 def cache_get(key):
-    return g.CACHE.get(key)
+    value = g.CACHE.get(key)
+    return value if not value == g.CACHE.NOT_CACHED else None
 
 
 def cache_insert(key, value, expiration=datetime.timedelta(hours=24)):
-    g.CACHE.set(key, value, expiration=expiration)
+    if value:
+        g.CACHE.set(key, value, expiration=expiration)
 
 
 def get(func, duration, *args, **kwargs):
@@ -23,6 +25,8 @@ def get(func, duration, *args, **kwargs):
         cache_str += ".{}".format(item)
     cache_str = cache_str.lower()
     cached_data = g.CACHE.get(cache_str)
+    if cached_data == g.CACHE.NOT_CACHED:
+        cached_data = None
     global_cache_ignore = False
     ignore_cache = kwargs.pop("seren_reload", kwargs.get("ignore_cache", False))
     overwrite_cache = kwargs.pop("overwrite_cache", False)
@@ -30,7 +34,7 @@ def get(func, duration, *args, **kwargs):
         return cached_data
     else:
         result = func(*args, **kwargs)
-        if not ignore_cache or overwrite_cache:
+        if result and (not ignore_cache or overwrite_cache):
             g.CACHE.set(
                 cache_str, result, expiration=datetime.timedelta(hours=duration)
             )

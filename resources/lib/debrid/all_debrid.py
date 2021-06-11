@@ -43,7 +43,7 @@ def alldebird_guard_response(func):
             return None
         except requests.exceptions.ConnectionError:
             return None
-        except:
+        except Exception:
             xbmcgui.Dialog().notification(
                 g.ADDON_NAME, g.get_language_string(30025).format("AllDebrid")
             )
@@ -163,7 +163,7 @@ class AllDebrid:
         return False, int(resp["expires_in"])
 
     def get_user_info(self):
-        return self._extract_data(self.get_json("user"))["user"]
+        return self._extract_data(self.get_json("user")).get("user", {})
 
     def store_user_info(self):
         user_information = self.get_user_info()

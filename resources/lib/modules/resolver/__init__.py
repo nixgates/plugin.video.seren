@@ -28,9 +28,10 @@ class Resolver:
     """
     Handles resolving of identified sources to a playable format to supply to Player module
     """
-    torrent_resolve_failure_style = g.get_int_setting('general.resolvefailurehandling')
+    torrent_resolve_failure_style = None
 
     def __init__(self):
+        self.torrent_resolve_failure_style = g.get_int_setting('general.resolvefailurehandling')
         sys.path.append(g.ADDON_USERDATA_PATH)
         self.return_data = None
         self.resolvers = {

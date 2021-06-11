@@ -9,8 +9,6 @@ import xbmcgui
 from resources.lib.database import Database
 from resources.lib.modules.globals import g
 
-migrate_db_lock = threading.Lock()
-
 schema = {
     'search_history': {
         'columns': collections.OrderedDict([
@@ -25,7 +23,7 @@ schema = {
 
 class SearchHistory(Database):
     def __init__(self):
-        super(SearchHistory, self).__init__(g.SEARCH_HISTORY_DB_PATH, schema, migrate_db_lock)
+        super(SearchHistory, self).__init__(g.SEARCH_HISTORY_DB_PATH, schema)
         self.table_name = next(iter(schema))
 
     def get_search_history(self, media_type):

@@ -2,9 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import datetime
-import json
-import re
-import xbmc
+
 import xbmcgui
 import xbmcplugin
 
@@ -27,8 +25,8 @@ class Menus:
         self.shows_database = shows.TraktSyncDatabase()
         self.list_builder = ListBuilder()
         self.page_limit = g.get_int_setting("item.limit")
-        self.page_start = (g.PAGE-1)*self.page_limit
-        self.page_end = g.PAGE*self.page_limit
+        self.page_start = (g.PAGE - 1) * self.page_limit
+        self.page_end = g.PAGE * self.page_limit
 
     ######################################################
     # MENUS
@@ -40,10 +38,10 @@ class Menus:
             "progress_watched", "tvshow"
         )
         bookmarked_items = [
-            i
-            for i in self.bookmark_database.get_all_bookmark_items("episode")
-            if i["trakt_show_id"] not in hidden_shows
-        ][self.page_start:self.page_end]
+                               i
+                               for i in self.bookmark_database.get_all_bookmark_items("episode")
+                               if i["trakt_show_id"] not in hidden_shows
+                           ][self.page_start:self.page_end]
         self.list_builder.mixed_episode_builder(bookmarked_items)
 
     @staticmethod
@@ -257,8 +255,8 @@ class Menus:
         sort = "title" if g.get_int_setting("general.sortcollection") == 1 else False
         trakt_list = self.trakt_database.get_collected_shows(g.PAGE)
         if sort == "title" and not no_paging:
-            trakt_list = sorted(trakt_list, key=lambda k: re.sub(r"^a |^the |^an ", "",
-                                                                 k["trakt_object"]["info"].get('title').lower()))
+            trakt_list = sorted(trakt_list, key=lambda k: tools.SORT_TOKEN_REGEX
+                                .sub("", k["trakt_object"]["info"].get('title').lower()))
             offset = (g.PAGE - 1) * self.page_limit
             trakt_list = trakt_list[offset:offset + self.page_limit]
         self.list_builder.show_list_builder(trakt_list, no_paging=no_paging, sort=sort)
@@ -282,8 +280,8 @@ class Menus:
         sort = "title" if g.get_int_setting("general.sortcollection") == 1 else False
         trakt_list = self.trakt_database.get_unfinished_collected_shows(g.PAGE)
         if sort == "title" and not no_paging:
-            trakt_list = sorted(trakt_list, key=lambda k: re.sub(r"^a |^the |^an ", "",
-                                                                 k["trakt_object"]["info"].get('title').lower()))
+            trakt_list = sorted(trakt_list, key=lambda k: tools.SORT_TOKEN_REGEX
+                                .sub("", k["trakt_object"]["info"].get('title').lower()))
             offset = (g.PAGE - 1) * self.page_limit
             trakt_list = trakt_list[offset:offset + self.page_limit]
         self.list_builder.show_list_builder(trakt_list, no_paging=no_paging, sort=sort)
@@ -323,8 +321,8 @@ class Menus:
         date_string = datetime.datetime.today() - datetime.timedelta(days=13)
         trakt_list = self.trakt.get_json(
             "calendars/my/shows/{}/14".format(
-                date_string.strftime("%d-%m-%Y"), extended="full"
-            )
+                date_string.strftime("%d-%m-%Y")
+            ), extended="full"
         )
         trakt_list = sorted(
             [i for i in trakt_list if i["trakt_show_id"] not in hidden_shows],
@@ -414,13 +412,14 @@ class Menus:
         self.shows_search_results(query)
 
     def shows_search_results(self, query):
-        trakt_list = self.trakt.get_json_paged(
+        trakt_list = self.shows_database.extract_trakt_page(
             "search/show",
             query=query,
             page=g.PAGE,
             extended="full",
             field="title",
         )
+
         if not trakt_list:
             g.cancel_directory()
             return
@@ -451,8 +450,12 @@ class Menus:
             query = "-".join(name_parts[:i]) + "-".join(name_parts[i:i + 1])
             query = tools.quote_plus(query)
 
-            trakt_list = self.trakt.get_json_paged(
-                "people/{}/shows".format(query), extended="full", page=g.PAGE
+            trakt_list = self.shows_database.extract_trakt_page(
+                    "people/{}/shows".format(query),
+                    extended="full",
+                    page=g.PAGE,
+                    hide_watched=False,
+                    hide_unaired=False,
             )
             if not trakt_list:
                 continue
@@ -465,11 +468,10 @@ class Menus:
         except KeyError:
             g.cancel_directory()
             return
-        self.list_builder.show_list_builder(
-            trakt_list,
-            hide_watched=False,
-            hide_unaired=False,
-        )
+        self.list_builder.show_list_builder(trakt_list,
+                                            hide_watched=False,
+                                            hide_unaired=False
+                                            )
 
     def show_seasons(self, args):
         self.list_builder.season_list_builder(args["trakt_id"], no_paging=True)

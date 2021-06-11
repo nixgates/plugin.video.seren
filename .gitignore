@@ -118,6 +118,10 @@ ENV/
 # Packages
 *.zip
 
+# OS Directory Files
+.DS_STORE
+thumbs.db
+
 # test cache
 .pytest_cache
 /userdata/

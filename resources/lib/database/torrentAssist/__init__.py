@@ -7,8 +7,6 @@ import threading
 from resources.lib.database import Database
 from resources.lib.modules.globals import g
 
-migrate_db_lock = threading.Lock()
-
 schema = {
     'torrents': {
         'columns': collections.OrderedDict([
@@ -29,7 +27,7 @@ class TorrentAssist(Database):
     Database to monitor downloads of torrents initiated by Seren
     """
     def __init__(self):
-        super(TorrentAssist, self).__init__(g.TORRENT_ASSIST, schema, migrate_db_lock)
+        super(TorrentAssist, self).__init__(g.TORRENT_ASSIST, schema)
         self.table_name = next(iter(schema))
 
     def get_assist_torrents(self):

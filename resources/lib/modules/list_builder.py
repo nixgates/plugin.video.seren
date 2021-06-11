@@ -266,7 +266,7 @@ class ListBuilder(object):
             )
 
         if not item["info"]["mediatype"] == "list" and prepend_date:
-            release_date = tools.utc_to_local(item["info"].get("aired", None))
+            release_date = g.utc_to_local(item["info"].get("aired", None))
             if release_date:
                 release_day = tools.parse_datetime(release_date, g.DATE_TIME_FORMAT).strftime("%d %b")
                 name = "[{}] {}".format(release_day, name)

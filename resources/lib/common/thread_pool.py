@@ -67,7 +67,7 @@ class ThreadPoolWorker(Thread):
                 try:
                     self.tasks.task_done()
                 except Exception as e:
-                    print("task done error: {}".format(repr(e)))
+                    g.log("task done error: {}".format(repr(e)))
                     pass
 
 
@@ -79,7 +79,7 @@ class ThreadPool:
     scaled_workers = [20, 10, 20, 40, 80]
 
     def __init__(self):
-        self.limiter = g.get_global_setting("threadpool.limiter") == "true"
+        self.limiter = g.get_runtime_setting("threadpool.limiter")
         self.workers = self.scaled_workers[g.get_int_setting("general.threadpoolScale", -1) + 1]
         self.tasks = ClearableQueue(2 * self.workers)
         self.stop_event = threading.Event()
@@ -138,6 +138,7 @@ class ThreadPool:
         self._worker_maintenance()
 
     def _worker_maintenance(self):
+        sleep(0.001)  # Sleep for 1ms to prevent race conditions
         try:
             self.workers_threading_lock.acquire()
             # Shrink worker pool
@@ -181,7 +182,6 @@ class ThreadPool:
 
         while not self.tasks.empty():
             self._worker_maintenance()
-            sleep(0.001)
 
         [i.join() for i in self.worker_pool]
         self._try_raise()

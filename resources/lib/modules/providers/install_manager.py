@@ -332,7 +332,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             if xbmcvfs.exists("{}.temp".format(meta_location)):
                 os.remove(meta_location)
                 os.rename("{}.temp".format(meta_location), meta_location)
-        except:
+        except Exception:
             pass
 
         for folder in folders:
@@ -342,7 +342,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             if xbmcvfs.exists("{}.temp".format(folder_path)):
                 try:
                     shutil.rmtree(folder_path)
-                except:
+                except Exception:
                     pass
                 os.rename("{}.temp".format(folder_path), folder_path)
 

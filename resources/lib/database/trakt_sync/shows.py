@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.database import trakt_sync
 from resources.lib.modules.globals import g
 from resources.lib.modules.guard_decorators import (
@@ -115,7 +116,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             "SELECT watched from episodes "
             "where trakt_show_id=? and season=? and number=?",
             (show_id, season, number),
-        )["watched"]
+        ).get("watched")
+        if play_count is None:
+            return
         self._mark_episode_record("watched", play_count + 1, show_id, season, number)
         self._update_shows_statistics_from_show_id(show_id)
 
@@ -234,9 +237,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         """
         g.log("Fetching show list from sync database", "debug")
         trakt_list = [i for i in trakt_list if i.get("trakt_id")]
-        self.insert_trakt_shows(
-            self.filter_trakt_items_that_needs_updating(trakt_list, "shows")
-        )
         self._update_mill_format_shows(trakt_list, False)
         g.log("Show list update and milling compelete", "debug")
         statement = """SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes, 
@@ -264,7 +264,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: list
         """
         g.log("Fetching season list from sync database", "debug")
-        self._try_update_seasons(trakt_show_id)
+        self._try_update_seasons(trakt_show_id, trakt_id)
         g.log("Updated requested seasons", "debug")
         statement = """SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes, 
         s.episode_count FROM seasons AS s WHERE """
@@ -422,35 +422,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         )
         return result
 
-    def _repair_missing_trakt_items(self, list_to_update, media_type):
-        trakt_object = MetadataHandler.trakt_object
-
-        missing_trakt = [item for item in list_to_update if trakt_object(item) is None]
-        if len(missing_trakt) > 0:
-            [
-                self.task_queue.put(
-                    self._update_single_meta,
-                    "{}/{}".format(media_type, show.get("trakt_id")),
-                    show,
-                    media_type,
-                )
-                for show in missing_trakt
-            ]
-            self.task_queue.wait_completion()
-            self.update_missing_trakt_objects(list_to_update, missing_trakt)
-
-        return list_to_update
-
     @guard_against_none(list)
-    def _update_objects(self, list_to_update, db_list_to_update, media_type):
+    def _update_objects(self, db_list_to_update, media_type):
 
-        self.update_missing_trakt_objects(db_list_to_update, list_to_update)
-        db_list_to_update = self._repair_missing_trakt_items(
-            db_list_to_update, media_type
-        )
-
-        [self.task_queue.put(self.metadataHandler.update, i) for i in db_list_to_update]
-        updated_items = self.task_queue.wait_completion()
+        threadpool = ThreadPool()
+        for i in db_list_to_update:
+            threadpool.put(self.metadataHandler.update, i)
+        updated_items = threadpool.wait_completion()
 
         if updated_items is None:
             return
@@ -500,8 +478,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         trakt_object, trakt.meta_hash as trakt_meta_hash, tmdb_id, tmdb.value as tmdb_object, tmdb.meta_hash as 
         tmdb_meta_hash, tvdb_id, tvdb.value as tvdb_object, tvdb.meta_hash as tvdb_meta_hash, fanart.value as 
         fanart_object, fanart.meta_hash as fanart_meta_hash, s.imdb_id, omdb.value as omdb_object, omdb.meta_hash as 
-        omdb_meta_hash, CASE WHEN s.last_updated is null or (Datetime(s.last_updated) < Datetime(r.last_updated)) 
-        THEN 'true' else 'false' END as NeedsUpdate FROM requested as r LEFT JOIN shows as s on r.trakt_id = 
+        omdb_meta_hash, s.needs_update FROM requested as r LEFT JOIN shows as s on r.trakt_id = 
         s.trakt_id LEFT JOIN shows_meta as trakt on trakt.id = s.trakt_id and trakt.type = 'trakt' LEFT JOIN 
         shows_meta as tmdb on tmdb.id = s.tmdb_id and tmdb.type = 'tmdb' LEFT JOIN shows_meta as tvdb on tvdb.id = 
         s.tvdb_id and tvdb.type = 'tvdb' LEFT JOIN shows_meta as fanart on fanart.id = s.tvdb_id and fanart.type = 
@@ -515,9 +492,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         )
 
         db_list_to_update = self.fetchall(sql_statement)
-        updated_items = self._update_objects(
-            list_to_update, db_list_to_update, "shows"
-        )
+        updated_items = self._update_objects(db_list_to_update, "shows")
 
         formatted_items = self._format_objects(updated_items)
 
@@ -549,13 +524,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         )
 
     def _update_mill_format_shows(self, trakt_list, mill_episodes=False):
-        if not trakt_list or len(trakt_list) == 0:
+        if not trakt_list:
             return
         trakt_list = trakt_list if isinstance(trakt_list, list) else [trakt_list]
-        self.parent_task_queue.put(self._update_shows, self.filter_items_that_needs_updating(trakt_list, 'shows'))
-        self.parent_task_queue.put(self._mill_if_needed, trakt_list, None, mill_episodes)
-
-        self.parent_task_queue.wait_completion()
+        self.insert_trakt_shows(trakt_list)
+        self._update_shows(trakt_list)
+        self._mill_if_needed(trakt_list, None, mill_episodes)
 
     @guard_against_none_or_empty()
     def _identify_seasons_to_update(self, list_to_update):
@@ -565,8 +539,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         tmdb_id, tmdb.value as tmdb_object, tmdb.meta_hash as tmdb_meta_hash, sh.tvdb_id as tvdb_show_id, se.tvdb_id 
         as tvdb_id, tvdb.value as tvdb_object, tvdb.meta_hash as tvdb_meta_hash, fanart.value as fanart_object, 
         fanart.meta_hash as fanart_meta_hash, sh.imdb_id, omdb.value as omdb_object, omdb.meta_hash as omdb_meta_hash, 
-        sh.info as show_info, sh.art as show_art, sh.cast as show_cast, CASE WHEN se.last_updated is null or (
-        Datetime(se.last_updated) < Datetime(r.last_updated)) THEN 'true' else 'false' END as NeedsUpdate FROM 
+        sh.info as show_info, sh.art as show_art, sh.cast as show_cast, se.needs_update FROM 
         requested as r LEFT JOIN seasons as se on r.trakt_id = se.trakt_id LEFT JOIN shows as sh on sh.trakt_id = 
         se.trakt_show_id LEFT JOIN seasons_meta as trakt on trakt.id = se.trakt_id and trakt.type = 'trakt' LEFT JOIN 
         seasons_meta as tmdb on tmdb.id = se.tmdb_id and tmdb.type = 'tmdb' LEFT JOIN seasons_meta as tvdb on tvdb.id 
@@ -587,7 +560,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if db_list_to_update is None:
             db_list_to_update = []
 
-        return self._update_objects(list_to_update, db_list_to_update, "seasons")
+        return self._update_objects(db_list_to_update, "seasons")
 
     @guard_against_none_or_empty()
     def _format_seasons(self, list_to_update):
@@ -629,8 +602,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         as fanart_meta_hash, ep.imdb_id, omdb.value as omdb_object, omdb.meta_hash as omdb_meta_hash, sh.tmdb_id as 
         tmdb_show_id, sh.tvdb_id as tvdb_show_id, sh.info as show_info, sh.art as show_art, sh.cast as show_cast, 
         ep.trakt_season_id, se.tmdb_id as tmdb_season_id, sh.tvdb_id as tvdb_season_id, se.info as season_info, 
-        se.art as season_art, se.cast as season_cast, CASE WHEN ep.last_updated is null or (Datetime(ep.last_updated) 
-        < Datetime(r.last_updated)) THEN 'true' else 'false' END as NeedsUpdate FROM requested as r LEFT JOIN 
+        se.art as season_art, se.cast as season_cast, ep.needs_update FROM requested as r LEFT JOIN 
         episodes as ep on r.trakt_id = ep.trakt_id LEFT JOIN shows as sh on sh.trakt_id = ep.trakt_show_id LEFT JOIN 
         seasons as se on se.trakt_id = ep.trakt_season_id LEFT JOIN episodes_meta as trakt on trakt.id = ep.trakt_id 
         and trakt.type = 'trakt' LEFT JOIN episodes_meta as tmdb on tmdb.id = ep.tmdb_id and tmdb.type = 'tmdb' LEFT 
@@ -652,7 +624,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if db_list_to_update is None:
             db_list_to_update = []
 
-        return self._update_objects(list_to_update, db_list_to_update, "episodes")
+        return self._update_objects(db_list_to_update, "episodes")
 
     @guard_against_none_or_empty()
     def _format_episodes(self, list_to_update):
@@ -702,9 +674,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         else:
             query += "sh.trakt_id = {}".format(trakt_show_id)
 
-        seasons_to_update = self.filter_items_that_needs_updating(
-            self.fetchall(query), "seasons"
-            )
+        seasons_to_update = self.fetchall(query)
 
         self._update_seasons(seasons_to_update)
         self._format_seasons(seasons_to_update)
@@ -724,20 +694,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         else:
             query += "sh.trakt_id = {}".format(trakt_show_id)
 
-        episodes_to_update = self.filter_items_that_needs_updating(
-            self.fetchall(query), "episodes"
-            )
+        episodes_to_update = self.fetchall(query)
 
         self._update_episodes(episodes_to_update)
         self._format_episodes(episodes_to_update)
 
     @guard_against_none()
     def _try_update_mixed_episodes(self, trakt_items):
-        self.insert_trakt_shows(
-            self.filter_trakt_items_that_needs_updating(
-                [i.get("show") for i in trakt_items if i.get("show")], "shows",
-            )
-        )
+        self.insert_trakt_shows([i["show"] for i in trakt_items if i.get("show")])
 
         if [i for i in trakt_items if not i.get("show")]:
             [
@@ -756,34 +720,26 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         self._update_mill_format_shows(shows, True)
 
-        seasons_to_update = self.filter_items_that_needs_updating(
-                self.fetchall(
+        seasons_to_update = self.fetchall(
                     """SELECT value as trakt_object, se.trakt_id, se.trakt_show_id, sh.tmdb_id as tmdb_show_id, 
                     sh.tvdb_id as tvdb_show_id FROM seasons as se INNER JOIN shows as sh on se.trakt_show_id = 
                     sh.trakt_id INNER JOIN seasons_meta as sm on sm.id = se.trakt_id and sm.type='trakt' where 
                     se.trakt_id in (select e.trakt_season_id FROM episodes e where e.trakt_id in ({}))""".format(
                         ",".join(g.UNICODE(i.get("trakt_id")) for i in trakt_items)
                     )
-                ),
-                "seasons",
-            )
+                )
 
-        episodes_to_update = self.filter_items_that_needs_updating(
-            self.fetchall(
+        episodes_to_update = self.fetchall(
                 """SELECT value as trakt_object, 
         e.trakt_id, e.trakt_show_id, sh.tmdb_id as tmdb_show_id, sh.tvdb_id as tvdb_show_id FROM episodes as e INNER 
         JOIN shows as sh on e.trakt_show_id = sh.trakt_id INNER JOIN episodes_meta as em on em.id = e.trakt_id and 
         em.type='trakt' where e.trakt_id in ({})""".format(
                         ",".join(g.UNICODE(i.get("trakt_id")) for i in trakt_items)
                     )
-                ),
-                "episodes",
-            )
+                )
 
-        self.parent_task_queue.put(self._update_seasons, seasons_to_update)
-        self.parent_task_queue.put(self._update_episodes, episodes_to_update)
-
-        self.parent_task_queue.wait_completion()
+        self._update_seasons(seasons_to_update)
+        self._update_episodes(episodes_to_update)
 
         self._format_seasons(seasons_to_update)
         self._format_episodes(episodes_to_update)
@@ -880,9 +836,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: dict
         """
         show = [self._get_single_show_meta(trakt_show_id)]
-        self.insert_trakt_shows(
-            self.filter_trakt_items_that_needs_updating(show, "shows")
-        )
+        self.insert_trakt_shows(show)
         self._mill_if_needed(show)
         return self.fetchone(
             """select trakt_id, trakt_show_id from seasons where trakt_show_id=? and season =? """,
@@ -903,9 +857,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: dict
         """
         show = [self._get_single_show_meta(trakt_show_id)]
-        self.insert_trakt_shows(
-            self.filter_trakt_items_that_needs_updating(show, "shows")
-        )
+        self.insert_trakt_shows(show)
         self._mill_if_needed(show)
         return self.fetchone(
             """select trakt_id, trakt_show_id from episodes where trakt_show_id=? and season =? 

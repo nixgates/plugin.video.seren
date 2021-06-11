@@ -22,15 +22,19 @@ def fanart_guard_response(func):
             if response.status_code in [200, 201]:
                 return response
 
-            g.log('FanartTv returned a {} ({}): while requesting {}'.format(response.status_code,
+            if response.status_code == 404:
+                g.log('FanartTv failed to find {}'.format(response.url), 'debug')
+                return None
+            else:
+                g.log('FanartTv returned a {} ({}): while requesting {}'.format(response.status_code,
                                                                             FanartTv.http_codes[response.status_code],
                                                                             response.url), 'error')
-            return None
+            return response
         except requests.exceptions.ConnectionError:
             return None
-        except:
+        except Exception:
             xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30025).format('Fanart'))
-            if g.get_global_setting("run.mode") == "test":
+            if g.get_runtime_setting("run.mode") == "test":
                 raise
             else:
                 g.log_stacktrace()
@@ -48,7 +52,7 @@ def wrap_fanart_object(func):
 
 
 class FanartTv(ApiBase):
-    base_url = "http://webservice.fanart.tv/v3/"
+    base_url = "https://webservice.fanart.tv/v3/"
     api_key = "dfe6380e34f49f9b2b9518184922b49c"
 
     http_codes = {
@@ -82,7 +86,7 @@ class FanartTv(ApiBase):
         retries = Retry(total=5,
                         backoff_factor=0.1,
                         status_forcelist=[500, 502, 503, 504])
-        self.session.mount('http://', HTTPAdapter(max_retries=retries))
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
 
     def __del__(self):
         self.session.close()
@@ -122,46 +126,51 @@ class FanartTv(ApiBase):
         return image['lang'] if image['lang'] not in ('', '00') else None
 
     @fanart_guard_response
-    def get(self, url, **params):
+    def _get(self, url, **params):
         if not self.fanart_support:
             return None
-        return self.session.get(tools.urljoin(self.base_url, url), params=params, headers=self.headers, timeout=3)
+        timeout = params.pop("timeout", 10)
+        return self.session.get(tools.urljoin(self.base_url, url), params=params, headers=self.headers, timeout=timeout)
 
-    def get_json(self, url, **params):
-        if not self.fanart_support:
+    def _get_json(self, url, **params):
+        response = self._get(url, **params)
+        if not response:
             return None
-        response = self.get(url)
-        if response is None:
-            return None
-        try:
-            return self._handle_response(response.json(), params.pop('type'), params.pop('season', None))
-        except (ValueError, AttributeError):
-            g.log('Failed to receive JSON from FanartTv response - response: {}'.format(response), 'error')
-            return None
+        return response.json()
+
+    @use_cache()
+    def _get_json_cached(self, url, **params):
+        return self._get_json(url, **params)
 
     @wrap_fanart_object
     def get_movie(self, tmdb_id):
         if not self.fanart_support:
             return None
-        return self.get_json('movies/{}'.format(tmdb_id), type='movie')
+        return self._handle_response(self._get_json_cached('movies/{}'.format(tmdb_id)), 'movie')
 
     @wrap_fanart_object
     def get_show(self, tvdb_id):
         if not self.fanart_support:
             return None
-        return self.get_json('tv/{}'.format(tvdb_id), type='tvshow')
+        return self._handle_response(self._get_json_cached('tv/{}'.format(tvdb_id)), 'tvshow')
 
-    @use_cache()
     @wrap_fanart_object
     def get_season(self, tvdb_id, season):
-        return self.get_json('tv/{}'.format(tvdb_id), type='season', season=season)
+        if not self.fanart_support:
+            return None
+        return self._handle_response(self._get_json_cached('tv/{}'.format(tvdb_id)), 'season', season)
 
     @handle_single_item_or_list
-    def _handle_response(self, response, type, season):
-        result = {}
-        result.update({'art': self._handle_art(response, type, season)})
-        result.update({'info': self._normalize_info(self.meta_objects[type], response)})
-        return result
+    def _handle_response(self, response, art_type, season=None):
+        try:
+            if response:
+                result = {}
+                result.update({'art': self._handle_art(response, art_type, season)})
+                result.update({'info': self._normalize_info(self.meta_objects[art_type], response)})
+                return result
+        except (ValueError, AttributeError):
+            g.log('Failed to receive JSON from FanartTv response - response: {}'.format(response), 'error')
+            return None
 
     def _handle_art(self, item, type, season=None):
         meta = {}

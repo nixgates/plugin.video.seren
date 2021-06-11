@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+import time
 from datetime import datetime
 
 import xbmc
 import xbmcgui
-import time
 
 from resources.lib.database import trakt_sync
 from resources.lib.database.trakt_sync import hidden
@@ -87,7 +87,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             last_activities_call = self.activities["last_activities_call"]
 
         if time.time() < (last_activities_call + (5 * 60)):
-            g.log("Activities endpoint call to frequently! An issue is occuring!", 'error')
+            g.log("Activities endpoint call too frequently! An issue is occurring!", 'warning')
             return None
         else:
             remote_activities = self.trakt_api.get_json("sync/last_activities")
@@ -109,7 +109,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             remote_activities = self.fetch_remote_activities(silent)
 
             if remote_activities is None:
-                g.log("Activities Sync Failure: Unable to connect to Trakt or activities called to often", "error")
+                g.log("Activities Sync Failure: Unable to connect to Trakt or activities called too often", "error")
                 return True
 
             if self.requires_update(remote_activities["all"], self.activities["all_activities"]):
@@ -160,7 +160,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 activity[3]()
                 self._update_activity_record(activity[2], update_time)
             except ActivitySyncFailure as e:
-                g.log("Falied to sync activity: {} - {}".format(activity[0], e))
+                g.log("Failed to sync activity: {} - {}".format(activity[0], e))
                 self.sync_errors = True
                 continue
 
@@ -217,12 +217,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def _fetch_hidden_section(self, section):
         items = []
-        [
+        for paged_items in self.trakt_api.get_all_pages_json("users/hidden/{}".format(section)):
             items.extend(paged_items)
-            for paged_items in self.trakt_api.get_all_pages_json(
-            "users/hidden/{}".format(section)
-        )
-        ]
         return {section: items}
 
     def _sync_watched_movies(self):
@@ -233,9 +229,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             if len(trakt_watched) == 0:
                 return
             self.execute_sql("UPDATE movies SET watched=0")
-            self.insert_trakt_movies(
-                self.filter_trakt_items_that_needs_updating(trakt_watched, "movies")
-            )
+            self.insert_trakt_movies(trakt_watched)
             self.execute_sql(
                 "UPDATE movies SET watched=1 where trakt_id in ({})".format(
                     ",".join(str(i.get("trakt_id")) for i in trakt_watched)
@@ -252,9 +246,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             if len(trakt_collection) == 0:
                 return
             self.execute_sql("UPDATE movies SET collected=0")
-            self.insert_trakt_movies(
-                self.filter_trakt_items_that_needs_updating(trakt_collection, "movies")
-            )
+            self.insert_trakt_movies(trakt_collection)
             self.execute_sql(
                 "UPDATE movies SET collected=1 where trakt_id in ({})".format(
                     ",".join(str(i.get("trakt_id")) for i in trakt_collection)
@@ -269,11 +261,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             trakt_watched = self.trakt_api.get_json(
                 "sync/watched/shows", extended="full"
             )
-            if len(trakt_watched) == 0:
+            if not trakt_watched:
                 return
-            self.insert_trakt_shows(
-                self.filter_trakt_items_that_needs_updating(trakt_watched, "shows")
-            )
+            self.insert_trakt_shows(trakt_watched)
             self._mill_if_needed(trakt_watched, self._queue_with_progress)
             self.execute_sql("UPDATE episodes SET watched=0")
             with self.create_temp_table("_episodes_watched",
@@ -313,12 +303,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             trakt_collection = self.trakt_api.get_json(
                 "sync/collection/shows", extended="full"
             )
-            if len(trakt_collection) == 0:
+            if not trakt_collection:
                 return
 
-            self.insert_trakt_shows(
-                self.filter_trakt_items_that_needs_updating(trakt_collection, "shows")
-            )
+            self.insert_trakt_shows(trakt_collection)
             self._mill_if_needed(trakt_collection, self._queue_with_progress)
 
             self.execute_sql("UPDATE episodes SET collected=0")
@@ -355,6 +343,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             raise ActivitySyncFailure(e)
 
     def _filter_lists_items_that_needs_updating(self, requested):
+        # TODO: This is never called, the query is also broken and we don't seem to sync lists
         if len(requested) == 0:
             return requested
 
@@ -417,6 +406,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                            and get(i, "duration")
                     ),
                 )
+                self.insert_trakt_movies(progress)
             else:
                 self.execute_sql(
                     base_sql_statement,
@@ -437,6 +427,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                            and get(i["episode"], "duration")
                     ),
                 )
+                self.insert_trakt_shows([i["show"] for i in progress if i.get("show")])
+                self._mill_if_needed([i["show"] for i in progress if i.get("show")], mill_episodes=False)
+                self.insert_trakt_episodes([i["episode"] for i in progress if i.get("episode")])
 
     def _queue_with_progress(self, func, args):
         for idx, arg in enumerate(args):

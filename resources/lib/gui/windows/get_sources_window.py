@@ -44,7 +44,7 @@ class GetSourcesWindow(BaseWindow):
             remaining_providers_list = self.getControlList(2000)
             remaining_providers_list.reset()
             remaining_providers_list.addItems(sources_information["remainingProviders"])
-        except:
+        except Exception:
             pass
 
     def set_property(self, key, value):
