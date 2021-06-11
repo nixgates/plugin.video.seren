@@ -18,7 +18,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     @guard_against_none(list)
     def get_movie_list(self, trakt_list, **params):
-        self._update_movies(self.filter_items_that_needs_updating(trakt_list, "movies"))
+        self._update_movies(trakt_list)
         query = """SELECT m.trakt_id, m.info, m.art, m.cast, m.args, b.resume_time, b.percent_played, m.watched as 
         play_count FROM movies as m left join bookmarks as b on m.trakt_id = b.trakt_id WHERE m.trakt_id in ({})""".format(
             ",".join((str(i.get("trakt_id")) for i in trakt_list))
@@ -108,46 +108,20 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     @guard_against_none(list)
     def get_movie(self, trakt_id):
-        return self.get_movie_list(
-            [
-                self.fetchone(
-                    """WITH requested(trakt_id) AS (VALUES ({})) select r.trakt_id as 
-        trakt_id, db.value as trakt_object from requested as r left join movies_meta as db on r.trakt_id == db.id and 
-        type = 'trakt' """.format(
-                        trakt_id
-                    )
-                )
-            ]
-        )[0]
+        return self.get_movie_list([self._get_single_movie_meta(trakt_id)])[0]
+
+    @guard_against_none()
+    def _get_single_movie_meta(self, trakt_id):
+        return self._get_single_meta("/movies/{}".format(trakt_id), trakt_id, "movies")
 
     @guard_against_none_or_empty()
     def _update_movies(self, list_to_update):
-        trakt_object = MetadataHandler.trakt_object
         get = MetadataHandler.get_trakt_info
-
-        missing_trakt = [
-            movie
-            for movie in list_to_update
-            if trakt_object(movie) is None or trakt_object(movie) == {}
-        ]
-        if len(missing_trakt) > 0:
-            [
-                self.task_queue.put(
-                    self._update_single_meta,
-                    "movies/{}".format(movie.get("trakt_id")),
-                    movie,
-                    "movies",
-                )
-                for movie in missing_trakt
-            ]
-            self.task_queue.wait_completion()
-            self.update_missing_trakt_objects(list_to_update, missing_trakt)
 
         sql_statement = """WITH requested(trakt_id, last_updated) AS (VALUES {}) SELECT r.trakt_id, trakt.value as  
         trakt_object, trakt.meta_hash as trakt_meta_hash, tmdb_id, tmdb.value as tmdb_object, tmdb.meta_hash as 
         tmdb_meta_hash, fanart.value as fanart_object, fanart.meta_hash as fanart_meta_hash, m.imdb_id, omdb.value as 
-        omdb_object, omdb.meta_hash as omdb_meta_hash, CASE WHEN m.last_updated is null or (Datetime(m.last_updated) 
-        < Datetime(r.last_updated)) THEN 'true' else 'false' END as NeedsUpdate FROM requested as r LEFT JOIN movies 
+        omdb_object, omdb.meta_hash as omdb_meta_hash, m.needs_update FROM requested as r LEFT JOIN movies 
         as m on r.trakt_id = m.trakt_id LEFT JOIN movies_meta as trakt on trakt.id = m.trakt_id and trakt.type = 
         'trakt' LEFT JOIN movies_meta as tmdb on tmdb.id = m.tmdb_id and tmdb.type = 'tmdb' LEFT JOIN movies_meta as 
         fanart on fanart.id = m.tmdb_id and fanart.type = 'fanart' LEFT JOIN movies_meta as omdb on omdb.id = 
@@ -160,23 +134,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         db_list_to_update = self.fetchall(sql_statement)
 
-        self.update_missing_trakt_objects(db_list_to_update, list_to_update)
-
-        [
+        for movie in db_list_to_update:
             self.task_queue.put(self.metadataHandler.update, movie)
-            for movie in db_list_to_update
-        ]
         updated_items = self.task_queue.wait_completion()
 
         if not updated_items:
             return
 
-        self.save_to_meta_table(
-            (i for i in updated_items if "trakt_object" in i),
-            "movies",
-            "trakt",
-            "trakt_id",
-        )
         self.save_to_meta_table(
             (i for i in updated_items if "tmdb_object" in i),
             "movies",

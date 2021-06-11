@@ -237,7 +237,7 @@ def dispatch(params):
                     sources[1], sources[2], pack_select
                 )
         finally:
-            g.set_setting("general.tempSilent", "false")
+            g.set_runtime_setting("tempSilent", False)
 
         g.log("Pre-scraping completed")
 
@@ -383,7 +383,7 @@ def dispatch(params):
         smartPlay.SmartPlay(action_args).shuffle_play()
 
     elif action == "resetSilent":
-        g.set_setting("general.tempSilent", "false")
+        g.set_runtime_setting("tempSilent", False)
         g.notification(
             "{}: {}".format(g.ADDON_NAME, g.get_language_string(30329)),
             g.get_language_string(30034),
@@ -765,3 +765,7 @@ def dispatch(params):
     elif action == "toggleLanguageInvoker":
         from resources.lib.common.maintenance import toggle_reuselanguageinvoker
         toggle_reuselanguageinvoker()
+
+    elif action == "chooseTimeZone":
+        from resources.lib.modules.manual_timezone import choose_timezone
+        choose_timezone()

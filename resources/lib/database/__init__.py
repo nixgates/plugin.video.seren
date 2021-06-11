@@ -5,7 +5,6 @@ import os
 import sqlite3
 import types
 from abc import ABCMeta, abstractmethod
-
 from contextlib import contextmanager
 from functools import wraps
 
@@ -14,17 +13,18 @@ import xbmcvfs
 from requests import Response
 
 from resources.lib.common import tools
+from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
 
 try:
     import cPickle as pickle
-except:
+except ImportError:
     import pickle
 
 try:
     pickletype = buffer  # noqa: F821  pylint: disable=undefined-variable
-except:
+except NameError:
     pickletype = bytes
 
 
@@ -80,15 +80,9 @@ PICKLE_TYPES = (
 )
 
 
-def _register_pickler_adapters():
-    sqlite3.register_adapter(bool, int)  # pylint: disable=no-member
-    sqlite3.register_converter(str("BOOLEAN"), lambda v: bool(int(v)))  # pylint: disable=no-member
-
-
 class Database(object):
-    def __init__(self, db_file, database_layout, threading_lock):
+    def __init__(self, db_file, database_layout):
         self._db_file = db_file
-        self._threading_lock = threading_lock
         self._database_layout = database_layout
         self._integrity_check_db()
 
@@ -127,23 +121,23 @@ class Database(object):
 
     def _integrity_check_db(self):
         db_file_checksum = tools.md5_hash(self._database_layout)
-        with GlobalLock(
-                self.__class__.__name__, self._threading_lock, True, db_file_checksum
-        ) as lock:
-            if lock.runned_once():
-                return
-            if xbmcvfs.exists(self._db_file) and g.read_all_text("{}.md5".format(self._db_file)) == db_file_checksum:
-                return
-            g.log(
-                "Integrity checked failed - {} - {} - rebuilding db".format(
-                    self._db_file, db_file_checksum
+        try:
+            with GlobalLock(self.__class__.__name__, True, db_file_checksum):
+                if xbmcvfs.exists(self._db_file) and g.read_all_text("{}.md5".format(self._db_file)) == db_file_checksum:
+                    return
+                g.log(
+                    "Integrity checked failed - {} - {} - rebuilding db".format(
+                        self._db_file, db_file_checksum
+                    )
                 )
-            )
-            self.rebuild_database()
-            g.write_all_text("{}.md5".format(self._db_file), db_file_checksum)
+                self.rebuild_database()
+                g.write_all_text("{}.md5".format(self._db_file), db_file_checksum)
+        except RanOnceAlready:
+            return
 
     # endregion
 
+    # region public methods
     def rebuild_database(self):
         g.log("Rebuilding database: {}".format(self._db_file))
         with SQLiteConnection(self._db_file) as sqlite:
@@ -151,15 +145,11 @@ class Database(object):
                 database_schema = sqlite._connection.execute(
                     "SELECT m.name from sqlite_master m where type = 'table'"
                 ).fetchall()
-
+            sqlite._connection.execute("PRAGMA foreign_keys = OFF")
             for q in ["DROP TABLE IF EXISTS [{}]".format(t["name"]) for t in database_schema]:
                 sqlite._connection.execute(q)
 
             self._create_tables(sqlite._connection)
-
-    # endregion
-
-    # region public methods
 
     def fetchall(self, query, data=None):
         with SQLiteConnection(self._db_file) as connection:
@@ -199,19 +189,23 @@ class _connection:
 
     @abstractmethod
     def _create_connection(self):
-        return
+        pass
 
     @abstractmethod
     def _create_cursor(self):
-        return
+        pass
 
     @contextmanager
     def smart_transaction(self, query):
         no_transaction_keywords = ["select ", "vacuum"]
 
         if isinstance(query, list) and any(
-                k for k in no_transaction_keywords if any(q for q in query if k in q.lower())) \
-                or not isinstance(query, list) and any(k for k in no_transaction_keywords if k in query.lower()):
+                k for k in no_transaction_keywords if any(
+                    q for q in query if q[:10].lstrip().lower().startswith(k)
+                )
+        ) or not isinstance(query, list) and any(
+            k for k in no_transaction_keywords if query[:10].lstrip().lower().startswith(k)
+        ):
             yield
         else:
             yield self.transaction()
@@ -221,9 +215,10 @@ class _connection:
         self._cursor.execute('BEGIN')
         try:
             yield self._cursor
-        except:
+        except BaseException as be:
             self._connection.rollback()
-            raise
+            if isinstance(be, Exception):
+                raise
         else:
             self._connection.commit()
 
@@ -253,7 +248,7 @@ class _connection:
                     return self._cursor.fetchall()
                 else:
                     return self._cursor
-        except:
+        except Exception:
             self._log_error(query, data)
             raise
 
@@ -267,7 +262,7 @@ class _connection:
 
 class SQLiteConnection(_connection):
     def __init__(self, path):
-        _connection.__init__(self)
+        super(SQLiteConnection, self).__init__()
         self.path = path
         self._create_db_path()
 
@@ -305,7 +300,7 @@ class SQLiteConnection(_connection):
         connection.execute("PRAGMA synchronous = normal")
         connection.execute("PRAGMA temp_store = memory")
         connection.execute("PRAGMA mmap_size = 30000000000")
-        connection.execute("PRAGMA page_size = 32768")
+        connection.execute("PRAGMA page_size = 32768")  # no-translate
 
     def _create_db_path(self):
         if not xbmcvfs.exists(os.path.dirname(self.path)):
@@ -314,7 +309,7 @@ class SQLiteConnection(_connection):
 
 class MySqlConnection(_connection):
     def __init__(self, config):
-        _connection.__init__(self, True)
+        super(MySqlConnection, self).__init__(True)
         self.config = {
             'user': config.get("user"),
             'password': config.get("password"),
@@ -330,7 +325,59 @@ class MySqlConnection(_connection):
         return mysql.connector.connect(**self.config)
 
     def _create_cursor(self):
-        return self._connection.cursor(dictionary=True)
+        return self._connection.cursor(cursor_class=MySQLCursorDict)
+
+
+class MySQLCursorDict(mysql.connector.connection.MySQLCursor):
+    """
+    Cursor fetching rows as dictionaries.
+
+    The fetch methods of this class will return dictionaries instead of tuples.
+    Each row is a dictionary that looks like:
+        row = {
+            "col1": value1,
+            "col2": value2
+        }
+    """
+    ERR_NO_RESULT_TO_FETCH = "No result set to fetch from"
+
+    def _row_to_python(self, rowdata, desc=None):
+        """Convert a MySQL text result row to Python types
+
+        Returns a dictionary.
+        """
+        row = rowdata
+
+        if row:
+            return dict(zip(self.column_names, row))
+
+        return None
+
+    def fetchone(self):
+        """Returns next row of a query result set
+        """
+        row = self._fetch_row()
+        if row:
+            return self._row_to_python(row, self.description)
+        return None
+
+    def fetchall(self):
+        """Returns all rows of a query result set
+        """
+        if not self._have_unread_result():
+            raise mysql.connector.errors.InterfaceError(self.ERR_NO_RESULT_TO_FETCH)
+        (rows, eof) = self._connection.get_rows()
+        if self._nextrow[0]:
+            rows.insert(0, self._nextrow[0])
+        res = []
+        for row in rows:
+            res.append(self._row_to_python(row, self.description))
+        self._handle_eof(eof)
+        rowcount = len(rows)
+        if rowcount >= 0 and self._rowcount == -1:
+            self._rowcount = 0
+        self._rowcount += rowcount
+        return res
 
 
 class TempTable:

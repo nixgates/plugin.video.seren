@@ -20,5 +20,5 @@ kodistubs==19.0.1; python_version>="3.7"
 contextlib2; python_version<"3"
 requests-mock
 Mock~=3.0.5
-tzlocal
-mysql-connector-python
+mysql-connector-python==8.0.18
+unidecode==1.1.1

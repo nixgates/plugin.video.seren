@@ -27,7 +27,7 @@ class Resolverhelper(object):
         :param overwrite_cache: Set to true if you wish to overwrite the current cached return value
         :return: None if unsuccessful otherwise a playable object
         """
-        if g.get_bool_setting('general.tempSilent'):
+        if g.get_bool_runtime_setting('tempSilent'):
             return Resolver().resolve_multiple_until_valid_link(sources, item_information, pack_select, True)
         else:
             window = ResolverWindow(*SkinManager().confirm_skin_path('resolver.xml'),

@@ -11,11 +11,9 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from resources.lib.common import tools
+from resources.lib.database.cache import use_cache
 from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
 from resources.lib.modules.globals import g
-
-if g.PYTHON3:
-    unicode = str
 
 
 def tmdb_guard_response(func):
@@ -42,9 +40,9 @@ def tmdb_guard_response(func):
                 "TMDb returned a {} ({}): while requesting {}".format(
                     response.status_code,
                     TMDBAPI.http_codes[response.status_code],
-                    response.url,
+                    "&".join(x for x in response.url.split('&') if not x.lower().startswith("api_key")),
                 ),
-                "warning",
+                "warning" if not response.status_code == 404 else "debug"
             )
             return None
         except requests.exceptions.ConnectionError:
@@ -53,7 +51,7 @@ def tmdb_guard_response(func):
             xbmcgui.Dialog().notification(
                 g.ADDON_NAME, g.get_language_string(30025).format("TMDb")
             )
-            if g.get_global_setting("run.mode") == "test":
+            if g.get_runtime_setting("run.mode") == "test":
                 raise
             else:
                 g.log_stacktrace()
@@ -76,7 +74,7 @@ class TMDBAPI(ApiBase):
 
     normalization = [
         ("overview", ("plot", "overview", "plotoutline"), None),
-        ("release_date", ("premiered", "aired"), lambda t: tools.validate_date(t)),
+        ("release_date", ("premiered", "aired"), lambda t: g.validate_date(t)),
         (
             "keywords",
             "tag",
@@ -133,8 +131,8 @@ class TMDBAPI(ApiBase):
             (
                 "first_air_date",
                 "year",
-                lambda t: tools.validate_date(t)[:4]
-                if tools.validate_date(t)
+                lambda t: g.validate_date(t)[:4]
+                if g.validate_date(t)
                 else None
             ),
             (
@@ -240,8 +238,8 @@ class TMDBAPI(ApiBase):
             (
                 "premiered",
                 "year",
-                lambda t: tools.validate_date(t)[:4]
-                if tools.validate_date(t)
+                lambda t: g.validate_date(t)[:4]
+                if g.validate_date(t)
                 else None
             ),
         ],
@@ -351,11 +349,12 @@ class TMDBAPI(ApiBase):
 
     @tmdb_guard_response
     def get(self, url, **params):
-        return requests.get(
+        timeout = params.pop("timeout", 10)
+        return self.session.get(
             tools.urljoin(self.baseUrl, url),
             params=self._add_api_key(params),
             headers={"Accept": "application/json"},
-            timeout=3,
+            timeout=timeout,
         )
 
     def get_json(self, url, **params):
@@ -364,9 +363,16 @@ class TMDBAPI(ApiBase):
             return None
         return self._handle_response(response.json())
 
+    @use_cache()
+    def get_json_cached(self, url, **params):
+        response = self.get(url, **params)
+        if response is None:
+            return None
+        return self._handle_response(response.json())
+
     @wrap_tmdb_object
     def get_movie(self, tmdb_id):
-        return self.get_json(
+        return self.get_json_cached(
             "movie/{}".format(tmdb_id),
             language=self.lang_full_code,
             append_to_response=",".join(self.append_to_response),
@@ -377,7 +383,7 @@ class TMDBAPI(ApiBase):
     @wrap_tmdb_object
     def get_movie_rating(self, tmdb_id):
         result = tools.filter_dictionary(
-            tools.safe_dict_get(self.get_json("movie/{}".format(tmdb_id)), "info"),
+            tools.safe_dict_get(self.get_json_cached("movie/{}".format(tmdb_id)), "info"),
             "rating",
         )
         return {"info": result} if result else None
@@ -385,20 +391,20 @@ class TMDBAPI(ApiBase):
     @wrap_tmdb_object
     def get_movie_cast(self, tmdb_id):
         result = tools.safe_dict_get(
-            self.get_json("movie/{}/credits".format(tmdb_id)), "cast"
+            self.get_json_cached("movie/{}/credits".format(tmdb_id)), "cast"
         )
         return {"cast": result} if result else None
 
     @wrap_tmdb_object
     def get_movie_art(self, tmdb_id):
-        return self.get_json(
+        return self.get_json_cached(
             "movie/{}/images".format(tmdb_id),
             include_image_language=",".join(self.include_languages),
         )
 
     @wrap_tmdb_object
     def get_show(self, tmdb_id):
-        return self.get_json(
+        return self.get_json_cached(
             "tv/{}".format(tmdb_id),
             language=self.lang_full_code,
             append_to_response=",".join(self.append_to_response),
@@ -408,7 +414,7 @@ class TMDBAPI(ApiBase):
 
     @wrap_tmdb_object
     def get_show_art(self, tmdb_id):
-        return self.get_json(
+        return self.get_json_cached(
             "tv/{}/images".format(tmdb_id),
             include_image_language=",".join(self.include_languages),
         )
@@ -416,7 +422,7 @@ class TMDBAPI(ApiBase):
     @wrap_tmdb_object
     def get_show_rating(self, tmdb_id):
         result = tools.filter_dictionary(
-            tools.safe_dict_get(self.get_json("tv/{}".format(tmdb_id)), "info"),
+            tools.safe_dict_get(self.get_json_cached("tv/{}".format(tmdb_id)), "info"),
             "rating",
         )
         return {"info": result} if result else None
@@ -424,13 +430,13 @@ class TMDBAPI(ApiBase):
     @wrap_tmdb_object
     def get_show_cast(self, tmdb_id):
         result = tools.safe_dict_get(
-            self.get_json("tv/{}/credits".format(tmdb_id)), "cast"
+            self.get_json_cached("tv/{}/credits".format(tmdb_id)), "cast"
         )
         return {"cast": result} if result else None
 
     @wrap_tmdb_object
     def get_season(self, tmdb_id, season):
-        return self.get_json(
+        return self.get_json_cached(
             "tv/{}/season/{}".format(tmdb_id, season),
             language=self.lang_full_code,
             append_to_response=",".join(self.append_to_response),
@@ -440,14 +446,14 @@ class TMDBAPI(ApiBase):
 
     @wrap_tmdb_object
     def get_season_art(self, tmdb_id, season):
-        return self.get_json(
+        return self.get_json_cached(
             "tv/{}/season/{}/images".format(tmdb_id, season),
             include_image_language=",".join(self.include_languages),
         )
 
     @wrap_tmdb_object
     def get_episode(self, tmdb_id, season, episode):
-        return self.get_json(
+        return self.get_json_cached(
             "tv/{}/season/{}/episode/{}".format(tmdb_id, season, episode),
             language=self.lang_full_code,
             append_to_response=",".join(self.append_to_response),
@@ -457,7 +463,7 @@ class TMDBAPI(ApiBase):
 
     @wrap_tmdb_object
     def get_episode_art(self, tmdb_id, season, episode):
-        return self.get_json(
+        return self.get_json_cached(
             "tv/{}/season/{}/episode/{}/images".format(tmdb_id, season, episode),
             include_image_language=",".join(self.include_languages),
         )
@@ -466,7 +472,7 @@ class TMDBAPI(ApiBase):
     def get_episode_rating(self, tmdb_id, season, episode):
         result = tools.filter_dictionary(
             tools.safe_dict_get(
-                self.get_json(
+                self.get_json_cached(
                     "tv/{}/season/{}/episode/{}".format(tmdb_id, season, episode)
                 ),
                 "info",

@@ -17,7 +17,7 @@ from resources.lib.modules.exceptions import (
     GeneralCachingFailure,
     DebridNotEnabled,
     FailureAtRemoteParty,
-    )
+)
 from resources.lib.modules.exceptions import KodiShutdownException
 from resources.lib.modules.globals import g
 
@@ -462,8 +462,10 @@ class CacheAssistHelper:
         if not torrent_list:
             return
         debrid_class = self.locations[g.get_int_setting("general.cachelocation")][1]
+        if not isinstance(torrent_list, list):
+            torrent_list = [torrent_list]
 
-        if len(torrent_list) == 0:
+        if len(torrent_list) == 1:
             selected_source = torrent_list[0]
         else:
             selected_source = _approx_best_source(torrent_list)

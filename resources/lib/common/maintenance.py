@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import os
-import re
 import time
 
 import requests
@@ -10,6 +9,7 @@ import xbmcgui
 import xbmcvfs
 
 from resources.lib.common import tools
+from resources.lib.database import cache
 from resources.lib.database.premiumizeTransfers import PremiumizeTransfers
 from resources.lib.database.skinManager import SkinManager
 from resources.lib.debrid import all_debrid
@@ -38,13 +38,13 @@ def check_for_addon_update():
     :rtype: None
     """
     if not g.get_bool_setting("general.checkAddonUpdates"):
-         return
-
-    if "-" in g.VERSION:
-        g.set_setting("addon.updateCheckTimeStamp", g.UNICODE(time.time()))
         return
 
-    update_timestamp = g.get_float_setting("addon.updateCheckTimeStamp")
+    if "-" in g.VERSION:
+        g.set_runtime_setting("addon.updateCheckTimeStamp", g.UNICODE(time.time()))
+        return
+
+    update_timestamp = g.get_float_runtime_setting("addon.updateCheckTimeStamp")
 
     if time.time() > (update_timestamp + (24 * (60 * 60))):
         repo_xml = requests.get(
@@ -66,7 +66,7 @@ def check_for_addon_update():
                 maxversion = dir_tag.get('maxversion')
                 if (
                         (
-                            minversion is None and maxversion is None
+                                minversion is None and maxversion is None
                         ) or
                         (
                                 minversion and maxversion and
@@ -74,12 +74,12 @@ def check_for_addon_update():
                                 tools.compare_version_numbers(g.KODI_FULL_VERSION, maxversion, include_same=True)
                         ) or
                         (
-                            maxversion is None and minversion and
-                            tools.compare_version_numbers(minversion, g.KODI_FULL_VERSION, include_same=True)
+                                maxversion is None and minversion and
+                                tools.compare_version_numbers(minversion, g.KODI_FULL_VERSION, include_same=True)
                         ) or
                         (
-                            minversion is None and maxversion and
-                            tools.compare_version_numbers(g.KODI_FULL_VERSION, maxversion, include_same=True)
+                                minversion is None and maxversion and
+                                tools.compare_version_numbers(g.KODI_FULL_VERSION, maxversion, include_same=True)
                         )
                 ):
                     repo_version = _get_latest_repo_version(dir_tag.find('info').text)
@@ -90,7 +90,7 @@ def check_for_addon_update():
         except tools.ElementTree.ParseError as pe:
             g.log("Could not parse repo XML", "error")
         finally:
-            g.set_setting("addon.updateCheckTimeStamp", str(time.time()))
+            g.set_runtime_setting("addon.updateCheckTimeStamp", g.UNICODE(time.time()))
 
 
 def _get_latest_repo_version(repo_url):
@@ -118,14 +118,13 @@ def _get_latest_repo_version(repo_url):
     return max_version
 
 
-
 def update_provider_packages():
     """
     Perform checks for provider package updates
     :return: None
     :rtype: None
     """
-    provider_check_stamp = g.get_float_setting("provider.updateCheckTimeStamp", 0)
+    provider_check_stamp = g.get_float_runtime_setting("provider.updateCheckTimeStamp", 0)
     automatic = g.get_bool_setting("providers.autoupdates")
     if time.time() > (provider_check_stamp + (24 * (60 * 60))):
         available_updates = ProviderInstallManager().check_for_updates(
@@ -133,7 +132,7 @@ def update_provider_packages():
         )
         if not automatic and len(available_updates) > 0:
             g.notification(g.ADDON_NAME, g.get_language_string(30278))
-        g.set_setting("provider.updateCheckTimeStamp", str(time.time()))
+        g.set_runtime_setting("provider.updateCheckTimeStamp", g.UNICODE(time.time()))
 
 
 def refresh_apis():
@@ -204,6 +203,7 @@ def account_premium_status_checks():
     :return: None
     :rtype: None
     """
+
     def set_settings_status(debrid_provider, is_premium):
         """
         Ease of use method to set premium status setting
@@ -250,7 +250,6 @@ def account_premium_status_checks():
 
 
 def toggle_reuselanguageinvoker(forced_state=None):
-
     def _store_and_reload(output):
         with open(file_path, "w+") as addon_xml:
             addon_xml.writelines(output)
@@ -328,7 +327,7 @@ def run_maintenance():
 
     # Check Premiumize Fair Usage for cleanup
     if g.get_bool_setting("premiumize.enabled") and g.get_bool_setting(
-        "premiumize.autodelete"
+            "premiumize.autodelete"
     ):
         try:
             premiumize_transfer_cleanup()
@@ -336,3 +335,4 @@ def run_maintenance():
             g.log("Failed to cleanup PM transfers: {}".format(e), 'error')
 
     # clean_deprecated_settings()
+    cache.Cache().check_cleanup()

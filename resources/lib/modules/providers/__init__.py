@@ -7,10 +7,12 @@ import json
 import os
 import sys
 import threading
+
 import xbmcvfs
 
 from resources.lib.common import tools
 from resources.lib.database.providerCache import ProviderCache
+from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.settings import SettingsManager
@@ -25,8 +27,6 @@ except ImportError:
 # If you update this init file_path you will need to update this base64 as well to ensure it is deployed on the users machine
 # If you change the init file_path without updating this it will be overwritten with the old one!!
 INIT_BASE64 = "aW1wb3J0IG9zCmZyb20gcmVzb3VyY2VzLmxpYi5tb2R1bGVzLmdsb2JhbHMgaW1wb3J0IGcKZnJvbSByZXNvdXJjZXMubGliLmRhdGFiYXNlLnByb3ZpZGVyQ2FjaGUgaW1wb3J0IFByb3ZpZGVyQ2FjaGUKCgpkZWYgX2lzX3ZhbGlkX3Byb3ZpZGVyX2RpcihuYW1lKToKICAgIGRpcl9wYXRoID0gb3MucGF0aC5qb2luKGRhdGFfcGF0aCwgbmFtZSkKICAgIHRyeToKICAgICAgICBpZiBub3Qgb3MucGF0aC5pc2RpcihkaXJfcGF0aCk6CiAgICAgICAgICAgIHJldHVybiBGYWxzZQogICAgICAgIGlmIG5hbWUuc3RhcnRzd2l0aCgnX18nKToKICAgICAgICAgICAgcmV0dXJuIEZhbHNlCgogICAgICAgIHJldHVybiBUcnVlCgogICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICByZXR1cm4gRmFsc2UKCgpkYXRhX3BhdGggPSBvcy5wYXRoLmpvaW4oZy5BRERPTl9VU0VSREFUQV9QQVRILCAncHJvdmlkZXJzJykKcHJvdmlkZXJfcGFja2FnZXMgPSBbbmFtZSBmb3IgbmFtZSBpbiBvcy5saXN0ZGlyKGRhdGFfcGF0aCkgaWYgX2lzX3ZhbGlkX3Byb3ZpZGVyX2RpcihuYW1lKV0KcHJvdmlkZXJDYWNoZSA9IFByb3ZpZGVyQ2FjaGUoKQoKcHJvdmlkZXJfdHlwZXMgPSAoCiAgICAoJ2hvc3RlcnMnLCAnZ2V0X2hvc3RlcnMnKSwKICAgICgndG9ycmVudCcsICdnZXRfdG9ycmVudCcpLAogICAgKCdhZGFwdGl2ZScsICdnZXRfYWRhcHRpdmUnKQopCgoKZGVmIF9pc19wcm92aWRlcl9lbmFibGVkKHByb3ZpZGVyX25hbWUsIHBhY2thZ2UsIHN0YXR1c2VzKToKICAgIHJldHVybiBUcnVlIGlmIGxlbigKICAgICAgICBbaSBmb3IgaSBpbiBzdGF0dXNlcyBpZiBpWydwcm92aWRlcl9uYW1lJ10gPT0gcHJvdmlkZXJfbmFtZSBhbmQgaVsncGFja2FnZSddID09IHBhY2thZ2VdKSBlbHNlIEZhbHNlCgoKZGVmIF9nZXRfcHJvdmlkZXJzKGxhbmd1YWdlLCBzdGF0dXM9RmFsc2UpOgogICAgcHJvdmlkZXJfc3RvcmUgPSB7CiAgICAgICAgJ2hvc3RlcnMnOiBbXSwKICAgICAgICAndG9ycmVudCc6IFtdLAogICAgICAgICdhZGFwdGl2ZSc6IFtdLAogICAgfQogICAgZm9yIHBhY2thZ2UgaW4gcHJvdmlkZXJfcGFja2FnZXM6CiAgICAgICAgcHJvdmlkZXJzX3BhdGggPSAncHJvdmlkZXJzLiVzLiVzJyAlIChwYWNrYWdlLCBsYW5ndWFnZSkKICAgICAgICBwcm92aWRlcl9saXN0ID0gX19pbXBvcnRfXyhwcm92aWRlcnNfcGF0aCwgZnJvbWxpc3Q9WycnXSkKICAgICAgICBmb3IgcHJvdmlkZXJfdHlwZSBpbiBwcm92aWRlcl90eXBlczoKICAgICAgICAgICAgZm9yIGkgaW4gZ2V0YXR0cihwcm92aWRlcl9saXN0LCBwcm92aWRlcl90eXBlWzFdLCBsYW1iZGE6IFtdKSgpOgogICAgICAgICAgICAgICAgaWYgc3RhdHVzIGlzIG5vdCBGYWxzZSBhbmQgbm90IF9pc19wcm92aWRlcl9lbmFibGVkKGksIHBhY2thZ2UsIHN0YXR1cyk6CiAgICAgICAgICAgICAgICAgICAgY29udGludWUKCiAgICAgICAgICAgICAgICBwcm92aWRlcl9zdG9yZVtwcm92aWRlcl90eXBlWzBdXS5hcHBlbmQoKCd7fS57fScuZm9ybWF0KHByb3ZpZGVyc19wYXRoLCBwcm92aWRlcl90eXBlWzBdKSwgaSwgcGFja2FnZSkpCgogICAgcmV0dXJuIHByb3ZpZGVyX3N0b3JlCgoKZGVmIGdldF9yZWxldmFudChsYW5ndWFnZSk6CiAgICAjIEdldCBlbmFibGVkIHByb3ZpZGVycwogICAgcHJvdmlkZXJfc3RhdHVzID0gW2kgZm9yIGkgaW4gcHJvdmlkZXJDYWNoZS5nZXRfcHJvdmlkZXJzKCkgaWYgaVsnY291bnRyeSddID09IGxhbmd1YWdlXQogICAgcHJvdmlkZXJfc3RhdHVzID0gW2kgZm9yIGkgaW4gcHJvdmlkZXJfc3RhdHVzIGlmIGlbJ3N0YXR1cyddID09ICdlbmFibGVkJ10KCiAgICByZXR1cm4gX2dldF9wcm92aWRlcnMobGFuZ3VhZ2UsIHByb3ZpZGVyX3N0YXR1cykKCgpkZWYgZ2V0X2FsbChsYW5ndWFnZSk6CiAgICByZXR1cm4gX2dldF9wcm92aWRlcnMobGFuZ3VhZ2UpCg=="
-
-provider_lock = threading.Lock()
 
 
 class CustomProviders(ProviderCache):
@@ -43,9 +43,11 @@ class CustomProviders(ProviderCache):
         self.modules_path = os.path.join(g.ADDON_USERDATA_PATH, "providerModules")
         self.meta_path = os.path.join(g.ADDON_USERDATA_PATH, "providerMeta")
         self.provider_types = ["torrent", "hosters", "adaptive"]
-        with GlobalLock(self.__class__.__name__, provider_lock, True) as lock:
-            if not lock.runned_once():
+        try:
+            with GlobalLock(self.__class__.__name__, True):
                 self._init_providers()
+        except RanOnceAlready:
+            pass
         self.poll_database()
         self.provider_settings = SettingsManager()
 

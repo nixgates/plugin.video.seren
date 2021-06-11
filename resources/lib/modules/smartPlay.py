@@ -231,7 +231,7 @@ class SmartPlay:
             return
 
         url = url.replace("getSources", "preScrape")
-        g.set_setting("general.tempSilent", "true")
+        g.set_runtime_setting("tempSilent", True)
         g.log("Running Pre-Scrape: {}".format(url))
         xbmc.executebuiltin('RunPlugin("{}")'.format(url))
 
@@ -314,7 +314,7 @@ class SmartPlay:
             bulk_add=True,
             is_playable=True,
             )
-        g.PLAYLIST.add(url=sys.argv[0] + sys.argv[2], listitem=item[1])
+        g.PLAYLIST.add(url=g.BASE_URL + "/?" + g.PARAM_STRING, listitem=item[1])
         return g.PLAYLIST
 
     def playlist_present_check(self, ignore_setting=False):
@@ -339,7 +339,7 @@ class SmartPlay:
             ]
 
             # Check to see if we are just starting playback and kodi has created a playlist
-            if len(playlist_uris) == 1 and playlist_uris[0].split('/')[-1] == sys.argv[2]:
+            if len(playlist_uris) == 1 and playlist_uris[0].split('/')[-1].lstrip('?') == g.PARAM_STRING:
                 return False
 
             if g.PLAYLIST.getposition() == -1:
@@ -364,7 +364,7 @@ class SmartPlay:
                 playlist_uris = []
 
             if (len(playlist_uris) == 0 or
-                (len(playlist_uris) > 1 and not any(sys.argv[2] in i for i in playlist_uris))) or \
+                (len(playlist_uris) > 1 and not any(g.PARAM_STRING in i for i in playlist_uris))) or \
                     g.PLAYLIST.getposition() == -1:
                 return self.create_single_item_playlist_from_info()
 

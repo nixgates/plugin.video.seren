@@ -13,6 +13,8 @@ class SerenMonitor(xbmc.Monitor):
     def onSettingsChanged(self):
         super(SerenMonitor, self).onSettingsChanged()
         g.log("SETTINGS UPDATED", "info")
-        if not g.is_addon_visible():
+        if g.SETTINGS_CACHE.get_settings_persisted_flag():
             return
+        g.log("FLUSHING SETTINGS CACHE", "info")
+        g.SETTINGS_CACHE.clear_cache()
         g.trigger_widget_refresh()

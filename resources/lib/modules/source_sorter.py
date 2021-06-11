@@ -254,11 +254,11 @@ class SourceSorter:
                 and len(torrents + hosters + cloud) > 0
         ):
             response = None
-            if not g.get_bool_setting('general.tempSilent'):
+            if not g.get_bool_runtime_setting('tempSilent'):
                 response = xbmcgui.Dialog().yesno(
                     g.ADDON_NAME, g.get_language_string(30510)
                     )
-            if response or g.get_bool_setting('general.tempSilent'):
+            if response or g.get_bool_runtime_setting('tempSilent'):
                 self.torrent_list = deepcopy(torrents)
                 self.hoster_list = deepcopy(hosters)
                 self.cloud_files = deepcopy(cloud)

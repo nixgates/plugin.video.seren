@@ -21,10 +21,10 @@ mock_source = {
     "info": ["HDTV", "AAC"],
     "quality": "1080p",
     "hash": "hash",
-    "size": 140000,
+    "size": 1400,
     "provider": "Test Provider",
     "release_title": "Test.Source.HDTV.AAC.1080p",
-    "debrid_provider": "Premiumize",
+    "debrid_provider": "premiumize",
     "seeds": 123,
 }
 

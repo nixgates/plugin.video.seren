@@ -3,47 +3,42 @@ from __future__ import absolute_import, division, unicode_literals
 
 import threading
 
-import xbmc
-
+from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.globals import g
 
 
 class GlobalLock(object):
-    def __init__(self, lock_name, threading_lock=threading.Lock(), run_once=False, check_sum=None):
+    def __init__(self, lock_name, run_once=False, check_sum=None):
         self._lock_name = lock_name
         self._run_once = run_once
         self._lock_format = "{}.GlobalLock.{}.{}"
-        self._threading_lock = threading_lock
         self._check_sum = check_sum or 'global'
 
     def _create_key(self, value):
         return self._lock_format.format(g.ADDON_NAME, self._lock_name, value)
 
     def _run(self):
-        if self.runned_once():
-            return
-        while not g.abort_requested() and self.running():
+        self._check_ran_once_already()
+        while not g.abort_requested() and self._running():
             if g.wait_for_abort(.100):
                 break
-        g.HOME_WINDOW.setProperty(self._create_key("Running"), 'true')
+        self._check_ran_once_already()
+        g.set_runtime_setting(self._create_key("Running"), True)
 
-    def running(self):
-        return g.HOME_WINDOW.getProperty(self._create_key("Running")) == 'true'
+    def _running(self):
+        return g.get_bool_runtime_setting(self._create_key("Running"))
 
-    def runned_once(self):
-        return g.HOME_WINDOW.getProperty(self._create_key("RunOnce")) == 'true' and \
-               g.HOME_WINDOW.getProperty(self._create_key("CheckSum")) == self._check_sum
+    def _check_ran_once_already(self):
+        if g.get_bool_runtime_setting(self._create_key("RunOnce")) and \
+               g.get_runtime_setting(self._create_key("CheckSum")) == self._check_sum:
+            raise RanOnceAlready("Lock name: {}, Checksum: {}".format(self._lock_name, self._check_sum))
 
     def __enter__(self):
-        self._threading_lock.acquire()
         self._run()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        try:
-            if self._run_once:
-                g.HOME_WINDOW.setProperty(self._create_key("RunOnce"), 'true')
-                g.HOME_WINDOW.setProperty(self._create_key("CheckSum"), self._check_sum)
-            g.HOME_WINDOW.clearProperty(self._create_key("Running"))
-        finally:
-            self._threading_lock.release()
+        if self._run_once:
+            g.set_runtime_setting(self._create_key("RunOnce"), True)
+            g.set_runtime_setting(self._create_key("CheckSum"), self._check_sum)
+        g.clear_runtime_setting(self._create_key("Running"))

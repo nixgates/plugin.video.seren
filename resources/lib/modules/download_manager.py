@@ -6,7 +6,6 @@ import os
 import time
 
 import requests
-import xbmc
 import xbmcgui
 import xbmcvfs
 

@@ -19,7 +19,7 @@ ACTION_NAV_BACK = 92
 
 class BaseWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, xml_file, location, item_information=None):
-        xbmcgui.WindowXMLDialog.__init__(self, xml_file, location)
+        super(BaseWindow, self).__init__(xml_file, location)
         self.item_information = {}
         self.action_exitkeys_id = [ACTION_PREVIOUS_MENU,
                                    ACTION_PLAYER_STOP,
@@ -97,7 +97,6 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
         media_type = info.get("mediatype", None)
         if media_type in [g.MEDIA_SHOW, g.MEDIA_SEASON, g.MEDIA_EPISODE]:
             # Convert dates to localtime for display
-            g.log("Converting TV Info Dates to local time for display", "debug")
             g.convert_info_dates(info)
         try:
             year, month, day = self.item_information['info'].get('aired', '0000-00-00').split('-')

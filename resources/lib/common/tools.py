@@ -10,11 +10,10 @@ import os
 import re
 import sys
 import time
+import traceback
 
 import xbmc
 import xbmcvfs
-
-from resources.lib.third_party import pytz, tzlocal
 
 try:
     # Try to get Python 3 versions
@@ -43,14 +42,13 @@ except ImportError:
 
 try:
     basestring = basestring  # noqa # pylint: disable=undefined-variable
-
-    unicode = unicode  # noqa # pylint: disable=undefined-variable
-    xrange = xrange  # noqa # pylint: disable=undefined-variable
 except NameError:
-    basestring = str
-    unicode = str
-    xrange = range
+    pass
 
+try:
+    unicode = unicode  # noqa # pylint: disable=undefined-variable
+except NameError:
+    unicode = str
 
 try:
     import xml.etree.cElementTree as ElementTree
@@ -63,13 +61,6 @@ try:
     xrange = range
 except NameError:
     pass
-
-try:
-    from collections import Mapping
-
-    mapping_type = Mapping
-except ImportError:
-    mapping_type = collections.Mapping
 
 DIGIT_REGEX = re.compile(r"\d")
 SORT_TOKENS = [
@@ -90,8 +81,10 @@ SORT_TOKENS = [
     "o ",
     "the ",
 ]
+SORT_TOKEN_REGEX = re.compile(r"|".join(r"^{}".format(i) for i in SORT_TOKENS), re.IGNORECASE)
 
 PYTHON3 = True if sys.version_info.major == 3 else False
+
 
 def copy2clip(txt):
     """
@@ -350,20 +343,27 @@ def smart_merge_dictionary(dictionary, merge_dict, keep_original=False, extend_a
         if isinstance(new_value, (dict, collections.Mapping)):
             if original_value is None:
                 original_value = {}
-            new_value = smart_merge_dictionary(original_value, new_value, keep_original)
+            new_value = smart_merge_dictionary(original_value, new_value, keep_original, extend_array)
         else:
             if original_value and keep_original:
                 continue
             if extend_array and isinstance(original_value, (list, set)) and isinstance(
                     new_value, (list, set)
             ):
-                original_value.extend(x for x in new_value if x not in original_value)
-                try:
-                    new_value = sorted(original_value)
-                except TypeError:  # Sorting of complex array doesn't work.
-                    new_value = original_value
-                    pass
-        if new_value:
+                if isinstance(original_value, set):
+                    original_value.update(x for x in new_value if x not in original_value)
+                    try:
+                        new_value = set(sorted(original_value))
+                    except TypeError:  # Sorting of complex array doesn't work.
+                        new_value = original_value
+                else:
+                    original_value.extend(x for x in new_value if x not in original_value)
+                    try:
+                        new_value = sorted(original_value)
+                    except TypeError:  # Sorting of complex array doesn't work.
+                        new_value = original_value
+        if new_value or new_value == 0 or isinstance(new_value, bool):
+            # We want to skip empty lists / dicts / sets
             dictionary[new_key] = new_value
     return dictionary
 
@@ -393,6 +393,8 @@ def md5_hash(value):
     :return: Hexdigest of hash
     :rtype: str
     """
+    if isinstance(value, (tuple, dict, list, set)):
+        value = json.dumps(value, sort_keys=True)
     return hashlib.md5(unicode(value).encode("utf-8")).hexdigest()
 
 
@@ -565,74 +567,6 @@ def create_multiline_message(line1=None, line2=None, line3=None, *lines):
     return "\n".join(result)
 
 
-def validate_date(date_string):
-    """Validates the path and returns only the date portion, if it invalidates it just returns none.
-
-    :param date_string:string value with a supposed date.
-    :type date_string:str
-    :return:formatted datetime or none
-    :rtype:str
-    """
-    from resources.lib.modules.globals import g
-
-    result = None
-    if not date_string:
-        return date_string
-
-    try:
-        result = parse_datetime(date_string, g.DATE_FORMAT, False)
-    except ValueError:
-        pass
-
-    if not result:
-        try:
-            result = parse_datetime(date_string, g.DATE_TIME_FORMAT_ZULU, False)
-        except ValueError:
-            pass
-
-    if not result:
-        try:
-            result = parse_datetime(date_string, g.DATE_TIME_FORMAT, False)
-        except ValueError:
-            pass
-
-    if not result:
-        try:
-            result = parse_datetime(date_string, "%d %b %Y", False)
-        except ValueError:
-            pass
-
-    if result and result.year > 1900:
-        return g.UNICODE(result.strftime(g.DATE_TIME_FORMAT))
-    return None
-
-
-def utc_to_local(utc_string):
-    """
-    Converts a UTC style datetime string to the localtimezone
-    :param utc_string: UTC datetime string
-    :return: localized datetime string
-    """
-    from resources.lib.modules.globals import g
-
-    if utc_string is None:
-        return None
-
-    utc_string = validate_date(utc_string)
-
-    if not utc_string:
-        return None
-
-    utc_timezone = pytz.timezone('UTC')
-    local_tz = tzlocal.get_localzone()  # If this fails we should get UTC back
-
-    utc = parse_datetime(utc_string, g.DATE_TIME_FORMAT, False)
-    utc = utc_timezone.localize(utc)
-    local_time = utc.astimezone(local_tz)
-    g.log("Original utc_string: {}  local_time: {}".format(utc_string, local_time.strftime(g.DATE_TIME_FORMAT)), "debug")
-    return local_time.strftime(g.DATE_TIME_FORMAT)
-
-
 def makedirs(name, mode=0o777, exist_ok=False):
     """makedirs(name [, mode=0o777][, exist_ok=False])
 
@@ -704,4 +638,3 @@ def safe_dict_get(dictionary, *path):
         return safe_dict_get(result, *path[1:])
     else:
         return dictionary.get(current_path)
-

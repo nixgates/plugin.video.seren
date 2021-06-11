@@ -6,7 +6,6 @@ from collections import OrderedDict
 from functools import wraps
 
 from resources.lib.common import tools
-from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.modules.exceptions import NormalizationFailure
 from resources.lib.modules.globals import g
 

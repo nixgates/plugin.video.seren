@@ -7,6 +7,7 @@ import _strptime
 import json
 import os
 import re
+import threading
 import time
 import traceback
 import unicodedata
@@ -16,10 +17,12 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 import xbmcvfs
+from unidecode import unidecode
 
 from resources.lib.common import tools
+from resources.lib.modules.settings_cache import PersistedSettingsCache, RuntimeSettingsCache
+from resources.lib.third_party import pytz, tzlocal
 from resources.lib.third_party.cached_property import cached_property
-from resources.lib.third_party.unidecode import unidecode
 
 viewTypes = [
     ("Default", 50),
@@ -293,13 +296,16 @@ class GlobalVariables(object):
         self.DEFAULT_FANART = None
         self.DEFAULT_ICON = None
         self.ADDON_USERDATA_PATH = None
-        self.SETTINGS_CACHE = {}
+        self.SETTINGS_CACHE = None
+        self.RUNTIME_SETTINGS_CACHE = None
         self.LANGUAGE_CACHE = {}
         self.PLAYLIST = None
         self.HOME_WINDOW = None
         self.KODI_FULL_VERSION = None
         self.KODI_VERSION = None
         self.PLATFORM = self._get_system_platform()
+        self.UTC_TIMEZONE = pytz.utc
+        self.LOCAL_TIMEZONE = None
         self.URL = None
         self.PLUGIN_HANDLE = 0
         self.IS_SERVICE = True
@@ -323,8 +329,6 @@ class GlobalVariables(object):
 
     def init_globals(self, argv=None, addon_id=None):
         self.IS_ADDON_FIRSTRUN = self.IS_ADDON_FIRSTRUN is None
-        self.SETTINGS_CACHE = {}
-        self.LANGUAGE_CACHE = {}
         self.ADDON = xbmcaddon.Addon()
         self.ADDON_ID = addon_id if addon_id else self.ADDON.getAddonInfo("id")
         self.ADDON_NAME = self.ADDON.getAddonInfo("name")
@@ -334,6 +338,8 @@ class GlobalVariables(object):
         self.DEFAULT_FANART = self.ADDON.getAddonInfo("fanart")
         self.DEFAULT_ICON = self.ADDON.getAddonInfo("icon")
         self._init_kodi()
+        self._init_settings_cache()
+        self._init_local_timezone()
         self._init_paths()
         self.init_request(argv)
         self._init_cache()
@@ -357,6 +363,69 @@ class GlobalVariables(object):
         else:
             self.KODI_FULL_VERSION = self.KODI_FULL_VERSION.split(' ')[0]
             self.KODI_VERSION = int(self.KODI_FULL_VERSION[:2])
+
+    def _init_settings_cache(self):
+        self.RUNTIME_SETTINGS_CACHE = RuntimeSettingsCache()
+        self.SETTINGS_CACHE = PersistedSettingsCache()
+
+    def _init_local_timezone(self):
+        """
+        Attempts to detect the local timezone via a variety of approaches
+        Initializes LOCAL_TIMEZONE to correct tzinfo value
+        If this fails we should just use UTC as lack of any LOCAL_TIMEZONE will cause many failures
+        :return: None
+        """
+        timezone_string = None
+        try:
+            try:
+                response = self.json_rpc("Settings.GetSettingValue", {"setting": "locale.timezone"})
+                timezone_string = response.get("value", '')
+
+                self.LOCAL_TIMEZONE = pytz.timezone(timezone_string)
+            except pytz.UnknownTimeZoneError:
+                if timezone_string:
+                    self.log(
+                        "Kodi provided an invalid local timezone '{}', trying a different approach".format(timezone_string),
+                        "warning"
+                    )
+                else:
+                    self.log(
+                        "Kodi does not support locale.timezone JSON RPC call on your platform, trying a different approach",
+                        "debug"
+                    )
+            except Exception as e:
+                self.log("Error detecting local timezone with Kodi, trying a different approach: {}".format(e), "warning")
+            # If Kodi detection failed, fall back on tzlocal
+            try:
+                if not self.LOCAL_TIMEZONE or self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
+                    self.LOCAL_TIMEZONE = tzlocal.get_localzone()
+            except Exception as e:
+                self.log("Error detecting local timezone with alternative approach: {}".format(e), "warning")
+            # If we still don't have a timezone, try manual setting
+            try:
+                if not self.LOCAL_TIMEZONE or self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
+                    g.set_setting("general.manualtimezone", True)
+                    timezone_string = self.get_setting("general.localtimezone")
+                    if timezone_string:
+                        self.LOCAL_TIMEZONE = pytz.timezone(timezone_string)
+                else:
+                    g.set_setting("general.manualtimezone", False)
+            except pytz.UnknownTimeZoneError:
+                self.log("Invalid local timezone '{}' in settings.xml".format(timezone_string), "debug")
+            except Exception as e:
+                self.log("Error using local timezone '{}' in settings.xml: {}".format(timezone_string, e),
+                         "warning")
+        finally:
+            # If Kodi and tzocal detection fails and we don't have a valid manual setting, fallback to UTC
+            if not self.LOCAL_TIMEZONE:
+                self.LOCAL_TIMEZONE = self.UTC_TIMEZONE
+            if self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
+                self.log(
+                    "Unable to detect local timezone, defaulting to UTC for displayed dates/times. "
+                    "Note that this does not affect filtering or sorting, only display",
+                    "debug"
+                )
+            self.set_setting("general.localtimezone", self.LOCAL_TIMEZONE.zone)
 
     @staticmethod
     def _get_system_platform():
@@ -382,42 +451,6 @@ class GlobalVariables(object):
         from resources.lib.database.cache import Cache
 
         self.CACHE = Cache()
-
-    # region global settings
-    @staticmethod
-    def _global_setting_key(setting_id):
-        return "seren.setting.{}".format(setting_id)
-
-    def get_global_setting(self, setting_id):
-        try:
-            return eval(
-                self.HOME_WINDOW.getProperty(self._global_setting_key(setting_id))
-            )
-        except:
-            return None
-
-    def set_global_setting(self, setting_id, value):
-        return self.HOME_WINDOW.setProperty(
-            self._global_setting_key(setting_id), repr(value)
-        )
-
-    def add_dictionary_to_window(self, key_prepend, dictionary):
-        for k, v in list(dictionary.items()):
-            key = "{}.{}".format(key_prepend, g.UNICODE(k))
-            if isinstance(v, dict):
-                self.add_dictionary_to_window(key, v)
-            else:
-                self.HOME_WINDOW.setProperty(key, repr(v))
-
-    def remove_dictionary_from_window(self, key_prepend, dictionary):
-        for k, v in list(dictionary.items()):
-            key = "{}_{}".format(key_prepend, g.UNICODE(k))
-            if isinstance(v, dict):
-                self.remove_dictionary_from_window(key, v)
-            else:
-                self.HOME_WINDOW.clearProperty(key)
-
-    # endregion
 
     def init_request(self, argv):
         if argv is None:
@@ -634,22 +667,27 @@ class GlobalVariables(object):
         }
 
         if xbmcvfs.exists(self.ADVANCED_SETTINGS_PATH):
-            advanced_settings = tools.ElementTree.fromstring(g.read_all_text(self.ADVANCED_SETTINGS_PATH))
-            settings = advanced_settings.find("videodatabase")
-            if settings:
-                for setting in settings:
-                    if setting.tag == 'type':
-                        result["type"] = setting.text
-                    elif setting.tag == 'host':
-                        result["host"] = setting.text
-                    elif setting.tag == 'port':
-                        result["port"] = setting.text
-                    elif setting.tag == 'name':
-                        result["database"] = setting.text
-                    elif setting.tag == 'user':
-                        result["user"] = setting.text
-                    elif setting.tag == 'pass':
-                        result["password"] = setting.text
+            advanced_settings_text = g.read_all_text(self.ADVANCED_SETTINGS_PATH)
+            if advanced_settings_text:
+                try:
+                    advanced_settings = tools.ElementTree.fromstring(advanced_settings_text)
+                    settings = advanced_settings.find("videodatabase")
+                    if settings:
+                        for setting in settings:
+                            if setting.tag == 'type':
+                                result["type"] = setting.text
+                            elif setting.tag == 'host':
+                                result["host"] = setting.text
+                            elif setting.tag == 'port':
+                                result["port"] = setting.text
+                            elif setting.tag == 'name':
+                                result["database"] = setting.text
+                            elif setting.tag == 'user':
+                                result["user"] = setting.text
+                            elif setting.tag == 'pass':
+                                result["password"] = setting.text
+                except tools.ElementTree.ParseError as pe:
+                    g.log("Failed to parse advanced settings.xml: {}".format(pe), "warning")
         return result
 
     def clear_kodi_bookmarks(self):
@@ -661,46 +699,44 @@ class GlobalVariables(object):
             video_database.execute_sql(["DELETE FROM {} WHERE idFile IN ({})".format(table, ",".join(file_ids))
                                         for table in ["bookmark", "streamdetails", "files"]])
 
+    # region runtime settings
+    def set_runtime_setting(self, setting_id, value):
+        self.RUNTIME_SETTINGS_CACHE.set_setting(setting_id, value)
+
+    def clear_runtime_setting(self, setting_id):
+        self.RUNTIME_SETTINGS_CACHE.clear_setting(setting_id)
+
+    def get_runtime_setting(self, setting_id, default_value=None):
+        return self.RUNTIME_SETTINGS_CACHE.get_setting(setting_id, default_value)
+
+    def get_float_runtime_setting(self, setting_id, default_value=None):
+        return self.RUNTIME_SETTINGS_CACHE.get_float_setting(setting_id, default_value)
+
+    def get_int_runtime_setting(self, setting_id, default_value=None):
+        return self.RUNTIME_SETTINGS_CACHE.get_int_setting(setting_id, default_value)
+
+    def get_bool_runtime_setting(self, setting_id, default_value=None):
+        return self.RUNTIME_SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
+    # endregion
+
     # region KODI setting
     def set_setting(self, setting_id, value):
-        self.SETTINGS_CACHE.update({setting_id: value})
-        return self.ADDON.setSetting(setting_id, value)
+        self.SETTINGS_CACHE.set_setting(setting_id, value)
+
+    def clear_setting(self, setting_id):
+        self.SETTINGS_CACHE.clear_setting(setting_id)
 
     def get_setting(self, setting_id, default_value=None):
-        value = self.SETTINGS_CACHE.get(setting_id, self.ADDON.getSetting(setting_id))
-        if value is None or value == "" and default_value:
-            return default_value
-        else:
-            self.SETTINGS_CACHE.update({setting_id: value})
-            return value
+        return self.SETTINGS_CACHE.get_setting(setting_id, default_value)
 
     def get_float_setting(self, setting_id, default_value=None):
-        try:
-            return float(self.get_setting(setting_id, default_value))
-        except:
-            if default_value is not None:
-                return default_value
-            else:
-                return 0
+        return self.SETTINGS_CACHE.get_float_setting(setting_id, default_value)
 
     def get_int_setting(self, setting_id, default_value=None):
-        try:
-            return int(self.get_setting(setting_id, default_value))
-        except:
-            if default_value is not None:
-                return default_value
-            else:
-                return 0
+        return self.SETTINGS_CACHE.get_int_setting(setting_id, default_value)
 
     def get_bool_setting(self, setting_id, default_value=None):
-        try:
-            return self.get_setting(setting_id, default_value) == "true"
-        except:
-            if default_value is not None:
-                return default_value
-            else:
-                return False
-
+        return self.SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
     # endregion
 
     def get_language_string(self, language_id):
@@ -1002,11 +1038,7 @@ class GlobalVariables(object):
     def trigger_widget_refresh(self):
         # Force an update of widgets to occur
         self.log("FORCE REFRESHING WIDGETS")
-        timestr = time.strftime("%Y%m%d%H%M%S", time.gmtime())
-        self.HOME_WINDOW.setProperty("widgetreload", timestr)
-        self.HOME_WINDOW.setProperty("widgetreload-tvshows", timestr)
-        self.HOME_WINDOW.setProperty("widgetreload-episodes", timestr)
-        self.HOME_WINDOW.setProperty("widgetreload-movies", timestr)
+        xbmc.executebuiltin('UpdateLibrary(video,widget_refresh,true)')
 
     def get_language_code(self, region=None):
         if region:
@@ -1048,12 +1080,13 @@ class GlobalVariables(object):
             item.setProperty("UnWatchedEpisodes", g.UNICODE(menu_item["unwatched_episodes"]))
         if "watched_episodes" in menu_item:
             item.setProperty("WatchedEpisodes", g.UNICODE(menu_item["watched_episodes"]))
-        if menu_item.get("episode_count", 0) > 0 and menu_item.get(
-                "episode_count", 0
-        ) == menu_item.get("watched_episodes", 0):
+        if menu_item.get("episode_count", 0) \
+                and menu_item.get("watched_episodes", 0) \
+                and menu_item.get("episode_count", 0) == menu_item.get("watched_episodes", 0):
             info["playcount"] = 1
         if (
                 menu_item.get("watched_episodes", 0) == 0
+                and menu_item.get("episode_count", 0)
                 and menu_item.get("episode_count", 0) > 0
         ):
             item.setProperty("WatchedEpisodes", g.UNICODE(0))
@@ -1145,17 +1178,15 @@ class GlobalVariables(object):
             art["thumb"] = ""
         try:
             item.setArt(art)
-        except:
+        except Exception:
             pass
 
         # Clear out keys not relevant to Kodi info labels
         self.clean_info_keys(info)
         media_type = info.get("mediatype", None)
         # Only TV shows/seasons/episodes have associated times, movies just have dates.
-        g.log("Media type: {}".format(media_type), "debug")
         if media_type in [g.MEDIA_SHOW, g.MEDIA_SEASON, g.MEDIA_EPISODE]:
             # Convert dates to localtime for display
-            g.log("Converting TV Info Dates to local time for display", "debug")
             self.convert_info_dates(info)
 
         item.setInfo("video", info)
@@ -1185,8 +1216,7 @@ class GlobalVariables(object):
 
         return info_dict
 
-    @staticmethod
-    def convert_info_dates(info_dict):
+    def convert_info_dates(self, info_dict):
         if info_dict is None:
             return None
 
@@ -1194,7 +1224,7 @@ class GlobalVariables(object):
             return info_dict
 
         dates_to_convert = [i for i in info_dict.keys() if i in info_dates]
-        converted_dates = {key: tools.utc_to_local(info_dict.get(key))
+        converted_dates = {key: self.utc_to_local(info_dict.get(key))
                            for key in dates_to_convert if info_dict.get(key)}
         info_dict.update(converted_dates)
         return info_dict
@@ -1240,7 +1270,7 @@ class GlobalVariables(object):
         finally:
             try:
                 f.close()
-            except:
+            except Exception:
                 pass
 
     def write_all_text(self, file_path, content):
@@ -1252,7 +1282,7 @@ class GlobalVariables(object):
         finally:
             try:
                 f.close()
-            except:
+            except Exception:
                 pass
 
     def notification(self, heading, message, time=5000, sound=True):
@@ -1281,9 +1311,9 @@ class GlobalVariables(object):
         response = json.loads(xbmc.executeJSONRPC(json.dumps(request_data)))
         if "error" in response:
             self.log(
-                "{}: {}".format(response["error"]["code"], response["error"]["message"])
+                "JsonRPC Error {}: {}".format(response["error"]["code"], response["error"]["message"]), "debug"
             )
-        return response["result"]
+        return response.get("result", {})
 
     def get_kodi_subtitle_languages(self, iso_format=False):
         subtitle_language = self.json_rpc(
@@ -1345,6 +1375,63 @@ class GlobalVariables(object):
     @staticmethod
     def reload_profile():
         xbmc.executebuiltin('LoadProfile({})'.format(xbmc.getInfoLabel("system.profilename")))
+
+    def validate_date(self, date_string):
+        """Validates the path and returns only the date portion, if it invalidates it just returns none.
+
+        :param date_string:string value with a supposed date.
+        :type date_string:str
+        :return:formatted datetime or none
+        :rtype:str
+        """
+
+        result = None
+        if not date_string:
+            return date_string
+
+        try:
+            result = tools.parse_datetime(date_string, self.DATE_FORMAT, False)
+        except ValueError:
+            pass
+
+        if not result:
+            try:
+                result = tools.parse_datetime(date_string, self.DATE_TIME_FORMAT_ZULU, False)
+            except ValueError:
+                pass
+
+        if not result:
+            try:
+                result = tools.parse_datetime(date_string, self.DATE_TIME_FORMAT, False)
+            except ValueError:
+                pass
+
+        if not result:
+            try:
+                result = tools.parse_datetime(date_string, "%d %b %Y", False)
+            except ValueError:
+                pass
+
+        if result and result.year > 1900:
+            return g.UNICODE(result.strftime(self.DATE_TIME_FORMAT))
+        return None
+
+    def utc_to_local(self, utc_string):
+        """
+        Converts a UTC style datetime string to the local timezone
+        :param utc_string: UTC datetime string
+        :return: localized datetime string
+        """
+
+        utc_string = self.validate_date(utc_string)
+
+        if not utc_string:
+            return None
+
+        utc = tools.parse_datetime(utc_string, self.DATE_TIME_FORMAT, False)
+        utc = self.UTC_TIMEZONE.localize(utc)
+        local_time = utc.astimezone(self.LOCAL_TIMEZONE)
+        return local_time.strftime(self.DATE_TIME_FORMAT)
 
 
 g = GlobalVariables()

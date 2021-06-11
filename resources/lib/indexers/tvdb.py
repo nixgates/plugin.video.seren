@@ -6,7 +6,7 @@ import time
 import traceback
 from collections import OrderedDict
 from functools import wraps
-from math import sin, pi
+from math import sin, pi  # pylint: disable=no-name-in-module
 
 import requests
 import xbmcgui
@@ -17,6 +17,7 @@ from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.database.cache import use_cache
 from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
+from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
 
@@ -31,33 +32,33 @@ def tvdb_guard_response(func):
                 return response
 
             if response.status_code == 401:
-                with GlobalLock(
-                    "tvdb.oauth", run_once=True, check_sum=method_class.jwToken
-                ) as lock:
-                    if not lock.runned_once():
+                try:
+                    with GlobalLock("tvdb.oauth", run_once=True, check_sum=method_class.jwToken) as lock:
                         if method_class.jwToken is not None:
                             method_class.try_refresh_token(True)
-                    if method_class.refresh_token is not None:
-                        return func(*args, **kwarg)
+                except RanOnceAlready:
+                    pass
+                if method_class.refresh_token is not None:
+                    return func(*args, **kwarg)
 
             g.log(
                 "TVDB returned a {} ({}): while requesting {}".format(
                     response.status_code,
                     TVDBAPI.http_codes[response.status_code]
-                    if response.status_code != 404
+                    if not response.status_code == 404
                     else response.json()["Error"],
                     response.url,
                 ),
-                "warning",
+                "warning" if not response.status_code == 404 else "debug",
             )
             return None
         except requests.exceptions.ConnectionError:
             return None
-        except:
+        except Exception:
             xbmcgui.Dialog().notification(
                 g.ADDON_NAME, g.get_language_string(30025).format("TVDB")
             )
-            if g.get_global_setting("run.mode") == "test":
+            if g.get_runtime_setting("run.mode") == "test":
                 raise
             else:
                 g.log_stacktrace()
@@ -101,7 +102,7 @@ class TVDBAPI(ApiBase):
                 lambda r, c: {"rating": tools.safe_round(r, 2), "votes": c},
             ),
         ),
-        ("firstAired", ("premiered", "aired"), lambda t: tools.validate_date(t)),
+        ("firstAired", ("premiered", "aired"), lambda t: g.validate_date(t)),
         ("overview", ("plot", "plotoutline"), None),
         ("mediatype", "mediatype", None),
     ]
@@ -111,8 +112,8 @@ class TVDBAPI(ApiBase):
             (
                 "firstAired",
                 "year",
-                lambda t: tools.validate_date(t)[:4]
-                if tools.validate_date(t)
+                lambda t: g.validate_date(t)[:4]
+                if g.validate_date(t)
                 else None,
             ),
             ("status", "status", None),
@@ -120,7 +121,6 @@ class TVDBAPI(ApiBase):
             ("network", "studio", None),
             ("genre", "genre", lambda t: sorted(OrderedDict.fromkeys(t))),
             ("seriesName", ("title", "tvshowtitle"), None),
-            ("added", "dateadded", None),
             ("rating", "mpaa", None),
             ("language", "language", None),
             ("aliases", "aliases", None),
@@ -171,7 +171,6 @@ class TVDBAPI(ApiBase):
     }
 
     imageBaseUrl = "https://www.thetvdb.com/banners/"
-    _threading_lock = threading.Lock()
 
     art_map = {
         "fanart": "fanart",
@@ -877,28 +876,28 @@ class TVDBAPI(ApiBase):
     def try_refresh_token(self, force=False):
         if not force and self.tokenExpires >= float(time.time()):
             return
-        with GlobalLock(
-            self.__class__.__name__, self._threading_lock, True, self.jwToken
-        ) as lock:
-            if lock.runned_once():
-                return
-            try:
-                g.log("TVDB Token requires refreshing...")
-                response = self.session.post(
-                    tools.urljoin(self.baseUrl, "refresh_token"),
-                    headers=self._get_headers(),
-                ).json()
-                if "Error" in response:
+        try:
+            with GlobalLock(self.__class__.__name__, True, self.jwToken) as lock:
+                try:
+                    g.log("TVDB Token requires refreshing...")
                     response = self.session.post(
-                        self.baseUrl + "login",
-                        json={"apikey": self.apiKey},
+                        tools.urljoin(self.baseUrl, "refresh_token"),
                         headers=self._get_headers(),
                     ).json()
-                self._save_settings(response)
-                g.log("Refreshed Tvdbs Token")
-            except:
-                g.log("Failed to refresh Tvdb Access Token", "error")
-                return
+                    if "Error" in response:
+                        response = self.session.post(
+                            self.baseUrl + "login",
+                            json={"apikey": self.apiKey},
+                            headers=self._get_headers(),
+                        ).json()
+                    self._save_settings(response)
+                    g.log("Refreshed Tvdbs Token")
+                except Exception:
+                    g.log("Failed to refresh Tvdb Access Token", "error")
+                    return
+        except RanOnceAlready:
+            return
+
 
     def _save_settings(self, response):
         if "token" in response:
@@ -908,15 +907,16 @@ class TVDBAPI(ApiBase):
             g.set_setting("tvdb.expiry", g.UNICODE(self.tokenExpires))
 
     def init_token(self):
-        with GlobalLock(self.__class__.__name__, self._threading_lock, True) as lock:
-            if lock.runned_once():
-                return
-            response = self.session.post(
-                self.baseUrl + "login",
-                json={"apikey": self.apiKey},
-                headers=self._get_headers(),
-            ).json()
-            self._save_settings(response)
+        try:
+            with GlobalLock(self.__class__.__name__, True):
+                response = self.session.post(
+                    self.baseUrl + "login",
+                    json={"apikey": self.apiKey},
+                    headers=self._get_headers(),
+                ).json()
+                self._save_settings(response)
+        except RanOnceAlready:
+            return
 
     @tvdb_guard_response
     def get(self, url, **params):
@@ -924,11 +924,12 @@ class TVDBAPI(ApiBase):
             language = params.pop("language")
         else:
             language = None
+        timeout = params.pop("timeout", 10)
         return self.session.get(
             self.baseUrl + url,
             params=params,
             headers=self._get_headers(language),
-            timeout=3,
+            timeout=timeout,
         )
 
     @staticmethod
@@ -1120,7 +1121,7 @@ class TVDBAPI(ApiBase):
 
     @wrap_tvdb_object
     def get_show_rating(self, tvdb_id):
-        item = self.get_json(
+        item = self.get_json_cached(
             "series/{}/filter".format(tvdb_id),
             keys="siteRating,siteRatingCount,seriesName",
         )
@@ -1140,7 +1141,7 @@ class TVDBAPI(ApiBase):
 
     @use_cache()
     def _get_show_art_types(self, tvdb_id):
-        result = self.get_json("series/{}/images/query/params".format(tvdb_id))
+        result = self.get_json_cached("series/{}/images/query/params".format(tvdb_id))
         return (
             result
             if not result
@@ -1150,7 +1151,7 @@ class TVDBAPI(ApiBase):
     def _get_show_art(self, tvdb_id, key_type, language):
         return {
             "art": self._extract_art(
-                self.get_json(
+                self.get_json_cached(
                     "series/{}/images/query?keyType={}".format(tvdb_id, key_type),
                     language=language,
                 ),
@@ -1160,11 +1161,11 @@ class TVDBAPI(ApiBase):
         }
 
     def _get_show_info(self, tvdb_id, language):
-        return self.get_json("series/{}".format(tvdb_id), language=language)
+        return self.get_json_cached("series/{}".format(tvdb_id), language=language)
 
     def _get_series_cast(self, tvdb_id):
         return {
-            "cast": self._handle_cast(self.get_json("series/{}/actors".format(tvdb_id)))
+            "cast": self._handle_cast(self.get_json_cached("series/{}/actors".format(tvdb_id)))
         }
 
     @wrap_tvdb_object
@@ -1200,7 +1201,7 @@ class TVDBAPI(ApiBase):
         }
 
     def _get_episode_info(self, tvdb_id, season, episode, language):
-        result = self.get_json(
+        result = self.get_json_cached(
             "series/{}/episodes/query".format(tvdb_id),
             airedSeason=season,
             airedEpisode=episode,

@@ -9,8 +9,6 @@ import xbmcgui
 from resources.lib.database import Database
 from resources.lib.modules.globals import g
 
-migrate_db_lock = threading.Lock()
-
 schema = {
     "cache": {
         "columns": collections.OrderedDict(
@@ -31,7 +29,7 @@ schema = {
 
 class TorrentCache(Database):
     def __init__(self):
-        super(TorrentCache, self).__init__(g.TORRENT_CACHE, schema, migrate_db_lock)
+        super(TorrentCache, self).__init__(g.TORRENT_CACHE, schema)
         self.table_name = next(iter(schema))
         self.enabled = g.get_bool_setting("general.torrentCache")
 

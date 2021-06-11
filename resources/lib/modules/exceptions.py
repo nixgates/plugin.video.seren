@@ -36,7 +36,7 @@ class ActivitySyncFailure(StackTraceException):
     pass
 
 
-class PreemptiveCancellation(StackTraceException):
+class PreemptiveCancellation(Exception):
     pass
 
 
@@ -151,3 +151,14 @@ class InvalidMediaTypeException(Exception):
         super(InvalidMediaTypeException, self).__init__(
             "Invalid media_type:\n{}".format(media_type)
         )
+
+
+class UnsupportedCacheParamException(Exception):
+    def __init__(self, parameter):
+        super(UnsupportedCacheParamException, self).__init__(
+            "Unsupported cache parameter:{}".format(parameter)
+        )
+
+
+class RanOnceAlready(RuntimeError):
+    pass

@@ -2,8 +2,8 @@ import os
 import re
 import warnings
 
-from .. import pytz
 from . import utils
+from .. import pytz
 
 _cache_tz = None
 

@@ -20,7 +20,7 @@ class StillWatching(BaseWindow):
             super(StillWatching, self).__init__(
                 xml_file, xml_location, item_information=item_information
             )
-        except:
+        except Exception:
             g.log_stacktrace()
 
     def onInit(self):
@@ -51,7 +51,7 @@ class StillWatching(BaseWindow):
         try:
             try:
                 progress_bar = self.getControlProgress(3014)
-            except:
+            except Exception:
                 progress_bar = None
 
             while (
@@ -66,7 +66,7 @@ class StillWatching(BaseWindow):
 
             if not self.closed:
                 self.player.pause()
-        except:
+        except Exception:
             g.log_stacktrace()
 
         self.close()
@@ -79,7 +79,7 @@ class StillWatching(BaseWindow):
         """
         try:
             super(StillWatching, self).doModal()
-        except:
+        except Exception:
             g.log_stacktrace()
 
     def close(self):

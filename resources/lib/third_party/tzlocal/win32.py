@@ -6,9 +6,9 @@ except ImportError:
 import os
 import warnings
 
-from .. import pytz
-from .windows_tz import win_tz
 from . import utils
+from .windows_tz import win_tz
+from .. import pytz
 
 _cache_tz = None
 

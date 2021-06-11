@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import datetime
 
-import xbmc
 import xbmcgui
 
 from resources.lib.common import tools
@@ -24,8 +23,8 @@ class Menus:
         self.movies_database = movies.TraktSyncDatabase()
         self.list_builder = ListBuilder()
         self.page_limit = g.get_int_setting("item.limit")
-        self.page_start = (g.PAGE-1)*self.page_limit
-        self.page_end = g.PAGE*self.page_limit
+        self.page_start = (g.PAGE - 1) * self.page_limit
+        self.page_end = g.PAGE * self.page_limit
 
     ######################################################
     # MENUS
@@ -36,10 +35,10 @@ class Menus:
         hidden_movies = HiddenDatabase().get_hidden_items("progress_watched", "movies")
         bookmark_sync = BookmarkDatabase()
         bookmarked_items = [
-            i
-            for i in bookmark_sync.get_all_bookmark_items("movie")
-            if i["trakt_id"] not in hidden_movies
-        ][self.page_start:self.page_end]
+                               i
+                               for i in bookmark_sync.get_all_bookmark_items("movie")
+                               if i["trakt_id"] not in hidden_movies
+                           ][self.page_start:self.page_end]
         self.list_builder.movie_menu_builder(bookmarked_items)
 
     @staticmethod
@@ -293,9 +292,15 @@ class Menus:
         self.movies_search_results(query)
 
     def movies_search_results(self, query):
-        trakt_list = self.trakt.get_json_paged(
-            "search/movie", query=query, extended="full", page=g.PAGE
+        trakt_list = self.movies_database.extract_trakt_page(
+            "search/movie",
+            query=query,
+            extended="full",
+            page=g.PAGE,
+            hide_watched=False,
+            hide_unaired=False,
         )
+
         if not trakt_list:
             g.cancel_directory()
             return
@@ -352,11 +357,15 @@ class Menus:
         # This approach will only work if only one pair of adjoining transliterated chars are joined
         name_parts = query.split()
         for i in range(len(name_parts), 0, -1):
-            query = "-".join(name_parts[:i]) + "-".join(name_parts[i:i+1])
+            query = "-".join(name_parts[:i]) + "-".join(name_parts[i:i + 1])
             query = tools.quote_plus(query)
 
-            trakt_list = self.trakt.get_json_paged(
-                "people/{}/movies".format(query), extended="full", page=g.PAGE
+            trakt_list = self.movies_database.extract_trakt_page(
+                "people/{}/movies".format(query),
+                extended="full",
+                page=g.PAGE,
+                hide_watched=False,
+                hide_unaired=False
             )
             if not trakt_list:
                 continue
@@ -369,11 +378,9 @@ class Menus:
         except KeyError:
             g.cancel_directory()
             return
-        self.list_builder.movie_menu_builder(
-            trakt_list,
-            hide_watched=False,
-            hide_unaired=False,
-        )
+        self.list_builder.movie_menu_builder(trakt_list,
+                                             hide_watched=False,
+                                             hide_unaired=False)
 
     def movies_genres(self):
         g.add_directory_item(g.get_language_string(30046), action="movieGenresGet")
