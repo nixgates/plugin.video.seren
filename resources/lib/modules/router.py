@@ -563,11 +563,6 @@ def dispatch(params):
 
         trakt_sync.TraktSyncDatabase().flush_activities()
 
-    elif action == "flushTraktDBMeta":
-        from resources.lib.database import trakt_sync
-
-        trakt_sync.TraktSyncDatabase().clear_all_meta()
-
     elif action == "myFiles":
         from resources.lib.gui import myFiles
 

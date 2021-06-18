@@ -145,11 +145,11 @@ class Database(object):
                 database_schema = sqlite._connection.execute(
                     "SELECT m.name from sqlite_master m where type = 'table'"
                 ).fetchall()
-            sqlite._connection.execute("PRAGMA foreign_keys = OFF")
-            for q in ["DROP TABLE IF EXISTS [{}]".format(t["name"]) for t in database_schema]:
-                sqlite._connection.execute(q)
+                sqlite._connection.execute("PRAGMA foreign_keys = OFF")
+                for q in ["DROP TABLE IF EXISTS [{}]".format(t["name"]) for t in database_schema]:
+                    sqlite._connection.execute(q)
 
-            self._create_tables(sqlite._connection)
+                self._create_tables(sqlite._connection)
 
     def fetchall(self, query, data=None):
         with SQLiteConnection(self._db_file) as connection:
@@ -179,6 +179,8 @@ class _connection:
 
     def __enter__(self):
         self._connection = self._create_connection()
+        if not self._connection:
+            g.log("Database _create_connection() failed!", "error")
         self._cursor = self._create_cursor()
         return self
 
@@ -231,26 +233,36 @@ class _connection:
     def execute_sql(self, query, data=None):
         return self._execute_query(_dumps(data), None, query)
 
-    @_handle_single_item_or_list
-    def _execute_query(self, data, result_method, query):
-        try:
-            with self.smart_transaction(query):
-                if isinstance(data, list) or isinstance(data, types.GeneratorType):
-                    self._cursor.executemany(query, data)
-                elif data:
-                    self._cursor.execute(query, data)
-                else:
-                    self._cursor.execute(query)
+    @abstractmethod
+    def _retry_handler(self, exception):
+        raise exception
 
-                if result_method == "fetchone":
-                    return self._cursor.fetchone()
-                elif result_method == "fetchall":
-                    return self._cursor.fetchall()
-                else:
-                    return self._cursor
-        except Exception:
-            self._log_error(query, data)
-            raise
+    @_handle_single_item_or_list
+    def _execute_query(self, data, result_method, query, retries=50):
+        retry_count = 0
+        while retry_count <= retries:
+            try:
+                with self.smart_transaction(query):
+                    if isinstance(data, list) or isinstance(data, types.GeneratorType):
+                        self._cursor.executemany(query, data)
+                    elif data:
+                        self._cursor.execute(query, data)
+                    else:
+                        self._cursor.execute(query)
+
+                    if result_method == "fetchone":
+                        return self._cursor.fetchone()
+                    elif result_method == "fetchall":
+                        return self._cursor.fetchall()
+                    else:
+                        return self._cursor
+            except Exception as e:
+                try:
+                    self._retry_handler(e)
+                    retry_count += 1
+                except Exception:
+                    self._log_error(query, data)
+                    raise
 
     @staticmethod
     def _log_error(query, data):
@@ -289,6 +301,19 @@ class SQLiteConnection(_connection):
                     g.wait_for_abort(0.1)
             retries += 1
 
+    def _retry_handler(self, exception):
+        if (
+                isinstance(exception, sqlite3.OperationalError) and  # pylint: disable=no-member
+                "database is locked" in g.UNICODE(exception)
+        ):
+            g.log(
+                "database is locked waiting: {}".format(self.path),
+                "warning",
+            )
+            g.wait_for_abort(0.1)
+        else:
+            super(SQLiteConnection, self)._retry_handler(exception)
+
     def _create_cursor(self):
         return self._connection.cursor()
 
@@ -296,11 +321,11 @@ class SQLiteConnection(_connection):
     def _set_connection_settings(connection):
         connection.row_factory = lambda c, r: dict([(col[0], _loads(r[idx])) for idx, col in enumerate(c.description)])
         connection.execute("PRAGMA foreign_keys = ON")
+        connection.execute("PRAGMA page_size = 32768")  # no-translate
         connection.execute("PRAGMA journal_mode = WAL")
         connection.execute("PRAGMA synchronous = normal")
         connection.execute("PRAGMA temp_store = memory")
         connection.execute("PRAGMA mmap_size = 30000000000")
-        connection.execute("PRAGMA page_size = 32768")  # no-translate
 
     def _create_db_path(self):
         if not xbmcvfs.exists(os.path.dirname(self.path)):
@@ -309,7 +334,7 @@ class SQLiteConnection(_connection):
 
 class MySqlConnection(_connection):
     def __init__(self, config):
-        super(MySqlConnection, self).__init__(True)
+        super(MySqlConnection, self).__init__(keep_alive=True)
         self.config = {
             'user': config.get("user"),
             'password': config.get("password"),
@@ -326,6 +351,9 @@ class MySqlConnection(_connection):
 
     def _create_cursor(self):
         return self._connection.cursor(cursor_class=MySQLCursorDict)
+
+    def _retry_handler(self, exception):
+        super(MySqlConnection, self)._retry_handler(exception)
 
 
 class MySQLCursorDict(mysql.connector.connection.MySQLCursor):

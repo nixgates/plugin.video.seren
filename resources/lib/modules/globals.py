@@ -782,7 +782,7 @@ class GlobalVariables(object):
 
     def log(self, msg, level="info"):
         msg = msg
-        msg = "{}: {}".format(self.ADDON_NAME.upper(), msg)
+        msg = "{} ({}): {}".format(self.ADDON_NAME.upper(), self.PLUGIN_HANDLE, msg)
         if level == "error":
             xbmc.log(msg, level=xbmc.LOGERROR)
         elif level == "info":

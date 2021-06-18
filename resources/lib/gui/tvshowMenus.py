@@ -296,12 +296,16 @@ class Menus:
     def shows_new(self):
         hidden_items = self.hidden_database.get_hidden_items("recommendations", "shows")
         date_string = datetime.datetime.today() - datetime.timedelta(days=29)
-        trakt_list = self.trakt.get_json(
+        trakt_list = self.shows_database.extract_trakt_page(
             "calendars/all/shows/new/{}/30".format(date_string.strftime("%d-%m-%Y")),
             languages=','.join({'en', self.language_code}),
             extended="full",
+            no_paging=True,
+            ignore_cache=True,
+            hide_watched=False,
+            hide_unaired=False
         )
-        trakt_list = [i.get("show") for i in trakt_list if i["trakt_show_id"] not in hidden_items][:self.page_limit]
+        trakt_list = [i for i in trakt_list if i["trakt_id"] not in hidden_items][:self.page_limit]
         self.list_builder.show_list_builder(trakt_list, no_paging=True)
 
     def shows_recently_watched(self):
@@ -372,8 +376,12 @@ class Menus:
     def shows_updated(self):
         date = datetime.date.today() - datetime.timedelta(days=31)
         date = date.strftime(g.DATE_FORMAT)
-        trakt_list = self.trakt.get_json(
-            "shows/updates/{}".format(date), extended="full"
+        trakt_list = self.shows_database.extract_trakt_page(
+            "shows/updates/{}".format(date),
+            extended="full",
+            ignore_cache=True,
+            hide_watched=False,
+            hide_unaired=False
         )
         self.list_builder.show_list_builder(trakt_list, no_paging=True)
 
@@ -538,7 +546,7 @@ class Menus:
         self.list_builder.show_list_builder(trakt_list, next_args=genre_string)
 
     def shows_related(self, args):
-        trakt_list = self.trakt.get_json(
+        trakt_list = self.shows_database.extract_trakt_page(
             "shows/{}/related".format(args), extended="full"
         )
         self.list_builder.show_list_builder(trakt_list)
@@ -561,8 +569,8 @@ class Menus:
             xbmcplugin.addDirectoryItems(g.PLUGIN_HANDLE, menu_items, len(menu_items))
             g.close_directory(g.CONTENT_SHOW)
         else:
-            trakt_list = self.trakt.get_json(
-                "shows/popular", years=year, page=g.PAGE, extended="full"
+            trakt_list = self.shows_database.extract_trakt_page(
+                "shows/popular", years=year, page=g.PAGE, extended="full", hide_watched=False
             )
             self.list_builder.show_list_builder(trakt_list)
 

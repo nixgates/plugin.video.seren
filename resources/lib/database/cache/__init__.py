@@ -19,12 +19,12 @@ schema = {
     "cache": {
         "columns": collections.OrderedDict(
             [
-                ("id", ["TEXT", "PRIMARY KEY"]),
+                ("id", ["TEXT", "PRIMARY KEY", "NOT NULL"]),
                 ("expires", ["INTEGER", "NOT NULL"]),
                 ("data", ["PICKLE"]),
                 ("checksum", ["INTEGER"]),
-                ]
-            ),
+            ]
+        ),
         "table_constraints": ["UNIQUE(id)"],
         "default_seed": [],
         }
@@ -125,7 +125,7 @@ class Cache(CacheBase):
         super(Cache, self).__init__()
         self.enable_mem_cache = True
         self._mem_cache = MemCache()
-        self._db_cache = DatabaseCache(g.CACHE_DB_PATH, schema)
+        self._db_cache = DatabaseCache(g.CACHE_DB_PATH, schema, rebuild_callback=self._mem_cache.do_cleanup)
         self._auto_clean_interval = datetime.timedelta(hours=4)
 
     def set_auto_clean_interval(self, interval):
@@ -203,10 +203,16 @@ class DatabaseCache(Database, CacheBase):
     Handles disk stored caching
     """
 
-    def __init__(self, db_file, database_layout):
+    def __init__(self, db_file, database_layout, rebuild_callback=None):
+        self.rebuild_callback = rebuild_callback
         super(DatabaseCache, self).__init__(db_file, database_layout)
         CacheBase.__init__(self)
         self.cache_table_name = next(iter(database_layout))
+
+    def rebuild_database(self):
+        super(DatabaseCache, self).rebuild_database()
+        if callable(self.rebuild_callback):
+            self.rebuild_callback()
 
     def do_cleanup(self):
         if self._exit or g.abort_requested():

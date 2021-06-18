@@ -193,20 +193,8 @@ class TraktAPI(ApiBase):
     username_setting_key = "trakt.username"
 
     def __init__(self):
-        self.client_id = g.get_setting(
-            "trakt.clientid",
-            "0c9a30819e4af6ffaf3b954cbeae9b54499088513863c03c02911de00ac2de79",
-        )
-        self.client_secret = g.get_setting(
-            "trakt.secret",
-            "bf02417f27b514cee6a8d135f2ddc261a15eecfb6ed6289c36239826dcdd1842",
-        )
+        self._load_settings()
         self.redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
-        self.access_token = g.get_setting("trakt.auth")
-        self.refresh_token = g.get_setting("trakt.refresh")
-        self.token_expires = g.get_float_setting("trakt.expires")
-        self.default_limit = g.get_int_setting("item.limit")
-        self.username = g.get_setting(self.username_setting_key)
         self.try_refresh_token()
         self.progress_dialog = xbmcgui.DialogProgress()
         self.language = g.get_language_code()
@@ -390,7 +378,7 @@ class TraktAPI(ApiBase):
         retries = Retry(
             total=4,
             backoff_factor=0.3,
-            status_forcelist=[429, 500, 503, 504, 520, 521, 522, 524],
+            status_forcelist=[429, 500, 502, 503, 504, 520, 521, 522, 524],
         )
         self.session.mount("https://", HTTPAdapter(max_retries=retries))
 
@@ -537,13 +525,30 @@ class TraktAPI(ApiBase):
             )
             self.token_expires = float(response["created_at"] + response["expires_in"])
 
+    def _load_settings(self):
+        self.client_id = g.get_setting(
+            "trakt.clientid",
+            "0c9a30819e4af6ffaf3b954cbeae9b54499088513863c03c02911de00ac2de79",
+        )
+        self.client_secret = g.get_setting(
+            "trakt.secret",
+            "bf02417f27b514cee6a8d135f2ddc261a15eecfb6ed6289c36239826dcdd1842",
+        )
+        self.access_token = g.get_setting("trakt.auth")
+        self.refresh_token = g.get_setting("trakt.refresh")
+        self.token_expires = g.get_float_setting("trakt.expires")
+        self.default_limit = g.get_int_setting("item.limit")
+        self.username = g.get_setting(self.username_setting_key)
+
     def try_refresh_token(self, force=False):
         """
         Attempts to refresh current Trakt Auth Token
         :param force: Set to True to avoid Global Lock and forces refresh
         :return: None
         """
-        if not force and (not self.refresh_token or self.token_expires >= float(time.time())):
+        if not self.refresh_token:
+            return
+        if not force and self.token_expires > float(time.time()):
             return
 
         try:
@@ -562,8 +567,8 @@ class TraktAPI(ApiBase):
                 self._save_settings(response)
                 g.log("Refreshed Trakt Token")
         except RanOnceAlready:
+            self._load_settings()
             return
-
 
     @trakt_guard_response
     def get(self, url, **params):
@@ -715,7 +720,10 @@ class TraktAPI(ApiBase):
         :param params: any params for the url
         :return: Yields trakt pages
         """
-        for response in self._get_all_pages(self.get_cached, url, **params):
+        ignore_cache = params.pop("ignore_cache", False)
+        get_method = self.get if ignore_cache else self.get_cached
+
+        for response in self._get_all_pages(get_method, url, **params):
             if not response:
                 return
             yield self._handle_response(

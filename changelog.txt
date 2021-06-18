@@ -1,3 +1,13 @@
+Changelog 2.1.1
+Fix RD losing auth issue
+Improve OAUTH refresh flow edge case coverage for Trakt and TVDB
+Re-implement retry on db lock during sql execution
+Fix an issue with GlobalLock run_once exiting too early
+Fix several shows views on demand insertion of missing data
+Fix movies genres on demand insertion of missing data
+Update season episode count after episode milling (fixes seasons showing incorrectly as watched)
+Fix minimum size filter
+
 Changelog 2.1.0
 Major re-work of metadata updates and merging
 Fix air dates not being updated

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import threading
-
 from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.globals import g
 
@@ -18,7 +16,6 @@ class GlobalLock(object):
         return self._lock_format.format(g.ADDON_NAME, self._lock_name, value)
 
     def _run(self):
-        self._check_ran_once_already()
         while not g.abort_requested() and self._running():
             if g.wait_for_abort(.100):
                 break

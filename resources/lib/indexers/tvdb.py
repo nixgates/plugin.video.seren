@@ -830,10 +830,8 @@ class TVDBAPI(ApiBase):
     def __init__(self):
         self.session = requests.Session()
         self.session.mount("https://", HTTPAdapter(max_retries=self.retries))
+        self._load_settings()
 
-        self.apiKey = g.get_setting("tvdb.apikey", "43VPI0R8323FB7TI")
-        self.jwToken = g.get_setting("tvdb.jw")
-        self.tokenExpires = g.get_float_setting("tvdb.expiry")
         self.lang_code = g.get_language_code(False)
 
         self.languages = (
@@ -874,7 +872,7 @@ class TVDBAPI(ApiBase):
         return headers
 
     def try_refresh_token(self, force=False):
-        if not force and self.tokenExpires >= float(time.time()):
+        if not force and self.tokenExpires > float(time.time()):
             return
         try:
             with GlobalLock(self.__class__.__name__, True, self.jwToken) as lock:
@@ -898,6 +896,10 @@ class TVDBAPI(ApiBase):
         except RanOnceAlready:
             return
 
+    def _load_settings(self):
+        self.apiKey = g.get_setting("tvdb.apikey", "43VPI0R8323FB7TI")
+        self.jwToken = g.get_setting("tvdb.jw")
+        self.tokenExpires = g.get_float_setting("tvdb.expiry")
 
     def _save_settings(self, response):
         if "token" in response:
