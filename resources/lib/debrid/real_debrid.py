@@ -29,18 +29,11 @@ RD_USERNAME_KEY = "rd.username"
 class RealDebrid:
 
     def __init__(self):
-        self.client_id = g.get_setting("rd.client_id")
-        if not self.client_id:
-            self.client_id = "X245A4XAIBGVM"
         self.oauth_url = "https://api.real-debrid.com/oauth/v2/"
         self.device_code_url = "device/code?{}"
         self.device_credentials_url = "device/credentials?{}"
         self.token_url = "token"
-        self.token = g.get_setting(RD_AUTH_KEY)
-        self.refresh = g.get_setting(RD_REFRESH_KEY)
-        self.expiry = g.get_float_setting(RD_EXPIRY_KEY)
         self.device_code = ""
-        self.client_secret = g.get_setting(RD_SECRET_KEY)
         self.oauth_timeout = 0
         self.oauth_time_step = 0
         self.base_url = "https://api.real-debrid.com/rest/1.0/"
@@ -49,16 +42,17 @@ class RealDebrid:
         self.session = requests.Session()
         retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
         self.session.mount("https://", HTTPAdapter(max_retries=retries))
-        self.session.headers.update({"Authorization": "Bearer {}".format(self.token)})
+        self._load_settings()
 
     def __del__(self):
         self.session.close()
+        del self.progress_dialog
 
     def _auth_loop(self):
         url = "client_id={}&code={}".format(self.client_id, self.device_code)
         url = self.oauth_url + self.device_credentials_url.format(url)
         response = self.session.get(url).json()
-        if "error" not in response:
+        if "error" not in response and response.get("client_secret"):
             try:
                 self.progress_dialog.close()
                 g.set_setting(RD_CLIENT_ID_KEY, response["client_id"])
@@ -72,8 +66,6 @@ class RealDebrid:
         return False
 
     def auth(self):
-        self.client_secret = ""
-        self.client_id = "X245A4XAIBGVM"
         url = "client_id={}&new_credentials=yes".format(self.client_id)
         url = self.oauth_url + self.device_code_url.format(url)
         response = self.session.get(url).json()
@@ -97,7 +89,7 @@ class RealDebrid:
         success = False
         self.progress_dialog.update(100)
         while (
-            not self.client_secret
+            not success
             and not token_ttl <= 0
             and not self.progress_dialog.iscanceled()
         ):
@@ -118,8 +110,6 @@ class RealDebrid:
                 xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30216))
 
     def token_request(self):
-        import time
-
         if not self.client_secret:
             return
 
@@ -133,16 +123,26 @@ class RealDebrid:
                 "grant_type": "http://oauth.net/grant_type/device/1.0",
             },
         ).json()
-        g.set_setting(RD_AUTH_KEY, response["access_token"])
-        g.set_setting(RD_REFRESH_KEY, response["refresh_token"])
-        self.token = response["access_token"]
-        self.session.headers.update({"Authorization": "Bearer {}".format(self.token)})
-        self.refresh = response["refresh_token"]
-        g.set_setting(RD_EXPIRY_KEY, str(time.time() + int(response["expires_in"])))
+        self._save_settings(response)
         username = self.get_url("user").get("username")
         g.set_setting(RD_USERNAME_KEY, username)
         xbmcgui.Dialog().ok(g.ADDON_NAME, "Real Debrid " + g.get_language_string(30021))
         g.log("Authorised Real Debrid successfully", "info")
+
+    def _save_settings(self, response):
+        self.token = response["access_token"]
+        self.refresh = response["refresh_token"]
+        self.expiry = time.time() + int(response["expires_in"])
+        g.set_setting(RD_AUTH_KEY, self.token)
+        g.set_setting(RD_REFRESH_KEY, self.refresh)
+        g.set_setting(RD_EXPIRY_KEY, self.expiry)
+
+    def _load_settings(self):
+        self.client_id = g.get_setting("rd.client_id", "X245A4XAIBGVM")
+        self.token = g.get_setting(RD_AUTH_KEY)
+        self.refresh = g.get_setting(RD_REFRESH_KEY)
+        self.expiry = g.get_float_setting(RD_EXPIRY_KEY)
+        self.client_secret = g.get_setting(RD_SECRET_KEY)
 
     @staticmethod
     def _handle_error(response):
@@ -157,12 +157,14 @@ class RealDebrid:
             self._handle_error(response)
             return False
 
-    def try_refresh_token(self):
-        if not self.token or float(time.time()) < (self.expiry - (15 * 60)):
+    def try_refresh_token(self, force=False):
+        if not self.refresh:
+            return
+        if not force and self.expiry > float(time.time()):
             return
 
         try:
-            with GlobalLock(self.__class__.__name__, True, self.refresh):
+            with GlobalLock(self.__class__.__name__, True, self.token):
                 url = self.oauth_url + "token"
                 response = self.session.post(
                     url,
@@ -184,20 +186,20 @@ class RealDebrid:
                     )
                     return False
                 response = response.json()
-                if "access_token" in response:
-                    self.token = response["access_token"]
-                if "refresh_token" in response:
-                    self.refresh = response["refresh_token"]
-                g.set_setting(RD_AUTH_KEY, self.token)
-                g.set_setting(RD_REFRESH_KEY, self.refresh)
-                g.set_setting(RD_EXPIRY_KEY, str(time.time() + int(response["expires_in"])))
+                self._save_settings(response)
                 g.log("Real Debrid Token Refreshed")
                 return True
-                ###############################################
-                # To be FINISHED FINISH ME
-                ###############################################
         except RanOnceAlready:
+            self._load_settings()
             return
+
+    def _get_headers(self):
+        headers = {
+            "Content-Type": "application/json",
+        }
+        if self.token:
+            headers["Authorization"] = "Bearer {}".format(self.token)
+        return headers
 
     def post_url(self, url, post_data, fail_check=False):
         original_url = url
@@ -205,9 +207,9 @@ class RealDebrid:
         if not self.token:
             return None
 
-        response = self.session.post(url, data=post_data, timeout=5)
+        response = self.session.post(url, data=post_data, headers=self._get_headers(), timeout=5)
         if not self._is_response_ok(response) and not fail_check:
-            self.try_refresh_token()
+            self.try_refresh_token(True)
             response = self.post_url(original_url, post_data, fail_check=True)
         try:
             return response.json()
@@ -221,10 +223,10 @@ class RealDebrid:
             g.log("No Real Debrid Token Found")
             return None
 
-        response = self.session.get(url, timeout=5)
+        response = self.session.get(url, headers=self._get_headers(), timeout=5)
 
         if not self._is_response_ok(response) and not fail_check:
-            self.try_refresh_token()
+            self.try_refresh_token(True)
             response = self.get_url(original_url, fail_check=True)
         try:
             return response.json()
@@ -330,4 +332,4 @@ class RealDebrid:
         return g.get_bool_setting("realdebrid.enabled") and g.get_setting(RD_AUTH_KEY)
 
     def is_account_premium(self):
-        return self.get_url("user").get("type", "free") != "free"
+        return self.get_url("user").get("type") != "free"

@@ -108,7 +108,7 @@ class SourceSorter:
                 size_limit = g.get_int_setting("general.sizelimit.movie") * 1024
                 size_minimum = int(g.get_float_setting("general.sizeminimum.movie") * 1024)
             self._filter_all_by_methods(
-                [lambda i: size_limit > int(i.get("size", 0)) > size_minimum]
+                [lambda i: size_limit >= int(i.get("size", 0)) >= size_minimum]
                 )
 
     def _apply_hevc_priority(self):

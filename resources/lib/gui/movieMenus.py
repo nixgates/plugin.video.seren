@@ -384,7 +384,7 @@ class Menus:
 
     def movies_genres(self):
         g.add_directory_item(g.get_language_string(30046), action="movieGenresGet")
-        genres = self.trakt.get_json("genres/movies")
+        genres = self.trakt.get_json_cached("genres/movies")
         if genres is None:
             g.cancel_directory()
             return
@@ -402,7 +402,7 @@ class Menus:
         )
         if args is None:
             genre_display_list = []
-            genres = self.trakt.get_json("genres/movies")
+            genres = self.trakt.get_json_cached("genres/movies")
             for genre in genres:
                 genre_display_list.append(genre["name"])
             genre_multiselect = xbmcgui.Dialog().multiselect(
@@ -415,7 +415,7 @@ class Menus:
         else:
             genre_string = tools.unquote(args)
 
-        trakt_list = self.trakt.get_json_cached(
+        trakt_list = self.movies_database.extract_trakt_page(
             "movies/{}".format(trakt_endpoint),
             genres=genre_string,
             page=g.PAGE,

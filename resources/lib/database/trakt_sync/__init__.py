@@ -16,6 +16,7 @@ from resources.lib.modules.exceptions import (
     UnsupportedProviderType,
     InvalidMediaTypeException,
 )
+from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
 from resources.lib.modules.metadataHandler import MetadataHandler
 from resources.lib.modules.sync_lock import SyncLock
@@ -253,7 +254,7 @@ schema = {
     "lists": {
         "columns": collections.OrderedDict(
             [
-                ("trakt_id", ["INTEGER", "NOT NULL"]),
+                ("trakt_id", ["INTEGER", "PRIMARY KEY", "NOT NULL"]),
                 ("name", ["TEXT", "NOT NULL"]),
                 ("username", ["TEXT", "NOT NULL"]),
                 ("last_updated", ["TEXT", "NOT NULL"]),
@@ -265,7 +266,7 @@ schema = {
                 ("meta_hash", ["TEXT", "NOT NULL"]),
             ]
         ),
-        "table_constraints": ["PRIMARY KEY(trakt_id)"],
+        "table_constraints": [],
         "default_seed": [],
     },
 }
@@ -422,8 +423,6 @@ class TraktSyncDatabase(Database):
             if confirm == 0:
                 return
 
-        self.clear_all_meta(False)
-        self.clear_user_information(False)
         self.rebuild_database()
         self.set_base_activities()
         self.refresh_activities()
@@ -470,17 +469,18 @@ class TraktSyncDatabase(Database):
         if obj is None or meta_hash is None:
             raise UnsupportedProviderType(provider_type)
 
-        self.execute_sql(
-            sql_statement,
-            (
-                (i.get(id_column), provider_type, meta_hash, self.clean_meta(obj(i)))
-                for i in items
-                if i
-                   and obj(i)
-                   and i.get(id_column)
-                   and MetadataHandler.full_meta_up_to_par(meta_type, obj(i))
-            ),
-        )
+        with GlobalLock("save_to_meta_table", check_sum=meta_type):
+            self.execute_sql(
+                sql_statement,
+                (
+                    (i.get(id_column), provider_type, meta_hash, self.clean_meta(obj(i)))
+                    for i in items
+                    if i
+                       and obj(i)
+                       and i.get(id_column)
+                       and MetadataHandler.full_meta_up_to_par(meta_type, obj(i))
+                ),
+            )
 
         for i in items:
             if i and obj(i):
@@ -819,9 +819,7 @@ class TraktSyncDatabase(Database):
                 self.update_shows_statistics({"trakt_id": i} for i in sync_lock.running_ids)
 
                 if mill_episodes:
-                    self.update_season_statistics(
-                        {"trakt_id": i} for i in sync_lock.running_ids
-                    )
+                    self.update_season_statistics({"trakt_id": i['trakt_id']} for i in seasons)
 
     def _filter_trakt_items_that_needs_updating(self, requested, media_type):
         if not requested:
@@ -871,8 +869,9 @@ class TraktSyncDatabase(Database):
         }
         if args["trakt_id"] is None:
             import inspect
-            g.log(inspect.stack())
-            g.log(item)
+            g.log("Trakt ID not found in item!", "error")
+            g.log(inspect.stack(), "error")
+            g.log(item, "error")
         if args["mediatype"] == "season":
             args["trakt_show_id"] = get(
                 item, "trakt_show_id", info(item).get("trakt_show_id")
@@ -957,6 +956,7 @@ class TraktSyncDatabase(Database):
             if media_type == "movies":
                 self.insert_trakt_movies(current_page)
             elif media_type == "shows":
+                current_page = [i.get("show", i) for i in current_page]
                 self.insert_trakt_shows(current_page)
             query = (
                 "WITH requested(trakt_id) AS (VALUES {}) select r.trakt_id as trakt_id from requested as r inner "
@@ -981,17 +981,19 @@ class TraktSyncDatabase(Database):
 
         no_paging = params.get("no_paging", False)
         pull_all = params.pop("pull_all", False)
+        ignore_cache = params.pop("ignore_cache", False)
         page_number = params.pop("page", 1)
 
         if pull_all:
-            _handle_page(self.trakt_api.get_json_cached(url, **params))
+            get_method = self.trakt_api.get_json if ignore_cache else self.trakt_api.get_json_cached
+            _handle_page(get_method(url, **params))
             if len(result) >= (self.page_limit * page_number) and not no_paging:
                 return result[
                        self.page_limit * (page_number - 1): self.page_limit * page_number
                        ]
         else:
             params["limit"] = params.pop("page", self.page_limit)
-            for page in self.trakt_api.get_all_pages_json(url, **params):
+            for page in self.trakt_api.get_all_pages_json(url, ignore_cache=ignore_cache, **params):
                 _handle_page(page)
                 if len(result) >= (self.page_limit * page_number) and not no_paging:
                     return result[

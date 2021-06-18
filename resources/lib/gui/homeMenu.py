@@ -126,10 +126,6 @@ class Menus:
                              action='forceTraktSync',
                              is_folder=False,
                              description=g.get_language_string(30422))
-        g.add_directory_item(g.get_language_string(30240),
-                             action='flushTraktDBMeta',
-                             is_folder=False,
-                             description=g.get_language_string(30423))
         g.add_directory_item(g.get_language_string(30241),
                              action='rebuildTraktDatabase',
                              is_folder=False,

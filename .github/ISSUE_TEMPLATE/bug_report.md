@@ -6,11 +6,6 @@ labels: bug
 assignees: ''
 
 ---
-**Logs**
-
-Please provide debug logs to assist with your issue
-
-
 
 **Describe the bug**
 A clear and concise description of what the bug is.

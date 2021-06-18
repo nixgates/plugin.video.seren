@@ -703,13 +703,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def _try_update_mixed_episodes(self, trakt_items):
         self.insert_trakt_shows([i["show"] for i in trakt_items if i.get("show")])
 
-        if [i for i in trakt_items if not i.get("show")]:
-            [
+        for i in trakt_items:
+            if not i.get("show"):
                 self.task_queue.put(self._get_single_show_meta, i["trakt_show_id"])
-                for i in trakt_items
-                if not i.get("show")
-            ]
-            self.task_queue.wait_completion()
+        self.task_queue.wait_completion()
 
         shows = self.fetchall(
             """SELECT value as trakt_object, s.trakt_id, s.tvdb_id, s.tmdb_id FROM shows as s 

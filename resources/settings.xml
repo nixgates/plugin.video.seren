@@ -462,8 +462,6 @@
                  action="RunPlugin(plugin://plugin.video.seren/?action=flushTraktActivities)"/>
         <setting id="traktdb.force" type="action" label="30239"
                  action="RunPlugin(plugin://plugin.video.seren/?action=forceTraktSync)"/>
-        <setting id="traktdb.clearmeta" type="action" label="30240"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=flushTraktDBMeta)"/>
         <setting id="traktdb.rebuild" type="action" label="30241"
                  action="RunPlugin(plugin://plugin.video.seren/?action=rebuildTraktDatabase)"/>
 

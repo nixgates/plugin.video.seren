@@ -149,6 +149,8 @@ class ListBuilder(object):
 
         params.pop("hide_unaired", None)
         params.pop("hide_watched", None)
+        params.pop("ignore_cache", None)
+
         try:
             params["bulk_add"] = True
             list_items = [
