@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from functools import wraps
 
+import time
 import requests
 import xbmc
 import xbmcgui
@@ -169,9 +170,7 @@ class AllDebrid:
         user_information = self.get_user_info()
         if user_information is not None:
             g.set_setting("alldebrid.username", user_information["username"])
-            g.set_setting("alldebrid.premiumstatus",
-                          "Premium" if user_information.get("isPremium", False)
-                          else "Expired")
+            g.set_setting("alldebrid.premiumstatus", self.get_account_status().title())
 
     def check_hash(self, hash_list):
         return self.post_json("magnet/instant", {"magnets[]": hash_list})
@@ -216,8 +215,20 @@ class AllDebrid:
     def is_service_enabled():
         return (
             g.get_bool_setting(AD_ENABLED_KEY)
-            and g.get_setting(AD_AUTH_KEY)
+            and g.get_setting(AD_AUTH_KEY) is not None
         )
 
-    def is_account_premium(self):
-        return self.get_user_info().get("isPremium", False)
+    def get_account_status(self):
+        premium = self.get_user_info().get("isPremium")
+        premiumUntil = self.get_user_info().get("premiumUntil", 0)
+        subscribed = self.get_user_info().get("isSubscribed")
+        trial = self.get_user_info().get("isTrial")
+
+        if premium and premiumUntil > time.time():
+            return "premium"
+        elif subscribed:
+            return "subscribed"
+        elif trial:
+            return "trial"
+        else:
+            return "invalid"

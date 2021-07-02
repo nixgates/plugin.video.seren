@@ -1,10 +1,10 @@
 # encoding: utf-8
 from __future__ import absolute_import, division, unicode_literals
 
-from abc import ABCMeta, abstractmethod
-
 import threading
+from abc import ABCMeta, abstractmethod
 from ast import literal_eval
+from contextlib import contextmanager
 
 import xbmc
 import xbmcaddon
@@ -62,7 +62,7 @@ class SettingsCache:
         :type default_value: str|unicode|float|int|bool
         :return: The value of the setting.
                  If the setting is not stored, the optional default_value if provided or None
-        :returns: str|unicode|float|int|bool
+        :rtype: str|unicode|float|int|bool
         """
         pass
 
@@ -77,7 +77,7 @@ class SettingsCache:
         :type default_value: float
         :return: The value of the setting.
                  If the setting is not stored, the optional default_value if provided or 0.0
-        :returns: float
+        :rtype: float
         """
         try:
             return float(self.get_setting(setting_id, default_value))
@@ -98,7 +98,7 @@ class SettingsCache:
         :type default_value: int
         :return: The value of the setting.
                  If the setting is not stored, the optional default_value if provided or 0
-        :returns: int
+        :rtype: int
         """
         try:
             return int(float(self.get_setting(setting_id, default_value)))
@@ -111,7 +111,7 @@ class SettingsCache:
     @abstractmethod
     def get_bool_setting(self, setting_id, default_value=None):
         """
-        Get a setting as an int value
+        Get a setting as a bool value
 
         :param setting_id: The name of the setting
         :type setting_id: str|unicode
@@ -119,7 +119,7 @@ class SettingsCache:
         :type default_value: bool
         :return: The value of the setting.
                  If the setting is not stored, the optional default_value if provided or False
-        :returns: bool
+        :rtype: bool
         """
         value = self.get_setting(setting_id, default_value)
         if isinstance(value, bool):
@@ -159,9 +159,7 @@ class RuntimeSettingsCache(SettingsCache):
         :param value: The value to store in settings
         :type value: str|unicode|float|int|bool|list|dict
         """
-        self._KODI_HOME_WINDOW.setProperty(
-            self._setting_key(setting_id), repr(value)
-        )
+        self._KODI_HOME_WINDOW.setProperty(self._setting_key(setting_id), repr(value))
 
     def update_settings(self, dictionary):
         super(RuntimeSettingsCache, self).update_settings(dictionary)
@@ -175,7 +173,7 @@ class RuntimeSettingsCache(SettingsCache):
             if value is not None and not value == "":
                 value = literal_eval(value)
             if value is None or value == "":
-                if default_value:
+                if default_value is not None:
                     return default_value
                 else:
                     return None
@@ -199,6 +197,7 @@ class PersistedSettingsCache(SettingsCache):
     SETTINGS_LIST_NAME = "CachedSettingsList"
     SETTINGS_PERSISTED_FLAG = "SettingsPersistedFlag"
     EMPTY_PERSISTED_SETTING_VALUE = "__EMPTY_PERSISTED_VALUE__"
+    _SETTINGS_THREAD_LOCK = threading.Lock()
     _SETTINGS_CACHE = None
     _RUNTIME_SETTINGS = None
     _KODI_ADDON = None
@@ -219,6 +218,21 @@ class PersistedSettingsCache(SettingsCache):
         del self._KODI_MONITOR
         self._KODI_HOME_WINDOW = None
         del self._KODI_HOME_WINDOW
+
+    class KodiShutdown(RuntimeError):
+        pass
+
+    @contextmanager
+    def _settings_lock(self):
+        while self._RUNTIME_SETTINGS.get_bool_setting(self.SETTINGS_LOCK_NAME):
+            if self._KODI_MONITOR.waitForAbort(0.001):
+                raise self.KodiShutdown("Kodi Shutdown")
+        try:
+            with self._SETTINGS_THREAD_LOCK:  # pylint: disable=not-context-manager
+                self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_LOCK_NAME, True)
+                yield
+        finally:
+            self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_LOCK_NAME)
 
     def _get_settings_list_set(self):
         settings_list = self._RUNTIME_SETTINGS.get_setting(self.SETTINGS_LIST_NAME)
@@ -250,66 +264,47 @@ class PersistedSettingsCache(SettingsCache):
         The persisted settings flag is cleared on calling this method.
 
         :return: A boolean representing whether a setting change was made within addon code
-        :returns: bool
+        :rtype: bool
         """
-        while (
-                self._RUNTIME_SETTINGS.get_setting(self.SETTINGS_LOCK_NAME)
-                and not self._KODI_MONITOR.abortRequested()
-        ):
-            if self._KODI_MONITOR.waitForAbort(0.001):
-                return
-        try:
-            with threading.Lock():
-                flag = self._RUNTIME_SETTINGS.get_bool_setting(self.SETTINGS_PERSISTED_FLAG)
-                self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_PERSISTED_FLAG)
-                return flag
-        finally:
-            self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_LOCK_NAME)
+        with self._settings_lock():
+            flag = self._RUNTIME_SETTINGS.get_bool_setting(self.SETTINGS_PERSISTED_FLAG)
+            self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_PERSISTED_FLAG)
+            return flag
 
     def set_setting(self, setting_id, value):
         if isinstance(value, bool):
             value_string = unicode(value).lower()
         else:
-            value_string = unicode(value)
+            value_string = (
+                unicode(value) if value is not None and not value == "" else self.EMPTY_PERSISTED_SETTING_VALUE
+            )
         cache_value = self._SETTINGS_CACHE.get_setting(setting_id)
         if cache_value is not None and cache_value == value_string:
             return
         else:
-            while (
-                    self._RUNTIME_SETTINGS.get_setting(self.SETTINGS_LOCK_NAME)
-                    and not self._KODI_MONITOR.abortRequested()
-            ):
-                if self._KODI_MONITOR.waitForAbort(0.001):
-                    return
             try:
-                with threading.Lock():
-                    self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_LOCK_NAME, True)
-
+                with self._settings_lock():
                     settings_list = self._get_settings_list_set()
                     settings_list.add(setting_id)
                     self._store_setting_list_set(settings_list)
 
                     self._SETTINGS_CACHE.set_setting(setting_id, value_string)
-                    if not self._KODI_ADDON.getSetting(setting_id) == value_string:
-                        self._KODI_ADDON.setSetting(setting_id, value_string)
+                    if not self._KODI_ADDON.getSetting(setting_id) == (
+                        value_string if not value_string == self.EMPTY_PERSISTED_SETTING_VALUE else ""
+                    ):
+                        self._KODI_ADDON.setSetting(
+                            setting_id, value_string if not value_string == self.EMPTY_PERSISTED_SETTING_VALUE else ""
+                        )
                         self._set_settings_persisted_flag()
-            finally:
-                self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_LOCK_NAME)
+            except self.KodiShutdown:
+                return
 
     def update_settings(self, dictionary):
         super(PersistedSettingsCache, self).update_settings(dictionary)
 
     def clear_setting(self, setting_id):
-        while (
-                self._RUNTIME_SETTINGS.get_setting(self.SETTINGS_LOCK_NAME)
-                and not self._KODI_MONITOR.abortRequested()
-        ):
-            if self._KODI_MONITOR.waitForAbort(0.001):
-                return
         try:
-            with threading.Lock():
-                self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_LOCK_NAME, True)
-
+            with self._settings_lock():
                 settings_list = self._get_settings_list_set()
                 settings_list.discard(setting_id)
                 self._store_setting_list_set(settings_list)
@@ -317,23 +312,15 @@ class PersistedSettingsCache(SettingsCache):
                 self._SETTINGS_CACHE.clear_setting(setting_id)
                 self._KODI_ADDON.setSetting(setting_id, "")
                 self._set_settings_persisted_flag()
-        finally:
-            self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_LOCK_NAME)
+        except self.KodiShutdown:
+            return
 
     def clear_cache(self):
         """
         Clears the cache of all settings values leaving the persisted settings intact
         """
-        while (
-                self._RUNTIME_SETTINGS.get_setting(self.SETTINGS_LOCK_NAME)
-                and not self._KODI_MONITOR.abortRequested()
-        ):
-            if self._KODI_MONITOR.waitForAbort(0.001):
-                return
         try:
-            with threading.Lock():
-                self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_LOCK_NAME, True)
-
+            with self._settings_lock():
                 settings_list = self._RUNTIME_SETTINGS.get_setting(self.SETTINGS_LIST_NAME)
                 if settings_list is None or settings_list == "":
                     settings_list = set()
@@ -344,8 +331,8 @@ class PersistedSettingsCache(SettingsCache):
                     self._SETTINGS_CACHE.clear_setting(setting_id)
 
                 self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_LIST_NAME)
-        finally:
-            self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_LOCK_NAME)
+        except self.KodiShutdown:
+            return
 
     def get_setting(self, setting_id, default_value=None):
         """
@@ -357,32 +344,27 @@ class PersistedSettingsCache(SettingsCache):
         :type default_value: str|unicode
         :return: The value of the setting as a string
                  If the setting is not stored, the optional default_value if provided or None
-        :returns: str|unicode
+        :rtype: str|unicode
         """
         value = self._SETTINGS_CACHE.get_setting(setting_id)
         if value == self.EMPTY_PERSISTED_SETTING_VALUE:
             return unicode(default_value) if default_value else None
         if value is None or value == "":
-            while (
-                    self._RUNTIME_SETTINGS.get_setting(self.SETTINGS_LOCK_NAME)
-                    and not self._KODI_MONITOR.abortRequested()
-            ):
-                if self._KODI_MONITOR.waitForAbort(0.001):
-                    return
-            with threading.Lock():
-                try:
-                    self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_LOCK_NAME, True)
+            try:
+                with self._settings_lock():
                     value = self._KODI_ADDON.getSetting(setting_id)
                     if value is None or value == "":
-                        value = unicode(default_value) if default_value else self.EMPTY_PERSISTED_SETTING_VALUE
+                        value = (
+                            unicode(default_value) if default_value is not None else self.EMPTY_PERSISTED_SETTING_VALUE
+                        )
 
                     settings_list = self._get_settings_list_set()
                     settings_list.add(setting_id)
                     self._store_setting_list_set(settings_list)
 
                     self._SETTINGS_CACHE.set_setting(setting_id, value)
-                finally:
-                    self._RUNTIME_SETTINGS.clear_setting(self.SETTINGS_LOCK_NAME)
+            except self.KodiShutdown:
+                return
         return value if not value == self.EMPTY_PERSISTED_SETTING_VALUE else None
 
     def get_float_setting(self, setting_id, default_value=None):

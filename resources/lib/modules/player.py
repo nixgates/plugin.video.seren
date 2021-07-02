@@ -397,19 +397,23 @@ class SerenPlayer(xbmc.Player):
         return item
 
     def _add_support_for_external_trakt_scrobbling(self):
-        if self.trakt_enabled and self.scrobbling_enabled:
-            return
         trakt_meta = {}
-        info = self.item_information.get("info")
-        if info:
-            if info.get("tmdb_id"):
-                trakt_meta.update({"tmdb": info.get("tmdb_id")})
-            if info.get("imdb_id"):
-                trakt_meta.update({"imdb": info.get("imdb_id")})
-            if info.get("trakt_slug"):
-                trakt_meta.update({"slug": info.get("trakt_slug")})
-            if info.get("tvdb_id"):
-                trakt_meta.update({"tvdb": info.get("tvdb_id")})
+        keys = {
+            "tmdb_id": "tmdb",
+            "imdb_id": "imdb",
+            "trakt_slug": "slug",
+            "tvdb_id": "tvdb",
+            "trakt_id": "trakt",
+        }
+
+        info = self.item_information.get("info", {})
+        for id in keys:
+            meta_id = info.get(
+                "tvshow." + id if info.get("mediatype") == "episode" else id
+            )
+            if meta_id:
+                trakt_meta[keys[id]] = meta_id
+
         g.HOME_WINDOW.setProperty(
             "script.trakt.ids", json.dumps(trakt_meta, sort_keys=True)
         )

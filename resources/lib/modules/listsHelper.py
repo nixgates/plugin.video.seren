@@ -21,6 +21,7 @@ class ListsHelper:
         list_items = self.lists_database.get_list_content(arguments['username'],
                                                           arguments['trakt_id'],
                                                           self._backwards_compatibility(media_type),
+                                                          ignore_cache=True,
                                                           page=g.PAGE,
                                                           no_paging=self.no_paging)
 

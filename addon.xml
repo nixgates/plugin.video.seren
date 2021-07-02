@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.1.1" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.1.2" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.addon" version="17.9.910" />
         <import addon="script.module.future" version="0.17.1"/>
         <import addon="script.module.requests" version="2.22.0" />
         <import addon="script.module.beautifulsoup4" version="4.6.2"/>
         <import addon="context.seren" version="2.0.0"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+        <import addon="script.module.inputstreamhelper" version="0.3.3" optional="true"/>
         <import addon="script.module.unidecode" version="1.1.1"/>
         <import addon="script.module.myconnpy" version="1.1.7"/>
     </requires>
@@ -62,6 +62,27 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.1.2
+            Fix RD auth when there are existing values in settings.xml
+            Get debrid premium status immediately after auth and improve values/handling
+            Make Trakt auth for widget loads needing auth to wait for auth
+            Ensure all trakt API instances always get latest auth tokens
+            Fix Trakt revoke auth issues that led to bad values in settings.xml
+            Don't wipe user data in trakt sync db on trakt revoke auth unless next authed user is different
+            Fix clipboard copy to work on Linux under Matrix and and add MacOS support
+            Fix season milling requires update check
+            Fix adding unaired items to watchlist from search when hide unaired is enabled
+            Fix eternal trakt IDs for trakt addon ratings/scrobbling for episodes
+            Fix trakt list sorting direction for rank sorting
+            Don't cache personal trakt lists
+            Reorder code path in GlobalLock to avoid rare race condition
+            Fix Long life service manager does not exit when kodi requests it to
+            Change InputStream Helper dependency to optional
+            Gracefully handle bad dates in OMDB indexer
+            Improved settings cache thread locking
+            Handle None/empty values better in settings cache
+            VACCUM during DB rebuild (reclaim disk space)
+
             Changelog 2.1.1
             Fix RD losing auth issue
             Improve OAUTH refresh flow edge case coverage for Trakt and TVDB

@@ -105,7 +105,7 @@ class OmdbApi(ApiBase):
             (
                 "@runtime",
                 "duration",
-                lambda d: int(d[:-4]) * 60 if not self._is_value_none(d) else None,
+                lambda d: int(d[:-4]) * 60 if not self._is_value_none(d) and len(d) > 4 and d[:-4].isdigit() else None,
             ),
             (
                 "@genre",
@@ -273,7 +273,7 @@ class OmdbApi(ApiBase):
 
     @staticmethod
     def _is_value_none(value):
-        if value in ["N/A", "0.0", "0", 0, 0.0, None]:
+        if value in ["", "N/A", "0.0", "0", 0, 0.0, None]:
             return True
         else:
             return False

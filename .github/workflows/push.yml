@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-      - v2-development
+      - v2-Development
       - master
     tags:
       - v*.*.*

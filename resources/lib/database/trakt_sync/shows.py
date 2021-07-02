@@ -381,7 +381,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Show item with full meta
         :rtype: dict
         """
-        return self.get_show_list([self._get_single_show_meta(trakt_id)])[0]
+        return self.get_show_list(
+            [self._get_single_show_meta(trakt_id)],
+            hide_unaired=False,
+            hide_watched=False
+        )[0]
 
     @guard_against_none(list)
     def get_season(self, trakt_id, trakt_show_id):
@@ -394,7 +398,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Season item with full meta
         :rtype: dict
         """
-        return self.get_season_list(trakt_show_id, trakt_id)[0]
+        return self.get_season_list(
+            trakt_show_id, trakt_id,
+            hide_unaired=False,
+            hide_watched=False
+        )[0]
 
     @guard_against_none(list)
     def get_episode(self, trakt_id, trakt_show_id):
@@ -407,7 +415,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Episode object with full meta
         :rtype: dict
         """
-        result = self.get_episode_list(trakt_show_id, trakt_id=trakt_id)[0]
+        result = self.get_episode_list(
+            trakt_show_id, trakt_id=trakt_id,
+            hide_unaired=False,
+            hide_watched=False
+        )[0]
         result.update(
             self.fetchone(
                 """select s.season_count, s.episode_count as show_episode_count, 

@@ -105,6 +105,7 @@ class Premiumize:
 
         account_info = self.account_info()
         g.set_setting("premiumize.username", account_info["customer_id"])
+        g.set_setting("premiumize.premiumstatus", self.get_account_status().title())
 
         return False, True
 
@@ -364,13 +365,16 @@ class Premiumize:
         """
         return (
             g.get_bool_setting("premiumize.enabled")
-            and g.get_setting(PM_TOKEN_KEY, None) is not None
+            and g.get_setting(PM_TOKEN_KEY) is not None
         )
 
-    def is_account_premium(self):
+    def get_account_status(self):
         """
         Confirm accounts Premium status
-        :return: True if premium else false
+        :return: 'premium' if premium else 'expired'
         :rtype: bool
         """
-        return self.account_info().get("premium_until", 0) > time.time()
+        premium_until = self.account_info().get("premium_until", 0)
+        if premium_until == 0:
+            return "invalid"
+        return "premium" if premium_until > time.time() else "expired"

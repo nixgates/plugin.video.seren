@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import inspect
-import threading
 import time
 from collections import OrderedDict
 from functools import wraps
@@ -67,8 +66,14 @@ def trakt_auth_guard(func):
         """
         if g.get_setting("trakt.auth"):
             return func(*args, **kwargs)
-        elif xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30507)):
-            TraktAPI().auth()
+        with GlobalLock("trakt.auth_guard"):
+            if not g.get_setting("trakt.auth"):
+                if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30507)):
+                    TraktAPI().auth()
+                else:
+                    g.cancel_directory()
+        if g.get_setting("trakt.auth"):
+            return func(*args, **kwargs)
         else:
             g.cancel_directory()
 
@@ -90,11 +95,12 @@ def _connection_failure_dialog():
         g.set_setting("general.trakt.failure.timeout", g.UNICODE(time.time()))
 
 
-def _reset_trakt_auth():
+def _reset_trakt_auth(notify=True):
     settings = ["trakt.refresh", "trakt.auth", "trakt.expires", "trakt.username"]
     for i in settings:
-        g.set_setting(i, "")
-    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30578))
+        g.clear_setting(i)
+    if notify:
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30578))
 
 
 def trakt_guard_response(func):
@@ -113,6 +119,7 @@ def trakt_guard_response(func):
         :return:
         """
         method_class = args[0]
+        method_class._load_settings()
         try:
             response = func(*args, **kwargs)
             if response.status_code in [200, 201, 204]:
@@ -193,6 +200,10 @@ class TraktAPI(ApiBase):
     username_setting_key = "trakt.username"
 
     def __init__(self):
+        self.access_token = None
+        self.refresh_token = None
+        self.token_expires = 0
+        self.username = None
         self._load_settings()
         self.redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
         self.try_refresh_token()
@@ -402,21 +413,14 @@ class TraktAPI(ApiBase):
         :return:
         """
         url = "oauth/revoke"
-        post_data = {"token": self.access_token}
+        post_data = {"token": self.access_token, "client_id": self.client_id, "client_secret": self.client_secret}
         if self.access_token:
             self.post(url, post_data)
-        self._save_settings(
-            {
-                "access_token": None,
-                "refresh_token": None,
-                "expires_in": 0,
-                "created_at": 0,
-            }
-        )
-        g.set_setting(self.username_setting_key, None)
-        from resources.lib.database.trakt_sync import activities
-
-        activities.TraktSyncDatabase().clear_user_information()
+        _reset_trakt_auth(notify=False)
+        self.access_token = None
+        self.refresh_token = None
+        self.token_expires = 0
+        self.username = None
         xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30022))
 
     def auth(self):
@@ -482,6 +486,7 @@ class TraktAPI(ApiBase):
             self._save_settings(response)
             username = self.get_username()
             self.username = username
+            g.set_setting(self.username_setting_key, username)
             self.progress_dialog.close()
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30300))
 
@@ -499,7 +504,7 @@ class TraktAPI(ApiBase):
                     'RunPlugin("{}?action=syncTraktActivities")'.format(g.BASE_URL)
                 )
 
-            g.set_setting(self.username_setting_key, username)
+
 
         elif response.status_code == 404 or response.status_code == 410:
             self.progress_dialog.close()
@@ -543,7 +548,7 @@ class TraktAPI(ApiBase):
     def try_refresh_token(self, force=False):
         """
         Attempts to refresh current Trakt Auth Token
-        :param force: Set to True to avoid Global Lock and forces refresh
+        :param force: Set to True to force refresh
         :return: None
         """
         if not self.refresh_token:
@@ -817,7 +822,7 @@ class TraktAPI(ApiBase):
         if sort_by == "added":
             items = sorted(items, key=lambda x: x.get("listed_at"))
         elif sort_by == "rank":
-            items = sorted(items, key=lambda x: x.get("rank"), reverse=True)
+            items = sorted(items, key=lambda x: x.get("rank"))
         elif sort_by == "title":
             items = sorted(items, key=self._title_sorter)
         elif sort_by == "released":
