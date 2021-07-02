@@ -148,7 +148,11 @@ class Database(object):
                 sqlite._connection.execute("PRAGMA foreign_keys = OFF")
                 for q in ["DROP TABLE IF EXISTS [{}]".format(t["name"]) for t in database_schema]:
                     sqlite._connection.execute(q)
+                sqlite._connection.execute("PRAGMA foreign_keys = ON")
 
+            sqlite._connection.execute("VACUUM")
+
+            with sqlite.transaction():
                 self._create_tables(sqlite._connection)
 
     def fetchall(self, query, data=None):

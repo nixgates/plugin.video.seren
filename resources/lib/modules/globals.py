@@ -701,41 +701,159 @@ class GlobalVariables(object):
 
     # region runtime settings
     def set_runtime_setting(self, setting_id, value):
+        """
+        Set a runtime setting value
+
+        Lists and Dict may only contain simple types
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param value: The value to store in settings
+        :type value: str|unicode|float|int|bool|list|dict
+        """
         self.RUNTIME_SETTINGS_CACHE.set_setting(setting_id, value)
 
     def clear_runtime_setting(self, setting_id):
+        """
+        Clear a runtime setting from the cache.
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        """
         self.RUNTIME_SETTINGS_CACHE.clear_setting(setting_id)
 
     def get_runtime_setting(self, setting_id, default_value=None):
+        """
+        Get a runtime setting value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param default_value: An optional default value to provide if the setting is not stored
+        :type default_value: str|unicode|float|int|bool
+        :return: The value of the setting.
+                 If the setting is not stored, the optional default_value if provided or None
+        :rtype: str|unicode|float|int|bool|list|dict
+        """
         return self.RUNTIME_SETTINGS_CACHE.get_setting(setting_id, default_value)
 
     def get_float_runtime_setting(self, setting_id, default_value=None):
+        """
+        Get a runtime setting as a float value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param default_value: An optional default value to provide if the setting is not stored
+        :type default_value: float
+        :return: The value of the setting.
+                 If the setting is not stored, the optional default_value if provided or 0.0
+        :rtype: float
+        """
         return self.RUNTIME_SETTINGS_CACHE.get_float_setting(setting_id, default_value)
 
     def get_int_runtime_setting(self, setting_id, default_value=None):
+        """
+        Get a runtime setting as an int value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param default_value: An optional default value to provide if the setting is not stored
+        :type default_value: int
+        :return: The value of the setting.
+                 If the setting is not stored, the optional default_value if provided or 0
+        :rtype: int
+        """
         return self.RUNTIME_SETTINGS_CACHE.get_int_setting(setting_id, default_value)
 
     def get_bool_runtime_setting(self, setting_id, default_value=None):
+        """
+        Get a runtime setting as a bool value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param default_value: An optional default value to provide if the setting is not stored
+        :type default_value: bool
+        :return: The value of the setting.
+                 If the setting is not stored, the optional default_value if provided or False
+        :rtype: bool
+        """
         return self.RUNTIME_SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
     # endregion
 
     # region KODI setting
     def set_setting(self, setting_id, value):
+        """
+        Set a setting value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param value: The value to store in settings
+        :type value: str|unicode|float|int|bool
+        """
         self.SETTINGS_CACHE.set_setting(setting_id, value)
 
     def clear_setting(self, setting_id):
+        """
+        Clear a setting from the cache and settings.xml
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        """
         self.SETTINGS_CACHE.clear_setting(setting_id)
 
     def get_setting(self, setting_id, default_value=None):
+        """
+        Get a setting value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param default_value:
+        :type default_value: str|unicode
+        :return: The value of the setting as a string
+                 If the setting is not stored, the optional default_value if provided or None
+        :rtype: str|unicode
+        """
         return self.SETTINGS_CACHE.get_setting(setting_id, default_value)
 
     def get_float_setting(self, setting_id, default_value=None):
+        """
+        Get a setting as a float value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param default_value: An optional default value to provide if the setting is not stored
+        :type default_value: float
+        :return: The value of the setting.
+                 If the setting is not stored, the optional default_value if provided or 0.0
+        :rtype: float
+        """
         return self.SETTINGS_CACHE.get_float_setting(setting_id, default_value)
 
     def get_int_setting(self, setting_id, default_value=None):
+        """
+        Get a setting as an int value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param default_value: An optional default value to provide if the setting is not stored
+        :type default_value: int
+        :return: The value of the setting.
+                 If the setting is not stored, the optional default_value if provided or 0
+        :rtype: int
+        """
         return self.SETTINGS_CACHE.get_int_setting(setting_id, default_value)
 
     def get_bool_setting(self, setting_id, default_value=None):
+        """
+        Get a setting as a bool value
+
+        :param setting_id: The name of the setting
+        :type setting_id: str|unicode
+        :param default_value: An optional default value to provide if the setting is not stored
+        :type default_value: bool
+        :return: The value of the setting.
+                 If the setting is not stored, the optional default_value if provided or False
+        :rtype: bool
+        """
         return self.SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
     # endregion
 

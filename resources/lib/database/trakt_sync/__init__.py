@@ -688,6 +688,24 @@ class TraktSyncDatabase(Database):
         if queue_wrapper is None:
             queue_wrapper = self._queue_mill_tasks
 
+        query = """select s.trakt_id, agg.meta_count, s.season_count, CASE WHEN (agg.season_count is NULL or 
+            agg.season_count != s.season_count) or (agg.meta_count=0 or agg.meta_count!=s.season_count) THEN 'True' 
+            ELSE 'False' END as needs_update from shows as s left join(select s.trakt_id, count(se.trakt_id) as 
+            season_count, count(sm.id) as meta_count from shows as s inner join seasons as se on s.trakt_id = 
+            se.trakt_show_id left join seasons_meta as sm on sm.id = se.trakt_id and sm.type = 'trakt' and sm.meta_hash = 
+            '{}' where se.season != 0 and Datetime(se.air_date) < Datetime('now') 
+            GROUP BY s.trakt_id) as agg on s.trakt_id == agg.trakt_id WHERE s.trakt_id in ({})""".format(
+            self.trakt_api.meta_hash,
+            ",".join(
+                str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
+            ),
+        )
+        needs_update = self.fetchall(query)
+        if needs_update is not None:
+            needs_update = {x.get('trakt_id'): x for x in needs_update if x.get('needs_update') == "True"}
+        else:
+            needs_update = {}
+
         if mill_episodes:
             query = """select s.trakt_id, CASE WHEN (agg.episode_count is NULL or 
             agg.episode_count != s.episode_count) or (agg.meta_count=0 or agg.meta_count!=s.episode_count) THEN 'True' 
@@ -701,23 +719,12 @@ class TraktSyncDatabase(Database):
                     str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
                 ),
             )
-        else:
-            query = """select s.trakt_id, agg.meta_count, s.season_count, CASE WHEN (agg.season_count is NULL or 
-                agg.season_count != s.season_count) or (agg.meta_count=0 or agg.meta_count!=s.season_count) THEN 'True' 
-                ELSE 'False' END as needs_update from shows as s left join(select s.trakt_id, count(se.trakt_id) as 
-                season_count, count(sm.id) as meta_count from shows as s inner join seasons as se on s.trakt_id = 
-                se.trakt_show_id left join seasons_meta as sm on sm.id = se.trakt_id and sm.type = 'trakt' and sm.meta_hash = 
-                '{}' where se.season != 0 and Datetime(se.air_date) < Datetime('now') 
-                GROUP BY s.trakt_id) as agg on s.trakt_id == agg.trakt_id WHERE s.trakt_id in ({})""".format(
-                self.trakt_api.meta_hash,
-                ",".join(
-                    str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
-                ),
-            )
-        needs_update = self.fetchall(query)
-        if needs_update is None:
-            return
-        needs_update = {x.get('trakt_id'): x for x in needs_update if x.get('needs_update') == "True"}
+            episodes_needs_update = self.fetchall(query)
+            if episodes_needs_update is not None:
+                needs_update.update(
+                    {x.get('trakt_id'): x for x in episodes_needs_update if x.get('needs_update') == "True"}
+                )
+
         update_size = len(needs_update)
         if update_size > 0:
             g.log("{} items require season milling".format(update_size), "debug")

@@ -34,12 +34,12 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
         :rtype: None
         """
         g.log('Starting Service Manager Long Life Service')
-        [self._start_package_services(package) for package in self.known_packages]
+        for package in self.known_packages:
+            self._start_package_services(package)
         self._service_trigger_loop()
 
     def _service_trigger_loop(self):
-        while not g.abort_requested():
-            xbmc.sleep(500)
+        while not g.wait_for_abort(0.5):
             self._handle_messages(self.get_messages())
 
     def _shutdown_package_services(self, package_name):

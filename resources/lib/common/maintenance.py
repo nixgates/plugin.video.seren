@@ -48,7 +48,7 @@ def check_for_addon_update():
 
     if time.time() > (update_timestamp + (24 * (60 * 60))):
         repo_xml = requests.get(
-            "https://github.com/nixgates/nixgates/raw/master/packages/addons.xml"
+            "https://github.com/nixgates/nixgates/raw/master/repo/zips/addons.xml"
         )
         if not repo_xml.status_code == 200:
             g.log(
@@ -204,7 +204,7 @@ def account_premium_status_checks():
     :rtype: None
     """
 
-    def set_settings_status(debrid_provider, is_premium):
+    def set_settings_status(debrid_provider, status):
         """
         Ease of use method to set premium status setting
         :param debrid_provider: setting prefix for debrid provider
@@ -214,8 +214,7 @@ def account_premium_status_checks():
         :return: None
         :rtype: None
         """
-        status = "Premium" if is_premium else "Expired"
-        g.set_setting("{}.premiumstatus".format(debrid_provider), status)
+        g.set_setting("{}.premiumstatus".format(debrid_provider), status.title())
 
     def display_expiry_notification(display_debrid_name):
         """
@@ -240,13 +239,11 @@ def account_premium_status_checks():
     for service in valid_debrid_providers:
         service_module = service[1]()
         if service_module.is_service_enabled():
-            if service_module.is_account_premium():
-                g.log("Premium: {}".format(service[0]))
-                set_settings_status(service[2], True)
-            else:
+            status = service_module.get_account_status()
+            if status == "expired":
                 display_expiry_notification(service[0])
-                g.log("Expired: {}".format(service[0]))
-                set_settings_status(service[2], False)
+            g.log("{}: {}".format(service[0], status))
+            set_settings_status(service[2], status)
 
 
 def toggle_reuselanguageinvoker(forced_state=None):

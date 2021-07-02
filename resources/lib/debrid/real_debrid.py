@@ -19,11 +19,13 @@ from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
 
 RD_AUTH_KEY = "rd.auth"
+RD_STATUS_KEY = "rd.premiumstatus"
 RD_REFRESH_KEY = "rd.refresh"
 RD_EXPIRY_KEY = "rd.expiry"
 RD_SECRET_KEY = "rd.secret"
 RD_CLIENT_ID_KEY = "rd.client_id"
 RD_USERNAME_KEY = "rd.username"
+RD_AUTH_CLIENT_ID = "X245A4XAIBGVM"
 
 
 class RealDebrid:
@@ -49,7 +51,7 @@ class RealDebrid:
         del self.progress_dialog
 
     def _auth_loop(self):
-        url = "client_id={}&code={}".format(self.client_id, self.device_code)
+        url = "client_id={}&code={}".format(RD_AUTH_CLIENT_ID, self.device_code)
         url = self.oauth_url + self.device_credentials_url.format(url)
         response = self.session.get(url).json()
         if "error" not in response and response.get("client_secret"):
@@ -124,8 +126,7 @@ class RealDebrid:
             },
         ).json()
         self._save_settings(response)
-        username = self.get_url("user").get("username")
-        g.set_setting(RD_USERNAME_KEY, username)
+        self._save_user_status()
         xbmcgui.Dialog().ok(g.ADDON_NAME, "Real Debrid " + g.get_language_string(30021))
         g.log("Authorised Real Debrid successfully", "info")
 
@@ -137,8 +138,14 @@ class RealDebrid:
         g.set_setting(RD_REFRESH_KEY, self.refresh)
         g.set_setting(RD_EXPIRY_KEY, self.expiry)
 
+    def _save_user_status(self):
+        username = self.get_url("user").get("username")
+        status = self.get_account_status().title()
+        g.set_setting(RD_USERNAME_KEY, username)
+        g.set_setting(RD_STATUS_KEY, status)
+
     def _load_settings(self):
-        self.client_id = g.get_setting("rd.client_id", "X245A4XAIBGVM")
+        self.client_id = g.get_setting("rd.client_id", RD_AUTH_CLIENT_ID)
         self.token = g.get_setting(RD_AUTH_KEY)
         self.refresh = g.get_setting(RD_REFRESH_KEY)
         self.expiry = g.get_float_setting(RD_EXPIRY_KEY)
@@ -329,7 +336,11 @@ class RealDebrid:
 
     @staticmethod
     def is_service_enabled():
-        return g.get_bool_setting("realdebrid.enabled") and g.get_setting(RD_AUTH_KEY)
+        return (
+            g.get_bool_setting("realdebrid.enabled")
+            and g.get_setting(RD_AUTH_KEY) is not None
+        )
 
-    def is_account_premium(self):
-        return self.get_url("user").get("type") != "free"
+    def get_account_status(self):
+        status = self.get_url("user", {}).get("type")
+        return status if status else "invalid"

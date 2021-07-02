@@ -108,7 +108,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     @guard_against_none(list)
     def get_movie(self, trakt_id):
-        return self.get_movie_list([self._get_single_movie_meta(trakt_id)])[0]
+        return self.get_movie_list(
+            [self._get_single_movie_meta(trakt_id)],
+            hide_unaired=False,
+            hide_watched=False
+        )[0]
 
     @guard_against_none()
     def _get_single_movie_meta(self, trakt_id):

@@ -19,8 +19,8 @@ class GlobalLock(object):
         while not g.abort_requested() and self._running():
             if g.wait_for_abort(.100):
                 break
-        self._check_ran_once_already()
         g.set_runtime_setting(self._create_key("Running"), True)
+        self._check_ran_once_already()
 
     def _running(self):
         return g.get_bool_runtime_setting(self._create_key("Running"))
@@ -28,6 +28,7 @@ class GlobalLock(object):
     def _check_ran_once_already(self):
         if g.get_bool_runtime_setting(self._create_key("RunOnce")) and \
                g.get_runtime_setting(self._create_key("CheckSum")) == self._check_sum:
+            g.clear_runtime_setting(self._create_key("Running"))
             raise RanOnceAlready("Lock name: {}, Checksum: {}".format(self._lock_name, self._check_sum))
 
     def __enter__(self):

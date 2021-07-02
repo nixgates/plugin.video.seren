@@ -103,12 +103,14 @@ def copy2clip(txt):
             return subprocess.check_call(cmd, shell=True)
         except Exception as e:
             log("Failure to copy to clipboard, \n{}".format(e), "error")
-    elif platform == "linux2":
+    elif platform.startswith("linux") or platform == "darwin":
         try:
             from subprocess import Popen, PIPE
 
-            p = Popen(["xsel", "-pi"], stdin=PIPE)
-            p.communicate(input=txt)
+            cmd = "pbcopy" if platform == "darwin" else ["xsel", "-pi"]
+            kwargs = {"stdin": PIPE, "text": True} if PYTHON3 else {"stdin": PIPE}
+            p = Popen(cmd, **kwargs)
+            p.communicate(input=str(txt))
         except Exception as e:
             log("Failure to copy to clipboard, \n{}".format(e), "error")
 
