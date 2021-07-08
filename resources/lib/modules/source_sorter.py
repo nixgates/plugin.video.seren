@@ -17,7 +17,7 @@ class SourceSorter:
     Handles sorting of sources according to users preferences
     """
 
-    def __init__(self, media_type, uncached=False):
+    def __init__(self, media_type, duration, uncached=False):
         """
         Handles sorting of sources according to users preference
         :param media_type: Type of media to be sorted (movie/episode)
@@ -28,6 +28,7 @@ class SourceSorter:
         self.sort_method = g.get_int_setting("general.sortsources")
         self.resolution_list = reversed(get_accepted_resolution_list())
         self.media_type = media_type
+        self.duration = duration
         self.torrent_list = []
         self.hoster_list = []
         self.cloud_files = []
@@ -110,6 +111,14 @@ class SourceSorter:
             self._filter_all_by_methods(
                 [lambda i: size_limit >= int(i.get("size", 0)) >= size_minimum]
                 )
+
+        if g.get_bool_setting("general.sizeperminlimit"):
+            if self.media_type == "episode":
+                sizepermin_limit = g.get_int_setting("general.sizeperminlimit.episode")
+            else:
+                sizepermin_limit = g.get_int_setting("general.sizeperminlimit.movie")
+
+            self._filter_all_by_methods([lambda i: (int(i.get('size', 0)) / self.duration) < sizepermin_limit])
 
     def _apply_hevc_priority(self):
         if g.get_bool_setting("general.265sort"):

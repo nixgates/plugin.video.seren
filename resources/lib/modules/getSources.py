@@ -60,6 +60,7 @@ class Sources(object):
         self.hoster_providers = []
         self.adaptive_providers = []
         self.running_providers = []
+        self.duration = 0
         self.language = 'en'
         self.sources_information = {
             "adaptiveSources": [],
@@ -219,7 +220,8 @@ class Sources(object):
                 g.notification(g.ADDON_NAME, g.get_language_string(30056))
             return uncached, [], self.item_information
 
-        sorted_sources = SourceSorter(self.media_type).sort_sources(
+        self.duration = self.item_information['info']['duration'] / 60
+        sorted_sources = SourceSorter(self.media_type, self.duration).sort_sources(
             list(self.sources_information["torrentCacheSources"].values()),
             list(self.sources_information['hosterSources'].values()),
             self.sources_information['cloudFiles'])
@@ -884,9 +886,9 @@ class Sources(object):
             return 0
         size = int(torrent['size'])
 
-        if torrent['package'] == 'show':
+        if torrent['package'] == 'show' and info['show_episode_count'] is not None:
             size = size / int(info['show_episode_count'])
-        elif torrent['package'] == 'season':
+        elif torrent['package'] == 'season' and info['episode_count'] is not None:
             size = size / int(info['episode_count'])
         return size
 

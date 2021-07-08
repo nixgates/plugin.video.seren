@@ -3282,3 +3282,18 @@ msgid ""
 msgstr ""
 "Seren was unable to detect your local time zone automatically.  Would you "
 "like to set this now?"
+
+#: /resources/settings.xml:401
+msgctxt "#90363"
+msgid "Enable File Size Per Minute Limit"
+msgstr ""
+
+#: /resources/settings.xml:402
+msgctxt "#90364"
+msgid "Movie File Size Per Minute Limit (MB)"
+msgstr ""
+
+#: /resources/settings.xml:404
+msgctxt "#90365"
+msgid "Episode File Size Per Minute Limit (MB)"
+msgstr ""

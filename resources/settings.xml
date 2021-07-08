@@ -401,6 +401,11 @@
                  range="0.0,0.1,30.0" default="0" visible="eq(-3,true)"/>
         <setting id="general.sizeminimum.episode" type="slider" subsetting="true" label="30577" option="float"
                  range="0.0,0.1,30.0" default="0" visible="eq(-4,true)"/>
+        <setting id="general.sizeperminlimit" type="bool" label="90363" default="true" />
+        <setting id="general.sizeperminlimit.movie" type="slider" subsetting="true" label="90364" option="int" range="0,1,300"
+                 default="10" visible="eq(-1,true)" />
+        <setting id="general.sizeperminlimit.episode" type="slider" subsetting="true" label="90365" option="int" range="0,1,300"
+                 default="10" visible="eq(-2,true)" />
         <setting id="general.disable3d" type="bool" label="30160" default="true"/>
         <setting id="general.disable265" type="bool" label="30119" default="false"/>
         <setting id="general.disablelowQuality" type="bool" label="30175" default="false"/>

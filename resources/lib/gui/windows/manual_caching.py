@@ -15,7 +15,7 @@ from resources.lib.modules.source_sorter import SourceSorter
 class ManualCacheWindow(BaseWindow):
     def __init__(self, xml_file, location, item_information=None, sources=None):
         super(ManualCacheWindow, self).__init__(xml_file, location, item_information=item_information)
-        self.sources = SourceSorter(item_information['info']['mediatype'], uncached=True).sort_sources(sources)
+        self.sources = SourceSorter(item_information['info']['mediatype'], item_information['info']['duration'], uncached=True).sort_sources(sources)
         self.canceled = False
         self.display_list = None
         self.cached_source = None
