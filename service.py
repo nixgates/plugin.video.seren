@@ -15,8 +15,6 @@ if tools.is_stub():
 
 from resources.lib.modules.globals import g
 
-from resources.lib.common import maintenance
-from resources.lib.database.trakt_sync.activities import TraktSyncDatabase
 from resources.lib.modules.serenMonitor import SerenMonitor
 from resources.lib.modules.update_news import do_update_news
 from resources.lib.modules.manual_timezone import validate_timezone_detected
@@ -56,15 +54,16 @@ try:
 
     g.wait_for_abort(30)  # Sleep for a half a minute to allow widget loads to complete.
     while not monitor.abortRequested():
-        try:
-            if g.get_bool_setting("general.checkAddonUpdates"):
-                maintenance.check_for_addon_update()
-
-            maintenance.run_maintenance()
-            TraktSyncDatabase().sync_activities()
-        except Exception:
-            g.log("Background service failure", "error")
-            g.log_stacktrace()
+        xbmc.executebuiltin(
+            'RunPlugin("plugin://plugin.video.seren/?action=runMaintenance&action_args=updateCheck")'
+        )
+        xbmc.executebuiltin(
+            'RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")'
+        )
+        if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
+            xbmc.executebuiltin(
+                'RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")'
+            )
         if g.wait_for_abort(60 * randint(13, 17)):
             break
 finally:
