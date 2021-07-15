@@ -1,3 +1,9 @@
+Changelog 2.1.3
+Workaround Kodi's lack of multi-process settings management
+Fix Trakt updated endpoints now only support 30 days from "now"
+Fix call to get_url in RD account status check and enhanced PM and AD account status checks
+Fix Trakt IDs being sent wrong to windows
+
 Changelog 2.1.2
 Fix RD auth when there are existing values in settings.xml
 Get debrid premium status immediately after auth and improve values/handling
@@ -18,7 +24,6 @@ Gracefully handle bad dates in OMDB indexer
 Improved settings cache thread locking
 Handle None/empty values better in settings cache
 VACCUM during DB rebuild (reclaim disk space)
-
 
 Changelog 2.1.1
 Fix RD losing auth issue

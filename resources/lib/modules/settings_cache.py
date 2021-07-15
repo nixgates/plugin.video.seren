@@ -200,20 +200,16 @@ class PersistedSettingsCache(SettingsCache):
     _SETTINGS_THREAD_LOCK = threading.Lock()
     _SETTINGS_CACHE = None
     _RUNTIME_SETTINGS = None
-    _KODI_ADDON = None
     _KODI_MONITOR = None
     _KODI_HOME_WINDOW = None
 
     def __init__(self):
         self._KODI_HOME_WINDOW = xbmcgui.Window(10000)
-        self._KODI_ADDON = xbmcaddon.Addon()
         self._KODI_MONITOR = xbmc.Monitor()
         self._SETTINGS_CACHE = RuntimeSettingsCache(settings_prefix="persisted")
         self._RUNTIME_SETTINGS = RuntimeSettingsCache()
 
     def __del__(self):
-        self._KODI_ADDON = None
-        del self._KODI_ADDON
         self._KODI_MONITOR = None
         del self._KODI_MONITOR
         self._KODI_HOME_WINDOW = None
@@ -289,13 +285,15 @@ class PersistedSettingsCache(SettingsCache):
                     self._store_setting_list_set(settings_list)
 
                     self._SETTINGS_CACHE.set_setting(setting_id, value_string)
-                    if not self._KODI_ADDON.getSetting(setting_id) == (
+                    kodi_addon = xbmcaddon.Addon()
+                    if not kodi_addon.getSetting(setting_id) == (
                         value_string if not value_string == self.EMPTY_PERSISTED_SETTING_VALUE else ""
                     ):
-                        self._KODI_ADDON.setSetting(
+                        kodi_addon.setSetting(
                             setting_id, value_string if not value_string == self.EMPTY_PERSISTED_SETTING_VALUE else ""
                         )
                         self._set_settings_persisted_flag()
+                    del kodi_addon
             except self.KodiShutdown:
                 return
 
@@ -310,7 +308,9 @@ class PersistedSettingsCache(SettingsCache):
                 self._store_setting_list_set(settings_list)
 
                 self._SETTINGS_CACHE.clear_setting(setting_id)
-                self._KODI_ADDON.setSetting(setting_id, "")
+                kodi_addon = xbmcaddon.Addon()
+                kodi_addon.setSetting(setting_id, "")
+                del kodi_addon
                 self._set_settings_persisted_flag()
         except self.KodiShutdown:
             return
@@ -321,11 +321,7 @@ class PersistedSettingsCache(SettingsCache):
         """
         try:
             with self._settings_lock():
-                settings_list = self._RUNTIME_SETTINGS.get_setting(self.SETTINGS_LIST_NAME)
-                if settings_list is None or settings_list == "":
-                    settings_list = set()
-                else:
-                    settings_list = set(settings_list)
+                settings_list = self._get_settings_list_set()
 
                 for setting_id in settings_list:
                     self._SETTINGS_CACHE.clear_setting(setting_id)
@@ -352,7 +348,9 @@ class PersistedSettingsCache(SettingsCache):
         if value is None or value == "":
             try:
                 with self._settings_lock():
-                    value = self._KODI_ADDON.getSetting(setting_id)
+                    kodi_addon = xbmcaddon.Addon()
+                    value = kodi_addon.getSetting(setting_id)
+                    del kodi_addon
                     if value is None or value == "":
                         value = (
                             unicode(default_value) if default_value is not None else self.EMPTY_PERSISTED_SETTING_VALUE

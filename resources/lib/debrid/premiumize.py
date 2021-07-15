@@ -374,7 +374,9 @@ class Premiumize:
         :return: 'premium' if premium else 'expired'
         :rtype: bool
         """
-        premium_until = self.account_info().get("premium_until", 0)
-        if premium_until == 0:
-            return "invalid"
+        account_info = self.account_info()
+        if isinstance(account_info, dict):
+            premium_until = account_info.get("premium_until")
+        if not premium_until or not isinstance(premium_until, (float, int)):
+            return "unknown"
         return "premium" if premium_until > time.time() else "expired"

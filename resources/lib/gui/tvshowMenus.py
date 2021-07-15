@@ -374,7 +374,7 @@ class Menus:
         g.close_directory(g.CONTENT_SHOW)
 
     def shows_updated(self):
-        date = datetime.date.today() - datetime.timedelta(days=31)
+        date = datetime.date.today() - datetime.timedelta(days=29)
         date = date.strftime(g.DATE_FORMAT)
         trakt_list = self.shows_database.extract_trakt_page(
             "shows/updates/{}".format(date),

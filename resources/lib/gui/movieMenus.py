@@ -252,7 +252,7 @@ class Menus:
     def movies_updated(self):
         import datetime
 
-        date = datetime.date.today() - datetime.timedelta(days=31)
+        date = datetime.date.today() - datetime.timedelta(days=29)
         date = date.strftime(g.DATE_FORMAT)
         trakt_list = self.movies_database.extract_trakt_page(
             "movies/updates/{}".format(date), page=g.PAGE, extended="full"

@@ -164,9 +164,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             "imdb_id",
         )
 
-        formatted_items = [
-            i for i in self.metadataHandler.format_db_object(updated_items)
-        ]
+        formatted_items = self.metadataHandler.format_db_object(updated_items)
 
         self.execute_sql(
             self.upsert_movie_query,

@@ -219,16 +219,20 @@ class AllDebrid:
         )
 
     def get_account_status(self):
-        premium = self.get_user_info().get("isPremium")
-        premiumUntil = self.get_user_info().get("premiumUntil", 0)
-        subscribed = self.get_user_info().get("isSubscribed")
-        trial = self.get_user_info().get("isTrial")
+        user_info = self.get_user_info()
+        if not isinstance(user_info, dict):
+            return "unknown"
 
-        if premium and premiumUntil > time.time():
+        premium = user_info.get("isPremium")
+        premium_until = user_info.get("premiumUntil", 0)
+        subscribed = user_info.get("isSubscribed")
+        trial = user_info.get("isTrial")
+
+        if premium and premium_until > time.time():
             return "premium"
         elif subscribed:
             return "subscribed"
         elif trial:
             return "trial"
         else:
-            return "invalid"
+            return "unknown"
