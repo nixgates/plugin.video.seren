@@ -649,6 +649,9 @@ class Sources(object):
             for source in sources:
                 source['type'] = 'hoster'
                 source['release_title'] = source.get('release_title', title)
+                release_title = source['release_title'].lower()
+                quality = source_utils.get_quality(str(release_title))
+                source['quality'] = quality
                 source['source'] = source['source'].upper().split('.')[0]
                 source['size'] = source.get('size', '0')
                 source['info'] = source.get('info', [])
