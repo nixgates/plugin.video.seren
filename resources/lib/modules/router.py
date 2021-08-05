@@ -110,6 +110,8 @@ def dispatch(params):
         trakt.TraktAPI().revoke_auth()
 
     elif action == "getSources":
+        kodi_params = ('{"jsonrpc":"2.0","method":"GUI.ActivateWindow","params":{"window":"busydialog"},"id":"1"}')
+        kodi_response = xbmc.executeJSONRPC(kodi_params)
         from resources.lib.modules.smartPlay import SmartPlay
         from resources.lib.common import tools
         from resources.lib.modules import helpers
