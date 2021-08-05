@@ -43,13 +43,13 @@ def get_quality(release_title):
     """
     release_title = release_title.lower()
     quality = "SD"
-    if "4k" in release_title:
+    if "4k" in release_title or "4k" in str(release_title):
         quality = "4K"
-    if "2160" in release_title:
+    if "2160" in release_title or  "2160" in str(release_title):
         quality = "4K"
-    if "1080" in release_title:
+    if "1080" in release_title or "1080" in str(release_title):
         quality = "1080p"
-    if "720" in release_title:
+    if "720" in release_title or "720" in str(release_title):
         quality = "720p"
     if any(
         i in release_title
