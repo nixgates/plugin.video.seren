@@ -183,7 +183,22 @@ class PlayingNext(BaseWindow):
         if control_id is None:
             control_id = self.getFocusId()
         if control_id == 3001:
+            if_playback_paused()
             xbmc.executebuiltin('PlayerControl(BigSkipForward)')
             self.close()
         if control_id == 3002:
             self.close()
+
+def if_playback_paused():
+    #start_time = xbmc.Player().getTime()
+    json_result = xbmc.executeJSONRPC('{"jsonrpc": "2.0","id": "1","method": "Player.GetProperties","params": {"playerid": 1,"properties": ["speed"]}}')
+    json_object  = json.loads(json_result)
+    speed = json_object['result']['speed']
+    xbmc.log(str(speed)+'playback_speed===>PHIL', level=xbmc.LOGINFO)
+    #xbmc.sleep(10)
+    #if xbmc.Player().getTime() == start_time:
+    if int(speed) == 0:
+        xbmc.executebuiltin('PlayerControl(Play)')
+        return
+    else:
+        return
