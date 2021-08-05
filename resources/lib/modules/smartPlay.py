@@ -328,6 +328,18 @@ class SmartPlay:
         """
         if g.get_bool_setting("smartplay.playlistcreate") or ignore_setting:
 
+            #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+            """
+            try:
+                if not self.item_information["info"]["mediatype"] == "episode":
+                    g.log("Movie playback requested, clearing playlist")
+                    g.PLAYLIST.clear()
+                    return False
+            #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+            except:
+                return False
+            """
+            #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
             if not self.item_information["info"]["mediatype"] == "episode":
                 g.log("Movie playback requested, clearing playlist")
                 g.PLAYLIST.clear()
