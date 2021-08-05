@@ -10,6 +10,7 @@ from resources.lib.modules.guard_decorators import (
 )
 from resources.lib.modules.metadataHandler import MetadataHandler
 
+import xbmc
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     """
@@ -307,6 +308,88 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         """
         g.log("Fetching Episode list from sync database", "debug")
         self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
+        #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+        """
+        try:
+            self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
+        except:
+            #try:
+            #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+            if 1==1:
+                import sys
+                import xbmc
+                #xbmc.log(str(sys.argv)+'===>PHIL', level=xbmc.LOGINFO)
+                from urllib.parse import unquote
+                action_vars = unquote(sys.argv[2])
+                action_vars = action_vars.split('{')[1].split('}')[0]
+                episode = action_vars.split('"episode":')[1].split(',')[0].strip()
+                season = action_vars.split('"season":')[1].split(',')[0].strip()
+                import requests
+                import json
+                import os
+                from os.path import expanduser
+
+                home = expanduser("~")
+                import xml.etree.ElementTree as ET
+                tree = ET.parse(home + '/.kodi/userdata/addon_data/plugin.video.themoviedb.helper/settings.xml')
+                root = tree.getroot()
+
+                for child in root:
+                    if (child.attrib)['id'] == 'trakt_token':
+                        token = json.loads(child.text)
+
+                home = expanduser("~")
+                try:
+                    inFile = open(home + '/.kodi/addons/plugin.video.themoviedb.helper/resources/lib/traktapi.py')
+                    for line in inFile:
+                        if 'self.client_id = ' in line:
+                            client_id = line.replace('self.client_id = ','').replace('\'','').replace('    ','').replace('\n', '')
+                        if 'self.client_secret = ' in line:
+                            client_secret = line.replace('self.client_secret = ','').replace('\'','').replace('    ','').replace('\n', '')
+                except:
+                    inFile = open(home + '/.kodi/addons/plugin.video.themoviedb.helper/resources/lib/trakt/api.py')
+                    for line in inFile:
+                        if 'CLIENT_ID = ' in line:
+                            client_id = line.replace('CLIENT_ID = ','').replace('\'','').replace('    ','').replace('\n', '')
+                        if 'CLIENT_SECRET = ' in line:
+                            client_secret = line.replace('CLIENT_SECRET = ','').replace('\'','').replace('    ','').replace('\n', '')
+
+                inFile.close()
+
+                headers = {'trakt-api-version': '2', 'trakt-api-key': client_id, 'Content-Type': 'application/json'}
+                headers['Authorization'] = 'Bearer {0}'.format(token.get('access_token'))
+                response = requests.get('https://api.trakt.tv/shows/'+str(trakt_show_id)+'/seasons', headers=headers).json()
+
+                xbmc.log(str(response)+'===>PHIL', level=xbmc.LOGINFO)
+                trakt_season_id = response[int(season)-1]['ids']['trakt']
+                #self.execute_sql(
+                #    "UPDATE episodes SET trakt_season_id=? WHERE trakt_show_id=? and season=?",
+                #    (trakt_season_id, trakt_show_id,int(season)),
+                #)
+                #self.execute_sql(
+                #    "UPDATE seasons SET trakt_id=? WHERE trakt_show_id=? and season=?", (trakt_season_id, trakt_show_id,int(season))
+                #)
+
+                import sqlite3
+                con = sqlite3.connect('/home/osmc/.kodi/userdata/addon_data/plugin.video.seren/traktSync.db')
+                cur = con.cursor()
+
+                update_sql = ("UPDATE episodes SET trakt_season_id="+str(trakt_season_id)+" WHERE trakt_show_id="+str(trakt_show_id)+" and season="+str(season))
+                cur.execute(update_sql).fetchall()
+                con.commit()
+
+                update_sql = ("UPDATE seasons SET trakt_id="+str(trakt_season_id)+" WHERE trakt_show_id="+str(trakt_show_id)+" and season="+str(season))
+                cur.execute(update_sql).fetchall()
+                con.commit()
+
+                cur.close()
+                con.close()
+
+                self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
+            #except Exception as e: 
+            #    xbmc.log(str(e)+'===>PHIL', level=xbmc.LOGINFO)
+        """
+        #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
         g.log("Updated required episodes", "debug")
         statement = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count,
          b.resume_time as resume_time, b.percent_played as percent_played FROM episodes as e 
@@ -641,7 +724,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     @guard_against_none_or_empty()
     def _format_episodes(self, list_to_update):
         formatted_items = self._format_objects(self._identify_episodes_to_update(list_to_update))
-
+        """
+        #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+        """
         if formatted_items is None:
             return
         self.execute_sql(
@@ -672,6 +757,85 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 for i in formatted_items
             ),
         )
+        #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+        """
+        try:
+            if formatted_items is None:
+                return
+            self.execute_sql(
+                self.upsert_episode_query,
+                (
+                    (
+                        i["info"]["trakt_id"],
+                        i["info"]["trakt_show_id"],
+                        i["info"]["trakt_season_id"],
+                        None,
+                        None,
+                        i["info"].get("aired"),
+                        i["info"].get("dateadded"),
+                        i["info"].get("season"),
+                        i["info"].get("episode"),
+                        i["info"].get("tmdb_id"),
+                        i["info"].get("tvdb_id"),
+                        i["info"].get("imdb_id"),
+                        i["info"],
+                        i.get("art"),
+                        i.get("cast"),
+                        self._create_args(i),
+                        None,
+                        None,
+                        self.metadataHandler.meta_hash,
+                        i["info"]["trakt_id"],
+                    )
+                    for i in formatted_items
+                ),
+            )
+        except:
+            #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+            for i in formatted_items:
+                #xbmc.log(str(i)+'===>PHIL', level=xbmc.LOGINFO)
+                if 'tvshow.trakt_id' in str(i):
+                    trakt_show_id = i['info']['tvshow.trakt_id']
+                    break
+            import sqlite3
+            con = sqlite3.connect('/home/osmc/.kodi/userdata/addon_data/plugin.video.seren/traktSync.db')
+            cur = con.cursor()
+            sql = cur.execute('select * from seasons where trakt_show_id = ' + str(trakt_show_id)).fetchall()
+            trakt_season_id = sql[0][0]
+
+            if formatted_items is None:
+                return
+            self.execute_sql(
+                self.upsert_episode_query,
+                (
+                    (
+                        i["info"]["trakt_id"],
+                        i["info"]["trakt_show_id"],
+                        trakt_season_id,
+                        None,
+                        None,
+                        i["info"].get("aired"),
+                        i["info"].get("dateadded"),
+                        i["info"].get("season"),
+                        i["info"].get("episode"),
+                        i["info"].get("tmdb_id"),
+                        i["info"].get("tvdb_id"),
+                        i["info"].get("imdb_id"),
+                        i["info"],
+                        i.get("art"),
+                        i.get("cast"),
+                        self._create_args(i),
+                        None,
+                        None,
+                        self.metadataHandler.meta_hash,
+                        i["info"]["trakt_id"],
+                    )
+                    for i in formatted_items
+                ),
+            )
+            #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+        """
+        #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
 
     @guard_against_none(None, 1)
     def _try_update_seasons(self, trakt_show_id, trakt_season_id=None):
