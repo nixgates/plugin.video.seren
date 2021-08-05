@@ -48,63 +48,63 @@ class Menus:
             action="genericEndpoint",
             mediatype="movies",
             endpoint="popular",
-            description=g.get_language_string(30429),
+            description=g.get_language_string(30423),
         )
         g.add_directory_item(
-            g.get_language_string(30380),
+            g.get_language_string(30375),
             action="moviePopularRecent",
-            description=g.get_language_string(30430),
+            description=g.get_language_string(30424),
         )
         if g.get_setting("trakt.auth"):
             g.add_directory_item(
                 g.get_language_string(30005),
                 action="moviesRecommended",
-                description=g.get_language_string(30431),
+                description=g.get_language_string(30425),
             )
         g.add_directory_item(
             g.get_language_string(30006),
             action="genericEndpoint",
             mediatype="movies",
             endpoint="trending",
-            description=g.get_language_string(30432),
+            description=g.get_language_string(30426),
         )
         g.add_directory_item(
-            g.get_language_string(30381),
+            g.get_language_string(30376),
             action="movieTrendingRecent",
-            description=g.get_language_string(30433),
+            description=g.get_language_string(30427),
         )
         g.add_directory_item(
             g.get_language_string(30007),
             action="genericEndpoint",
             mediatype="movies",
             endpoint="played",
-            description=g.get_language_string(30434),
+            description=g.get_language_string(30428),
         )
         g.add_directory_item(
             g.get_language_string(30008),
             action="genericEndpoint",
             mediatype="movies",
             endpoint="watched",
-            description=g.get_language_string(30435),
+            description=g.get_language_string(30429),
         )
         g.add_directory_item(
             g.get_language_string(30009),
             action="genericEndpoint",
             mediatype="movies",
             endpoint="collected",
-            description=g.get_language_string(30436),
+            description=g.get_language_string(30430),
         )
         g.add_directory_item(
-            g.get_language_string(30386),
+            g.get_language_string(30381),
             action="TrendingLists",
             mediatype="movies",
-            description=g.get_language_string(30437),
+            description=g.get_language_string(30431),
         )
         g.add_directory_item(
-            g.get_language_string(30388),
+            g.get_language_string(30383),
             action="PopularLists",
             mediatype="movies",
-            description=g.get_language_string(30438),
+            description=g.get_language_string(30432),
         )
         if not g.get_bool_setting("general.hideUnAired"):
             g.add_directory_item(
@@ -112,46 +112,46 @@ class Menus:
                 action="genericEndpoint",
                 mediatype="movies",
                 endpoint="anticipated",
-                description=g.get_language_string(30439),
+                description=g.get_language_string(30433),
             )
         g.add_directory_item(
             g.get_language_string(30012),
             action="genericEndpoint",
             mediatype="movies",
             endpoint="boxoffice",
-            description=g.get_language_string(30440),
+            description=g.get_language_string(30434),
         )
         g.add_directory_item(
             g.get_language_string(30011),
             action="moviesUpdated",
-            description=g.get_language_string(30441),
+            description=g.get_language_string(30435),
         )
         g.add_directory_item(
-            g.get_language_string(30043),
+            g.get_language_string(30042),
             action="movieGenres",
-            description=g.get_language_string(30442),
+            description=g.get_language_string(30436),
         )
         g.add_directory_item(
-            g.get_language_string(30188),
+            g.get_language_string(30187),
             action="movieYears",
-            description=g.get_language_string(30443),
+            description=g.get_language_string(30437),
         )
         g.add_directory_item(
-            g.get_language_string(30212),
+            g.get_language_string(30209),
             action="movieByActor",
-            description=g.get_language_string(30408),
+            description=g.get_language_string(30403),
         )
         if not g.get_bool_setting("searchHistory"):
             g.add_directory_item(
                 g.get_language_string(30013),
                 action="moviesSearch",
-                description=g.get_language_string(30404),
+                description=g.get_language_string(30399),
             )
         else:
             g.add_directory_item(
                 g.get_language_string(30013),
                 action="moviesSearchHistory",
-                description=g.get_language_string(30406),
+                description=g.get_language_string(30401),
             )
         g.close_directory(g.CONTENT_FOLDER)
 
@@ -159,36 +159,36 @@ class Menus:
     @trakt_auth_guard
     def my_movies():
         g.add_directory_item(
-            g.get_language_string(30044),
+            g.get_language_string(30043),
             action="onDeckMovies",
-            description=g.get_language_string(30444),
+            description=g.get_language_string(30438),
         )
         g.add_directory_item(
             g.get_language_string(30014),
             action="moviesMyCollection",
-            description=g.get_language_string(30445),
+            description=g.get_language_string(30439),
         )
         g.add_directory_item(
             g.get_language_string(30015),
             action="moviesMyWatchlist",
-            description=g.get_language_string(30446),
+            description=g.get_language_string(30440),
         )
         g.add_directory_item(
-            g.get_language_string(30045),
+            g.get_language_string(30044),
             action="myTraktLists",
             mediatype="movies",
-            description=g.get_language_string(30447),
+            description=g.get_language_string(30441),
         )
         g.add_directory_item(
-            g.get_language_string(30384),
+            g.get_language_string(30379),
             action="myLikedLists",
             mediatype="movies",
-            description=g.get_language_string(30448),
+            description=g.get_language_string(30442),
         )
         g.add_directory_item(
-            g.get_language_string(30357),
+            g.get_language_string(30353),
             action="myWatchedMovies",
-            description=g.get_language_string(30449),
+            description=g.get_language_string(30443),
         )
         g.close_directory(g.CONTENT_FOLDER)
 
@@ -263,16 +263,16 @@ class Menus:
     def movies_search_history():
         history = SearchHistory().get_search_history("movie")
         g.add_directory_item(
-            g.get_language_string(30203),
+            g.get_language_string(30200),
             action="moviesSearch",
-            description=g.get_language_string(30404),
+            description=g.get_language_string(30399),
         )
         g.add_directory_item(
-            g.get_language_string(30202),
+            g.get_language_string(30199),
             action="clearSearchHistory",
             mediatype="movie",
             is_folder=False,
-            description=g.get_language_string(30414),
+            description=g.get_language_string(30409),
         )
 
         for i in history:
@@ -383,14 +383,26 @@ class Menus:
                                              hide_unaired=False)
 
     def movies_genres(self):
-        g.add_directory_item(g.get_language_string(30046), action="movieGenresGet")
+        g.add_directory_item(
+            g.get_language_string(30045), action="movieGenresGet",
+            menu_item={
+                    "art": dict.fromkeys(
+                        ['icon', 'poster', 'thumb', 'fanart'], g.GENRES_PATH + "list.png"
+                    )
+                }
+        )
         genres = self.trakt.get_json_cached("genres/movies")
         if genres is None:
             g.cancel_directory()
             return
         for i in genres:
             g.add_directory_item(
-                i["name"], action="movieGenresGet", action_args=i["slug"]
+                i["name"], action="movieGenresGet", action_args=i["slug"],
+                menu_item={
+                    "art": dict.fromkeys(
+                        ['icon', 'poster', 'thumb', 'fanart'], "{}{}.png".format(g.GENRES_PATH, i["slug"])
+                    )
+                }
             )
         g.close_directory(g.CONTENT_GENRES)
 
@@ -404,10 +416,12 @@ class Menus:
             genre_display_list = []
             genres = self.trakt.get_json_cached("genres/movies")
             for genre in genres:
-                genre_display_list.append(genre["name"])
+                gi = xbmcgui.ListItem(genre["name"])
+                gi.setArt({"thumb": "{}{}.png".format(g.GENRES_PATH, genre["slug"])})
+                genre_display_list.append(gi)
             genre_multiselect = xbmcgui.Dialog().multiselect(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30330)),
-                genre_display_list,
+                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30326)),
+                genre_display_list, useDetails=True
             )
             if genre_multiselect is None:
                 return

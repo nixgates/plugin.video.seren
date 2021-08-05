@@ -58,7 +58,7 @@ class SearchHistory(Database):
         :return: None
         :rtype: None
         """
-        if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30229)):
+        if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30226)):
             if media_type is not None:
                 self.execute_sql("DELETE FROM {} where type = ?".format(self.table_name), (media_type,))
                 g.container_refresh()

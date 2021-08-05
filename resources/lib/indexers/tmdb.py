@@ -49,7 +49,7 @@ def tmdb_guard_response(func):
             return None
         except Exception:
             xbmcgui.Dialog().notification(
-                g.ADDON_NAME, g.get_language_string(30025).format("TMDb")
+                g.ADDON_NAME, g.get_language_string(30024).format("TMDb")
             )
             if g.get_runtime_setting("run.mode") == "test":
                 raise
@@ -319,7 +319,7 @@ class TMDBAPI(ApiBase):
 
         self.session = requests.Session()
         retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
 
     def __del__(self):
         self.session.close()
@@ -384,7 +384,7 @@ class TMDBAPI(ApiBase):
     def get_movie_rating(self, tmdb_id):
         result = tools.filter_dictionary(
             tools.safe_dict_get(self.get_json_cached("movie/{}".format(tmdb_id)), "info"),
-            "rating",
+            "rating.tmdb",
         )
         return {"info": result} if result else None
 
@@ -423,7 +423,7 @@ class TMDBAPI(ApiBase):
     def get_show_rating(self, tmdb_id):
         result = tools.filter_dictionary(
             tools.safe_dict_get(self.get_json_cached("tv/{}".format(tmdb_id)), "info"),
-            "rating",
+            "rating.tmdb",
         )
         return {"info": result} if result else None
 
@@ -477,7 +477,7 @@ class TMDBAPI(ApiBase):
                 ),
                 "info",
             ),
-            "rating",
+            "rating.tmdb",
         )
         return {"info": result} if result else None
 

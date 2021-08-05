@@ -66,20 +66,20 @@ class SmartPlay:
 
         window = self._get_window()
 
-        window.set_text(g.get_language_string(30063))
+        window.set_text(g.get_language_string(30062))
         window.show()
 
-        window.set_text(g.get_language_string(30064))
+        window.set_text(g.get_language_string(30063))
 
         season_id, episode = self.get_resume_episode()
 
-        window.set_text(g.get_language_string(30065))
+        window.set_text(g.get_language_string(30064))
 
-        window.set_text(g.get_language_string(30066))
+        window.set_text(g.get_language_string(30065))
 
         self.build_playlist(season_id, episode)
 
-        window.set_text(g.get_language_string(30338))
+        window.set_text(g.get_language_string(30334))
 
         g.log(
             "Begining play from Season ID {} Episode {}".format(season_id, episode),
@@ -245,7 +245,7 @@ class SmartPlay:
         g.PLAYLIST.clear()
         window = self._get_window()
         window.show()
-        window.set_text(g.get_language_string(30065))
+        window.set_text(g.get_language_string(30064))
 
         season_list = self.trakt_api.get_json(
             "shows/{}/seasons".format(self.show_trakt_id), extended="episodes"
@@ -253,7 +253,7 @@ class SmartPlay:
         if season_list[0]["trakt_object"]["info"]["season"] == 0:
             season_list.pop(0)
 
-        window.set_text(g.get_language_string(30066))
+        window.set_text(g.get_language_string(30065))
 
         episode_list = [
             episode
@@ -271,7 +271,7 @@ class SmartPlay:
             episode_list, smart_play=True
         )
 
-        window.set_text(g.get_language_string(30067))
+        window.set_text(g.get_language_string(30066))
 
         for episode in playlist:
             if episode is not None:
@@ -424,10 +424,10 @@ class SmartPlay:
                 selection = xbmcgui.Dialog().contextmenu(
                     [
                         "{} {}".format(
-                            g.get_language_string(30062),
+                            g.get_language_string(30061),
                             datetime.timedelta(seconds=int(resume_switch)),
                         ),
-                        g.get_language_string(30362),
+                        g.get_language_string(30358),
                     ]
                 )
                 if selection == -1:

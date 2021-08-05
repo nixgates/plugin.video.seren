@@ -18,7 +18,7 @@ AD_AUTH_KEY = "alldebrid.apikey"
 AD_ENABLED_KEY = "alldebrid.enabled"
 
 
-def alldebird_guard_response(func):
+def alldebrid_guard_response(func):
     @wraps(func)
     def wrapper(*args, **kwarg):
         try:
@@ -46,7 +46,7 @@ def alldebird_guard_response(func):
             return None
         except Exception:
             xbmcgui.Dialog().notification(
-                g.ADDON_NAME, g.get_language_string(30025).format("AllDebrid")
+                g.ADDON_NAME, g.get_language_string(30024).format("AllDebrid")
             )
             raise
 
@@ -77,12 +77,12 @@ class AllDebrid:
         retries = Retry(
             total=5, backoff_factor=0.1, status_forcelist=[429, 500, 502, 503, 504]
         )
-        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
 
     def __del__(self):
         self.session.close()
 
-    @alldebird_guard_response
+    @alldebrid_guard_response
     def get(self, url, **params):
         if not g.get_bool_setting(AD_ENABLED_KEY):
             return
@@ -96,7 +96,7 @@ class AllDebrid:
     def get_json(self, url, **params):
         return self._extract_data(self.get(url, **params).json())
 
-    @alldebird_guard_response
+    @alldebrid_guard_response
     def post(self, url, post_data=None, **params):
         if not g.get_bool_setting(AD_ENABLED_KEY) or not self.apikey:
             return
@@ -120,13 +120,13 @@ class AllDebrid:
         auth_complete = False
         tools.copy2clip(resp["pin"])
         self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30366),
+            g.ADDON_NAME + ": " + g.get_language_string(30361),
             tools.create_multiline_message(
-                line1=g.get_language_string(30019).format(
+                line1=g.get_language_string(30018).format(
                     g.color_string(resp["base_url"])
                 ),
-                line2=g.get_language_string(30020).format(g.color_string(resp["pin"])),
-                line3=g.get_language_string(30048),
+                line2=g.get_language_string(30019).format(g.color_string(resp["pin"])),
+                line3=g.get_language_string(30047),
             ),
         )
 
@@ -149,7 +149,7 @@ class AllDebrid:
 
         if auth_complete:
             xbmcgui.Dialog().ok(
-                g.ADDON_NAME, "AllDebrid {}".format(g.get_language_string(30021))
+                g.ADDON_NAME, "AllDebrid {}".format(g.get_language_string(30020))
             )
         else:
             return

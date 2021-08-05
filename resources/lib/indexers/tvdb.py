@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import threading
 import time
 import traceback
 from collections import OrderedDict
@@ -56,7 +55,7 @@ def tvdb_guard_response(func):
             return None
         except Exception:
             xbmcgui.Dialog().notification(
-                g.ADDON_NAME, g.get_language_string(30025).format("TVDB")
+                g.ADDON_NAME, g.get_language_string(30024).format("TVDB")
             )
             if g.get_runtime_setting("run.mode") == "test":
                 raise
@@ -829,7 +828,7 @@ class TVDBAPI(ApiBase):
     
     def __init__(self):
         self.session = requests.Session()
-        self.session.mount("https://", HTTPAdapter(max_retries=self.retries))
+        self.session.mount("https://", HTTPAdapter(max_retries=self.retries, pool_maxsize=100))
         self._load_settings()
 
         self.lang_code = g.get_language_code(False)
@@ -1070,8 +1069,6 @@ class TVDBAPI(ApiBase):
 
     @wrap_tvdb_object
     def get_show(self, tvdb_id):
-        item = {}
-
         art_types = self._get_show_art_types(tvdb_id)
         if art_types:
             art_types = [i for i in art_types if not i.startswith("season")]
@@ -1085,15 +1082,13 @@ class TVDBAPI(ApiBase):
             thread_pool.put(self._get_show_info, tvdb_id, language)
             for art_type in art_types:
                 thread_pool.put(self._get_show_art, tvdb_id, art_type, language)
-            item = tools.smart_merge_dictionary(item, thread_pool.wait_completion())
-        if not item or len(item.keys()) == 0:
+        item = thread_pool.wait_completion()
+        if not item or len(item) == 0:
             return None
         return item
 
     @wrap_tvdb_object
     def get_show_art(self, tvdb_id):
-        item = {}
-
         art_types = self._get_show_art_types(tvdb_id)
         if art_types:
             art_types = [i for i in art_types if not i.startswith("season")]
@@ -1104,20 +1099,19 @@ class TVDBAPI(ApiBase):
         for language in self.languages:
             for art_type in art_types:
                 thread_pool.put(self._get_show_art, tvdb_id, art_type, language)
-            item = tools.smart_merge_dictionary(item, thread_pool.wait_completion())
-        if not item or len(item.keys()) == 0:
+        item = thread_pool.wait_completion()
+        if not item or len(item) == 0:
             return None
         return item
 
     @wrap_tvdb_object
     def get_show_info(self, tvdb_id):
-        item = {}
         thread_pool = ThreadPool()
         thread_pool.put(self._get_series_cast, tvdb_id)
         for language in self.languages:
             thread_pool.put(self._get_show_info, tvdb_id, language)
-            item = tools.smart_merge_dictionary(item, thread_pool.wait_completion())
-        if not item or len(item.keys()) == 0:
+        item = thread_pool.wait_completion()
+        if not item or len(item) == 0:
             return None
         return item
 
@@ -1128,10 +1122,10 @@ class TVDBAPI(ApiBase):
             keys="siteRating,siteRatingCount,seriesName",
         )
 
-        if not item or len(item.keys()) == 0:
+        if not item or len(item) == 0:
             return None
 
-        return {"info": tools.filter_dictionary(item["info"], "rating")}
+        return {"info": tools.filter_dictionary(item["info"], "rating.tvdb")}
 
     @wrap_tvdb_object
     def get_show_cast(self, tvdb_id):
@@ -1172,7 +1166,6 @@ class TVDBAPI(ApiBase):
 
     @wrap_tvdb_object
     def get_season_art(self, tvdb_id, season):
-        item = {}
         art_types = self._get_show_art_types(tvdb_id)
         if not art_types:
             return None
@@ -1183,8 +1176,8 @@ class TVDBAPI(ApiBase):
                 thread_pool.put(
                     self._get_season_art, tvdb_id, art_type, season, language
                 )
-            item = tools.smart_merge_dictionary(item, thread_pool.wait_completion())
-        if not item or len(item.keys()) == 0:
+        item = thread_pool.wait_completion()
+        if not item or len(item) == 0:
             return None
         return item
 
@@ -1222,8 +1215,8 @@ class TVDBAPI(ApiBase):
         thread_pool = ThreadPool()
         for language in self.languages:
             thread_pool.put(self._get_episode_info, tvdb_id, season, episode, language)
-            item = tools.smart_merge_dictionary(item, thread_pool.wait_completion())
-        if not item or len(item.keys()) == 0:
+        item = thread_pool.wait_completion()
+        if not item or len(item) == 0:
             return None
         return item
 
@@ -1231,10 +1224,10 @@ class TVDBAPI(ApiBase):
     def get_episode_rating(self, tvdb_id, season, episode):
         item = self._get_episode_info(tvdb_id, season, episode, None)
 
-        if not item or len(item.keys()) == 0:
+        if not item or len(item) == 0:
             return None
 
-        return {"info": tools.filter_dictionary(item["info"], "rating")}
+        return {"info": tools.filter_dictionary(item["info"], "rating.tvdb")}
 
     def _get_absolute_image_path(self, relative_path):
         if not relative_path:

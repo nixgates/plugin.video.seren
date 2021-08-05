@@ -2,89 +2,88 @@
 <settings>
 
     <!-- Interface -->
-    <category label="30284">
+    <category label="30280">
 
         <!-- General -->
-        <setting type="lsep" label="30087"/>
-        <setting id="general.localtimezone" type="text" label="30589" default="" enable="False"/>
+        <setting type="lsep" label="30086"/>
+        <setting id="general.localtimezone" type="text" label="30583" default="" enable="False"/>
         <setting id="general.manualtimezone" type="bool" default="false" visible="false"/>
-        <setting id="general.choosetimezone" type="action" subsetting="true" label="30590"
+        <setting id="general.choosetimezone" type="action" subsetting="true" label="30584"
                  action="RunPlugin(plugin://plugin.video.seren/?action=chooseTimeZone)" visible="eq(-1,true)"/>
-        <setting id="searchHistory" type="bool" label="30177" default="false"/>
-        <setting id="general.flatten.episodes" type="bool" label="30230" default="false"/>
-        <setting id="general.hideSpecials" type="bool" label="30189" default="false"/>
-        <setting id="general.hideUnAired" type="bool" label="30187" default="true"/>
-        <setting id="general.hideWatched" type="bool" label="30487" default="false"/>
-        <setting id="general.datedelay" type="bool" label="30181" default="false"/>
+        <setting id="searchHistory" type="bool" label="30176" default="false"/>
+        <setting id="general.flatten.episodes" type="bool" label="30227" default="false"/>
+        <setting id="general.hideSpecials" type="bool" label="30188" default="true"/>
+        <setting id="general.hideUnAired" type="bool" label="30186" default="true"/>
+        <setting id="general.hideWatched" type="bool" label="30481" default="false"/>
+        <setting id="general.datedelay" type="bool" label="30180" default="false"/>
         <setting id="trakt.auth" type="text" default="" visible="false"/>
-        <setting id="nextup.sort" type="enum" label="30094" default="0" lvalues="30095|30096" enable="!eq(-1,)"/>
-        <setting id="general.sourceselectlines" type="bool" label="30097" default="true" visible="false"/>
-        <setting id="general.textColorSelect" type="action" label="30109" option="close"
+        <setting id="nextup.sort" type="enum" label="30093" default="0" lvalues="30094|30095" enable="!eq(-1,)"/>
+        <setting id="general.sourceselectlines" type="bool" label="30096" default="true" visible="false"/>
+        <setting id="general.textColorSelect" type="action" label="30108" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=colorPicker)"/>
-        <setting id="general.displayColor" type="text" label="30110" default="None" enable="false"/>
-        <setting id="general.setViews" type="bool" label="30152" default="false"/>
-        <setting id="general.viewidswitch" type="bool" subsetting='true' label="30100" default="false"
+        <setting id="general.displayColor" type="text" label="30109" default="None" enable="false"/>
+        <setting id="general.setViews" type="bool" label="30151" default="false"/>
+        <setting id="general.viewidswitch" type="bool" subsetting='true' label="30099" default="false"
                  visible="eq(-1,true)"/>
-        <setting id="addon.view" type="enum" subsetting="true" label="30206"
-                 lvalues='30246|30247|30248|30249|30250|30251|30252|30253|30254' default="0"
+        <setting id="addon.view" type="enum" subsetting="true" label="30203"
+                 lvalues='30242|30243|30244|30245|30246|30247|30248|30249|30250' default="0"
                  visible="eq(-1,false) + eq(-2,true)"/>
-        <setting id="addon.view.id" type="number" subsetting="true" label="30207" default=""
+        <setting id="addon.view.id" type="number" subsetting="true" label="30204" default=""
                  visible="eq(-2,true) + eq(-3,true)"/>
-        <setting id="movie.view" type="enum" subsetting="true" label="30101"
-                 lvalues='30246|30247|30248|30249|30250|30251|30252|30253|30254' default="0"
+        <setting id="movie.view" type="enum" subsetting="true" label="30100"
+                 lvalues='30242|30243|30244|30245|30246|30247|30248|30249|30250' default="0"
                  visible="eq(-3,false) + eq(-4,true)"/>
-        <setting id="movie.view.id" type="number" subsetting="true" label="30102" default=""
+        <setting id="movie.view.id" type="number" subsetting="true" label="30101" default=""
                  visible="eq(-4,true) + eq(-5,true)"/>
-        <setting id="show.view" type="enum" subsetting="true" label="30103"
-                 lvalues='30246|30247|30248|30249|30250|30251|30252|30253|30254' default="0"
+        <setting id="show.view" type="enum" subsetting="true" label="30102"
+                 lvalues='30242|30243|30244|30245|30246|30247|30248|30249|30250' default="0"
                  visible="eq(-5,false) + eq(-6,true)"/>
-        <setting id="show.view.id" type="number" subsetting="true" label="30104" default=""
+        <setting id="show.view.id" type="number" subsetting="true" label="30103" default=""
                  visible="eq(-6,true) + eq(-7,true)"/>
-        <setting id="episode.view" type="enum" subsetting="true" label="30105"
-                 lvalues='30246|30247|30248|30249|30250|30251|30252|30253|30254' default="0"
+        <setting id="episode.view" type="enum" subsetting="true" label="30104"
+                 lvalues='30242|30243|30244|30245|30246|30247|30248|30249|30250' default="0"
                  visible="eq(-7,false) + eq(-8,true)"/>
-        <setting id="episode.view.id" type="number" subsetting="true" label="30106" default=""
+        <setting id="episode.view.id" type="number" subsetting="true" label="30105" default=""
                  visible="eq(-8,true) + eq(-9,true)"/>
-        <setting id="season.view" type="enum" subsetting="true" label="30107"
-                 lvalues='30246|30247|30248|30249|30250|30251|30252|30253|30254' default="0"
+        <setting id="season.view" type="enum" subsetting="true" label="30106"
+                 lvalues='30242|30243|30244|30245|30246|30247|30248|30249|30250' default="0"
                  visible="eq(-9,false) + eq(-10,true)"/>
-        <setting id="season.view.id" type="number" subsetting="true" label="30108" default=""
+        <setting id="season.view.id" type="number" subsetting="true" label="30107" default=""
                  visible="eq(-10,true) + eq(-11,true)"/>
-        <setting id="general.paginatetraktlists" type="bool" label="30355" default="true"/>
-        <setting id="general.paginatecollection" type="bool" label="30478" default="true"/>
-        <setting id="general.sortcollection" type="enum" label="30579" default="0" lvalues="30580|30581"/>
-        <setting id="general.genres.endpoint" type="enum" label="30482" default="0" lvalues="30006|30004"/>
-        <setting id="general.subtitle.enable" type="bool" label="30486" default="true"/>
-        <setting id="general.widget.hide_next" type="bool" label="30488" default="false"/>
+        <setting id="general.paginatetraktlists" type="bool" label="30351" default="true"/>
+        <setting id="general.paginatecollection" type="bool" label="30472" default="true"/>
+        <setting id="general.sortcollection" type="enum" label="30573" default="0" lvalues="30574|30575"/>
+        <setting id="general.genres.endpoint" type="enum" label="30476" default="0" lvalues="30006|30004"/>
+        <setting id="general.subtitle.enable" type="bool" label="30480" default="true"/>
+        <setting id="general.widget.hide_next" type="bool" label="30482" default="false"/>
         <!-- Themes -->
-        <setting type="lsep" label="30221"/>
-        <setting id="skin.updateAutomatic" label="30371" default="True" type="bool"/>
-        <setting id="skin.active" type="text" label="30222" default="Seren Fox" enable="false"/>
-        <setting id="skin.install" type="action" label="30225"
+        <setting type="lsep" label="30218"/>
+        <setting id="skin.updateAutomatic" label="30366" default="True" type="bool"/>
+        <setting id="skin.active" type="text" label="30219" default="Seren Fox" enable="false"/>
+        <setting id="skin.install" type="action" label="30222"
                  action="RunPlugin(plugin://plugin.video.seren/?action=installSkin)"/>
-        <setting id="skin.uninstall" type="action" label="30224"
+        <setting id="skin.uninstall" type="action" label="30221"
                  action="RunPlugin(plugin://plugin.video.seren/?action=uninstallSkin)"/>
-        <setting id="skin.switch" type="action" label="30223"
+        <setting id="skin.switch" type="action" label="30220"
                  action="RunPlugin(plugin://plugin.video.seren/?action=switchSkin)"/>
-        <setting id="skin.updates" type="action" label="30150"
+        <setting id="skin.updates" type="action" label="30149"
                  action="RunPlugin(plugin://plugin.video.seren/?action=checkSkinUpdates)"/>
-        <setting id="skin.testmenu" type="bool" label="30587" default="false"/>
+        <setting id="skin.testmenu" type="bool" label="30581" default="false"/>
 
         <!-- Advanced -->
-        <setting type="lsep" label="30286"/>
-        <setting type="bool" id="general.fanart.fallback" label="30524" default="false" />
-        <setting id="general.checkAddonUpdates" type="bool" label="30200" default="true"/>
-        <setting id="general.menucaching" type="bool" label="30215" default="true"/>
-        <setting id="general.appendtitles" type="enum" label="30154" default="3" lvalues="30389|30390|30391|30392"/>
-        <setting id="general.appendepisodegeneral" type="enum" label="30503" default="0"
-                 lvalues="30389|30390|30391|30392"/>
-        <setting id="general.appendListTitles" type="enum" label="30394" default="1" lvalues="30395|30396"/>
-        <setting id="general.disableNotificationSound" type="bool" label="30393" default="false"/>
-        <setting id="general.showRemainingUnwatched" type="bool" label="30479" default="false"/>
-        <setting id="item.limit" type="slider" label="30099" option="int" range="10,100" default="20"/>
-        <setting id="general.metalocation" type="enum" label="30098" lvalues="30140|30281|30282" default="1"/>
-        <setting id="general.meta.showoriginaltitle" type="bool" label="30489" default="false"/>
-        <setting id="general.force.widget.refresh.playback" type="bool" label="30516" default="false"/>
+        <setting type="lsep" label="30282"/>
+        <setting type="bool" id="general.fanart.fallback" label="30518" default="false" />
+        <setting id="general.menucaching" type="bool" label="30212" default="true"/>
+        <setting id="general.appendtitles" type="enum" label="30153" default="3" lvalues="30384|30385|30386|30387"/>
+        <setting id="general.appendepisodegeneral" type="enum" label="30497" default="0"
+                 lvalues="30384|30385|30386|30387"/>
+        <setting id="general.appendListTitles" type="enum" label="30389" default="1" lvalues="30390|30391"/>
+        <setting id="general.disableNotificationSound" type="bool" label="30388" default="false"/>
+        <setting id="general.showRemainingUnwatched" type="bool" label="30473" default="false"/>
+        <setting id="item.limit" type="slider" label="30098" option="int" range="10,100" default="20"/>
+        <setting id="general.metalocation" type="enum" label="30097" lvalues="30139|30277|30278" default="1"/>
+        <setting id="general.meta.showoriginaltitle" type="bool" label="30483" default="false"/>
+        <setting id="general.force.widget.refresh.playback" type="bool" label="30510" default="false"/>
 
 
         <!-- HIDDEN SETTINGS BELONG HERE -->
@@ -109,381 +108,383 @@
         <setting id="general.trakt.failure.timeout" type="number" visible="false" default="0"/>
         <setting id="update.news.version" type="text" default="" visible="false"/>
 
-        <!-- <setting id="general.resolvedisplay" type="enum" label="30192" lvalues="30193|30194" default="30193" /> -->
-        <!-- <setting id="general.sourceselect" type="enum" label="30091" lvalues="30093|30092" default="1" /> -->
-        <!-- <setting id="general.autoselect" type="bool" subsetting="true" label="30195" default="false" /> -->
-        <!-- <setting id="general.autoselectTime" type="slider" subsetting="true" label="30196" option="int" range="1,1,20" default="10" visible="eq(-1,true)" /> -->
+        <!-- <setting id="general.resolvedisplay" type="enum" label="30191" lvalues="30192|30193" default="30192" /> -->
+        <!-- <setting id="general.sourceselect" type="enum" label="30090" lvalues="30092|30091" default="1" /> -->
+        <!-- <setting id="general.autoselect" type="bool" subsetting="true" label="30194" default="false" /> -->
+        <!-- <setting id="general.autoselectTime" type="slider" subsetting="true" label="30195" option="int" range="1,1,20" default="10" visible="eq(-1,true)" /> -->
 
         <!-- END HIDDEN SETTINGS -->
     </category>
 
-    <category label="30285">
+    <category label="30281">
 
         <!-- Fanart.TV -->
-        <setting type="lsep" label="30180"/>
+        <setting type="lsep" label="30179"/>
         <setting type="sep"/>
-        <setting id="fanart.apikey" type="text" label="30179" default=""/>
-        <setting id="artwork.preferredsize" label="30374" type="enum" default="1" lvalues="30375|30376|30377"/>
+        <setting id="fanart.apikey" type="text" label="30178" default=""/>
+        <setting id="artwork.preferredsize" label="30369" type="enum" default="1" lvalues="30370|30371|30372"/>
 
         <!-- Artwork Settings -->
-        <setting type="lsep" label="30295"/>
+        <setting type="lsep" label="30291"/>
         <setting type="sep"/>
-        <setting id="movies.preferedsource" type="enum" label="30279" lvalues="30180|30281" default="1"
+        <setting id="movies.preferedsource" type="enum" label="30275" lvalues="30179|30277" default="1"
                  enable="!eq(-3,)"/>
-        <setting id="movie.artwork.advanced" type="bool" label="30291" default="false"/>
+        <setting id="movie.artwork.advanced" type="bool" label="30287" default="false"/>
         <setting id="movies.poster_limit" type="slider" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30247]" option="int" range="1,1,10"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30243]" option="int" range="1,1,10"
                  default="1" visible="eq(-1,true)"/>
         <setting id="movies.fanart_limit" type="slider" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30254]" option="int" range="1,1,20"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30250]" option="int" range="1,1,20"
                  default="1" visible="eq(-2,true)"/>
         <setting id="movies.banner" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30253]" default="true"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30249]" default="true"
                  visible="eq(-3,true)"/>
         <setting id="movies.landscape" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30341]" default="true"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30337]" default="true"
                  visible="eq(-4,true)"/>
         <setting id="movies.keyart_limit" type="slider" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30339]" option="int" range="0,1,10"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30335]" option="int" range="0,1,10"
                  default="0" visible="eq(-5,true) + !eq(-9,)"/>
         <setting id="movies.clearlogo" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30340]" default="true"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30336]" default="true"
                  visible="eq(-6,true) + !eq(-10,)"/>
         <setting id="movies.clearart" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30343]" default="true"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30339]" default="true"
                  visible="eq(-7,true) + !eq(-11,)"/>
         <setting id="movies.discart" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30344]" default="true"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30340]" default="true"
                  visible="eq(-8,true) + !eq(-12,)"/>
         <setting id="movies.characterart_limit" type="slider" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30290]: $ADDON[plugin.video.seren 30342]" option="int" range="0,1,20"
+                 label="$ADDON[plugin.video.seren 30286]: $ADDON[plugin.video.seren 30338]" option="int" range="0,1,20"
                  default="0" visible="eq(-9,true) + !eq(-13,)"/>
 
-        <setting type="lsep" label="30296"/>
+        <setting type="lsep" label="30292"/>
         <setting type="sep"/>
-        <setting id="tvshows.preferedsource" type="enum" label="30280" lvalues="30180|30281|30282" default="1"
+        <setting id="tvshows.preferedsource" type="enum" label="30276" lvalues="30179|30277|30278" default="1"
                  enable="!eq(-16,)"/>
-        <setting id="tv.artwork.advanced" type="bool" label="30292" default="false"/>
+        <setting id="tv.artwork.advanced" type="bool" label="30288" default="false"/>
         <setting id="tvshows.poster_limit" type="slider" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30289]: $ADDON[plugin.video.seren 30247]" option="int" range="1,1,10"
+                 label="$ADDON[plugin.video.seren 30285]: $ADDON[plugin.video.seren 30243]" option="int" range="1,1,10"
                  default="1" visible="eq(-1,true)"/>
         <setting id="tvshows.fanart_limit" type="slider" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30289]: $ADDON[plugin.video.seren 30254]" option="int" range="1,1,20"
+                 label="$ADDON[plugin.video.seren 30285]: $ADDON[plugin.video.seren 30250]" option="int" range="1,1,20"
                  default="1" visible="eq(-2,true)"/>
         <setting id="tvshows.banner" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30289]: $ADDON[plugin.video.seren 30253]" default="true"
+                 label="$ADDON[plugin.video.seren 30285]: $ADDON[plugin.video.seren 30249]" default="true"
                  visible="eq(-3,true)"/>
         <setting id="tvshows.landscape" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30289]: $ADDON[plugin.video.seren 30341]" default="true"
+                 label="$ADDON[plugin.video.seren 30285]: $ADDON[plugin.video.seren 30337]" default="true"
                  visible="eq(-4,true)"/>
         <setting id="tvshows.keyart_limit" type="slider" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30289]: $ADDON[plugin.video.seren 30339]" option="int" range="0,1,10"
+                 label="$ADDON[plugin.video.seren 30285]: $ADDON[plugin.video.seren 30335]" option="int" range="0,1,10"
                  default="0" visible="eq(-5,true) + !eq(-22,)"/>
         <setting id="tvshows.clearlogo" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30289]: $ADDON[plugin.video.seren 30340]" default="true"
+                 label="$ADDON[plugin.video.seren 30285]: $ADDON[plugin.video.seren 30336]" default="true"
                  visible="eq(-6,true) + !eq(-23,)"/>
         <setting id="tvshows.clearart" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30289]: $ADDON[plugin.video.seren 30343]" default="true"
+                 label="$ADDON[plugin.video.seren 30285]: $ADDON[plugin.video.seren 30339]" default="true"
                  visible="eq(-7,true) + !eq(-24,)"/>
         <setting id="tvshows.characterart_limit" type="slider" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30289]: $ADDON[plugin.video.seren 30342]" option="int" range="0,1,20"
+                 label="$ADDON[plugin.video.seren 30285]: $ADDON[plugin.video.seren 30338]" option="int" range="0,1,20"
                  default="0" visible="eq(-8,true) + !eq(-25,)"/>
         <setting id="season.poster" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30287]: $ADDON[plugin.video.seren 30247]" default="true"
+                 label="$ADDON[plugin.video.seren 30283]: $ADDON[plugin.video.seren 30243]" default="true"
                  visible="eq(-9,true)"/>
         <setting id="season.banner" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30287]: $ADDON[plugin.video.seren 30253]" default="true"
+                 label="$ADDON[plugin.video.seren 30283]: $ADDON[plugin.video.seren 30249]" default="true"
                  visible="eq(-10,true)"/>
         <setting id="season.landscape" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30287]: $ADDON[plugin.video.seren 30341]" default="true"
+                 label="$ADDON[plugin.video.seren 30283]: $ADDON[plugin.video.seren 30337]" default="true"
                  visible="eq(-11,true)"/>
         <setting id="season.fanart" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30287]: $ADDON[plugin.video.seren 30254]" default="true"
+                 label="$ADDON[plugin.video.seren 30283]: $ADDON[plugin.video.seren 30250]" default="true"
                  visible="eq(-12,true)"/>
         <setting id="episode.fanart" type="bool" subsetting="true"
-                 label="$ADDON[plugin.video.seren 30288]: $ADDON[plugin.video.seren 30254]" default="true"
+                 label="$ADDON[plugin.video.seren 30284]: $ADDON[plugin.video.seren 30250]" default="true"
                  visible="eq(-13,true)"/>
     </category>
 
     <!-- Scraping -->
-    <category label="30117">
+    <category label="30116">
 
         <!-- General -->
-        <setting type="lsep" label="30087"/>
+        <setting type="lsep" label="30086"/>
         <setting type="sep"/>
-        <setting id="general.scrapedisplay" type="enum" label="30191" lvalues="30193|30194" default="0"/>
-        <setting id="general.torrentCache" type="bool" label="30118" default="true"/>
-        <setting id="general.threadpoolScale" type="enum" label="30582"
-                 lvalues="30583|30584|30585|30586" default="1"/>
-        <setting id="general.timeout" type="slider" label="30120" option="int" range="10,180" default="60"/>
+        <setting id="general.scrapedisplay" type="enum" label="30190" lvalues="30192|30193" default="0"/>
+        <setting id="general.torrentCache" type="bool" label="30117" default="true"/>
+        <setting id="general.threadpoolScale" type="enum" label="30576"
+                 lvalues="30577|30578|30579|30580" default="1"/>
+        <setting id="general.timeout" type="slider" label="30119" option="int" range="10,180" default="60"/>
 
         <!-- Auto Caching Assistant -->
-        <setting type="lsep" label="30121"/>
+        <setting type="lsep" label="30120"/>
         <setting type="sep"/>
-        <setting id="general.autocache" type="bool" label="30122" default="true"/>
-        <setting id="general.cacheAssistMode" type="enum" subsetting="true" label="30123" lvalues="30255|30256"
+        <setting id="general.autocache" type="bool" label="30121" default="true"/>
+        <setting id="general.cacheAssistMode" type="enum" subsetting="true" label="30122" lvalues="30251|30252"
                  visible="eq(-1,true)"/>
-        <setting id="general.cachelocation" type="enum" subsetting="true" label="30124" lvalues="30145|30146|30365"
+        <setting id="general.cachelocation" type="enum" subsetting="true" label="30123" lvalues="30144|30145|30360"
                  visible="eq(-2,true)"/>
 
         <!-- Preemptive Termination -->
-        <setting type="lsep" label="30132"/>
+        <setting type="lsep" label="30131"/>
         <setting type="sep"/>
-        <setting id="preem.enabled" type="bool" label="30133" default="true"/>
-        <setting id="preem.movieres" type="enum" subsetting="true" label="30134" values="4K|1080p|720p|SD" default="0"
+        <setting id="preem.enabled" type="bool" label="30132" default="true"/>
+        <setting id="preem.movieres" type="enum" subsetting="true" label="30133" values="4K|1080p|720p|SD" default="0"
                  visible="eq(-1,true)"/>
-        <setting id="preem.tvres" type="enum" subsetting="true" label="30135" values="4K|1080p|720p|SD" default="1"
+        <setting id="preem.tvres" type="enum" subsetting="true" label="30134" values="4K|1080p|720p|SD" default="1"
                  visible="eq(-2,true)"/>
-        <setting id="preem.limit" type="slider" subsetting="true" label="30136" option="int" range="0,20" default="5"
+        <setting id="preem.limit" type="slider" subsetting="true" label="30135" option="int" range="0,20" default="5"
                  visible="eq(-3,true)"/>
-        <setting id="preem.type" type="enum" subsetting="true" label="30137" lvalues="30257|30258|30259" default="0"
+        <setting id="preem.type" type="enum" subsetting="true" label="30136" lvalues="30253|30254|30255" default="0"
                  visible="eq(-4,true)"/>
-        <setting id="preem.cloudfiles" type="bool" label="30210" default="true"/>
-        <setting id="preem.adaptiveSources" type="bool" label="30518" default="true"/>
+        <setting id="preem.cloudfiles" type="bool" label="30207" default="true"/>
+        <setting id="preem.adaptiveSources" type="bool" label="30512" default="true"/>
     </category>
 
     <!-- Downloads -->
-    <category label="30509">
-        <setting id="set.download.location" type="action" label="30480"
+    <category label="30503">
+        <setting id="set.download.location" type="action" label="30474"
                  action="RunPlugin(plugin://plugin.video.seren/?action=setDownloadLocation)"/>
-        <setting id="download.location" type="text" label="30481" enable="false" default="userdata"/>
+        <setting id="download.location" type="text" label="30475" enable="false" default="userdata"/>
     </category>
 
     <!-- Playback -->
-    <category label="30283">
+    <category label="30279">
 
         <!-- General -->
-        <setting type="lsep" label="30087"/>
-        <setting id="general.playstyleMovie" type="enum" label="30213" lvalues="30089|30090" default="0"/>
-        <setting id="general.playstyleEpisodes" type="enum" label="30088" lvalues="30089|30090" default="0"/>
-        <setting id="general.autotrynext" type="bool" label="30217" default="true"/>
-        <setting id="general.resolvefailurehandling" type="enum" label="30528" lvalues="30529|30530" default="1"/>
-        <setting id="general.bookmarkstyle" type="enum" label="30116" default="0" lvalues="30360|30255|30361"/>
-        <setting id="smartplay.displaystyle" type="enum" label="30345" lvalues="30193|30194" default="0"/>
-        <setting id="smartplay.playlistcreate" type="bool" label="30113" default="true"/>
-        <setting id="smartplay.clickresume" type="bool" label="30114" default="false"/>
-        <setting id="smartPlay.preScrape" type="bool" label="30115" default="true"/>
+        <setting type="lsep" label="30086"/>
+        <setting id="general.playstyleMovie" type="enum" label="30210" lvalues="30088|30089" default="0"/>
+        <setting id="general.playstyleEpisodes" type="enum" label="30087" lvalues="30088|30089" default="0"/>
+        <setting id="general.autotrynext" type="bool" label="30214" default="true"/>
+        <setting id="general.resolvefailurehandling" type="enum" label="30522" lvalues="30523|30524" default="1"/>
+        <setting id="general.bookmarkstyle" type="enum" label="30115" default="0" lvalues="30356|30251|30357"/>
+        <setting id="smartplay.displaystyle" type="enum" label="30341" lvalues="30192|30193" default="0"/>
+        <setting id="smartplay.playlistcreate" type="bool" label="30112" default="true"/>
+        <setting id="smartplay.clickresume" type="bool" label="30113" default="false"/>
+        <setting id="smartPlay.preScrape" type="bool" label="30114" default="true"/>
 
         <!-- Next Episode Dialog -->
-        <setting type="lsep" label="30346"/>
+        <setting type="lsep" label="30342"/>
         <setting type="sep"/>
-        <setting id="smartplay.playingnextdialog" type="bool" label="30111" default="true"/>
-        <setting id="playingnext.time" type="slider" subsetting="true" label="30112" option="int" range="10,180"
+        <setting id="smartplay.playingnextdialog" type="bool" label="30110" default="true"/>
+        <setting id="playingnext.time" type="slider" subsetting="true" label="30111" option="int" range="10,180"
                  default="30" visible="eq(-1,true)"/>
-        <!--<setting id="playingnext.dialogstyle" type="enum" subsetting="true" label="30347" lvalues="30193|30348" default="0" visible="eq(-2,true)" />-->
-        <setting id="playingnext.defaultaction" type="enum" subsetting="true" label="30349" lvalues="30350|30351"
+        <!--<setting id="playingnext.dialogstyle" type="enum" subsetting="true" label="30343" lvalues="30192|30344" default="0" visible="eq(-2,true)" />-->
+        <setting id="playingnext.defaultaction" type="enum" subsetting="true" label="30345" lvalues="30346|30347"
                  default="0" visible="eq(-2,true)"/>
 
         <!-- Still Watching Dialog -->
-        <setting type="lsep" label="30352"/>
+        <setting type="lsep" label="30348"/>
         <setting type="sep"/>
-        <setting id="smartplay.stillwatching" type="bool" label="30353" default="false"/>
-        <setting id="stillwatching.numepisodes" type="slider" subsetting="true" label="30354" option="int" range="1,10"
+        <setting id="smartplay.stillwatching" type="bool" label="30349" default="false"/>
+        <setting id="stillwatching.numepisodes" type="slider" subsetting="true" label="30350" option="int" range="1,10"
                  default="3" visible="eq(-1,true)"/>
     </category>
 
     <!-- Accounts -->
-    <category label="30138">
+    <category label="30137">
 
         <!-- General -->
-        <setting type="lsep" label="30087"/>
+        <setting type="lsep" label="30086"/>
         <setting type="sep"/>
-        <setting id="general.accountNotifications" type="bool" label="30139" default="true"/>
+        <setting id="general.accountNotifications" type="bool" label="30138" default="true"/>
 
         <!-- Trakt -->
-        <setting type="lsep" label="30140"/>
+        <setting type="lsep" label="30139"/>
         <setting type="sep"/>
-        <setting id="trakt.username" type="text" label="30141" enable="false"/>
-        <setting id="trakt.authtrakt" type="action" label="30142" option="close"
+        <setting id="trakt.username" type="text" label="30140" enable="false"/>
+        <setting id="trakt.authtrakt" type="action" label="30141" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=authTrakt)"/>
-        <setting id="trakt.scrobbling" type="bool" label="30143" default="true" visible="!eq(-2,)"/>
-        <setting id="trakt.ignoreSecondsAtStart" type="slider" subsetting="true" label="30521" option="int"
+        <setting id="trakt.scrobbling" type="bool" label="30142" default="true" visible="!eq(-2,)"/>
+        <setting id="trakt.ignoreSecondsAtStart" type="slider" subsetting="true" label="30515" option="int"
                  range="30,360" default="180" visible="!eq(-3,) + eq(-1,true)"/>
-        <setting id="trakt.playCountMinimumPercent" type="slider" subsetting="true" label="30522" option="int"
+        <setting id="trakt.playCountMinimumPercent" type="slider" subsetting="true" label="30516" option="int"
                  range="80,95" default="80" visible="!eq(-4,) + eq(-2,true)"/>
-        <setting id="trakt.revoketrakt" type="action" label="30144" option="close"
+        <setting id="trakt.revoketrakt" type="action" label="30143" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=revokeTrakt)" visible="!eq(-5,)"/>
 
         <!-- Premiumize -->
-        <setting type="lsep" label="30145"/>
+        <setting type="lsep" label="30144"/>
         <setting type="sep"/>
-        <setting id="premiumize.enabled" type="bool" label="30174" default="false"/>
-        <setting id="premiumize.auth" label="30372" type="action" option="close"
+        <setting id="premiumize.enabled" type="bool" label="30173" default="false"/>
+        <setting id="premiumize.auth" label="30367" type="action" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=authPremiumize)" visible="eq(-1,true)"/>
-        <setting id="premiumize.username" type="text" subsetting="true" label="30172" default="" enable="false"
+        <setting id="premiumize.username" type="text" subsetting="true" label="30171" default="" enable="false"
                  visible="eq(-2,true)"/>
-        <setting id="premiumize.premiumstatus" type="text" subsetting="true" label="30494" enable="false"
+        <setting id="premiumize.premiumstatus" type="text" subsetting="true" label="30488" enable="false"
                  visible="eq(-3,true)" default=""/>
-        <setting id="premiumize.priority" type="slider" subsetting="true" label="30173" option="int" range="1,1,10"
+        <setting id="premiumize.priority" type="slider" subsetting="true" label="30172" option="int" range="1,1,10"
                  default="10" visible="eq(-4,true)"/>
-        <setting id="premiumize.torrents" type="bool" subsetting="true" label="30166" default="true"
+        <setting id="premiumize.torrents" type="bool" subsetting="true" label="30165" default="true"
                  visible="eq(-5,true)"/>
-        <setting id="premiumize.hosters" type="bool" subsetting="true" label="30167" default="true"
+        <setting id="premiumize.hosters" type="bool" subsetting="true" label="30166" default="true"
                  visible="eq(-6,true)"/>
-        <setting id="premiumize.transcoded" type="bool" subsetting="true" label="30171" default="false"
+        <setting id="premiumize.transcoded" type="bool" subsetting="true" label="30170" default="false"
                  visible="eq(-7,true)"/>`
-        <setting id="premiumize.addToCloud" type="bool" subsetting="true" label="30205" default="false"
+        <setting id="premiumize.addToCloud" type="bool" subsetting="true" label="30202" default="false"
                  visible="eq(-8,true)"/>
-        <setting id="premiumize.autodelete" type="bool" subsetting="true" label="30170" default="true"
+        <setting id="premiumize.autodelete" type="bool" subsetting="true" label="30169" default="true"
                  visible="eq(-9,true)"/>
-        <setting id="premiumize.threshold" type="slider" subsetting="true" label="30169" range="50,50,1000"
+        <setting id="premiumize.threshold" type="slider" subsetting="true" label="30168" range="50,50,1000"
                  default="750" visible="eq(-1,true) + eq(-10,true)"/>
-        <setting id="premiumize.cloudInspection" type="bool" subsetting="true" label="30211" default="true"
+        <setting id="premiumize.cloudInspection" type="bool" subsetting="true" label="30208" default="true"
                  visible="eq(-11,true)"/>
 
         <!-- Real-Debrid -->
-        <setting type="lsep" label="30146"/>
+        <setting type="lsep" label="30145"/>
         <setting type="sep"/>
-        <setting id="realdebrid.enabled" type="bool" default="false" label="30164"/>
-        <setting id="rd.username" type="text" label="30163" default="" enable="false" visible="eq(-1,true)"/>
-        <setting id="rd.premiumstatus" type="text" subsetting="true" label="30494" enable="false" visible="eq(-2,true)"
+        <setting id="realdebrid.enabled" type="bool" default="false" label="30163"/>
+        <setting id="rd.username" type="text" label="30162" default="" enable="false" visible="eq(-1,true)"/>
+        <setting id="rd.premiumstatus" type="text" subsetting="true" label="30488" enable="false" visible="eq(-2,true)"
                  default=""/>
-        <setting id="rd.auth_start" type="action" label="30162" option="close"
+        <setting id="rd.auth_start" type="action" label="30161" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=authRealDebrid)" visible="eq(-3,true)"/>
-        <setting id="rd.priority" type="slider" subsetting="true" label="30165" option="int" range="1,1,10" default="10"
+        <setting id="rd.priority" type="slider" subsetting="true" label="30164" option="int" range="1,1,10" default="10"
                  visible="eq(-4,true)"/>
-        <setting id="rd.torrents" type="bool" subsetting="true" label="30166" default="true" visible="eq(-5,true)"/>
-        <setting id="rd.hosters" type="bool" subsetting="true" label="30167" default="true" visible="eq(-6,true)"/>
-        <setting id="rd.autodelete" type="bool" subsetting="true" label="30168" default="true" visible="eq(-7,true)"/>
-        <setting id="rd.cloudInspection" type="bool" subsetting="true" label="30211" default="true"
+        <setting id="rd.torrents" type="bool" subsetting="true" label="30165" default="true" visible="eq(-5,true)"/>
+        <setting id="rd.hosters" type="bool" subsetting="true" label="30166" default="true" visible="eq(-6,true)"/>
+        <setting id="rd.autodelete" type="bool" subsetting="true" label="30167" default="true" visible="eq(-7,true)"/>
+        <setting id="rd.cloudInspection" type="bool" subsetting="true" label="30208" default="true"
                  visible="eq(-8,true)"/>
 
 
         <!-- All Debrid -->
-        <setting type="lsep" label="30365"/>
+        <setting type="lsep" label="30360"/>
         <setting type="sep"/>
-        <setting id="alldebrid.enabled" type="bool" default="false" label="30367"/>
-        <setting id="alldebrid.username" type="text" default="" label="30368" enable="false" visible="eq(-1,true)"/>
-        <setting id="alldebrid.premiumstatus" type="text" subsetting="true" label="30494" enable="false"
+        <setting id="alldebrid.enabled" type="bool" default="false" label="30362"/>
+        <setting id="alldebrid.username" type="text" default="" label="30363" enable="false" visible="eq(-1,true)"/>
+        <setting id="alldebrid.premiumstatus" type="text" subsetting="true" label="30488" enable="false"
                  visible="eq(-2,true)" default=""/>
-        <setting id="alldebrid.auth_start" type="action" label="30369" option="close"
+        <setting id="alldebrid.auth_start" type="action" label="30364" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=authAllDebrid)" visible="eq(-3,true)"/>
-        <setting id="alldebrid.priority" type="slider" subsetting="true" label="30370" option="int" range="1,1,10"
+        <setting id="alldebrid.priority" type="slider" subsetting="true" label="30365" option="int" range="1,1,10"
                  default="10" visible="eq(-4,true)"/>
-        <setting id="alldebrid.torrents" type="bool" subsetting="true" label="30166" default="true"
+        <setting id="alldebrid.torrents" type="bool" subsetting="true" label="30165" default="true"
                  visible="eq(-5,true)"/>
-        <setting id="alldebrid.hosters" type="bool" subsetting="true" label="30167" default="true"
+        <setting id="alldebrid.hosters" type="bool" subsetting="true" label="30166" default="true"
                  visible="eq(-6,true)"/>
-        <setting id="alldebrid.cloudInspection" type="bool" subsetting="true" label="30211" default="true"
+        <setting id="alldebrid.autodelete" type="bool" subsetting="true" label="30167" default="true"
                  visible="eq(-7,true)"/>
+        <setting id="alldebrid.cloudInspection" type="bool" subsetting="true" label="30208" default="true"
+                 visible="eq(-8,true)"/>
     </category>
 
     <!-- Providers -->
-    <category label="30147">
+    <category label="30146">
 
         <!-- General -->
-        <setting type="lsep" label="30087"/>
+        <setting type="lsep" label="30086"/>
         <setting type="sep"/>
-        <setting id="providers.autoupdates" type="bool" label="30149" default="true"/>
+        <setting id="providers.autoupdates" type="bool" label="30148" default="true"/>
 
         <!-- Manage Provider Packages -->
-        <setting type="lsep" label="30151"/>
+        <setting type="lsep" label="30150"/>
         <setting type="sep"/>
-        <setting id="providers.checkupdates" type="action" label="30150"
+        <setting id="providers.checkupdates" type="action" label="30149"
                  action="RunPlugin(plugin://plugin.video.seren/?action=manualProviderUpdate)"/>
-        <setting id="providers.manage" type="action" label="30151"
+        <setting id="providers.manage" type="action" label="30150"
                  action="RunPlugin(plugin://plugin.video.seren/?action=manageProviders)"/>
     </category>
 
     <!-- Sort & Filter -->
-    <category label="30159">
+    <category label="30158">
 
         <!-- Source Filters -->
-        <setting type="lsep" label="30125"/>
+        <setting type="lsep" label="30124"/>
         <setting type="sep"/>
-        <setting id="general.maxResolution" type="enum" label="30131" values="4k|1080p|720p|SD" default="0"/>
-        <setting id="general.enablesizelimit" type="bool" label="30126" default="true"/>
-        <setting id="general.sizelimit.movie" type="slider" subsetting="true" label="30214" option="int" range="0,1,300"
+        <setting id="general.maxResolution" type="enum" label="30130" values="4k|1080p|720p|SD" default="0"/>
+        <setting id="general.enablesizelimit" type="bool" label="30125" default="true"/>
+        <setting id="general.sizelimit.movie" type="slider" subsetting="true" label="30211" option="int" range="0,1,300"
                  default="10" visible="eq(-1,true)"/>
-        <setting id="general.sizelimit.episode" type="slider" subsetting="true" label="30127" option="int"
+        <setting id="general.sizelimit.episode" type="slider" subsetting="true" label="30126" option="int"
                  range="0,1,300" default="10" visible="eq(-2,true)"/>
-        <setting id="general.sizeminimum.movie" type="slider" subsetting="true" label="30576" option="float"
+        <setting id="general.sizeminimum.movie" type="slider" subsetting="true" label="30570" option="float"
                  range="0.0,0.1,30.0" default="0" visible="eq(-3,true)"/>
-        <setting id="general.sizeminimum.episode" type="slider" subsetting="true" label="30577" option="float"
+        <setting id="general.sizeminimum.episode" type="slider" subsetting="true" label="30571" option="float"
                  range="0.0,0.1,30.0" default="0" visible="eq(-4,true)"/>
-        <setting id="general.disable3d" type="bool" label="30160" default="true"/>
-        <setting id="general.disable265" type="bool" label="30119" default="false"/>
-        <setting id="general.disablelowQuality" type="bool" label="30175" default="false"/>
-        <setting id="general.hidesd" type="bool" label="30185" default="false"/>
-        <setting id="general.disablehdrsources" type="bool" label="30511" default="false"/>
+        <setting id="general.disable3d" type="bool" label="30159" default="true"/>
+        <setting id="general.disable265" type="bool" label="30118" default="false"/>
+        <setting id="general.disablelowQuality" type="bool" label="30174" default="false"/>
+        <setting id="general.hidesd" type="bool" label="30184" default="false"/>
+        <setting id="general.disablehdrsources" type="bool" label="30505" default="false"/>
 
         <!-- Source Sorting -->
-        <setting type="lsep" label="30161"/>
+        <setting type="lsep" label="30160"/>
         <setting type="sep"/>
-        <setting id="general.sortsources" type="enum" label="30128" lvalues="30058|30059|30260|30527" default="0"/>
-        <setting id="general.sizesort" type="bool" label="30129" default="true"/>
-        <setting id="general.reversesizesort" type="bool" subsetting="true" label="30517" default="false"
+        <setting id="general.sortsources" type="enum" label="30127" lvalues="30057|30058|30256|30521" default="0"/>
+        <setting id="general.sizesort" type="bool" label="30128" default="true"/>
+        <setting id="general.reversesizesort" type="bool" subsetting="true" label="30511" default="false"
                  visible="eq(-1,true)"/>
-        <setting id="general.265sort" type="bool" label="30130" default="false"/>
-        <setting id="general.lowQualitysort" label="30176" type="bool" default="false"/>
+        <setting id="general.265sort" type="bool" label="30129" default="false"/>
+        <setting id="general.lowQualitysort" label="30175" type="bool" default="false"/>
     </category>
 
     <!-- API Keys -->
-    <category label="30148">
+    <category label="30147">
 
         <!-- API Keys -->
-        <setting type="lsep" label="30148"/>
+        <setting type="lsep" label="30147"/>
         <setting type="sep"/>
-        <setting id="advanced.apikeys" type="bool" label="30294" default="false"/>
+        <setting id="advanced.apikeys" type="bool" label="30290" default="false"/>
 
         <!-- TMDb -->
-        <setting id="tmdb.apikey" type="text" subsetting="true" label="30155" default="" visible="eq(-1,true)"/>
+        <setting id="tmdb.apikey" type="text" subsetting="true" label="30154" default="" visible="eq(-1,true)"/>
 
         <!-- Trakt -->
-        <setting id="trakt.clientid" type="text" subsetting="true" label="30156" default="" visible="eq(-2,true)"/>
-        <setting id="trakt.secret" type="text" subsetting="true" label="30157" default="" visible="eq(-3,true)"/>
+        <setting id="trakt.clientid" type="text" subsetting="true" label="30155" default="" visible="eq(-2,true)"/>
+        <setting id="trakt.secret" type="text" subsetting="true" label="30156" default="" visible="eq(-3,true)"/>
 
         <!-- TVDB -->
-        <setting id="tvdb.apikey" type="text" subsetting="true" label="30158" default="" visible="eq(-4,true) "/>
+        <setting id="tvdb.apikey" type="text" subsetting="true" label="30157" default="" visible="eq(-4,true) "/>
 
         <!-- OMDb -->
-        <setting id="omdb.apikey" type="text" subsetting="true" label="30490" default="" visible="eq(-5,true) "/>
+        <setting id="omdb.apikey" type="text" subsetting="true" label="30484" default="" visible="eq(-5,true) "/>
     </category>
 
     <!-- Shortcuts -->
-    <category label="30153">
+    <category label="30152">
 
         <!-- Clear Cache -->
-        <setting type="lsep" label="30029"/>
+        <setting type="lsep" label="30028"/>
         <setting type="sep"/>
-        <setting id="cache.clear" type="action" label="30029"
+        <setting id="cache.clear" type="action" label="30028"
                  action="RunPlugin(plugin://plugin.video.seren/?action=clearCache)"/>
-        <setting id="cache.cleartorrent" type="action" label="30040"
+        <setting id="cache.cleartorrent" type="action" label="30039"
                  action="RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)"/>
-        <setting id="cache.clearsearch" type="action" label="30202"
+        <setting id="cache.clearsearch" type="action" label="30199"
                  action="RunPlugin(plugin://plugin.video.seren/?action=clearSearchHistory)"/>
-        <setting id="cache.wipeaddon" type="action" label="30042" option="close"
+        <setting id="cache.wipeaddon" type="action" label="30041" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=cleanInstall)"/>
 
         <!-- Trakt Sync Tools -->
-        <setting type="lsep" label="30237"/>
+        <setting type="lsep" label="30234"/>
         <setting type="sep"/>
-        <setting id="traktdb.flush" type="action" label="30238"
+        <setting id="traktdb.flush" type="action" label="30235"
                  action="RunPlugin(plugin://plugin.video.seren/?action=flushTraktActivities)"/>
-        <setting id="traktdb.force" type="action" label="30239"
+        <setting id="traktdb.force" type="action" label="30236"
                  action="RunPlugin(plugin://plugin.video.seren/?action=forceTraktSync)"/>
-        <setting id="traktdb.rebuild" type="action" label="30241"
+        <setting id="traktdb.rebuild" type="action" label="30237"
                  action="RunPlugin(plugin://plugin.video.seren/?action=rebuildTraktDatabase)"/>
 
         <!-- Reuse Language Invoker -->
-        <setting type="lsep" label="30573"/>
+        <setting type="lsep" label="30567"/>
         <setting type="sep"/>
-        <setting id="reuselanguageinvoker.status" label="30574" type="text" default="Enabled" enable="false"/>
-        <setting id="reuselanguageinvoker.toggle" label="30575" type="action" option="close"
+        <setting id="reuselanguageinvoker.status" label="30568" type="text" default="Enabled" enable="false"/>
+        <setting id="reuselanguageinvoker.toggle" label="30569" type="action" option="close"
                  action="RunPlugin(plugin://plugin.video.seren/?action=toggleLanguageInvoker)"/>
 
         <!-- Window Tests -->
-        <setting type="lsep" label="30588"/>
+        <setting type="lsep" label="30582"/>
         <setting type="sep"/>
-        <setting id="windowtests.playingNext" type="action" label="30498"
+        <setting id="windowtests.playingNext" type="action" label="30492"
                  action="RunPlugin(plugin://plugin.video.seren/?action=testPlayingNext)"/>
-        <setting id="windowtests.stillWatching" type="action" label="30499"
+        <setting id="windowtests.stillWatching" type="action" label="30493"
                  action="RunPlugin(plugin://plugin.video.seren/?action=testStillWatching)"/>
-        <setting id="windowtests.resolverWindow" type="action" label="30500"
+        <setting id="windowtests.resolverWindow" type="action" label="30494"
                  action="RunPlugin(plugin://plugin.video.seren/?action=testResolverWindow)"/>
-        <setting id="windowtests.sourceSelectWindow" type="action" label="30501"
+        <setting id="windowtests.sourceSelectWindow" type="action" label="30495"
                  action="RunPlugin(plugin://plugin.video.seren/?action=testSourceSelectWindow)"/>
-        <setting id="windowtests.manualCacheWindow" type="action" label="30502"
+        <setting id="windowtests.manualCacheWindow" type="action" label="30496"
                  action="RunPlugin(plugin://plugin.video.seren/?action=testManualCacheWindow)"/>
     </category>
 </settings>

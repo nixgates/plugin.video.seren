@@ -29,7 +29,7 @@ class ManualCacheWindow(BaseWindow):
         # self.sources = sorted(self.sources, key=lambda x: int(x['seeds']), reverse=True)
         for idx, i in enumerate(self.sources):
             menu_item = xbmcgui.ListItem(label='{}'.format(i['release_title']))
-            for info in i.keys():
+            for info in i:
                 try:
                     value = i[info]
                     if isinstance(value, list):
@@ -41,7 +41,7 @@ class ManualCacheWindow(BaseWindow):
                     menu_item.setProperty(info, i[info])
 
             struct_info = source_utils.info_list_to_dict(i.get('info', []))
-            for property in struct_info.keys():
+            for property in struct_info:
                 menu_item.setProperty('info.{}'.format(property), struct_info[property])
 
             self.display_list.addItem(menu_item)
