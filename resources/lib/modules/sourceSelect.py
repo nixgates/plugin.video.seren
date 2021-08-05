@@ -25,7 +25,7 @@ def source_select(uncached_sources, source_list, item_information):
         del window
 
         if selection is None:
-            g.notification(g.ADDON_NAME, g.get_language_string(30033), time=5000)
+            g.notification(g.ADDON_NAME, g.get_language_string(30032), time=5000)
             raise Exception
         if not selection:
             g.cancel_playback()

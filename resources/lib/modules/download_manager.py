@@ -55,7 +55,7 @@ class Manager:
         :return:
         """
         self.download_ids.remove(url_hash)
-        g.HOME_WINDOW.setProperty("SDMIndex", ",".join(self.download_ids))
+        g.set_runtime_setting("SDMIndex", ",".join(self.download_ids))
 
     def get_all_tasks_info(self):
         """
@@ -74,16 +74,17 @@ class Manager:
         Refreshes download IDS from window index
         :return:
         """
+        index = g.get_runtime_setting("SDMIndex")
         self.download_ids = [
-            i for i in g.HOME_WINDOW.getProperty("SDMIndex").split(",") if i
-        ]
+            i for i in index.split(",") if i
+        ] if index is not None else []
 
     def _insert_into_index(self):
         """
         Inserts new ID into window index
         :return:
         """
-        g.HOME_WINDOW.setProperty("SDMIndex", ",".join(self.download_ids))
+        g.set_runtime_setting("SDMIndex", ",".join(self.download_ids))
 
     def update_task_info(self, url_hash, download_dict):
         """
@@ -92,7 +93,7 @@ class Manager:
         :param download_dict: dict
         :return:
         """
-        g.HOME_WINDOW.setProperty(
+        g.set_runtime_setting(
             "sdm.{}".format(url_hash), tools.construct_action_args(download_dict)
         )
 
@@ -104,7 +105,7 @@ class Manager:
         """
         try:
             return tools.deconstruct_action_args(
-                g.HOME_WINDOW.getProperty("sdm.{}".format(url_hash))
+                g.get_runtime_setting("sdm.{}".format(url_hash))
             )
         except Exception:
             raise TaskDoesNotExist(url_hash)
@@ -150,7 +151,7 @@ class Manager:
         self._get_download_index()
         with GlobalLock("SerenDownloaderUpdate"):
             self._get_download_index()
-            g.HOME_WINDOW.clearProperty("sdm.{}".format(url_hash))
+            g.clear_runtime_setting("sdm.{}".format(url_hash))
             if url_hash in self.download_ids:
                 self.remove_from_index(url_hash)
 
@@ -424,7 +425,7 @@ class _DebridDownloadBase(object):
         file_titles = [i[1] for i in available_files]
 
         selection = xbmcgui.Dialog().multiselect(
-            g.get_language_string(30509), file_titles
+            g.get_language_string(30503), file_titles
         )
         selection = [available_files[i] for i in selection]
         return selection
@@ -526,7 +527,7 @@ class _RealDebridDownloader(_DebridDownloadBase):
         return self.available_files
 
     def _resolve_file_url(self, file):
-        return self.debrid_module.resolve_hoster(file[0]["url"])
+        return self.debrid_module.resolve_hoster(file[0])
 
     def _resolver_setup(self, selected_files):
         if self.source.get("type") in ["hoster", "cloud"]:
@@ -599,6 +600,6 @@ def set_download_location():
     """
 
     new_location = xbmcgui.Dialog().browse(
-        0, g.get_language_string(30480), "video", defaultt=STORAGE_LOCATION
+        0, g.get_language_string(30474), "video", defaultt=STORAGE_LOCATION
     )
     g.set_setting("download.location", new_location)

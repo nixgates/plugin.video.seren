@@ -105,12 +105,21 @@ class Database(object):
                 table_name, (",".join(table_data))
             )
         )
-        if len(data["default_seed"]) == 0:
+        indices = data.get("indices")
+        if indices and len(indices) > 0:
+            for index_name, columns in indices:
+                connection.execute(
+                    "CREATE INDEX IF NOT EXISTS [{}] ON {}({})".format(
+                        index_name, table_name, (",".join(columns))
+                    )
+                )
+        default_seed = data["default_seed"]
+        if not default_seed or len(default_seed) == 0:
             return
         query = "INSERT OR IGNORE INTO [{}] ({}) VALUES ({})".format(
             table_name,
-            ",".join(data["columns"].keys()),
-            ",".join(["?" for i in data["columns"].keys()]),
+            ",".join(data["columns"]),
+            ",".join(["?" for i in data["columns"]]),
         )
         for row_values in (tuple(row) for row in data["default_seed"]):
             connection.execute(query, row_values)
@@ -323,7 +332,10 @@ class SQLiteConnection(_connection):
 
     @staticmethod
     def _set_connection_settings(connection):
-        connection.row_factory = lambda c, r: dict([(col[0], _loads(r[idx])) for idx, col in enumerate(c.description)])
+        connection.row_factory = lambda c, r: {
+            col[0]: _loads(r[idx]) if isinstance(r[idx], pickletype) else r[idx]
+            for idx, col in enumerate(c.description)
+        }
         connection.execute("PRAGMA foreign_keys = ON")
         connection.execute("PRAGMA page_size = 32768")  # no-translate
         connection.execute("PRAGMA journal_mode = WAL")

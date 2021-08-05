@@ -125,8 +125,8 @@ def dispatch(params):
                 xbmcgui.Dialog().ok(
                     g.ADDON_NAME,
                     tools.create_multiline_message(
-                        line1=g.get_language_string(30208),
-                        line2=g.get_language_string(30209),
+                        line1=g.get_language_string(30205),
+                        line2=g.get_language_string(30206),
                     ),
                 )
                 return None
@@ -161,7 +161,7 @@ def dispatch(params):
             ):
 
                 if background:
-                    background.set_text(g.get_language_string(30198))
+                    background.set_text(g.get_language_string(30197))
                 from resources.lib.modules import sourceSelect
 
                 stream_link = sourceSelect.source_select(
@@ -169,14 +169,14 @@ def dispatch(params):
                 )
             else:
                 if background:
-                    background.set_text(g.get_language_string(30032))
+                    background.set_text(g.get_language_string(30031))
                 stream_link = helpers.Resolverhelper().resolve_silent_or_visible(
                     sources[1], sources[2], pack_select
                 )
                 if stream_link is None:
                     g.close_busy_dialog()
                     g.notification(
-                        g.ADDON_NAME, g.get_language_string(30033), time=5000
+                        g.ADDON_NAME, g.get_language_string(30032), time=5000
                     )
 
             g.show_busy_dialog()
@@ -385,8 +385,8 @@ def dispatch(params):
     elif action == "resetSilent":
         g.set_runtime_setting("tempSilent", False)
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30329)),
-            g.get_language_string(30034),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30325)),
+            g.get_language_string(30033),
             time=5000,
         )
 
@@ -505,7 +505,7 @@ def dispatch(params):
         )
 
         confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30182)
+            g.ADDON_NAME, g.get_language_string(30181)
         )
         if confirmation == 0:
             return
@@ -517,7 +517,7 @@ def dispatch(params):
         )
 
         confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30184).format(url)
+            g.ADDON_NAME, g.get_language_string(30183).format(url)
         )
         if confirmation == 0:
             return
@@ -757,13 +757,16 @@ def dispatch(params):
         toggle_reuselanguageinvoker()
 
     elif action == "runMaintenance":
-        from resources.lib.common.maintenance import run_maintenance, check_for_addon_update
-        if action_args and action_args == "updateCheck":
-            if g.get_bool_setting("general.checkAddonUpdates"):
-                check_for_addon_update()
-        else:
-            run_maintenance()
+        from resources.lib.common.maintenance import run_maintenance
+
+        run_maintenance()
 
     elif action == "chooseTimeZone":
         from resources.lib.modules.manual_timezone import choose_timezone
         choose_timezone()
+
+    elif action == "widgetRefresh":
+        g.trigger_widget_refresh()
+
+    elif action == "updateLocalTimezone":
+        g.init_local_timezone()

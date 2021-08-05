@@ -534,6 +534,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 for i in formatted_items
             ),
         )
+        self.update_shows_statistics(({"trakt_id": i["info"]["trakt_id"]} for i in formatted_items))
 
     def _update_mill_format_shows(self, trakt_list, mill_episodes=False):
         if not trakt_list:
@@ -550,14 +551,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         trakt.value as trakt_object, trakt.meta_hash as trakt_meta_hash, sh.tmdb_id as tmdb_show_id, se.tmdb_id as 
         tmdb_id, tmdb.value as tmdb_object, tmdb.meta_hash as tmdb_meta_hash, sh.tvdb_id as tvdb_show_id, se.tvdb_id 
         as tvdb_id, tvdb.value as tvdb_object, tvdb.meta_hash as tvdb_meta_hash, fanart.value as fanart_object, 
-        fanart.meta_hash as fanart_meta_hash, sh.imdb_id, omdb.value as omdb_object, omdb.meta_hash as omdb_meta_hash, 
-        sh.info as show_info, sh.art as show_art, sh.cast as show_cast, se.needs_update FROM 
-        requested as r LEFT JOIN seasons as se on r.trakt_id = se.trakt_id LEFT JOIN shows as sh on sh.trakt_id = 
-        se.trakt_show_id LEFT JOIN seasons_meta as trakt on trakt.id = se.trakt_id and trakt.type = 'trakt' LEFT JOIN 
-        seasons_meta as tmdb on tmdb.id = se.tmdb_id and tmdb.type = 'tmdb' LEFT JOIN seasons_meta as tvdb on tvdb.id 
-        = se.tvdb_id and tvdb.type = 'tvdb' LEFT JOIN seasons_meta as fanart on fanart.id = se.tvdb_id and 
-        fanart.type = 'fanart' LEFT JOIN seasons_meta as omdb on omdb.id = sh.imdb_id and omdb.type = 'omdb' 
-        """.format(
+        fanart.meta_hash as fanart_meta_hash, sh.info as show_info, sh.art as show_art, sh.cast as show_cast, 
+        se.needs_update FROM requested as r LEFT JOIN seasons as se on r.trakt_id = se.trakt_id LEFT JOIN shows as sh 
+        on sh.trakt_id = se.trakt_show_id LEFT JOIN seasons_meta as trakt on trakt.id = se.trakt_id and trakt.type = 
+        'trakt' LEFT JOIN seasons_meta as tmdb on tmdb.id = se.tmdb_id and tmdb.type = 'tmdb' LEFT JOIN seasons_meta 
+        as tvdb on tvdb.id = se.tvdb_id and tvdb.type = 'tvdb' LEFT JOIN seasons_meta as fanart on fanart.id = 
+        se.tvdb_id and fanart.type = 'fanart' """.format(
             ",".join(
                 "({},'{}')".format(i.get("trakt_id"), get(i, "dateadded"))
                 for i in list_to_update
@@ -603,6 +602,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 for i in formatted_items
             ),
         )
+        self.update_season_statistics(({"trakt_id": i["info"]["trakt_id"]} for i in formatted_items))
 
     @guard_against_none_or_empty()
     def _identify_episodes_to_update(self, list_to_update):

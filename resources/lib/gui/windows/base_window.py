@@ -26,11 +26,11 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
                                    ACTION_NAV_BACK]
         self.canceled = False
 
-        self.setProperty('texture.white', os.path.join(g.IMAGES_PATH, 'white.png'))
-        self.setProperty('seren.logo', os.path.join(g.IMAGES_PATH, 'logo-seren-2.png'))
+        self.setProperty('texture.white', g.IMAGES_PATH + 'white.png')
+        self.setProperty('seren.logo', g.IMAGES_PATH + 'logo-seren-2.png')
         self.setProperty('seren.fanart', g.DEFAULT_FANART)
         self.setProperty('settings.color', g.get_user_text_color())
-        self.setProperty('test.pattern', os.path.join(g.IMAGES_PATH, 'test_pattern.png'))
+        self.setProperty('test.pattern', g.IMAGES_PATH + 'test_pattern.png')
         self.setProperty('skin.dir', SkinManager().confirm_skin_path(xml_file)[1])
 
         if item_information is None:
@@ -92,7 +92,7 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
             self.setProperty("item.ids.{}".format(key), g.UNICODE(value))
 
     def add_art_properties(self):
-        for i in self.item_information['art'].keys():
+        for i in self.item_information['art']:
             self.setProperty('item.art.{}'.format(i), g.UNICODE(self.item_information['art'][i]))
 
     def add_date_properties(self):
@@ -131,7 +131,7 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
             self.setProperty('item.info.premiered', g.UNICODE(premiered))
 
     def add_info_properties(self):
-        for i in self.item_information['info'].keys():
+        for i in self.item_information['info']:
             value = self.item_information['info'][i]
             if i == 'aired' or i == 'premiered':
                 continue

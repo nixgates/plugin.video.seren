@@ -46,7 +46,7 @@ class ZipManager:
     @staticmethod
     def _get_zip_location_type():
         return xbmcgui.Dialog().select(
-            g.ADDON_NAME, [g.get_language_string(30331), g.get_language_string(30332)]
+            g.ADDON_NAME, [g.get_language_string(30327), g.get_language_string(30328)]
         )
 
     def _get_new_package_location(self, install_style):
@@ -59,7 +59,7 @@ class ZipManager:
         if install_style == 0:
             zip_location = xbmcgui.Dialog().browse(
                 1,
-                g.get_language_string(30333).format("Provider"),
+                g.get_language_string(30329).format("Provider"),
                 "",
                 ".zip",
                 True,
@@ -67,7 +67,7 @@ class ZipManager:
             )
         elif install_style == 1:
             zip_location = xbmc.Keyboard(
-                "", "{}: {}".format(g.ADDON_NAME, g.get_language_string(30334))
+                "", "{}: {}".format(g.ADDON_NAME, g.get_language_string(30330))
             )
             zip_location.doModal()
             if zip_location.isConfirmed() and zip_location.getText():

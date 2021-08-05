@@ -121,7 +121,7 @@ class Sources(object):
             self._create_adaptive_threads()
 
             self.window.create()
-            self.window.set_text(g.get_language_string(30055), self.progress, self.sources_information, self.runtime)
+            self.window.set_text(g.get_language_string(30054), self.progress, self.sources_information, self.runtime)
             self.window.set_property('process_started', 'true')
 
             # Keep alive for gui display and threading
@@ -197,7 +197,7 @@ class Sources(object):
 
     def _check_local_torrent_database(self):
         if g.get_bool_setting('general.torrentCache'):
-            self.window.set_text(g.get_language_string(30054), self.progress, self.sources_information, self.runtime)
+            self.window.set_text(g.get_language_string(30053), self.progress, self.sources_information, self.runtime)
             self._get_local_torrent_results()
 
     def _is_playable_source(self):
@@ -216,7 +216,7 @@ class Sources(object):
             self._build_cache_assist()
             g.cancel_playback()
             if self.silent:
-                g.notification(g.ADDON_NAME, g.get_language_string(30056))
+                g.notification(g.ADDON_NAME, g.get_language_string(30055))
             return uncached, [], self.item_information
 
         sorted_sources = SourceSorter(self.media_type).sort_sources(
@@ -359,8 +359,8 @@ class Sources(object):
                 xbmc.executebuiltin(
                     'RunPlugin({}?action=cacheAssist&action_args={})'.format(g.BASE_URL, action_args))
         elif not self.silent:
-            confirmation = xbmcgui.Dialog().yesno('{} - {}'.format(g.ADDON_NAME, g.get_language_string(30335)),
-                                                  g.get_language_string(30057))
+            confirmation = xbmcgui.Dialog().yesno('{} - {}'.format(g.ADDON_NAME, g.get_language_string(30331)),
+                                                  g.get_language_string(30056))
             if confirmation:
                 window = ManualCacheWindow(*SkinManager().confirm_skin_path('manual_caching.xml'),
                                            item_information=self.item_information, sources=sources)
@@ -376,7 +376,7 @@ class Sources(object):
             else:
                 providers = reload_module(importlib.import_module("providers"))
         except ValueError:
-            g.notification(g.ADDON_NAME, g.get_language_string(30477))
+            g.notification(g.ADDON_NAME, g.get_language_string(30471))
             g.log('No providers installed', 'warning')
             return
 
@@ -392,9 +392,9 @@ class Sources(object):
         self.torrent_providers = torrent_providers
         self.hoster_providers = hoster_providers
         self.adaptive_providers = adaptive_providers
-        self.host_domains = OrderedDict.fromkeys([host[0].lower() for provider in self.hoster_domains['premium'].keys()
+        self.host_domains = OrderedDict.fromkeys([host[0].lower() for provider in self.hoster_domains['premium']
                                                   for host in self.hoster_domains['premium'][provider]])
-        self.host_names = OrderedDict.fromkeys([host[1].lower() for provider in self.hoster_domains['premium'].keys()
+        self.host_names = OrderedDict.fromkeys([host[1].lower() for provider in self.hoster_domains['premium']
                                                 for host in self.hoster_domains['premium'][provider]])
 
     @staticmethod
@@ -736,20 +736,20 @@ class Sources(object):
         ]
         self.sources_information["hosters_quality"] = list2
 
-        # string1 = u'{} - 4K: {} | 1080: {} | 720: {} | SD: {}'.format(g.get_language_string(30058),
+        # string1 = u'{} - 4K: {} | 1080: {} | 720: {} | SD: {}'.format(g.get_language_string(30057),
         #                                                              self._color_number(list1[0]),
         #                                                              self._color_number(list1[1]),
         #                                                              self._color_number(list1[2]),
         #                                                              self._color_number(list1[3]))
-        # string2 = u'{} - 4k: {} | 1080: {} | 720: {} | SD: {}'.format(g.get_language_string(30059),
+        # string2 = u'{} - 4k: {} | 1080: {} | 720: {} | SD: {}'.format(g.get_language_string(30058),
         #                                                              self._color_number(list2[0]),
         #                                                              self._color_number(list2[1]),
         #                                                              self._color_number(list2[2]),
         #                                                              self._color_number(list2[3]))
         #
-        # string4 = '{} - 4k: 0 | 1080: 0 | 720: 0 | SD: 0'.format(g.get_language_string(30060))
+        # string4 = '{} - 4k: 0 | 1080: 0 | 720: 0 | SD: 0'.format(g.get_language_string(30059))
         # provider_string = ', '.join(g.color_string(i for i in self.sources_information["remainingProviders"]))
-        # string3 = '{} - {}'.format(g.get_language_string(30061), provider_string[2:])
+        # string3 = '{} - {}'.format(g.get_language_string(30060), provider_string[2:])
         # return [string1, string2, string3, string4]
 
     @staticmethod
@@ -813,7 +813,7 @@ class Sources(object):
 
     def _debrid_hoster_duplicates(self, sources):
         updated_sources = {}
-        for provider in self.hoster_domains['premium'].keys():
+        for provider in self.hoster_domains['premium']:
             for hoster in self.hoster_domains['premium'][provider]:
                 for source in sources:
                     if hoster[1].lower() == source['source'].lower() or hoster[0].lower() in g.UNICODE(source['url']).lower():
