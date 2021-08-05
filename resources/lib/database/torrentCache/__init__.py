@@ -94,5 +94,5 @@ class TorrentCache(Database):
     def clear_all(self):
         g.show_busy_dialog()
         self.rebuild_database()
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30520))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30514))
         g.close_busy_dialog()

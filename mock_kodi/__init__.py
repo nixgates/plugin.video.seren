@@ -21,6 +21,8 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ElementTree
 
+import polib
+
 import xbmc
 import xbmcaddon
 import xbmcdrm
@@ -169,6 +171,7 @@ class SerenStubs:
                 "log": SerenStubs.xbmc.log,
                 "getSupportedMedia": SerenStubs.xbmc.getSupportedMedia,
                 "getLanguage": SerenStubs.xbmc.getLanguage,
+                "getLocalizedString": SerenStubs.xbmc.getLocalizedString,
                 "getCondVisibility": SerenStubs.xbmc.getCondVisibility,
                 "executebuiltin": SerenStubs.xbmc.executebuiltin,
                 "PlayList": SerenStubs.xbmc.PlayList,
@@ -343,6 +346,10 @@ class SerenStubs:
                 return result
             else:
                 return result.split("-")[0]
+
+        @staticmethod
+        def getLocalizedString(id):
+            return MOCK.LOCALIZATIONS.get(id, "")
 
         @staticmethod
         def executebuiltin(function, wait=False):
@@ -956,6 +963,7 @@ class MockKodi:
         self.PROFILE_ROOT = os.path.abspath(os.path.join(self.XBMC_ROOT, "../"))
         self.SEREN_ROOT = self.PROFILE_ROOT
         self.KODI_UI_LANGUAGE = os.environ.get("KODI_UI_LANGUAGE", "en-gb")
+        self.LOCALIZATIONS = self.get_localizations(self.KODI_UI_LANGUAGE)
         self.INTERACTIVE_MODE = (
                 os.environ.get("SEREN_INTERACTIVE_MODE", False) == "True"
         )
@@ -975,6 +983,36 @@ class MockKodi:
         self._monkey_patcher = MonkeyPatchKodiStub()
         # self._monkey_patcher.trace_log()
         self._monkey_patcher.monkey_patch()
+
+    @staticmethod
+    def get_localizations(ui_language="en-gb"):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        try:
+            return {
+                int(entry.msgctxt.lstrip('#')): entry.msgstr if entry.msgstr else entry.msgid
+                for entry in
+                polib.pofile(
+                    os.path.join(
+                        dir_path,
+                        "resource.language.{}".format(ui_language.replace("-", "_")),
+                        "strings.po"
+                    ),
+                    encoding="utf-8"
+                )
+            }
+        except IOError:
+            return {
+                int(entry.msgctxt.lstrip('#')): entry.msgstr if entry.msgstr else entry.msgid
+                for entry in
+                polib.pofile(
+                    os.path.join(
+                        dir_path,
+                        "resource.language.en_gb",
+                        "strings.po"
+                    ),
+                    encoding="utf-8"
+                )
+            }
 
     @staticmethod
     def get_kodi_installation():
@@ -1036,10 +1074,13 @@ class MockKodiUILanguage(object):
     def __init__(self, new_language):
         self.new_language = new_language
         self.original_language = MOCK.KODI_UI_LANGUAGE
+        self.original_translations = MOCK.LOCALIZATIONS
 
     def __enter__(self):
         MOCK.KODI_UI_LANGUAGE = self.new_language
+        MOCK.LOCALIZATIONS = MOCK.get_localizations(self.new_language)
         return self.new_language
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         MOCK.KODI_UI_LANGUAGE = self.original_language
+        MOCK.LOCALIZATIONS = self.original_translations

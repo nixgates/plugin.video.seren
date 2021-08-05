@@ -4,7 +4,6 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import time
 
-import requests
 import xbmcgui
 import xbmcvfs
 
@@ -31,107 +30,22 @@ def update_themes():
         SkinManager().check_for_updates(silent=True)
 
 
-def check_for_addon_update():
-    """
-    Perform checks for addon updates and notify user of any available updates
-    :return: None
-    :rtype: None
-    """
-    if not g.get_bool_setting("general.checkAddonUpdates"):
-        return
-
-    if "-" in g.VERSION:
-        g.set_runtime_setting("addon.updateCheckTimeStamp", g.UNICODE(time.time()))
-        return
-
-    update_timestamp = g.get_float_runtime_setting("addon.updateCheckTimeStamp")
-
-    if time.time() > (update_timestamp + (24 * (60 * 60))):
-        repo_xml = requests.get(
-            "https://github.com/nixgates/nixgates/raw/master/repo/zips/addons.xml"
-        )
-        if not repo_xml.status_code == 200:
-            g.log(
-                "Could not connect to repo XML, status: {}".format(
-                    repo_xml.status_code
-                ),
-                "error",
-            )
-            return
-        try:
-            xml = tools.ElementTree.fromstring(repo_xml.text)
-
-            for dir_tag in xml.iterfind("./addon[@id='repository.nixgates']/extension/dir"):
-                minversion = dir_tag.get('minversion')
-                maxversion = dir_tag.get('maxversion')
-                if (
-                        (
-                                minversion is None and maxversion is None
-                        ) or
-                        (
-                                minversion and maxversion and
-                                tools.compare_version_numbers(minversion, g.KODI_FULL_VERSION, include_same=True) and
-                                tools.compare_version_numbers(g.KODI_FULL_VERSION, maxversion, include_same=True)
-                        ) or
-                        (
-                                maxversion is None and minversion and
-                                tools.compare_version_numbers(minversion, g.KODI_FULL_VERSION, include_same=True)
-                        ) or
-                        (
-                                minversion is None and maxversion and
-                                tools.compare_version_numbers(g.KODI_FULL_VERSION, maxversion, include_same=True)
-                        )
-                ):
-                    repo_version = _get_latest_repo_version(dir_tag.find('info').text)
-                    if tools.compare_version_numbers(g.CLEAN_VERSION, repo_version):
-                        xbmcgui.Dialog().ok(
-                            g.ADDON_NAME, g.get_language_string(30199).format(repo_version)
-                        )
-        except tools.ElementTree.ParseError as pe:
-            g.log("Could not parse repo XML", "error")
-        finally:
-            g.set_runtime_setting("addon.updateCheckTimeStamp", g.UNICODE(time.time()))
-
-
-def _get_latest_repo_version(repo_url):
-    repo_xml = requests.get(repo_url)
-    if not repo_xml.status_code == 200:
-        g.log(
-            "Could not connect to repo XML, status: {}".format(
-                repo_xml.status_code
-            ),
-            "error",
-        )
-        return
-    try:
-        xml = tools.ElementTree.fromstring(repo_xml.text)
-        max_version = g.CLEAN_VERSION
-        repo_versions = [ver.get('version') for ver in xml.iterfind("./addon[@id='plugin.video.seren']")]
-        for version in repo_versions:
-            if version:
-                clean_version = g.SEMVER_REGEX.findall(version)[0]
-                if clean_version and tools.compare_version_numbers(max_version, clean_version):
-                    max_version = clean_version
-    except tools.ElementTree.ParseError as pe:
-        g.log("Could not parse repo XML", "error")
-
-    return max_version
-
-
 def update_provider_packages():
     """
     Perform checks for provider package updates
     :return: None
     :rtype: None
     """
-    provider_check_stamp = g.get_float_runtime_setting("provider.updateCheckTimeStamp", 0)
+    provider_check_stamp = g.get_float_runtime_setting(
+        "provider.updateCheckTimeStamp", 0
+    )
     automatic = g.get_bool_setting("providers.autoupdates")
     if time.time() > (provider_check_stamp + (24 * (60 * 60))):
         available_updates = ProviderInstallManager().check_for_updates(
             silent=True, automatic=automatic
         )
         if not automatic and len(available_updates) > 0:
-            g.notification(g.ADDON_NAME, g.get_language_string(30278))
+            g.notification(g.ADDON_NAME, g.get_language_string(30274))
         g.set_runtime_setting("provider.updateCheckTimeStamp", g.UNICODE(time.time()))
 
 
@@ -152,14 +66,14 @@ def wipe_install():
     :return: None
     :rtype: None
     """
-    confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30086))
+    confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30085))
     if confirm == 0:
         return
 
     confirm = xbmcgui.Dialog().yesno(
         g.ADDON_NAME,
-        g.get_language_string(30035)
-        + "{}".format(g.color_string(g.get_language_string(30036))),
+        g.get_language_string(30034)
+        + "{}".format(g.color_string(g.get_language_string(30035))),
     )
     if confirm == 0:
         return
@@ -227,7 +141,7 @@ def account_premium_status_checks():
         if g.get_bool_setting("general.accountNotifications"):
             g.notification(
                 "{}".format(g.ADDON_NAME),
-                g.get_language_string(30037).format(display_debrid_name),
+                g.get_language_string(30036).format(display_debrid_name),
             )
 
     valid_debrid_providers = [
@@ -250,7 +164,7 @@ def toggle_reuselanguageinvoker(forced_state=None):
     def _store_and_reload(output):
         with open(file_path, "w+") as addon_xml:
             addon_xml.writelines(output)
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30572))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30566))
         g.reload_profile()
 
     file_path = os.path.join(g.ADDON_DATA_PATH, "addon.xml")

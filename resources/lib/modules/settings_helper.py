@@ -78,7 +78,7 @@ class SettingsHelper:
         lines = self.construct_wrapper(
             [
                 self.construct_line(self.current_user_settings[i])
-                for i in sorted(self.current_user_settings.keys())
+                for i in sorted(self.current_user_settings)
                 if i is not None
             ]
         )

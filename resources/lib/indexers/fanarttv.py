@@ -33,7 +33,7 @@ def fanart_guard_response(func):
         except requests.exceptions.ConnectionError:
             return None
         except Exception:
-            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30025).format('Fanart'))
+            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30024).format('Fanart'))
             if g.get_runtime_setting("run.mode") == "test":
                 raise
             else:
@@ -86,7 +86,7 @@ class FanartTv(ApiBase):
         retries = Retry(total=5,
                         backoff_factor=0.1,
                         status_forcelist=[500, 502, 503, 504])
-        self.session.mount('https://', HTTPAdapter(max_retries=retries))
+        self.session.mount('https://', HTTPAdapter(max_retries=retries, pool_maxsize=100))
 
     def __del__(self):
         self.session.close()

@@ -43,7 +43,7 @@ class RealDebrid:
         self.progress_dialog = xbmcgui.DialogProgress()
         self.session = requests.Session()
         retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
         self._load_settings()
 
     def __del__(self):
@@ -63,7 +63,7 @@ class RealDebrid:
                 self.client_id = response["client_id"]
                 return True
             except Exception:
-                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30068))
+                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30067))
                 raise
         return False
 
@@ -73,15 +73,15 @@ class RealDebrid:
         response = self.session.get(url).json()
         tools.copy2clip(response["user_code"])
         self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30018),
+            g.ADDON_NAME + ": " + g.get_language_string(30017),
             tools.create_multiline_message(
-                line1=g.get_language_string(30019).format(
+                line1=g.get_language_string(30018).format(
                     g.color_string("https://real-debrid.com/device")
                 ),
-                line2=g.get_language_string(30020).format(
+                line2=g.get_language_string(30019).format(
                     g.color_string(response["user_code"])
                 ),
-                line3=g.get_language_string(30048),
+                line3=g.get_language_string(30047),
             ),
         )
         self.oauth_timeout = int(response["expires_in"])
@@ -109,7 +109,7 @@ class RealDebrid:
 
             user_information = self.get_url("user")
             if user_information["type"] != "premium":
-                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30216))
+                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30213))
 
     def token_request(self):
         if not self.client_secret:
@@ -127,7 +127,7 @@ class RealDebrid:
         ).json()
         self._save_settings(response)
         self._save_user_status()
-        xbmcgui.Dialog().ok(g.ADDON_NAME, "Real Debrid " + g.get_language_string(30021))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, "Real Debrid " + g.get_language_string(30020))
         g.log("Authorised Real Debrid successfully", "info")
 
     def _save_settings(self, response):
@@ -240,6 +240,23 @@ class RealDebrid:
         except (ValueError, AttributeError):
             return response
 
+    def delete_url(self, url, fail_check=False):
+        original_url = url
+        url = self.base_url + url
+        if not self.token:
+            g.log("No Real Debrid Token Found")
+            return None
+
+        response = self.session.delete(url, headers=self._get_headers(), timeout=5)
+
+        if not self._is_response_ok(response) and not fail_check:
+            self.try_refresh_token(True)
+            response = self.delete_url(original_url, fail_check=True)
+        try:
+            return response.json()
+        except (ValueError, AttributeError):
+            return response
+
     def check_hash(self, hash_list):
         if isinstance(hash_list, list):
             hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
@@ -287,9 +304,8 @@ class RealDebrid:
             raise UnexpectedResponse(response)
 
     def delete_torrent(self, id):
-        if not self.token:
-            return None
-        self.session.delete(self.base_url + "torrents/delete/{}".format(id), timeout=5)
+        url = "torrents/delete/{}".format(id)
+        self.delete_url(url)
 
     @staticmethod
     def is_streamable_storage_type(storage_variant):

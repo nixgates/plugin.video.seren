@@ -241,7 +241,7 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>$ADDON[plugin.video.seren 30058]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(total_torrents)][/COLOR] | $ADDON[plugin.video.seren 30271]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(cached_torrents)][/COLOR] | $ADDON[plugin.video.seren 30059]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(hosters_sources)][/COLOR] | $ADDON[plugin.video.seren 30272]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(cloud_sources)][/COLOR] | $ADDON[plugin.video.seren 30506]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(adaptive_sources)][/COLOR]
+                <label>$ADDON[plugin.video.seren 30057]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(total_torrents)][/COLOR] | $ADDON[plugin.video.seren 30267]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(cached_torrents)][/COLOR] | $ADDON[plugin.video.seren 30058]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(hosters_sources)][/COLOR] | $ADDON[plugin.video.seren 30268]: [COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(cloud_sources)][/COLOR] | $ADDON[plugin.video.seren 30500]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(adaptive_sources)][/COLOR]
                 </label>
             </control>
 
@@ -267,7 +267,7 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>$ADDON[plugin.video.seren 30273]: $INFO[Window().Property(remaining_providers_count)]</label>
+                <label>$ADDON[plugin.video.seren 30269]: $INFO[Window().Property(remaining_providers_count)]</label>
                 <visible>Integer.IsGreaterOrEqual(Window().Property(remaining_providers_count),10)</visible>
             </control>
 

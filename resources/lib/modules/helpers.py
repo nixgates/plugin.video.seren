@@ -51,13 +51,13 @@ class SourcesHelper(object):
         """
         item_information = tools.get_item_information(action_args)
         if not ProviderCache().get_provider_packages():
-            yesno = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30477))
+            yesno = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30471))
             if not yesno:
                 return
         sources = Sources(item_information).get_sources()
         if sources is None or len(sources) <= 0 or len(sources[1]) <= 0:
             g.cancel_playback()
-            g.notification(g.ADDON_NAME, g.get_language_string(30033), time=5000)
+            g.notification(g.ADDON_NAME, g.get_language_string(30032), time=5000)
         return sources
 
 
@@ -72,7 +72,7 @@ def show_persistent_window_if_required(item_information):
         from resources.lib.gui.windows.persistent_background import PersistentBackground
         background = PersistentBackground(*SkinManager().confirm_skin_path('persistent_background.xml'),
                                           item_information=item_information)
-        background.set_text(g.get_language_string(30031))
+        background.set_text(g.get_language_string(30030))
         background.show()
         return background
     else:

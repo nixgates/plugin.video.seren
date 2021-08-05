@@ -83,7 +83,7 @@ class PackageConfiguration(BaseWindow):
                 and provider["provider_type"] == provider_type
             ]:
                 item = xbmcgui.ListItem(label=i["provider_name"])
-                for info in i.keys():
+                for info in i:
                     item.setProperty(info, i[info])
 
                 self.provider_list.addItem(item)

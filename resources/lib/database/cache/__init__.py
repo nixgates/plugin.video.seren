@@ -2,11 +2,11 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import abc
-import calendar
 import codecs
 import collections
 import datetime
 import pickle
+import time
 import types
 from functools import reduce, wraps
 
@@ -48,10 +48,18 @@ class CacheBase:
 
     @staticmethod
     def _get_timestamp(timedelta=None):
-        date_time = datetime.datetime.utcnow()
+        """
+        Get the current timestamp, optionally offsetting with a provided timedelta
+
+        :param timedelta: The time delta to apply
+        :type timedelta: datetime.timedelta
+        :return: The timestamp, offet by the time delta if provided
+        :rtype: float
+        """
+        time_stamp = time.time()
         if timedelta:
-            date_time = date_time + timedelta
-        return calendar.timegm(date_time.timetuple())
+            time_stamp = time_stamp + timedelta.total_seconds()
+        return time_stamp
 
     def _get_checksum(self, checksum):
         if not checksum and not self.global_checksum:
@@ -158,8 +166,8 @@ class Cache(CacheBase):
         if not self._exit:
             self._db_cache.set(cache_id, data, checksum, expiration)
 
-    def _cleanup_required_check(self, lastexecuted, cur_time):
-        return (eval(lastexecuted) + self._auto_clean_interval) < cur_time
+    def _cleanup_required_check(self, lastexecuted, cur_timestamp):
+        return lastexecuted == 0 or lastexecuted + self._auto_clean_interval.total_seconds() <= cur_timestamp
 
     def check_cleanup(self):
         """
@@ -167,26 +175,22 @@ class Cache(CacheBase):
         :return:
         :rtype:
         """
-        cur_time = datetime.datetime.utcnow()
-        lastexecuted = g.get_runtime_setting(self._create_key("clean.lastexecuted"))
-        if not lastexecuted:
-            g.set_runtime_setting(self._create_key("clean.lastexecuted"), repr(cur_time))
-        elif self._cleanup_required_check(lastexecuted, cur_time):
+        cur_timestamp = CacheBase._get_timestamp()
+        lastexecuted = g.get_float_runtime_setting(self._create_key("clean.lastexecuted"))
+        if self._cleanup_required_check(lastexecuted, cur_timestamp):
             self.do_cleanup()
 
     def do_cleanup(self):
         if self._exit or g.abort_requested():
             return
-        if g.get_runtime_setting(self._create_key("clean.busy")):
+        if g.get_bool_runtime_setting(self._create_key("clean.busy")):
             return
-        g.set_runtime_setting(self._create_key("clean.busy"), "busy")
-
-        cur_time = datetime.datetime.utcnow()
+        g.set_runtime_setting(self._create_key("clean.busy"), True)
 
         self._db_cache.do_cleanup()
         self._mem_cache.do_cleanup()
 
-        g.set_runtime_setting(self._create_key("clean.lastexecuted"), repr(cur_time))
+        g.set_runtime_setting(self._create_key("clean.lastexecuted"), CacheBase._get_timestamp())
         g.clear_runtime_setting(self._create_key("clean.busy"))
 
     def clear_all(self):
@@ -217,14 +221,12 @@ class DatabaseCache(Database, CacheBase):
     def do_cleanup(self):
         if self._exit or g.abort_requested():
             return
-        cur_time = datetime.datetime.utcnow()
-        if g.get_runtime_setting(self._create_key("cache.db.clean.busy")):
+        if g.get_bool_runtime_setting(self._create_key("db.clean.busy")):
             return
-        g.set_runtime_setting(self._create_key("cache.db.clean.busy"), "busy")
+        g.set_runtime_setting(self._create_key("db.clean.busy"), True)
         query = "DELETE FROM {} where expires < ?".format(self.cache_table_name)
         self.execute_sql(query, (self._get_timestamp(),))
-        g.set_runtime_setting(self._create_key("cache.mem.clean.busy"), repr(cur_time))
-        g.clear_runtime_setting(self._create_key("cache.mem.clean.busy"))
+        g.clear_runtime_setting(self._create_key("db.clean.busy"))
 
     def get(self, cache_id, checksum=None):
         cur_time = self._get_timestamp()
@@ -306,19 +308,17 @@ class MemCache(CacheBase):
     def do_cleanup(self):
         if self._exit or g.abort_requested():
             return
-        cur_time = datetime.datetime.utcnow()
         cur_timestamp = self._get_timestamp()
-        if g.get_runtime_setting(self._create_key("cache.mem.clean.busy")):
+        if g.get_bool_runtime_setting(self._create_key("mem.clean.busy")):
             return
-        g.set_runtime_setting(self._create_key("cache.mem.clean.busy"), "busy")
+        g.set_runtime_setting(self._create_key("mem.clean.busy"), True)
 
         self._get_index()
         for cache_id, expires in self._index:
             if expires < cur_timestamp:
                 g.clear_runtime_setting(cache_id)
 
-        g.set_runtime_setting(self._create_key("cache.mem.clean.busy"), repr(cur_time))
-        g.clear_runtime_setting(self._create_key("cache.mem.clean.busy"))
+        g.clear_runtime_setting(self._create_key("mem.clean.busy"))
 
     def clear_all(self):
         self._get_index()
@@ -363,7 +363,7 @@ def use_cache(cache_hours=12):
                     raise UnsupportedCacheParamException("generator")
 
             try:
-                global_cache_ignore = g.get_runtime_setting("ignore.cache")
+                global_cache_ignore = g.get_bool_runtime_setting("ignore.cache")
             except Exception:
                 global_cache_ignore = False
             checksum = _get_checksum(method_class.__class__.__name__, func.__name__)

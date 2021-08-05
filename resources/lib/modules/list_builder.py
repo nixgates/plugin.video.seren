@@ -195,7 +195,15 @@ class ListBuilder(object):
                         g.REQUEST_PARAMS["action_args"] = g.REQUEST_PARAMS.get("action_args")
                     params = g.REQUEST_PARAMS
                     params.update({"special_sort": "bottom"})
-                    g.add_directory_item(g.get_language_string(30016), **params)
+                    g.add_directory_item(
+                        g.get_language_string(33078, addon=False),
+                        menu_item={
+                            "art": dict.fromkeys(
+                                ['icon', 'poster', 'thumb', 'fanart'], g.NEXT_PAGE_ICON
+                            )
+                        },
+                        **params
+                    )
                 g.close_directory(content_type, sort=sort)
 
     def is_aired(self, info):

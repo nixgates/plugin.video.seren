@@ -186,11 +186,9 @@ def paginate_list(list_items, page, limit):
     :return: items on page
     :rtype: list
     """
-    pages = [list_items[i: i + limit] for i in xrange(0, len(list_items), limit)]
-    if len(pages) > page - 1:
-        return pages[page - 1]
-    else:
+    if page - 1 > float(len(list_items))/limit:
         return []
+    return list_items[(page - 1) * limit: page * limit]
 
 
 def italic_string(text):
@@ -341,7 +339,7 @@ def smart_merge_dictionary(dictionary, merge_dict, keep_original=False, extend_a
     if not isinstance(dictionary, dict) or not isinstance(merge_dict, dict):
         return dictionary
     for new_key, new_value in merge_dict.items():
-        original_value = dictionary.get(new_key, {})
+        original_value = dictionary.get(new_key)
         if isinstance(new_value, (dict, collections.Mapping)):
             if original_value is None:
                 original_value = {}
@@ -461,12 +459,14 @@ def ensure_path_is_dir(path):
     :return: Formatted path
     :rtype: str
     """
-    if not path.endswith("\\") and sys.platform == "win32":
-        if path.endswith("/"):
-            path = path.split("/")[0]
-        return path + "\\"
-    elif not path.endswith("/") and sys.platform == "linux2":
-        return path + "/"
+    if sys.platform == "win32":
+        if not path.endswith("\\"):
+            if path.endswith("/"):
+                path = path.rstrip("/")
+            return path + "\\"
+    else:
+        if not path.endswith("/"):
+            return path + "/"
     return path
 
 
@@ -615,8 +615,9 @@ def filter_dictionary(dictionary, *keys):
     """
     if not dictionary:
         return None
+    key_set = set(keys)
 
-    return {k: v for k, v in dictionary.items() if any(k.startswith(x) for x in keys)}
+    return {k: v for k, v in dictionary.items() if k in key_set}
 
 
 def safe_dict_get(dictionary, *path):
@@ -629,14 +630,17 @@ def safe_dict_get(dictionary, *path):
     :return:The value for that given path
     :rtype:any
     """
-    if len(path) == 0:
-        return dictionary
-    current_path = path[0]
     if dictionary is None or not isinstance(dictionary, dict):
         return None
+    if len(path) == 0:
+        return dictionary
+    result = dictionary
 
-    result = dictionary.get(current_path)
-    if isinstance(result, dict):
-        return safe_dict_get(result, *path[1:])
-    else:
-        return dictionary.get(current_path)
+    for element in path:
+        result = result.get(element)
+        if isinstance(result, dict):
+            continue
+        else:
+            break
+
+    return result

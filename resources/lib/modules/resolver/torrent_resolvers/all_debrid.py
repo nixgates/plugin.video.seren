@@ -7,6 +7,8 @@ from resources.lib.modules.resolver.torrent_resolvers.base_resolver import (
     TorrentResolverBase,
 )
 
+from resources.lib.modules.globals import g
+
 
 class AllDebridResolver(TorrentResolverBase):
     """
@@ -39,4 +41,5 @@ class AllDebridResolver(TorrentResolverBase):
         return self.debrid_module.resolve_hoster(file_info["link"])
 
     def _do_post_processing(self, item_information, torrent):
-        pass
+        if g.get_bool_setting("alldebrid.autodelete"):
+            self.debrid_module.delete_magnet(self.magnet_id)

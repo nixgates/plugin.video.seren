@@ -108,8 +108,8 @@ def info_list_to_dict(info_list):
         },
     }
 
-    for info_prop in info_struct.keys():
-        for codec in info_struct[info_prop].keys():
+    for info_prop in info_struct:
+        for codec in info_struct[info_prop]:
             if codec in info_list:
                 info[info_prop] = codec
                 break

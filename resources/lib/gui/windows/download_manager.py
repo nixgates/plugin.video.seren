@@ -87,7 +87,7 @@ class DownloadManager(BaseWindow):
             control_id = self.getFocusId()
 
         if action_id == 117 or (action_id == 7 and control_id == 2003):
-            response = xbmcgui.Dialog().contextmenu([g.get_language_string(30073), g.get_language_string(30495)])
+            response = xbmcgui.Dialog().contextmenu([g.get_language_string(30072), g.get_language_string(30489)])
             if response == 0 and position > -1:
                 self.manager.cancel_task(self.list_control.getListItem(position).getProperty('hash'))
 

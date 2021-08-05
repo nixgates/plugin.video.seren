@@ -61,7 +61,7 @@ def omdb_guard_response(func):
             return None
         except Exception:
             xbmcgui.Dialog().notification(
-                g.ADDON_NAME, g.get_language_string(30025).format("OMDb")
+                g.ADDON_NAME, g.get_language_string(30024).format("OMDb")
             )
             if g.get_runtime_setting("run.mode") == "test":
                 raise
@@ -247,7 +247,7 @@ class OmdbApi(ApiBase):
             backoff_factor=0.1,
             status_forcelist=[500, 503, 504, 520, 521, 522, 524],
         )
-        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
 
     def __del__(self):
         try:

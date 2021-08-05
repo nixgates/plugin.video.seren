@@ -7,8 +7,6 @@ import _strptime
 import json
 import os
 import re
-import threading
-import time
 import traceback
 import unicodedata
 
@@ -295,6 +293,7 @@ class GlobalVariables(object):
         self.USER_AGENT = None
         self.DEFAULT_FANART = None
         self.DEFAULT_ICON = None
+        self.NEXT_PAGE_ICON = None
         self.ADDON_USERDATA_PATH = None
         self.SETTINGS_CACHE = None
         self.RUNTIME_SETTINGS_CACHE = None
@@ -335,12 +334,13 @@ class GlobalVariables(object):
         self.VERSION = self.ADDON.getAddonInfo("version")
         self.CLEAN_VERSION = self.SEMVER_REGEX.findall(self.VERSION)[0]
         self.USER_AGENT = "{} - {}".format(self.ADDON_NAME, self.CLEAN_VERSION)
-        self.DEFAULT_FANART = self.ADDON.getAddonInfo("fanart")
-        self.DEFAULT_ICON = self.ADDON.getAddonInfo("icon")
         self._init_kodi()
         self._init_settings_cache()
         self._init_local_timezone()
         self._init_paths()
+        self.DEFAULT_FANART = self.ADDON.getAddonInfo("fanart")
+        self.DEFAULT_ICON = self.ADDON.getAddonInfo("icon")
+        self.NEXT_PAGE_ICON = self.IMAGES_PATH + "next.png"
         self.init_request(argv)
         self._init_cache()
 
@@ -369,6 +369,20 @@ class GlobalVariables(object):
         self.SETTINGS_CACHE = PersistedSettingsCache()
 
     def _init_local_timezone(self):
+        try:
+            timezone_string = self.get_setting("general.localtimezone")
+            if timezone_string:
+                self.LOCAL_TIMEZONE = pytz.timezone(timezone_string)
+        except pytz.UnknownTimeZoneError:
+            self.log("Invalid local timezone '{}' in settings.xml".format(timezone_string), "debug")
+        except Exception as e:
+            self.log("Error using local timezone '{}' in settings.xml: {}".format(timezone_string, e),
+                     "warning")
+        finally:
+            if not self.LOCAL_TIMEZONE or self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
+                self.init_local_timezone()
+
+    def init_local_timezone(self):
         """
         Attempts to detect the local timezone via a variety of approaches
         Initializes LOCAL_TIMEZONE to correct tzinfo value
@@ -600,9 +614,8 @@ class GlobalVariables(object):
         self.GUI_PATH = tools.translate_path(
             os.path.join(self.ADDON_DATA_PATH, "resources", "lib", "gui")
         )
-        self.IMAGES_PATH = tools.translate_path(
-            os.path.join(self.ADDON_DATA_PATH, "resources", "images")
-        )
+        self.IMAGES_PATH = self.ADDON.getAddonInfo("path") + "/resources/images/"
+        self.GENRES_PATH = self.IMAGES_PATH + "genres/"
         self.SKINS_PATH = tools.translate_path(
             os.path.join(self.ADDON_USERDATA_PATH, "skins")
         )
@@ -857,11 +870,24 @@ class GlobalVariables(object):
         return self.SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
     # endregion
 
-    def get_language_string(self, language_id):
-        text = self.LANGUAGE_CACHE.get(
-            language_id, self.ADDON.getLocalizedString(language_id)
-        )
-        self.LANGUAGE_CACHE.update({language_id: text})
+    def get_language_string(self, localization_id, addon=True):
+        """
+        Gets a localized string from cache if feasible, if not from localization files
+        Will retrieve from addon localizations by default but can be requested from Kodi localizations
+
+        :param localization_id: The id of the localization to retrieve
+        :type localization_id: int
+        :param addon: True to retrieve from addon, False from Kodi localizations.  Default True
+        :type addon bool
+        :return: The localized text matching the localization_id from the appropriate localization files.
+        :rtype: str|unicode
+        """
+        cache_id = "A" + str(localization_id) if addon else "K" + str(localization_id)
+        text = self.LANGUAGE_CACHE.get(cache_id)
+        if not text:
+            text = self.ADDON.getLocalizedString(localization_id) if addon else xbmc.getLocalizedString(localization_id)
+            self.LANGUAGE_CACHE.update({cache_id: text})
+
         return text
 
     def get_view_type(self, content_type):
@@ -925,7 +951,7 @@ class GlobalVariables(object):
         for i in colorChart:
             select_list.append(self.color_string(i, i))
         color = xbmcgui.Dialog().select(
-            "{}: {}".format(self.ADDON_NAME, self.get_language_string(30017)), select_list
+            "{}: {}".format(self.ADDON_NAME, self.get_language_string(30016)), select_list
         )
         if color == -1:
             return
@@ -1055,14 +1081,14 @@ class GlobalVariables(object):
 
     def clear_cache(self):
         confirm = xbmcgui.Dialog().yesno(
-            self.ADDON_NAME, self.get_language_string(30030)
+            self.ADDON_NAME, self.get_language_string(30029)
         )
         if confirm != 1:
             return
         g.CACHE.clear_all()
         g._init_cache()
         self.log(self.ADDON_NAME + ": Cache Cleared", "debug")
-        xbmcgui.Dialog().notification(self.ADDON_NAME, self.get_language_string(30053))
+        xbmcgui.Dialog().notification(self.ADDON_NAME, self.get_language_string(30052))
 
     def cancel_playback(self):
         self.PLAYLIST.clear()
@@ -1154,9 +1180,39 @@ class GlobalVariables(object):
         return xbmc.executebuiltin("Container.Refresh")
 
     def trigger_widget_refresh(self):
-        # Force an update of widgets to occur
-        self.log("FORCE REFRESHING WIDGETS")
-        xbmc.executebuiltin('UpdateLibrary(video,widget_refresh,true)')
+        """
+        Trigger a widget refresh using the update library with an invalid path trick
+        Widget refresh will not be attempted if playing or if another process is waiting to refresh widgets
+        The widget refresh will not occur until the user returns to the home window to prevent updating other addon
+        containers.
+
+        Care must be taken when executing this method as it will block until the home window becomes available or
+        playback is started
+        """
+        player = xbmc.Player()
+        if (
+                self.get_bool_runtime_setting("widget_refreshing") or
+                player.isPlaying() or  # Don't wait if we are playing as it will refresh after
+                xbmc.getCondVisibility("Library.IsScanningVideo")  # Don't do library update if already scanning library
+        ):
+            del player
+            return
+        try:
+            g.set_runtime_setting("widget_refreshing", True)
+            while not self.abort_requested():
+                if xbmcgui.getCurrentWindowId() == 10000:
+                    self.log("TRIGGERING WIDGET REFRESH")
+                    xbmc.executebuiltin('UpdateLibrary(video,widget_refresh,true)')
+                    break
+                elif (
+                        self.wait_for_abort(0.5) or
+                        player.isPlaying() or
+                        xbmc.getCondVisibility("Library.IsScanningVideo")
+                ):
+                    break
+        finally:
+            del player
+            g.clear_runtime_setting("widget_refreshing")
 
     def get_language_code(self, region=None):
         if region:
@@ -1178,7 +1234,6 @@ class GlobalVariables(object):
         ]
 
     def add_directory_item(self, name, **params):
-        [params.update({key: value}) for key, value in params.items()]
         menu_item = params.pop("menu_item", {})
         if not isinstance(menu_item, dict):
             menu_item = {}
@@ -1233,8 +1288,10 @@ class GlobalVariables(object):
             info["plot"] = info["overview"] = info["description"] = params.pop(
                 "description", None
             )
-        if "special_sort" in params:
-            item.setProperty("SpecialSort", g.UNICODE(params["special_sort"]))
+
+        special_sort = params.pop("special_sort", None)
+        if special_sort is not None:
+            item.setProperty("SpecialSort", g.UNICODE(special_sort))
         label2 = params.pop("label2", None)
         if label2 is not None:
             item.setLabel2(label2)
@@ -1251,26 +1308,31 @@ class GlobalVariables(object):
             cast = []
         item.setCast(cast)
 
-        [
-            item.setProperty(key, g.UNICODE(value))
-            for key, value in info.items()
-            if key.endswith("_id")
-        ]
+        for key, value in info.items():
+            if key.endswith("_id"):
+                item.setProperty(key, g.UNICODE(value))
+
+        media_type = info.get("mediatype", None)
+        id_keys = {
+            "tmdb_id": "tmdb",
+            "imdb_id": "imdb",
+            "tvdb_id": "tvdb",
+        }
         item.setUniqueIDs(
             {
-                id_: info[i]
-                for i in info.keys()
-                for id_ in ["imdb", "tvdb", "tmdb", "anidb"]
-                if i == "{}_id".format(id_)
+                unique_id_key: info[
+                    "tvshow." + id_key if media_type in ["episode", "season"] else id_key
+                ]
+                for id_key, unique_id_key in id_keys.items()
+                if info.get("tvshow." + id_key if media_type in ["episode", "season"] else id_key)
             }
         )
-        [
-            item.setRating(
-                i.split(".")[1], float(info[i].get("rating", 0.0)), int(info[i].get("votes", 0)), False
-            )
-            for i in info.keys()
-            if i.startswith("rating.")
-        ]
+
+        for i in info:
+            if i.startswith("rating."):
+                item.setRating(
+                    i.split(".")[1], float(info[i].get("rating", 0.0)), int(info[i].get("votes", 0)), False
+                )
 
         cm = params.pop("cm", [])
         if cm is None or not isinstance(cm, (set, list)):
@@ -1281,13 +1343,13 @@ class GlobalVariables(object):
         if art is None or not isinstance(art, dict):
             art = {}
         if (
-                art.get("fanart", art.get("season.fanart", art.get("tvshow.fanart", None)))
-                is None
+            art.get("fanart", art.get("season.fanart", art.get("tvshow.fanart", None)))
+            is None
         ) and not self.get_bool_setting("general.fanart.fallback", False):
             art["fanart"] = self.DEFAULT_FANART
         if (
-                art.get("poster", art.get("season.poster", art.get("tvshow.poster", None)))
-                is None
+            art.get("poster", art.get("season.poster", art.get("tvshow.poster", None)))
+            is None
         ):
             art["poster"] = self.DEFAULT_ICON
         if art.get("icon") is None:
@@ -1301,7 +1363,6 @@ class GlobalVariables(object):
 
         # Clear out keys not relevant to Kodi info labels
         self.clean_info_keys(info)
-        media_type = info.get("mediatype", None)
         # Only TV shows/seasons/episodes have associated times, movies just have dates.
         if media_type in [g.MEDIA_SHOW, g.MEDIA_SEASON, g.MEDIA_EPISODE]:
             # Convert dates to localtime for display
@@ -1329,7 +1390,7 @@ class GlobalVariables(object):
         if not isinstance(info_dict, dict):
             return info_dict
 
-        keys_to_remove = [i for i in info_dict.keys() if i not in info_labels]
+        keys_to_remove = [i for i in info_dict if i not in info_labels]
         [info_dict.pop(key) for key in keys_to_remove]
 
         return info_dict
@@ -1341,7 +1402,7 @@ class GlobalVariables(object):
         if not isinstance(info_dict, dict):
             return info_dict
 
-        dates_to_convert = [i for i in info_dict.keys() if i in info_dates]
+        dates_to_convert = [i for i in info_dict if i in info_dates]
         converted_dates = {key: self.utc_to_local(info_dict.get(key))
                            for key in dates_to_convert if info_dict.get(key)}
         info_dict.update(converted_dates)
@@ -1508,19 +1569,19 @@ class GlobalVariables(object):
             return date_string
 
         try:
-            result = tools.parse_datetime(date_string, self.DATE_FORMAT, False)
+            result = tools.parse_datetime(date_string, self.DATE_TIME_FORMAT_ZULU, False)
         except ValueError:
             pass
 
         if not result:
             try:
-                result = tools.parse_datetime(date_string, self.DATE_TIME_FORMAT_ZULU, False)
+                result = tools.parse_datetime(date_string, self.DATE_TIME_FORMAT, False)
             except ValueError:
                 pass
 
         if not result:
             try:
-                result = tools.parse_datetime(date_string, self.DATE_TIME_FORMAT, False)
+                result = tools.parse_datetime(date_string, self.DATE_FORMAT, False)
             except ValueError:
                 pass
 

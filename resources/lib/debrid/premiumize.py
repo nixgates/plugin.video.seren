@@ -33,7 +33,7 @@ class Premiumize:
 
         self.session = requests.Session()
         retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
 
     def __del__(self):
         self.session.close()
@@ -62,15 +62,15 @@ class Premiumize:
         success = False
         tools.copy2clip(token["user_code"])
         self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30382),
+            g.ADDON_NAME + ": " + g.get_language_string(30377),
             tools.create_multiline_message(
-                line1=g.get_language_string(30019).format(
+                line1=g.get_language_string(30018).format(
                     g.color_string(token["verification_uri"])
                 ),
-                line2=g.get_language_string(30020).format(
+                line2=g.get_language_string(30019).format(
                     g.color_string(token["user_code"])
                 ),
-                line3=g.get_language_string(30048),
+                line3=g.get_language_string(30047),
             ),
         )
         self.progress_dialog.update(100)
@@ -86,7 +86,7 @@ class Premiumize:
         self.progress_dialog.close()
 
         if success:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30021))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30020))
 
     def _poll_token(self, device_code):
         data = {

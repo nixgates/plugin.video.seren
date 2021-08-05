@@ -46,13 +46,13 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     def _get_package_selection(self):
         packages = [i["pack_name"] for i in self.known_packages]
         if len(packages) == 0:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30049))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30048))
             return
         selection = xbmcgui.Dialog().select(
             "{}: {} {}".format(
                 g.ADDON_NAME,
-                g.get_language_string(30050),
-                g.get_language_string(30147),
+                g.get_language_string(30049),
+                g.get_language_string(30146),
             ),
             packages,
         )
@@ -77,7 +77,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             return
 
         confirm = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30051) + " {}".format(package_name)
+            g.ADDON_NAME, g.get_language_string(30050) + " {}".format(package_name)
         )
         if confirm == 0:
             return
@@ -91,7 +91,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             if not silent:
                 xbmcgui.Dialog().ok(
                     g.ADDON_NAME,
-                    "{} {}".format(package_name, g.get_language_string(30052)),
+                    "{} {}".format(package_name, g.get_language_string(30051)),
                 )
         except Exception as e:
             self._handle_uninstall_failure(package_name)
@@ -103,7 +103,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     def _handle_uninstall_failure(package_name):
         xbmcgui.Dialog().ok(
             g.ADDON_NAME,
-            g.get_language_string(30183).format(g.ADDON_NAME, package_name),
+            g.get_language_string(30182).format(g.ADDON_NAME, package_name),
         )
         g.log_stacktrace()
 
@@ -115,7 +115,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     @staticmethod
     def _handle_install_failure(exception):
         g.log(exception, "error")
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30514))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30508))
         return
 
     def install_package(self, install_style, url=None):
@@ -135,7 +135,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         try:
             self._install_zip()
         except (UnsafeZipStructure, InvalidMetaFormat):
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30075))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30074))
         except FileIOError as e:
             g.log(e, "error")
             self._failed_prompt()
@@ -156,18 +156,18 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
     def _handle_no_updates_prompt(self, remote_meta):
         if not remote_meta and not self.silent:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30082))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30081))
 
     def _install_confirmation(self, pack_name, author, version):
         if not self.silent:
             accept = xbmcgui.Dialog().yesno(
-                g.ADDON_NAME + " - {}".format(g.get_language_string(30072)),
-                "{}\n{}\n{}".format(g.color_string(g.get_language_string(30069)) +
+                g.ADDON_NAME + " - {}".format(g.get_language_string(30071)),
+                "{}\n{}\n{}".format(g.color_string(g.get_language_string(30068)) +
                                     " {} - v{}".format(pack_name, version),
-                                    g.color_string(g.get_language_string(30070)) + "{}".format(author),
-                                    g.get_language_string(30071)),
-                nolabel=g.get_language_string(30073),
-                yeslabel=g.get_language_string(30074),
+                                    g.color_string(g.get_language_string(30069)) + "{}".format(author),
+                                    g.get_language_string(30070)),
+                nolabel=g.get_language_string(30072),
+                yeslabel=g.get_language_string(30073),
             )
             if accept == 0:
                 return False
@@ -218,8 +218,8 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             install_progress.create(
                 g.ADDON_NAME,
                 tools.create_multiline_message(
-                    line1="{} - {}".format(pack_name, g.get_language_string(30076)),
-                    line2=g.get_language_string(30077),
+                    line1="{} - {}".format(pack_name, g.get_language_string(30075)),
+                    line2=g.get_language_string(30076),
                 ),
             )
             install_progress.update(-1)
@@ -238,7 +238,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
         if not self.silent:
             xbmcgui.Dialog().ok(
-                g.ADDON_NAME, "{} - {}".format(g.get_language_string(30078), pack_name)
+                g.ADDON_NAME, "{} - {}".format(g.get_language_string(30077), pack_name)
             )
         xbmc.executebuiltin(
             'RunPlugin("plugin://plugin.video.{}/?action=refreshProviders")'.format(
@@ -282,13 +282,13 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             self._get_zip_file(url=zip_file, silent=True)
         except requests.exceptions.ConnectionError:
             g.close_busy_dialog()
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30081))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30080))
             return
 
         result = self._install_zip()
         if result is not None:
             g.notification(
-                g.ADDON_NAME, g.get_language_string(30083).format(package_name)
+                g.ADDON_NAME, g.get_language_string(30082).format(package_name)
             )
 
     def manual_update(self):
@@ -301,7 +301,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
         # If there are no available updates return
         if not update:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30084))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30083))
             return
 
         # Display available packages to update
@@ -319,7 +319,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         xbmcgui.Dialog().ok(
             g.ADDON_NAME,
             tools.create_multiline_message(
-                line1=g.get_language_string(30080), line2=g.get_language_string(30079)
+                line1=g.get_language_string(30079), line2=g.get_language_string(30078)
             ),
         )
 
@@ -373,7 +373,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
         if not silent:
             update_dialog = xbmcgui.DialogProgress()
-            update_dialog.create(g.ADDON_NAME, g.get_language_string(30085))
+            update_dialog.create(g.ADDON_NAME, g.get_language_string(30084))
             update_dialog.update(-1)
 
         updates = []

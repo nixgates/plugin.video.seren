@@ -102,7 +102,7 @@
                         <font>font25_title</font>
                         <textcolor>eeffffff</textcolor>
                         <shadowcolor>00000000</shadowcolor>
-                        <label>Are you still watching?</label>
+                        <label>$ADDON[plugin.video.seren 30596]</label>
                         <visible>!Integer.IsGreater(Player.TimeRemaining,59)</visible>
                     </control>
                     <control type="label">
@@ -112,7 +112,7 @@
                         <font>font25_title</font>
                         <textcolor>eeffffff</textcolor>
                         <shadowcolor>00000000</shadowcolor>
-                        <label>$ADDON[plugin.video.seren 30232]</label>
+                        <label>$ADDON[plugin.video.seren 30229]</label>
                         <visible>Integer.IsGreater(Player.TimeRemaining,59)</visible>
                     </control>
                     <!-- Details -->
@@ -170,7 +170,7 @@
                         <itemgap>10</itemgap>
                         <width>100%</width>
                         <control type="button" id="3001">
-                            <label>Play Next</label>
+                            <label>$ADDON[plugin.video.seren 30597]</label>
                             <height>56</height>
                             <width min="50">auto</width>
                             <font>font20_title</font>
@@ -188,7 +188,7 @@
                             <pulseonselect>no</pulseonselect>
                         </control>
                         <control type="button" id="3002">
-                            <label>I'm Here</label>
+                            <label>$ADDON[plugin.video.seren 30598]</label>
                             <height>56</height>
                             <width min="50">auto</width>
                             <font>font20_title</font>
@@ -206,7 +206,7 @@
                             <pulseonselect>no</pulseonselect>
                         </control>
                         <control type="button" id="3003">
-                            <label>Stop</label>
+                            <label>$ADDON[plugin.video.seren 30599]</label>
                             <height>56</height>
                             <width min="50">auto</width>
                             <font>font20_title</font>

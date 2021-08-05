@@ -84,7 +84,7 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>$ADDON[plugin.video.seren 30257]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(debrid_provider)][/COLOR][/UPPERCASE] | $ADDON[plugin.video.seren 30274]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_provider)][/COLOR][/UPPERCASE]
+                <label>$ADDON[plugin.video.seren 30253]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(debrid_provider)][/COLOR][/UPPERCASE] | $ADDON[plugin.video.seren 30270]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_provider)][/COLOR][/UPPERCASE]
                 </label>
             </control>
 
@@ -97,7 +97,7 @@
                 <aligny>center</aligny>
                 <width>auto</width>
                 <textcolor>FFDDDDDD</textcolor>
-                <label>$ADDON[plugin.video.seren 30260]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_resolution)][/COLOR][UPPERCASE] | $ADDON[plugin.video.seren 30275]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_info)][/COLOR][/UPPERCASE]
+                <label>$ADDON[plugin.video.seren 30256]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_resolution)][/COLOR][UPPERCASE] | $ADDON[plugin.video.seren 30271]: [UPPERCASE][COLOR$INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_info)][/COLOR][/UPPERCASE]
                 </label>
             </control>
 
