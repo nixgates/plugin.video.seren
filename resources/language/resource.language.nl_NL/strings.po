@@ -2471,7 +2471,7 @@ msgid ""
 "percentage and the number of ratings."
 msgstr ""
 "Bekijk de meest populaire shows. Populariteit wordt berekend aan de hand "
-"vanhet beoordelingspercentage en het aantal beoordelingen."
+"van het beoordelingspercentage en het aantal beoordelingen."
 
 #: /resources/lib/gui/tvshowMenus.py:59
 msgctxt "#30445"
@@ -2719,7 +2719,7 @@ msgstr "OMDb API-sleutel"
 #: /resources/lib/modules/cacheAssist.py:92
 msgctxt "#30485"
 msgid "Follow Progress"
-msgstr "Volg Progress"
+msgstr "Volg de voortgang"
 
 #: /resources/lib/modules/cacheAssist.py:90
 msgctxt "#30486"
@@ -2762,12 +2762,12 @@ msgstr "Bekijk niet gecachet"
 #: /resources/settings.xml:478 /resources/lib/gui/homeMenu.py:136
 msgctxt "#30492"
 msgid "Test Playing Next"
-msgstr "Test Playing Next"
+msgstr "Volgende spelen testen"
 
 #: /resources/settings.xml:480 /resources/lib/gui/homeMenu.py:140
 msgctxt "#30493"
 msgid "Test Still Watching"
-msgstr "Test Still Watching"
+msgstr "Test nog steeds aan het kijken"
 
 #: /resources/settings.xml:482 /resources/lib/gui/homeMenu.py:144
 msgctxt "#30494"
@@ -2798,7 +2798,7 @@ msgstr "Deze taak wordt nu op de achtergrond uitgevoerd"
 #: /resources/skins/Default/1080i/download_manager.xml:207
 msgctxt "#30499"
 msgid "Clear Completed"
-msgstr "Verwijderen Voltooid"
+msgstr "Wissen Voltooid"
 
 #: /resources/skins/Default/1080i/get_sources.xml:243
 msgctxt "#30500"
@@ -2819,7 +2819,7 @@ msgstr ""
 #: /resources/lib/modules/resolver/torrent_resolvers/premiumize.py:45
 msgctxt "#30502"
 msgid "Failed to create transfer at PM, please check the log"
-msgstr "Kan in Premiumize geen overdracht maken. Controleer het logboek"
+msgstr "Kan in PM geen overdracht maken. Controleer het logboek"
 
 #: /resources/settings.xml:244
 #: /resources/skins/Default/1080i/source_select.xml:376
@@ -3100,12 +3100,12 @@ msgstr "Short"
 #: /resources/lib/modules/metadataHandler.py:104
 msgctxt "#30553"
 msgid "Soap"
-msgstr "Zeep"
+msgstr Soap"
 
 #: /resources/lib/modules/metadataHandler.py:105
 msgctxt "#30554"
 msgid "Special Interest"
-msgstr "Special Interest Group"
+msgstr "Speciale interesse"
 
 #: /resources/lib/modules/metadataHandler.py:106
 msgctxt "#30555"
@@ -3172,24 +3172,23 @@ msgstr ""
 #: /resources/lib/common/maintenance.py:166
 msgctxt "#30566"
 msgid "Language Invoker option has been changed, reloading kodi profile"
-msgstr ""
-"De optie \"Re-Use Language Invoker\" is gewijzigd, waarbij het kodi-profiel "
-"opnieuw wordt geladen"
+msgstr "Taal taalaabroeper optie is gewijzigd, Kodi-profiel opnieuw geladen"
+
 
 #: /resources/settings.xml:469
 msgctxt "#30567"
 msgid "Language Invoker Options"
-msgstr "Language Invoker-opties"
+msgstr "Opties voor taalaanroeper"
 
 #: /resources/settings.xml:471
 msgctxt "#30568"
 msgid "Re-Use Language Invoker Status"
-msgstr "Re-Use Language Invoker Status"
+msgstr "Status van taalaanroeper opnieuw gebruiken"
 
 #: /resources/settings.xml:472
 msgctxt "#30569"
 msgid "Toggle Re-Use Language Invoker"
-msgstr "Schakel Re-Use Language Invoker"
+msgstr "Toggle Taalaanroeper opnieuw gebruiken"
 
 #: /resources/settings.xml:400
 msgctxt "#30570"
@@ -3213,7 +3212,7 @@ msgstr ""
 #: /resources/settings.xml:54
 msgctxt "#30573"
 msgid "Collection Sort Style"
-msgstr "Collectie Sorteerstijl"
+msgstr "Collectie Sorteer stijl"
 
 #: /resources/settings.xml:54
 msgctxt "#30574"
@@ -3253,12 +3252,12 @@ msgstr "Extreem"
 #: /resources/settings.xml:70
 msgctxt "#30581"
 msgid "Enable Tools menu item for Window Tests"
-msgstr "Schakel gereedschap menu-item in voor venstertests"
+msgstr "Schakel gereedschap menu item in voor venstertests"
 
 #: /resources/settings.xml:476
 msgctxt "#30582"
 msgid "Window Tests"
-msgstr "Venstertests"
+msgstr "Venster test"
 
 #: /resources/settings.xml:8
 msgctxt "#30583"
@@ -3303,7 +3302,7 @@ msgstr "Zaden"
 #: /resources/skins/Default/1080i/playing_next.xml:104
 msgctxt "#30590"
 msgid "Playing in"
-msgstr "Als speler in"
+msgstr "Afspelen in"
 
 #: /resources/skins/Default/1080i/playing_next.xml:104
 msgctxt "#30591"
@@ -3313,7 +3312,7 @@ msgstr "seconden"
 #: /resources/skins/Default/1080i/playing_next.xml:172
 msgctxt "#30592"
 msgid "Play now"
-msgstr "Play now"
+msgstr "Nu afspelen"
 
 #: /resources/skins/Default/1080i/provider_packages.xml:32
 msgctxt "#30593"
@@ -3343,7 +3342,7 @@ msgstr "Volgende afspelen"
 #: /resources/skins/Default/1080i/still_watching.xml:190
 msgctxt "#30598"
 msgid "I'm Here"
-msgstr "I'm Here"
+msgstr "Ik ben hier"
 
 #: /resources/skins/Default/1080i/still_watching.xml:208
 msgctxt "#30599"
