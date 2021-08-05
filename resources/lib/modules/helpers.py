@@ -17,7 +17,7 @@ class Resolverhelper(object):
     """
     Helper object to stream line resolving items
     """
-    @use_cache(1)
+    @use_cache(24)
     def resolve_silent_or_visible(self, sources, item_information, pack_select=False, overwrite_cache=False):
         """
         Method to handle automatic background or foreground resolving
