@@ -15,6 +15,7 @@ from resources.lib.modules.timeLogger import TimeLogger
 
 g.init_globals(sys.argv)
 
+"""
 try:
     with TimeLogger('{}'.format(g.REQUEST_PARAMS.get('action', ''))):
         router.dispatch(g.REQUEST_PARAMS)
@@ -78,4 +79,4 @@ try:
 except:
     pass
 exit()
-"""
+
