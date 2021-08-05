@@ -251,8 +251,11 @@ class OmdbApi(ApiBase):
 
     def __del__(self):
         try:
-            self.session.close()
-        except NameError:
+            try:
+                self.session.close()
+            except NameError:
+                pass
+        except:
             pass
 
     def _extract_awards(self, value, *params):
