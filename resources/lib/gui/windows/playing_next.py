@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import xbmc
+import json
 
 from resources.lib.gui.windows.base_window import BaseWindow
 from resources.lib.modules.globals import g
