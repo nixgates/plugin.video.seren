@@ -30,7 +30,7 @@
             <left>40</left>
             <width>100%</width>
             <height>50</height>
-            <label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]Seren[/COLOR] - $ADDON[plugin.video.seren 30090][/UPPERCASE]</label>
+            <label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]Seren[/COLOR] - $ADDON[plugin.video.seren 30089][/UPPERCASE]</label>
             <font>font37</font>
             <textcolor>white</textcolor>
         </control>
@@ -94,7 +94,7 @@
                                     <font>font12</font>
                                     <textcolor>AAFFFFFF</textcolor>
                                     <align>left</align>
-                                    <label>$ADDON[plugin.video.seren 30276]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR]</label>
+                                    <label>$ADDON[plugin.video.seren 30272]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR]</label>
                                 </control>
                                 <control type="label">
                                     <top>10</top>
@@ -104,7 +104,7 @@
                                     <font>font12</font>
                                     <align>left</align>
                                     <textcolor>AAFFFFFF</textcolor>
-                                    <label>$ADDON[plugin.video.seren 30260]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR]</label>
+                                    <label>$ADDON[plugin.video.seren 30256]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR]</label>
                                 </control>
                                 <control type="label">
                                     <top>10</top>
@@ -114,7 +114,7 @@
                                     <font>font12</font>
                                     <align>left</align>
                                     <textcolor>AAFFFFFF</textcolor>
-                                    <label>$ADDON[plugin.video.seren 30277]: [CAPITALIZE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/CAPITALIZE]
+                                    <label>$ADDON[plugin.video.seren 30273]: [CAPITALIZE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/CAPITALIZE]
                                     </label>
                                 </control>
                             </control>
@@ -209,7 +209,7 @@
                             <font>font12</font>
                             <textcolor>FFFFFFFF</textcolor>
                             <align>right</align>
-                            <label>$ADDON[plugin.video.seren 30276]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR]</label>
+                            <label>$ADDON[plugin.video.seren 30272]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(size)][/COLOR]</label>
                         </control>
                         <control type="label">
                             <top>30</top>
@@ -219,7 +219,7 @@
                             <font>font12</font>
                             <align>right</align>
                             <textcolor>FFFFFFFF</textcolor>
-                            <label>$ADDON[plugin.video.seren 30260]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR]</label>
+                            <label>$ADDON[plugin.video.seren 30256]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR]</label>
                         </control>
                         <control type="label">
                             <top>60</top>
@@ -229,7 +229,7 @@
                             <font>font12</font>
                             <align>right</align>
                             <textcolor>FFFFFFFF</textcolor>
-                            <label>$ADDON[plugin.video.seren 30277]: [CAPITALIZE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/CAPITALIZE]
+                            <label>$ADDON[plugin.video.seren 30273]: [CAPITALIZE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/CAPITALIZE]
                             </label>
                         </control>
                         <control type="label">
@@ -303,7 +303,7 @@
                     <textcolor>FFFFFFFF</textcolor>
                     <align>right</align>
                     <visible>String.IsEmpty(Window().Property(item.info.season))</visible>
-                    <label>Year: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.Year)] [/COLOR] | MPAA: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.mpaa)][/COLOR]</label>
+                    <label>$ADDON[plugin.video.seren 30594]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.Year)] [/COLOR] | $ADDON[plugin.video.seren 30595]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.mpaa)][/COLOR]</label>
                 </control>
             </control>
 
@@ -354,7 +354,7 @@
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
                         <colorfocus>$INFO[Window().Property(settings.color)]</colorfocus>
-                        <label>$ADDON[plugin.video.seren 30350]</label>
+                        <label>$ADDON[plugin.video.seren 30346]</label>
                         <textcolor>white</textcolor>
                         <align>right</align>
                     </control>
@@ -364,7 +364,7 @@
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30497]</label>
+                        <label>$ADDON[plugin.video.seren 30491]</label>
                         <align>right</align>
                         <textcolor>white</textcolor>
                     </control>
@@ -374,7 +374,7 @@
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30509]</label>
+                        <label>$ADDON[plugin.video.seren 30503]</label>
                         <align>right</align>
                         <textcolor>white</textcolor>
                      </control>
@@ -458,7 +458,7 @@
 <!--                    <texturefocus colordiffuse="FFFFFFFF">white.png</texturefocus>-->
 <!--                    <texturenofocus colordiffuse="FF181818">white.png</texturenofocus>-->
 <!--                    <focusedcolor>FF000000</focusedcolor>-->
-<!--                    <label>$ADDON[plugin.video.seren 30497]</label>-->
+<!--                    <label>$ADDON[plugin.video.seren 30491]</label>-->
 <!--                    <align>center</align>-->
 <!--                </control>-->
 

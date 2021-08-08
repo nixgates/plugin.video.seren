@@ -392,7 +392,7 @@ class SerenPlayer(xbmc.Player):
         cast = self.item_information.get("cast", [])
         item.setCast(cast if isinstance(cast, list) else [])
         item.setUniqueIDs(
-            {i.split("_")[0]: info[i] for i in info.keys() if i.endswith("id")},
+            {i.split("_")[0]: info[i] for i in info if i.endswith("id")},
             )
         return item
 
@@ -547,7 +547,7 @@ class SerenPlayer(xbmc.Player):
          ):
             xbmc.sleep(10000)
             g.set_runtime_setting("marked_watched_dialog_open", True)
-            if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30526)):
+            if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30520)):
                 self._force_marked_watched = True
             g.set_runtime_setting("marked_watched_dialog_open", False)
 

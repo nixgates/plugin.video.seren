@@ -34,7 +34,7 @@ class ProviderPackages(BaseWindow):
         self.package_list.reset()
         for i in self.packages:
             item = xbmcgui.ListItem(label=i['pack_name'])
-            for info in i.keys():
+            for info in i:
                 item.setProperty(info, i[info])
             self.package_list.addItem(item)
 
@@ -81,7 +81,7 @@ class ProviderPackages(BaseWindow):
                 package = self.package_list.getSelectedItem().getLabel()
                 g.show_busy_dialog()
                 try:
-                    confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30293).format(package))
+                    confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30289).format(package))
                     if not confirm:
                         g.close_busy_dialog()
                         return

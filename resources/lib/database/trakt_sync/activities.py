@@ -87,7 +87,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             last_activities_call = self.activities["last_activities_call"]
 
         if time.time() < (last_activities_call + (5 * 60)):
-            g.log("Activities endpoint call too frequently! An issue is occurring!", 'warning')
+            g.log("Activities endpoint called too frequently, skipping sync", 'info')
             return None
         else:
             remote_activities = self.trakt_api.get_json("sync/last_activities")
@@ -129,7 +129,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if not self.sync_errors:
             self._update_activity_record("all_activities", update_time)
-            g.trigger_widget_refresh()
+            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=widgetRefresh")')
 
     def _do_sync_acitivites(self, remote_activities):
         total_activities = len(self._sync_activities_list)
@@ -170,7 +170,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 and str(self.activities["all_activities"]) == self.base_date
                 and trakt_auth is not None
         ):
-            g.notification(g.ADDON_NAME, g.get_language_string(30197))
+            g.notification(g.ADDON_NAME, g.get_language_string(30196))
             # Give the people time to read the damn notification
             xbmc.sleep(500)
             self.silent = False

@@ -36,7 +36,7 @@ class SourceSelect(BaseWindow):
         self.display_list.reset()
         for idx, i in enumerate(self.sources):
             menu_item = self.get_list_item_with_properties(self.item_information, i['release_title'])
-            for info in i.keys():
+            for info in i:
                 try:
                     value = i[info]
                     if isinstance(value, list):
@@ -49,7 +49,7 @@ class SourceSelect(BaseWindow):
                     menu_item.setProperty(info, i[info])
 
             struct_info = source_utils.info_list_to_dict(i.get('info', []))
-            for prop in struct_info.keys():
+            for prop in struct_info:
                 menu_item.setProperty('info.{}'.format(prop), struct_info[prop])
 
             self.display_list.addItem(menu_item)
@@ -76,10 +76,10 @@ class SourceSelect(BaseWindow):
         self.position = self.display_list.getSelectedPosition()
 
         if action_id == 117:
-            response = xbmcgui.Dialog().contextmenu([g.get_language_string(30335),
-                                                     g.get_language_string(30350),
-                                                     g.get_language_string(30509),
-                                                     g.get_language_string(30523)])
+            response = xbmcgui.Dialog().contextmenu([g.get_language_string(30331),
+                                                     g.get_language_string(30346),
+                                                     g.get_language_string(30503),
+                                                     g.get_language_string(30517)])
             if response == 0:
                 self._open_manual_cache_assist()
             elif response == 1:
@@ -127,7 +127,7 @@ class SourceSelect(BaseWindow):
                                                                       overwrite_cache=pack_select)
 
         if self.stream_link is None:
-            g.notification(g.ADDON_NAME, g.get_language_string(30033), time=2000)
+            g.notification(g.ADDON_NAME, g.get_language_string(30032), time=2000)
         else:
             self.close()
 
