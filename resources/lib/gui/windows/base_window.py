@@ -82,11 +82,14 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
         return control
 
     def add_id_properties(self):
-        id_dict = {}
-        [id_dict.update({i.split('_')[0]: self.item_information['info'][i]})
-         for i in self.item_information['info'].keys() if i.endswith('id')]
-        for id, value in id_dict.items():
-            self.setProperty('item.ids.{}_id'.format(id), g.UNICODE(value))
+        id_dict = {
+            k: self.item_information["info"][k]
+            for k in self.item_information["info"]
+            if k.endswith("_id")
+        }
+
+        for key, value in id_dict.items():
+            self.setProperty("item.ids.{}".format(key), g.UNICODE(value))
 
     def add_art_properties(self):
         for i in self.item_information['art'].keys():

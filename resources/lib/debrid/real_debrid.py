@@ -342,5 +342,8 @@ class RealDebrid:
         )
 
     def get_account_status(self):
-        status = self.get_url("user", {}).get("type")
-        return status if status else "invalid"
+        status = None
+        status_response = self.get_url("user")
+        if isinstance(status_response, dict):
+            status = status_response.get("type")
+        return status if status else "unknown"

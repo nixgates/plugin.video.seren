@@ -448,11 +448,6 @@ def dispatch(params):
 
         tvshowMenus.Menus().my_next_up()
 
-    elif action == "runMaintenance":
-        from resources.lib.common import maintenance
-
-        maintenance.run_maintenance()
-
     elif action == "providerTools":
         from resources.lib.gui import homeMenu
 
@@ -760,6 +755,14 @@ def dispatch(params):
     elif action == "toggleLanguageInvoker":
         from resources.lib.common.maintenance import toggle_reuselanguageinvoker
         toggle_reuselanguageinvoker()
+
+    elif action == "runMaintenance":
+        from resources.lib.common.maintenance import run_maintenance, check_for_addon_update
+        if action_args and action_args == "updateCheck":
+            if g.get_bool_setting("general.checkAddonUpdates"):
+                check_for_addon_update()
+        else:
+            run_maintenance()
 
     elif action == "chooseTimeZone":
         from resources.lib.modules.manual_timezone import choose_timezone
