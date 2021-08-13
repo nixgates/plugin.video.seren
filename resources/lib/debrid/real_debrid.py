@@ -219,7 +219,10 @@ class RealDebrid:
             self.try_refresh_token(True)
             response = self.post_url(original_url, post_data, fail_check=True)
         try:
-            return response.json()
+            if response.status_code == 204:
+                return response.status_code
+            else:
+                return response.json()
         except (ValueError, AttributeError):
             return response
 
@@ -253,7 +256,10 @@ class RealDebrid:
             self.try_refresh_token(True)
             response = self.delete_url(original_url, fail_check=True)
         try:
-            return response.json()
+            if response.status_code == 204:
+                return response.status_code
+            else:
+                return response.json()
         except (ValueError, AttributeError):
             return response
 
