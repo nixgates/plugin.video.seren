@@ -24,10 +24,11 @@ finally:
 #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
 """
 try:
+    import time
     curr_time = time.time()
     with TimeLogger('{}'.format(g.REQUEST_PARAMS.get('action', ''))):
         router.dispatch(g.REQUEST_PARAMS)
-    while time.time() - curr_time < 3:
+    while time.time() - curr_time < 4:
         #xbmc.log(str(1)+'===>PHIL', level=xbmc.LOGINFO)
         xbmc.sleep(1000)
         #xbmc.log(str(2)+'===>PHIL', level=xbmc.LOGINFO)
