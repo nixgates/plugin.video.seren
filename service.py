@@ -65,7 +65,7 @@ try:
             xbmc.executebuiltin(
                 'RunPlugin("plugin://plugin.video.seren/?action=updateLocalTimezone")'
             )
-        if g.wait_for_abort(60 * randint(13, 17)):
+        if g.wait_for_abort(60 * randint(57, 63)):
             break
 finally:
     del monitor
