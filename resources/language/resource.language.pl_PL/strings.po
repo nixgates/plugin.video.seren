@@ -626,7 +626,7 @@ msgstr "Włącz odtwarzanie następnego okna dialogowego"
 #: /resources/settings.xml:269
 msgctxt "#30111"
 msgid "Minimum Seconds Left Before Showing Dialog"
-msgstr "Minimalny czas pozostały do wyświetlenia okna dialogowego"
+msgstr "Minimalny czas wyświetlenia okna dialogowego"
 
 #: /resources/settings.xml:261
 msgctxt "#30112"
@@ -641,7 +641,7 @@ msgstr "Wymuś automatyczne wznowienie odcinka"
 #: /resources/settings.xml:263
 msgctxt "#30114"
 msgid "Pre-emptive Scraping"
-msgstr "Złomowanie z wyprzedzeniem"
+msgstr "Pre-emptive Scraping"
 
 #: /resources/settings.xml:259
 msgctxt "#30115"
@@ -651,7 +651,7 @@ msgstr "Wznów styl"
 #: /resources/settings.xml:207
 msgctxt "#30116"
 msgid "Scraping"
-msgstr "Zdrapywanie"
+msgstr "Scraping"
 
 #: /resources/settings.xml:213
 msgctxt "#30117"
@@ -686,12 +686,12 @@ msgstr "Tryb wspomagania"
 #: /resources/settings.xml:224
 msgctxt "#30123"
 msgid "Preferred Cloud Location"
-msgstr "Preferowana lokalizacja chmury"
+msgstr "Preferowana Lokalizacja Chmury"
 
 #: /resources/settings.xml:392
 msgctxt "#30124"
 msgid "Source Filters"
-msgstr "Filtry źródłowe"
+msgstr "Filtry źródeł"
 
 #: /resources/settings.xml:395
 msgctxt "#30125"
@@ -736,22 +736,22 @@ msgstr "Włącz wywłaszczające zakończenie"
 #: /resources/settings.xml:231
 msgctxt "#30133"
 msgid "Minimum Movie Resolution"
-msgstr "Minimalna rozdzielczość filmu"
+msgstr "Minimalna Rozdzielczość Filmu"
 
 #: /resources/settings.xml:233
 msgctxt "#30134"
 msgid "Minimum TV Shows Resolution"
-msgstr "Minimalna rozdzielczość programów telewizyjnych"
+msgstr "Minimalna Rozdzielczość Seriali"
 
 #: /resources/settings.xml:235
 msgctxt "#30135"
 msgid "Minimum Sources"
-msgstr "Minimalne źródła"
+msgstr "Minimalne źródeł"
 
 #: /resources/settings.xml:237
 msgctxt "#30136"
 msgid "Terminate on... "
-msgstr "Zakończ w dniu... "
+msgstr "Zakończ na... "
 
 #: /resources/settings.xml:284
 msgctxt "#30137"
@@ -761,7 +761,7 @@ msgstr "Konta"
 #: /resources/settings.xml:289
 msgctxt "#30138"
 msgid "Enable Account Expiry Notifications"
-msgstr "Włącz powiadomienia o wygaśnięciu konta"
+msgstr "Włącz Powiadomienia O Wygaśnięciu Konta"
 
 #: /resources/settings.xml:83 /resources/settings.xml:292
 msgctxt "#30139"
@@ -771,7 +771,7 @@ msgstr "Trakt"
 #: /resources/settings.xml:294
 msgctxt "#30140"
 msgid "Trakt Username"
-msgstr "Nazwa użytkownika Traktu"
+msgstr "Nazwa użytkownika Trakt"
 
 #: /resources/settings.xml:295
 msgctxt "#30141"
@@ -786,12 +786,12 @@ msgstr "Włącz scrobbling Trakt"
 #: /resources/settings.xml:302
 msgctxt "#30143"
 msgid "Revoke Trakt Authentication..."
-msgstr "Odwołaj uwierzytelnianie Trakt..."
+msgstr "Cofnij dane uwierzytelniania Trakt..."
 
 #: /resources/settings.xml:224 /resources/settings.xml:306
 msgctxt "#30144"
 msgid "Premiumize"
-msgstr "Premiuj"
+msgstr "Premiumize"
 
 #: /resources/settings.xml:224 /resources/settings.xml:333
 msgctxt "#30145"
@@ -849,12 +849,12 @@ msgstr "Klucz API TMDb"
 #: /resources/settings.xml:433
 msgctxt "#30155"
 msgid "Trakt Client ID"
-msgstr "Traktuj ID klienta"
+msgstr "Trakt ID klienta"
 
 #: /resources/settings.xml:434
 msgctxt "#30156"
 msgid "Trakt Client Secret"
-msgstr "Tajemnica klienta Trakt"
+msgstr "Trakt Client Secret"
 
 #: /resources/settings.xml:437
 msgctxt "#30157"
@@ -879,7 +879,7 @@ msgstr "Sortowanie źródeł"
 #: /resources/settings.xml:339
 msgctxt "#30161"
 msgid "Authorize Real-Debrid..."
-msgstr "Autoryzuj rzeczywistą debrid..."
+msgstr "Autoryzuj Real-Debrid..."
 
 #: /resources/settings.xml:336
 msgctxt "#30162"
@@ -889,7 +889,7 @@ msgstr "Nazwa użytkownika Real-Debrid"
 #: /resources/settings.xml:335
 msgctxt "#30163"
 msgid "Enable Real-Debrid"
-msgstr "Włącz rzeczywiste usuwanie"
+msgstr "Włącz Real-Debrid"
 
 #: /resources/settings.xml:341
 msgctxt "#30164"
@@ -900,7 +900,7 @@ msgstr "Priorytet Real-Debrid"
 #: /resources/settings.xml:361
 msgctxt "#30165"
 msgid "Enable Torrents"
-msgstr "Włącz torrenty"
+msgstr "Włącz Torrenty"
 
 #: /resources/settings.xml:319 /resources/settings.xml:344
 #: /resources/settings.xml:363
@@ -911,7 +911,7 @@ msgstr "Włącz hosterów"
 #: /resources/settings.xml:345 /resources/settings.xml:365
 msgctxt "#30167"
 msgid "Auto-Delete Torrents"
-msgstr "Automatyczne usuwanie torrentów"
+msgstr "Automatyczne Usuwanie Torrentów"
 
 #: /resources/settings.xml:327
 msgctxt "#30168"
@@ -921,7 +921,7 @@ msgstr "Maksymalna przestrzeń dyskowa używana przed usunięciem (GB)"
 #: /resources/settings.xml:325
 msgctxt "#30169"
 msgid "Automatic Cloud Removal"
-msgstr "Automatyczne usuwanie chmury"
+msgstr "Automatyczne usuwanie z chmury"
 
 #: /resources/settings.xml:321
 msgctxt "#30170"
@@ -931,12 +931,12 @@ msgstr "Preferuj transkodowane pliki"
 #: /resources/settings.xml:311
 msgctxt "#30171"
 msgid "Premiumize Customer ID"
-msgstr "Identyfikator klienta Premium"
+msgstr "Identyfikator klienta Premiumize"
 
 #: /resources/settings.xml:315
 msgctxt "#30172"
 msgid "Premiumize Priority"
-msgstr "Priorytet Premium"
+msgstr "Priorytet Premiumize"
 
 #: /resources/settings.xml:308
 msgctxt "#30173"
@@ -961,13 +961,13 @@ msgstr "Włącz historię wyszukiwania"
 #: /resources/lib/indexers/trakt.py:432
 msgctxt "#30177"
 msgid ""
-Unable to contact Trakt.\n
-Please check Trakts outage status at:\n
-http://status.trakt.tv
+"Unable to contact Trakt.\n"
+"Please check Trakts outage status at:\n"
+"http://status.trakt.tv"
 msgstr ""
-Unable to contact Trakt.\n
-Please check Trakts outage status at:\n
-http://status.trakt.tv
+"Unable to contact Trakt.\n"
+"Please check Trakts outage status at:\n"
+"http://status.trakt.tv"
 
 #: /resources/settings.xml:123
 msgctxt "#30178"
@@ -983,16 +983,16 @@ msgstr "Fanart.TV"
 #: /resources/settings.xml:17
 msgctxt "#30180"
 msgid "Delay Release Dates By a Day"
-msgstr "Opóźnienie dat wydania o jeden dzień"
+msgstr "Opóźnij daty wydania o jeden dzień"
 
 #: /resources/lib/modules/router.py:507
 msgctxt "#30181"
 msgid ""
-Another addon is attempting to install a provider into Seren\n
-Do you wish to allow this?
+"Another addon is attempting to install a provider into Seren\n"
+"Do you wish to allow this?"
 msgstr ""
-Another addon is attempting to install a provider into Seren\n
-Do you wish to allow this?
+"Another addon is attempting to install a provider into Seren\n"
+"Do you wish to allow this?"
 
 #: /resources/lib/modules/providers/install_manager.py:105
 msgctxt "#30182"
