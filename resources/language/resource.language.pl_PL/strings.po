@@ -200,11 +200,11 @@ msgstr "Ustawienie cichego skrobaka zostało zresetowane"
 #: /resources/lib/common/maintenance.py:74
 msgctxt "#30034"
 msgid ""
-Please be aware this will completely wipe the following:\n
-Cached Data, Settings, Installed Providers\n
+"Please be aware this will completely wipe the following:\n"
+"Cached Data, Settings, Installed Providers\n"
 msgstr ""
-Please be aware this will completely wipe the following:\n
-Cached Data, Settings, Installed Providers\n
+"Please be aware this will completely wipe the following:\n"
+"Cached Data, Settings, Installed Providers\n"
 
 #: /resources/lib/common/maintenance.py:75
 msgctxt "#30035"
@@ -311,20 +311,20 @@ msgstr "Inicjowanie Dostawców"
 #: /resources/lib/modules/getSources.py:218
 msgctxt "#30055"
 msgid ""
-No Sources found for next item in playlist.\n
-Clearing current playlist
+"No Sources found for next item in playlist.\n"
+"Clearing current playlist"
 msgstr ""
-No Sources found for next item in playlist.\n
-Clearing current playlist
+"No Sources found for next item in playlist.\n"
+"Clearing current playlist"
 
 #: /resources/lib/modules/getSources.py:362
 msgctxt "#30056"
 msgid ""
-No Playable Sources were found.\n
-Would you like to attempt to cache a torrent?
+"No Playable Sources were found.\n"
+"Would you like to attempt to cache a torrent?"
 msgstr ""
-No Playable Sources were found.\n
-Would you like to attempt to cache a torrent?
+"No Playable Sources were found.\n"
+"Would you like to attempt to cache a torrent?"
 
 #: /resources/settings.xml:413
 #: /resources/skins/Default/1080i/get_sources.xml:243
@@ -421,11 +421,11 @@ msgstr "Zainstaluj"
 #: /resources/lib/modules/providers/install_manager.py:137
 msgctxt "#30074"
 msgid ""
-Failed to install provider package\n
-Please check the log for further information
+"Failed to install provider package\n"
+"Please check the log for further information"
 msgstr ""
-Failed to install provider package\n
-Please check the log for further information
+"Failed to install provider package\n"
+"Please check the log for further information"
 
 #: /resources/lib/modules/providers/install_manager.py:220
 msgctxt "#30075"
@@ -457,11 +457,11 @@ msgstr "Nie udało się zainstalować pakietu"
 #: /resources/lib/modules/providers/install_manager.py:284
 msgctxt "#30080"
 msgid ""
-Unable to connect to file.\n
-Please check URL and try again.
+"Unable to connect to file.\n"
+"Please check URL and try again."
 msgstr ""
-Unable to connect to file.\n
-Please check URL and try again.
+"Unable to connect to file.\n"
+"Please check URL and try again."
 
 #: /resources/lib/modules/providers/install_manager.py:158
 msgctxt "#30081"
@@ -3166,11 +3166,11 @@ msgstr "Minimalny rozmiar pliku dla odcinka (GB)"
 #: /resources/lib/indexers/trakt.py:101
 msgctxt "#30572"
 msgid ""
-Invalid Trakt API keys, your authentication has been reset.\n
-Please re-auth your Trakt account.
+"Invalid Trakt API keys, your authentication has been reset.\n"
+"Please re-auth your Trakt account."
 msgstr ""
-Invalid Trakt API keys, your authentication has been reset.\n
-Please re-auth your Trakt account.
+"Invalid Trakt API keys, your authentication has been reset.\n"
+"Please re-auth your Trakt account."
 
 #: /resources/settings.xml:54
 msgctxt "#30573"
