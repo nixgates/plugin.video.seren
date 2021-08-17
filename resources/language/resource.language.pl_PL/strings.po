@@ -135,8 +135,8 @@ msgstr "Autoryzuj Trakt"
 #: /resources/lib/indexers/trakt.py:442 /resources/lib/indexers/trakt.py:509
 msgctxt "#30023"
 msgid ""
-"Błąd autoryzacji Trakt.\n"
-"Spróbuj ponownie."
+"Error while authenticating with Trakt.\n"
+"Please try again."
 msgstr ""
 "Błąd autoryzacji Trakt.\n"
 "Spróbuj ponownie."
@@ -195,7 +195,7 @@ msgstr "Nie znaleziono źródeł do odtwarzania"
 #: /resources/lib/modules/router.py:388
 msgctxt "#30033"
 msgid "Silent Scraper Setting has been reset"
-msgstr "Ustawienie cichego skrobaka zostało zresetowane"
+msgstr "Ustawienie cichego scrapowania zostało zresetowane"
 
 #: /resources/lib/common/maintenance.py:74
 msgctxt "#30034"
@@ -203,8 +203,8 @@ msgid ""
 "Please be aware this will completely wipe the following:\n"
 "Cached Data, Settings, Installed Providers\n"
 msgstr ""
-"Please be aware this will completely wipe the following:\n"
-"Cached Data, Settings, Installed Providers\n"
+"Pamiętaj, że spowoduje to całkowite wyczyszczenie następujących elementów:\n"
+"Dane w pamięci podręcznej, ustawienia, zainstalowani dostawcy\n"
 
 #: /resources/lib/common/maintenance.py:75
 msgctxt "#30035"
@@ -314,8 +314,8 @@ msgid ""
 "No Sources found for next item in playlist.\n"
 "Clearing current playlist"
 msgstr ""
-"No Sources found for next item in playlist.\n"
-"Clearing current playlist"
+"Nie znaleziono źródeł dla następnego elementu na liście odtwarzania.\n"
+"Usuwam bieżącą playlistę" 
 
 #: /resources/lib/modules/getSources.py:362
 msgctxt "#30056"
@@ -348,7 +348,7 @@ msgstr "Bezpłatne Hosty"
 #: /resources/lib/modules/getSources.py:748
 msgctxt "#30060"
 msgid "Remaining Providers"
-msgstr "Pozostali dostawcy"
+msgstr "Pozostali Dostawcy"
 
 #: /resources/lib/modules/smartPlay.py:426
 msgctxt "#30061"
@@ -424,8 +424,8 @@ msgid ""
 "Failed to install provider package\n"
 "Please check the log for further information"
 msgstr ""
-"Failed to install provider package\n"
-"Please check the log for further information"
+"Nie udało się zainstalować pakietu dostawcy\n"
+"Proszę sprawdzić dziennik, aby uzyskać więcej informacji"
 
 #: /resources/lib/modules/providers/install_manager.py:220
 msgctxt "#30075"
@@ -460,8 +460,8 @@ msgid ""
 "Unable to connect to file.\n"
 "Please check URL and try again."
 msgstr ""
-"Unable to connect to file.\n"
-"Please check URL and try again."
+"Nie można połączyć się z plikiem.\n"
+"Sprawdź adres URL i spróbuj ponownie". 
 
 #: /resources/lib/modules/providers/install_manager.py:158
 msgctxt "#30081"
@@ -489,11 +489,11 @@ msgstr "Sprawdzanie dostępnych aktualizacji pakietów"
 #: /resources/lib/common/maintenance.py:68
 msgctxt "#30085"
 msgid ""
-This will completely wipe your addon settings.\n
-Are you completely sure you want to do this?
+"This will completely wipe your addon settings.\n"
+"Are you completely sure you want to do this?"
 msgstr ""
-This will completely wipe your addon settings.\n
-Are you completely sure you want to do this?
+"Spowoduje to całkowite wyczyszczenie ustawień dodatków.\n"
+"Jesteś całkowicie pewien/a, że chcesz to zrobić?" 
 
 #: /resources/settings.xml:7 /resources/settings.xml:210
 #: /resources/settings.xml:254 /resources/settings.xml:287
