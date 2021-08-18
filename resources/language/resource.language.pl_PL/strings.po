@@ -681,7 +681,7 @@ msgstr "Automatycznie dodawaj niezbuforowane źródła do Debrid"
 #: /resources/settings.xml:222
 msgctxt "#30122"
 msgid "Assist Mode"
-msgstr "Tryb wspomagania"
+msgstr "Tryb Wyboru"
 
 #: /resources/settings.xml:224
 msgctxt "#30123"
@@ -746,12 +746,12 @@ msgstr "Minimalna Rozdzielczość Seriali"
 #: /resources/settings.xml:235
 msgctxt "#30135"
 msgid "Minimum Sources"
-msgstr "Minimalne źródeł"
+msgstr "Minimalnie źródeł"
 
 #: /resources/settings.xml:237
 msgctxt "#30136"
 msgid "Terminate on... "
-msgstr "Zakończ na... "
+msgstr "Przerwij na... "
 
 #: /resources/settings.xml:284
 msgctxt "#30137"
@@ -761,7 +761,7 @@ msgstr "Konta"
 #: /resources/settings.xml:289
 msgctxt "#30138"
 msgid "Enable Account Expiry Notifications"
-msgstr "Włącz Powiadomienia O Wygaśnięciu Konta"
+msgstr "Włącz Powiadomienia o wygaśnięciu Premium"
 
 #: /resources/settings.xml:83 /resources/settings.xml:292
 msgctxt "#30139"
@@ -916,7 +916,7 @@ msgstr "Automatyczne Usuwanie Torrentów"
 #: /resources/settings.xml:327
 msgctxt "#30168"
 msgid "Max Storage Space Used Before Deletion (GB)"
-msgstr "Maksymalna przestrzeń dyskowa używana przed usunięciem (GB)"
+msgstr "Maksymalna przestrzeń używana przed usunięciem (GB)"
 
 #: /resources/settings.xml:325
 msgctxt "#30169"
@@ -983,7 +983,7 @@ msgstr "Fanart.TV"
 #: /resources/settings.xml:17
 msgctxt "#30180"
 msgid "Delay Release Dates By a Day"
-msgstr "Opóźnij daty wydania o jeden dzień"
+msgstr "Opóźnij daty emisji serialu o jeden dzień"
 
 #: /resources/lib/modules/router.py:507
 msgctxt "#30181"
@@ -1145,7 +1145,7 @@ msgstr ""
 #: /resources/settings.xml:239
 msgctxt "#30207"
 msgid "Terminate if cloud sources are found"
-msgstr "Zakończ, jeśli zostaną znalezione źródła w chmurze"
+msgstr "Przerwij, jeśli zostaną znalezione źródła w chmurze"
 
 #: /resources/settings.xml:329 /resources/settings.xml:346
 #: /resources/settings.xml:367
@@ -2060,12 +2060,12 @@ msgstr "Najpopularniejsze najnowsze Seriale"
 #: /resources/lib/gui/movieMenus.py:53
 msgctxt "#30375"
 msgid "Popular Recent Movies"
-msgstr "Popularne najnowsze filmy"
+msgstr "Popularne Filmy"
 
 #: /resources/lib/gui/movieMenus.py:71
 msgctxt "#30376"
 msgid "Trending Recent Movies"
-msgstr "Najpopularniejsze najnowsze filmy"
+msgstr "Najnowsze Filmy"
 
 #: /resources/lib/debrid/premiumize.py:64
 msgctxt "#30377"
@@ -2618,7 +2618,7 @@ msgstr ""
 #: /resources/settings.xml:53
 msgctxt "#30472"
 msgid "Paginate Trakt Collection"
-msgstr "Kolekcja Traktów stronicowania"
+msgstr "Paginate Trakt Collection"
 
 #: /resources/settings.xml:81
 msgctxt "#30473"
@@ -2845,7 +2845,7 @@ msgstr "Sortowanie odwrócone według rozmiaru (od małej do dużej)"
 #: /resources/settings.xml:240
 msgctxt "#30512"
 msgid "Terminate if adaptive sources are found"
-msgstr "Zakończ, jeśli zostaną znalezione źródła adaptacyjne"
+msgstr "Przerwij, jeśli zostaną znalezione źródła adaptacyjne"
 
 #: /resources/lib/gui/tvshowMenus.py:186
 msgctxt "#30513"
@@ -2860,7 +2860,7 @@ msgstr "Baza danych pamięci podręcznej torrenta została pomyślnie wyczyszczo
 #: /resources/settings.xml:298
 msgctxt "#30515"
 msgid "Start scrobble after seconds."
-msgstr "Rozpocznij scrobblowanie po kilku sekundach."
+msgstr "Rozpocznij scrobblowanie po sekund:."
 
 #: /resources/settings.xml:300
 msgctxt "#30516"
@@ -3265,7 +3265,7 @@ msgstr "Seeds"
 #: /resources/skins/Default/1080i/playing_next.xml:104
 msgctxt "#30590"
 msgid "Playing in"
-msgstr "Gram w"
+msgstr "Playing in"
 
 #: /resources/skins/Default/1080i/playing_next.xml:104
 msgctxt "#30591"
