@@ -323,8 +323,8 @@ msgid ""
 "No Playable Sources were found.\n"
 "Would you like to attempt to cache a torrent?"
 msgstr ""
-"No Playable Sources were found.\n"
-"Would you like to attempt to cache a torrent?"
+"Nie znaleziono żadnych odtwarzalnych źródeł."
+"Czy chcesz spróbować zbuforować torrent?"
 
 #: /resources/settings.xml:413
 #: /resources/skins/Default/1080i/get_sources.xml:243
@@ -536,7 +536,7 @@ msgstr "Okno dialogowe"
 #: /resources/settings.xml:19
 msgctxt "#30093"
 msgid "Next Up Sort Style"
-msgstr "Styl sortowania następnego w górę"
+msgstr "Styl sortowania następny w górę"
 
 #: /resources/settings.xml:19
 msgctxt "#30094"
@@ -566,7 +566,7 @@ msgstr "Limit elementów strony"
 #: /resources/settings.xml:25
 msgctxt "#30099"
 msgid "Use Custom View IDs (Advanced)"
-msgstr "Użyj identyfikatorów widoku niestandardowego (zaawansowane)"
+msgstr "Użyj widoku niestandardowego dla identyfikatorów (zaawansowane)"
 
 #: /resources/settings.xml:32
 msgctxt "#30100"
@@ -646,7 +646,7 @@ msgstr "Pre-emptive Scraping"
 #: /resources/settings.xml:259
 msgctxt "#30115"
 msgid "Resume Style"
-msgstr "Wznów styl"
+msgstr "Styl Wznawiania"
 
 #: /resources/settings.xml:207
 msgctxt "#30116"
@@ -676,7 +676,7 @@ msgstr "Asystent automatycznego buforowania"
 #: /resources/settings.xml:221
 msgctxt "#30121"
 msgid "Auto Add Un-Cached Sources to Debrid"
-msgstr "Automatycznie dodawaj niebuforowane źródła do usuwania"
+msgstr "Automatycznie dodawaj niezbuforowane źródła do Debrid"
 
 #: /resources/settings.xml:222
 msgctxt "#30122"
@@ -726,12 +726,12 @@ msgstr "Maksymalna rozdzielczość"
 #: /resources/settings.xml:228
 msgctxt "#30131"
 msgid "Preemptive Termination"
-msgstr "Wypowiedzenie z wyprzedzeniem"
+msgstr "Preemptive Termination"
 
 #: /resources/settings.xml:230
 msgctxt "#30132"
 msgid "Enable Preemptive Termination"
-msgstr "Włącz wywłaszczające zakończenie"
+msgstr "Enable Preemptive Termination"
 
 #: /resources/settings.xml:231
 msgctxt "#30133"
@@ -965,8 +965,8 @@ msgid ""
 "Please check Trakts outage status at:\n"
 "http://status.trakt.tv"
 msgstr ""
-"Unable to contact Trakt.\n"
-"Please check Trakts outage status at:\n"
+"Nie można połączyć się z Trakt.\"
+"Proszę sprawdzić status awarii w serwisie Trakt:\"
 "http://status.trakt.tv"
 
 #: /resources/settings.xml:123
@@ -991,8 +991,8 @@ msgid ""
 "Another addon is attempting to install a provider into Seren\n"
 "Do you wish to allow this?"
 msgstr ""
-"Another addon is attempting to install a provider into Seren\n"
-"Do you wish to allow this?"
+"Inny dodatek próbuje zainstalować dostawcę w Seren".
+"Czy chcesz na to zezwolić?"
 
 #: /resources/lib/modules/providers/install_manager.py:105
 msgctxt "#30182"
@@ -1009,8 +1009,8 @@ msgid ""
 "Another addon is attempting to uninstall the {} provider from Seren\n"
 "Do you wish to allow this?"
 msgstr ""
-"Another addon is attempting to uninstall the {} provider from Seren\n"
-"Do you wish to allow this?"
+"Inny dodatek próbuje odinstalować dostawcę {} z Seren\n"
+"Czy chcesz na to zezwolić? "
 
 #: /resources/settings.xml:407
 msgctxt "#30184"
@@ -1092,8 +1092,8 @@ msgid ""
 "[COLOR red]WARNING[/COLOR]\n"
 "This will reset all meta information, are you sure?"
 msgstr ""
-"[COLOR red]WARNING[/COLOR]\n"
-"This will reset all meta information, are you sure?"
+"[COLOR red]!OSTRZEŻENIE![/COLOR]\n"
+"Spowoduje to zresetowanie wszystkich metainformacji, czy jesteś pewny/a? 
 
 #: /resources/settings.xml:453 /resources/lib/gui/homeMenu.py:79
 #: /resources/lib/gui/movieMenus.py:270 /resources/lib/gui/tvshowMenus.py:396
@@ -1139,8 +1139,8 @@ msgid ""
 "Please setup your accounts in the settings menu before attempting to play an"
 " item"
 msgstr ""
-"Please setup your accounts in the settings menu before attempting to play an"
-" item"
+"Skonfiguruj swoje konta w menu ustawień, zanim spróbujesz odtworzyć"
+" element"
 
 #: /resources/settings.xml:239
 msgctxt "#30207"
@@ -1179,8 +1179,8 @@ msgid ""
 "Please Note\n"
 "You appear to have authorized a non-premium account and will not be able to play items using this account"
 msgstr ""
-"Please Note\n"
-"You appear to have authorized a non-premium account and will not be able to play items using this account"
+"Uwaga\n"
+"Wygląda na to, że autoryzowałeś konto bez premium i nie będziesz mógł odtwarzać elementów przy użyciu tego konta" 
 
 #: /resources/settings.xml:257
 msgctxt "#30214"
@@ -1237,8 +1237,8 @@ msgid ""
 "You are attempting to uninstall the active theme, this will switch you to "
 "the default theme."
 msgstr ""
-"You are attempting to uninstall the active theme, this will switch you to "
-"the default theme."
+"Próbujesz odinstalować aktywny motyw, spowoduje to zmianę na "
+"motyw domyślny."
 
 #: /resources/lib/database/skinManager/__init__.py:387
 msgctxt "#30224"
@@ -1561,7 +1561,7 @@ msgstr "Interfejs"
 #: /resources/settings.xml:118
 msgctxt "#30281"
 msgid "Artwork"
-msgstr "Grafika"
+msgstr "Artwork"
 
 #: /resources/settings.xml:73
 msgctxt "#30282"
@@ -1849,7 +1849,7 @@ msgstr "Rozpoczęcie odtwarzania"
 #: /resources/settings.xml:145 /resources/settings.xml:178
 msgctxt "#30335"
 msgid "Keyart"
-msgstr "Klucz"
+msgstr "Klucz(Keyart)"
 
 #: /resources/settings.xml:148 /resources/settings.xml:181
 msgctxt "#30336"
@@ -1860,22 +1860,22 @@ msgstr "Wyczyść logo"
 #: /resources/settings.xml:196
 msgctxt "#30337"
 msgid "Landscape"
-msgstr "Krajobraz"
+msgstr "Landscape(Orientacja pozioma)"
 
 #: /resources/settings.xml:157 /resources/settings.xml:187
 msgctxt "#30338"
 msgid "Character Art"
-msgstr "Rysunek postaci"
+msgstr "Character Art"
 
 #: /resources/settings.xml:151 /resources/settings.xml:184
 msgctxt "#30339"
 msgid "Clear Art"
-msgstr "Czysta sztuka"
+msgstr "Clear Art
 
 #: /resources/settings.xml:154
 msgctxt "#30340"
 msgid "Disc Art"
-msgstr "Grafika na płycie"
+msgstr "Disc Art"
 
 #: /resources/settings.xml:260
 msgctxt "#30341"
@@ -1917,12 +1917,12 @@ msgstr "Wstrzymaj"
 #: /resources/settings.xml:276
 msgctxt "#30348"
 msgid "Still Watching Dialog"
-msgstr "Okno dialogowe nadal obserwowane"
+msgstr "Okno dialogowe nadal oglądane"
 
 #: /resources/settings.xml:278
 msgctxt "#30349"
 msgid "Enable Still Watching Dialog"
-msgstr "Włącz okno dialogowe „Wciąż oglądanie"
+msgstr "Włącz okno dialogowe "Wciąż oglądane"
 
 #: /resources/settings.xml:279
 msgctxt "#30350"
@@ -1975,8 +1975,8 @@ msgid ""
 "There were issues when processing the synchronization with Trakt, please "
 "check the log"
 msgstr ""
-"There were issues when processing the synchronization with Trakt, please "
-"check the log"
+"Wystąpiły problemy podczas synchronizacji z Trakt, proszę"
+"Sprawdź dziennik zdarzeń" 
 
 #: /resources/settings.xml:224 /resources/settings.xml:351
 msgctxt "#30360"
@@ -2024,13 +2024,13 @@ msgid ""
 "There appears to be a problem with your Trakt Authorization \n"
 "Please try re-authorizing your account"
 msgstr ""
-"There appears to be a problem with your Trakt Authorization \n"
-"Please try re-authorizing your account"
+"Wygląda na to, że wystąpił problem z autoryzacją Trakt \n"
+"Spróbuj ponownie autoryzować swoje konto" 
 
 #: /resources/settings.xml:124
 msgctxt "#30369"
 msgid "Preferred artwork size"
-msgstr "Preferowany rozmiar grafiki"
+msgstr "Preferowany rozmiar grafiki(artwork)"
 
 #: /resources/settings.xml:124
 msgctxt "#30370"
@@ -2248,7 +2248,7 @@ msgctxt "#30411"
 msgid ""
 "Remove all settings, providers, databases, themes and cache (Fresh start)"
 msgstr ""
-"Remove all settings, providers, databases, themes and cache (Fresh start)"
+"Usuń wszystkie ustawienia, dostawców, bazy danych, motywy i pamięć podręczną (CZYSTY START KASUJE WSZYSTKO !)"
 
 #: /resources/lib/gui/homeMenu.py:94
 msgctxt "#30412"
@@ -2256,8 +2256,8 @@ msgid ""
 "A list of tools to assist with issues that may arise with the syncing of "
 "your trakt data"
 msgstr ""
-"A list of tools to assist with issues that may arise with the syncing of "
-"your trakt data"
+"Lista narzędzi pomagających w rozwiązywaniu problemów, które mogą wystąpić podczas synchronizacji"
+"Twoich danych z trakt" 
 
 #: /resources/lib/gui/homeMenu.py:102
 msgctxt "#30413"
@@ -2267,12 +2267,12 @@ msgstr "Zestaw okien testowych, które pomogą w debugowaniu motywu"
 #: /resources/lib/gui/homeMenu.py:110
 msgctxt "#30414"
 msgid "Force Seren to check for updates for your installed provider(s)"
-msgstr "Zmuś Seren do sprawdzania aktualizacji dla zainstalowanych dostawców"
+msgstr "Zmuś Seren do sprawdzania aktualizacji dla zainstalowanych dostawców źródeł"
 
 #: /resources/lib/gui/homeMenu.py:114
 msgctxt "#30415"
 msgid "Open a window to enable/disable/install/uninstall providers in Seren"
-msgstr "Otwórz okno, aby włączyć/wyłączyć/zainstalować/odinstalować dostawców w Seren"
+msgstr "Otwórz okno, aby włączyć/wyłączyć/zainstalować/odinstalować dostawców źródeł w Seren"
 
 #: /resources/lib/gui/homeMenu.py:123
 msgctxt "#30416"
@@ -2431,7 +2431,7 @@ msgstr "Moje listy utworów filmowych"
 #: /resources/lib/gui/movieMenus.py:185
 msgctxt "#30442"
 msgid "My liked Trakt Lists"
-msgstr "Moje lubiane listy tras"
+msgstr "Moje polubione listy Trakt"
 
 #: /resources/lib/gui/movieMenus.py:190
 msgctxt "#30443"
@@ -2664,7 +2664,7 @@ msgstr "Automatycznie pobieraj napisy, jeśli są dostępne"
 #: /resources/settings.xml:16
 msgctxt "#30481"
 msgid "Hide watched items"
-msgstr "Ukryj obserwowane Elementy"
+msgstr "Ukryj obejrzane elementy"
 
 #: /resources/settings.xml:57
 msgctxt "#30482"
@@ -2692,8 +2692,8 @@ msgid ""
 "Would you like to cache this in the background or wait for the item to "
 "finish?"
 msgstr ""
-"Would you like to cache this in the background or wait for the item to "
-"finish?"
+"Czy chcesz zapisać to w pamięci podręcznej w tle, czy poczekać, aż element "
+"koniec?"
 
 #: /resources/lib/modules/cacheAssist.py:91
 msgctxt "#30487"
@@ -2938,7 +2938,7 @@ msgstr "Przygoda"
 #: /resources/lib/modules/metadataHandler.py:78
 msgctxt "#30528"
 msgid "Animation"
-msgstr "Animacja"
+msgstr "Animowane"
 
 #: /resources/lib/modules/metadataHandler.py:79
 msgctxt "#30529"
@@ -2963,12 +2963,12 @@ msgstr "Komedia"
 #: /resources/lib/modules/metadataHandler.py:83
 msgctxt "#30533"
 msgid "Crime"
-msgstr "Zbrodnia"
+msgstr "Kryminały"
 
 #: /resources/lib/modules/metadataHandler.py:84
 msgctxt "#30534"
 msgid "Documentary"
-msgstr "Dokument"
+msgstr "Dokumentalne"
 
 #: /resources/lib/modules/metadataHandler.py:85
 msgctxt "#30535"
@@ -2983,12 +2983,12 @@ msgstr "Rodzina"
 #: /resources/lib/modules/metadataHandler.py:87
 msgctxt "#30537"
 msgid "Fantasy"
-msgstr "Fantazja"
+msgstr "Fantazja(Fantasy)"
 
 #: /resources/lib/modules/metadataHandler.py:88
 msgctxt "#30538"
 msgid "Game Show"
-msgstr "Pokaz gry"
+msgstr "Game Show"
 
 #: /resources/lib/modules/metadataHandler.py:89
 msgctxt "#30539"
@@ -3023,7 +3023,7 @@ msgstr "Muzyka"
 #: /resources/lib/modules/metadataHandler.py:95
 msgctxt "#30545"
 msgid "Musical"
-msgstr "Muzyka"
+msgstr "Musical"
 
 #: /resources/lib/modules/metadataHandler.py:96
 msgctxt "#30546"
@@ -3100,7 +3100,7 @@ msgstr "Thriller"
 #: /resources/lib/modules/metadataHandler.py:112
 msgctxt "#30560"
 msgid "TV Movie"
-msgstr "Film telewizyjny"
+msgstr "Filmy telewizyjne"
 
 #: /resources/lib/modules/metadataHandler.py:113
 msgctxt "#30561"
