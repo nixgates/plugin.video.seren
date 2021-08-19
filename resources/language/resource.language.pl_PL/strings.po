@@ -338,12 +338,12 @@ msgstr "Torrenty"
 #: /resources/lib/modules/getSources.py:740
 msgctxt "#30058"
 msgid "Hosters"
-msgstr "Hosty"
+msgstr "Hostingi"
 
 #: /resources/lib/modules/getSources.py:746
 msgctxt "#30059"
 msgid "Free Hosters"
-msgstr "Bezpłatne Hosty"
+msgstr "Bezpłatne Hostingi"
 
 #: /resources/lib/modules/getSources.py:748
 msgctxt "#30060"
@@ -906,7 +906,7 @@ msgstr "Włącz Torrenty"
 #: /resources/settings.xml:363
 msgctxt "#30166"
 msgid "Enable Hosters"
-msgstr "Włącz hosterów"
+msgstr "Włącz hostingi"
 
 #: /resources/settings.xml:345 /resources/settings.xml:365
 msgctxt "#30167"
@@ -1421,12 +1421,12 @@ msgstr "Tylko torrenty"
 #: /resources/settings.xml:237
 msgctxt "#30254"
 msgid "Hosters Only"
-msgstr "Tylko hosterzy"
+msgstr "Tylko hostingi"
 
 #: /resources/settings.xml:237
 msgctxt "#30255"
 msgid "Torrents/Hosters"
-msgstr "Torrenty/hosterzy"
+msgstr "Torrenty/Hostingi
 
 #: /resources/settings.xml:413 /resources/skins/Default/1080i/resolver.xml:99
 #: /resources/skins/Default/1080i/source_select.xml:106
@@ -1458,7 +1458,7 @@ msgstr "Wyłącz pakiet"
 #: /resources/skins/Default/1080i/configure_provider_package.xml:296
 msgctxt "#30261"
 msgid "Enable All Hosters"
-msgstr "Włącz wszystkich hosterów"
+msgstr "Włącz wszystkie hostingi"
 
 #: /resources/skins/Default/1080i/configure_provider_package.xml:306
 msgctxt "#30262"
@@ -1468,7 +1468,7 @@ msgstr "Włącz Wzystkie Torrenty"
 #: /resources/skins/Default/1080i/configure_provider_package.xml:316
 msgctxt "#30263"
 msgid "Disable All Hosters"
-msgstr "Wyłącz wszystkich hosterów"
+msgstr "Wyłącz wszystkie hostingi"
 
 #: /resources/skins/Default/1080i/configure_provider_package.xml:326
 msgctxt "#30264"
