@@ -1274,7 +1274,7 @@ msgstr ""
 #: /resources/lib/gui/tvshowMenus.py:189
 msgctxt "#30229"
 msgid "Next Up"
-msgstr "Dalej"
+msgstr "Następny w Kolejce"
 
 #: /resources/lib/gui/tvshowMenus.py:194
 msgctxt "#30230"
