@@ -298,8 +298,15 @@ class RealDebrid:
         url = "unrestrict/link"
         post_data = {"link": link}
         response = self.post_url(url, post_data)
+        #try:
+        #    return response["download"]
         try:
-            return response["download"]
+            headers2=requests.head(response["download"]).headers
+            if not str('attachment') in headers2.get('Content-Disposition',''):
+                #xbmc.log(str(response)+'seren_response===>PHIL', level=xbmc.LOGINFO)
+                raise UnexpectedResponse(response)
+            else:
+                return response["download"]
         except KeyError:
             raise UnexpectedResponse(response)
 
