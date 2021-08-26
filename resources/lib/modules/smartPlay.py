@@ -430,7 +430,7 @@ class SmartPlay:
             and not force_resume_off
         ):
 
-            if bookmark_style == 0 and not force_resume_on:
+            if bookmark_style == 0 and not force_resume_on and int(bookmark["resume_time"]) > 60:
                 import datetime
 
                 selection = xbmcgui.Dialog().contextmenu(
