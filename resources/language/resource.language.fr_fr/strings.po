@@ -20,7 +20,7 @@ msgstr "Découvrir les séries"
 #: /resources/lib/gui/homeMenu.py:22
 msgctxt "#30003"
 msgid "My Shows"
-msgstr "Mes émissions"
+msgstr "Mes séries"
 
 #: /resources/settings.xml:55 /resources/lib/gui/movieMenus.py:46
 #: /resources/lib/gui/tvshowMenus.py:50
@@ -261,7 +261,7 @@ msgstr "Multi Select..."
 #: /resources/lib/gui/tvshowMenus.py:80
 msgctxt "#30046"
 msgid "New TV Shows"
-msgstr "New Séries"
+msgstr "Nouvelles séries"
 
 #: /resources/lib/indexers/trakt.py:453 /resources/lib/debrid/premiumize.py:72
 #: /resources/lib/debrid/real_debrid.py:83
@@ -739,7 +739,7 @@ msgstr "Résolution vidéo minimale"
 #: /resources/settings.xml:233
 msgctxt "#30134"
 msgid "Minimum TV Shows Resolution"
-msgstr "Résolution minimale des émissions de télévision"
+msgstr "Résolution minimale des séries"
 
 #: /resources/settings.xml:235
 msgctxt "#30135"
@@ -1108,7 +1108,7 @@ msgstr "Recherche de nouveau film ..."
 #: /resources/lib/gui/tvshowMenus.py:391
 msgctxt "#30201"
 msgid "New Show Search..."
-msgstr "Nouvelle recherche de spectacle ..."
+msgstr "Nouvelle recherche de séries..."
 
 #: /resources/settings.xml:323
 msgctxt "#30202"
@@ -1284,7 +1284,7 @@ msgstr "Épisodes à venir"
 #: /resources/lib/gui/tvshowMenus.py:199
 msgctxt "#30231"
 msgid "Unfinished Shows in Collection"
-msgstr "Spectacles inachevés dans la collection"
+msgstr "Séries inachevés dans la collection"
 
 #: /resources/lib/gui/tvshowMenus.py:204
 msgctxt "#30232"
@@ -1294,7 +1294,7 @@ msgstr "Épisodes récents"
 #: /resources/lib/gui/tvshowMenus.py:209
 msgctxt "#30233"
 msgid "My Show Lists"
-msgstr "Mes listes de spectacles"
+msgstr "Mes listes de séries"
 
 #: /resources/settings.xml:459 /resources/lib/gui/homeMenu.py:91
 msgctxt "#30234"
@@ -1535,7 +1535,7 @@ msgstr "Préférez les illustrations de film de"
 #: /resources/settings.xml:162
 msgctxt "#30276"
 msgid "Prefer TV Show artwork from"
-msgstr "Préférez les illustrations de séries télévisées de"
+msgstr "Préférer les illustrations de séries de"
 
 #: /resources/settings.xml:83 /resources/settings.xml:129
 #: /resources/settings.xml:162
@@ -1624,7 +1624,7 @@ msgstr "Oeuvre de film"
 #: /resources/settings.xml:160
 msgctxt "#30292"
 msgid "TV show Artwork"
-msgstr "Oeuvre de série télévisée"
+msgstr "Illustrations des séries"
 
 #: /resources/lib/database/trakt_sync/__init__.py:399
 msgctxt "#30293"
@@ -1952,7 +1952,7 @@ msgstr "Rechercher des films par acteur ..."
 #: /resources/lib/gui/homeMenu.py:57
 msgctxt "#30355"
 msgid "Search Shows By Actor..."
-msgstr "Rechercher des émissions par acteur ..."
+msgstr "Rechercher des séries par acteur..."
 
 #: /resources/settings.xml:259
 msgctxt "#30356"
@@ -2050,12 +2050,12 @@ msgstr "Petit"
 #: /resources/lib/gui/tvshowMenus.py:57
 msgctxt "#30373"
 msgid "Popular Recent Shows"
-msgstr "Émissions récentes populaires"
+msgstr "Séries récentes populaires"
 
 #: /resources/lib/gui/tvshowMenus.py:75
 msgctxt "#30374"
 msgid "Trending Recent Shows"
-msgstr "Tendance des émissions récentes"
+msgstr "Séries tendances récentes"
 
 #: /resources/lib/gui/movieMenus.py:53
 msgctxt "#30375"
@@ -2075,7 +2075,7 @@ msgstr "Premiumize auth"
 #: /resources/lib/gui/tvshowMenus.py:215
 msgctxt "#30378"
 msgid "My Liked Show Lists"
-msgstr "Mes listes d'émissions aimées"
+msgstr "Mes listes de séries favorites"
 
 #: /resources/lib/gui/movieMenus.py:182
 msgctxt "#30379"
@@ -2085,7 +2085,7 @@ msgstr "Mes listes de films aimés"
 #: /resources/lib/gui/tvshowMenus.py:106
 msgctxt "#30380"
 msgid "Trending Show Lists"
-msgstr "Listes de spectacles tendance"
+msgstr "Listes de séries tendance"
 
 #: /resources/lib/gui/movieMenus.py:97
 msgctxt "#30381"
@@ -2095,7 +2095,7 @@ msgstr "Listes de films tendance"
 #: /resources/lib/gui/tvshowMenus.py:112
 msgctxt "#30382"
 msgid "Popular Show Lists"
-msgstr "Listes d'émissions populaires"
+msgstr "Listes de séries populaires"
 
 #: /resources/lib/gui/movieMenus.py:103
 msgctxt "#30383"
@@ -2115,12 +2115,12 @@ msgstr "01x01. ÉpisodeTitle"
 #: /resources/settings.xml:76 /resources/settings.xml:78
 msgctxt "#30386"
 msgid "ShowTitle: EpisodeTitle"
-msgstr "ShowTitle: Titre de l'épisode"
+msgstr "TitreSérie: TitreEpisode"
 
 #: /resources/settings.xml:76 /resources/settings.xml:78
 msgctxt "#30387"
 msgid "ShowTitle: 01x01. EpisodeTitle"
-msgstr "ShowTitle: 01x01. ÉpisodeTitle"
+msgstr "TitreSérie: 01x01. TitreEpisode"
 
 #: /resources/settings.xml:80
 msgctxt "#30388"
@@ -2155,7 +2155,7 @@ msgctxt "#30393"
 msgid ""
 "Discover TV shows that are Popular, Trending, Recommended for you and more."
 msgstr ""
-"Découvrez des émissions de télévision populaires, tendances, recommandées "
+"Découvrez des séries populaires, tendances, recommandées "
 "pour vous et plus encore."
 
 #: /resources/lib/gui/homeMenu.py:20
@@ -2167,7 +2167,7 @@ msgstr "Regardez des films en fonction de vos informations Trakt"
 msgctxt "#30395"
 msgid "View shows and episodes based on your Trakt information"
 msgstr ""
-"Afficher des émissions et des épisodes en fonction de vos informations Trakt"
+"Afficher des séries et des épisodes en fonction de vos informations Trakt"
 
 #: /resources/lib/gui/homeMenu.py:28
 msgctxt "#30396"
@@ -2177,7 +2177,7 @@ msgstr "Afficher ou lire des fichiers stockés sur votre fournisseur de cloud"
 #: /resources/lib/gui/homeMenu.py:31
 msgctxt "#30397"
 msgid "Search for movies or shows"
-msgstr "Rechercher des films ou des émissions"
+msgstr "Rechercher des films ou des séries"
 
 #: /resources/lib/gui/homeMenu.py:34
 msgctxt "#30398"
@@ -2196,7 +2196,7 @@ msgstr "Rechercher des films par titre"
 #: /resources/lib/gui/tvshowMenus.py:393
 msgctxt "#30400"
 msgid "Search for shows by title"
-msgstr "Rechercher des émissions par titre"
+msgstr "Rechercher des séries par titre"
 
 #: /resources/lib/gui/homeMenu.py:42 /resources/lib/gui/movieMenus.py:153
 msgctxt "#30401"
@@ -2209,7 +2209,7 @@ msgstr ""
 msgctxt "#30402"
 msgid "View your shows search history or start a new search"
 msgstr ""
-"Afficher l'historique de recherche de vos émissions ou lancer une nouvelle "
+"Afficher l'historique de recherche de vos séries ou lancer une nouvelle "
 "recherche"
 
 #: /resources/lib/gui/homeMenu.py:56 /resources/lib/gui/movieMenus.py:141
@@ -2220,7 +2220,7 @@ msgstr "Rechercher des films par nom d'acteur"
 #: /resources/lib/gui/homeMenu.py:59
 msgctxt "#30404"
 msgid "Search show by actor"
-msgstr "Rechercher une émission par acteur"
+msgstr "Rechercher une série par acteur"
 
 #: /resources/lib/gui/homeMenu.py:66
 msgctxt "#30405"
@@ -2472,7 +2472,7 @@ msgid ""
 "View the most popular shows. Popularity is calculated using the rating "
 "percentage and the number of ratings."
 msgstr ""
-"Voir les émissions les plus populaires. La popularité est calculée en "
+"Voir les séries les plus populaires. La popularité est calculée en "
 "utilisant le pourcentage de notation et le nombre de notes."
 
 #: /resources/lib/gui/tvshowMenus.py:59
@@ -2481,14 +2481,14 @@ msgid ""
 "View the recent most popular shows. Popularity is calculated using the "
 "rating percentage and the number of ratings."
 msgstr ""
-"Voir les dernières émissions les plus populaires. La popularité est "
+"Voir les dernières séries les plus populaires. La popularité est "
 "calculéeen utilisant le pourcentage de notation et le nombre de notes."
 
 #: /resources/lib/gui/tvshowMenus.py:65
 msgctxt "#30446"
 msgid "Personalized show recommendations based on your watched history"
 msgstr ""
-"Recommandations d'émissions personnalisées en fonction de votre historique "
+"Recommandations de séries personnalisées en fonction de votre historique "
 "de visionnage"
 
 #: /resources/lib/gui/tvshowMenus.py:72
@@ -2497,7 +2497,7 @@ msgid ""
 "Returns all shows being watched right now. Shows with the most users are "
 "returned first."
 msgstr ""
-"Renvoie toutes les émissions actuellement regardées. Les émissions avec le "
+"Renvoie toutes les séries actuellement regardées. Les séries avec le "
 "plus grand nombre d'utilisateurs sont renvoyées en premier."
 
 #: /resources/lib/gui/tvshowMenus.py:77
@@ -2506,13 +2506,13 @@ msgid ""
 "Returns all recent shows being watched right now. Shows with the most users "
 "are returned first."
 msgstr ""
-"Renvoie toutes les émissions récentes regardées en ce moment. Les émissions "
+"Renvoie toutes les séries récentes regardées en ce moment. Les séries "
 "avec le plus grand nombre d'utilisateurs sont renvoyées en premier."
 
 #: /resources/lib/gui/tvshowMenus.py:82
 msgctxt "#30449"
 msgid "Returns shows being released within a 30 day period"
-msgstr "Les retours sont publiés dans un délai de 30 jours"
+msgstr "Renvoie les séries sorties sur une période de 30 jours"
 
 #: /resources/lib/gui/tvshowMenus.py:89
 msgctxt "#30450"
@@ -2520,32 +2520,32 @@ msgid ""
 "Returns the most played (a single user can watch multiple episodes multiple "
 "times) shows for the week"
 msgstr ""
-"Renvoie les émissions les plus jouées (un seul utilisateur peut regarder "
-"plusieurs épisodes plusieurs fois) pour la semaine"
+"Renvoie les séries les plus lues (un seul utilisateur peut regarder "
+"plusieurs épisodes plusieurs fois) de la semaine"
 
 #: /resources/lib/gui/tvshowMenus.py:96
 msgctxt "#30451"
 msgid "Returns the most watched (unique users) shows for the week"
 msgstr ""
-"Renvoie les émissions les plus regardées (utilisateurs uniques) de la "
+"Renvoie les séries les plus regardées (utilisateurs uniques) de la "
 "semaine"
 
 #: /resources/lib/gui/tvshowMenus.py:103
 msgctxt "#30452"
 msgid "Returns the most collected (unique users) shows for the week"
 msgstr ""
-"Renvoie les émissions les plus collectées (utilisateurs uniques) de la "
+"Renvoie les séries les plus collectées (utilisateurs uniques) de la "
 "semaine"
 
 #: /resources/lib/gui/tvshowMenus.py:109
 msgctxt "#30453"
 msgid "Returns the most played show lists for the week"
-msgstr "Renvoie les listes d'émissions les plus jouées de la semaine"
+msgstr "Renvoie les listes de séries les plus lues de la semaine"
 
 #: /resources/lib/gui/tvshowMenus.py:115
 msgctxt "#30454"
 msgid "Returns the most popular show lists of all time"
-msgstr "Renvoie les listes d'émissions les plus populaires de tous les temps"
+msgstr "Renvoie les listes de séries les plus populaires de tous les temps"
 
 #: /resources/lib/gui/tvshowMenus.py:123
 msgctxt "#30455"
@@ -2553,38 +2553,38 @@ msgid ""
 "Returns the most anticipated shows based on the number of Trakt lists a show"
 " appears on."
 msgstr ""
-"Renvoie les émissions les plus attendues en fonction du nombre de listes "
-"Trakt sur lesquelles une émission apparaît."
+"Renvoie les séries les plus attendues en fonction du nombre de listes "
+"Trakt sur lesquelles elles apparaissent"
 
 #: /resources/lib/gui/tvshowMenus.py:129
 msgctxt "#30456"
 msgid "Returns all shows updated over the past 30 days"
 msgstr ""
-"Renvoie toutes les émissions mises à jour au cours des 30 derniers jours"
+"Renvoie toutes les séries mises à jour au cours des 30 derniers jours"
 
 #: /resources/lib/gui/tvshowMenus.py:134
 msgctxt "#30457"
 msgid "Returns a list of TV networks that can be used to filter shows by"
 msgstr ""
-"Renvoie une liste de réseaux de télévision pouvant être utilisés pour "
-"filtrer les émissions par"
+"Renvoie une liste de chaînes pouvant être utilisés pour "
+"filtrer les séries"
 
 #: /resources/lib/gui/tvshowMenus.py:139
 msgctxt "#30458"
 msgid "Returns a list of years to filter shows by their release dates"
 msgstr ""
-"Renvoie une liste d'années pour filtrer les émissions en fonction de leurs "
+"Renvoie une liste d'années pour filtrer les séries en fonction de leurs "
 "dates de sortie"
 
 #: /resources/lib/gui/tvshowMenus.py:144
 msgctxt "#30459"
 msgid "Returns a list of genres to filter shows by"
-msgstr "Renvoie une liste de genres pour filtrer les émissions par"
+msgstr "Renvoie une liste de genres pour filtrer les séries"
 
 #: /resources/lib/gui/tvshowMenus.py:149
 msgctxt "#30460"
 msgid "Search for shows by actor name"
-msgstr "Rechercher des émissions par nom d'acteur"
+msgstr "Rechercher des séries par nom d'acteur"
 
 #: /resources/lib/gui/tvshowMenus.py:171
 msgctxt "#30461"
@@ -2599,14 +2599,14 @@ msgstr ""
 msgctxt "#30462"
 msgid "View TV shows you have added to your Trakt Collection"
 msgstr ""
-"Regardez les émissions de télévision que vous avez ajoutées à votre "
+"Afficher les séries que vous avez ajoutées à votre "
 "collection Trakt"
 
 #: /resources/lib/gui/tvshowMenus.py:181
 msgctxt "#30463"
 msgid "View TV shows you have added to your Trakt Watchlist"
 msgstr ""
-"Regardez les émissions de télévision que vous avez ajoutées à votre liste "
+"Afficher les séries que vous avez ajoutées à votre liste "
 "de lecture Trakt"
 
 #: /resources/lib/gui/tvshowMenus.py:191
@@ -2615,7 +2615,7 @@ msgid ""
 "View the next episode(s) you should watch for all TV shows you have started"
 msgstr ""
 "Afficher le ou les prochains épisodes que vous devriez regarder pour toutes "
-"les émissions télévisées que vous avez commencées"
+"les séries que vous avez commencées"
 
 #: /resources/lib/gui/tvshowMenus.py:196
 msgctxt "#30465"
@@ -2628,7 +2628,7 @@ msgstr ""
 msgctxt "#30466"
 msgid "View TV shows that you have not yet finished watching"
 msgstr ""
-"Regardez les émissions télévisées que vous n'avez pas encore fini de "
+"Afficher les séries que vous n'avez pas encore fini de "
 "regarder"
 
 #: /resources/lib/gui/tvshowMenus.py:206
@@ -2636,18 +2636,18 @@ msgctxt "#30467"
 msgid ""
 "View episode(s) for shows you watch that have aired in the last 12 days"
 msgstr ""
-"Afficher les épisodes des émissions que vous regardez qui ont été diffusées "
+"Afficher les épisodes des séries que vous regardez qui ont été diffusées "
 "au cours des 12 derniers jours"
 
 #: /resources/lib/gui/tvshowMenus.py:212
 msgctxt "#30468"
 msgid "View your personal show Trakt lists"
-msgstr "Consultez vos listes de Trakt pour les émissions personnelles"
+msgstr "Afficher vos listes personnelles Trakt de séries"
 
 #: /resources/lib/gui/tvshowMenus.py:218
 msgctxt "#30469"
 msgid "View your liked show Trakt lists"
-msgstr "Afficher les listes Trakt de vos émissions préférées"
+msgstr "Afficher les listes Trakt de vos séries préférées"
 
 #: /resources/lib/gui/tvshowMenus.py:223
 msgctxt "#30470"
@@ -2903,7 +2903,7 @@ msgstr "Arrêter si des sources adaptatives sont trouvées"
 msgctxt "#30513"
 msgid "A list of shows you watch sorted by most recently watched"
 msgstr ""
-"Une liste des émissions que vous regardez triées par les plus récemment "
+"Une liste des séries que vous regardez triées par les plus récemment "
 "regardées"
 
 #: /resources/lib/database/torrentCache/__init__.py:96
