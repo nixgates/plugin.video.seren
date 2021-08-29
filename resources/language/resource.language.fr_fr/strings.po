@@ -2065,7 +2065,7 @@ msgstr "Films récents populaires"
 #: /resources/lib/gui/movieMenus.py:71
 msgctxt "#30376"
 msgid "Trending Recent Movies"
-msgstr "Tendance des films récents"
+msgstr "Films tendances récents"
 
 #: /resources/lib/debrid/premiumize.py:64
 msgctxt "#30377"
@@ -2085,12 +2085,12 @@ msgstr "Mes listes de films aimés"
 #: /resources/lib/gui/tvshowMenus.py:106
 msgctxt "#30380"
 msgid "Trending Show Lists"
-msgstr "Listes de séries tendance"
+msgstr "Listes de séries tendances"
 
 #: /resources/lib/gui/movieMenus.py:97
 msgctxt "#30381"
 msgid "Trending Movie Lists"
-msgstr "Listes de films tendance"
+msgstr "Listes de films tendances"
 
 #: /resources/lib/gui/tvshowMenus.py:112
 msgctxt "#30382"
