@@ -42,7 +42,7 @@ msgstr "Tendance"
 #: /resources/lib/gui/movieMenus.py:76 /resources/lib/gui/tvshowMenus.py:85
 msgctxt "#30007"
 msgid "Most Played"
-msgstr "Les plus jouées"
+msgstr "Les plus lues"
 
 #: /resources/lib/gui/movieMenus.py:83 /resources/lib/gui/tvshowMenus.py:92
 msgctxt "#30008"
@@ -320,7 +320,7 @@ msgid ""
 "No Playable Sources were found.\n"
 "Would you like to attempt to cache a torrent?"
 msgstr ""
-"Aucune source jouable n'a été trouvée.\n"
+"Aucune source lisible n'a été trouvée.\n"
 "Souhaitez-vous essayer de mettre en cache un torrent?"
 
 #: /resources/settings.xml:413
@@ -2780,7 +2780,7 @@ msgstr "Afficher non mis en cache"
 #: /resources/settings.xml:478 /resources/lib/gui/homeMenu.py:136
 msgctxt "#30492"
 msgid "Test Playing Next"
-msgstr "Test Suivante à jouer"
+msgstr "Test Suivante à lire"
 
 #: /resources/settings.xml:480 /resources/lib/gui/homeMenu.py:140
 msgctxt "#30493"
@@ -3320,7 +3320,7 @@ msgstr "Seeds"
 #: /resources/skins/Default/1080i/playing_next.xml:104
 msgctxt "#30590"
 msgid "Playing in"
-msgstr "Jouer dans"
+msgstr "Lire dans"
 
 #: /resources/skins/Default/1080i/playing_next.xml:104
 msgctxt "#30591"
