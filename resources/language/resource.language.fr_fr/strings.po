@@ -449,7 +449,7 @@ msgstr "Veuillez consulter le journal pour plus de détails"
 #: /resources/lib/modules/providers/install_manager.py:321
 msgctxt "#30079"
 msgid "Failed to install package"
-msgstr "Impossible d`installer le paquetage"
+msgstr "Impossible d`installer le package"
 
 #: /resources/lib/modules/providers/install_manager.py:284
 msgctxt "#30080"
@@ -469,7 +469,7 @@ msgstr ""
 #: /resources/lib/modules/providers/install_manager.py:290
 msgctxt "#30082"
 msgid "{} package has been updated"
-msgstr "{} package a été mis à jour"
+msgstr "le package {} a été mis à jour"
 
 #: /resources/lib/database/skinManager/__init__.py:256
 #: /resources/lib/database/skinManager/__init__.py:285
@@ -1438,7 +1438,7 @@ msgstr "Résolution"
 #: /resources/skins/Default/1080i/provider_packages.xml:189
 msgctxt "#30257"
 msgid "Install Package"
-msgstr "Installer le paquet"
+msgstr "Installer le package"
 
 #: /resources/skins/Default/1080i/provider_packages.xml:199
 msgctxt "#30258"
@@ -1448,7 +1448,7 @@ msgstr "Désinstaller le package"
 #: /resources/skins/Default/1080i/provider_packages.xml:209
 msgctxt "#30259"
 msgid "Enable Package"
-msgstr "Activer le pack"
+msgstr "Activer le package"
 
 #: /resources/skins/Default/1080i/provider_packages.xml:219
 msgctxt "#30260"
@@ -2869,7 +2869,7 @@ msgstr "Annuler la tâche"
 #: /resources/skins/Default/1080i/provider_packages.xml:179
 msgctxt "#30507"
 msgid "Manage Package Settings"
-msgstr "Gérer les paramètres du package"
+msgstr "Gérer les paramètres des packages"
 
 #: /resources/lib/modules/providers/install_manager.py:117
 msgctxt "#30508"
