@@ -5,7 +5,7 @@ msgstr ""
 #: /resources/lib/gui/homeMenu.py:11
 msgctxt "#30000"
 msgid "Discover Movies"
-msgstr "Découvrez les films"
+msgstr "Découvrir les films"
 
 #: /resources/lib/gui/homeMenu.py:18
 msgctxt "#30001"
@@ -231,7 +231,7 @@ msgstr "Effacer le cache de torrent local"
 #: /resources/lib/gui/homeMenu.py:83
 msgctxt "#30040"
 msgid "Open Settings Menu"
-msgstr "Ouvrez le menu Paramètres"
+msgstr "Ouvrir les paramètres"
 
 #: /resources/settings.xml:455 /resources/lib/gui/homeMenu.py:87
 msgctxt "#30041"
@@ -654,7 +654,7 @@ msgstr "Scraping"
 #: /resources/settings.xml:213
 msgctxt "#30117"
 msgid "Cache Torrent Info Locally"
-msgstr "Cachez les informations sur le torrent localement"
+msgstr "Cacher les informations sur le torrent localement"
 
 #: /resources/settings.xml:405
 msgctxt "#30118"
@@ -924,7 +924,7 @@ msgstr "Suppression automatique du cloud"
 #: /resources/settings.xml:321
 msgctxt "#30170"
 msgid "Prefer Transcoded Files"
-msgstr "Préférez les fichiers transcodés"
+msgstr "Préférer les fichiers transcodés"
 
 #: /resources/settings.xml:311
 msgctxt "#30171"
@@ -1530,7 +1530,7 @@ msgstr "Un ou plusieurs fournisseurs ont des mises à jour en attente"
 #: /resources/settings.xml:129
 msgctxt "#30275"
 msgid "Prefer Movie artwork from"
-msgstr "Préférez les illustrations de film de"
+msgstr "Préférer les illustrations de film de"
 
 #: /resources/settings.xml:162
 msgctxt "#30276"
@@ -2147,7 +2147,7 @@ msgctxt "#30392"
 msgid ""
 "Discover movies that are Popular, Trending, Recommended for you and more."
 msgstr ""
-"Découvrez des films populaires, tendances, recommandés pour vous et plus "
+"Découvrir des films populaires, tendances, recommandés pour vous et plus "
 "encore."
 
 #: /resources/lib/gui/homeMenu.py:16
@@ -2155,13 +2155,13 @@ msgctxt "#30393"
 msgid ""
 "Discover TV shows that are Popular, Trending, Recommended for you and more."
 msgstr ""
-"Découvrez des séries populaires, tendances, recommandées "
+"Découvrir des séries populaires, tendances, recommandées "
 "pour vous et plus encore."
 
 #: /resources/lib/gui/homeMenu.py:20
 msgctxt "#30394"
 msgid "View movies based on your Trakt information"
-msgstr "Regardez des films en fonction de vos informations Trakt"
+msgstr "Afficher des films en fonction de vos informations Trakt"
 
 #: /resources/lib/gui/homeMenu.py:24
 msgctxt "#30395"
@@ -2202,7 +2202,7 @@ msgstr "Rechercher des séries par titre"
 msgctxt "#30401"
 msgid "View your movie search history or start a new search"
 msgstr ""
-"Affichez votre historique de recherche de films ou lancez une nouvelle "
+"Afficher votre historique de recherche de films ou lancer une nouvelle "
 "recherche"
 
 #: /resources/lib/gui/homeMenu.py:45 /resources/lib/gui/tvshowMenus.py:161
@@ -2238,7 +2238,7 @@ msgstr "Afficher vos transferts cloud actuels ou précédents"
 msgctxt "#30407"
 msgid "Clear the cached information from long processes or network request"
 msgstr ""
-"Effacez les informations mises en cache des processus longs ou des requêtes "
+"Effacer les informations mises en cache des processus longs ou des requêtes "
 "réseau"
 
 #: /resources/lib/gui/homeMenu.py:78
@@ -2256,7 +2256,7 @@ msgstr "Clear your search history"
 #: /resources/lib/gui/homeMenu.py:86
 msgctxt "#30410"
 msgid "Open Seren's settings"
-msgstr "Ouvrez les paramètres de Seren"
+msgstr "Ouvrir les paramètres de Seren"
 
 #: /resources/lib/gui/homeMenu.py:90
 msgctxt "#30411"
@@ -2291,7 +2291,7 @@ msgstr ""
 msgctxt "#30415"
 msgid "Open a window to enable/disable/install/uninstall providers in Seren"
 msgstr ""
-"Ouvrez une fenêtre pour activer / désactiver / installer / désinstaller les "
+"Ouvre une fenêtre pour activer / désactiver / installer / désinstaller les "
 "fournisseurs dans Seren"
 
 #: /resources/lib/gui/homeMenu.py:123
@@ -2309,8 +2309,8 @@ msgstr ""
 msgctxt "#30418"
 msgid "Remove all information in the Trakt Sync database and force a re-sync"
 msgstr ""
-"Supprimez toutes les informations de la base de données Trakt Sync et "
-"forcezune resynchronisation"
+"Supprimer toutes les informations de la base de données Trakt Sync et "
+"forcer une resynchronisation"
 
 #: /resources/lib/gui/homeMenu.py:139
 msgctxt "#30419"
@@ -2338,7 +2338,7 @@ msgid ""
 "View the most popular movies. Popularity is calculated using the rating "
 "percentage and the number of ratings."
 msgstr ""
-"Regardez les films les plus populaires. La popularité est calculée en "
+"Regarder les films les plus populaires. La popularité est calculée en "
 "utilisant le pourcentage de notation et le nombre de notes."
 
 #: /resources/lib/gui/movieMenus.py:55
@@ -2347,7 +2347,7 @@ msgid ""
 "View the most recent popular movies. Popularity is calculated using the "
 "rating percentage and the number of ratings."
 msgstr ""
-"Regardez les films populaires les plus récents. La popularité est calculée "
+"Regarder les films populaires les plus récents. La popularité est calculée "
 "en utilisant le pourcentage de notation et le nombre de notes."
 
 #: /resources/lib/gui/movieMenus.py:61
@@ -2680,7 +2680,7 @@ msgstr ""
 #: /resources/lib/modules/download_manager.py:602
 msgctxt "#30474"
 msgid "Select Download Location"
-msgstr "Sélectionnez l'emplacement de téléchargement"
+msgstr "Sélectionner l'emplacement de téléchargement"
 
 #: /resources/settings.xml:247
 msgctxt "#30475"
@@ -2735,7 +2735,7 @@ msgstr "Clé API OMDb"
 #: /resources/lib/modules/cacheAssist.py:92
 msgctxt "#30485"
 msgid "Follow Progress"
-msgstr "Suivez les progrès"
+msgstr "Suivre la progression"
 
 #: /resources/lib/modules/cacheAssist.py:90
 msgctxt "#30486"
@@ -2914,7 +2914,7 @@ msgstr "La base de données du cache du torrent a été effacée avec succès"
 #: /resources/settings.xml:298
 msgctxt "#30515"
 msgid "Start scrobble after seconds."
-msgstr "Commencez le scrobble après quelques secondes."
+msgstr "Commencer le scrobble après x secondes."
 
 #: /resources/settings.xml:300
 msgctxt "#30516"
