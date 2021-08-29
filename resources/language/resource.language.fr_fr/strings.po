@@ -86,7 +86,7 @@ msgstr "Collecte"
 #: /resources/lib/gui/movieMenus.py:171 /resources/lib/gui/tvshowMenus.py:179
 msgctxt "#30015"
 msgid "Watchlist"
-msgstr "Liste"
+msgstr "Liste de lecture"
 
 #: /resources/lib/modules/globals.py:953
 msgctxt "#30016"
@@ -1661,12 +1661,12 @@ msgstr "Remove {} from Collection"
 #: /resources/lib/indexers/trakt.py:1018 /resources/lib/indexers/trakt.py:1067
 msgctxt "#30299"
 msgid "Add to Watchlist"
-msgstr "Ajouter à votre liste"
+msgstr "Ajouter à la liste de lecture"
 
 #: /resources/lib/indexers/trakt.py:1022 /resources/lib/indexers/trakt.py:1068
 msgctxt "#30300"
 msgid "Remove from Watchlist"
-msgstr "Enlever des Affaires à suivre"
+msgstr "Supprimer de la liste de lecture"
 
 #: /resources/lib/indexers/trakt.py:1026 /resources/lib/indexers/trakt.py:1115
 #: /resources/lib/indexers/trakt.py:1118
@@ -1747,12 +1747,12 @@ msgstr "Élément supprimé de la collection"
 #: /resources/lib/indexers/trakt.py:1310
 msgctxt "#30315"
 msgid "Item added to Watchlist"
-msgstr "Article ajouté à la liste de surveillance"
+msgstr "Article ajouté à la liste de lecture"
 
 #: /resources/lib/indexers/trakt.py:1321
 msgctxt "#30316"
 msgid "Item removed from Watchlist"
-msgstr "Élément supprimé de la liste de surveillance"
+msgstr "Élément supprimé de la liste de lecture"
 
 #: /resources/lib/indexers/trakt.py:1343
 msgctxt "#30317"
@@ -2607,7 +2607,7 @@ msgctxt "#30463"
 msgid "View TV shows you have added to your Trakt Watchlist"
 msgstr ""
 "Regardez les émissions de télévision que vous avez ajoutées à votre liste "
-"desurveillance Trakt"
+"de lecture Trakt"
 
 #: /resources/lib/gui/tvshowMenus.py:191
 msgctxt "#30464"
