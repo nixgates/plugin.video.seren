@@ -26,7 +26,7 @@ msgstr "Mes séries"
 #: /resources/lib/gui/tvshowMenus.py:50
 msgctxt "#30004"
 msgid "Most Popular"
-msgstr "Les plus prisées"
+msgstr "Les plus populaires"
 
 #: /resources/lib/gui/movieMenus.py:59 /resources/lib/gui/tvshowMenus.py:63
 msgctxt "#30005"
