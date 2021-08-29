@@ -201,7 +201,7 @@ msgid ""
 "Cached Data, Settings, Installed Providers\n"
 msgstr ""
 "Veuillez noter que cela effacera complètement les éléments suivants:\n"
-"Données en cache, paramètres, fournisseurs installés\n"
+"Données en cache, paramètres, providers installés\n"
 
 #: /resources/lib/common/maintenance.py:75
 msgctxt "#30035"
@@ -216,7 +216,7 @@ msgstr "Votre {} statut Premium a expiré"
 #: /resources/lib/gui/homeMenu.py:64
 msgctxt "#30037"
 msgid "Provider Tools"
-msgstr "Outils du fournisseur"
+msgstr "Outils des providers"
 
 #: /resources/lib/gui/homeMenu.py:68
 msgctxt "#30038"
@@ -303,7 +303,7 @@ msgstr "Vérification de la base de données locale"
 #: /resources/lib/modules/getSources.py:123
 msgctxt "#30054"
 msgid "Initializing Providers"
-msgstr "Initialisation des fournisseurs"
+msgstr "Initialisation des providers"
 
 #: /resources/lib/modules/getSources.py:218
 msgctxt "#30055"
@@ -345,7 +345,7 @@ msgstr "Hébergeurs gratuits"
 #: /resources/lib/modules/getSources.py:748
 msgctxt "#30060"
 msgid "Remaining Providers"
-msgstr "Fournisseurs restants"
+msgstr "Providers restants"
 
 #: /resources/lib/modules/smartPlay.py:426
 msgctxt "#30061"
@@ -421,7 +421,7 @@ msgid ""
 "Failed to install provider package\n"
 "Please check the log for further information"
 msgstr ""
-"Échec de l'installation du package du fournisseur\n"
+"Échec de l'installation du package de provider\n"
 "Veuillez consulter le journal pour plus d'informations"
 
 #: /resources/lib/modules/providers/install_manager.py:220
@@ -800,7 +800,7 @@ msgstr "Real-Debrid"
 #: /resources/lib/modules/providers/install_manager.py:54
 msgctxt "#30146"
 msgid "Providers"
-msgstr "Artisans"
+msgstr "Providers"
 
 #: /resources/settings.xml:422 /resources/settings.xml:425
 msgctxt "#30147"
@@ -810,7 +810,7 @@ msgstr "Clés API"
 #: /resources/settings.xml:377
 msgctxt "#30148"
 msgid "Enable Automatic Provider Updates"
-msgstr "Activer les mises à jour automatiques des fournisseurs"
+msgstr "Activer les mises à jour automatiques des providers"
 
 #: /resources/settings.xml:68 /resources/settings.xml:382
 #: /resources/lib/gui/homeMenu.py:107
@@ -822,7 +822,7 @@ msgstr "Vérifier les mises à jour"
 #: /resources/lib/gui/homeMenu.py:111
 msgctxt "#30150"
 msgid "Manage Provider Packages"
-msgstr "Gérer les packages du fournisseur"
+msgstr "Gérer les packages de providers"
 
 #: /resources/settings.xml:24
 msgctxt "#30151"
@@ -989,8 +989,8 @@ msgid ""
 "Another addon is attempting to install a provider into Seren\n"
 "Do you wish to allow this?"
 msgstr ""
-"Un autre addon tente d'installer un fournisseur dans Seren\n"
-"Souhaitez-vous autoriser cela?"
+"Un autre addon tente d'installer un provider dans Seren\n"
+"Souhaitez-vous l'autoriser ?"
 
 #: /resources/lib/modules/providers/install_manager.py:105
 msgctxt "#30182"
@@ -1007,8 +1007,8 @@ msgid ""
 "Another addon is attempting to uninstall the {} provider from Seren\n"
 "Do you wish to allow this?"
 msgstr ""
-"Un autre module complémentaire tente de désinstaller le fournisseur {} de Seren\n"
-"Souhaitez-vous autoriser cela?"
+"Un autre module complémentaire tente de désinstaller le provider {} de Seren\n"
+"Souhaitez-vous l'autoriser ?"
 
 #: /resources/settings.xml:407
 msgctxt "#30184"
@@ -1498,7 +1498,7 @@ msgstr "Cloudfiles"
 #: /resources/skins/Default/1080i/get_sources.xml:269
 msgctxt "#30269"
 msgid "Remaining providers"
-msgstr "Fournisseurs restants"
+msgstr "Providers restants"
 
 #: /resources/skins/Default/1080i/resolver.xml:86
 msgctxt "#30270"
@@ -1525,7 +1525,7 @@ msgstr "Type de source"
 #: /resources/lib/common/maintenance.py:47
 msgctxt "#30274"
 msgid "One or more providers have updates pending"
-msgstr "Un ou plusieurs fournisseurs ont des mises à jour en attente"
+msgstr "Un ou plusieurs providers ont des mises à jour en attente"
 
 #: /resources/settings.xml:129
 msgctxt "#30275"
@@ -2172,7 +2172,7 @@ msgstr ""
 #: /resources/lib/gui/homeMenu.py:28
 msgctxt "#30396"
 msgid "View or play files stored on your cloud provider"
-msgstr "Afficher ou lire des fichiers stockés sur votre fournisseur de cloud"
+msgstr "Afficher ou lire des fichiers stockés sur votre provider cloud"
 
 #: /resources/lib/gui/homeMenu.py:31
 msgctxt "#30397"
@@ -2226,7 +2226,7 @@ msgstr "Rechercher une série par acteur"
 msgctxt "#30405"
 msgid "Tools to help you update or manage your installed providers"
 msgstr ""
-"Des outils pour vous aider à mettre à jour ou à gérer vos fournisseurs "
+"Des outils pour vous aider à mettre à jour ou à gérer vos providers "
 "installés"
 
 #: /resources/lib/gui/homeMenu.py:70
@@ -2246,7 +2246,7 @@ msgctxt "#30408"
 msgid "Clear the locally indexed torrent information identified by providers"
 msgstr ""
 "Effacer les informations torrent indexées localement identifiées par les "
-"fournisseurs"
+"providers"
 
 #: /resources/lib/gui/homeMenu.py:82 /resources/lib/gui/movieMenus.py:274
 msgctxt "#30409"
@@ -2263,7 +2263,7 @@ msgctxt "#30411"
 msgid ""
 "Remove all settings, providers, databases, themes and cache (Fresh start)"
 msgstr ""
-"Supprimer tous les paramètres, fournisseurs, bases de données, thèmes et "
+"Supprimer tous les paramètres, providers, bases de données, thèmes et "
 "cache (nouveau départ)"
 
 #: /resources/lib/gui/homeMenu.py:94
@@ -2285,14 +2285,14 @@ msgstr ""
 msgctxt "#30414"
 msgid "Force Seren to check for updates for your installed provider(s)"
 msgstr ""
-"Forcer Seren à rechercher des mises à jour pour vos fournisseurs installés"
+"Forcer Seren à rechercher des mises à jour pour vos providers installés"
 
 #: /resources/lib/gui/homeMenu.py:114
 msgctxt "#30415"
 msgid "Open a window to enable/disable/install/uninstall providers in Seren"
 msgstr ""
 "Ouvre une fenêtre pour activer / désactiver / installer / désinstaller les "
-"fournisseurs dans Seren"
+"providers dans Seren"
 
 #: /resources/lib/gui/homeMenu.py:123
 msgctxt "#30416"
@@ -2661,7 +2661,7 @@ msgid ""
 "It seems you have no providers installed\n"
 "Are you sure you wish to continue?"
 msgstr ""
-"Il semble qu'aucun fournisseur n'est installé\n"
+"Il semble qu'aucun provider n'est installé\n"
 "Êtes-vous sûr de vouloir continuer?"
 
 #: /resources/settings.xml:53
@@ -2882,7 +2882,7 @@ msgstr ""
 #: /resources/skins/Default/1080i/configure_provider_package.xml:49
 msgctxt "#30509"
 msgid "No settings available for this provider package"
-msgstr "Aucun paramètre disponible pour ce package fournisseur"
+msgstr "Aucun paramètre disponible pour ce package de provider"
 
 #: /resources/settings.xml:85
 msgctxt "#30510"
@@ -3335,7 +3335,7 @@ msgstr "Écouter maintenant"
 #: /resources/skins/Default/1080i/provider_packages.xml:32
 msgctxt "#30593"
 msgid "Provider Packages"
-msgstr "Forfaits fournisseurs"
+msgstr "Packages de providers"
 
 #: /resources/skins/Default/1080i/source_select.xml:305
 msgctxt "#30594"
