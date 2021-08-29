@@ -76,12 +76,12 @@ msgstr "Box Office Top 10"
 #: /resources/lib/gui/tvshowMenus.py:447
 msgctxt "#30013"
 msgid "Search..."
-msgstr "Rechercher…"
+msgstr "Rechercher..."
 
 #: /resources/lib/gui/movieMenus.py:166 /resources/lib/gui/tvshowMenus.py:174
 msgctxt "#30014"
 msgid "Collection"
-msgstr "Collecte"
+msgstr "Collection"
 
 #: /resources/lib/gui/movieMenus.py:171 /resources/lib/gui/tvshowMenus.py:179
 msgctxt "#30015"
@@ -154,7 +154,7 @@ msgstr "Rechercher films..."
 #: /resources/lib/gui/homeMenu.py:43 /resources/lib/gui/homeMenu.py:50
 msgctxt "#30026"
 msgid "Search Shows..."
-msgstr "Chercher des séries..."
+msgstr "Rechercher des séries..."
 
 #: /resources/lib/gui/homeMenu.py:32
 msgctxt "#30027"
@@ -175,12 +175,12 @@ msgstr "Voulez-vous vraiment vider le cache?"
 #: /resources/lib/modules/helpers.py:74
 msgctxt "#30030"
 msgid "Starting Engines"
-msgstr "Moteurs de démarrage"
+msgstr "Démarrage des moteurs"
 
 #: /resources/lib/modules/router.py:171
 msgctxt "#30031"
 msgid "Starting Resolver..."
-msgstr "Démarrage du résolveur ..."
+msgstr "Démarrage du résolveur..."
 
 #: /resources/lib/gui/windows/source_select.py:129
 #: /resources/lib/modules/sourceSelect.py:27
@@ -192,7 +192,7 @@ msgstr "Aucune source lisible trouvée pour l'élément"
 #: /resources/lib/modules/router.py:388
 msgctxt "#30033"
 msgid "Silent Scraper Setting has been reset"
-msgstr "Le réglage silencieux du grattoir a été réinitialisé"
+msgstr "Le réglage du scraper silencieux a été réinitialisé"
 
 #: /resources/lib/common/maintenance.py:74
 msgctxt "#30034"
@@ -377,7 +377,7 @@ msgstr "Eléments de la liste de construction"
 #: /resources/lib/modules/smartPlay.py:273
 msgctxt "#30066"
 msgid "Starting Scraping"
-msgstr "Commencer le grattage"
+msgstr "Démarrage du scraping"
 
 #: /resources/lib/debrid/real_debrid.py:65
 msgctxt "#30067"
@@ -639,7 +639,7 @@ msgstr "Forcer la reprise automatique de l'épisode"
 #: /resources/settings.xml:263
 msgctxt "#30114"
 msgid "Pre-emptive Scraping"
-msgstr "Raclage préventif"
+msgstr "Scraping préventif"
 
 #: /resources/settings.xml:259
 msgctxt "#30115"
@@ -1043,7 +1043,7 @@ msgstr "Mes fichiers"
 #: /resources/settings.xml:212
 msgctxt "#30190"
 msgid "Scraper Display Style"
-msgstr "Style d'affichage du grattoir"
+msgstr "Style d'affichage du scraper"
 
 #: /resources/settings.xml:110
 msgctxt "#30191"
@@ -1149,7 +1149,7 @@ msgstr "Arrêter si des sources cloud sont trouvées"
 #: /resources/settings.xml:367
 msgctxt "#30208"
 msgid "Inspect Cloud Files on Scrape"
-msgstr "Inspecter les fichiers cloud sur Scrape"
+msgstr "Inspecter les fichiers cloud sur scrape"
 
 #: /resources/lib/gui/movieMenus.py:139 /resources/lib/gui/tvshowMenus.py:147
 msgctxt "#30209"
@@ -1797,7 +1797,7 @@ msgstr "L'historique de progression de l'élément a été supprimé"
 #: /resources/lib/modules/router.py:387
 msgctxt "#30325"
 msgid "Silent scrape"
-msgstr "Grattage silencieux"
+msgstr "Scrape silencieux"
 
 #: /resources/lib/gui/movieMenus.py:422 /resources/lib/gui/tvshowMenus.py:540
 msgctxt "#30326"
@@ -1981,7 +1981,7 @@ msgstr ""
 #: /resources/settings.xml:224 /resources/settings.xml:351
 msgctxt "#30360"
 msgid "AllDebrid"
-msgstr "ToutDebrid"
+msgstr "AllDebrid"
 
 #: /resources/lib/debrid/all_debrid.py:122
 msgctxt "#30361"
@@ -2940,7 +2940,7 @@ msgid ""
 "scrape results"
 msgstr ""
 "Un problème est survenu lors de l'obtention des domaines hébergeurs "
-"acceptés, cela peut entraîner des résultats de grattage étranges"
+"acceptés, cela peut entraîner des résultats de scrape étranges"
 
 #: /resources/lib/modules/player.py:549
 msgctxt "#30520"
