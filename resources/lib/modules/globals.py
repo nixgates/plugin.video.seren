@@ -496,6 +496,12 @@ class GlobalVariables(object):
             self.REQUEST_PARAMS["action_args"] = tools.deconstruct_action_args(
                 self.REQUEST_PARAMS["action_args"]
             )
+
+            #import xbmc
+            #xbmc.log(str(self.REQUEST_PARAMS["action_args"]['episode'])+'===>PHIL', level=xbmc.LOGINFO)
+            #xbmc.log(str(dict(tools.parse_qsl(self.PARAM_STRING)))+'===>PHIL', level=xbmc.LOGINFO)
+
+
             if isinstance(self.REQUEST_PARAMS["action_args"], dict):
                 self.REQUEST_PARAMS["action_args"] = self.legacy_action_args_converter(
                     self.REQUEST_PARAMS["action_args"]
@@ -520,13 +526,113 @@ class GlobalVariables(object):
         if "episode" in action_args["item_type"]:
             from resources.lib.database.trakt_sync import shows
 
-            action_args.update(
-                shows.TraktSyncDatabase().get_episode_action_args(
-                    action_args["trakt_id"],
-                    action_args["season"],
-                    action_args["episode"],
+            try:
+                action_args.update(
+                    shows.TraktSyncDatabase().get_episode_action_args(
+                        action_args["trakt_id"],
+                        action_args["season"],
+                        action_args["episode"],
+                    )
                 )
-            )
+            except:
+                xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+                if 1==1:
+                    import sys
+                    #xbmc.log(str(sys.argv)+'===>PHIL', level=xbmc.LOGINFO)
+                    from urllib.parse import unquote
+                    trakt_show_id = action_args["trakt_id"]
+                    episode = action_args["episode"]
+                    season = action_args["episode"]
+                    import requests
+                    import json
+                    import os
+                    from os.path import expanduser
+
+                    home = expanduser("~")
+                    import xml.etree.ElementTree as ET
+                    tree = ET.parse(home + '/.kodi/userdata/addon_data/plugin.video.themoviedb.helper/settings.xml')
+                    root = tree.getroot()
+
+                    for child in root:
+                        if (child.attrib)['id'] == 'trakt_token':
+                            token = json.loads(child.text)
+
+                    home = expanduser("~")
+                    try:
+                        inFile = open(home + '/.kodi/addons/plugin.video.themoviedb.helper/resources/lib/traktapi.py')
+                        for line in inFile:
+                            if 'self.client_id = ' in line:
+                                client_id = line.replace('self.client_id = ','').replace('\'','').replace('    ','').replace('\n', '')
+                            if 'self.client_secret = ' in line:
+                                client_secret = line.replace('self.client_secret = ','').replace('\'','').replace('    ','').replace('\n', '')
+                    except:
+                        inFile = open(home + '/.kodi/addons/plugin.video.themoviedb.helper/resources/lib/trakt/api.py')
+                        for line in inFile:
+                            if 'CLIENT_ID = ' in line:
+                                client_id = line.replace('CLIENT_ID = ','').replace('\'','').replace('    ','').replace('\n', '')
+                            if 'CLIENT_SECRET = ' in line:
+                                client_secret = line.replace('CLIENT_SECRET = ','').replace('\'','').replace('    ','').replace('\n', '')
+
+                    inFile.close()
+
+                    headers = {'trakt-api-version': '2', 'trakt-api-key': client_id, 'Content-Type': 'application/json'}
+                    headers['Authorization'] = 'Bearer {0}'.format(token.get('access_token'))
+                    response = requests.get('https://api.trakt.tv/shows/'+str(trakt_show_id)+'/seasons', headers=headers).json()
+
+                    #xbmc.log(str(response)+'===>PHIL', level=xbmc.LOGINFO)
+                    trakt_season_id = response[int(season)-1]['ids']['trakt']
+                    #self.execute_sql(
+                    #    "UPDATE episodes SET trakt_season_id=? WHERE trakt_show_id=? and season=?",
+                    #    (trakt_season_id, trakt_show_id,int(season)),
+                    #)
+                    #self.execute_sql(
+                    #    "UPDATE seasons SET trakt_id=? WHERE trakt_show_id=? and season=?", (trakt_season_id, trakt_show_id,int(season))
+                    #)
+
+                    import sqlite3
+                    con = sqlite3.connect('/home/osmc/.kodi/userdata/addon_data/plugin.video.seren/traktSync.db')
+                    cur = con.cursor()
+
+                    update_sql = ("UPDATE episodes SET trakt_season_id="+str(trakt_season_id)+" WHERE trakt_show_id="+str(trakt_show_id)+" and season="+str(season))
+                    cur.execute(update_sql).fetchall()
+                    con.commit()
+
+
+                    update_sql = ("UPDATE seasons SET trakt_id="+str(trakt_season_id)+" WHERE trakt_show_id="+str(trakt_show_id)+" and season="+str(season))
+                    cur.execute(update_sql).fetchall()
+                    con.commit()
+                    """
+                    try:
+
+                    except:
+                        update_sql = ("DELETE from seasons WHERE trakt_show_id="+str(trakt_show_id)+" and season="+str(season))
+                        cur.execute(update_sql).fetchall()
+                        con.commit()
+                        update_sql = ("UPDATE seasons SET trakt_id="+str(trakt_season_id)+" WHERE trakt_show_id="+str(trakt_show_id)+" and season="+str(season))
+                        cur.execute(update_sql).fetchall()
+                        con.commit()
+                    """
+                    cur.close()
+                    con.close()
+
+                    self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
+                    action_args.update(
+                        shows.TraktSyncDatabase().get_episode_action_args(
+                            action_args["trakt_id"],
+                            action_args["season"],
+                            action_args["episode"],
+                        )
+                    )
+
+
+
+            
+            
+            
+            
+            
+            
+                pass
 
         if "show" in action_args["item_type"]:
             action_args["item_type"] = "shows"
@@ -1202,7 +1308,8 @@ class GlobalVariables(object):
             while not self.abort_requested():
                 if xbmcgui.getCurrentWindowId() == 10000:
                     self.log("TRIGGERING WIDGET REFRESH")
-                    xbmc.executebuiltin('UpdateLibrary(video,widget_refresh,true)')
+                    #xbmc.executebuiltin('UpdateLibrary(video,widget_refresh,true)')
+                    xbmc.log(str('NOT TRIGGERING WIDGET REFRESH')+'===>PHIL', level=xbmc.LOGINFO)
                     break
                 elif (
                         self.wait_for_abort(0.5) or

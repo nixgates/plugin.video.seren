@@ -307,14 +307,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: list
         """
         g.log("Fetching Episode list from sync database", "debug")
-        self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
+        #self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
         #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
-        """
+        
         try:
             self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
         except:
             #try:
-            #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+            xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
             if 1==1:
                 import sys
                 import xbmc
@@ -360,7 +360,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 headers['Authorization'] = 'Bearer {0}'.format(token.get('access_token'))
                 response = requests.get('https://api.trakt.tv/shows/'+str(trakt_show_id)+'/seasons', headers=headers).json()
 
-                xbmc.log(str(response)+'===>PHIL', level=xbmc.LOGINFO)
+                #xbmc.log(str(response)+'===>PHIL', level=xbmc.LOGINFO)
                 trakt_season_id = response[int(season)-1]['ids']['trakt']
                 #self.execute_sql(
                 #    "UPDATE episodes SET trakt_season_id=? WHERE trakt_show_id=? and season=?",
@@ -388,7 +388,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
             #except Exception as e: 
             #    xbmc.log(str(e)+'===>PHIL', level=xbmc.LOGINFO)
-        """
+        
         #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
         g.log("Updated required episodes", "debug")
         statement = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count,
@@ -726,7 +726,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         formatted_items = self._format_objects(self._identify_episodes_to_update(list_to_update))
         """
         #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
-        """
+        
         if formatted_items is None:
             return
         self.execute_sql(
@@ -836,6 +836,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
         """
         #xbmc.log(str('SEREN_MODIFICATION')+'===>PHIL', level=xbmc.LOGINFO)
+        """
 
     @guard_against_none(None, 1)
     def _try_update_seasons(self, trakt_show_id, trakt_season_id=None):

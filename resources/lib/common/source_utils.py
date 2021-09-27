@@ -67,6 +67,7 @@ def get_quality(release_title):
             "hdtc",
             "telecine",
             "xbet",
+            "Paramount Comedy",
         ]
     ):
         quality = "CAM"

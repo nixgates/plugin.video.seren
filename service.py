@@ -6,6 +6,7 @@ import sys
 from random import randint
 
 import xbmc
+import time,xbmcgui
 
 from resources.lib.common import tools
 
@@ -54,19 +55,25 @@ try:
 
     g.wait_for_abort(30)  # Sleep for a half a minute to allow widget loads to complete.
     while not monitor.abortRequested():
-        xbmc.executebuiltin(
-            'RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")'
-        )
-        if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
+        curr_time = time.time()
+        Seren_LastUpdate = xbmcgui.Window(10000).getProperty('Next_EP.Seren_LastUpdate')
+        if str(Seren_LastUpdate) == '':
+            Seren_LastUpdate = 0
+        if curr_time > float(Seren_LastUpdate) + 5*60 or Seren_LastUpdate == 0:
+            xbmcgui.Window(10000).setProperty('Next_EP.Seren_LastUpdate', str(curr_time))
             xbmc.executebuiltin(
-                'RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")'
+                'RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")'
             )
-        if not g.wait_for_abort(15):  # Sleep to make sure we don't possibly clobber settings
-            xbmc.executebuiltin(
-                'RunPlugin("plugin://plugin.video.seren/?action=updateLocalTimezone")'
-            )
-        if g.wait_for_abort(60 * randint(57, 63)):
-            break
+            if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
+                xbmc.executebuiltin(
+                    'RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")'
+                )
+            if not g.wait_for_abort(15):  # Sleep to make sure we don't possibly clobber settings
+                xbmc.executebuiltin(
+                    'RunPlugin("plugin://plugin.video.seren/?action=updateLocalTimezone")'
+                )
+            if g.wait_for_abort(60 * randint(57, 63)):
+                break
 finally:
     del monitor
     g.deinit()

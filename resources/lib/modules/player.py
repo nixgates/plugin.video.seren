@@ -572,7 +572,10 @@ class SerenPlayer(xbmc.Player):
 
         while self._is_file_playing() and not g.abort_requested():
 
-            self._update_progress()
+            try:
+                self._update_progress()
+            except:
+                break
 
             if not self.scrobble_started:
                 self._trakt_start_watching()
@@ -588,9 +591,23 @@ class SerenPlayer(xbmc.Player):
 
             if self.dialogs_enabled and not self.dialogs_triggered:
                 if time_left <= self.playing_next_time:
-                    xbmc.executebuiltin(
-                        'RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")'
+                    #xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')
+                    #from resources.lib.modules.player import PlayerDialogs
+                    xbmc.log(str('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')+'===>PHIL', level=xbmc.LOGINFO)
+                    player_dialogs = PlayerDialogs()
+                    player_dialogs.display_dialog()
+                    del player_dialogs
+                    """
+                    from resources.lib.gui.windows.playing_next import PlayingNext
+                    from resources.lib.database.skinManager import SkinManager
+
+                    window = PlayingNext(
+                        *SkinManager().confirm_skin_path("playing_next.xml"),
+                        item_information=self._get_next_item_item_information()
                         )
+                    window.doModal()
+                    del window
+                    """
                     self.dialogs_triggered = True
 
             xbmc.sleep(100)

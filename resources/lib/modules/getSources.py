@@ -208,9 +208,14 @@ class Sources(object):
     def _finalise_results(self):
         monkey_requests.allow_provider_requests = False
         self._send_provider_stop_event()
-
-        uncached = [i for i in self.sources_information["allTorrents"].values()
-                    if i['hash'] not in self.sources_information['cached_hashes']]
+        uncached = []
+        try:
+            for i in list(self.sources_information["allTorrents"].values()):
+                if i['hash'] not in self.sources_information['cached_hashes']:
+                    uncached.append(i)
+        except:
+            uncached = [i for i in self.sources_information["allTorrents"].values()
+                        if i['hash'] not in self.sources_information['cached_hashes']]
 
         if not self._is_playable_source():
             self._build_cache_assist()

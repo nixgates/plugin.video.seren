@@ -443,7 +443,8 @@ class TraktAPI(ApiBase):
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30023))
             raise
 
-        tools.copy2clip(user_code)
+        #tools.copy2clip(user_code)
+        #xbmc.log(str(1)+'===>PHIL', level=xbmc.LOGINFO)
         self.progress_dialog.create(
             g.ADDON_NAME + ": " + g.get_language_string(30022),
             tools.create_multiline_message(
@@ -454,21 +455,25 @@ class TraktAPI(ApiBase):
                 line3=g.get_language_string(30047),
             ),
         )
+        x = 0
         failed = False
         self.progress_dialog.update(100)
-        while (
-            not failed
-            and self.username is None
-            and not token_ttl <= 0
-            and not self.progress_dialog.iscanceled()
-        ):
+        while not failed and x < 25:
+            #xbmc.sleep(25000)
+            failed = False
+            #while (
+            #    not failed
+            #    and self.username is None
+            #    and not token_ttl <= 0
+            #    and not self.progress_dialog.iscanceled()
+            #):
             xbmc.sleep(1000)
             if token_ttl % interval == 0:
-                failed = self._auth_poll(device)
+                    failed = self._auth_poll(device)
             progress_percent = int(float((token_ttl * 100) / expiry))
             self.progress_dialog.update(progress_percent)
             token_ttl -= 1
-
+            #xbmc.log(str(2)+'===>PHIL', level=xbmc.LOGINFO)
         self.progress_dialog.close()
 
     def _auth_poll(self, device):
