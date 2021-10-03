@@ -60,12 +60,12 @@ msgstr "Najczęściej Dodawane"
 #: /resources/lib/gui/movieMenus.py:110 /resources/lib/gui/tvshowMenus.py:119
 msgctxt "#30010"
 msgid "Most Anticipated"
-msgstr "Najbardziej oczekiwane"
+msgstr "Najbardziej Oczekiwane"
 
 #: /resources/lib/gui/movieMenus.py:124 /resources/lib/gui/tvshowMenus.py:127
 msgctxt "#30011"
 msgid "Recently Updated"
-msgstr "Ostatnio zaktualizowane"
+msgstr "Ostatnio Dodane"
 
 #: /resources/lib/gui/movieMenus.py:117
 msgctxt "#30012"
@@ -89,7 +89,7 @@ msgstr "Kolekcja"
 #: /resources/lib/gui/movieMenus.py:171 /resources/lib/gui/tvshowMenus.py:179
 msgctxt "#30015"
 msgid "Watchlist"
-msgstr "Lista obserwowanych"
+msgstr "Obserwowane"
 
 #: /resources/lib/modules/globals.py:953
 msgctxt "#30016"
@@ -571,7 +571,7 @@ msgstr "Użyj widoku niestandardowego dla identyfikatorów (zaawansowane)"
 #: /resources/settings.xml:32
 msgctxt "#30100"
 msgid "Movie View"
-msgstr "Widok filmu"
+msgstr "Widok filmów"
 
 #: /resources/settings.xml:35
 msgctxt "#30101"
@@ -716,7 +716,7 @@ msgstr "Włącz drugorzędne sortowanie według rozmiaru pliku"
 #: /resources/settings.xml:417
 msgctxt "#30129"
 msgid "Enable Tertiary HEVC Sort Preference"
-msgstr "Włącz trzeciorzędne preferencje sortowania HEVC"
+msgstr "Włącz Format HEVC na początku listy(Tertiary Sort HEVC)"
 
 #: /resources/settings.xml:394
 msgctxt "#30130"
@@ -1937,12 +1937,12 @@ msgstr "Stronicowanie list Trakt"
 #: /resources/lib/gui/tvshowMenus.py:221
 msgctxt "#30352"
 msgid "My Watched Episodes"
-msgstr "Moje obejrzane odcinki"
+msgstr "Obejrzane Seriale"
 
 #: /resources/lib/gui/movieMenus.py:188
 msgctxt "#30353"
 msgid "My Watched Movies"
-msgstr "Moje obejrzane filmy"
+msgstr "Obejrzane Filmy"
 
 #: /resources/lib/gui/homeMenu.py:54
 msgctxt "#30354"
@@ -2050,22 +2050,22 @@ msgstr "Mały"
 #: /resources/lib/gui/tvshowMenus.py:57
 msgctxt "#30373"
 msgid "Popular Recent Shows"
-msgstr "Popularne najnowsze Seriale"
+msgstr "Popularne Nowe Seriale"
 
 #: /resources/lib/gui/tvshowMenus.py:75
 msgctxt "#30374"
 msgid "Trending Recent Shows"
-msgstr "Najpopularniejsze najnowsze Seriale"
+msgstr "Nowe Seriale Zyskujące Popularność"
 
 #: /resources/lib/gui/movieMenus.py:53
 msgctxt "#30375"
 msgid "Popular Recent Movies"
-msgstr "Popularne Filmy"
+msgstr "Popularne Nowe Filmy"
 
 #: /resources/lib/gui/movieMenus.py:71
 msgctxt "#30376"
 msgid "Trending Recent Movies"
-msgstr "Najnowsze Filmy"
+msgstr "Nowe Filmy Zyskujące Popularność"
 
 #: /resources/lib/debrid/premiumize.py:64
 msgctxt "#30377"
@@ -2085,12 +2085,12 @@ msgstr "Moje polubione listy filmów"
 #: /resources/lib/gui/tvshowMenus.py:106
 msgctxt "#30380"
 msgid "Trending Show Lists"
-msgstr "Najpopularniejsze listy seriali"
+msgstr "Zyskujące Popularność Seriale"
 
 #: /resources/lib/gui/movieMenus.py:97
 msgctxt "#30381"
 msgid "Trending Movie Lists"
-msgstr "Najpopularniejsze listy filmów"
+msgstr "Zyskujące Popularność Filmy"
 
 #: /resources/lib/gui/tvshowMenus.py:112
 msgctxt "#30382"
@@ -2416,7 +2416,7 @@ msgstr "Lista filmów, które zacząłeś oglądać, ale jeszcze nie skończyłe
 #: /resources/lib/gui/movieMenus.py:168
 msgctxt "#30439"
 msgid "A list of movies you have collected on Trakt"
-msgstr "Lista filmów, które zebrałeś w Trakcie"
+msgstr "Lista filmów, które dodałeś do kolekcji Trakt"
 
 #: /resources/lib/gui/movieMenus.py:173
 msgctxt "#30440"
@@ -2426,7 +2426,7 @@ msgstr "Lista filmów, które chciałeś obejrzeć"
 #: /resources/lib/gui/movieMenus.py:179
 msgctxt "#30441"
 msgid "My movie Trakt Lists"
-msgstr "Moje listy utworów filmowych"
+msgstr "Moje listy filmów Trakt"
 
 #: /resources/lib/gui/movieMenus.py:185
 msgctxt "#30442"
@@ -2436,7 +2436,7 @@ msgstr "Moje polubione listy Trakt"
 #: /resources/lib/gui/movieMenus.py:190
 msgctxt "#30443"
 msgid "My recent watched movies"
-msgstr "Moje ostatnio oglądane filmy"
+msgstr "Ostatnio oglądane filmy"
 
 #: /resources/lib/gui/tvshowMenus.py:54
 msgctxt "#30444"
