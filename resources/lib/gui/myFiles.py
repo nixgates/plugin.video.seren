@@ -31,14 +31,14 @@ class Menus:
         for key, value in sorted(self.providers.items()):
             args = {'debrid_provider': key, 'id': None}
             g.add_directory_item(value[0], action='myFilesFolder', action_args=args)
-        g.close_directory(g.CONTENT_FOLDER, sort='title')
+        g.close_directory(g.CONTENT_MENU, sort='title')
 
     def my_files_folder(self, args):
         if args.get('id') is None:
             self.providers[args['debrid_provider']][1]().get_init_list()
         else:
             self.providers[args['debrid_provider']][1]().get_folder(args)
-        g.close_directory(g.CONTENT_FOLDER, sort='title')
+        g.close_directory(g.CONTENT_MENU, sort='title')
 
     def my_files_play(self, args):
         self.providers[args['debrid_provider']][1]().play_item(args)

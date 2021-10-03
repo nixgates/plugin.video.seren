@@ -359,7 +359,7 @@ class Sources(object):
                 xbmc.executebuiltin(
                     'RunPlugin({}?action=cacheAssist&action_args={})'.format(g.BASE_URL, action_args))
         elif not self.silent:
-            confirmation = xbmcgui.Dialog().yesno('{} - {}'.format(g.ADDON_NAME, g.get_language_string(30331)),
+            confirmation = xbmcgui.Dialog().yesno('{} - {}'.format(g.ADDON_NAME, g.get_language_string(30325)),
                                                   g.get_language_string(30056))
             if confirmation:
                 window = ManualCacheWindow(*SkinManager().confirm_skin_path('manual_caching.xml'),
@@ -376,7 +376,7 @@ class Sources(object):
             else:
                 providers = reload_module(importlib.import_module("providers"))
         except ValueError:
-            g.notification(g.ADDON_NAME, g.get_language_string(30471))
+            g.notification(g.ADDON_NAME, g.get_language_string(30465))
             g.log('No providers installed', 'warning')
             return
 

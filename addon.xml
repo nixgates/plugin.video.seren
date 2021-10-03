@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.1.4" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.1.5" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.addon" version="17.9.910" />
         <import addon="script.module.future" version="0.17.1"/>
@@ -62,6 +62,27 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.1.5
+            Workaround trakt shitty season data
+            Added trakt list sort types for Watched, Collected and My Rating
+            Fix trakt season milling for updated shows
+            Fix mill_if_needed queries for seasons and episodes
+            Use cache for first load of widgets for trakt lists
+            Force a cache clear on release version changes
+            Update seasons statistics again, with even more fallbacks
+            Ensure we clean up AD/RD cloudfiles if we can't identify the file to play
+            Fixed typo in url for widget refresh from activities sync
+            Allow widget refresh while playing for foreground tasks
+            Fix air dates not always showed correctly for shows/seasons
+            Fix tzlocal call to pytz.tzinfo.build_tzinfo and update pytz to 2021.3
+            Hide trakt auth option if we are already authed
+            Change icons to transparent background
+            Use an empty content type value for menu containers
+            Added 'an' to the list of excluded sort tokens
+            Update Dutch translations
+            Update French translations
+            Add Polish translations
+
             Changelog 2.1.4
             Genre and Next Page icons
             Improve widget refresh logic

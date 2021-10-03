@@ -125,8 +125,8 @@ def dispatch(params):
                 xbmcgui.Dialog().ok(
                     g.ADDON_NAME,
                     tools.create_multiline_message(
-                        line1=g.get_language_string(30205),
-                        line2=g.get_language_string(30206),
+                        line1=g.get_language_string(30199),
+                        line2=g.get_language_string(30200),
                     ),
                 )
                 return None
@@ -161,7 +161,7 @@ def dispatch(params):
             ):
 
                 if background:
-                    background.set_text(g.get_language_string(30197))
+                    background.set_text(g.get_language_string(30191))
                 from resources.lib.modules import sourceSelect
 
                 stream_link = sourceSelect.source_select(
@@ -385,7 +385,7 @@ def dispatch(params):
     elif action == "resetSilent":
         g.set_runtime_setting("tempSilent", False)
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30325)),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30319)),
             g.get_language_string(30033),
             time=5000,
         )
@@ -505,7 +505,7 @@ def dispatch(params):
         )
 
         confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30181)
+            g.ADDON_NAME, g.get_language_string(30178)
         )
         if confirmation == 0:
             return
@@ -517,7 +517,7 @@ def dispatch(params):
         )
 
         confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30183).format(url)
+            g.ADDON_NAME, g.get_language_string(30180).format(url)
         )
         if confirmation == 0:
             return
@@ -766,7 +766,13 @@ def dispatch(params):
         choose_timezone()
 
     elif action == "widgetRefresh":
-        g.trigger_widget_refresh()
+        if_playing = params.get('playing')
+        if if_playing is not None:
+            if_playing = False if if_playing.lower() == "false" else True if if_playing.lower() == "true" else None
+        if if_playing is not None:
+            g.trigger_widget_refresh(if_playing=if_playing)
+        else:
+            g.trigger_widget_refresh()
 
     elif action == "updateLocalTimezone":
         g.init_local_timezone()

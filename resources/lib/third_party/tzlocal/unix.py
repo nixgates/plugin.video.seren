@@ -15,7 +15,7 @@ def _tz_from_env(tzenv):
     # TZ specifies a file
     if os.path.isabs(tzenv) and os.path.exists(tzenv):
         with open(tzenv, 'rb') as tzfile:
-            return pytz.tzfile.build_tzinfo('local', tzfile)
+            return pytz.build_tzinfo('local', tzfile)
 
     # TZ specifies a zoneinfo zone.
     try:
@@ -157,10 +157,11 @@ def _get_localzone(_root='/'):
         if not os.path.exists(tzpath):
             continue
         with open(tzpath, 'rb') as tzfile:
-            return pytz.tzfile.build_tzinfo('local', tzfile)
+            return pytz.build_tzinfo('local', tzfile)
 
     warnings.warn('Can not find any timezone configuration, defaulting to UTC.')
     return pytz.utc
+
 
 def get_localzone():
     """Get the computers configured local timezone, if any."""

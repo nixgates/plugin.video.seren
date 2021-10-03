@@ -79,7 +79,7 @@ class SmartPlay:
 
         self.build_playlist(season_id, episode)
 
-        window.set_text(g.get_language_string(30334))
+        window.set_text(g.get_language_string(30328))
 
         g.log(
             "Begining play from Season ID {} Episode {}".format(season_id, episode),
@@ -427,7 +427,7 @@ class SmartPlay:
                             g.get_language_string(30061),
                             datetime.timedelta(seconds=int(resume_switch)),
                         ),
-                        g.get_language_string(30358),
+                        g.get_language_string(30352),
                     ]
                 )
                 if selection == -1:

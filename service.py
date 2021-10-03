@@ -15,12 +15,13 @@ if tools.is_stub():
 
 from resources.lib.modules.globals import g
 
+from resources.lib.modules.seren_version import do_version_change
 from resources.lib.modules.serenMonitor import SerenMonitor
 from resources.lib.modules.update_news import do_update_news
 from resources.lib.modules.manual_timezone import validate_timezone_detected
 
 g.init_globals(sys.argv)
-g.HOME_WINDOW.setProperty("SerenDownloadManagerIndex", "{}")
+do_version_change()
 
 g.log("##################  STARTING SERVICE  ######################")
 g.log("### {} {}".format(g.ADDON_ID, g.VERSION))

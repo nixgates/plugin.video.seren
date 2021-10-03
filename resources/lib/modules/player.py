@@ -547,7 +547,7 @@ class SerenPlayer(xbmc.Player):
          ):
             xbmc.sleep(10000)
             g.set_runtime_setting("marked_watched_dialog_open", True)
-            if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30520)):
+            if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30514)):
                 self._force_marked_watched = True
             g.set_runtime_setting("marked_watched_dialog_open", False)
 

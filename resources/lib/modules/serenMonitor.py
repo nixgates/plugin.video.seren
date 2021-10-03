@@ -22,7 +22,7 @@ class SerenMonitor(xbmc.Monitor):
             return
         g.log("FLUSHING SETTINGS CACHE", "info")
         g.SETTINGS_CACHE.clear_cache()
-        g.trigger_widget_refresh()
+        g.trigger_widget_refresh(if_playing=False)
 
     def onNotification(self, sender, method, data):
         if method == "System.OnWake":

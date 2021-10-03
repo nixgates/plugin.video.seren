@@ -5,7 +5,6 @@ Used for testing against as they are only correct for the years
 '''
 
 from datetime import tzinfo, timedelta, datetime
-
 from pytz import HOUR, ZERO, UTC
 
 __all__ = [

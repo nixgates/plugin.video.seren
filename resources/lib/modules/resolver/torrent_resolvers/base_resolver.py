@@ -64,12 +64,12 @@ class TorrentResolverBase(ApiBase):
         """
 
     @abc.abstractmethod
-    def _do_post_processing(self, item_information, torrent):
+    def _do_post_processing(self, item_information, torrent, identified_file):
         """
-        Perform any required processing post the resolving of the file
-        :param torrent:
-        :param item_information:
-        :param identified_file:
+        Perform any required processing after the resolving of the file or if a file could not be identified
+        :param item_information: The item information
+        :param torrent: The torrent information
+        :param identified_file: The file that was identified or None if no file was identified in the torrent
         :return:
         """
 
@@ -80,15 +80,16 @@ class TorrentResolverBase(ApiBase):
     def _user_selection(self, folder_details):
         folder_details = self._filter_non_playable_files(folder_details)
         folder_details = sorted(folder_details, key= lambda k: k['path'].split("/")[-1])
-        selection = xbmcgui.Dialog().select(g.get_language_string(30517),
+        selection = xbmcgui.Dialog().select(g.get_language_string(30511),
                                             [i['path'].split('/')[-1] for i in folder_details])
         return folder_details[selection] if selection >= 0 else None
 
     def _finalize_resolving(self, item_information, torrent, identified_file, folder_details):
         if identified_file is None:
+            self._do_post_processing(item_information, torrent, identified_file)
             return None
         stream_link = self.resolve_stream_url(identified_file)
-        self._do_post_processing(item_information, torrent)
+        self._do_post_processing(item_information, torrent, identified_file)
         if not stream_link:
             raise FileIdentification([i["path"] for i in folder_details])
         return stream_link

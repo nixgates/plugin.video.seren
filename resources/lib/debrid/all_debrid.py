@@ -120,7 +120,7 @@ class AllDebrid:
         auth_complete = False
         tools.copy2clip(resp["pin"])
         self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30361),
+            g.ADDON_NAME + ": " + g.get_language_string(30355),
             tools.create_multiline_message(
                 line1=g.get_language_string(30018).format(
                     g.color_string(resp["base_url"])

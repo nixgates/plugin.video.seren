@@ -40,6 +40,6 @@ class AllDebridResolver(TorrentResolverBase):
         """
         return self.debrid_module.resolve_hoster(file_info["link"])
 
-    def _do_post_processing(self, item_information, torrent):
-        if g.get_bool_setting("alldebrid.autodelete"):
+    def _do_post_processing(self, item_information, torrent, identified_file):
+        if g.get_bool_setting("alldebrid.autodelete") or identified_file is None:
             self.debrid_module.delete_magnet(self.magnet_id)

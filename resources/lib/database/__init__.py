@@ -332,10 +332,12 @@ class SQLiteConnection(_connection):
 
     @staticmethod
     def _set_connection_settings(connection):
-        connection.row_factory = lambda c, r: {
-            col[0]: _loads(r[idx]) if isinstance(r[idx], pickletype) else r[idx]
-            for idx, col in enumerate(c.description)
-        }
+        connection.row_factory = lambda c, r: dict(
+            [
+                (col[0], _loads(r[idx]) if isinstance(r[idx], pickletype) else r[idx])
+                for idx, col in enumerate(c.description)
+            ]
+        )
         connection.execute("PRAGMA foreign_keys = ON")
         connection.execute("PRAGMA page_size = 32768")  # no-translate
         connection.execute("PRAGMA journal_mode = WAL")

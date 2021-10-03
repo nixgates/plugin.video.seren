@@ -68,6 +68,6 @@ class RealDebridResolver(TorrentResolverBase):
         """
         return self.debrid_module.resolve_hoster(file_info["link"])
 
-    def _do_post_processing(self, item_information, torrent):
-        if g.get_bool_setting("rd.autodelete"):
+    def _do_post_processing(self, item_information, torrent, identified_file):
+        if g.get_bool_setting("rd.autodelete") or identified_file is None:
             self.debrid_module.delete_torrent(self.torrent_id)

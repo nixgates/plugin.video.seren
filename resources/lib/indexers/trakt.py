@@ -67,7 +67,7 @@ def trakt_auth_guard(func):
             return func(*args, **kwargs)
         with GlobalLock("trakt.auth_guard"):
             if not g.get_setting("trakt.auth"):
-                if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30501)):
+                if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30495)):
                     TraktAPI().auth()
                 else:
                     g.cancel_directory()
@@ -99,7 +99,7 @@ def _reset_trakt_auth(notify=True):
     for i in settings:
         g.clear_setting(i)
     if notify:
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30572))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30566))
 
 
 def trakt_guard_response(func):
@@ -145,7 +145,7 @@ def trakt_guard_response(func):
             if response.status_code == 401:
                 if inspect.stack(1)[1][3] == "try_refresh_token":
                     xbmcgui.Dialog().notification(
-                        g.ADDON_NAME, g.get_language_string(30368)
+                        g.ADDON_NAME, g.get_language_string(30362)
                     )
                     g.log(
                         "Attempts to refresh Trakt token have failed. User intervention is required",
@@ -161,7 +161,7 @@ def trakt_guard_response(func):
                                 and method_class.username is not None
                             ):
                                 xbmcgui.Dialog().ok(
-                                    g.ADDON_NAME, g.get_language_string(30368)
+                                    g.ADDON_NAME, g.get_language_string(30362)
                                 )
                     except RanOnceAlready:
                         pass
@@ -198,6 +198,8 @@ class TraktAPI(ApiBase):
 
     username_setting_key = "trakt.username"
 
+    trakt_db = None
+
     def __init__(self):
         self.access_token = None
         self.refresh_token = None
@@ -218,6 +220,25 @@ class TraktAPI(ApiBase):
             ("overview", ("plot", "plotoutline"), None),
         ]
 
+        self.UserRatingNormalization = [
+            (
+                "rating",
+                "user_rating",
+                lambda t: tools.safe_round(tools.get_clean_number(t), 2),
+            ),
+            ("rated_at", "rated_at", lambda t: g.validate_date(t))
+        ]
+
+        self.PlayBackNormalization = [
+            ("progress", "percentplayed", None),
+            ("paused_at", "paused_at", lambda t: g.validate_date(t)),
+            ("id", "playback_id", None)
+        ]
+
+        self.CalendarNormalization = [
+            ("first_aired", "first_aired", lambda t: g.validate_date(t))
+        ]
+
         self.Normalization = tools.extend_array(
             [
                 ("certification", "mpaa", None),
@@ -227,14 +248,14 @@ class TraktAPI(ApiBase):
                 (("ids", "slug"), "trakt_slug", None),
                 (("ids", "tvdb"), "tvdb_id", None),
                 (("ids", "tmdb"), "tmdb_id", None),
-                ("id", "playback_id", None),
+                ("playback_id", "playback_id", None),
                 (("show", "ids", "trakt"), "trakt_show_id", None),
                 ("network", "studio", lambda n: [n]),
                 ("runtime", "duration", lambda d: d * 60),
                 ("progress", "percentplayed", None),
+                ("percentplayed", "percentplayed", None),
                 ("updated_at", "dateadded", lambda t: g.validate_date(t)),
                 ("last_updated_at", "dateadded", lambda t: g.validate_date(t)),
-                ("collected_at", "collected_at", lambda t: g.validate_date(t)),
                 (
                     "last_watched_at",
                     "last_watched_at",
@@ -278,6 +299,8 @@ class TraktAPI(ApiBase):
                     "country_origin",
                     lambda t: t.upper() if t is not None else None,
                 ),
+                ("user_rating", "user_rating", None),
+                ("rated_at", "rated_at", None)
             ],
             self.TranslationNormalization,
         )
@@ -287,6 +310,7 @@ class TraktAPI(ApiBase):
                 ("plays", "playcount", None),
                 ("year", "year", None),
                 ("released", ("premiered", "aired"), lambda t: g.validate_date(t)),
+                ("collected_at", "collected_at", lambda t: g.validate_date(t)),
             ],
             self.Normalization,
         )
@@ -308,8 +332,13 @@ class TraktAPI(ApiBase):
                     ("premiered", "aired"),
                     lambda t: g.validate_date(t),
                 ),
+                (
+                    "last_collected_at",
+                    "last_collected_at",
+                    lambda t: g.validate_date(t)
+                )
             ],
-            self.Normalization,
+            self.Normalization
         )
 
         self.SeasonNormalization = tools.extend_array(
@@ -329,6 +358,11 @@ class TraktAPI(ApiBase):
                     ("premiered", "aired"),
                     lambda t: g.validate_date(t),
                 ),
+                (
+                    "last_collected_at",
+                    "last_collected_at",
+                    lambda t: g.validate_date(t)
+                )
             ],
             self.Normalization,
         )
@@ -351,6 +385,11 @@ class TraktAPI(ApiBase):
                     ("premiered", "aired"),
                     lambda t: g.validate_date(t),
                 ),
+                (
+                    "collected_at",
+                    "collected_at",
+                    lambda t: g.validate_date(t)
+                )
             ],
             self.Normalization,
         )
@@ -368,21 +407,30 @@ class TraktAPI(ApiBase):
 
         self.MixedEpisodeNormalization = [
             (("show", "ids", "trakt"), "trakt_show_id", None),
-            (("episode", "ids", "trakt"), "trakt_id", None),
-            ("show", "show", None),
-            ("episode", "episode", None),
+            (("episode", "ids", "trakt"), "trakt_id", None)
         ]
 
-        self.MetaObjects = {
+        self.MixedSeasonNormalization = [
+            (("show", "ids", "trakt"), "trakt_show_id", None),
+            (("season", "ids", "trakt"), "trakt_id", None)
+        ]
+
+        self.MetaNormalization = {
             "movie": self.MoviesNormalization,
             "list": self.ListNormalization,
             "show": self.ShowNormalization,
             "season": self.SeasonNormalization,
             "episode": self.EpisodeNormalization,
             "mixedepisode": self.MixedEpisodeNormalization,
+            "mixedseason": self.MixedSeasonNormalization,
+            "playback": self.PlayBackNormalization,
+            "user_rating": self.UserRatingNormalization,
+            "calendar": self.CalendarNormalization
         }
 
-        self.MetaCollections = ("movies", "shows", "seasons", "episodes")
+        self.MetaObjects = ("movie", "tvshow", "show", "season", "episode", "list")
+
+        self.MetaCollections = ("movies", "shows", "seasons", "episodes", "cast")
 
         self.session = requests.Session()
         retries = Retry(
@@ -395,6 +443,7 @@ class TraktAPI(ApiBase):
     def __del__(self):
         self.session.close()
 
+    # region Auth
     def _get_headers(self):
         headers = {
             "Content-Type": "application/json",
@@ -430,7 +479,7 @@ class TraktAPI(ApiBase):
         self.username = None
         response = self.post("oauth/device/code", data={"client_id": self.client_id})
         if not response.ok:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30177))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30174))
             return
         try:
             response = response.json()
@@ -487,7 +536,7 @@ class TraktAPI(ApiBase):
             self.username = username
             g.set_setting(self.username_setting_key, username)
             self.progress_dialog.close()
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30296))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30290))
 
             # Synchronise Trakt Database with new user
             from resources.lib.database.trakt_sync import activities
@@ -503,8 +552,6 @@ class TraktAPI(ApiBase):
                     'RunPlugin("{}?action=syncTraktActivities")'.format(g.BASE_URL)
                 )
 
-
-
         elif response.status_code == 404 or response.status_code == 410:
             self.progress_dialog.close()
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30023))
@@ -515,34 +562,6 @@ class TraktAPI(ApiBase):
         elif response.status_code == 429:
             xbmc.sleep(1 * 1000)
         return False
-
-    def _save_settings(self, response):
-        if "access_token" in response:
-            g.set_setting("trakt.auth", response["access_token"])
-            self.access_token = response["access_token"]
-        if "refresh_token" in response:
-            g.set_setting("trakt.refresh", response["refresh_token"])
-            self.refresh_token = response["refresh_token"]
-        if "expires_in" in response and "created_at" in response:
-            g.set_setting(
-                "trakt.expires", g.UNICODE(response["created_at"] + response["expires_in"])
-            )
-            self.token_expires = float(response["created_at"] + response["expires_in"])
-
-    def _load_settings(self):
-        self.client_id = g.get_setting(
-            "trakt.clientid",
-            "0c9a30819e4af6ffaf3b954cbeae9b54499088513863c03c02911de00ac2de79",
-        )
-        self.client_secret = g.get_setting(
-            "trakt.secret",
-            "bf02417f27b514cee6a8d135f2ddc261a15eecfb6ed6289c36239826dcdd1842",
-        )
-        self.access_token = g.get_setting("trakt.auth")
-        self.refresh_token = g.get_setting("trakt.refresh")
-        self.token_expires = g.get_float_setting("trakt.expires")
-        self.default_limit = g.get_int_setting("item.limit")
-        self.username = g.get_setting(self.username_setting_key)
 
     def try_refresh_token(self, force=False):
         """
@@ -573,6 +592,37 @@ class TraktAPI(ApiBase):
         except RanOnceAlready:
             self._load_settings()
             return
+    # endregion
+
+    # region settings
+    def _save_settings(self, response):
+        if "access_token" in response:
+            g.set_setting("trakt.auth", response["access_token"])
+            self.access_token = response["access_token"]
+        if "refresh_token" in response:
+            g.set_setting("trakt.refresh", response["refresh_token"])
+            self.refresh_token = response["refresh_token"]
+        if "expires_in" in response and "created_at" in response:
+            g.set_setting(
+                "trakt.expires", g.UNICODE(response["created_at"] + response["expires_in"])
+            )
+            self.token_expires = float(response["created_at"] + response["expires_in"])
+
+    def _load_settings(self):
+        self.client_id = g.get_setting(
+            "trakt.clientid",
+            "0c9a30819e4af6ffaf3b954cbeae9b54499088513863c03c02911de00ac2de79",
+        )
+        self.client_secret = g.get_setting(
+            "trakt.secret",
+            "bf02417f27b514cee6a8d135f2ddc261a15eecfb6ed6289c36239826dcdd1842",
+        )
+        self.access_token = g.get_setting("trakt.auth")
+        self.refresh_token = g.get_setting("trakt.refresh")
+        self.token_expires = g.get_float_setting("trakt.expires")
+        self.default_limit = g.get_int_setting("item.limit")
+        self.username = g.get_setting(self.username_setting_key)
+    # endregion
 
     @trakt_guard_response
     def get(self, url, **params):
@@ -649,29 +699,19 @@ class TraktAPI(ApiBase):
     @handle_single_item_or_list
     def _handle_response(self, item):
         item = self._try_detect_type(item)
-        if item.get("type") == "castcrew":
-            item.pop("type")
-            item = self._handle_response(
-                [i.get("movie", i.get("show")) for i in item.pop("cast", [])]
-            )
+        item = self._try_flatten_if_single_type(item)
+
+        if isinstance(item, list):
+            return self._handle_response(item)
+
+        if not item.get("type") or item.get("type") not in self.MetaNormalization:
             return item
-        item = self._flatten_if_single_type(item)
-        item = self._try_detect_type(item)
-        if not item.get("type") or item.get("type") not in self.MetaObjects:
-            return item
-        if item["type"] == "mixedepisode":
-            single_type = self._handle_single_type(item)
-            [
-                single_type.update({meta: self._handle_response(item.pop(meta, {}))})
-                for meta in self.MetaObjects
-                if meta in item
-            ]
-            single_type.update(item)
-            if single_type.get("trakt_id"):
-                single_type["episode"]["trakt_show_id"] = single_type.get("trakt_show_id")
-                single_type["episode"]["trakt_object"]["info"]["trakt_show_id"] = single_type.get("trakt_show_id")
-            return single_type
-        return self._create_trakt_object(self._handle_single_type(item))
+
+        if item["type"].startswith("mixed"):
+            return self._handle_mixed_type(item)
+
+        result = self._handle_single_type(item)
+        return self._create_trakt_object(result) if result.get("type", result.get("mediatype")) in self.MetaObjects else result
 
     @staticmethod
     def _create_trakt_object(item):
@@ -690,9 +730,24 @@ class TraktAPI(ApiBase):
             for key in self.MetaCollections
             if key in translated
         }
-        normalized = self._normalize_info(self.MetaObjects[item["type"]], translated)
+        normalized = self._normalize_info(self.MetaNormalization[item["type"]], translated)
         normalized.update(collections)
         return normalized
+
+    def _handle_mixed_type(self, item):
+        mixed_type = item["type"].replace("mixed", "")
+        result = self._handle_single_type(item)
+        [
+            result.update({meta: self._handle_response(item.pop(meta, {}))})
+            for meta in self.MetaNormalization
+            if meta in item
+        ]
+        single_type = self._try_detect_type(item)
+        single_type = self._handle_single_type(single_type)
+        result.update(single_type)
+        result[mixed_type]["trakt_object"]["info"].update(single_type)
+        result[mixed_type]["trakt_object"]["info"].update({"trakt_show_id": result.get("trakt_show_id")})
+        return result
 
     @staticmethod
     def _get_all_pages(func, url, **params):
@@ -783,9 +838,9 @@ class TraktAPI(ApiBase):
     @staticmethod
     def _get_display_name(content_type):
         if content_type == "movie":
-            return g.get_language_string(30286)
+            return g.get_language_string(30280)
         else:
-            return g.get_language_string(30308)
+            return g.get_language_string(30302)
 
     def get_username(self):
         """
@@ -795,6 +850,7 @@ class TraktAPI(ApiBase):
         user_details = self.get_json("users/me")
         return user_details["username"]
 
+    # region Sorting
     def _try_sort(self, sort_by, sort_how, items):
         if not isinstance(items, (set, list)):
             return items
@@ -813,9 +869,13 @@ class TraktAPI(ApiBase):
             "random",
             "runtime",
             "percentage",
+            "watched",
+            "collected",
+            "my_rating"
         ]
 
         if sort_by not in supported_sorts:
+            g.log("Error sorting trakt response: Unsupported sort_by ({})".format(sort_by), "error")
             return items
 
         if sort_by == "added":
@@ -841,8 +901,13 @@ class TraktAPI(ApiBase):
             items = sorted(items, key=lambda x: x[x["type"]].get("rating"))
         elif sort_by == "random":
             import random
-
             random.shuffle(items)
+        elif sort_by == "watched":
+            items = self._watched_sort(items)
+        elif sort_by == "collected":
+            items = self._collected_sort(items)
+        elif sort_by == "my_rating":
+            items = self._rating_sort(items)
 
         if sort_how == "desc":
             items.reverse()
@@ -862,30 +927,89 @@ class TraktAPI(ApiBase):
             released = ""
         return released
 
+    def _watched_sort(self, items):
+        if not items or len(items) < 1:
+            return items
+        if not self.trakt_db:
+            from resources.lib.database import trakt_sync
+            self.trakt_db = trakt_sync.TraktSyncDatabase()
+
+        item_type = items[0]["type"]
+        watched_at = self.trakt_db.fetchall(
+            "select trakt_id, COALESCE(last_watched_at, '') as last_watched_at from {}s where trakt_id in ({})".format(
+                item_type,
+                ",".join(map(lambda i: str(i[item_type]["ids"]["trakt"]), items))
+            )
+        )
+        watched_at = {i['trakt_id']: i['last_watched_at'] for i in watched_at}
+        return sorted(items, key=lambda i: watched_at.get(i[item_type]["ids"]["trakt"], ""))
+
+    def _collected_sort(self, items):
+        if not items or len(items) < 1:
+            return items
+        if not self.trakt_db:
+            from resources.lib.database import trakt_sync
+            self.trakt_db = trakt_sync.TraktSyncDatabase()
+
+        item_type = items[0]["type"]
+        collected_field = "last_collected_at" if item_type in ["show", "season"] else "collected_at"
+        collected_at = self.trakt_db.fetchall(
+            "select trakt_id, COALESCE({}, '') as {} from {}s where trakt_id in ({})".format(
+                collected_field,
+                collected_field,
+                item_type,
+                ",".join(map(lambda i: str(i[item_type]["ids"]["trakt"]), items))
+            )
+        )
+        collected_at = {i['trakt_id']: i[collected_field] for i in collected_at}
+        return sorted(items, key=lambda i: collected_at.get(i[item_type]["ids"]["trakt"], ""))
+
+    def _rating_sort(self, items):
+        if not items or len(items) < 1:
+            return items
+        if not self.trakt_db:
+            from resources.lib.database import trakt_sync
+            self.trakt_db = trakt_sync.TraktSyncDatabase()
+
+        item_type = items[0]["type"]
+        ratings = self.trakt_db.fetchall(
+            "select trakt_id, coalesce(user_rating, 0) as user_rating from {}s where trakt_id in ({})".format(
+                item_type,
+                ",".join(map(lambda i: str(i[item_type]["ids"]["trakt"]), items))
+            )
+        )
+        ratings = {i['trakt_id']: i['user_rating'] for i in ratings}
+        return sorted(items, key=lambda i: ratings.get(i[item_type]["ids"]["trakt"], 0))
+    # endregion
+
     @handle_single_item_or_list
-    def _flatten_if_single_type(self, item):
+    def _try_flatten_if_single_type(self, item):
         media_type = item.get("type")
         if media_type and media_type in item:
             key = media_type
         else:
-            keys = [meta for meta in self.MetaObjects if meta in item]
+            keys = [meta for meta in self.MetaNormalization if meta in item]
             if len(keys) == 1:
                 key = keys[0]
             else:
                 return item
+
         if isinstance(item[key], dict):
-            item.update(item.pop(key))
+            single_item = item.pop(key)
+            if media_type and media_type in self.MetaNormalization:
+                item = self._normalize_info(self.MetaNormalization[media_type], item)
+            item.update(single_item)
             item.update({"type": key})
+        elif isinstance(item[key], list):
+            return item[key]
         return item
 
-    @staticmethod
     @handle_single_item_or_list
-    def _try_detect_type(item):
+    def _try_detect_type(self, item):
         item_types = [
             ("list", lambda x: "item_count" in x and "sort_by" in x),
             ("mixedepisode", lambda x: "show" in x and "episode" in x),
-            ("show", lambda x: "show" in x),
-            ("movie", lambda x: "movie" in x),
+            ("mixedseason", lambda x: "show" in x and "season" in x),
             (
                 "movie",
                 lambda x: "title" in x and "year" in x and "network" not in x,
@@ -901,10 +1025,24 @@ class TraktAPI(ApiBase):
                 ),
             ),
             ("season", lambda x: "number" in x),
-            ("castcrew", lambda x: "cast" in x and "crew" in x),
-            ("sync", lambda x: "all" in x),
+            ("playback", lambda x: "paused_at" in x),
+            ("user_rating", lambda x: "rated_at" in x),
+            ("calendar", lambda x: "first_aired" in x),
+            ("cast", lambda x: "cast" in x),
             ("genre", lambda x: "name" in x and "slug" in x),
-            ("network", lambda x: "name")
+            ("network", lambda x: "name" in x),
+            ("alias", lambda x: "title" in x and "country" in x),
+            ("translation", lambda x: "title" in x and "language" in x),
+            ("people", lambda x: "character" in x and "characters" in x),
+            ("anticipated", lambda x: "list_count" in x),
+            ("box_office", lambda x: "revenue" in x),
+            ("collected", lambda x: "watcher_count" in x and "collected_count" in x and "play_count" in x),
+            ("lists", lambda x: "like_count" in x and "comment_count" in x),
+            ("updated", lambda x: "updated_at" in x and ("movie" in x or "show" in x)),
+            ("trending", lambda x: "watchers" in x),
+            ("sync_activities", lambda x: "all" in x),
+            ("sync_watched", lambda x: "last_watched_at" in x),
+            ("sync_collected", lambda x: "last_collected_at" in x)
         ]
         for item_type in item_types:
             if item_type[1](item):
@@ -988,10 +1126,10 @@ class TraktManager(TraktAPI):
         self._handle_watchlist_options(item_type)
 
         standard_list = [
-            g.get_language_string(30303),
-            g.get_language_string(30304),
-            g.get_language_string(30305).format(display_type),
-            g.get_language_string(30306),
+            g.get_language_string(30297),
+            g.get_language_string(30298),
+            g.get_language_string(30299).format(display_type),
+            g.get_language_string(30300),
         ]
 
         for i in standard_list:
@@ -1000,7 +1138,7 @@ class TraktManager(TraktAPI):
         self._handle_progress_option(item_type, trakt_id)
 
         selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
             self.dialog_list,
         )
 
@@ -1008,47 +1146,47 @@ class TraktManager(TraktAPI):
             return
 
         options = {
-            g.get_language_string(30297).format(display_type): {
+            g.get_language_string(30291).format(display_type): {
                 "method": self._add_to_collection,
                 "info_key": "info",
             },
-            g.get_language_string(30298).format(display_type): {
+            g.get_language_string(30292).format(display_type): {
                 "method": self._remove_from_collection,
                 "info_key": "info",
             },
-            g.get_language_string(30299): {
+            g.get_language_string(30293): {
                 "method": self._add_to_watchlist,
                 "info_key": "info",
             },
-            g.get_language_string(30300): {
+            g.get_language_string(30294): {
                 "method": self._remove_from_watchlist,
                 "info_key": "info",
             },
-            g.get_language_string(30301): {
+            g.get_language_string(30295): {
                 "method": self._mark_watched,
                 "info_key": "info",
             },
-            g.get_language_string(30302): {
+            g.get_language_string(30296): {
                 "method": self._mark_unwatched,
                 "info_key": "info",
             },
-            g.get_language_string(30303): {
+            g.get_language_string(30297): {
                 "method": self._add_to_list,
                 "info_key": "info",
             },
-            g.get_language_string(30304): {
+            g.get_language_string(30298): {
                 "method": self._remove_from_list,
                 "info_key": "info",
             },
-            g.get_language_string(30305).format(display_type): {
+            g.get_language_string(30299).format(display_type): {
                 "method": self._hide_item,
                 "info_key": "action_args",
             },
-            g.get_language_string(30306): {
+            g.get_language_string(30300): {
                 "method": self._refresh_meta_information,
                 "info_key": "info",
             },
-            g.get_language_string(30307): {
+            g.get_language_string(30301): {
                 "method": self._remove_playback_history,
                 "info_key": "info",
             },
@@ -1065,8 +1203,8 @@ class TraktManager(TraktAPI):
     def _handle_watchlist_options(self, item_type):
         if item_type not in ["season", "episode"]:
             self.dialog_list += [
-                g.get_language_string(30299),
-                g.get_language_string(30300),
+                g.get_language_string(30293),
+                g.get_language_string(30294),
             ]
 
     def _handle_progress_option(self, item_type, trakt_id):
@@ -1075,7 +1213,7 @@ class TraktManager(TraktAPI):
         if item_type not in ["show", "season"] and TraktSyncDatabase().get_bookmark(
             trakt_id
         ):
-            self.dialog_list.append(g.get_language_string(30307))
+            self.dialog_list.append(g.get_language_string(30301))
 
     def _handle_collected_options(self, item_information, trakt_id, display_type):
         if item_information["info"]["mediatype"] == "movie":
@@ -1086,11 +1224,11 @@ class TraktManager(TraktAPI):
             ]
             if trakt_id in collection:
                 self.dialog_list.append(
-                    g.get_language_string(30298).format(display_type)
+                    g.get_language_string(30292).format(display_type)
                 )
             else:
                 self.dialog_list.append(
-                    g.get_language_string(30297).format(display_type)
+                    g.get_language_string(30291).format(display_type)
                 )
         else:
             from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
@@ -1101,22 +1239,22 @@ class TraktManager(TraktAPI):
             trakt_id = self._get_show_id(item_information["info"])
             if trakt_id in collection:
                 self.dialog_list.append(
-                    g.get_language_string(30298).format(display_type)
+                    g.get_language_string(30292).format(display_type)
                 )
             else:
                 self.dialog_list.append(
-                    g.get_language_string(30297).format(display_type)
+                    g.get_language_string(30291).format(display_type)
                 )
 
     def _handle_watched_options(self, item_information, item_type):
         if item_type in ["movie", "episode"]:
             if item_information["play_count"] > 0:
-                self.dialog_list.append(g.get_language_string(30302))
+                self.dialog_list.append(g.get_language_string(30296))
             else:
-                self.dialog_list.append(g.get_language_string(30301))
+                self.dialog_list.append(g.get_language_string(30295))
         else:
             if item_information.get("unwatched_episodes", 0) > 0:
-                self.dialog_list.append(g.get_language_string(30301))
+                self.dialog_list.append(g.get_language_string(30295))
 
     @staticmethod
     def _confirm_item_information(item_information):
@@ -1139,8 +1277,8 @@ class TraktManager(TraktAPI):
             return True
         else:
             g.notification(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-                g.get_language_string(30310),
+                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+                g.get_language_string(30304),
             )
             g.log("Failed to mark item as watched\nTrakt Response: {}".format(response))
 
@@ -1153,8 +1291,8 @@ class TraktManager(TraktAPI):
             return True
         else:
             g.notification(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-                g.get_language_string(30310),
+                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+                g.get_language_string(30304),
             )
             g.log(
                 "Failed to mark item as unwatched\nTrakt Response: {}".format(response)
@@ -1215,8 +1353,8 @@ class TraktManager(TraktAPI):
                 TraktSyncDatabase().mark_show_watched(item_information["trakt_id"], 1)
 
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-            g.get_language_string(30311),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+            g.get_language_string(30305),
         )
         if not silent:
             g.container_refresh()
@@ -1257,8 +1395,8 @@ class TraktManager(TraktAPI):
         TraktSyncDatabase().remove_bookmark(item_information["trakt_id"])
 
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-            g.get_language_string(30312),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+            g.get_language_string(30306),
         )
         g.container_refresh()
         g.trigger_widget_refresh()
@@ -1277,8 +1415,8 @@ class TraktManager(TraktAPI):
             TraktSyncDatabase().mark_show_collected(trakt_id, 1)
 
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-            g.get_language_string(30313),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+            g.get_language_string(30307),
         )
         g.trigger_widget_refresh()
 
@@ -1299,16 +1437,16 @@ class TraktManager(TraktAPI):
 
         g.container_refresh()
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-            g.get_language_string(30314),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+            g.get_language_string(30308),
         )
         g.trigger_widget_refresh()
 
     def _add_to_watchlist(self, item_information):
         self.post("sync/watchlist", self._info_to_trakt_object(item_information, True))
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-            g.get_language_string(30315),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+            g.get_language_string(30309),
         )
         g.trigger_widget_refresh()
 
@@ -1318,8 +1456,8 @@ class TraktManager(TraktAPI):
         )
         g.container_refresh()
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-            g.get_language_string(30316),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+            g.get_language_string(30310),
         )
         g.trigger_widget_refresh()
 
@@ -1329,7 +1467,7 @@ class TraktManager(TraktAPI):
         get = MetadataHandler.get_trakt_info
         lists = self.get_json("users/me/lists")
         selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30319)),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30313)),
             [get(i, "name") for i in lists],
         )
         if selection == -1:
@@ -1340,8 +1478,8 @@ class TraktManager(TraktAPI):
             self._info_to_trakt_object(item_information, True),
         )
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-            g.get_language_string(30317).format(get(selection, "name")),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+            g.get_language_string(30311).format(get(selection, "name")),
         )
         g.trigger_widget_refresh()
 
@@ -1351,7 +1489,7 @@ class TraktManager(TraktAPI):
         get = MetadataHandler.get_trakt_info
         lists = self.get_json("users/me/lists")
         selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30319)),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30313)),
             [get(i, "name") for i in lists],
         )
         if selection == -1:
@@ -1363,8 +1501,8 @@ class TraktManager(TraktAPI):
         )
         g.container_refresh()
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30309)),
-            g.get_language_string(30318).format(get(selection, "name")),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
+            g.get_language_string(30312).format(get(selection, "name")),
         )
         g.trigger_widget_refresh()
 
@@ -1372,9 +1510,9 @@ class TraktManager(TraktAPI):
         from resources.lib.database.trakt_sync.hidden import TraktSyncDatabase
 
         sections = ["progress_watched", "calendar"]
-        sections_display = [g.get_language_string(30320), g.get_language_string(30321)]
+        sections_display = [g.get_language_string(30314), g.get_language_string(30315)]
         selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30322)),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30316)),
             sections_display,
         )
         if selection == -1:
@@ -1398,7 +1536,7 @@ class TraktManager(TraktAPI):
         g.container_refresh()
         g.notification(
             g.ADDON_NAME,
-            g.get_language_string(30323).format(sections_display[selection]),
+            g.get_language_string(30317).format(sections_display[selection]),
         )
         g.trigger_widget_refresh()
 
@@ -1411,6 +1549,7 @@ class TraktManager(TraktAPI):
         progress = self.get_json("sync/playback/{}".format(media_type + "s"))
         if len(progress) == 0:
             return
+        print(progress)
         if media_type == "movie":
             progress_ids = [
                 i["playback_id"]
@@ -1432,5 +1571,5 @@ class TraktManager(TraktAPI):
         TraktSyncDatabase().remove_bookmark(item_information["trakt_id"])
 
         g.container_refresh()
-        g.notification(g.ADDON_NAME, g.get_language_string(30324))
+        g.notification(g.ADDON_NAME, g.get_language_string(30318))
         g.trigger_widget_refresh()

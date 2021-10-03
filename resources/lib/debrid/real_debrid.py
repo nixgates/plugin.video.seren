@@ -109,7 +109,7 @@ class RealDebrid:
 
             user_information = self.get_url("user")
             if user_information["type"] != "premium":
-                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30213))
+                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30207))
 
     def token_request(self):
         if not self.client_secret:
