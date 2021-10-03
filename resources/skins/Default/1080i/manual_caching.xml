@@ -78,7 +78,7 @@
                         <textcolor>66FFFFFF</textcolor>
                         <align>left</align>
                         <aligny>top</aligny>
-                        <label>$ADDON[plugin.video.seren 30589]: [B][UPPERCASE]$INFO[ListItem.Property(Seeds)][/UPPERCASE][/B] | Size: [B][UPPERCASE]$INFO[ListItem.Property(size)][/UPPERCASE][/B]</label>
+                        <label>$ADDON[plugin.video.seren 30583]: [B][UPPERCASE]$INFO[ListItem.Property(Seeds)][/UPPERCASE][/B] | Size: [B][UPPERCASE]$INFO[ListItem.Property(size)][/UPPERCASE][/B]</label>
                     </control>
                     <control type="image">
                             <left>0</left>
@@ -133,7 +133,7 @@
                         <align>left</align>
                         <aligny>top</aligny>
                         <wrapmultiline>true</wrapmultiline>
-                        <label>[COLOR $INFO[Window.Property(settings.color)]]$ADDON[plugin.video.seren 30589][/COLOR]: [B][UPPERCASE]$INFO[ListItem.Property(Seeds)][/UPPERCASE][/B] | [COLOR $INFO[Window.Property(settings.color)]]Size[/COLOR]: [B][UPPERCASE]$INFO[ListItem.Property(size)][/UPPERCASE][/B]</label>
+                        <label>[COLOR $INFO[Window.Property(settings.color)]]$ADDON[plugin.video.seren 30583][/COLOR]: [B][UPPERCASE]$INFO[ListItem.Property(Seeds)][/UPPERCASE][/B] | [COLOR $INFO[Window.Property(settings.color)]]Size[/COLOR]: [B][UPPERCASE]$INFO[ListItem.Property(size)][/UPPERCASE][/B]</label>
                     </control>
                     <control type="label">
                         <top>160</top>
@@ -177,7 +177,7 @@
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30489]</label>
+                        <label>$ADDON[plugin.video.seren 30483]</label>
                         <align>right</align>
                         <textcolor>white</textcolor>
                      </control>

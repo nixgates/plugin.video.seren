@@ -74,45 +74,45 @@ class MetadataHandler(object):
         self.preferred_artwork_size = g.get_int_setting("artwork.preferredsize", 1)
 
         self.genres = {
-            "action": g.get_language_string(30526),
-            "adventure": g.get_language_string(30527),
-            "animation": g.get_language_string(30528),
-            "anime": g.get_language_string(30529),
-            "biography": g.get_language_string(30530),
-            "children": g.get_language_string(30531),
-            "comedy": g.get_language_string(30532),
-            "crime": g.get_language_string(30533),
-            "documentary": g.get_language_string(30534),
-            "drama": g.get_language_string(30535),
-            "family": g.get_language_string(30536),
-            "fantasy": g.get_language_string(30537),
-            "game-show": g.get_language_string(30538),
-            "history": g.get_language_string(30539),
-            "holiday": g.get_language_string(30540),
-            "home-and-garden": g.get_language_string(30541),
-            "horror": g.get_language_string(30542),
-            "mini-series": g.get_language_string(30543),
-            "music": g.get_language_string(30544),
-            "musical": g.get_language_string(30545),
-            "mystery": g.get_language_string(30546),
-            "news": g.get_language_string(30547),
-            "none": g.get_language_string(30548),
-            "reality": g.get_language_string(30549),
-            "romance": g.get_language_string(30550),
-            "science-fiction": g.get_language_string(30551),
-            "sci-fi": g.get_language_string(30551),
-            "short": g.get_language_string(30552),
-            "soap": g.get_language_string(30553),
-            "special-interest": g.get_language_string(30554),
-            "sporting-event": g.get_language_string(30555),
-            "superhero": g.get_language_string(30556),
-            "suspense": g.get_language_string(30557),
-            "talk-show": g.get_language_string(30558),
-            "talkshow": g.get_language_string(30558),
-            "thriller": g.get_language_string(30559),
-            "tv-movie": g.get_language_string(30560),
-            "war": g.get_language_string(30561),
-            "western": g.get_language_string(30562),
+            "action": g.get_language_string(30520),
+            "adventure": g.get_language_string(30521),
+            "animation": g.get_language_string(30522),
+            "anime": g.get_language_string(30523),
+            "biography": g.get_language_string(30524),
+            "children": g.get_language_string(30525),
+            "comedy": g.get_language_string(30526),
+            "crime": g.get_language_string(30527),
+            "documentary": g.get_language_string(30528),
+            "drama": g.get_language_string(30529),
+            "family": g.get_language_string(30530),
+            "fantasy": g.get_language_string(30531),
+            "game-show": g.get_language_string(30532),
+            "history": g.get_language_string(30533),
+            "holiday": g.get_language_string(30534),
+            "home-and-garden": g.get_language_string(30535),
+            "horror": g.get_language_string(30536),
+            "mini-series": g.get_language_string(30537),
+            "music": g.get_language_string(30538),
+            "musical": g.get_language_string(30539),
+            "mystery": g.get_language_string(30540),
+            "news": g.get_language_string(30541),
+            "none": g.get_language_string(30542),
+            "reality": g.get_language_string(30543),
+            "romance": g.get_language_string(30544),
+            "science-fiction": g.get_language_string(30545),
+            "sci-fi": g.get_language_string(30545),
+            "short": g.get_language_string(30546),
+            "soap": g.get_language_string(30547),
+            "special-interest": g.get_language_string(30548),
+            "sporting-event": g.get_language_string(30549),
+            "superhero": g.get_language_string(30550),
+            "suspense": g.get_language_string(30551),
+            "talk-show": g.get_language_string(30552),
+            "talkshow": g.get_language_string(30552),
+            "thriller": g.get_language_string(30553),
+            "tv-movie": g.get_language_string(30554),
+            "war": g.get_language_string(30555),
+            "western": g.get_language_string(30556),
         }
 
         self.meta_hash = tools.md5_hash(
@@ -362,9 +362,9 @@ class MetadataHandler(object):
             media_type = meta["info"]["mediatype"]
             title = None
             if media_type == "season":
-                title = g.get_language_string(30563).format(meta["info"]["season"])
+                title = g.get_language_string(30557).format(meta["info"]["season"])
             if media_type == "episode":
-                title = g.get_language_string(30564).format(meta["info"]["episode"])
+                title = g.get_language_string(30558).format(meta["info"]["episode"])
             if title:
                 meta["info"]["sorttitle"] = title
                 meta["info"]["title"] = title

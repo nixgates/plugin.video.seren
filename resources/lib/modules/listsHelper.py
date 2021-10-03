@@ -18,10 +18,17 @@ class ListsHelper:
     def get_list_items(self):
         arguments = g.REQUEST_PARAMS['action_args']
         media_type = g.REQUEST_PARAMS.get('media_type', arguments.get('type'))
+        ignore_cache = True
+        if g.REQUEST_PARAMS.get('from_widget') and g.REQUEST_PARAMS.get('from_widget').lower() == "true":
+            widget_loaded_setting = "widget_loaded.{}.{}".format(media_type, arguments)
+            if not g.get_bool_runtime_setting(widget_loaded_setting):
+                ignore_cache = False
+            else:
+                g.set_runtime_setting(widget_loaded_setting, True)
         list_items = self.lists_database.get_list_content(arguments['username'],
                                                           arguments['trakt_id'],
                                                           self._backwards_compatibility(media_type),
-                                                          ignore_cache=True,
+                                                          ignore_cache=ignore_cache,
                                                           page=g.PAGE,
                                                           no_paging=self.no_paging)
 
@@ -76,9 +83,7 @@ class ListsHelper:
         self.builder.lists_menu_builder(
             [tools.smart_merge_dictionary(trakt_object(trakt_list),
                                           {'args': {'trakt_id': get(trakt_list, 'trakt_id'),
-                                              'username': get(trakt_list, 'username'),
-                                              'sort_how': get(trakt_list, 'sort_how'),
-                                              'sort_by': get(trakt_list, 'sort_by')}})
+                                                    'username': get(trakt_list, 'username')}})
              for trakt_list in trakt_lists], **params)
 
     @staticmethod

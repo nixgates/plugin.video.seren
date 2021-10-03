@@ -62,7 +62,7 @@ class Premiumize:
         success = False
         tools.copy2clip(token["user_code"])
         self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30377),
+            g.ADDON_NAME + ": " + g.get_language_string(30371),
             tools.create_multiline_message(
                 line1=g.get_language_string(30018).format(
                     g.color_string(token["verification_uri"])

@@ -102,7 +102,7 @@
                         <font>font25_title</font>
                         <textcolor>eeffffff</textcolor>
                         <shadowcolor>00000000</shadowcolor>
-                        <label>$ADDON[plugin.video.seren 30590] [COLOR $INFO[Window.Property(settings.color)]]$INFO[Player.TimeRemaining(ss),,][/COLOR] $ADDON[plugin.video.seren 30591]</label>
+                        <label>$ADDON[plugin.video.seren 30584] [COLOR $INFO[Window.Property(settings.color)]]$INFO[Player.TimeRemaining(ss),,][/COLOR] $ADDON[plugin.video.seren 30585]</label>
                         <visible>!Integer.IsGreater(Player.TimeRemaining,59)</visible>
                     </control>
                     <control type="label">
@@ -112,7 +112,7 @@
                         <font>font25_title</font>
                         <textcolor>eeffffff</textcolor>
                         <shadowcolor>00000000</shadowcolor>
-                        <label>$ADDON[plugin.video.seren 30229]</label>
+                        <label>$ADDON[plugin.video.seren 30223]</label>
                         <visible>Integer.IsGreater(Player.TimeRemaining,59)</visible>
                     </control>
                     <!-- Details -->
@@ -170,7 +170,7 @@
                         <itemgap>10</itemgap>
                         <width>100%</width>
                         <control type="button" id="3001">
-                            <label>$ADDON[plugin.video.seren 30592]</label>
+                            <label>$ADDON[plugin.video.seren 30586]</label>
                             <height>56</height>
                             <width min="50">auto</width>
                             <font>font20_title</font>

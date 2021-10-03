@@ -46,6 +46,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 self._sync_show_bookmarks,
             ),
             (
+                "Shows ratings",
+                ("shows", "rated_at"),
+                "shows_rated",
+                self._sync_rated_shows,
+            ),
+            (
                 "Hidden Movies",
                 ("movies", "hidden_at"),
                 "hidden_sync",
@@ -68,6 +74,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 ("movies", "paused_at"),
                 "movies_bookmarked",
                 self._sync_movie_bookmarks,
+            ),
+            (
+                "Movie ratings",
+                ("movies", "rated_at"),
+                "movies_rated",
+                self._sync_rated_movies,
             ),
         ]
 
@@ -129,7 +141,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         if not self.sync_errors:
             self._update_activity_record("all_activities", update_time)
-            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=widgetRefresh")')
+            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=widgetRefresh&playing=False")')
 
     def _do_sync_acitivites(self, remote_activities):
         total_activities = len(self._sync_activities_list)
@@ -170,7 +182,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 and str(self.activities["all_activities"]) == self.base_date
                 and trakt_auth is not None
         ):
-            g.notification(g.ADDON_NAME, g.get_language_string(30196))
+            g.notification(g.ADDON_NAME, g.get_language_string(30190))
             # Give the people time to read the damn notification
             xbmc.sleep(500)
             self.silent = False
@@ -207,7 +219,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             self.execute_sql(
                 db.insert_query,
                 (
-                    (i.get("trakt_id"), get(i, "mediatype"), key)
+                    (i.get("trakt_id"), get(i.get("season", i), "mediatype"), key)
                     for key, value in items.items()
                     for i in value
                 ),
@@ -255,6 +267,39 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         except Exception as e:
             raise ActivitySyncFailure(e)
 
+    def _sync_rated_movies(self):
+        try:
+            trakt_rated = self.trakt_api.get_json(
+                "/sync/ratings/movies", extended="full"
+            )
+            if len(trakt_rated) == 0:
+                return
+
+            self.execute_sql("update movies set user_rating=?", (None,))
+            self.insert_trakt_movies(trakt_rated)
+
+            get = MetadataHandler.get_trakt_info
+            with self.create_temp_table(
+                    "_movies_rated",
+                    ["trakt_id", "user_rating"]
+            ) as temp_table:
+                temp_table.insert_data([{
+                    "trakt_id": get(movie, "trakt_id"),
+                    "user_rating": get(movie, "user_rating")
+                }
+                    for movie in trakt_rated
+                ])
+                self.execute_sql(
+                    """INSERT OR REPLACE INTO movies (trakt_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, 
+                    last_updated, collected, watched, args, air_date, last_watched_at, collected_at, user_rating, 
+                    needs_update) SELECT m.trakt_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, 
+                    collected, watched, args, air_date, last_watched_at, collected_at, mr.user_rating, needs_update 
+                    FROM movies as m INNER JOIN _movies_rated as mr on m.trakt_id = mr.trakt_id 
+                    """
+                )
+        except Exception as e:
+            raise ActivitySyncFailure(e)
+
     def sync_watched_episodes(self):
         try:
             get = MetadataHandler.get_trakt_info
@@ -266,9 +311,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             self.insert_trakt_shows(trakt_watched)
             self._mill_if_needed(trakt_watched, self._queue_with_progress)
             self.execute_sql("UPDATE episodes SET watched=0")
-            with self.create_temp_table("_episodes_watched",
-                                        ["trakt_show_id", "season", "episode", "last_watched_at",
-                                         "watched"]) as temp_table:
+            with self.create_temp_table(
+                    "_episodes_watched",
+                    ["trakt_show_id", "season", "episode", "last_watched_at", "watched"]
+            ) as temp_table:
                 temp_table.insert_data([{
                     "trakt_show_id": show.get("trakt_id"),
                     "season": get(season, "season"),
@@ -281,19 +327,33 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     for episode in get(season, "episodes", [])
                 ])
                 self.execute_sql(
-                    'INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, season, '
-                    'tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, collected, '
-                    'watched, "number", args, air_date, last_watched_at, collected_at) SELECT trakt_id, '
-                    'e.trakt_show_id, trakt_season_id, e.season, tvdb_id, tmdb_id, imdb_id, info, '
-                    '"cast", art, meta_hash, last_updated, collected, ew.watched, ew.episode as '
-                    '"number", args, air_date, ew.last_watched_at, collected_at FROM episodes as e INNER '
-                    'JOIN _episodes_watched as ew on e.trakt_show_id = ew.trakt_show_id AND e.season = '
-                    'ew.season and e.number = ew.episode')
+                    """INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, season, tvdb_id, 
+                    tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, collected, watched, "number", args, 
+                    air_date, last_watched_at, collected_at, user_rating) SELECT trakt_id, e.trakt_show_id, trakt_season_id, 
+                    e.season, tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, collected, 
+                    ew.watched, ew.episode as "number", args, air_date, ew.last_watched_at, collected_at, user_rating FROM 
+                    episodes as e INNER JOIN _episodes_watched as ew on e.trakt_show_id = ew.trakt_show_id AND 
+                    e.season = ew.season and e.number = ew.episode """
+                )
+                self.execute_sql(
+                    """INSERT OR REPLACE INTO seasons (trakt_id, trakt_show_id, tvdb_id, tmdb_id, season, info, 
+                    "cast", art, meta_hash, episode_count, unwatched_episodes, last_updated, args, air_date, 
+                    last_watched_at, last_collected_at, user_rating) SELECT s.trakt_id, s.trakt_show_id, s.tvdb_id, 
+                    s.tmdb_id, s.season, s.info, s."cast", s.art, s.meta_hash, s.episode_count, s.unwatched_episodes, 
+                    s.last_updated, s.args, s.air_date, max(ew.last_watched_at), s.last_collected_at, s.user_rating FROM 
+                    seasons as s INNER JOIN episodes as e on s.trakt_show_id = e.trakt_show_id and 
+                    s.trakt_id=e.trakt_season_id INNER JOIN _episodes_watched as ew on e.trakt_show_id = 
+                    ew.trakt_show_id AND e.season = ew.season and e.number = ew.episode GROUP BY s.trakt_id """
+                )
 
             self.update_shows_statistics(trakt_watched)
-            self.update_season_statistics(self.fetchall(
-                "select trakt_id from seasons where trakt_show_id in ({})"
-                    .format(",".join({str(i.get("trakt_id")) for i in trakt_watched}))))
+            self.update_season_statistics(
+                self.fetchall(
+                    "select trakt_id from seasons where trakt_show_id in ({})".format(
+                        ",".join({str(i.get("trakt_id")) for i in trakt_watched})
+                    )
+                )
+            )
         except Exception as e:
             raise ActivitySyncFailure(e)
 
@@ -311,9 +371,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
             self.execute_sql("UPDATE episodes SET collected=0")
 
-            with self.create_temp_table("_episodes_collected",
-                                        ["trakt_show_id", "season", "episode", "collected_at",
-                                         "collected"]) as temp_table:
+            with self.create_temp_table(
+                    "_episodes_collected",
+                    ["trakt_show_id", "season", "episode", "collected_at", "collected"]
+            ) as temp_table:
                 temp_table.insert_data([{
                     "trakt_show_id": show.get("trakt_id"),
                     "season": get(season, "season"),
@@ -325,19 +386,126 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     for season in get(show, "seasons", [])
                     for episode in get(season, "episodes", [])
                 ])
-                self.execute_sql('INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, '
-                                 'season, tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, '
-                                 'collected, watched, "number", args, air_date, last_watched_at, collected_at) '
-                                 'SELECT trakt_id, e.trakt_show_id, trakt_season_id, e.season, tvdb_id, tmdb_id, '
-                                 'imdb_id, info, "cast", art, meta_hash, last_updated, ec.collected, watched, '
-                                 'ec.episode as "number", args, air_date, last_watched_at, ec.collected_at FROM '
-                                 'episodes as e INNER JOIN _episodes_collected as ec on e.trakt_show_id = '
-                                 'ec.trakt_show_id AND e.season = ec.season and e.number = ec.episode')
+                self.execute_sql(
+                    """INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, season, tvdb_id, 
+                    tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, collected, watched, "number", args, 
+                    air_date, last_watched_at, collected_at, user_rating) SELECT trakt_id, e.trakt_show_id, trakt_season_id, 
+                    e.season, tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, ec.collected, 
+                    watched, ec.episode as "number", args, air_date, last_watched_at, ec.collected_at, user_rating FROM 
+                    episodes as e INNER JOIN _episodes_collected as ec on e.trakt_show_id = ec.trakt_show_id AND 
+                    e.season = ec.season and e.number = ec.episode """
+                )
+                self.execute_sql(
+                    """INSERT OR REPLACE INTO seasons (trakt_id, trakt_show_id, tvdb_id, tmdb_id, season, info, 
+                    "cast", art, meta_hash, episode_count, unwatched_episodes, last_updated, args, air_date, 
+                    last_watched_at, last_collected_at, user_rating) SELECT s.trakt_id, s.trakt_show_id, s.tvdb_id, 
+                    s.tmdb_id, s.season, s.info, s."cast", s.art, s.meta_hash, s.episode_count, s.unwatched_episodes, 
+                    s.last_updated, s.args, s.air_date, s.last_watched_at, max(ec.collected_at), s.user_rating FROM seasons 
+                    as s INNER JOIN episodes as e on s.trakt_show_id = e.trakt_show_id and s.trakt_id=e.trakt_season_id 
+                    INNER JOIN _episodes_collected as ec on e.trakt_show_id = ec.trakt_show_id AND e.season = 
+                    ec.season and e.number = ec.episode GROUP BY s.trakt_id """
+                )
 
             self.update_shows_statistics(trakt_collection)
-            self.update_season_statistics(self.fetchall(
-                "select trakt_id from seasons where trakt_show_id in ({})"
-                    .format(",".join({str(i.get("trakt_id")) for i in trakt_collection}))))
+            self.update_season_statistics(
+                self.fetchall(
+                    "select trakt_id from seasons where trakt_show_id in ({})".format(
+                        ",".join({str(i.get("trakt_id")) for i in trakt_collection})
+                    )
+                )
+            )
+
+        except Exception as e:
+            raise ActivitySyncFailure(e)
+
+    def _sync_rated_shows(self):
+        try:
+            self.execute_sql("update shows set user_rating=?", (None,))
+            self.execute_sql("update seasons set user_rating=?", (None,))
+            self.execute_sql("update episodes set user_rating=?", (None,))
+
+            trakt_rated_shows = self.trakt_api.get_json(
+                "sync/ratings/shows", extended="full"
+            )
+            self.insert_trakt_shows(trakt_rated_shows)
+
+            trakt_rated_seasons = self.trakt_api.get_json(
+                "sync/ratings/seasons", extended="full"
+            )
+            self.insert_trakt_shows(i.get("show") for i in trakt_rated_seasons)
+
+            trakt_rated_episodes = self.trakt_api.get_json(
+                "sync/ratings/episodes", extended="full"
+            )
+            self.insert_trakt_shows(i.get("show") for i in trakt_rated_episodes)
+
+            self._mill_if_needed(
+                trakt_rated_shows + trakt_rated_seasons + trakt_rated_episodes,
+                self._queue_with_progress
+            )
+
+            get = MetadataHandler.get_trakt_info
+
+            with self.create_temp_table(
+                    "_shows_rated",
+                    ["trakt_id", "user_rating"]
+            ) as temp_table:
+                temp_table.insert_data([{
+                    "trakt_id": get(show, "trakt_id"),
+                    "user_rating": get(show, "user_rating")
+                }
+                    for show in trakt_rated_shows
+                ])
+                self.execute_sql(
+                    """INSERT OR REPLACE INTO shows (trakt_id, tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, season_count, 
+                    episode_count, unwatched_episodes, watched_episodes, last_updated, args, air_date, is_airing, 
+                    last_watched_at, last_collected_at, user_rating, needs_update, needs_milling) SELECT s.trakt_id, tvdb_id, 
+                    tmdb_id, imdb_id, info, "cast", art, meta_hash, season_count, episode_count, unwatched_episodes, 
+                    watched_episodes, last_updated, args, air_date, is_airing, last_watched_at, last_collected_at, 
+                    sr.user_rating, needs_update, needs_milling FROM shows as s INNER JOIN _shows_rated as sr on 
+                    s.trakt_id = sr.trakt_id  
+                    """
+                )
+
+            with self.create_temp_table(
+                    "_seasons_rated",
+                    ["trakt_id", "user_rating"]
+            ) as temp_table:
+                temp_table.insert_data([{
+                    "trakt_id": season.get("trakt_id"),
+                    "user_rating": get(season.get("season"), "user_rating")
+                }
+                    for season in trakt_rated_seasons
+                ])
+                self.execute_sql(
+                    """INSERT OR REPLACE INTO seasons (trakt_id, trakt_show_id, tvdb_id, tmdb_id, season, info, "cast", art, meta_hash, 
+                    episode_count, unwatched_episodes, watched_episodes, last_updated, args, air_date, is_airing, 
+                    last_watched_at, last_collected_at, user_rating, needs_update) SELECT s.trakt_id, trakt_show_id, tvdb_id, 
+                    tmdb_id, season, info, "cast", art, meta_hash, episode_count, unwatched_episodes, watched_episodes, 
+                    last_updated, args, air_date, is_airing, last_watched_at, last_collected_at, sr.user_rating, needs_update 
+                    FROM seasons as s INNER JOIN _seasons_rated as sr on s.trakt_id = sr.trakt_id  
+                    """
+                )
+
+            with self.create_temp_table(
+                    "_episodes_rated",
+                    ["trakt_id", "user_rating"]
+            ) as temp_table:
+                temp_table.insert_data([{
+                    "trakt_id": episode.get("trakt_id"),
+                    "user_rating": get(episode.get("episode"), "user_rating")
+                }
+                    for episode in trakt_rated_episodes
+                ])
+                self.execute_sql(
+                    """INSERT OR REPLACE INTO episodes (trakt_id, trakt_show_id, trakt_season_id, season, tvdb_id, tmdb_id, imdb_id, 
+                    info, "cast", art, meta_hash, last_updated, collected, watched, "number", args, air_date, 
+                    last_watched_at, collected_at, user_rating, needs_update) SELECT e.trakt_id, trakt_show_id, 
+                    trakt_season_id, season, tvdb_id, tmdb_id, imdb_id, info, "cast", art, meta_hash, last_updated, 
+                    collected, watched, "number", args, air_date, last_watched_at, collected_at, er.user_rating, needs_update
+                    FROM episodes as e INNER JOIN _episodes_rated as er on e.trakt_id = er.trakt_id  
+                    """
+                )
 
         except Exception as e:
             raise ActivitySyncFailure(e)
@@ -414,21 +582,21 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                         (
                             i.get("trakt_id"),
                             int(
-                                float(i.get("progress") / 100)
+                                float(i.get("percentplayed") / 100)
                                 * get(i["episode"], "duration")
                             ),
-                            i.get("progress"),
+                            i.get("percentplayed"),
                             bookmark_type[:-1],
                             i.get("paused_at"),
                         )
                         for i in progress
-                        if i.get("progress")
-                           and 0 < i.get("progress") < 100
+                        if i.get("percentplayed")
+                           and 0 < i.get("percentplayed") < 100
                            and get(i["episode"], "duration")
                     ),
                 )
                 self.insert_trakt_shows([i["show"] for i in progress if i.get("show")])
-                self._mill_if_needed([i["show"] for i in progress if i.get("show")], mill_episodes=False)
+                self._mill_if_needed([i["show"] for i in progress if i.get("show")])
                 self.insert_trakt_episodes([i["episode"] for i in progress if i.get("episode")])
 
     def _queue_with_progress(self, func, args):

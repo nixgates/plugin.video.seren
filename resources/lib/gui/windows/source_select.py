@@ -76,10 +76,10 @@ class SourceSelect(BaseWindow):
         self.position = self.display_list.getSelectedPosition()
 
         if action_id == 117:
-            response = xbmcgui.Dialog().contextmenu([g.get_language_string(30331),
-                                                     g.get_language_string(30346),
-                                                     g.get_language_string(30503),
-                                                     g.get_language_string(30517)])
+            response = xbmcgui.Dialog().contextmenu([g.get_language_string(30325),
+                                                     g.get_language_string(30340),
+                                                     g.get_language_string(30497),
+                                                     g.get_language_string(30511)])
             if response == 0:
                 self._open_manual_cache_assist()
             elif response == 1:

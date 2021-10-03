@@ -65,6 +65,7 @@ except NameError:
 DIGIT_REGEX = re.compile(r"\d")
 SORT_TOKENS = [
     "a ",
+    "an ",
     "das ",
     "de ",
     "der ",

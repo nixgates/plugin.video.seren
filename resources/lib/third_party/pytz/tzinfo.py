@@ -1,8 +1,7 @@
 '''Base classes and helpers for building zone specific tzinfo classes'''
 
-from bisect import bisect_right
 from datetime import datetime, timedelta, tzinfo
-
+from bisect import bisect_right
 try:
     set
 except NameError:
