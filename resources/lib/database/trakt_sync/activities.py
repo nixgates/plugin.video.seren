@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+import itertools
 import time
 from datetime import datetime
 
@@ -229,7 +230,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def _fetch_hidden_section(self, section):
         items = []
-        for paged_items in self.trakt_api.get_all_pages_json("users/hidden/{}".format(section)):
+        for paged_items in self.trakt_api.get_all_pages_json("users/hidden/{}".format(section), ignore_cache=True):
             items.extend(paged_items)
         return {section: items}
 
@@ -269,11 +270,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def _sync_rated_movies(self):
         try:
-            trakt_rated = self.trakt_api.get_json(
-                "/sync/ratings/movies", extended="full"
+            trakt_rated = self.trakt_api.get_all_pages_json(
+                "/sync/ratings/movies", extended="full", limit=50, ignore_cache=True
             )
-            if len(trakt_rated) == 0:
-                return
+            trakt_rated = list(itertools.chain.from_iterable(trakt_rated))
 
             self.execute_sql("update movies set user_rating=?", (None,))
             self.insert_trakt_movies(trakt_rated)
@@ -424,23 +424,31 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             self.execute_sql("update seasons set user_rating=?", (None,))
             self.execute_sql("update episodes set user_rating=?", (None,))
 
-            trakt_rated_shows = self.trakt_api.get_json(
-                "sync/ratings/shows", extended="full"
+            trakt_rated_shows = self.trakt_api.get_all_pages_json(
+                "sync/ratings/shows", extended="full", limit=50, ignore_cache=True
             )
+            trakt_rated_shows = list(itertools.chain.from_iterable(trakt_rated_shows))
             self.insert_trakt_shows(trakt_rated_shows)
 
-            trakt_rated_seasons = self.trakt_api.get_json(
-                "sync/ratings/seasons", extended="full"
+            trakt_rated_seasons = self.trakt_api.get_all_pages_json(
+                "sync/ratings/seasons", extended="full", limit=50, ignore_cache=True
             )
+            trakt_rated_seasons = list(itertools.chain.from_iterable(trakt_rated_seasons))
             self.insert_trakt_shows(i.get("show") for i in trakt_rated_seasons)
 
-            trakt_rated_episodes = self.trakt_api.get_json(
-                "sync/ratings/episodes", extended="full"
-            )
+            def fetch_rated_episodes(rating):
+                return self.trakt_api.get_json(
+                    "sync/ratings/episodes/{}".format(rating),
+                    extended="full",
+                    no_paging=True,
+                    timeout=90
+                )
+            self._queue_with_progress(fetch_rated_episodes, [(i,) for i in range(1, 11)])
+            trakt_rated_episodes = self.mill_task_queue.wait_completion()
             self.insert_trakt_shows(i.get("show") for i in trakt_rated_episodes)
 
             self._mill_if_needed(
-                trakt_rated_shows + trakt_rated_seasons + trakt_rated_episodes,
+                trakt_rated_shows + trakt_rated_seasons +trakt_rated_episodes,
                 self._queue_with_progress
             )
 
@@ -552,7 +560,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self.execute_sql("DELETE FROM bookmarks WHERE type=?", (bookmark_type[:-1],))
         base_sql_statement = "REPLACE INTO bookmarks VALUES (?, ?, ?, ?, ?)"
         for progress in self.trakt_api.get_all_pages_json(
-                "sync/playback/{}".format(bookmark_type), extended="full", timeout=60, limit=50
+                "sync/playback/{}".format(bookmark_type), extended="full", timeout=60, limit=50, ignore_cache=True
         ):
             if bookmark_type == "movies":
                 self.execute_sql(
