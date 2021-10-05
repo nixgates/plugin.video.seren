@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals, print_function
 
-import collections
+try:  # Python >= 3.3
+    from collections.abc import Mapping
+except ImportError:  # Python < 3.3
+    from collections import Mapping
+
 import copy
 import datetime
 import hashlib
@@ -341,7 +345,7 @@ def smart_merge_dictionary(dictionary, merge_dict, keep_original=False, extend_a
         return dictionary
     for new_key, new_value in merge_dict.items():
         original_value = dictionary.get(new_key)
-        if isinstance(new_value, (dict, collections.Mapping)):
+        if isinstance(new_value, (dict, Mapping)):
             if original_value is None:
                 original_value = {}
             new_value = smart_merge_dictionary(original_value, new_value, keep_original, extend_array)

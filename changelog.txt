@@ -1,3 +1,8 @@
+Changelog 2.1.6
+Work around Sqlite on Leia under Windows does not support boolean named values
+Ensure we fetch all pages for syncing ratings and ignore cache for bookmark/hidden sync
+Fix collections.Mapping import for Python >= 3.3
+
 Changelog 2.1.5
 Workaround trakt shitty season data
 Added trakt list sort types for Watched, Collected and My Rating

@@ -912,7 +912,7 @@ class TraktSyncDatabase(Database):
                     self.update_season_statistics({"trakt_id": i['trakt_id']} for i in seasons)
 
                 self.execute_sql(
-                    "UPDATE shows SET needs_milling=False where trakt_id in ({})".format(
+                    "UPDATE shows SET needs_milling=0 where trakt_id in ({})".format(
                         ",".join(map(str, sync_lock.running_ids))
                     )
                 )
@@ -1174,18 +1174,18 @@ class TraktSyncDatabase(Database):
     @property
     def upsert_movie_query(self):
         return """INSERT or REPLACE into movies ( trakt_id, info, art, cast, collected, watched, air_date, 
-        last_updated, tmdb_id, imdb_id, meta_hash, args, collected_at, last_watched_at, user_rating, needs_update) SELECT 
-        COALESCE( new.trakt_id, old.trakt_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), 
+        last_updated, tmdb_id, imdb_id, meta_hash, args, collected_at, last_watched_at, user_rating, needs_update) 
+        SELECT COALESCE(new.trakt_id, old.trakt_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), 
         COALESCE(new.cast, old.cast), COALESCE(new.collected, old.collected), COALESCE(new.watched, old.watched), 
         COALESCE(new.air_date, old.air_date), COALESCE(new.last_updated, old.last_updated), COALESCE(new.tmdb_id, 
         old.tmdb_id), COALESCE(new.imdb_id, old.imdb_id), COALESCE(new.meta_hash, old.meta_hash), COALESCE(new.args, 
         old.args), COALESCE(new.collected_at, old.collected_at), COALESCE(new.last_watched_at, old.last_watched_at), 
-        COALESCE(new.user_rating, old.user_rating), CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR new.art 
-        != old.art OR new.cast != old.cast THEN False ELSE old.needs_update END ELSE CASE WHEN Datetime(COALESCE(
-        old.last_updated, 0)) < Datetime( new.last_updated) THEN True ELSE False END END as needs_update FROM ( 
-        SELECT ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? AS collected, ? as watched, ? AS air_date, 
-        ? AS last_updated, ? AS tmdb_id, ? AS imdb_id, ? AS meta_hash, ? AS args, ? AS collected_at, 
-        ? AS last_watched_at, ? AS user_rating) AS new LEFT JOIN (SELECT * FROM movies WHERE trakt_id = ? limit 1) AS old """
+        COALESCE(new.user_rating, old.user_rating), CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR 
+        new.art != old.art OR new.cast != old.cast THEN 0 ELSE old.needs_update END ELSE CASE WHEN Datetime(COALESCE( 
+        old.last_updated, 0)) < Datetime( new.last_updated) THEN 1 ELSE 0 END END as needs_update FROM ( SELECT ? AS 
+        trakt_id, ? AS info, ? AS art, ? AS cast, ? AS collected, ? as watched, ? AS air_date, ? AS last_updated, 
+        ? AS tmdb_id, ? AS imdb_id, ? AS meta_hash, ? AS args, ? AS collected_at, ? AS last_watched_at, 
+        ? AS user_rating) AS new LEFT JOIN (SELECT * FROM movies WHERE trakt_id = ? limit 1) AS old """
 
     @property
     def upsert_show_query(self):
@@ -1198,15 +1198,15 @@ class TraktSyncDatabase(Database):
         old.meta_hash), COALESCE(new.season_count, old.season_count), COALESCE(new.episode_count, old.episode_count), 
         COALESCE(old.watched_episodes, 0), COALESCE(old.unwatched_episodes, 0), COALESCE(new.args, old.args), 
         COALESCE(new.is_airing, old.is_airing), COALESCE(new.last_watched_at, old.last_watched_at), 
-        COALESCE(new.last_collected_at, old.last_collected_at), COALESCE(new.user_rating, old.user_rating), CASE WHEN 
-        old.needs_update THEN CASE WHEN new.info != old.info OR new.art != old.art OR new.cast != old.cast THEN False 
-        ELSE old.needs_update END ELSE CASE WHEN Datetime( COALESCE(old.last_updated,0)) < Datetime(new.last_updated) 
-        THEN True ELSE False END END as needs_update, CASE WHEN old.needs_milling THEN old.needs_milling ELSE CASE 
-        WHEN Datetime(COALESCE(old.last_updated, 0)) < Datetime(new.last_updated) THEN True ELSE False END END as 
+        COALESCE(new.last_collected_at, old.last_collected_at), COALESCE(new.user_rating, old.user_rating), 
+        CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR new.art != old.art OR new.cast != old.cast 
+        THEN 0 ELSE old.needs_update END ELSE CASE WHEN Datetime( COALESCE(old.last_updated,0)) < Datetime(
+        new.last_updated) THEN 1 ELSE 0 END END as needs_update, CASE WHEN old.needs_milling THEN old.needs_milling 
+        ELSE CASE WHEN Datetime(COALESCE(old.last_updated, 0)) < Datetime(new.last_updated) THEN 1 ELSE 0 END END as 
         needs_milling FROM (SELECT ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? AS air_date, ? AS last_updated, 
         ? AS tmdb_id, ? AS tvdb_id, ? AS imdb_id, ? AS meta_hash, ? AS season_count, ? AS episode_count, ? AS args, 
-        ? as is_airing, ? AS last_watched_at, ? AS last_collected_at, ? AS user_rating) AS new LEFT JOIN (SELECT * FROM 
-        shows WHERE trakt_id = ? limit 1) AS old """
+        ? as is_airing, ? AS last_watched_at, ? AS last_collected_at, ? AS user_rating) AS new LEFT JOIN (SELECT * 
+        FROM shows WHERE trakt_id = ? limit 1) AS old """
 
     @property
     def upsert_season_query(self):
@@ -1219,13 +1219,13 @@ class TraktSyncDatabase(Database):
         COALESCE(new.meta_hash, old.meta_hash), COALESCE(new.episode_count, old.episode_count), old.watched_episodes, 
         old.unwatched_episodes, COALESCE(new.season, old.season), COALESCE(new.args, old.args), old.is_airing, 
         COALESCE(new.last_watched_at, old.last_watched_at), COALESCE(new.last_collected_at, old.last_collected_at), 
-        COALESCE(new.user_rating, old.user_rating), CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR new.art 
-        != old.art OR new.cast != old.cast THEN False ELSE old.needs_update END ELSE CASE WHEN Datetime(COALESCE(
-        old.last_updated,0)) < Datetime(new.last_updated) THEN True ELSE False END END as needs_update FROM (SELECT ? 
-        AS trakt_show_id, ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? AS air_date, ? AS last_updated, 
-        ? AS tmdb_id, ? AS tvdb_id, ? AS meta_hash, ? AS episode_count, ? AS season, ? AS args, ? AS last_watched_at, 
-        ? AS last_collected_at, ? AS user_rating) AS new LEFT JOIN (SELECT * FROM seasons WHERE trakt_id = ? limit 1) AS 
-        old """
+        COALESCE(new.user_rating, old.user_rating), CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR 
+        new.art != old.art OR new.cast != old.cast THEN 0 ELSE old.needs_update END ELSE CASE WHEN Datetime(COALESCE( 
+        old.last_updated,0)) < Datetime(new.last_updated) THEN 1 ELSE 0 END END as needs_update FROM (SELECT ? AS 
+        trakt_show_id, ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? AS air_date, ? AS last_updated, ? AS tmdb_id, 
+        ? AS tvdb_id, ? AS meta_hash, ? AS episode_count, ? AS season, ? AS args, ? AS last_watched_at, 
+        ? AS last_collected_at, ? AS user_rating) AS new LEFT JOIN (SELECT * FROM seasons WHERE trakt_id = ? limit 1) 
+        AS old """
 
     @property
     def upsert_episode_query(self):
@@ -1236,13 +1236,13 @@ class TraktSyncDatabase(Database):
         COALESCE(new.watched, old.watched), COALESCE(new.collected, old.collected), COALESCE(new.air_date, 
         old.air_date), COALESCE(new.last_updated, old.last_updated), COALESCE(new.season, old.season), 
         COALESCE(new.number, old.number), COALESCE(new.tmdb_id, old.tmdb_id), COALESCE(new.tvdb_id, old.tvdb_id), 
-        COALESCE( new.imdb_id, old.imdb_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), 
-        COALESCE(new.cast , old.cast), COALESCE(new.args, old.args), COALESCE(new.last_watched_at, 
-        old.last_watched_at), COALESCE(new.collected_at, old.collected_at), COALESCE(new.user_rating, old.user_rating), 
-        COALESCE(new.meta_hash, old.meta_hash), CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR 
-        new.art != old.art OR new.cast != old.cast THEN False ELSE old.needs_update END ELSE CASE WHEN Datetime(
-        COALESCE(old.last_updated,0)) < Datetime( new.last_updated) THEN True ELSE False END END as needs_update FROM 
-        (SELECT ? AS trakt_id, ? AS trakt_show_id, ? AS trakt_season_id, ? AS watched, ? AS collected, ? AS air_date, 
-        ? AS last_updated, ? AS season, ? AS number, ? AS tmdb_id, ? AS tvdb_id, ? AS imdb_id, ? AS info, ? AS art, 
-        ? AS cast, ? AS args, ? AS last_watched_at, ? AS collected_at, ? AS user_rating, ? AS meta_hash) AS new LEFT JOIN 
-        (SELECT * FROM episodes WHERE trakt_id = ? limit 1) AS old """
+        COALESCE(new.imdb_id, old.imdb_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), 
+        COALESCE(new.cast, old.cast), COALESCE(new.args, old.args), COALESCE(new.last_watched_at, 
+        old.last_watched_at), COALESCE(new.collected_at, old.collected_at), COALESCE(new.user_rating, 
+        old.user_rating), COALESCE(new.meta_hash, old.meta_hash), CASE WHEN old.needs_update THEN CASE WHEN new.info 
+        != old.info OR new.art != old.art OR new.cast != old.cast THEN 0 ELSE old.needs_update END ELSE CASE WHEN 
+        Datetime( COALESCE(old.last_updated,0)) < Datetime( new.last_updated) THEN 1 ELSE 0 END END as needs_update 
+        FROM (SELECT ? AS trakt_id, ? AS trakt_show_id, ? AS trakt_season_id, ? AS watched, ? AS collected, 
+        ? AS air_date, ? AS last_updated, ? AS season, ? AS number, ? AS tmdb_id, ? AS tvdb_id, ? AS imdb_id, 
+        ? AS info, ? AS art, ? AS cast, ? AS args, ? AS last_watched_at, ? AS collected_at, ? AS user_rating, 
+        ? AS meta_hash) AS new LEFT JOIN (SELECT * FROM episodes WHERE trakt_id = ? limit 1) AS old """
