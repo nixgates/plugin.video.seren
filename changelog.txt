@@ -1,3 +1,13 @@
+Changelog 2.1.7
+Fix MyFiles listings for all FileWalkers
+Fix Rescrape item should overwrite torrent cache
+Added info meta up to par check in fallback logic
+Fix playback history normalization needed for Quick Resume context menu bug
+Fix reset playback progress for shows/seasons/episodes
+Handle Cloudflare 530 error for Trakt
+Fix Premiumize.me space_used now returns value in TB
+Handle bugs in Premiumize.me API for list files gracefully.
+
 Changelog 2.1.6
 Work around Sqlite on Leia under Windows does not support boolean named values
 Ensure we fetch all pages for syncing ratings and ignore cache for bookmark/hidden sync

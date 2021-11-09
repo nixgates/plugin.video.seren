@@ -200,7 +200,7 @@ class AllDebrid:
         return resolve["link"]
 
     def magnet_status(self, magnet_id):
-        return self.get_json("magnet/status", id=magnet_id)
+        return self.get_json("magnet/status", id=magnet_id) if magnet_id else self.get_json("magnet/status")
 
     def saved_magnets(self):
         return self.get_json("magnet/status")['magnets']

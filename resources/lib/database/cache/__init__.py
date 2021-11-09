@@ -362,15 +362,17 @@ def use_cache(cache_hours=12):
                 if isinstance(v, types.GeneratorType):
                     raise UnsupportedCacheParamException("generator")
 
-            try:
-                global_cache_ignore = g.get_bool_runtime_setting("ignore.cache")
-            except Exception:
-                global_cache_ignore = False
-            checksum = _get_checksum(method_class.__class__.__name__, func.__name__)
+            overwrite_cache = (
+                kwargs.get("overwrite_cache", False)
+                if func.__name__ == "get_sources"
+                else kwargs.pop("overwrite_cache", False)
+            )
+            global_cache_ignore = g.get_bool_runtime_setting("ignore.cache", False)
             ignore_cache = kwargs.pop("ignore_cache", False)
             if ignore_cache or global_cache_ignore:
                 return func(*args, **kwargs)
-            overwrite_cache = kwargs.pop("overwrite_cache", False)
+
+            checksum = _get_checksum(method_class.__class__.__name__, func.__name__)
             hours = kwargs.pop("cache_hours", cache_hours)
             cache_str = "{}.{}.{}.{}".format(
                 method_class.__class__.__name__,

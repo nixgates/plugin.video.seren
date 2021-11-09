@@ -1251,7 +1251,7 @@ class GlobalVariables(object):
         return [
             i
             for i in xbmc.getSupportedMedia("video").split("|")
-            if i != "" and i != ".zip"
+            if i not in ["", ".zip", ".rar"]
         ]
 
     def add_directory_item(self, name, **params):

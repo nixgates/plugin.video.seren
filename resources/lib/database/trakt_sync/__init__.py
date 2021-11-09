@@ -762,18 +762,18 @@ class TraktSyncDatabase(Database):
         query = (
             """select s.trakt_id, s.needs_milling, s.season_count, agg.meta_count, agg.tot_season_count, 
             agg.tot_meta_count from shows as s left join(select s.trakt_id, sum(CASE WHEN se.trakt_id is not null 
-            and se.season != 0 and Datetime(se.air_date) < Datetime('now') THEN 1 ELSE 0 END) as season_count, 
-            sum(CASE WHEN sm.id is not null and se.season != 0 and Datetime(se.air_date) < Datetime('now') THEN 1 
+            and se.season != 0 and Datetime(se.air_date) < Datetime('{datetime}') THEN 1 ELSE 0 END) as season_count, 
+            sum(CASE WHEN sm.id is not null and se.season != 0 and Datetime(se.air_date) < Datetime('{datetime}') THEN 1 
             ELSE 0 END) as meta_count, count(se.trakt_id) as tot_season_count, count(sm.id) as tot_meta_count from 
             shows as s inner join seasons as se on s.trakt_id = se.trakt_show_id left join seasons_meta as sm on 
-            sm.id = se.trakt_id and sm.type = 'trakt' and sm.meta_hash = '{}' WHERE s.trakt_id in ({}) GROUP BY 
-            s.trakt_id) as agg on s.trakt_id = agg.trakt_id WHERE s.trakt_id in ({}) AND ((s.needs_milling or (
+            sm.id = se.trakt_id and sm.type = 'trakt' and sm.meta_hash = '{meta_hash}' WHERE s.trakt_id in ({ids}) GROUP BY 
+            s.trakt_id) as agg on s.trakt_id = agg.trakt_id WHERE s.trakt_id in ({ids}) AND ((s.needs_milling or (
             agg.season_count is NULL or agg.season_count != s.season_count) or (agg.meta_count = 0 or 
             agg.meta_count!=s.season_count) or agg.tot_season_count != agg.tot_meta_count)) """
         ).format(
-            self.trakt_api.meta_hash,
-            ids_to_mill_check,
-            ids_to_mill_check
+            meta_hash=self.trakt_api.meta_hash,
+            ids=ids_to_mill_check,
+            datetime=self._get_datetime_now()
         )
         needs_milling = self.fetchall(query)
         if needs_milling is not None:
@@ -785,18 +785,18 @@ class TraktSyncDatabase(Database):
             query = (
                 """select s.trakt_id, s.episode_count, agg.episode_count, agg.meta_count, agg.tot_episode_count, 
                 agg.tot_meta_count from shows as s left join(select s.trakt_id, sum(CASE WHEN e.trakt_id is not null 
-                and e.season != 0 and Datetime(e.air_date) < Datetime('now') THEN 1 END) as episode_count, 
-                sum(CASE WHEN em.id is not null and e.season != 0 and Datetime(e.air_date) < Datetime('now') THEN 1 
+                and e.season != 0 and Datetime(e.air_date) < Datetime('{datetime}') THEN 1 END) as episode_count, 
+                sum(CASE WHEN em.id is not null and e.season != 0 and Datetime(e.air_date) < Datetime('{datetime}') THEN 1 
                 END) as meta_count, count(e.trakt_id) as tot_episode_count, count(em.id) as tot_meta_count from shows 
                 as s inner join episodes as e on s.trakt_id = e.trakt_show_id left join episodes_meta as em on em.id 
-                = e.trakt_id and em.type = 'trakt' and em.meta_hash = '{}' WHERE s.trakt_id in ({}) GROUP BY 
-                s.trakt_id) as agg on s.trakt_id = agg.trakt_id WHERE s.trakt_id in ({}) AND ((agg.episode_count is 
+                = e.trakt_id and em.type = 'trakt' and em.meta_hash = '{meta_hash}' WHERE s.trakt_id in ({ids}) GROUP BY 
+                s.trakt_id) as agg on s.trakt_id = agg.trakt_id WHERE s.trakt_id in ({ids}) AND ((agg.episode_count is 
                 NULL or agg.episode_count != s.episode_count) or (agg.meta_count = 0 or 
                 agg.meta_count!=s.episode_count) or (agg.tot_episode_count != agg.tot_meta_count)) """
             ).format(
-                self.trakt_api.meta_hash,
-                ids_to_mill_check,
-                ids_to_mill_check
+                meta_hash=self.trakt_api.meta_hash,
+                ids=ids_to_mill_check,
+                datetime=self._get_datetime_now()
             )
             episodes_needs_milling = self.fetchall(query)
             if episodes_needs_milling is not None:
@@ -1062,7 +1062,7 @@ class TraktSyncDatabase(Database):
                 )
             )
             if hide_unaired:
-                query += " AND Datetime(air_date) < Datetime('now')"
+                query += " AND Datetime(air_date) < Datetime('{}')".format(self._get_datetime_now())
             if hide_watched:
                 if media_type == "movies":
                     query += " AND watched = 0"
@@ -1117,17 +1117,17 @@ class TraktSyncDatabase(Database):
             old.last_collected_at, old.user_rating, old.needs_update, old.needs_milling FROM (select sh.trakt_id, 
             CASE WHEN min(COALESCE(e.air_date, datetime('9999-12-31T00:00:00'))) <> datetime('9999-12-31T00:00:00') 
             THEN min(COALESCE(e.air_date, datetime('9999-12-31T00:00:00'))) END as air_date, CASE WHEN count(distinct 
-            CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN season END) > 0 THEN count(
-            distinct CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN season END) END as 
-            season_count, sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 END) as 
-            episode_count, ( CASE WHEN sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 
-            END) > sh.episode_count THEN sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 
+            CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN season END) > 0 THEN count(
+            distinct CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN season END) END as 
+            season_count, sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN 1 END) as 
+            episode_count, ( CASE WHEN sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN 1 
+            END) > sh.episode_count THEN sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN 
             1 END) ELSE sh.episode_count END ) - sum(CASE WHEN e.watched > 0 AND e.season != 0 AND Datetime(
-            e.air_date) < Datetime('now') THEN 1 ELSE 0 END) as unwatched_episodes, sum( CASE WHEN e.watched > 0 AND 
-            e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 END ) as watched_episodes from shows as 
+            e.air_date) < Datetime('{datetime}') THEN 1 ELSE 0 END) as unwatched_episodes, sum( CASE WHEN e.watched > 0 AND 
+            e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN 1 END ) as watched_episodes from shows as 
             sh left join episodes as e on e.trakt_show_id = sh.trakt_id group by sh.trakt_id) AS new LEFT JOIN (
             SELECT * FROM shows) AS old on old.trakt_id = new.trakt_id """
-        )
+        ).format(datetime=self._get_datetime_now())
         if trakt_list:
             trakt_ids = ",".join({str(i.get("trakt_id")) for i in trakt_list})
             query += " where old.trakt_id in ({})".format(trakt_ids)
@@ -1156,14 +1156,14 @@ class TraktSyncDatabase(Database):
             old.needs_update FROM ( SELECT se.trakt_id, CASE WHEN min(COALESCE( e.air_date, 
             datetime('9999-12-31T00:00:00'))) <> datetime( '9999-12-31T00:00:00') THEN min(COALESCE( e.air_date, 
             datetime('9999-12-31T00:00:00'))) END as air_date, CASE WHEN max(e.trakt_id) is not null THEN sum(CASE 
-            WHEN datetime(e.air_date) < datetime('now') THEN 1 ELSE 0 END) END AS episode_count, CASE WHEN max( 
-            e.trakt_id) is not null THEN sum(CASE WHEN e.watched == 0 AND datetime(e.air_date) < datetime('now') THEN 
+            WHEN datetime(e.air_date) < datetime('{datetime}') THEN 1 ELSE 0 END) END AS episode_count, CASE WHEN max( 
+            e.trakt_id) is not null THEN sum(CASE WHEN e.watched == 0 AND datetime(e.air_date) < datetime('{datetime}') THEN 
             1 ELSE 0 END) END AS unwatched_episodes, CASE WHEN max( e.trakt_id) is not null THEN sum(CASE WHEN 
-            e.watched > 0 AND datetime(e.air_date) < datetime('now') THEN 1 ELSE 0 END) END AS watched_episodes, 
-            CASE WHEN max(e.trakt_id) is not null THEN CASE WHEN max( e.air_date) > datetime('now') THEN 1 ELSE 0 END 
+            e.watched > 0 AND datetime(e.air_date) < datetime('{datetime}') THEN 1 ELSE 0 END) END AS watched_episodes, 
+            CASE WHEN max(e.trakt_id) is not null THEN CASE WHEN max( e.air_date) > datetime('{datetime}') THEN 1 ELSE 0 END 
             END AS is_airing FROM seasons AS se LEFT JOIN episodes AS e ON e.trakt_season_id = se.trakt_id GROUP BY 
             se.trakt_id ) AS new LEFT JOIN (SELECT * FROM seasons) AS old ON new.trakt_id = old.trakt_id """
-        )
+        ).format(datetime=self._get_datetime_now())
         if trakt_list:
             trakt_ids = ",".join({str(i.get("trakt_id")) for i in trakt_list})
             query += " where old.trakt_id in ({})".format(trakt_ids)
