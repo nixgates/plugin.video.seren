@@ -9,87 +9,134 @@ import xbmcgui
 from resources.lib.database import Database
 from resources.lib.modules.globals import g
 
+TV_CACHE_TYPE = "tvshow"
+MOVIE_CACHE_TYPE = "movie"
+
 schema = {
-    "cache": {
+    MOVIE_CACHE_TYPE: {
         "columns": collections.OrderedDict(
             [
                 ("trakt_id", ["TEXT", "NOT NULL"]),
-                ("meta", ["PICKLE", "NOT NULL"]),
-                ("hash", ["TEXT", "NOT NULL", "PRIMARY KEY"]),
-                ("season", ["TEXT", "NOT NULL"]),
-                ("episode", ["TEXT", "NOT NULL"]),
+                ("hash", ["TEXT", "NOT NULL", "UNIQUE"]),
                 ("package", ["TEXT", "NOT NULL"]),
+                ("torrent_object", ["PICKLE", "NOT NULL"]),
             ]
         ),
-        "table_constraints": ["UNIQUE(hash)"],
+        "table_constraints": ["PRIMARY KEY(trakt_id, hash, package)"],
+        "default_seed": [],
+    },
+    TV_CACHE_TYPE: {
+        "columns": collections.OrderedDict(
+            [
+                ("trakt_id", ["TEXT", "NOT NULL"]),
+                ("hash", ["TEXT", "NOT NULL", "UNIQUE"]),
+                ("package", ["TEXT", "NOT NULL"]),
+                ("torrent_object", ["PICKLE", "NOT NULL"]),
+            ]
+        ),
+        "table_constraints": ["PRIMARY KEY(trakt_id, hash, package)"],
         "default_seed": [],
     }
 }
+
+INSERT_TV_CACHE_QUERY = "REPLACE INTO {} (trakt_id, hash, package, torrent_object) VALUES (?, ?, ?, ?)".format(TV_CACHE_TYPE)
+INSERT_MOVIE_CACHE_QUERY = "REPLACE INTO {} (trakt_id, hash, package, torrent_object) VALUES (?, ?, ?, ?)".format(MOVIE_CACHE_TYPE)
 
 
 class TorrentCache(Database):
     def __init__(self):
         super(TorrentCache, self).__init__(g.TORRENT_CACHE, schema)
-        self.table_name = next(iter(schema))
         self.enabled = g.get_bool_setting("general.torrentCache")
+
+    @staticmethod
+    def _get_item_id_keys(item_meta):
+        trakt_season_id = trakt_show_id = None
+        trakt_id = item_meta["trakt_id"]
+
+        if item_meta["info"]["mediatype"] == "episode":
+            cache_type = TV_CACHE_TYPE
+            trakt_season_id = item_meta["info"]["trakt_season_id"]
+            trakt_show_id = item_meta["info"]["trakt_show_id"]
+        else:
+            cache_type = MOVIE_CACHE_TYPE
+
+        return cache_type, trakt_id, trakt_season_id, trakt_show_id
 
     def get_torrents(self, item_meta):
         if not self.enabled:
             return []
-        if item_meta["info"]["mediatype"] == "episode":
-            season = item_meta["info"]["season"]
-            episode = item_meta["info"]["episode"]
-            trakt_id = item_meta["info"]["trakt_show_id"]
 
+        cache_type, trakt_id, trakt_season_id, trakt_show_id = TorrentCache._get_item_id_keys(item_meta)
+
+        if cache_type == TV_CACHE_TYPE:
             torrent_list = self.fetchall(
-                "SELECT * FROM cache WHERE trakt_id=? AND package=?",
-                (trakt_id, "tvshow"),
+                "SELECT torrent_object from {} "
+                "WHERE (trakt_id={} AND package='single') "
+                "   OR (trakt_id={} AND package='season') "
+                "   OR (trakt_id={} AND package='tvshow') ".format(
+                    cache_type,
+                    trakt_id,
+                    trakt_season_id,
+                    trakt_show_id
+                )
             )
-            torrent_list += self.fetchall(
-                "SELECT * FROM cache WHERE trakt_id=? AND package=? AND season=?",
-                (trakt_id, "season", season),
-            )
-            torrent_list += self.fetchall(
-                "SELECT * FROM cache WHERE trakt_id=? AND package=? AND season=? "
-                "AND episode=?",
-                (trakt_id, "single", season, episode),
-            )
-
         else:
-            trakt_id = item_meta["trakt_id"]
             torrent_list = self.fetchall(
-                "SELECT * FROM cache WHERE trakt_id=?", (trakt_id,)
+                "SELECT torrent_object from {} "
+                "WHERE trakt_id={} ".format(
+                    cache_type,
+                    trakt_id,
+                )
             )
 
-        return [i["meta"] for i in torrent_list]
+        return [i["torrent_object"] for i in torrent_list]
 
     def add_torrent(self, item_meta, torrent_objects):
         if not self.enabled:
-            return []
-        if item_meta["info"]["mediatype"] == "episode":
-            season = item_meta["info"]["season"]
-            episode = item_meta["info"]["episode"]
-            trakt_id = item_meta["info"]["trakt_show_id"]
-        else:
-            season = 0
-            episode = 0
-            trakt_id = item_meta["trakt_id"]
+            return
+
+        cache_type, trakt_id, trakt_season_id, trakt_show_id = TorrentCache._get_item_id_keys(item_meta)
 
         self.execute_sql(
-            "REPLACE INTO {} (trakt_id, meta, hash, season, episode, package) "
-            "VALUES (?, ?, ?, ?, ?, ?)".format(self.table_name),
+            "REPLACE INTO {} (trakt_id, hash, package, torrent_object) VALUES (?, ?, ?, ?)".format(cache_type),
             (
                 (
-                    trakt_id,
-                    torrent_object,
+                    (
+                        trakt_show_id if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "tvshow"
+                        else trakt_season_id if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "season"
+                        else trakt_id
+                    ),
                     torrent_object["hash"],
-                    season,
-                    episode,
                     torrent_object["package"],
+                    torrent_object,
                 )
                 for torrent_object in torrent_objects
             ),
         )
+
+    def clear_item(self, item_meta, clear_packs=True):
+        cache_type, trakt_id, trakt_season_id, trakt_show_id = TorrentCache._get_item_id_keys(item_meta)
+
+        if cache_type == TV_CACHE_TYPE and clear_packs:
+            self.execute_sql(
+                "DELETE FROM {} "
+                "WHERE (trakt_id={} AND package='single') "
+                "   OR (trakt_id={} AND package='season') "
+                "   OR (trakt_id={} AND package='tvshow') ".format(
+                    cache_type,
+                    trakt_id,
+                    trakt_season_id,
+                    trakt_show_id
+                )
+            )
+        else:
+            self.execute_sql(
+                "DELETE FROM {} "
+                "WHERE trakt_id={} AND package='single' ".format(
+                    cache_type,
+                    trakt_id,
+                )
+            )
 
     def clear_all(self):
         g.show_busy_dialog()

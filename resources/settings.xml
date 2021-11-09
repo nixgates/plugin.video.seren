@@ -317,7 +317,7 @@
         <setting id="premiumize.autodelete" type="bool" subsetting="true" label="30166" default="true"
                  visible="eq(-9,true)"/>
         <setting id="premiumize.threshold" type="slider" subsetting="true" label="30165" range="50,50,1000"
-                 default="750" visible="eq(-1,true) + eq(-10,true)"/>
+                 option="int" default="750" visible="eq(-1,true) + eq(-10,true)"/>
         <setting id="premiumize.cloudInspection" type="bool" subsetting="true" label="30202" default="true"
                  visible="eq(-11,true)"/>
 

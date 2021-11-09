@@ -116,38 +116,38 @@ msgctxt "#30017"
 msgid "Real-Debrid Auth"
 msgstr "مصادقة Real-Debrid"
 
-#: /resources/lib/indexers/trakt.py:498 /resources/lib/debrid/premiumize.py:66
+#: /resources/lib/indexers/trakt.py:507 /resources/lib/debrid/premiumize.py:65
 #: /resources/lib/debrid/real_debrid.py:77
 #: /resources/lib/debrid/all_debrid.py:124
 msgctxt "#30018"
 msgid "Open this link in a browser: {}"
 msgstr "افتح هذا الرابط في المتصفح: {}"
 
-#: /resources/lib/indexers/trakt.py:501 /resources/lib/debrid/premiumize.py:69
+#: /resources/lib/indexers/trakt.py:510 /resources/lib/debrid/premiumize.py:68
 #: /resources/lib/debrid/real_debrid.py:80
 #: /resources/lib/debrid/all_debrid.py:127
 msgctxt "#30019"
 msgid "Enter the code: {}"
 msgstr "ادخل الرمز: {}"
 
-#: /resources/lib/debrid/premiumize.py:88
+#: /resources/lib/debrid/premiumize.py:87
 #: /resources/lib/debrid/real_debrid.py:129
 #: /resources/lib/debrid/all_debrid.py:151
 msgctxt "#30020"
 msgid "Authentication is completed"
 msgstr "المصادقة اكتملت"
 
-#: /resources/lib/indexers/trakt.py:471
+#: /resources/lib/indexers/trakt.py:480
 msgctxt "#30021"
 msgid "Trakt Successfully Disconnected"
 msgstr "تم قطع اتصال Trakt بنجاح"
 
-#: /resources/lib/indexers/trakt.py:496
+#: /resources/lib/indexers/trakt.py:505
 msgctxt "#30022"
 msgid "Authorize Trakt"
 msgstr "مصادقة Trakt"
 
-#: /resources/lib/indexers/trakt.py:491 /resources/lib/indexers/trakt.py:556
+#: /resources/lib/indexers/trakt.py:500 /resources/lib/indexers/trakt.py:565
 msgctxt "#30023"
 msgid ""
 "Error while authenticating with Trakt.\n"
@@ -156,7 +156,7 @@ msgstr ""
 "خطأ أثناء إجراء المصادقة مع Trakt\n"
 "يرجى المحاولة مرة أخرى"
 
-#: /resources/lib/indexers/tvdb.py:57 /resources/lib/indexers/trakt.py:92
+#: /resources/lib/indexers/tvdb.py:57 /resources/lib/indexers/trakt.py:93
 #: /resources/lib/indexers/tmdb.py:51 /resources/lib/indexers/omdb.py:63
 #: /resources/lib/indexers/fanarttv.py:35
 #: /resources/lib/debrid/all_debrid.py:48
@@ -281,7 +281,7 @@ msgctxt "#30046"
 msgid "New TV Shows"
 msgstr "مسلسلات جديدة"
 
-#: /resources/lib/indexers/trakt.py:502 /resources/lib/debrid/premiumize.py:72
+#: /resources/lib/indexers/trakt.py:511 /resources/lib/debrid/premiumize.py:71
 #: /resources/lib/debrid/real_debrid.py:83
 #: /resources/lib/debrid/all_debrid.py:128
 msgctxt "#30047"
@@ -313,17 +313,17 @@ msgctxt "#30052"
 msgid "All Cache Successfully Cleared"
 msgstr "تم تفريغ ذاكرة التخزين المؤقت بنجاح"
 
-#: /resources/lib/modules/getSources.py:199
+#: /resources/lib/modules/getSources.py:203
 msgctxt "#30053"
 msgid "Checking Local Database"
 msgstr "جارٍ التحقق من قاعدة البيانات المحلية"
 
-#: /resources/lib/modules/getSources.py:123
+#: /resources/lib/modules/getSources.py:127
 msgctxt "#30054"
 msgid "Initializing Providers"
 msgstr "جارٍ بدء تشغيل موفر المصادر"
 
-#: /resources/lib/modules/getSources.py:218
+#: /resources/lib/modules/getSources.py:222
 msgctxt "#30055"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -332,7 +332,7 @@ msgstr ""
 "لم يتم العثور على مصادر للعنصر التالي في قائمة التشغيل.\n"
 "جارٍ مسح قائمة التشغيل الحالية"
 
-#: /resources/lib/modules/getSources.py:362
+#: /resources/lib/modules/getSources.py:371
 msgctxt "#30056"
 msgid ""
 "No Playable Sources were found.\n"
@@ -343,24 +343,24 @@ msgstr ""
 
 #: /resources/settings.xml:404
 #: /resources/skins/Default/1080i/get_sources.xml:243
-#: /resources/lib/modules/getSources.py:735
+#: /resources/lib/modules/getSources.py:744
 msgctxt "#30057"
 msgid "Torrents"
 msgstr "التورنت"
 
 #: /resources/settings.xml:404
 #: /resources/skins/Default/1080i/get_sources.xml:243
-#: /resources/lib/modules/getSources.py:740
+#: /resources/lib/modules/getSources.py:749
 msgctxt "#30058"
 msgid "Hosters"
 msgstr "روابط مباشرة"
 
-#: /resources/lib/modules/getSources.py:746
+#: /resources/lib/modules/getSources.py:755
 msgctxt "#30059"
 msgid "Free Hosters"
 msgstr "روابط مباشرة مجانية"
 
-#: /resources/lib/modules/getSources.py:748
+#: /resources/lib/modules/getSources.py:757
 msgctxt "#30060"
 msgid "Remaining Providers"
 msgstr "موفري المصادر المتبقين"
@@ -958,7 +958,7 @@ msgctxt "#30173"
 msgid "Enable search history"
 msgstr "تمكين سجل البحث"
 
-#: /resources/lib/indexers/trakt.py:481
+#: /resources/lib/indexers/trakt.py:490
 msgctxt "#30174"
 msgid ""
 "Unable to contact Trakt.\n"
@@ -1058,7 +1058,7 @@ msgctxt "#30189"
 msgid "Background Task"
 msgstr "في الخلفية"
 
-#: /resources/lib/database/trakt_sync/activities.py:184
+#: /resources/lib/database/trakt_sync/activities.py:185
 msgctxt "#30190"
 msgid "Rebuilding Trakt Sync Database, please be patient"
 msgstr "جاري إعادة بناء قاعدة بيانات من Trakt, يرجى الانتظار"
@@ -1571,7 +1571,7 @@ msgstr "مسلسل"
 #: /resources/settings.xml:130 /resources/settings.xml:133
 #: /resources/settings.xml:136 /resources/settings.xml:139
 #: /resources/settings.xml:142 /resources/settings.xml:145
-#: /resources/settings.xml:148 /resources/lib/indexers/trakt.py:840
+#: /resources/settings.xml:148 /resources/lib/indexers/trakt.py:849
 msgctxt "#30280"
 msgid "Movie"
 msgstr "فلم"
@@ -1621,155 +1621,155 @@ msgctxt "#30289"
 msgid "Database has been rebuilt"
 msgstr "تم إعادة بناء قاعدة البيانات"
 
-#: /resources/lib/indexers/trakt.py:538
+#: /resources/lib/indexers/trakt.py:547
 msgctxt "#30290"
 msgid "Sucessfully authenticated with Trakt"
 msgstr "تمت المصادقة مع Trakt بنجاح"
 
-#: /resources/lib/indexers/trakt.py:1148 /resources/lib/indexers/trakt.py:1230
-#: /resources/lib/indexers/trakt.py:1245
+#: /resources/lib/indexers/trakt.py:1158 /resources/lib/indexers/trakt.py:1240
+#: /resources/lib/indexers/trakt.py:1255
 msgctxt "#30291"
 msgid "Add {} to Collection"
 msgstr "اضف {} الى المجموعة"
 
-#: /resources/lib/indexers/trakt.py:1152 /resources/lib/indexers/trakt.py:1226
-#: /resources/lib/indexers/trakt.py:1241
+#: /resources/lib/indexers/trakt.py:1162 /resources/lib/indexers/trakt.py:1236
+#: /resources/lib/indexers/trakt.py:1251
 msgctxt "#30292"
 msgid "Remove {} from Collection"
 msgstr "إزالة {} من المجموعة"
 
-#: /resources/lib/indexers/trakt.py:1156 /resources/lib/indexers/trakt.py:1205
+#: /resources/lib/indexers/trakt.py:1166 /resources/lib/indexers/trakt.py:1215
 msgctxt "#30293"
 msgid "Add to Watchlist"
 msgstr "إضافة الى قائمة المشاهدة"
 
-#: /resources/lib/indexers/trakt.py:1160 /resources/lib/indexers/trakt.py:1206
+#: /resources/lib/indexers/trakt.py:1170 /resources/lib/indexers/trakt.py:1216
 msgctxt "#30294"
 msgid "Remove from Watchlist"
 msgstr "إزالة من قائمة المشاهدة"
 
-#: /resources/lib/indexers/trakt.py:1164 /resources/lib/indexers/trakt.py:1253
-#: /resources/lib/indexers/trakt.py:1256
+#: /resources/lib/indexers/trakt.py:1174 /resources/lib/indexers/trakt.py:1263
+#: /resources/lib/indexers/trakt.py:1266
 msgctxt "#30295"
 msgid "Mark as Watched"
 msgstr "وضع علامة \"تمت المشاهدة\""
 
-#: /resources/lib/indexers/trakt.py:1168 /resources/lib/indexers/trakt.py:1251
+#: /resources/lib/indexers/trakt.py:1178 /resources/lib/indexers/trakt.py:1261
 msgctxt "#30296"
 msgid "Mark as Unwatched"
 msgstr "وضع علامة \"لم تتم مشاهدته\""
 
-#: /resources/lib/indexers/trakt.py:1128 /resources/lib/indexers/trakt.py:1172
+#: /resources/lib/indexers/trakt.py:1138 /resources/lib/indexers/trakt.py:1182
 msgctxt "#30297"
 msgid "Add to List"
 msgstr "أضف الى القائمة"
 
-#: /resources/lib/indexers/trakt.py:1129 /resources/lib/indexers/trakt.py:1176
+#: /resources/lib/indexers/trakt.py:1139 /resources/lib/indexers/trakt.py:1186
 msgctxt "#30298"
 msgid "Remove From List"
 msgstr "إزالة من القائمة"
 
-#: /resources/lib/indexers/trakt.py:1130 /resources/lib/indexers/trakt.py:1180
+#: /resources/lib/indexers/trakt.py:1140 /resources/lib/indexers/trakt.py:1190
 msgctxt "#30299"
 msgid "Hide {}"
 msgstr "إخفاء {}"
 
-#: /resources/lib/indexers/trakt.py:1131 /resources/lib/indexers/trakt.py:1184
+#: /resources/lib/indexers/trakt.py:1141 /resources/lib/indexers/trakt.py:1194
 msgctxt "#30300"
 msgid "Refresh Item Metadata"
 msgstr "تحديث البيانات التعريفية للعنصر"
 
-#: /resources/lib/indexers/trakt.py:1188 /resources/lib/indexers/trakt.py:1215
+#: /resources/lib/indexers/trakt.py:1198 /resources/lib/indexers/trakt.py:1225
 msgctxt "#30301"
 msgid "Remove Playback Progress"
 msgstr "إزالة تقدم التشغيل"
 
-#: /resources/lib/indexers/trakt.py:842
+#: /resources/lib/indexers/trakt.py:851
 msgctxt "#30302"
 msgid "Show"
 msgstr "مسلسل"
 
-#: /resources/lib/indexers/trakt.py:1140 /resources/lib/indexers/trakt.py:1279
-#: /resources/lib/indexers/trakt.py:1293 /resources/lib/indexers/trakt.py:1355
-#: /resources/lib/indexers/trakt.py:1397 /resources/lib/indexers/trakt.py:1417
-#: /resources/lib/indexers/trakt.py:1439 /resources/lib/indexers/trakt.py:1447
-#: /resources/lib/indexers/trakt.py:1458 /resources/lib/indexers/trakt.py:1480
-#: /resources/lib/indexers/trakt.py:1503
+#: /resources/lib/indexers/trakt.py:1150 /resources/lib/indexers/trakt.py:1289
+#: /resources/lib/indexers/trakt.py:1303 /resources/lib/indexers/trakt.py:1365
+#: /resources/lib/indexers/trakt.py:1407 /resources/lib/indexers/trakt.py:1427
+#: /resources/lib/indexers/trakt.py:1449 /resources/lib/indexers/trakt.py:1457
+#: /resources/lib/indexers/trakt.py:1468 /resources/lib/indexers/trakt.py:1490
+#: /resources/lib/indexers/trakt.py:1513
 msgctxt "#30303"
 msgid "Trakt manager"
 msgstr "مدير Trakt"
 
-#: /resources/lib/indexers/trakt.py:1280 /resources/lib/indexers/trakt.py:1294
+#: /resources/lib/indexers/trakt.py:1290 /resources/lib/indexers/trakt.py:1304
 msgctxt "#30304"
 msgid "Failed to update status, please check the log"
 msgstr "تعذر تحديث الحالة، يرجى التحقق من سجل الأخطاء"
 
-#: /resources/lib/indexers/trakt.py:1356
+#: /resources/lib/indexers/trakt.py:1366
 msgctxt "#30305"
 msgid "Item marked as watched"
 msgstr "تم وضع علامة على العنصر بأنه تمت مشاهدته"
 
-#: /resources/lib/indexers/trakt.py:1398
+#: /resources/lib/indexers/trakt.py:1408
 msgctxt "#30306"
 msgid "Item marked as unwatched"
 msgstr "تم وضع علامة على العنصر بأنه لم تتم مشاهدته"
 
-#: /resources/lib/indexers/trakt.py:1418
+#: /resources/lib/indexers/trakt.py:1428
 msgctxt "#30307"
 msgid "Item added to Collection"
 msgstr "تمت إضافة العنصر الى المجموعة"
 
-#: /resources/lib/indexers/trakt.py:1440
+#: /resources/lib/indexers/trakt.py:1450
 msgctxt "#30308"
 msgid "Item removed from Collection"
 msgstr "تمت إزالة العنصر من المجموعة"
 
-#: /resources/lib/indexers/trakt.py:1448
+#: /resources/lib/indexers/trakt.py:1458
 msgctxt "#30309"
 msgid "Item added to Watchlist"
 msgstr "تمت إضافة العنصر الى قائمة المشاهدة"
 
-#: /resources/lib/indexers/trakt.py:1459
+#: /resources/lib/indexers/trakt.py:1469
 msgctxt "#30310"
 msgid "Item removed from Watchlist"
 msgstr "تمت إزالة العنصر من قائمة المشاهدة"
 
-#: /resources/lib/indexers/trakt.py:1481
+#: /resources/lib/indexers/trakt.py:1491
 msgctxt "#30311"
 msgid "Item added to {}"
 msgstr "تمت إضافة العنصر الى {}"
 
-#: /resources/lib/indexers/trakt.py:1504
+#: /resources/lib/indexers/trakt.py:1514
 msgctxt "#30312"
 msgid "Item removed from {}"
 msgstr "تمت إزالة العنصر من {}"
 
-#: /resources/lib/indexers/trakt.py:1469 /resources/lib/indexers/trakt.py:1491
+#: /resources/lib/indexers/trakt.py:1479 /resources/lib/indexers/trakt.py:1501
 msgctxt "#30313"
 msgid "Select a list"
 msgstr "حدد احد القوائم"
 
-#: /resources/lib/indexers/trakt.py:1512
+#: /resources/lib/indexers/trakt.py:1522
 msgctxt "#30314"
 msgid "Watched Progress"
 msgstr "معدل المشاهدة"
 
-#: /resources/lib/indexers/trakt.py:1512
+#: /resources/lib/indexers/trakt.py:1522
 msgctxt "#30315"
 msgid "Calendar"
 msgstr "التقويم"
 
-#: /resources/lib/indexers/trakt.py:1514
+#: /resources/lib/indexers/trakt.py:1524
 msgctxt "#30316"
 msgid "Select Menu type to hide from"
 msgstr "اختار نوع القائمة للإخفاء منها"
 
-#: /resources/lib/indexers/trakt.py:1538
+#: /resources/lib/indexers/trakt.py:1548
 msgctxt "#30317"
 msgid "Item has been hidden from your {}"
 msgstr "تم اخفاء العنصر من {}"
 
-#: /resources/lib/indexers/trakt.py:1573
+#: /resources/lib/indexers/trakt.py:1582
 msgctxt "#30318"
 msgid "Item's Progress History has been removed"
 msgstr "تم إزالة سجل التقدم لهذا العنصر"
@@ -1806,7 +1806,7 @@ msgstr "أدخل رابط ملف الـمضغوط (Zip)"
 
 #: /resources/lib/gui/windows/source_select.py:78
 #: /resources/lib/modules/cacheAssist.py:115
-#: /resources/lib/modules/getSources.py:361
+#: /resources/lib/modules/getSources.py:370
 msgctxt "#30325"
 msgid "Cache Assist"
 msgstr "مساعد ذاكرة التخزين المؤقت"
@@ -1996,7 +1996,7 @@ msgctxt "#30361"
 msgid "Authorise Premiumize"
 msgstr "مصادقة Premiumize"
 
-#: /resources/lib/indexers/trakt.py:147 /resources/lib/indexers/trakt.py:163
+#: /resources/lib/indexers/trakt.py:148 /resources/lib/indexers/trakt.py:164
 msgctxt "#30362"
 msgid ""
 "There appears to be a problem with your Trakt Authorization \n"
@@ -2045,7 +2045,7 @@ msgctxt "#30370"
 msgid "Trending Recent Movies"
 msgstr "الأفلام الشائعة مؤخراً"
 
-#: /resources/lib/debrid/premiumize.py:64
+#: /resources/lib/debrid/premiumize.py:63
 msgctxt "#30371"
 msgid "Premiumize auth"
 msgstr "مصادقة Premiumize"
@@ -2585,7 +2585,7 @@ msgctxt "#30464"
 msgid "My recent watched episodes"
 msgstr "الحلقات التي شاهدتها مؤخرًا"
 
-#: /resources/lib/modules/getSources.py:378
+#: /resources/lib/modules/getSources.py:387
 #: /resources/lib/modules/helpers.py:53
 msgctxt "#30465"
 msgid ""
@@ -2750,7 +2750,7 @@ msgctxt "#30494"
 msgid "Adaptive"
 msgstr "ملفات متكيفة"
 
-#: /resources/lib/indexers/trakt.py:69
+#: /resources/lib/indexers/trakt.py:70
 msgctxt "#30495"
 msgid ""
 "Trakt is currently not authorized\n"
@@ -2831,7 +2831,7 @@ msgctxt "#30507"
 msgid "A list of shows you watch sorted by most recently watched"
 msgstr "قائمة بالعروض التي تشاهدها مصنفة حسب الأكثر مشاهدة مؤخراً"
 
-#: /resources/lib/database/torrentCache/__init__.py:96
+#: /resources/lib/database/torrentCache/__init__.py:143
 msgctxt "#30508"
 msgid "Torrent cache database successfully cleared"
 msgstr "تم مسح قاعدة بيانات ذاكرة التخزين المؤقت للتورنت بنجاح"
@@ -3141,7 +3141,7 @@ msgctxt "#30565"
 msgid "Episode minimum File Size (GB)"
 msgstr "الحد الأدنى لحجم ملف الحلقة بـ(GB)"
 
-#: /resources/lib/indexers/trakt.py:101
+#: /resources/lib/indexers/trakt.py:102
 msgctxt "#30566"
 msgid ""
 "Invalid Trakt API keys, your authentication has been reset.\n"

@@ -45,6 +45,7 @@ TRAKT_STATUS_CODES = {
     521: CLOUDFLARE_ERROR_MSG,
     522: CLOUDFLARE_ERROR_MSG,
     524: CLOUDFLARE_ERROR_MSG,
+    530: CLOUDFLARE_ERROR_MSG,
 }
 
 
@@ -171,7 +172,7 @@ def trakt_guard_response(func):
             g.log(
                 "Trakt returned a {} ({}): while requesting {}".format(
                     response.status_code,
-                    TRAKT_STATUS_CODES[response.status_code],
+                    TRAKT_STATUS_CODES.get(response.status_code, "*Unknown status code*"),
                     response.url,
                 ),
                 "error",
@@ -235,6 +236,12 @@ class TraktAPI(ApiBase):
             ("id", "playback_id", None)
         ]
 
+        self.PlayBackHistoryNormalization = [
+            ("action", "action", None),
+            ("watched_at", "watched_at", lambda t: g.validate_date(t)),
+            ("id", "playback_id", None)
+        ]
+
         self.CalendarNormalization = [
             ("first_aired", "first_aired", lambda t: g.validate_date(t))
         ]
@@ -259,8 +266,9 @@ class TraktAPI(ApiBase):
                 (
                     "last_watched_at",
                     "last_watched_at",
-                    lambda t: g.validate_date(t),
+                    lambda t: g.validate_date(t)
                 ),
+                ("watched_at", "watched_at", lambda t: g.validate_date(t)),
                 ("paused_at", "paused_at", lambda t: g.validate_date(t)),
                 (
                     "rating",
@@ -424,6 +432,7 @@ class TraktAPI(ApiBase):
             "mixedepisode": self.MixedEpisodeNormalization,
             "mixedseason": self.MixedSeasonNormalization,
             "playback": self.PlayBackNormalization,
+            "playbackhistory": self.PlayBackHistoryNormalization,
             "user_rating": self.UserRatingNormalization,
             "calendar": self.CalendarNormalization
         }
@@ -436,7 +445,7 @@ class TraktAPI(ApiBase):
         retries = Retry(
             total=4,
             backoff_factor=0.3,
-            status_forcelist=[429, 500, 502, 503, 504, 520, 521, 522, 524],
+            status_forcelist=[429, 500, 502, 503, 504, 520, 521, 522, 524, 530],
         )
         self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
 
@@ -497,7 +506,7 @@ class TraktAPI(ApiBase):
             g.ADDON_NAME + ": " + g.get_language_string(30022),
             tools.create_multiline_message(
                 line1=g.get_language_string(30018).format(
-                    g.color_string(g.color_string("https://trakt.tv/activate"))
+                    g.color_string("https://trakt.tv/activate")
                 ),
                 line2=g.get_language_string(30019).format(g.color_string(user_code)),
                 line3=g.get_language_string(30047),
@@ -1026,6 +1035,7 @@ class TraktAPI(ApiBase):
             ),
             ("season", lambda x: "number" in x),
             ("playback", lambda x: "paused_at" in x),
+            ("playbackhistory", lambda x: "action" in x),
             ("user_rating", lambda x: "rated_at" in x),
             ("calendar", lambda x: "first_aired" in x),
             ("cast", lambda x: "cast" in x),
@@ -1549,7 +1559,6 @@ class TraktManager(TraktAPI):
         progress = self.get_json("sync/playback/{}".format(media_type + "s"))
         if len(progress) == 0:
             return
-        print(progress)
         if media_type == "movie":
             progress_ids = [
                 i["playback_id"]
@@ -1558,7 +1567,7 @@ class TraktManager(TraktAPI):
             ]
         else:
             progress_ids = [
-                i["id"]
+                i["playback_id"]
                 for i in progress
                 if i["episode"]["trakt_id"] == item_information["trakt_id"]
             ]

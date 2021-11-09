@@ -84,9 +84,10 @@ class Sources(object):
 
         self.silent = g.get_bool_runtime_setting('tempSilent')
 
-    def get_sources(self):
+    def get_sources(self, overwrite_torrent_cache=False):
         """
         Main endpoint to initiate scraping process
+        :param overwrite_cache:
         :return: Returns (uncached_sources, sorted playable sources, items metadata)
         :rtype: tuple
         """
@@ -104,7 +105,10 @@ class Sources(object):
             self._handle_pre_scrape_modifiers()
             self._get_imdb_info()
 
-            self._check_local_torrent_database()
+            if overwrite_torrent_cache:
+                self._clear_local_torrent_results()
+            else:
+                self._check_local_torrent_database()
 
             self._update_progress()
             if self._prem_terminate():
@@ -290,6 +294,11 @@ class Sources(object):
         if len(torrent_list) == 0:
             return
         self.torrent_cache.add_torrent(self.item_information, torrent_list)
+
+    def _clear_local_torrent_results(self):
+        if g.get_bool_setting('general.torrentCache'):
+            g.log("Clearing existing local torrent cache items", "info")
+            self.torrent_cache.clear_item(self.item_information)
 
     def _get_local_torrent_results(self):
 

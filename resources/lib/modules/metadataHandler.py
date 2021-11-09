@@ -678,7 +678,7 @@ class MetadataHandler(object):
         if (
                 self.movies_preferred_art_source == ART_FANART
                 and self.metadata_location != META_TMDB
-                and not self._fanart_meta_up_to_par("movie", db_object)
+                and not self._fanart_art_meta_up_to_par("movie", db_object)
                 and self._tmdb_id_valid(db_object)
         ):
             tools.smart_merge_dictionary(
@@ -781,7 +781,7 @@ class MetadataHandler(object):
         if self._tvdb_id_valid(db_object):
             if (
                     self.metadata_location == META_TMDB
-                    and not tools.safe_dict_get(db_object, "tmdb_object", "info")
+                    and not self._tmdb_info_meta_up_to_par(db_object)
                     and not tools.safe_dict_get(db_object, "tvdb_object", "info")
             ):
                 tools.smart_merge_dictionary(
@@ -790,8 +790,8 @@ class MetadataHandler(object):
             if (
                     self.tvshows_preferred_art_source != ART_TVDB
                     and self.metadata_location != META_TVDB
-                    and not self._tmdb_meta_up_to_par("tvshow", db_object)
-                    and not self._tvdb_meta_up_to_par("tvshow", db_object)
+                    and not self._tmdb_art_meta_up_to_par("tvshow", db_object)
+                    and not self._tvdb_art_meta_up_to_par("tvshow", db_object)
             ):
                 tools.smart_merge_dictionary(
                     db_object, self.tvdb_api.get_show_art(db_object["tvdb_id"])
@@ -801,7 +801,7 @@ class MetadataHandler(object):
             if (
                     self.metadata_location == META_TVDB
                     and not tools.safe_dict_get(db_object, "tmdb_object", "info")
-                    and not tools.safe_dict_get(db_object, "tvdb_object", "info")
+                    and not self._tvdb_info_meta_up_to_par(db_object)
             ):
                 tools.smart_merge_dictionary(
                     db_object, self.tmdb_api.get_show(db_object["tmdb_id"])
@@ -809,8 +809,8 @@ class MetadataHandler(object):
             if (
                     self.tvshows_preferred_art_source != ART_TMDB
                     and self.metadata_location != META_TMDB
-                    and not self._tmdb_meta_up_to_par("tvshow", db_object)
-                    and not self._tvdb_meta_up_to_par("tvshow", db_object)
+                    and not self._tmdb_art_meta_up_to_par("tvshow", db_object)
+                    and not self._tvdb_art_meta_up_to_par("tvshow", db_object)
             ):
                 tools.smart_merge_dictionary(
                     db_object, self.tmdb_api.get_show_art(db_object["tmdb_id"])
@@ -890,7 +890,7 @@ class MetadataHandler(object):
         if (
                 (
                         self.tvshows_preferred_art_source == ART_TVDB
-                        or not self._tmdb_meta_up_to_par("season", db_object)
+                        or not self._tmdb_art_meta_up_to_par("season", db_object)
                 )
                 and (self._tvdb_needs_update(db_object) or self._force_update(db_object))
                 and self._tvdb_show_id_valid(db_object)
@@ -922,7 +922,7 @@ class MetadataHandler(object):
             if (
                     self.metadata_location == META_TVDB
                     and not tools.safe_dict_get(db_object, "tmdb_object", "info")
-                    and not tools.safe_dict_get(db_object, "tvdb_object", "info")
+                    and not self._tvdb_info_meta_up_to_par(db_object)
             ):
                 tools.smart_merge_dictionary(
                     db_object,
@@ -936,8 +936,8 @@ class MetadataHandler(object):
             if (
                     self.tvshows_preferred_art_source != ART_TMDB
                     and self.metadata_location != META_TMDB
-                    and not self._tmdb_meta_up_to_par("season", db_object)
-                    and not self._tvdb_meta_up_to_par("season", db_object)
+                    and not self._tmdb_art_meta_up_to_par("season", db_object)
+                    and not self._tvdb_art_meta_up_to_par("season", db_object)
             ):
                 tools.smart_merge_dictionary(
                     db_object,
@@ -953,8 +953,8 @@ class MetadataHandler(object):
             if (
                     self.tvshows_preferred_art_source != ART_TVDB
                     and self.metadata_location != META_TVDB
-                    and not self._tmdb_meta_up_to_par("season", db_object)
-                    and not self._tvdb_meta_up_to_par("season", db_object)
+                    and not self._tmdb_art_meta_up_to_par("season", db_object)
+                    and not self._tvdb_art_meta_up_to_par("season", db_object)
             ):
                 tools.smart_merge_dictionary(
                     db_object,
@@ -1009,7 +1009,7 @@ class MetadataHandler(object):
         if self._tvdb_show_id_valid(db_object):
             if (
                     self.metadata_location == META_TMDB
-                    and not tools.safe_dict_get(db_object, "tmdb_object", "info")
+                    and not self._tmdb_info_meta_up_to_par(db_object)
                     and not tools.safe_dict_get(db_object, "tvdb_object", "info")
             ):
                 tools.smart_merge_dictionary(
@@ -1029,7 +1029,7 @@ class MetadataHandler(object):
             if (
                     self.metadata_location == META_TVDB
                     and not tools.safe_dict_get(db_object, "tmdb_object", "info")
-                    and not tools.safe_dict_get(db_object, "tvdb_object", "info")
+                    and not self._tvdb_info_meta_up_to_par(db_object)
             ):
                 tools.smart_merge_dictionary(
                     db_object,
@@ -1044,8 +1044,8 @@ class MetadataHandler(object):
             if (
                     self.tvshows_preferred_art_source != ART_TMDB
                     and self.metadata_location != META_TMDB
-                    and not self._tmdb_meta_up_to_par("episode", db_object)
-                    and not self._tvdb_meta_up_to_par("episode", db_object)
+                    and not self._tmdb_art_meta_up_to_par("episode", db_object)
+                    and not self._tvdb_art_meta_up_to_par("episode", db_object)
             ):
                 tools.smart_merge_dictionary(
                     db_object,
@@ -1145,22 +1145,14 @@ class MetadataHandler(object):
     def _force_update(db_object):
         return True if db_object.get("needs_update", False) in ["true", "True", True, 1] else False
 
-    def _tmdb_meta_up_to_par(self, media_type, item):
+    def _tmdb_art_meta_up_to_par(self, media_type, item):
         return self.art_meta_up_to_par(media_type, MetadataHandler.tmdb_object(item))
 
-    def _tvdb_meta_up_to_par(self, media_type, item):
+    def _tvdb_art_meta_up_to_par(self, media_type, item):
         return self.art_meta_up_to_par(media_type, MetadataHandler.tvdb_object(item))
 
-    def _fanart_meta_up_to_par(self, media_type, item):
+    def _fanart_art_meta_up_to_par(self, media_type, item):
         return self.art_meta_up_to_par(media_type, MetadataHandler.fanart_object(item))
-
-    @staticmethod
-    def full_meta_up_to_par(media_type, item):
-        if tools.safe_dict_get(item, "info", "title"):
-            return True
-        elif MetadataHandler.art_meta_up_to_par(media_type, item):
-            return True
-        return False
 
     @staticmethod
     def art_meta_up_to_par(media_type, item):
@@ -1178,6 +1170,24 @@ class MetadataHandler(object):
             return True
         except KeyError:
             return False
+
+    @staticmethod
+    def _info_meta_up_to_par(item):
+        return tools.safe_dict_get(item, "info", "title") and tools.safe_dict_get(item, "info", "plot")
+
+    def _tmdb_info_meta_up_to_par(self, item):
+        return self._info_meta_up_to_par(MetadataHandler.tmdb_object(item))
+
+    def _tvdb_info_meta_up_to_par(self, item):
+        return self._info_meta_up_to_par(MetadataHandler.tvdb_object(item))
+
+    @staticmethod
+    def full_meta_up_to_par(media_type, item):
+        if MetadataHandler._info_meta_up_to_par(item):
+            return True
+        elif MetadataHandler.art_meta_up_to_par(media_type, item):
+            return True
+        return False
 
     @staticmethod
     def info(data):

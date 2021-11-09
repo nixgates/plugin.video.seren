@@ -179,6 +179,34 @@ def source_size_display(size):
     return size
 
 
+def bytes_size_display(size):
+    """
+    Converts source size (bytes) to best fitting *binary* prefix display string
+    :param size: Size of source in bytes
+    :type size: int
+    :return: Formatted string for size with best fitting *binary* prefix suffix
+    :rtype: str
+    """
+    size = float(size)
+    suffix = "B"
+    if size > 1024:
+        size = size / 1024
+        suffix = "KiB"
+    if size > 1024:
+        size = size / 1024
+        suffix = "MiB"
+    if size > 1024:
+        size = size / 1024
+        suffix = "GiB"
+    if size > 1024:
+        size = size / 1024
+        suffix = "TiB"
+    if size.is_integer():
+        return "{0:.0f} {1:}".format(size, suffix)
+    else:
+        return "{0:.2f} {1:}".format(size, suffix)
+
+
 def paginate_list(list_items, page, limit):
     """
     Paginate items and returns requested page

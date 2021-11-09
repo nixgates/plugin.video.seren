@@ -135,7 +135,7 @@ class SmartPlay:
         info = MetadataHandler().info
         try:
             playback_history = self.trakt_api.get_json(
-                "sync/history/shows/{}".format(self.show_trakt_id), limit=1
+                "sync/history/shows/{}".format(self.show_trakt_id), extended="full", limit=1
             )[0]
             action = playback_history["action"]
             episode_info = playback_history["episode"]

@@ -92,8 +92,8 @@ def premiumize_transfer_cleanup():
     """
     service = premiumize.Premiumize()
     premiumize_transfers = PremiumizeTransfers()
-    fair_usage = int(service.get_used_space())
-    threshold = g.get_int_setting("premiumize.threshold")
+    fair_usage = service.get_used_space()
+    threshold = g.get_float_setting("premiumize.threshold")
 
     if fair_usage < threshold:
         g.log("Premiumize Fair Usage below threshold, no cleanup required")

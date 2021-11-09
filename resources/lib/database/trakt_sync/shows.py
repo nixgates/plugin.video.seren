@@ -244,7 +244,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             ",".join((g.UNICODE(i.get("trakt_id")) for i in trakt_list))
         )
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(s.air_date) < Datetime('now')"
+            statement += " AND Datetime(s.air_date) < Datetime('{}')".format(self._get_datetime_now())
         if params.pop("hide_watched", self.hide_watched):
             statement += " AND s.watched_episodes < s.episode_count"
 
@@ -273,7 +273,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         else:
             statement += "s.trakt_show_id = {}".format(trakt_show_id)
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(s.air_date) < Datetime('now')"
+            statement += " AND Datetime(s.air_date) < Datetime('{}')".format(self._get_datetime_now())
         if params.pop("self.hide_specials", self.hide_specials):
             statement += " AND s.season != 0"
         if params.pop("hide_watched", self.hide_watched):
@@ -319,7 +319,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         else:
             statement += "e.trakt_show_id = {} ".format(trakt_show_id)
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(e.air_date) < Datetime('now') "
+            statement += " AND Datetime(e.air_date) < Datetime('{}') ".format(self._get_datetime_now())
         if params.pop("self.hide_specials", self.hide_specials):
             statement += " AND e.season != 0"
         if params.pop("hide_watched", self.hide_watched):
@@ -358,7 +358,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             )
 
         if params.pop("hide_unaired", self.hide_unaired):
-            query += " AND Datetime(e.air_date) < Datetime('now') "
+            query += " AND Datetime(e.air_date) < Datetime('{}') ".format(self._get_datetime_now())
         if params.pop("hide_specials", self.hide_specials):
             query += " AND e.season != 0"
         if params.pop("hide_watched", self.hide_watched):
@@ -789,10 +789,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         mw.max_watched_season + 1 AND e.number = 1) GROUP BY e.trakt_show_id) AS nw ON (e.trakt_show_id == 
         nw.trakt_show_id AND e.season == nw.season AND e.number >= nw.number) WHERE e.season > 0 AND watched = 0 AND 
         e.trakt_show_id NOT IN (SELECT trakt_id AS trakt_show_id FROM hidden WHERE SECTION IN ('progress_watched')) 
-        AND Datetime(air_date) < Datetime('now') GROUP BY e.trakt_show_id) AS INNER ON e.trakt_show_id == 
+        AND Datetime(air_date) < Datetime('{}') GROUP BY e.trakt_show_id) AS INNER ON e.trakt_show_id == 
         inner.trakt_show_id AND e.season == inner.season AND e.number == inner.number LEFT JOIN episodes_meta AS em 
         ON e.trakt_id = em.id AND em.TYPE = 'trakt' LEFT JOIN shows_meta AS sm ON e.trakt_show_id = sm.id AND sm.TYPE 
-        = 'trakt' """
+        = 'trakt' """.format(self._get_datetime_now())
         if sort_by_last_watched:
             query += " ORDER BY inner.last_watched_at DESC"
         else:
