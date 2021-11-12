@@ -1,3 +1,8 @@
+Changelog 2.1.8
+Fix prescrape cache result being ignored
+Fix get_sources to return all relevant torrent hashes from torrent cache
+Some minor cache performance improvements
+
 Changelog 2.1.7
 Fix MyFiles listings for all FileWalkers
 Fix Rescrape item should overwrite torrent cache

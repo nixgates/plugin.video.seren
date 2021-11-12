@@ -317,7 +317,7 @@ msgstr ""
 "Nie znaleziono źródeł dla następnego elementu na liście odtwarzania.\n"
 "Usuwam bieżącą playlistę"
 
-#: /resources/lib/modules/getSources.py:371
+#: /resources/lib/modules/getSources.py:355
 msgctxt "#30056"
 msgid ""
 "No Playable Sources were found.\n"
@@ -328,24 +328,24 @@ msgstr ""
 
 #: /resources/settings.xml:404
 #: /resources/skins/Default/1080i/get_sources.xml:243
-#: /resources/lib/modules/getSources.py:744
+#: /resources/lib/modules/getSources.py:728
 msgctxt "#30057"
 msgid "Torrents"
 msgstr "Torrenty"
 
 #: /resources/settings.xml:404
 #: /resources/skins/Default/1080i/get_sources.xml:243
-#: /resources/lib/modules/getSources.py:749
+#: /resources/lib/modules/getSources.py:733
 msgctxt "#30058"
 msgid "Hosters"
 msgstr "Hostingi"
 
-#: /resources/lib/modules/getSources.py:755
+#: /resources/lib/modules/getSources.py:739
 msgctxt "#30059"
 msgid "Free Hosters"
 msgstr "Bezpłatne Hostingi"
 
-#: /resources/lib/modules/getSources.py:757
+#: /resources/lib/modules/getSources.py:741
 msgctxt "#30060"
 msgid "Remaining Providers"
 msgstr "Pozostali Dostawcy"
@@ -1795,7 +1795,7 @@ msgstr "Wpisz adres URL do ZIP"
 
 #: /resources/lib/gui/windows/source_select.py:78
 #: /resources/lib/modules/cacheAssist.py:115
-#: /resources/lib/modules/getSources.py:370
+#: /resources/lib/modules/getSources.py:354
 msgctxt "#30325"
 msgid "Cache Assist"
 msgstr "Asystent pamięci podręcznej"
@@ -2603,7 +2603,7 @@ msgctxt "#30464"
 msgid "My recent watched episodes"
 msgstr "Moje ostatnio oglądane odcinki"
 
-#: /resources/lib/modules/getSources.py:387
+#: /resources/lib/modules/getSources.py:371
 #: /resources/lib/modules/helpers.py:53
 msgctxt "#30465"
 msgid ""
