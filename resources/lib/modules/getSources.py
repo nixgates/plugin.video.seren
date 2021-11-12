@@ -301,23 +301,7 @@ class Sources(object):
             self.torrent_cache.clear_item(self.item_information)
 
     def _get_local_torrent_results(self):
-
-        local_storage = self.torrent_cache.get_torrents(self.item_information)[:100]
-
-        relevant_torrents = []
-
-        if self.media_type == 'episode':
-            torrent_simple_info = self._build_simple_show_info(self.item_information)
-            episode_regex = source_utils.get_filter_single_episode_fn(torrent_simple_info)
-            show_regex = source_utils.get_filter_show_pack_fn(torrent_simple_info)
-            season_regex = source_utils.get_filter_season_pack_fn(torrent_simple_info)
-
-            for torrent in local_storage:
-                clean_title = source_utils.clean_title(torrent['release_title'])
-                if episode_regex(clean_title) or season_regex(clean_title) or show_regex(clean_title):
-                    relevant_torrents.append(torrent)
-        else:
-            relevant_torrents = local_storage
+        relevant_torrents = self.torrent_cache.get_torrents(self.item_information)[:100]
 
         if len(relevant_torrents) > 0:
             for torrent in relevant_torrents:
@@ -1041,6 +1025,7 @@ class TorrentCacheCheck:
                 count += 1
         except Exception:
             g.log_stacktrace()
+
 
 class SourceWindowAdapter(object):
     """

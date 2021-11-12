@@ -2,10 +2,9 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import abc
-import codecs
+import base64
 import collections
 import datetime
-import pickle
 import time
 import types
 from functools import reduce, wraps
@@ -14,6 +13,12 @@ from resources.lib.common import tools
 from resources.lib.database import Database
 from resources.lib.modules.exceptions import UnsupportedCacheParamException
 from resources.lib.modules.globals import g
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
 
 schema = {
     "cache": {
@@ -230,15 +235,10 @@ class DatabaseCache(Database, CacheBase):
 
     def get(self, cache_id, checksum=None):
         cur_time = self._get_timestamp()
-        query = "SELECT expires, data, checksum FROM {} WHERE id = ?".format(
-            self.cache_table_name
-        )
-        cache_data = self.fetchone(query, (cache_id,))
-        if (
-                cache_data
-                and cache_data["expires"] > cur_time
-                and (not checksum or cache_data["checksum"] == checksum)
-        ):
+        query = "SELECT expires, data, checksum FROM {} WHERE id = ? AND expires > ? " \
+                "AND (checksum IS NULL OR checksum = ?)".format(self.cache_table_name)
+        cache_data = self.fetchone(query, (cache_id, cur_time, checksum))
+        if cache_data:
             return cache_data["data"]
         return self.NOT_CACHED
 
@@ -284,7 +284,7 @@ class MemCache(CacheBase):
         cached = g.get_runtime_setting(cache_id)
         cur_time = self._get_timestamp()
         if cached:
-            cached = pickle.loads(codecs.decode(cached.encode(), "base64"))
+            cached = pickle.loads(base64.standard_b64decode(cached.encode()))
             if cached[0] > cur_time:
                 if not checksum or checksum == cached[2]:
                     return cached[1]
@@ -299,7 +299,7 @@ class MemCache(CacheBase):
         cached = (expires, data, checksum)
         g.set_runtime_setting(
             cache_id,
-            codecs.encode(pickle.dumps(cached), "base64").decode(),
+            base64.standard_b64encode(pickle.dumps(cached)).decode(),
             )
         self._get_index()
         self._index.add((cache_id, expires))
@@ -362,25 +362,27 @@ def use_cache(cache_hours=12):
                 if isinstance(v, types.GeneratorType):
                     raise UnsupportedCacheParamException("generator")
 
-            overwrite_cache = (
-                kwargs.get("overwrite_cache", False)
-                if func.__name__ == "get_sources"
-                else kwargs.pop("overwrite_cache", False)
-            )
+            if func.__name__ == "get_sources":
+                overwrite_cache = kwargs.get("overwrite_cache", False)
+                kwargs_cache_value = {k: v for k, v in kwargs.items() if not k == "overwrite_cache"}
+            else:
+                overwrite_cache = kwargs.pop("overwrite_cache", False)
+                kwargs_cache_value = kwargs
+
+            hours = kwargs.pop("cache_hours", cache_hours)
             global_cache_ignore = g.get_bool_runtime_setting("ignore.cache", False)
             ignore_cache = kwargs.pop("ignore_cache", False)
             if ignore_cache or global_cache_ignore:
                 return func(*args, **kwargs)
 
             checksum = _get_checksum(method_class.__class__.__name__, func.__name__)
-            hours = kwargs.pop("cache_hours", cache_hours)
             cache_str = "{}.{}.{}.{}".format(
                 method_class.__class__.__name__,
                 func.__name__,
                 tools.md5_hash(args[1:]),
-                tools.md5_hash(kwargs))
-            cached_data = g.CACHE.get(cache_str, checksum=checksum)
-            if cached_data == CacheBase.NOT_CACHED or overwrite_cache:
+                tools.md5_hash(kwargs_cache_value))
+            cached_data = g.CACHE.get(cache_str, checksum=checksum) if not overwrite_cache else CacheBase.NOT_CACHED
+            if cached_data == CacheBase.NOT_CACHED:
                 fresh_result = func(*args, **kwargs)
                 if func.__name__ == "get_sources" and (not fresh_result or len(fresh_result[1]) == 0):
                     return fresh_result
