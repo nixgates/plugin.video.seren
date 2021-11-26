@@ -37,11 +37,11 @@ class PremiumizeResolver(TorrentResolverBase):
         else:
             return file_info["link"]
 
-    def _do_post_processing(self, item_information, torrent):
-        if g.get_bool_setting("premiumize.addToCloud"):
+    def _do_post_processing(self, item_information, torrent, identified_file):
+        if g.get_bool_setting("premiumize.addToCloud") and identified_file is not None:
             transfer = self.debrid_module.create_transfer(torrent["magnet"])
             if transfer.get("id"):
                 self.transfer_class.add_premiumize_transfer(transfer["id"])
             else:
-                xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30502))
+                xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30496))
                 g.log(transfer, "error")

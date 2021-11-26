@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals, print_function
 
-import collections
+try:  # Python >= 3.3
+    from collections.abc import Mapping
+except ImportError:  # Python < 3.3
+    from collections import Mapping
+
 import copy
 import datetime
 import hashlib
@@ -65,6 +69,7 @@ except NameError:
 DIGIT_REGEX = re.compile(r"\d")
 SORT_TOKENS = [
     "a ",
+    "an ",
     "das ",
     "de ",
     "der ",
@@ -172,6 +177,34 @@ def source_size_display(size):
     size = float(size) / 1024
     size = "{0:.2f} GB".format(size)
     return size
+
+
+def bytes_size_display(size):
+    """
+    Converts source size (bytes) to best fitting *binary* prefix display string
+    :param size: Size of source in bytes
+    :type size: int
+    :return: Formatted string for size with best fitting *binary* prefix suffix
+    :rtype: str
+    """
+    size = float(size)
+    suffix = "B"
+    if size > 1024:
+        size = size / 1024
+        suffix = "KiB"
+    if size > 1024:
+        size = size / 1024
+        suffix = "MiB"
+    if size > 1024:
+        size = size / 1024
+        suffix = "GiB"
+    if size > 1024:
+        size = size / 1024
+        suffix = "TiB"
+    if size.is_integer():
+        return "{0:.0f} {1:}".format(size, suffix)
+    else:
+        return "{0:.2f} {1:}".format(size, suffix)
 
 
 def paginate_list(list_items, page, limit):
@@ -340,7 +373,7 @@ def smart_merge_dictionary(dictionary, merge_dict, keep_original=False, extend_a
         return dictionary
     for new_key, new_value in merge_dict.items():
         original_value = dictionary.get(new_key)
-        if isinstance(new_value, (dict, collections.Mapping)):
+        if isinstance(new_value, (dict, Mapping)):
             if original_value is None:
                 original_value = {}
             new_value = smart_merge_dictionary(original_value, new_value, keep_original, extend_array)

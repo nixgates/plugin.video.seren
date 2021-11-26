@@ -89,7 +89,11 @@ schema = {
                 ("args", ["TEXT", "NOT NULL"]),
                 ("air_date", ["TEXT"]),
                 ("is_airing", ["BOOLEAN"]),
-                ("needs_update", ["BOOLEAN", "NOT NULL", "DEFAULT 1"])
+                ("last_watched_at", ["TEXT"]),
+                ("last_collected_at", ["TEXT"]),
+                ("user_rating", ["INTEGER", "NULL"]),
+                ("needs_update", ["BOOLEAN", "NOT NULL", "DEFAULT 1"]),
+                ("needs_milling", ["BOOLEAN", "NOT NULL", "DEFAULT 1"])
             ]
         ),
         "table_constraints": [],
@@ -114,6 +118,9 @@ schema = {
                 ("args", ["TEXT", "NOT NULL"]),
                 ("air_date", ["TEXT"]),
                 ("is_airing", ["BOOLEAN"]),
+                ("last_watched_at", ["TEXT"]),
+                ("last_collected_at", ["TEXT"]),
+                ("user_rating", ["INTEGER", "NULL"]),
                 ("needs_update", ["BOOLEAN", "NOT NULL", "DEFAULT 1"])
             ]
         ),
@@ -145,6 +152,7 @@ schema = {
                 ("air_date", ["TEXT"]),
                 ("last_watched_at", ["TEXT"]),
                 ("collected_at", ["TEXT"]),
+                ("user_rating", ["INTEGER", "NULL"]),
                 ("needs_update", ["BOOLEAN", "NOT NULL", "DEFAULT 1"])
             ]
         ),
@@ -178,6 +186,7 @@ schema = {
                 ("air_date", ["TEXT"]),
                 ("last_watched_at", ["TEXT"]),
                 ("collected_at", ["TEXT"]),
+                ("user_rating", ["INTEGER", "NULL"]),
                 ("needs_update", ["BOOLEAN", "NOT NULL", "DEFAULT 1"])
             ]
         ),
@@ -216,6 +225,14 @@ schema = {
                 ),
                 (
                     "movies_watched",
+                    ["TEXT", "NOT NULL", "DEFAULT '1970-01-01T00:00:00'"],
+                ),
+                (
+                    "shows_rated",
+                    ["TEXT", "NOT NULL", "DEFAULT '1970-01-01T00:00:00'"],
+                ),
+                (
+                    "movies_rated",
                     ["TEXT", "NOT NULL", "DEFAULT '1970-01-01T00:00:00'"],
                 ),
                 (
@@ -385,19 +402,39 @@ class TraktSyncDatabase(Database):
         self.execute_sql(
             [
                 "UPDATE episodes SET last_watched_at=?",
+                "UPDATE shows SET last_watched_at=?",
+                "UPDATE seasons SET last_watched_at=?",
                 "UPDATE movies SET last_watched_at=?",
+            ],
+            (None,),
+        )
+        self.execute_sql(
+            [
+                "UPDATE episodes SET collected_at=?",
+                "UPDATE shows SET last_collected_at=?",
+                "UPDATE seasons SET last_collected_at=?",
+                "UPDATE movies SET collected_at=?",
             ],
             (None,),
         )
         self.execute_sql(
             ["DELETE from bookmarks WHERE 1=1", "DELETE from hidden WHERE 1=1", ]
         )
+        self.execute_sql(
+            [
+                "UPDATE episodes SET user_rating=?",
+                "UPDATE shows SET user_rating=?",
+                "UPDATE seasons SET user_rating=?",
+                "UPDATE movies SET user_rating=?",
+            ],
+            (None,),
+        )
         self.execute_sql("DELETE from lists WHERE username=?", (username,))
         self.set_trakt_user("")
         self.set_base_activities()
         if notify:
             g.notification(
-                self.notification_prefix, g.get_language_string(30293), time=5000
+                self.notification_prefix, g.get_language_string(30287), time=5000
             )
 
     def set_trakt_user(self, trakt_username):
@@ -406,7 +443,7 @@ class TraktSyncDatabase(Database):
 
     def clear_all_meta(self, notify=True):
         if notify:
-            confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30198))
+            confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30192))
             if confirm == 0:
                 return
 
@@ -430,12 +467,12 @@ class TraktSyncDatabase(Database):
         )
         if notify:
             g.notification(
-                self.notification_prefix, g.get_language_string(30294), time=5000
+                self.notification_prefix, g.get_language_string(30288), time=5000
             )
 
     def re_build_database(self, silent=False):
         if not silent:
-            confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30198))
+            confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30192))
             if confirm == 0:
                 return
 
@@ -449,13 +486,13 @@ class TraktSyncDatabase(Database):
 
         if sync_errors:
             g.notification(
-                self.notification_prefix, g.get_language_string(30359), time=5000
+                self.notification_prefix, g.get_language_string(30353), time=5000
             )
         elif sync_errors is None:
             self.refresh_activities()
         else:
             g.notification(
-                self.notification_prefix, g.get_language_string(30295), time=5000
+                self.notification_prefix, g.get_language_string(30289), time=5000
             )
 
     def save_to_meta_table(self, items, meta_type, provider_type, id_column):
@@ -491,10 +528,12 @@ class TraktSyncDatabase(Database):
                 (
                     (i.get(id_column), provider_type, meta_hash, self.clean_meta(obj(i)))
                     for i in items
-                    if i
-                       and obj(i)
-                       and i.get(id_column)
-                       and MetadataHandler.full_meta_up_to_par(meta_type, obj(i))
+                    if (
+                        i
+                        and obj(i)
+                        and i.get(id_column)
+                        and MetadataHandler.full_meta_up_to_par(meta_type, obj(i))
+                    )
                 ),
             )
 
@@ -532,11 +571,15 @@ class TraktSyncDatabase(Database):
         else:
             return result
 
-    @staticmethod
-    def _set_needs_update(items, updated):
-        updated_dict = {tid.get('trakt_id') for tid in updated}
+    def _set_needs_update(self, items, media_type):
+        update_list = self.fetchall(
+            "SELECT trakt_id from {} WHERE needs_update".format(media_type)
+        )
+        if not len(update_list) > 0:
+            return
+        update_set = {tid.get('trakt_id') for tid in update_list}
         for i in items:
-            i["needs_update"] = "true" if i.get("trakt_id") in updated_dict else "false"
+            i["needs_update"] = i.get("trakt_id") in update_set
 
     def insert_trakt_movies(self, movies):
         if not movies:
@@ -567,13 +610,14 @@ class TraktSyncDatabase(Database):
                     self._create_args(i),
                     g.validate_date(get(i, "collected_at")),
                     g.validate_date(get(i, "last_watched_at")),
+                    get(i, "user_rating"),
                     i.get("trakt_id"),
                 )
                 for i in to_insert
             ),
         )
         self.save_to_meta_table(to_insert, "movies", "trakt", "trakt_id")
-        self._set_needs_update(movies, to_insert)
+        self._set_needs_update(movies, "movies")
 
     def insert_trakt_shows(self, shows):
         if not shows:
@@ -604,13 +648,16 @@ class TraktSyncDatabase(Database):
                     get(i, "episode_count"),
                     self._create_args(i),
                     get(i, "is_airing"),
+                    g.validate_date(get(i, "last_watched_at")),
+                    g.validate_date(get(i, "last_collected_at")),
+                    get(i, "user_rating"),
                     i.get("trakt_id"),
                 )
                 for i in to_insert
             ),
         )
         self.save_to_meta_table(to_insert, "shows", "trakt", "trakt_id")
-        self._set_needs_update(shows, to_insert)
+        self._set_needs_update(shows, "shows")
 
     def insert_trakt_episodes(self, episodes):
         if not episodes:
@@ -655,6 +702,7 @@ class TraktSyncDatabase(Database):
                     self._create_args(i),
                     g.validate_date(get(i, "last_watched_at")),
                     g.validate_date(get(i, "collected_at")),
+                    get(i, "user_rating"),
                     self.trakt_api.meta_hash,
                     i.get("trakt_id"),
                 )
@@ -662,7 +710,7 @@ class TraktSyncDatabase(Database):
             ),
         )
         self.save_to_meta_table(to_insert, "episodes", "trakt", "trakt_id")
-        self._set_needs_update(episodes, to_insert)
+        self._set_needs_update(episodes, "episodes")
 
     def insert_trakt_seasons(self, seasons):
         if not seasons:
@@ -692,58 +740,73 @@ class TraktSyncDatabase(Database):
                     None,
                     get(i, "season"),
                     self._create_args(i),
+                    g.validate_date(get(i, "last_watched_at")),
+                    g.validate_date(get(i, "last_collected_at")),
+                    get(i, "user_rating"),
                     i.get("trakt_id"),
                 )
                 for i in to_insert
             ),
         )
         self.save_to_meta_table(to_insert, "seasons", "trakt", "trakt_id")
-        self._set_needs_update(seasons, to_insert)
+        self._set_needs_update(seasons, "seasons")
 
     def _mill_if_needed(self, list_to_update, queue_wrapper=None, mill_episodes=True):
         if queue_wrapper is None:
             queue_wrapper = self._queue_mill_tasks
 
-        query = """select s.trakt_id, agg.meta_count, s.season_count, CASE WHEN (agg.season_count is NULL or 
-            agg.season_count != s.season_count) or (agg.meta_count=0 or agg.meta_count!=s.season_count) THEN 'True' 
-            ELSE 'False' END as needs_update from shows as s left join(select s.trakt_id, count(se.trakt_id) as 
-            season_count, count(sm.id) as meta_count from shows as s inner join seasons as se on s.trakt_id = 
-            se.trakt_show_id left join seasons_meta as sm on sm.id = se.trakt_id and sm.type = 'trakt' 
-            and sm.meta_hash = '{}' where se.season != 0 and Datetime(se.air_date) < Datetime('now') 
-            GROUP BY s.trakt_id) as agg on s.trakt_id == agg.trakt_id WHERE s.trakt_id in ({})""".format(
-            self.trakt_api.meta_hash,
-            ",".join(
-                str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
-            ),
+        ids_to_mill_check = ",".join(
+            str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
         )
-        needs_update = self.fetchall(query)
-        if needs_update is not None:
-            needs_update = {x.get('trakt_id'): x for x in needs_update if x.get('needs_update') == "True"}
+
+        query = (
+            """select s.trakt_id, s.needs_milling, s.season_count, agg.meta_count, agg.tot_season_count, 
+            agg.tot_meta_count from shows as s left join(select s.trakt_id, sum(CASE WHEN se.trakt_id is not null 
+            and se.season != 0 and Datetime(se.air_date) < Datetime('{datetime}') THEN 1 ELSE 0 END) as season_count, 
+            sum(CASE WHEN sm.id is not null and se.season != 0 and Datetime(se.air_date) < Datetime('{datetime}') THEN 1 
+            ELSE 0 END) as meta_count, count(se.trakt_id) as tot_season_count, count(sm.id) as tot_meta_count from 
+            shows as s inner join seasons as se on s.trakt_id = se.trakt_show_id left join seasons_meta as sm on 
+            sm.id = se.trakt_id and sm.type = 'trakt' and sm.meta_hash = '{meta_hash}' WHERE s.trakt_id in ({ids}) GROUP BY 
+            s.trakt_id) as agg on s.trakt_id = agg.trakt_id WHERE s.trakt_id in ({ids}) AND ((s.needs_milling or (
+            agg.season_count is NULL or agg.season_count != s.season_count) or (agg.meta_count = 0 or 
+            agg.meta_count!=s.season_count) or agg.tot_season_count != agg.tot_meta_count)) """
+        ).format(
+            meta_hash=self.trakt_api.meta_hash,
+            ids=ids_to_mill_check,
+            datetime=self._get_datetime_now()
+        )
+        needs_milling = self.fetchall(query)
+        if needs_milling is not None:
+            needs_milling = {x.get('trakt_id') for x in needs_milling}
         else:
-            needs_update = {}
+            needs_milling = set()
 
         if mill_episodes:
-            query = """select s.trakt_id, CASE WHEN (agg.episode_count is NULL or 
-            agg.episode_count != s.episode_count) or (agg.meta_count=0 or agg.meta_count!=s.episode_count) THEN 'True' 
-            ELSE 'False' END as needs_update from shows as s left join(select s.trakt_id, count(e.trakt_id) as 
-            episode_count, count(em.id) as meta_count from shows as s inner join episodes as e on s.trakt_id = 
-            e.trakt_show_id left join episodes_meta as em on em.id = e.trakt_id and em.type = 'trakt' and em.meta_hash = 
-            '{}' where e.season != 0 and Datetime(e.air_date) < Datetime('now') GROUP BY s.trakt_id) as agg on s.trakt_id == 
-            agg.trakt_id WHERE s.trakt_id in ({})""".format(
-                self.trakt_api.meta_hash,
-                ",".join(
-                    str(i.get("trakt_show_id", i.get("trakt_id"))) for i in list_to_update
-                ),
+            query = (
+                """select s.trakt_id, s.episode_count, agg.episode_count, agg.meta_count, agg.tot_episode_count, 
+                agg.tot_meta_count from shows as s left join(select s.trakt_id, sum(CASE WHEN e.trakt_id is not null 
+                and e.season != 0 and Datetime(e.air_date) < Datetime('{datetime}') THEN 1 END) as episode_count, 
+                sum(CASE WHEN em.id is not null and e.season != 0 and Datetime(e.air_date) < Datetime('{datetime}') THEN 1 
+                END) as meta_count, count(e.trakt_id) as tot_episode_count, count(em.id) as tot_meta_count from shows 
+                as s inner join episodes as e on s.trakt_id = e.trakt_show_id left join episodes_meta as em on em.id 
+                = e.trakt_id and em.type = 'trakt' and em.meta_hash = '{meta_hash}' WHERE s.trakt_id in ({ids}) GROUP BY 
+                s.trakt_id) as agg on s.trakt_id = agg.trakt_id WHERE s.trakt_id in ({ids}) AND ((agg.episode_count is 
+                NULL or agg.episode_count != s.episode_count) or (agg.meta_count = 0 or 
+                agg.meta_count!=s.episode_count) or (agg.tot_episode_count != agg.tot_meta_count)) """
+            ).format(
+                meta_hash=self.trakt_api.meta_hash,
+                ids=ids_to_mill_check,
+                datetime=self._get_datetime_now()
             )
-            episodes_needs_update = self.fetchall(query)
-            if episodes_needs_update is not None:
-                needs_update.update(
-                    {x.get('trakt_id'): x for x in episodes_needs_update if x.get('needs_update') == "True"}
+            episodes_needs_milling = self.fetchall(query)
+            if episodes_needs_milling is not None:
+                needs_milling.update(
+                    {x.get('trakt_id') for x in episodes_needs_milling}
                 )
 
-        update_size = len(needs_update)
-        if update_size > 0:
-            g.log("{} items require season milling".format(update_size), "debug")
+        show_milling_count = len(needs_milling)
+        if show_milling_count > 0:
+            g.log("{} items require season milling".format(show_milling_count), "debug")
         else:
             return
 
@@ -751,7 +814,7 @@ class TraktSyncDatabase(Database):
             [
                 i
                 for i in list_to_update
-                if i.get("trakt_show_id", i.get("trakt_id")) in needs_update
+                if i.get("trakt_show_id", i.get("trakt_id")) in needs_milling
             ],
             queue_wrapper,
             mill_episodes
@@ -781,7 +844,8 @@ class TraktSyncDatabase(Database):
 
                 for show in trakt_collection:
                     extended_seasons = {get(x, "season"): x for x in get(show, "seasons", [])}
-                    for season in results.get(show.get("trakt_id"), []):
+                    # We make a dict here to ensure that the season numbers are unique due to a few bad trakt records.
+                    for s_num, season in {get(x, "season"): x for x in results.get(show.get("trakt_id"), [])}.items():
 
                         trakt_info(season).update({"trakt_show_id": get(show, "trakt_id")})
                         trakt_info(season).update({"tmdb_show_id": get(show, "tmdb_id")})
@@ -794,7 +858,7 @@ class TraktSyncDatabase(Database):
                         trakt_info(season).update({"dateadded": get(show, "dateadded")})
                         trakt_info(season).update({"tvshowtitle": get(show, "title")})
 
-                        if not get(season, "season") == 0:
+                        if not s_num == 0:
                             show.update({"season_count": show.get("season_count", 0) + (
                                 1 if get(season, "aired_episodes", 0) > 0 else 0)})
                             show.update(
@@ -803,13 +867,16 @@ class TraktSyncDatabase(Database):
                                 }
                             )
 
-                        extended_season = extended_seasons.get(get(season, "season"))
+                        extended_season = extended_seasons.get(s_num)
                         if extended_season:
                             tools.smart_merge_dictionary(season, extended_season, keep_original=True)
 
                         seasons.append(season)
 
-                        for episode in get(season, "episodes", []):
+                        extended_episodes = {
+                            get(x, "episode"): x for x in get(extended_season, "episodes", [])
+                        }
+                        for e_num, episode in {get(x, "episode"): x for x in get(season, "episodes", [])}.items():
                             trakt_info(episode).update({"trakt_show_id": get(show, "trakt_id")})
                             trakt_info(episode).update({"tmdb_show_id": get(show, "tmdb_id")})
                             trakt_info(episode).update({"tvdb_show_id": get(show, "tvdb_id")})
@@ -822,10 +889,7 @@ class TraktSyncDatabase(Database):
 
                             trakt_info(episode).update({"tvshowtitle": get(show, "title")})
 
-                            extended_episodes = {
-                                get(x, "episode"): x for x in get(extended_season, "episodes", [])
-                            }
-                            extended_episode = extended_episodes.get(get(episode, "episode"))
+                            extended_episode = extended_episodes.get(e_num)
                             if extended_episode:
                                 tools.smart_merge_dictionary(episode, extended_episode, keep_original=True)
 
@@ -838,6 +902,7 @@ class TraktSyncDatabase(Database):
                     (
                         (i.get("episode_count", 0), i.get("season_count", 0), i["trakt_id"])
                         for i in trakt_collection
+                        if i["trakt_id"] in sync_lock.running_ids
                     )
                 )
 
@@ -845,6 +910,12 @@ class TraktSyncDatabase(Database):
 
                 if mill_episodes:
                     self.update_season_statistics({"trakt_id": i['trakt_id']} for i in seasons)
+
+                self.execute_sql(
+                    "UPDATE shows SET needs_milling=0 where trakt_id in ({})".format(
+                        ",".join(map(str, sync_lock.running_ids))
+                    )
+                )
 
     def _filter_trakt_items_that_needs_updating(self, requested, media_type):
         if not requested:
@@ -854,9 +925,7 @@ class TraktSyncDatabase(Database):
         query_predicate = ["({}, '{}', '{}')".format(
             i.get("trakt_id"), self.trakt_api.meta_hash, get(i, "dateadded")
         )
-            for i in requested
-            if i.get("trakt_id")
-               and "needs_update" not in i]
+            for i in requested]
 
         if not query_predicate:
             return []
@@ -993,7 +1062,7 @@ class TraktSyncDatabase(Database):
                 )
             )
             if hide_unaired:
-                query += " AND Datetime(air_date) < Datetime('now')"
+                query += " AND Datetime(air_date) < Datetime('{}')".format(self._get_datetime_now())
             if hide_watched:
                 if media_type == "movies":
                     query += " AND watched = 0"
@@ -1040,24 +1109,25 @@ class TraktSyncDatabase(Database):
         query = (
             """INSERT or REPLACE into shows (trakt_id, info, art, cast, air_date, last_updated, tmdb_id, tvdb_id, 
             imdb_id, meta_hash, season_count, episode_count, watched_episodes, unwatched_episodes, args, is_airing, 
-            needs_update) SELECT old.trakt_id, old.info, old.art, old.cast, COALESCE(new.air_date, old.air_date), 
-            old.last_updated, old.tmdb_id, old.tvdb_id, old.imdb_id, old.meta_hash, COALESCE(new.season_count, 
-            old.season_count), COALESCE(new.episode_count, old.episode_count), COALESCE(new.watched_episodes, 
-            old.watched_episodes), COALESCE(new.unwatched_episodes, old.unwatched_episodes), old.args, old.is_airing, 
-            old.needs_update FROM (select sh.trakt_id, CASE WHEN min(COALESCE(e.air_date, datetime(
-            '9999-12-31T00:00:00'))) <> datetime('9999-12-31T00:00:00') THEN min(COALESCE(e.air_date, 
-            datetime('9999-12-31T00:00:00'))) END as air_date, CASE WHEN count(distinct CASE WHEN e.season != 0 AND 
-            Datetime(e.air_date) < Datetime('now') THEN season END) > 0 THEN count(distinct CASE WHEN e.season != 0 
-            AND Datetime(e.air_date) < Datetime('now') THEN season END) END as season_count, sum(CASE WHEN e.season 
-            != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 END) as episode_count, ( CASE WHEN sum(CASE WHEN 
-            e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 END) > sh.episode_count THEN sum(CASE 
-            WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 END) ELSE sh.episode_count END ) - 
-            sum(CASE WHEN e.watched > 0 AND e.season != 0 AND Datetime(e.air_date) < Datetime('now') THEN 1 ELSE 0 
-            END) as unwatched_episodes, sum( CASE WHEN e.watched > 0 AND e.season != 0 AND Datetime(e.air_date) < 
-            Datetime('now') THEN 1 END ) as watched_episodes from shows as sh left join episodes as e on 
-            e.trakt_show_id = sh.trakt_id group by sh.trakt_id) AS new LEFT JOIN (SELECT * FROM shows) AS old on 
-            old.trakt_id = new.trakt_id """
-        )
+            last_watched_at, last_collected_at, user_rating, needs_update, needs_milling) SELECT old.trakt_id, old.info, 
+            old.art, old.cast, COALESCE(new.air_date, old.air_date), old.last_updated, old.tmdb_id, old.tvdb_id, 
+            old.imdb_id, old.meta_hash, COALESCE(new.season_count, old.season_count), COALESCE(new.episode_count, 
+            old.episode_count), COALESCE(new.watched_episodes, old.watched_episodes), COALESCE( 
+            new.unwatched_episodes, old.unwatched_episodes), old.args, old.is_airing, old.last_watched_at, 
+            old.last_collected_at, old.user_rating, old.needs_update, old.needs_milling FROM (select sh.trakt_id, 
+            CASE WHEN min(COALESCE(e.air_date, datetime('9999-12-31T00:00:00'))) <> datetime('9999-12-31T00:00:00') 
+            THEN min(COALESCE(e.air_date, datetime('9999-12-31T00:00:00'))) END as air_date, CASE WHEN count(distinct 
+            CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN season END) > 0 THEN count(
+            distinct CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN season END) END as 
+            season_count, sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN 1 END) as 
+            episode_count, ( CASE WHEN sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN 1 
+            END) > sh.episode_count THEN sum(CASE WHEN e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN 
+            1 END) ELSE sh.episode_count END ) - sum(CASE WHEN e.watched > 0 AND e.season != 0 AND Datetime(
+            e.air_date) < Datetime('{datetime}') THEN 1 ELSE 0 END) as unwatched_episodes, sum( CASE WHEN e.watched > 0 AND 
+            e.season != 0 AND Datetime(e.air_date) < Datetime('{datetime}') THEN 1 END ) as watched_episodes from shows as 
+            sh left join episodes as e on e.trakt_show_id = sh.trakt_id group by sh.trakt_id) AS new LEFT JOIN (
+            SELECT * FROM shows) AS old on old.trakt_id = new.trakt_id """
+        ).format(datetime=self._get_datetime_now())
         if trakt_list:
             trakt_ids = ",".join({str(i.get("trakt_id")) for i in trakt_list})
             query += " where old.trakt_id in ({})".format(trakt_ids)
@@ -1073,23 +1143,27 @@ class TraktSyncDatabase(Database):
         query = (
             """INSERT or REPLACE into seasons ( trakt_show_id, trakt_id, info, art, cast, air_date, last_updated, 
             tmdb_id, tvdb_id, meta_hash, episode_count, watched_episodes, unwatched_episodes, is_airing, season, 
-            args , needs_update) SELECT old.trakt_show_id, old.trakt_id, old.info, old.art, old.cast, 
-            COALESCE(new.air_date, old.air_date), old.last_updated, old.tmdb_id, old.tvdb_id, old.meta_hash, 
-            COALESCE(new.episode_count, old.episode_count), CASE WHEN COALESCE(new.watched_episodes, 
+            args, last_watched_at, last_collected_at, user_rating, needs_update) SELECT old.trakt_show_id, old.trakt_id, 
+            old.info, old.art, old.cast, COALESCE(new.air_date, old.air_date), old.last_updated, old.tmdb_id, 
+            old.tvdb_id, old.meta_hash, CASE WHEN COALESCE(new.episode_count, old.episode_count) is not null THEN 
+            COALESCE( new.episode_count, old.episode_count) ELSE 0 END, CASE WHEN COALESCE(new.watched_episodes, 
             old.watched_episodes) is not null THEN COALESCE(new.watched_episodes, old.watched_episodes) ELSE 0 END, 
-            CASE WHEN COALESCE(new.unwatched_episodes, old.unwatched_episodes) is not null THEN COALESCE(
-            new.unwatched_episodes, old.unwatched_episodes) ELSE COALESCE(new.episode_count, old.episode_count) END, 
+            CASE WHEN COALESCE( new.unwatched_episodes, old.unwatched_episodes) is not null THEN COALESCE( 
+            new.unwatched_episodes, old.unwatched_episodes) ELSE CASE WHEN COALESCE(new.episode_count, 
+            old.episode_count) is not null THEN COALESCE(new.episode_count, old.episode_count) ELSE 0 END END, 
             CASE WHEN COALESCE(new.is_airing, old.is_airing) is not null THEN COALESCE(new.is_airing, old.is_airing) 
-            ELSE 0 END, old.season, old.args, old.needs_update FROM (SELECT se.trakt_id, CASE WHEN min(COALESCE(
-            e.air_date, datetime('9999-12-31T00:00:00'))) <> datetime('9999-12-31T00:00:00') THEN min(COALESCE(
-            e.air_date, datetime('9999-12-31T00:00:00'))) END as air_date, sum(CASE WHEN datetime(e.air_date) < 
-            datetime('now') THEN 1 END) AS episode_count, sum(CASE WHEN e.watched == 0 AND datetime(e.air_date) < 
-            datetime('now') THEN 1 END) AS unwatched_episodes, sum(CASE WHEN e.watched > 0 AND datetime(e.air_date) < 
-            datetime('now') THEN 1 END) AS watched_episodes, CASE WHEN max(e.air_date) is not null THEN CASE WHEN 
-            max(e.air_date) > datetime('now') THEN 1 ELSE 0 END END AS is_airing FROM seasons AS se LEFT JOIN 
-            episodes AS e ON e.trakt_season_id = se.trakt_id GROUP BY se.trakt_id ) AS new LEFT JOIN (SELECT * FROM 
-            seasons) AS old ON new.trakt_id = old.trakt_id """
-        )
+            ELSE 0 END, old.season, old.args, old.last_watched_at, old.last_collected_at, old.user_rating, 
+            old.needs_update FROM ( SELECT se.trakt_id, CASE WHEN min(COALESCE( e.air_date, 
+            datetime('9999-12-31T00:00:00'))) <> datetime( '9999-12-31T00:00:00') THEN min(COALESCE( e.air_date, 
+            datetime('9999-12-31T00:00:00'))) END as air_date, CASE WHEN max(e.trakt_id) is not null THEN sum(CASE 
+            WHEN datetime(e.air_date) < datetime('{datetime}') THEN 1 ELSE 0 END) END AS episode_count, CASE WHEN max( 
+            e.trakt_id) is not null THEN sum(CASE WHEN e.watched == 0 AND datetime(e.air_date) < datetime('{datetime}') THEN 
+            1 ELSE 0 END) END AS unwatched_episodes, CASE WHEN max( e.trakt_id) is not null THEN sum(CASE WHEN 
+            e.watched > 0 AND datetime(e.air_date) < datetime('{datetime}') THEN 1 ELSE 0 END) END AS watched_episodes, 
+            CASE WHEN max(e.trakt_id) is not null THEN CASE WHEN max( e.air_date) > datetime('{datetime}') THEN 1 ELSE 0 END 
+            END AS is_airing FROM seasons AS se LEFT JOIN episodes AS e ON e.trakt_season_id = se.trakt_id GROUP BY 
+            se.trakt_id ) AS new LEFT JOIN (SELECT * FROM seasons) AS old ON new.trakt_id = old.trakt_id """
+        ).format(datetime=self._get_datetime_now())
         if trakt_list:
             trakt_ids = ",".join({str(i.get("trakt_id")) for i in trakt_list})
             query += " where old.trakt_id in ({})".format(trakt_ids)
@@ -1100,60 +1174,75 @@ class TraktSyncDatabase(Database):
     @property
     def upsert_movie_query(self):
         return """INSERT or REPLACE into movies ( trakt_id, info, art, cast, collected, watched, air_date, 
-        last_updated, tmdb_id, imdb_id, meta_hash, args, collected_at, last_watched_at, needs_update) SELECT COALESCE(
-        new.trakt_id, old.trakt_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), COALESCE(new.cast, 
-        old.cast), COALESCE(new.collected, old.collected), COALESCE(new.watched, old.watched), COALESCE(new.air_date, 
-        old.air_date), COALESCE(new.last_updated, old.last_updated), COALESCE(new.tmdb_id, old.tmdb_id), 
-        COALESCE(new.imdb_id, old.imdb_id), COALESCE(new.meta_hash, old.meta_hash), COALESCE(new.args, old.args), 
-        COALESCE(new.collected_at, old.collected_at), COALESCE(new.last_watched_at, old.last_watched_at), 
-        Datetime(coalesce(old.last_updated, 0)) < Datetime(new.last_updated) as needs_update FROM ( 
-        SELECT ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? AS collected, ? as watched, ? AS air_date, 
-        ? AS last_updated, ? AS tmdb_id, ? AS imdb_id, ? AS meta_hash, ? AS args, ? AS collected_at, 
-        ? AS last_watched_at) AS new LEFT JOIN (SELECT * FROM movies WHERE trakt_id = ? limit 1) AS old """
+        last_updated, tmdb_id, imdb_id, meta_hash, args, collected_at, last_watched_at, user_rating, needs_update) 
+        SELECT COALESCE(new.trakt_id, old.trakt_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), 
+        COALESCE(new.cast, old.cast), COALESCE(new.collected, old.collected), COALESCE(new.watched, old.watched), 
+        COALESCE(new.air_date, old.air_date), COALESCE(new.last_updated, old.last_updated), COALESCE(new.tmdb_id, 
+        old.tmdb_id), COALESCE(new.imdb_id, old.imdb_id), COALESCE(new.meta_hash, old.meta_hash), COALESCE(new.args, 
+        old.args), COALESCE(new.collected_at, old.collected_at), COALESCE(new.last_watched_at, old.last_watched_at), 
+        COALESCE(new.user_rating, old.user_rating), CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR 
+        new.art != old.art OR new.cast != old.cast THEN 0 ELSE old.needs_update END ELSE CASE WHEN Datetime(COALESCE( 
+        old.last_updated, 0)) < Datetime( new.last_updated) THEN 1 ELSE 0 END END as needs_update FROM ( SELECT ? AS 
+        trakt_id, ? AS info, ? AS art, ? AS cast, ? AS collected, ? as watched, ? AS air_date, ? AS last_updated, 
+        ? AS tmdb_id, ? AS imdb_id, ? AS meta_hash, ? AS args, ? AS collected_at, ? AS last_watched_at, 
+        ? AS user_rating) AS new LEFT JOIN (SELECT * FROM movies WHERE trakt_id = ? limit 1) AS old """
 
     @property
     def upsert_show_query(self):
         return """INSERT or REPLACE into shows (trakt_id, info, art, cast, air_date, last_updated, tmdb_id, tvdb_id, 
-        imdb_id, meta_hash, season_count, episode_count, watched_episodes, unwatched_episodes, args, is_airing, needs_update) SELECT 
-        COALESCE(new.trakt_id, old.trakt_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), COALESCE(
-        new.cast, old.cast), COALESCE(new.air_date, old.air_date), COALESCE(new.last_updated, old.last_updated), 
-        COALESCE(new.tmdb_id, old.tmdb_id), COALESCE(new.tvdb_id, old.tvdb_id), COALESCE(new.imdb_id, old.imdb_id), 
-        COALESCE(new.meta_hash, old.meta_hash), COALESCE(new.season_count, old.season_count), 
-        COALESCE(new.episode_count, old.episode_count), COALESCE(old.watched_episodes, 0), 
-        COALESCE(old.unwatched_episodes, 0), COALESCE(new.args, old.args), COALESCE(new.is_airing, old.is_airing),
-        Datetime(coalesce(old.last_updated, 0)) < Datetime(new.last_updated) as needs_update FROM 
-        (SELECT ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? AS air_date, ? AS last_updated, ? AS tmdb_id, ? AS 
-        tvdb_id, ? AS imdb_id, ? AS meta_hash, ? AS season_count,? AS episode_count, ? AS args, ? as is_airing) AS 
-        new LEFT JOIN (SELECT * FROM shows WHERE trakt_id = ? limit 1) AS old """
+        imdb_id, meta_hash, season_count, episode_count, watched_episodes, unwatched_episodes, args, is_airing, 
+        last_watched_at, last_collected_at, user_rating, needs_update, needs_milling) SELECT COALESCE(new.trakt_id, 
+        old.trakt_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), COALESCE(new.cast, old.cast), 
+        COALESCE(new.air_date, old.air_date), COALESCE(new.last_updated, old.last_updated), COALESCE(new.tmdb_id, 
+        old.tmdb_id), COALESCE(new.tvdb_id, old.tvdb_id), COALESCE(new.imdb_id, old.imdb_id), COALESCE(new.meta_hash, 
+        old.meta_hash), COALESCE(new.season_count, old.season_count), COALESCE(new.episode_count, old.episode_count), 
+        COALESCE(old.watched_episodes, 0), COALESCE(old.unwatched_episodes, 0), COALESCE(new.args, old.args), 
+        COALESCE(new.is_airing, old.is_airing), COALESCE(new.last_watched_at, old.last_watched_at), 
+        COALESCE(new.last_collected_at, old.last_collected_at), COALESCE(new.user_rating, old.user_rating), 
+        CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR new.art != old.art OR new.cast != old.cast 
+        THEN 0 ELSE old.needs_update END ELSE CASE WHEN Datetime( COALESCE(old.last_updated,0)) < Datetime(
+        new.last_updated) THEN 1 ELSE 0 END END as needs_update, CASE WHEN old.needs_milling THEN old.needs_milling 
+        ELSE CASE WHEN Datetime(COALESCE(old.last_updated, 0)) < Datetime(new.last_updated) THEN 1 ELSE 0 END END as 
+        needs_milling FROM (SELECT ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? AS air_date, ? AS last_updated, 
+        ? AS tmdb_id, ? AS tvdb_id, ? AS imdb_id, ? AS meta_hash, ? AS season_count, ? AS episode_count, ? AS args, 
+        ? as is_airing, ? AS last_watched_at, ? AS last_collected_at, ? AS user_rating) AS new LEFT JOIN (SELECT * 
+        FROM shows WHERE trakt_id = ? limit 1) AS old """
 
     @property
     def upsert_season_query(self):
         return """INSERT or REPLACE into seasons ( trakt_show_id, trakt_id, info, art, cast, air_date, last_updated, 
-        tmdb_id, tvdb_id, meta_hash, episode_count, watched_episodes, unwatched_episodes, season, args, is_airing, needs_update) 
-        SELECT COALESCE(new.trakt_show_id, old.trakt_show_id), COALESCE(new.trakt_id, old.trakt_id), COALESCE(new.info, 
-        old.info), COALESCE(new.art, old.art), COALESCE(new.cast, old.cast), COALESCE(new.air_date, old.air_date), 
-        COALESCE(new.last_updated, old.last_updated), COALESCE(new.tmdb_id, old.tmdb_id), COALESCE(new.tvdb_id, 
-        old.tvdb_id), COALESCE(new.meta_hash, old.meta_hash), COALESCE(new.episode_count, old.episode_count), 
-        old.watched_episodes, old.unwatched_episodes, COALESCE(new.season, old.season), COALESCE(new.args, 
-        old.args), old.is_airing, Datetime(coalesce(old.last_updated, 0)) < Datetime(new.last_updated) as needs_update FROM 
-        ( SELECT ? AS trakt_show_id, ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? 
-        AS air_date, ? AS last_updated, ? AS tmdb_id, ? AS tvdb_id, ? AS meta_hash, ? AS episode_count, ? AS season, ? 
-        AS args) AS new LEFT JOIN ( SELECT * FROM seasons WHERE trakt_id = ? limit 1) AS old """
+        tmdb_id, tvdb_id, meta_hash, episode_count, watched_episodes, unwatched_episodes, season, args, is_airing, 
+        last_watched_at, last_collected_at, user_rating, needs_update) SELECT COALESCE(new.trakt_show_id, 
+        old.trakt_show_id), COALESCE(new.trakt_id, old.trakt_id), COALESCE(new.info, old.info), COALESCE(new.art, 
+        old.art), COALESCE(new.cast, old.cast), COALESCE(new.air_date, old.air_date), COALESCE(new.last_updated, 
+        old.last_updated), COALESCE(new.tmdb_id, old.tmdb_id), COALESCE(new.tvdb_id, old.tvdb_id), 
+        COALESCE(new.meta_hash, old.meta_hash), COALESCE(new.episode_count, old.episode_count), old.watched_episodes, 
+        old.unwatched_episodes, COALESCE(new.season, old.season), COALESCE(new.args, old.args), old.is_airing, 
+        COALESCE(new.last_watched_at, old.last_watched_at), COALESCE(new.last_collected_at, old.last_collected_at), 
+        COALESCE(new.user_rating, old.user_rating), CASE WHEN old.needs_update THEN CASE WHEN new.info != old.info OR 
+        new.art != old.art OR new.cast != old.cast THEN 0 ELSE old.needs_update END ELSE CASE WHEN Datetime(COALESCE( 
+        old.last_updated,0)) < Datetime(new.last_updated) THEN 1 ELSE 0 END END as needs_update FROM (SELECT ? AS 
+        trakt_show_id, ? AS trakt_id, ? AS info, ? AS art, ? AS cast, ? AS air_date, ? AS last_updated, ? AS tmdb_id, 
+        ? AS tvdb_id, ? AS meta_hash, ? AS episode_count, ? AS season, ? AS args, ? AS last_watched_at, 
+        ? AS last_collected_at, ? AS user_rating) AS new LEFT JOIN (SELECT * FROM seasons WHERE trakt_id = ? limit 1) 
+        AS old """
 
     @property
     def upsert_episode_query(self):
         return """INSERT or REPLACE into episodes (trakt_id, trakt_show_id, trakt_season_id, watched, collected, 
         air_date, last_updated, season, number, tmdb_id, tvdb_id, imdb_id, info, art, cast, args, last_watched_at, 
-        collected_at, meta_hash, needs_update) SELECT COALESCE (new.trakt_id , old.trakt_id), COALESCE (new.trakt_show_id , 
-        old.trakt_show_id), COALESCE (new.trakt_season_id, old.trakt_season_id), COALESCE (new.watched , 
-        old.watched), COALESCE (new.collected , old.collected), COALESCE (new.air_date , old.air_date), 
-        COALESCE (new.last_updated , old.last_updated), COALESCE (new.season , old.season), COALESCE (new.number , 
-        old.number), COALESCE (new.tmdb_id , old.tmdb_id), COALESCE (new.tvdb_id , old.tvdb_id), COALESCE (
-        new.imdb_id , old.imdb_id), COALESCE (new.info , old.info), COALESCE (new.art , old.art), COALESCE (new.cast 
-        , old.cast), COALESCE (new.args , old.args), COALESCE (new.last_watched_at , old.last_watched_at), 
-        COALESCE (new.collected_at , old.collected_at), COALESCE (new.meta_hash , old.meta_hash),
-        Datetime(coalesce(old.last_updated, 0)) < Datetime(new.last_updated) as needs_update FROM (SELECT ? AS 
-        trakt_id, ? AS trakt_show_id, ? AS trakt_season_id, ? AS watched, ? AS collected, ? AS air_date, 
-        ? AS last_updated, ? AS season, ? AS number, ? AS tmdb_id, ? AS tvdb_id, ? AS imdb_id, ? AS info, ? AS art, 
-        ? AS cast, ? AS args, ? AS last_watched_at, ? AS collected_at, ? AS meta_hash) AS new LEFT JOIN ( SELECT * 
-        FROM episodes WHERE trakt_id = ? limit 1) AS old """
+        collected_at, user_rating, meta_hash, needs_update) SELECT COALESCE(new.trakt_id, old.trakt_id), 
+        COALESCE(new.trakt_show_id, old.trakt_show_id), COALESCE(new.trakt_season_id, old.trakt_season_id), 
+        COALESCE(new.watched, old.watched), COALESCE(new.collected, old.collected), COALESCE(new.air_date, 
+        old.air_date), COALESCE(new.last_updated, old.last_updated), COALESCE(new.season, old.season), 
+        COALESCE(new.number, old.number), COALESCE(new.tmdb_id, old.tmdb_id), COALESCE(new.tvdb_id, old.tvdb_id), 
+        COALESCE(new.imdb_id, old.imdb_id), COALESCE(new.info, old.info), COALESCE(new.art, old.art), 
+        COALESCE(new.cast, old.cast), COALESCE(new.args, old.args), COALESCE(new.last_watched_at, 
+        old.last_watched_at), COALESCE(new.collected_at, old.collected_at), COALESCE(new.user_rating, 
+        old.user_rating), COALESCE(new.meta_hash, old.meta_hash), CASE WHEN old.needs_update THEN CASE WHEN new.info 
+        != old.info OR new.art != old.art OR new.cast != old.cast THEN 0 ELSE old.needs_update END ELSE CASE WHEN 
+        Datetime( COALESCE(old.last_updated,0)) < Datetime( new.last_updated) THEN 1 ELSE 0 END END as needs_update 
+        FROM (SELECT ? AS trakt_id, ? AS trakt_show_id, ? AS trakt_season_id, ? AS watched, ? AS collected, 
+        ? AS air_date, ? AS last_updated, ? AS season, ? AS number, ? AS tmdb_id, ? AS tvdb_id, ? AS imdb_id, 
+        ? AS info, ? AS art, ? AS cast, ? AS args, ? AS last_watched_at, ? AS collected_at, ? AS user_rating, 
+        ? AS meta_hash) AS new LEFT JOIN (SELECT * FROM episodes WHERE trakt_id = ? limit 1) AS old """

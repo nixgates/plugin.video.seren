@@ -9,19 +9,19 @@ from resources.lib.modules.globals import g
 class Menus:
 
     def __init__(self):
-        self.view_type = g.CONTENT_FOLDER
+        self.view_type = g.CONTENT_MENU
         self.torrent_assist = TorrentAssist()
 
     def home(self):
-        g.add_directory_item(g.get_language_string(30238), action='cacheAssistStatus')
+        g.add_directory_item(g.get_language_string(30232), action='cacheAssistStatus')
         if g.get_bool_setting('premiumize.enabled'):
-            g.add_directory_item(g.get_language_string(30239), action='premiumize_transfers')
+            g.add_directory_item(g.get_language_string(30233), action='premiumize_transfers')
         if g.get_bool_setting('realdebrid.enabled'):
-            g.add_directory_item(g.get_language_string(30240), action='realdebridTransfers')
+            g.add_directory_item(g.get_language_string(30234), action='realdebridTransfers')
         g.close_directory(self.view_type)
 
     def get_assist_torrents(self):
-        g.add_directory_item(g.get_language_string(30241), action='nonActiveAssistClear')
+        g.add_directory_item(g.get_language_string(30235), action='nonActiveAssistClear')
         torrent_list = self.torrent_assist.get_assist_torrents()
         if torrent_list is not None:
 

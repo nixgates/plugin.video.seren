@@ -265,7 +265,7 @@ class SourceSorter:
             response = None
             if not g.get_bool_runtime_setting('tempSilent'):
                 response = xbmcgui.Dialog().yesno(
-                    g.ADDON_NAME, g.get_language_string(30504)
+                    g.ADDON_NAME, g.get_language_string(30498)
                     )
             if response or g.get_bool_runtime_setting('tempSilent'):
                 self.torrent_list = deepcopy(torrents)

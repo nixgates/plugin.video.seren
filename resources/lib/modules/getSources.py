@@ -85,9 +85,10 @@ class Sources(object):
 
         self.silent = g.get_bool_runtime_setting('tempSilent')
 
-    def get_sources(self):
+    def get_sources(self, overwrite_torrent_cache=False):
         """
         Main endpoint to initiate scraping process
+        :param overwrite_cache:
         :return: Returns (uncached_sources, sorted playable sources, items metadata)
         :rtype: tuple
         """
@@ -105,7 +106,10 @@ class Sources(object):
             self._handle_pre_scrape_modifiers()
             self._get_imdb_info()
 
-            self._check_local_torrent_database()
+            if overwrite_torrent_cache:
+                self._clear_local_torrent_results()
+            else:
+                self._check_local_torrent_database()
 
             self._update_progress()
             if self._prem_terminate():
@@ -293,24 +297,13 @@ class Sources(object):
             return
         self.torrent_cache.add_torrent(self.item_information, torrent_list)
 
+    def _clear_local_torrent_results(self):
+        if g.get_bool_setting('general.torrentCache'):
+            g.log("Clearing existing local torrent cache items", "info")
+            self.torrent_cache.clear_item(self.item_information)
+
     def _get_local_torrent_results(self):
-
-        local_storage = self.torrent_cache.get_torrents(self.item_information)[:100]
-
-        relevant_torrents = []
-
-        if self.media_type == 'episode':
-            torrent_simple_info = self._build_simple_show_info(self.item_information)
-            episode_regex = source_utils.get_filter_single_episode_fn(torrent_simple_info)
-            show_regex = source_utils.get_filter_show_pack_fn(torrent_simple_info)
-            season_regex = source_utils.get_filter_season_pack_fn(torrent_simple_info)
-
-            for torrent in local_storage:
-                clean_title = source_utils.clean_title(torrent['release_title'])
-                if episode_regex(clean_title) or season_regex(clean_title) or show_regex(clean_title):
-                    relevant_torrents.append(torrent)
-        else:
-            relevant_torrents = local_storage
+        relevant_torrents = self.torrent_cache.get_torrents(self.item_information)[:100]
 
         if len(relevant_torrents) > 0:
             for torrent in relevant_torrents:
@@ -361,7 +354,7 @@ class Sources(object):
                 xbmc.executebuiltin(
                     'RunPlugin({}?action=cacheAssist&action_args={})'.format(g.BASE_URL, action_args))
         elif not self.silent:
-            confirmation = xbmcgui.Dialog().yesno('{} - {}'.format(g.ADDON_NAME, g.get_language_string(30331)),
+            confirmation = xbmcgui.Dialog().yesno('{} - {}'.format(g.ADDON_NAME, g.get_language_string(30325)),
                                                   g.get_language_string(30056))
             if confirmation:
                 window = ManualCacheWindow(*SkinManager().confirm_skin_path('manual_caching.xml'),
@@ -378,7 +371,7 @@ class Sources(object):
             else:
                 providers = reload_module(importlib.import_module("providers"))
         except ValueError:
-            g.notification(g.ADDON_NAME, g.get_language_string(30471))
+            g.notification(g.ADDON_NAME, g.get_language_string(30465))
             g.log('No providers installed', 'warning')
             return
 
@@ -1034,6 +1027,7 @@ class TorrentCacheCheck:
                 count += 1
         except Exception:
             g.log_stacktrace()
+
 
 class SourceWindowAdapter(object):
     """

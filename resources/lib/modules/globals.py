@@ -261,13 +261,15 @@ listitem_properties = [
 
 
 class GlobalVariables(object):
-    CONTENT_FOLDER = "files"
+    CONTENT_MENU = ""
+    CONTENT_FILES = "files"
     CONTENT_MOVIE = "movies"
     CONTENT_SHOW = "tvshows"
     CONTENT_SEASON = "seasons"
     CONTENT_EPISODE = "episodes"
     CONTENT_GENRES = "genres"
     CONTENT_YEARS = "years"
+    MEDIA_MENU = ""
     MEDIA_FOLDER = "file"
     MEDIA_MOVIE = "movie"
     MEDIA_SHOW = "tvshow"
@@ -300,6 +302,10 @@ class GlobalVariables(object):
         self.LANGUAGE_CACHE = {}
         self.PLAYLIST = None
         self.HOME_WINDOW = None
+        self.KODI_DATE_LONG_FORMAT = None
+        self.KODI_DATE_SHORT_FORMAT = None
+        self.KODI_TIME_FORMAT = None
+        self.KODI_TIME_NO_SECONDS_FORMAT = None
         self.KODI_FULL_VERSION = None
         self.KODI_VERSION = None
         self.PLATFORM = self._get_system_platform()
@@ -347,6 +353,10 @@ class GlobalVariables(object):
     def _init_kodi(self):
         self.PLAYLIST = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.HOME_WINDOW = xbmcgui.Window(10000)
+        self.KODI_DATE_LONG_FORMAT = xbmc.getRegion("datelong")
+        self.KODI_DATE_SHORT_FORMAT = xbmc.getRegion("dateshort")
+        self.KODI_TIME_FORMAT = xbmc.getRegion("time")
+        self.KODI_TIME_NO_SECONDS_FORMAT = self.KODI_TIME_FORMAT.replace(":%S", "")
         self.KODI_FULL_VERSION = xbmc.getInfoLabel("System.BuildVersion")
         version = re.findall(r'(?:(?:((?:\d+\.?){1,3}\S+))?\s+\(((?:\d+\.?){2,3})\))', self.KODI_FULL_VERSION)
         if version:
@@ -399,16 +409,22 @@ class GlobalVariables(object):
             except pytz.UnknownTimeZoneError:
                 if timezone_string:
                     self.log(
-                        "Kodi provided an invalid local timezone '{}', trying a different approach".format(timezone_string),
+                        "Kodi provided an invalid local timezone '{}', trying a different approach".format(
+                            timezone_string
+                        ),
                         "warning"
                     )
                 else:
                     self.log(
-                        "Kodi does not support locale.timezone JSON RPC call on your platform, trying a different approach",
+                        "Kodi does not support locale.timezone JSON RPC call on your platform, trying a different "
+                        "approach",
                         "debug"
                     )
             except Exception as e:
-                self.log("Error detecting local timezone with Kodi, trying a different approach: {}".format(e), "warning")
+                self.log(
+                    "Error detecting local timezone with Kodi, trying a different approach: {}".format(e),
+                    "warning"
+                )
             # If Kodi detection failed, fall back on tzlocal
             try:
                 if not self.LOCAL_TIMEZONE or self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
@@ -895,7 +911,7 @@ class GlobalVariables(object):
         view_type = None
 
         if not self.get_bool_setting("general.viewidswitch"):
-            if content_type == self.CONTENT_FOLDER:
+            if content_type == self.CONTENT_MENU:
                 view_type = self.get_setting("addon.view")
             if content_type == self.CONTENT_SHOW:
                 view_type = self.get_setting("show.view")
@@ -909,7 +925,7 @@ class GlobalVariables(object):
                 view_name, view_type = viewTypes[int(view_type)]
                 return view_type
         else:
-            if content_type == self.CONTENT_FOLDER:
+            if content_type == self.CONTENT_MENU:
                 view_type = self.get_setting("addon.view.id")
             if content_type == self.CONTENT_SHOW:
                 view_type = self.get_setting("show.view.id")
@@ -1079,16 +1095,18 @@ class GlobalVariables(object):
 
         return "[COLOR {}]{}[/COLOR]".format(color, text)
 
-    def clear_cache(self):
-        confirm = xbmcgui.Dialog().yesno(
-            self.ADDON_NAME, self.get_language_string(30029)
-        )
-        if confirm != 1:
-            return
+    def clear_cache(self, silent=False):
+        if not silent:
+            confirm = xbmcgui.Dialog().yesno(
+                self.ADDON_NAME, self.get_language_string(30029)
+            )
+            if confirm != 1:
+                return
         g.CACHE.clear_all()
         g._init_cache()
         self.log(self.ADDON_NAME + ": Cache Cleared", "debug")
-        xbmcgui.Dialog().notification(self.ADDON_NAME, self.get_language_string(30052))
+        if not silent:
+            xbmcgui.Dialog().notification(self.ADDON_NAME, self.get_language_string(30052))
 
     def cancel_playback(self):
         self.PLAYLIST.clear()
@@ -1179,20 +1197,23 @@ class GlobalVariables(object):
     def container_refresh(self):
         return xbmc.executebuiltin("Container.Refresh")
 
-    def trigger_widget_refresh(self):
+    def trigger_widget_refresh(self, if_playing=True):
         """
         Trigger a widget refresh using the update library with an invalid path trick
-        Widget refresh will not be attempted if playing or if another process is waiting to refresh widgets
+        Widget refresh will not be attempted if playing if if_playing is False or if another process is waiting to
+        refresh widgets.
         The widget refresh will not occur until the user returns to the home window to prevent updating other addon
         containers.
 
         Care must be taken when executing this method as it will block until the home window becomes available or
-        playback is started
+        playback is started or if the library is already being scanned
+        :param if_playing: Whether to attempt to refresh widgets if playing.  Default: True
+        :type if_playing: bool
         """
         player = xbmc.Player()
         if (
                 self.get_bool_runtime_setting("widget_refreshing") or
-                player.isPlaying() or  # Don't wait if we are playing as it will refresh after
+                (player.isPlaying() and not if_playing) or  # Don't wait if we are playing as it will refresh after
                 xbmc.getCondVisibility("Library.IsScanningVideo")  # Don't do library update if already scanning library
         ):
             del player
@@ -1230,7 +1251,7 @@ class GlobalVariables(object):
         return [
             i
             for i in xbmc.getSupportedMedia("video").split("|")
-            if i != "" and i != ".zip"
+            if i not in ["", ".zip", ".rar"]
         ]
 
     def add_directory_item(self, name, **params):
@@ -1284,10 +1305,15 @@ class GlobalVariables(object):
                 # item.setProperty("totaltime", g.UNICODE(info["duration"]))
         if "play_count" in menu_item and menu_item.get("play_count") is not None:
             info["playcount"] = menu_item["play_count"]
+        if "air_date" in menu_item and menu_item.get("air_date") is not None:
+            info["premiered"] = menu_item["air_date"]
+            info["aired"] = menu_item["air_date"]
         if "description" in params:
             info["plot"] = info["overview"] = info["description"] = params.pop(
                 "description", None
             )
+        if menu_item.get("user_rating"):
+            item.setProperty("userrating", g.UNICODE(menu_item["user_rating"]))
 
         special_sort = params.pop("special_sort", None)
         if special_sort is not None:
@@ -1437,7 +1463,7 @@ class GlobalVariables(object):
         return xbmc.getCondVisibility("Window.IsMedia")
 
     def cancel_directory(self):
-        xbmcplugin.setContent(self.PLUGIN_HANDLE, g.CONTENT_FOLDER)
+        xbmcplugin.setContent(self.PLUGIN_HANDLE, g.CONTENT_MENU)
         xbmcplugin.endOfDirectory(self.PLUGIN_HANDLE, cacheToDisc=False)
 
     def read_all_text(self, file_path):

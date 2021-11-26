@@ -45,7 +45,7 @@ def update_provider_packages():
             silent=True, automatic=automatic
         )
         if not automatic and len(available_updates) > 0:
-            g.notification(g.ADDON_NAME, g.get_language_string(30274))
+            g.notification(g.ADDON_NAME, g.get_language_string(30268))
         g.set_runtime_setting("provider.updateCheckTimeStamp", g.UNICODE(time.time()))
 
 
@@ -92,8 +92,8 @@ def premiumize_transfer_cleanup():
     """
     service = premiumize.Premiumize()
     premiumize_transfers = PremiumizeTransfers()
-    fair_usage = int(service.get_used_space())
-    threshold = g.get_int_setting("premiumize.threshold")
+    fair_usage = service.get_used_space()
+    threshold = g.get_float_setting("premiumize.threshold")
 
     if fair_usage < threshold:
         g.log("Premiumize Fair Usage below threshold, no cleanup required")
@@ -164,7 +164,7 @@ def toggle_reuselanguageinvoker(forced_state=None):
     def _store_and_reload(output):
         with open(file_path, "w+") as addon_xml:
             addon_xml.writelines(output)
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30566))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30560))
         g.reload_profile()
 
     file_path = os.path.join(g.ADDON_DATA_PATH, "addon.xml")

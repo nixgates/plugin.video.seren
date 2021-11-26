@@ -81,7 +81,7 @@ class ProviderPackages(BaseWindow):
                 package = self.package_list.getSelectedItem().getLabel()
                 g.show_busy_dialog()
                 try:
-                    confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30289).format(package))
+                    confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30283).format(package))
                     if not confirm:
                         g.close_busy_dialog()
                         return

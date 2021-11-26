@@ -20,12 +20,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def get_movie_list(self, trakt_list, **params):
         self._update_movies(trakt_list)
         query = """SELECT m.trakt_id, m.info, m.art, m.cast, m.args, b.resume_time, b.percent_played, m.watched as 
-        play_count FROM movies as m left join bookmarks as b on m.trakt_id = b.trakt_id WHERE m.trakt_id in ({})""".format(
+        play_count, m.user_rating FROM movies as m left join bookmarks as b on m.trakt_id = b.trakt_id WHERE m.trakt_id 
+        in ({})""".format(
             ",".join((str(i.get("trakt_id")) for i in trakt_list))
         )
 
         if params.get("hide_unaired", self.hide_unaired):
-            query += " AND Datetime(air_date) < Datetime('now')"
+            query += " AND Datetime(air_date) < Datetime('{}')".format(self._get_datetime_now())
         if params.get("hide_watched", self.hide_watched):
             query += " AND watched = 0"
 
@@ -182,6 +183,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     i["info"].get("imdb_id"),
                     self.metadataHandler.meta_hash,
                     self._create_args(i),
+                    None,
                     None,
                     None,
                     i["info"]["trakt_id"],

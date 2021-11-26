@@ -42,7 +42,7 @@ class SourcesHelper(object):
     Helper object to stream line scraping of items
     """
     @use_cache(1)
-    def get_sources(self, action_args, overwrite_cache=None):
+    def get_sources(self, action_args, overwrite_cache=False):
         """
         Method to handle automatic background or foreground scraping
         :param action_args: action arguments from request uri
@@ -51,10 +51,10 @@ class SourcesHelper(object):
         """
         item_information = tools.get_item_information(action_args)
         if not ProviderCache().get_provider_packages():
-            yesno = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30471))
+            yesno = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30465))
             if not yesno:
                 return
-        sources = Sources(item_information).get_sources()
+        sources = Sources(item_information).get_sources(overwrite_torrent_cache=overwrite_cache)
         if sources is None or len(sources) <= 0 or len(sources[1]) <= 0:
             g.cancel_playback()
             g.notification(g.ADDON_NAME, g.get_language_string(30032), time=5000)

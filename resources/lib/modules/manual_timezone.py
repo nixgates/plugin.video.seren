@@ -16,7 +16,7 @@ def validate_timezone_detected():
 
 
 def notify_timezone_not_detected():
-    confirm = xbmcgui.Dialog().yesno(g.get_language_string(30585), g.get_language_string(30586))
+    confirm = xbmcgui.Dialog().yesno(g.get_language_string(30579), g.get_language_string(30580))
     if confirm:
         choose_timezone()
 
@@ -24,6 +24,6 @@ def notify_timezone_not_detected():
 def choose_timezone():
     time_zones = [i for i in pytz.common_timezones if len(i.split('/')) >= 2 and not i.split('/')[0] == 'US']
     # Note we deliberately don't include the US timezones as they have too many assumptions for historic dates
-    tz_index = xbmcgui.Dialog().select(g.get_language_string(30584), time_zones)
+    tz_index = xbmcgui.Dialog().select(g.get_language_string(30578), time_zones)
     if not tz_index == -1:
         g.set_setting("general.localtimezone", time_zones[tz_index])

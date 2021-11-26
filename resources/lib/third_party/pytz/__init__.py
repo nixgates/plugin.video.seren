@@ -8,21 +8,22 @@ See the datetime section of the Python Library Reference for information
 on how to use these modules.
 '''
 
+import sys
 import datetime
 import os.path
-import sys
 
 from pytz.exceptions import AmbiguousTimeError
 from pytz.exceptions import InvalidTimeError
 from pytz.exceptions import NonExistentTimeError
 from pytz.exceptions import UnknownTimeZoneError
 from pytz.lazy import LazyDict, LazyList, LazySet  # noqa
-from pytz.tzfile import build_tzinfo
 from pytz.tzinfo import unpickler, BaseTzInfo
+from pytz.tzfile import build_tzinfo
+
 
 # The IANA (nee Olson) database is updated several times a year.
-OLSON_VERSION = '2021a'
-VERSION = '2021.1'  # pip compatible version number.
+OLSON_VERSION = '2021c'
+VERSION = '2021.3'  # pip compatible version number.
 __version__ = VERSION
 
 OLSEN_VERSION = OLSON_VERSION  # Old releases had this misspelling
@@ -1057,6 +1058,7 @@ all_timezones = \
  'Pacific/Guam',
  'Pacific/Honolulu',
  'Pacific/Johnston',
+ 'Pacific/Kanton',
  'Pacific/Kiritimati',
  'Pacific/Kosrae',
  'Pacific/Kwajalein',
@@ -1512,7 +1514,6 @@ common_timezones = \
  'Pacific/Chuuk',
  'Pacific/Easter',
  'Pacific/Efate',
- 'Pacific/Enderbury',
  'Pacific/Fakaofo',
  'Pacific/Fiji',
  'Pacific/Funafuti',
@@ -1521,6 +1522,7 @@ common_timezones = \
  'Pacific/Guadalcanal',
  'Pacific/Guam',
  'Pacific/Honolulu',
+ 'Pacific/Kanton',
  'Pacific/Kiritimati',
  'Pacific/Kosrae',
  'Pacific/Kwajalein',

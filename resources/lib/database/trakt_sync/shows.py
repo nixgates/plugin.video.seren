@@ -235,16 +235,16 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of updated shows with full meta
         :rtype: list
         """
-        g.log("Fetching show list from sync database", "debug")
+        g.log("Fetching show list from sync database and updating", "debug")
         trakt_list = [i for i in trakt_list if i.get("trakt_id")]
         self._update_mill_format_shows(trakt_list, False)
-        g.log("Show list update and milling compelete", "debug")
+        g.log("Show list update and milling complete", "debug")
         statement = """SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes, 
-        s.episode_count, s.season_count FROM shows as s WHERE s.trakt_id in ({}) """.format(
+        s.episode_count, s.season_count, s.air_date, s.user_rating FROM shows as s WHERE s.trakt_id in ({}) """.format(
             ",".join((g.UNICODE(i.get("trakt_id")) for i in trakt_list))
         )
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(s.air_date) < Datetime('now')"
+            statement += " AND Datetime(s.air_date) < Datetime('{}')".format(self._get_datetime_now())
         if params.pop("hide_watched", self.hide_watched):
             statement += " AND s.watched_episodes < s.episode_count"
 
@@ -263,17 +263,17 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of seasons with full meta
         :rtype: list
         """
-        g.log("Fetching season list from sync database", "debug")
+        g.log("Fetching season list from sync database and updating", "debug")
         self._try_update_seasons(trakt_show_id, trakt_id)
         g.log("Updated requested seasons", "debug")
         statement = """SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes, 
-        s.episode_count FROM seasons AS s WHERE """
+        s.episode_count, s.air_date, s.user_rating FROM seasons AS s WHERE """
         if trakt_id is not None:
             statement += "s.trakt_id == {}".format(trakt_id)
         else:
             statement += "s.trakt_show_id = {}".format(trakt_show_id)
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(s.air_date) < Datetime('now')"
+            statement += " AND Datetime(s.air_date) < Datetime('{}')".format(self._get_datetime_now())
         if params.pop("self.hide_specials", self.hide_specials):
             statement += " AND s.season != 0"
         if params.pop("hide_watched", self.hide_watched):
@@ -305,11 +305,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of episode objects with full meta
         :rtype: list
         """
-        g.log("Fetching Episode list from sync database", "debug")
+        g.log("Fetching Episode list from sync database and updating", "debug")
         self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
         g.log("Updated required episodes", "debug")
         statement = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count,
-         b.resume_time as resume_time, b.percent_played as percent_played FROM episodes as e 
+         b.resume_time as resume_time, b.percent_played as percent_played, e.user_rating FROM episodes as e 
          LEFT JOIN bookmarks as b on e.trakt_id = b.trakt_id WHERE """
 
         if trakt_season_id is not None:
@@ -319,7 +319,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         else:
             statement += "e.trakt_show_id = {} ".format(trakt_show_id)
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(e.air_date) < Datetime('now') "
+            statement += " AND Datetime(e.air_date) < Datetime('{}') ".format(self._get_datetime_now())
         if params.pop("self.hide_specials", self.hide_specials):
             statement += " AND e.season != 0"
         if params.pop("hide_watched", self.hide_watched):
@@ -346,19 +346,19 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if g.get_bool_setting("general.showRemainingUnwatched"):
             query = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count, b.resume_time as 
             resume_time, b.percent_played as percent_played, se.watched_episodes, se.unwatched_episodes, 
-            se.episode_count FROM episodes as e INNER JOIN seasons se on e.trakt_season_id = se.trakt_id
+            se.episode_count, e.user_rating FROM episodes as e INNER JOIN seasons se on e.trakt_season_id = se.trakt_id
             LEFT JOIN bookmarks as b on e.Trakt_id = b.Trakt_id WHERE e.trakt_id in ({})""".format(
                 in_predicate
             )
         else:
             query = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count, b.resume_time as 
-            resume_time, b.percent_played as percent_played FROM episodes as e LEFT JOIN bookmarks as b on e.Trakt_id = 
+            resume_time, b.percent_played as percent_played, e.user_rating FROM episodes as e LEFT JOIN bookmarks as b on e.Trakt_id = 
             b.Trakt_id WHERE e.trakt_id in ({})""".format(
                 in_predicate
             )
 
         if params.pop("hide_unaired", self.hide_unaired):
-            query += " AND Datetime(e.air_date) < Datetime('now') "
+            query += " AND Datetime(e.air_date) < Datetime('{}') ".format(self._get_datetime_now())
         if params.pop("hide_specials", self.hide_specials):
             query += " AND e.season != 0"
         if params.pop("hide_watched", self.hide_watched):
@@ -381,11 +381,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Show item with full meta
         :rtype: dict
         """
-        return self.get_show_list(
+        result = self.get_show_list(
             [self._get_single_show_meta(trakt_id)],
             hide_unaired=False,
             hide_watched=False
-        )[0]
+        )
+        return result[0] if len(result) > 0 else []
 
     @guard_against_none(list)
     def get_season(self, trakt_id, trakt_show_id):
@@ -398,11 +399,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Season item with full meta
         :rtype: dict
         """
-        return self.get_season_list(
+        result = self.get_season_list(
             trakt_show_id, trakt_id,
             hide_unaired=False,
             hide_watched=False
-        )[0]
+        )
+        return result[0] if len(result) > 0 else []
 
     @guard_against_none(list)
     def get_episode(self, trakt_id, trakt_show_id):
@@ -419,19 +421,21 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             trakt_show_id, trakt_id=trakt_id,
             hide_unaired=False,
             hide_watched=False
-        )[0]
-        result.update(
-            self.fetchone(
-                """select s.season_count, s.episode_count as show_episode_count, 
-        se.episode_count, se.is_airing, a.absoluteNumber from episodes as e INNER JOIN seasons as se on se.trakt_id = 
-        e.trakt_season_id INNER JOIN shows as s on s.trakt_id = e.trakt_show_id INNER JOIN 
-        (select e.trakt_show_id, count(distinct e.trakt_id) as absoluteNumber from episodes as e inner join 
-        (select e.trakt_show_id, (e.season*10 + e.number) as identifier from episodes as e where e.trakt_id = ?) as 
-        agg on agg.trakt_show_id = e.trakt_show_id and agg.identifier >= (e.season*10 + number) group by 
-        e.trakt_show_id) as a on a.trakt_show_id = e.trakt_show_id WHERE e.trakt_id = ?""",
-                (trakt_id, trakt_id),
-            )
         )
+        if len(result) > 0:
+            result = result[0]
+            result.update(
+                self.fetchone(
+                    """select s.season_count, s.episode_count as show_episode_count, 
+            se.episode_count, se.is_airing, a.absoluteNumber, e.user_rating from episodes as e INNER JOIN seasons as se 
+            on se.trakt_id = e.trakt_season_id INNER JOIN shows as s on s.trakt_id = e.trakt_show_id INNER JOIN 
+            (select e.trakt_show_id, count(distinct e.trakt_id) as absoluteNumber from episodes as e inner join 
+            (select e.trakt_show_id, (e.season*10 + e.number) as identifier from episodes as e where e.trakt_id = ?) as 
+            agg on agg.trakt_show_id = e.trakt_show_id and agg.identifier >= (e.season*10 + number) group by 
+            e.trakt_show_id) as a on a.trakt_show_id = e.trakt_show_id WHERE e.trakt_id = ?""",
+                    (trakt_id, trakt_id),
+                )
+            )
         return result
 
     @guard_against_none(list)
@@ -529,6 +533,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     i["info"].get("episode_count"),
                     self._create_args(i),
                     i["info"].get("is_airing"),
+                    i["info"].get("last_watched_at"),
+                    i["info"].get("last_collected_at"),
+                    i["info"].get("user_rating"),
                     i["info"]["trakt_id"],
                 )
                 for i in formatted_items
@@ -597,6 +604,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     i["info"].get("episode_count"),
                     i["info"].get("season"),
                     self._create_args(i),
+                    i["info"].get("last_watched_at"),
+                    i["info"].get("last_collected_at"),
+                    i["info"].get("user_rating"),
                     i["info"]["trakt_id"],
                 )
                 for i in formatted_items
@@ -664,6 +674,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     i.get("art"),
                     i.get("cast"),
                     self._create_args(i),
+                    None,
                     None,
                     None,
                     self.metadataHandler.meta_hash,
@@ -778,10 +789,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         mw.max_watched_season + 1 AND e.number = 1) GROUP BY e.trakt_show_id) AS nw ON (e.trakt_show_id == 
         nw.trakt_show_id AND e.season == nw.season AND e.number >= nw.number) WHERE e.season > 0 AND watched = 0 AND 
         e.trakt_show_id NOT IN (SELECT trakt_id AS trakt_show_id FROM hidden WHERE SECTION IN ('progress_watched')) 
-        AND Datetime(air_date) < Datetime('now') GROUP BY e.trakt_show_id) AS INNER ON e.trakt_show_id == 
+        AND Datetime(air_date) < Datetime('{}') GROUP BY e.trakt_show_id) AS INNER ON e.trakt_show_id == 
         inner.trakt_show_id AND e.season == inner.season AND e.number == inner.number LEFT JOIN episodes_meta AS em 
         ON e.trakt_id = em.id AND em.TYPE = 'trakt' LEFT JOIN shows_meta AS sm ON e.trakt_show_id = sm.id AND sm.TYPE 
-        = 'trakt' """
+        = 'trakt' """.format(self._get_datetime_now())
         if sort_by_last_watched:
             query += " ORDER BY inner.last_watched_at DESC"
         else:

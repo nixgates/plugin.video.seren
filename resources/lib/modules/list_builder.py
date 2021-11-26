@@ -129,7 +129,7 @@ class ListBuilder(object):
         :param params: Parameters to send to common_menu_builder method
         :return: List list_items if smart_play Kwarg is True else None
         """
-        self._common_menu_builder(trakt_list, g.CONTENT_FOLDER, "traktList", **params)
+        self._common_menu_builder(trakt_list, g.CONTENT_MENU, "traktList", **params)
 
     def _common_menu_builder(
         self, trakt_list, content_type, action="getSources", **params
@@ -206,13 +206,13 @@ class ListBuilder(object):
                     )
                 g.close_directory(content_type, sort=sort)
 
-    def is_aired(self, info):
+    def is_aired(self, item):
         """
         Confirms supplied item has aired based on meta
         :param info: Meta of item
         :return: Bool, True if object has aired else False
         """
-        air_date = info.get("aired", info.get("premiered"))
+        air_date = item.get("air_date", item["info"].get("aired", item["info"].get("premiered")))
 
         if not air_date:
             return False
@@ -256,7 +256,7 @@ class ListBuilder(object):
         if (
             not item["info"]["mediatype"] == "list"
             and not self.hide_unaired
-            and not self.is_aired(item["info"])
+            and not self.is_aired(item)
         ):
             name = g.color_string(tools.italic_string(name), "red")
 
@@ -276,9 +276,11 @@ class ListBuilder(object):
             )
 
         if not item["info"]["mediatype"] == "list" and prepend_date:
-            release_date = g.utc_to_local(item["info"].get("aired", None))
+            release_date = g.utc_to_local(item.get("air_date", item["info"].get("aired", None)))
             if release_date:
-                release_day = tools.parse_datetime(release_date, g.DATE_TIME_FORMAT).strftime("%d %b")
+                release_day = tools.parse_datetime(release_date, g.DATE_TIME_FORMAT, date_only=False).strftime(
+                    "{} @ {}".format("%a %d %b", g.KODI_TIME_NO_SECONDS_FORMAT)
+                )
                 name = "[{}] {}".format(release_day, name)
         item.update({"name": name})
         item["info"]["title"] = name

@@ -9,7 +9,7 @@ class SyncLock(object):
         self._lock_name = lock_name
         self._lock_format = "{}.SyncLock.{}.{}"
         self._trakt_ids = trakt_ids if trakt_ids else []
-        self._running_ids = []
+        self._running_ids = set()
 
     def _create_key(self, value):
         return self._lock_format.format(g.ADDON_NAME, self._lock_name, value)
@@ -19,8 +19,8 @@ class SyncLock(object):
         return i
 
     def _run(self):
-        self._running_ids = [self._run_id(i) for i in self._trakt_ids
-                             if not g.get_bool_runtime_setting(self._create_key(i))]
+        self._running_ids = {self._run_id(i) for i in self._trakt_ids
+                             if not g.get_bool_runtime_setting(self._create_key(i))}
 
     def _still_processing(self):
         return any(g.get_bool_runtime_setting(self._create_key(i)) for i in self._trakt_ids)

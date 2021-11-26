@@ -52,7 +52,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             "{}: {} {}".format(
                 g.ADDON_NAME,
                 g.get_language_string(30049),
-                g.get_language_string(30146),
+                g.get_language_string(30143),
             ),
             packages,
         )
@@ -103,7 +103,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     def _handle_uninstall_failure(package_name):
         xbmcgui.Dialog().ok(
             g.ADDON_NAME,
-            g.get_language_string(30182).format(g.ADDON_NAME, package_name),
+            g.get_language_string(30179).format(g.ADDON_NAME, package_name),
         )
         g.log_stacktrace()
 
@@ -115,7 +115,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     @staticmethod
     def _handle_install_failure(exception):
         g.log(exception, "error")
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30508))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30502))
         return
 
     def install_package(self, install_style, url=None):
