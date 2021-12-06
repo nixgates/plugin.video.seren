@@ -136,9 +136,11 @@ class SettingsCache:
 class RuntimeSettingsCache(SettingsCache):
     _KODI_HOME_WINDOW = None
     _SETTINGS_PREFIX = None
+    _KODI_ADDON_ID = None
 
     def __init__(self, settings_prefix="runtime"):
         self._KODI_HOME_WINDOW = xbmcgui.Window(10000)
+        self._KODI_ADDON_ID = xbmcaddon.Addon().getAddonInfo("id")
         self._SETTINGS_PREFIX = settings_prefix
 
     def __del__(self):
@@ -146,7 +148,7 @@ class RuntimeSettingsCache(SettingsCache):
         del self._KODI_HOME_WINDOW
 
     def _setting_key(self, setting_id):
-        return "seren.setting.{}.{}".format(self._SETTINGS_PREFIX, setting_id)
+        return "{}.{}.{}".format(self._KODI_ADDON_ID, self._SETTINGS_PREFIX, setting_id)
 
     def set_setting(self, setting_id, value):
         """

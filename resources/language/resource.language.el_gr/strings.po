@@ -1578,7 +1578,7 @@ msgctxt "#30282"
 msgid "Show Advanced TV Artwork Settings"
 msgstr "Εμφάνιση Ρυθμίσεων Εικονογραφιών Τηλεοπτικών Έργων για Προχωρημένους"
 
-#: /resources/lib/gui/windows/provider_packages.py:83
+#: /resources/lib/gui/windows/provider_packages.py:82
 msgctxt "#30283"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Είστε σίγουροι πως επιθυμείτε να αφαιρέσετε το {} πακέτο?"
@@ -2868,7 +2868,7 @@ msgstr ""
 "Μια λίστα με τις εκπομπές που παρακολουθείτε ταξινομημένες κατά την πιο "
 "πρόσφατη παρακολούθηση"
 
-#: /resources/lib/database/torrentCache/__init__.py:143
+#: /resources/lib/database/torrentCache/__init__.py:139
 msgctxt "#30508"
 msgid "Torrent cache database successfully cleared"
 msgstr "Η βάση δεδομένων προσωρινής μνήμης Torrent διαγράφηκε με επιτυχία"

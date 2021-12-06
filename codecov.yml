@@ -1,0 +1,5 @@
+ignore:
+  - "tests"
+  - "mock_kodi"
+  - "scripts"
+  - "**/third_party"

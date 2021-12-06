@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.1.8" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.1.9" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.addon" version="17.9.910" />
         <import addon="script.module.future" version="0.17.1"/>
@@ -62,6 +62,13 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.1.9
+            Fix PM Application Authorization
+            Fix show pack retrieval in torrent cache
+            Fix a4kSubtitles import path for case sensitive filesystems
+            Use addon id in setting cache prefix for kodi window properties
+            Fix focus broken in provider window with no providers
+
             Changelog 2.1.8
             Fix prescrape cache result being ignored
             Fix get_sources to return all relevant torrent hashes from torrent cache

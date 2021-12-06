@@ -32,12 +32,7 @@ class PackageConfiguration(BaseWindow):
         self.provider_list = self.getControlList(2000)
         self._populate_settings()
         self.fill_providers()
-        if self.settings_list.size():
-            self.setProperty("hassettings", "true")
-            self.setFocus(self.settings_list)
-        else:
-            self.setProperty("hassettings", "false")
-            self.setFocus(self.provider_list)
+        self.setProperty("hassettings", "true" if self.settings_list.size() > 0 else "false")
 
     def refresh_data(self):
         self.providers_class.poll_database()
