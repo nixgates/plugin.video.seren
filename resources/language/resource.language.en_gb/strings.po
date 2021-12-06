@@ -1574,7 +1574,7 @@ msgctxt "#30282"
 msgid "Show Advanced TV Artwork Settings"
 msgstr "Show Advanced TV Artwork Settings"
 
-#: /resources/lib/gui/windows/provider_packages.py:83
+#: /resources/lib/gui/windows/provider_packages.py:82
 msgctxt "#30283"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Are you sure you wish to remove the {} package?"
@@ -2820,7 +2820,7 @@ msgctxt "#30507"
 msgid "A list of shows you watch sorted by most recently watched"
 msgstr "A list of shows you watch sorted by most recently watched"
 
-#: /resources/lib/database/torrentCache/__init__.py:143
+#: /resources/lib/database/torrentCache/__init__.py:139
 msgctxt "#30508"
 msgid "Torrent cache database successfully cleared"
 msgstr "Torrent cache database successfully cleared"

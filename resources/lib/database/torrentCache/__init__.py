@@ -2,15 +2,14 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import collections
-import threading
 
 import xbmcgui
 
 from resources.lib.database import Database
 from resources.lib.modules.globals import g
 
-TV_CACHE_TYPE = "tvshow"
-MOVIE_CACHE_TYPE = "movie"
+TV_CACHE_TYPE = "tvshows"
+MOVIE_CACHE_TYPE = "movies"
 
 schema = {
     MOVIE_CACHE_TYPE: {
@@ -38,9 +37,6 @@ schema = {
         "default_seed": [],
     }
 }
-
-INSERT_TV_CACHE_QUERY = "REPLACE INTO {} (trakt_id, hash, package, torrent_object) VALUES (?, ?, ?, ?)".format(TV_CACHE_TYPE)
-INSERT_MOVIE_CACHE_QUERY = "REPLACE INTO {} (trakt_id, hash, package, torrent_object) VALUES (?, ?, ?, ?)".format(MOVIE_CACHE_TYPE)
 
 
 class TorrentCache(Database):
@@ -73,7 +69,7 @@ class TorrentCache(Database):
                 "SELECT torrent_object from {} "
                 "WHERE (trakt_id={} AND package='single') "
                 "   OR (trakt_id={} AND package='season') "
-                "   OR (trakt_id={} AND package='tvshow') ".format(
+                "   OR (trakt_id={} AND package='show') ".format(
                     cache_type,
                     trakt_id,
                     trakt_season_id,
@@ -102,7 +98,7 @@ class TorrentCache(Database):
             (
                 (
                     (
-                        trakt_show_id if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "tvshow"
+                        trakt_show_id if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "show"
                         else trakt_season_id if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "season"
                         else trakt_id
                     ),
@@ -122,7 +118,7 @@ class TorrentCache(Database):
                 "DELETE FROM {} "
                 "WHERE (trakt_id={} AND package='single') "
                 "   OR (trakt_id={} AND package='season') "
-                "   OR (trakt_id={} AND package='tvshow') ".format(
+                "   OR (trakt_id={} AND package='show') ".format(
                     cache_type,
                     trakt_id,
                     trakt_season_id,

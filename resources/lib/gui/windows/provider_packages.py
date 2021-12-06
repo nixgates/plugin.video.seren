@@ -23,7 +23,6 @@ class ProviderPackages(BaseWindow):
         self.package_list = self.getControlList(1000)
 
         self.fill_packages()
-        self.setFocus(self.package_list)
 
     def refresh_data(self):
         self.providers_class.poll_database()

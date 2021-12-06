@@ -55,7 +55,7 @@ class A4kSubtitlesAdapter:
 
     def __init__(self):
         path = tools.translate_path(
-            os.path.join(g.ADDONS_PATH, "service.subtitles.a4kSubtitles")
+            os.path.join(g.ADDONS_PATH, "service.subtitles.a4ksubtitles")
         )
         try:
             sys.path.append(path)

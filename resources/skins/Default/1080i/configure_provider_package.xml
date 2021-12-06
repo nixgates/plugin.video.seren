@@ -1,5 +1,5 @@
 <window type="dialog">
-    <defaultcontrol>2</defaultcontrol>
+    <defaultcontrol>3000</defaultcontrol>
     <coordinates>
         <left>0</left>
         <top>0</top>
