@@ -1,3 +1,10 @@
+Changelog 2.1.9
+Fix PM Application Authorization
+Fix show pack retrieval in torrent cache
+Fix a4kSubtitles import path for case sensitive filesystems
+Use addon id in setting cache prefix for kodi window properties
+Fix focus broken in provider window with no providers
+
 Changelog 2.1.8
 Fix prescrape cache result being ignored
 Fix get_sources to return all relevant torrent hashes from torrent cache
