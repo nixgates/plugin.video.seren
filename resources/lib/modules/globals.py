@@ -710,7 +710,7 @@ class GlobalVariables(object):
                             elif setting.tag == 'port':
                                 result["port"] = setting.text
                             elif setting.tag == 'name':
-                                result["database"] = setting.text
+                                result["database"] = "{}{}".format(setting.text, self.get_kodi_database_version())
                             elif setting.tag == 'user':
                                 result["user"] = setting.text
                             elif setting.tag == 'pass':
