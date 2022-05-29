@@ -680,12 +680,15 @@ class GlobalVariables(object):
             return MySqlConnection(config)
 
     def get_kodi_database_version(self):
+        dbids = []
         for root, dirs, files in os.walk(tools.translate_path(os.path.join("special://profile/", "Database/"))):
             for name in files:
-                dbver = re.search(r"MyVideos([^.]+)\.db", name)
+                dbver = re.search(r"MyVideos(\d+)\.db", name)
                 if dbver:
-                    return dbver.groups()[0]
-        if self.KODI_VERSION == 17:
+                    dbids.append(int(dbver.groups()[0]))
+        if dbids != []:
+            return sorted(dbids)[-1]
+        elif self.KODI_VERSION == 17:
             return "107"
         elif self.KODI_VERSION == 18:
             return "116"
