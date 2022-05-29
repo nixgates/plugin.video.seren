@@ -680,12 +680,19 @@ class GlobalVariables(object):
             return MySqlConnection(config)
 
     def get_kodi_database_version(self):
+        for root, dirs, files in os.walk(tools.translate_path(os.path.join("special://profile/", "Database/"))):
+            for name in files:
+                dbver = re.search(r"MyVideos([^.]+)\.db", name)
+                if dbver:
+                    return dbver.groups()[0]
         if self.KODI_VERSION == 17:
             return "107"
         elif self.KODI_VERSION == 18:
             return "116"
         elif self.KODI_VERSION == 19:
             return "119"
+        elif self.KODI_VERSION == 20:
+            return "121"
 
         raise KeyError("Unsupported kodi version")
 
