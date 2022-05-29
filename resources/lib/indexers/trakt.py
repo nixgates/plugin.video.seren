@@ -641,7 +641,7 @@ class TraktAPI(ApiBase):
         :param params: URL params for request
         :return: request response
         """
-        timeout = params.pop("timeout", 10)
+        timeout = params.pop("timeout", 60)
         self._try_add_default_paging(params)
         self._clean_params(params)
         return self.session.get(
