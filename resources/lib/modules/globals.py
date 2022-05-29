@@ -686,7 +686,7 @@ class GlobalVariables(object):
                 dbver = re.search(r"MyVideos(\d+)\.db", name)
                 if dbver:
                     dbids.append(int(dbver.groups()[0]))
-        if dbids != []:
+        if dbids:
             return sorted(dbids)[-1]
         elif self.KODI_VERSION == 17:
             return "107"
