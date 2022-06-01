@@ -187,6 +187,6 @@ def set_download_location():
 
     storage_location = g.DOWNLOAD_PATH
     new_location = xbmcgui.Dialog().browse(
-        0, g.get_language_string(30468), "video", defaultt=storage_location
+        0, g.get_language_string(30446), "video", defaultt=storage_location
     )
     g.set_setting("download.location", new_location)

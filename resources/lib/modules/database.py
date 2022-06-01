@@ -12,7 +12,9 @@ def cache_get(key):
     return value if not value == g.CACHE.NOT_CACHED else None
 
 
-def cache_insert(key, value, expiration=datetime.timedelta(hours=24)):
+def cache_insert(key, value, expiration=None):
+    if expiration is None:
+        expiration = datetime.timedelta(hours=24)
     if value:
         g.CACHE.set(key, value, expiration=expiration)
 

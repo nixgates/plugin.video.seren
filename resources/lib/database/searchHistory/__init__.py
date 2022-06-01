@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import collections
-import threading
 
 import xbmcgui
 
@@ -24,7 +23,6 @@ schema = {
 class SearchHistory(Database):
     def __init__(self):
         super(SearchHistory, self).__init__(g.SEARCH_HISTORY_DB_PATH, schema)
-        self.table_name = next(iter(schema))
 
     def get_search_history(self, media_type):
         """
@@ -50,6 +48,21 @@ class SearchHistory(Database):
         """
         self.execute_sql("REPLACE INTO search_history Values (?,?)", (media_type, search_string))
 
+    def remove_search_history(self, media_type, search_string):
+        """
+        Remove a search history record
+        :param media_type: Media type of search
+        :type media_type: str
+        :param search_string: String uesd in search
+        :type search_string: str
+        :return: None
+        :rtype: None
+        """
+        self.execute_sql(
+            "DELETE FROM search_history where type = ? and value = ?",
+            (media_type, search_string),
+        )
+
     def clear_search_history(self, media_type=None):
         """
         Clears optionall all records for a specific media type or all if not supplied
@@ -58,9 +71,11 @@ class SearchHistory(Database):
         :return: None
         :rtype: None
         """
-        if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30220)):
+        if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30207)):
             if media_type is not None:
-                self.execute_sql("DELETE FROM {} where type = ?".format(self.table_name), (media_type,))
+                self.execute_sql(
+                    "DELETE FROM search_history where type = ?", (media_type,)
+                )
                 g.container_refresh()
             else:
-                self.execute_sql("DELETE FROM {}".format(self.table_name))
+                self.execute_sql("DELETE FROM search_history")

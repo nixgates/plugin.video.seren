@@ -10,8 +10,8 @@ from resources.lib.modules.globals import g
 
 class StackTraceException(Exception):
     def __init__(self, msg):
-        g.log_stacktrace()
-        g.log("{} \n{}".format(traceback.format_exc(), msg), "error")
+        tb = traceback.format_exc()
+        g.log("{} \n{}".format(tb, msg) if not tb.startswith("NoneType: None") else msg, "error")
 
 
 class UnsafeZipStructure(StackTraceException):
@@ -139,10 +139,11 @@ class ResolverFailure(StackTraceException):
         )
 
 
-class NoPlayableSourcesException(StackTraceException):
+class NoPlayableSourcesException(Exception):
     def __init__(self):
-        super(NoPlayableSourcesException, self).__init__(
-            "No playable sources could be identified"
+        g.log(
+            "No playable sources could be identified",
+            "info"
         )
 
 

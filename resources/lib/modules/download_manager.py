@@ -424,7 +424,7 @@ class _DebridDownloadBase(object):
         file_titles = [i[1] for i in available_files]
 
         selection = xbmcgui.Dialog().multiselect(
-            g.get_language_string(30497), file_titles
+            g.get_language_string(30473), file_titles
         )
         selection = [available_files[i] for i in selection]
         return selection
@@ -599,6 +599,6 @@ def set_download_location():
     """
 
     new_location = xbmcgui.Dialog().browse(
-        0, g.get_language_string(30468), "video", defaultt=STORAGE_LOCATION
+        0, g.get_language_string(30446), "video", defaultt=STORAGE_LOCATION
     )
     g.set_setting("download.location", new_location)

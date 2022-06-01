@@ -9,15 +9,13 @@ import xbmcplugin
 import xbmcvfs
 
 from resources.lib.common import tools
-from resources.lib.common.thread_pool import ThreadPool
-from resources.lib.debrid import premiumize, real_debrid, all_debrid
+from resources.lib.common.tools import cached_property
 from resources.lib.modules.globals import g
 
 
-class Menus:
+class Menus(object):
 
     def __init__(self):
-        self.thread_pool = ThreadPool()
         self.providers = {}
         if g.all_debrid_enabled():
             self.providers.update({'all_debrid': ('All Debrid', AllDebridWalker)})
@@ -113,8 +111,13 @@ class BaseDebridWalker:
 class PremiumizeWalker(BaseDebridWalker):
     provider = 'premiumize'
 
+    @cached_property
+    def premiumize(self):
+        from resources.lib.debrid.premiumize import Premiumize
+        return Premiumize()
+
     def get_init_list(self):
-        items = premiumize.Premiumize().list_folder('')
+        items = self.premiumize.list_folder('')
         self._format_items(items)
 
     def _is_folder(self, list_item):
@@ -124,7 +127,7 @@ class PremiumizeWalker(BaseDebridWalker):
             return False
 
     def get_folder(self, list_item):
-        items = premiumize.Premiumize().list_folder(list_item['id'])
+        items = self.premiumize.list_folder(list_item['id'])
         self._format_items(items)
 
     def resolve_link(self, list_item):
@@ -134,8 +137,13 @@ class PremiumizeWalker(BaseDebridWalker):
 class RealDebridWalker(BaseDebridWalker):
     provider = 'real_debrid'
 
+    @cached_property
+    def real_debrid(self):
+        from resources.lib.debrid.real_debrid import RealDebrid
+        return RealDebrid()
+
     def get_init_list(self):
-        root = real_debrid.RealDebrid().list_torrents()
+        root = self.real_debrid.list_torrents()
         items = []
 
         for i in root:
@@ -161,7 +169,7 @@ class RealDebridWalker(BaseDebridWalker):
             return False
 
     def get_folder(self, list_item):
-        folder = real_debrid.RealDebrid().torrent_info(list_item['id'])
+        folder = self.real_debrid.torrent_info(list_item['id'])
         files = [file for file in folder.get("files", []) if file.get("selected") == 1]
         items = []
 
@@ -178,14 +186,19 @@ class RealDebridWalker(BaseDebridWalker):
         self._format_items(items)
 
     def resolve_link(self, list_item):
-        return real_debrid.RealDebrid().resolve_hoster(list_item['link'])
+        return self.real_debrid.resolve_hoster(list_item['link'])
 
 
 class AllDebridWalker(BaseDebridWalker):
     provider = 'all_debrid'
 
+    @cached_property
+    def all_debrid(self):
+        from resources.lib.debrid.all_debrid import AllDebrid
+        return AllDebrid()
+
     def get_init_list(self):
-        root = all_debrid.AllDebrid().magnet_status(None).get("magnets", [])
+        root = self.all_debrid.magnet_status(None).get("magnets", [])
         items = []
 
         for i in root:
@@ -220,7 +233,7 @@ class AllDebridWalker(BaseDebridWalker):
             return False
 
     def get_folder(self, list_item):
-        links = all_debrid.AllDebrid().magnet_status(list_item['id']).get("magnets", []).get("links", [])
+        links = self.all_debrid.magnet_status(list_item['id']).get("magnets", []).get("links", [])
         items = []
 
         for l in links:
@@ -247,7 +260,7 @@ class AllDebridWalker(BaseDebridWalker):
         return files
 
     def resolve_link(self, list_item):
-        return all_debrid.AllDebrid().resolve_hoster(list_item['link'])
+        return self.all_debrid.resolve_hoster(list_item['link'])
 
 
 class LocalFileWalker(BaseDebridWalker):

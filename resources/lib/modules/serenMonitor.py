@@ -2,9 +2,10 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import time
-from resources.lib.modules.globals import g
 
 import xbmc
+
+from resources.lib.modules.globals import g
 
 
 class SerenMonitor(xbmc.Monitor):
@@ -29,6 +30,9 @@ class SerenMonitor(xbmc.Monitor):
             g.log("System.OnWake notification received" "info")
             xbmc.executebuiltin(
                 'RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")'
+            )
+            xbmc.executebuiltin(
+                'RunPlugin("plugin://plugin.video.seren/?action=torrentCacheCleanup")'
             )
             if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
                 xbmc.executebuiltin(

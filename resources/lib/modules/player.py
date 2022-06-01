@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import copy
+import importlib
 import json
 import sys
 import time
@@ -13,7 +14,7 @@ import xbmcplugin
 from resources.lib.common import tools
 from resources.lib.database.trakt_sync import bookmark
 from resources.lib.indexers import trakt
-from resources.lib.modules import smartPlay, subtitles
+from resources.lib.modules import smartPlay
 from resources.lib.modules.globals import g
 
 
@@ -336,19 +337,6 @@ class SerenPlayer(xbmc.Player):
         if g.get_bool_setting("general.force.widget.refresh.playback"):
             g.trigger_widget_refresh()
 
-    def _add_subtitle_if_needed(self):
-        if not g.get_bool_setting("general.subtitle.enable"):
-            return
-
-        preferred_lang = self._get_kodi_preferred_subtitle_language()
-
-        if preferred_lang == self.getSubtitles():
-            return
-
-        subtitle = subtitles.SubtitleService().get_subtitle()
-        if subtitle is not None:
-            self.setSubtitles(subtitle)
-
     @staticmethod
     def _get_kodi_preferred_subtitle_language():
         language = g.get_kodi_preferred_subtitle_language(True)
@@ -371,16 +359,19 @@ class SerenPlayer(xbmc.Player):
         g.clean_info_keys(info)
         g.convert_info_dates(info)
 
-        if isinstance(stream_link, dict) and stream_link["type"] == "Adaptive":
+        if isinstance(stream_link, dict) and stream_link["type"] == "adaptive":
+            if g.ADDON_USERDATA_PATH not in sys.path:
+                sys.path.append(g.ADDON_USERDATA_PATH)
             provider = stream_link["provider_imports"]
-            provider_module = __import__(
-                "{}.{}".format(provider[0], provider[1]), fromlist=[""]
-                )
+            provider_module = importlib.import_module(
+                "{}.{}".format(provider[0], provider[1])
+            )
             if not hasattr(provider_module, "get_listitem") and hasattr(
                     provider_module, "sources"
                     ):
                 provider_module = provider_module.sources()
             item = provider_module.get_listitem(stream_link)
+            item.setInfo("video", info)
         else:
             item = xbmcgui.ListItem(path=stream_link)
             info["FileNameAndPath"] = tools.unquote(self.playing_file)
@@ -547,7 +538,7 @@ class SerenPlayer(xbmc.Player):
          ):
             xbmc.sleep(10000)
             g.set_runtime_setting("marked_watched_dialog_open", True)
-            if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30514)):
+            if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30486)):
                 self._force_marked_watched = True
             g.set_runtime_setting("marked_watched_dialog_open", False)
 
@@ -567,7 +558,6 @@ class SerenPlayer(xbmc.Player):
             self.resumed = True
 
         self._log_debug_information()
-        self._add_subtitle_if_needed()
         xbmc.sleep(5000)
 
         while self._is_file_playing() and not g.abort_requested():
@@ -708,23 +698,27 @@ class PlayerDialogs(xbmc.Player):
         from resources.lib.gui.windows.playing_next import PlayingNext
         from resources.lib.database.skinManager import SkinManager
 
-        window = PlayingNext(
-            *SkinManager().confirm_skin_path("playing_next.xml"),
-            item_information=self._get_next_item_item_information()
-            )
-        window.doModal()
-        del window
+        try:
+            window = PlayingNext(
+                *SkinManager().confirm_skin_path("playing_next.xml"),
+                item_information=self._get_next_item_item_information()
+                )
+            window.doModal()
+        finally:
+            del window
 
     def _show_still_watching(self):
         from resources.lib.gui.windows.still_watching import StillWatching
         from resources.lib.database.skinManager import SkinManager
 
-        window = StillWatching(
-            *SkinManager().confirm_skin_path("still_watching.xml"),
-            item_information=self._get_next_item_item_information()
-            )
-        window.doModal()
-        del window
+        try:
+            window = StillWatching(
+                *SkinManager().confirm_skin_path("still_watching.xml"),
+                item_information=self._get_next_item_item_information()
+                )
+            window.doModal()
+        finally:
+            del window
 
     @staticmethod
     def _get_next_item_item_information():

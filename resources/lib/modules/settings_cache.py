@@ -199,7 +199,7 @@ class PersistedSettingsCache(SettingsCache):
     SETTINGS_LIST_NAME = "CachedSettingsList"
     SETTINGS_PERSISTED_FLAG = "SettingsPersistedFlag"
     EMPTY_PERSISTED_SETTING_VALUE = "__EMPTY_PERSISTED_VALUE__"
-    _SETTINGS_THREAD_LOCK = threading.Lock()
+    _SETTINGS_THREAD_LOCK = threading.RLock()
     _SETTINGS_CACHE = None
     _RUNTIME_SETTINGS = None
     _KODI_MONITOR = None
@@ -223,10 +223,14 @@ class PersistedSettingsCache(SettingsCache):
     @contextmanager
     def _settings_lock(self):
         while self._RUNTIME_SETTINGS.get_bool_setting(self.SETTINGS_LOCK_NAME):
-            if self._KODI_MONITOR.waitForAbort(0.001):
+            if self._KODI_MONITOR.waitForAbort(0.01):
                 raise self.KodiShutdown("Kodi Shutdown")
         try:
-            with self._SETTINGS_THREAD_LOCK:  # pylint: disable=not-context-manager
+            with self._SETTINGS_THREAD_LOCK:
+                while self._RUNTIME_SETTINGS.get_bool_setting(self.SETTINGS_LOCK_NAME):
+                    if self._KODI_MONITOR.waitForAbort(0.01):
+                        raise self.KodiShutdown("Kodi Shutdown")
+                # pylint: disable=not-context-manager
                 self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_LOCK_NAME, True)
                 yield
         finally:

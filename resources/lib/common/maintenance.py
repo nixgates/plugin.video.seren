@@ -45,7 +45,7 @@ def update_provider_packages():
             silent=True, automatic=automatic
         )
         if not automatic and len(available_updates) > 0:
-            g.notification(g.ADDON_NAME, g.get_language_string(30268))
+            g.notification(g.ADDON_NAME, g.get_language_string(30253))
         g.set_runtime_setting("provider.updateCheckTimeStamp", g.UNICODE(time.time()))
 
 
@@ -66,7 +66,7 @@ def wipe_install():
     :return: None
     :rtype: None
     """
-    confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30085))
+    confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30083))
     if confirm == 0:
         return
 
@@ -164,7 +164,7 @@ def toggle_reuselanguageinvoker(forced_state=None):
     def _store_and_reload(output):
         with open(file_path, "w+") as addon_xml:
             addon_xml.writelines(output)
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30560))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30531))
         g.reload_profile()
 
     file_path = os.path.join(g.ADDON_DATA_PATH, "addon.xml")

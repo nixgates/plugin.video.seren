@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import inspect
 import time
-from collections import OrderedDict
 from functools import wraps
 
-import requests
 import xbmc
 import xbmcgui
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 from resources.lib.common import tools
+from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.indexers.apibase import (
     ApiBase,
@@ -36,48 +32,19 @@ TRAKT_STATUS_CODES = {
     409: "Conflict - resource already created",
     412: "Precondition Failed - use application/json content type",
     422: "Unprocessable Entity - validation errors",
+    423: "Locked User Account - Contact Trakt support",
+    426: "VIP Only - user must upgrade to VIP",
     429: "Rate Limit Exceeded",
     500: "Server Error - please open a support issue",
+    502: "Service Unavailable - server overloaded (try again in 30s)",
     503: "Service Unavailable - server overloaded (try again in 30s)",
     504: "Service Unavailable - server overloaded (try again in 30s)",
-    502: "Unspecified Error",
     520: CLOUDFLARE_ERROR_MSG,
     521: CLOUDFLARE_ERROR_MSG,
     522: CLOUDFLARE_ERROR_MSG,
     524: CLOUDFLARE_ERROR_MSG,
     530: CLOUDFLARE_ERROR_MSG,
 }
-
-
-def trakt_auth_guard(func):
-    """
-    Decorator to ensure method will only run if a valid Trakt auth is present
-    :param func: method to run
-    :return: wrapper method
-    """
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        """
-        Wrapper method
-        :param args: method args
-        :param kwargs: method kwargs
-        :return: method results
-        """
-        if g.get_setting("trakt.auth"):
-            return func(*args, **kwargs)
-        with GlobalLock("trakt.auth_guard"):
-            if not g.get_setting("trakt.auth"):
-                if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30495)):
-                    TraktAPI().auth()
-                else:
-                    g.cancel_directory()
-        if g.get_setting("trakt.auth"):
-            return func(*args, **kwargs)
-        else:
-            g.cancel_directory()
-
-    return wrapper
 
 
 def _log_connection_error(args, kwarg, e):
@@ -100,7 +67,7 @@ def _reset_trakt_auth(notify=True):
     for i in settings:
         g.clear_setting(i)
     if notify:
-        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30566))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30536))
 
 
 def trakt_guard_response(func):
@@ -120,6 +87,7 @@ def trakt_guard_response(func):
         """
         method_class = args[0]
         method_class._load_settings()
+        import requests
         try:
             response = func(*args, **kwargs)
             if response.status_code in [200, 201, 204]:
@@ -144,9 +112,11 @@ def trakt_guard_response(func):
                 return None
 
             if response.status_code == 401:
+                import inspect
+
                 if inspect.stack(1)[1][3] == "try_refresh_token":
                     xbmcgui.Dialog().notification(
-                        g.ADDON_NAME, g.get_language_string(30362)
+                        g.ADDON_NAME, g.get_language_string(30340)
                     )
                     g.log(
                         "Attempts to refresh Trakt token have failed. User intervention is required",
@@ -162,12 +132,21 @@ def trakt_guard_response(func):
                                 and method_class.username is not None
                             ):
                                 xbmcgui.Dialog().ok(
-                                    g.ADDON_NAME, g.get_language_string(30362)
+                                    g.ADDON_NAME, g.get_language_string(30340)
                                 )
                     except RanOnceAlready:
                         pass
                     if method_class.refresh_token is not None:
                         return func(*args, **kwargs)
+
+            if response.status_code == 423:
+                xbmcgui.Dialog().notification(
+                    g.ADDON_NAME, TRAKT_STATUS_CODES.get(response.status_code)
+                )
+                g.log(
+                    "Locked User Account - Contact Trakt support",
+                    "error",
+                )
 
             g.log(
                 "Trakt returned a {} ({}): while requesting {}".format(
@@ -209,11 +188,8 @@ class TraktAPI(ApiBase):
         self._load_settings()
         self.redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
         self.try_refresh_token()
-        self.progress_dialog = xbmcgui.DialogProgress()
         self.language = g.get_language_code()
         self.country = g.get_language_code(True).split("-")[-1].lower()
-
-        self.meta_hash = tools.md5_hash((self.language, self.ApiUrl, self.username))
 
         self.TranslationNormalization = [
             ("title", ("title", "originaltitle", "sorttitle"), None),
@@ -441,16 +417,26 @@ class TraktAPI(ApiBase):
 
         self.MetaCollections = ("movies", "shows", "seasons", "episodes", "cast")
 
-        self.session = requests.Session()
+    @cached_property
+    def meta_hash(self):
+        return tools.md5_hash((
+            self.language,
+            self.ApiUrl,
+            self.username))
+
+    @cached_property
+    def session(self):
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3 import Retry
+        session = requests.Session()
         retries = Retry(
             total=4,
             backoff_factor=0.3,
             status_forcelist=[429, 500, 502, 503, 504, 520, 521, 522, 524, 530],
         )
-        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
-
-    def __del__(self):
-        self.session.close()
+        session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
+        return session
 
     # region Auth
     def _get_headers(self):
@@ -488,7 +474,7 @@ class TraktAPI(ApiBase):
         self.username = None
         response = self.post("oauth/device/code", data={"client_id": self.client_id})
         if not response.ok:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30174))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30162))
             return
         try:
             response = response.json()
@@ -502,32 +488,40 @@ class TraktAPI(ApiBase):
             raise
 
         tools.copy2clip(user_code)
-        self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30022),
-            tools.create_multiline_message(
-                line1=g.get_language_string(30018).format(
-                    g.color_string("https://trakt.tv/activate")
-                ),
-                line2=g.get_language_string(30019).format(g.color_string(user_code)),
-                line3=g.get_language_string(30047),
-            ),
-        )
         failed = False
-        self.progress_dialog.update(100)
-        while (
-            not failed
-            and self.username is None
-            and not token_ttl <= 0
-            and not self.progress_dialog.iscanceled()
-        ):
-            xbmc.sleep(1000)
-            if token_ttl % interval == 0:
-                failed = self._auth_poll(device)
-            progress_percent = int(float((token_ttl * 100) / expiry))
-            self.progress_dialog.update(progress_percent)
-            token_ttl -= 1
+        try:
+            progress_dialog = xbmcgui.DialogProgress()
+            progress_dialog.create(
+                g.ADDON_NAME + ": " + g.get_language_string(30022),
+                tools.create_multiline_message(
+                    line1=g.get_language_string(30018).format(
+                        g.color_string("https://trakt.tv/activate")
+                    ),
+                    line2=g.get_language_string(30019).format(g.color_string(user_code)),
+                    line3=g.get_language_string(30047),
+                ),
+            )
+            progress_dialog.update(100)
+            while (
+                not failed
+                and self.username is None
+                and not token_ttl <= 0
+                and not progress_dialog.iscanceled()
+            ):
+                xbmc.sleep(1000)
+                if token_ttl % interval == 0:
+                    failed = self._auth_poll(device)
+                progress_percent = int(float((token_ttl * 100) / expiry))
+                progress_dialog.update(progress_percent)
+                token_ttl -= 1
 
-        self.progress_dialog.close()
+            progress_dialog.close()
+        finally:
+            del progress_dialog
+
+        if not failed:
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30273))
+            self._sync_trakt_user_data_if_required()
 
     def _auth_poll(self, device):
         response = self.post(
@@ -544,33 +538,30 @@ class TraktAPI(ApiBase):
             username = self.get_username()
             self.username = username
             g.set_setting(self.username_setting_key, username)
-            self.progress_dialog.close()
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30290))
-
-            # Synchronise Trakt Database with new user
-            from resources.lib.database.trakt_sync import activities
-
-            database = activities.TraktSyncDatabase()
-            if database.activities["trakt_username"] != username:
-                database.clear_user_information(
-                    True if database.activities["trakt_username"] else False
-                )
-                database.flush_activities(False)
-                database.set_trakt_user(username)
-                xbmc.executebuiltin(
-                    'RunPlugin("{}?action=syncTraktActivities")'.format(g.BASE_URL)
-                )
-
+            return False
         elif response.status_code == 404 or response.status_code == 410:
-            self.progress_dialog.close()
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30023))
             return True
         elif response.status_code == 409:
-            self.progress_dialog.close()
             return True
         elif response.status_code == 429:
             xbmc.sleep(1 * 1000)
         return False
+
+    def _sync_trakt_user_data_if_required(self):
+        # Synchronise Trakt Database with new user
+        from resources.lib.database.trakt_sync import activities
+
+        database = activities.TraktSyncDatabase()
+        if database.activities["trakt_username"] != self.username:
+            database.clear_user_information(
+                True if database.activities["trakt_username"] else False
+            )
+            database.flush_activities(False)
+            database.set_trakt_user(self.username)
+            xbmc.executebuiltin(
+                'RunPlugin("{}?action=syncTraktActivities")'.format(g.BASE_URL)
+            )
 
     def try_refresh_token(self, force=False):
         """
@@ -652,10 +643,6 @@ class TraktAPI(ApiBase):
         )
 
     def _try_add_default_paging(self, params):
-        if params.pop("no_paging", False):
-            params.pop("limit", "")
-            params.pop("page", "")
-            return
         if "page" not in params and "limit" in params:
             params.update({"page": 1})
         if "page" in params and "limit" not in params:
@@ -667,6 +654,10 @@ class TraktAPI(ApiBase):
             del params["hide_watched"]
         if "hide_unaired" in params:
             del params["hide_unaired"]
+        if "no_paging" in params:
+            del params["no_paging"]
+        if "pull_all" in params:
+            del params["pull_all"]
 
     def get_json(self, url, **params):
         """
@@ -776,9 +767,6 @@ class TraktAPI(ApiBase):
                 progress_callback(
                     (i / (int(response.headers["X-Pagination-Page-Count"]) + 1)) * 100
                 )
-            params.update({"page": i})
-            if "limit" not in params:
-                params.update({"limit": int(response.headers["X-Pagination-Limit"])})
             yield func(url, **params)
 
     def get_all_pages_json(self, url, **params):
@@ -843,13 +831,6 @@ class TraktAPI(ApiBase):
         return self.session.delete(
             tools.urljoin(self.ApiUrl, url), headers=self._get_headers()
         )
-
-    @staticmethod
-    def _get_display_name(content_type):
-        if content_type == "movie":
-            return g.get_language_string(30280)
-        else:
-            return g.get_language_string(30302)
 
     def get_username(self):
         """
@@ -1114,471 +1095,3 @@ class TraktAPI(ApiBase):
                 and item.get("title")
                 and str(item.get("number", 0)) not in item.get("title")
             ]
-
-
-class TraktManager(TraktAPI):
-    """
-    Handles manual user interactions to the Trakt API
-    """
-
-    def __init__(self, item_information):
-        super(TraktManager, self).__init__()
-        trakt_id = item_information["trakt_id"]
-        item_type = item_information["action_args"]["mediatype"].lower()
-        display_type = self._get_display_name(item_type)
-
-        self._confirm_item_information(item_information)
-
-        self.dialog_list = []
-
-        self._handle_watched_options(item_information, item_type)
-        self._handle_collected_options(item_information, trakt_id, display_type)
-        self._handle_watchlist_options(item_type)
-
-        standard_list = [
-            g.get_language_string(30297),
-            g.get_language_string(30298),
-            g.get_language_string(30299).format(display_type),
-            g.get_language_string(30300),
-        ]
-
-        for i in standard_list:
-            self.dialog_list.append(i)
-
-        self._handle_progress_option(item_type, trakt_id)
-
-        selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            self.dialog_list,
-        )
-
-        if selection == -1:
-            return
-
-        options = {
-            g.get_language_string(30291).format(display_type): {
-                "method": self._add_to_collection,
-                "info_key": "info",
-            },
-            g.get_language_string(30292).format(display_type): {
-                "method": self._remove_from_collection,
-                "info_key": "info",
-            },
-            g.get_language_string(30293): {
-                "method": self._add_to_watchlist,
-                "info_key": "info",
-            },
-            g.get_language_string(30294): {
-                "method": self._remove_from_watchlist,
-                "info_key": "info",
-            },
-            g.get_language_string(30295): {
-                "method": self._mark_watched,
-                "info_key": "info",
-            },
-            g.get_language_string(30296): {
-                "method": self._mark_unwatched,
-                "info_key": "info",
-            },
-            g.get_language_string(30297): {
-                "method": self._add_to_list,
-                "info_key": "info",
-            },
-            g.get_language_string(30298): {
-                "method": self._remove_from_list,
-                "info_key": "info",
-            },
-            g.get_language_string(30299).format(display_type): {
-                "method": self._hide_item,
-                "info_key": "action_args",
-            },
-            g.get_language_string(30300): {
-                "method": self._refresh_meta_information,
-                "info_key": "info",
-            },
-            g.get_language_string(30301): {
-                "method": self._remove_playback_history,
-                "info_key": "info",
-            },
-        }
-
-        selected_option = self.dialog_list[selection]
-        if selected_option not in options:
-            return
-        else:
-            selected_option = options[selected_option]
-
-        selected_option["method"](item_information[selected_option["info_key"]])
-
-    def _handle_watchlist_options(self, item_type):
-        if item_type not in ["season", "episode"]:
-            self.dialog_list += [
-                g.get_language_string(30293),
-                g.get_language_string(30294),
-            ]
-
-    def _handle_progress_option(self, item_type, trakt_id):
-        from resources.lib.database.trakt_sync.bookmark import TraktSyncDatabase
-
-        if item_type not in ["show", "season"] and TraktSyncDatabase().get_bookmark(
-            trakt_id
-        ):
-            self.dialog_list.append(g.get_language_string(30301))
-
-    def _handle_collected_options(self, item_information, trakt_id, display_type):
-        if item_information["info"]["mediatype"] == "movie":
-            from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
-
-            collection = [
-                i["trakt_id"] for i in TraktSyncDatabase().get_all_collected_movies()
-            ]
-            if trakt_id in collection:
-                self.dialog_list.append(
-                    g.get_language_string(30292).format(display_type)
-                )
-            else:
-                self.dialog_list.append(
-                    g.get_language_string(30291).format(display_type)
-                )
-        else:
-            from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
-
-            collection = TraktSyncDatabase().get_collected_shows(force_all=True)
-            collection = [i for i in collection if i is not None]
-            collection = OrderedDict.fromkeys([i["trakt_id"] for i in collection])
-            trakt_id = self._get_show_id(item_information["info"])
-            if trakt_id in collection:
-                self.dialog_list.append(
-                    g.get_language_string(30292).format(display_type)
-                )
-            else:
-                self.dialog_list.append(
-                    g.get_language_string(30291).format(display_type)
-                )
-
-    def _handle_watched_options(self, item_information, item_type):
-        if item_type in ["movie", "episode"]:
-            if item_information["play_count"] > 0:
-                self.dialog_list.append(g.get_language_string(30296))
-            else:
-                self.dialog_list.append(g.get_language_string(30295))
-        else:
-            if item_information.get("unwatched_episodes", 0) > 0:
-                self.dialog_list.append(g.get_language_string(30295))
-
-    @staticmethod
-    def _confirm_item_information(item_information):
-        if item_information is None:
-            raise TypeError("Invalid item information passed to Trakt Manager")
-
-    @staticmethod
-    def _refresh_meta_information(trakt_object):
-        from resources.lib.database import trakt_sync
-
-        trakt_sync.TraktSyncDatabase().clear_specific_item_meta(
-            trakt_object["trakt_id"], trakt_object["mediatype"]
-        )
-        g.container_refresh()
-        g.trigger_widget_refresh()
-
-    @staticmethod
-    def _confirm_marked_watched(response, type):
-        if response["added"][type] > 0:
-            return True
-        else:
-            g.notification(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-                g.get_language_string(30304),
-            )
-            g.log("Failed to mark item as watched\nTrakt Response: {}".format(response))
-
-            return False
-
-    @staticmethod
-    def _confirm_marked_unwatched(response, type):
-
-        if response["deleted"][type] > 0:
-            return True
-        else:
-            g.notification(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-                g.get_language_string(30304),
-            )
-            g.log(
-                "Failed to mark item as unwatched\nTrakt Response: {}".format(response)
-            )
-            return False
-
-    @staticmethod
-    def _info_to_trakt_object(item_information, force_show=False):
-        if force_show and item_information["mediatype"] in ("season", "episode"):
-            ids = [{"ids": {"trakt": item_information["trakt_show_id"]}}]
-            return {"shows": ids}
-        ids = [{"ids": {"trakt": item_information["trakt_id"]}}]
-        if item_information["mediatype"] == "movie":
-            return {"movies": ids}
-        elif item_information["mediatype"] == "season":
-            return {"seasons": ids}
-        elif item_information["mediatype"] == "tvshow":
-            return {"shows": ids}
-        elif item_information["mediatype"] == "episode":
-            return {"episodes": ids}
-
-    @staticmethod
-    def _get_show_id(item_information):
-        if item_information["mediatype"] != "tvshow":
-            trakt_id = item_information["trakt_show_id"]
-        else:
-            trakt_id = item_information["trakt_id"]
-        return trakt_id
-
-    def _mark_watched(self, item_information, silent=False):
-
-        response = self.post_json(
-            "sync/history", self._info_to_trakt_object(item_information)
-        )
-
-        if item_information["mediatype"] == "movie":
-            from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
-
-            if not self._confirm_marked_watched(response, "movies"):
-                return
-            TraktSyncDatabase().mark_movie_watched(item_information["trakt_id"])
-        else:
-            from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
-
-            if not self._confirm_marked_watched(response, "episodes"):
-                return
-            if item_information["mediatype"] == "episode":
-                TraktSyncDatabase().mark_episode_watched(
-                    item_information["trakt_show_id"],
-                    item_information["season"],
-                    item_information["episode"],
-                )
-            elif item_information["mediatype"] == "season":
-                show_id = item_information["trakt_show_id"]
-                season_no = item_information["season"]
-                TraktSyncDatabase().mark_season_watched(show_id, season_no, 1)
-            elif item_information["mediatype"] == "tvshow":
-                TraktSyncDatabase().mark_show_watched(item_information["trakt_id"], 1)
-
-        g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            g.get_language_string(30305),
-        )
-        if not silent:
-            g.container_refresh()
-            g.trigger_widget_refresh()
-
-    def _mark_unwatched(self, item_information):
-        response = self.post_json(
-            "sync/history/remove", self._info_to_trakt_object(item_information)
-        )
-
-        if item_information["mediatype"] == "movie":
-            from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
-
-            if not self._confirm_marked_unwatched(response, "movies"):
-                return
-            TraktSyncDatabase().mark_movie_unwatched(item_information["trakt_id"])
-
-        else:
-            from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
-
-            if not self._confirm_marked_unwatched(response, "episodes"):
-                return
-            if item_information["mediatype"] == "episode":
-                TraktSyncDatabase().mark_episode_unwatched(
-                    item_information["trakt_show_id"],
-                    item_information["season"],
-                    item_information["episode"],
-                )
-            elif item_information["mediatype"] == "season":
-                show_id = item_information["trakt_show_id"]
-                season_no = item_information["season"]
-                TraktSyncDatabase().mark_season_watched(show_id, season_no, 0)
-            elif item_information["mediatype"] == "tvshow":
-                TraktSyncDatabase().mark_show_watched(item_information["trakt_id"], 0)
-
-        from resources.lib.database.trakt_sync.bookmark import TraktSyncDatabase
-
-        TraktSyncDatabase().remove_bookmark(item_information["trakt_id"])
-
-        g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            g.get_language_string(30306),
-        )
-        g.container_refresh()
-        g.trigger_widget_refresh()
-
-    def _add_to_collection(self, item_information):
-        self.post("sync/collection", self._info_to_trakt_object(item_information, True))
-
-        if item_information["mediatype"] == "movie":
-            from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
-
-            TraktSyncDatabase().mark_movie_collected(item_information["trakt_id"])
-        else:
-            from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
-
-            trakt_id = self._get_show_id(item_information)
-            TraktSyncDatabase().mark_show_collected(trakt_id, 1)
-
-        g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            g.get_language_string(30307),
-        )
-        g.trigger_widget_refresh()
-
-    def _remove_from_collection(self, item_information):
-        self.post(
-            "sync/collection/remove", self._info_to_trakt_object(item_information, True)
-        )
-
-        if item_information["mediatype"] == "movie":
-            from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
-
-            TraktSyncDatabase().mark_movie_uncollected(item_information["trakt_id"])
-        else:
-            from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
-
-            trakt_id = self._get_show_id(item_information)
-            TraktSyncDatabase().mark_show_collected(trakt_id, 0)
-
-        g.container_refresh()
-        g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            g.get_language_string(30308),
-        )
-        g.trigger_widget_refresh()
-
-    def _add_to_watchlist(self, item_information):
-        self.post("sync/watchlist", self._info_to_trakt_object(item_information, True))
-        g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            g.get_language_string(30309),
-        )
-        g.trigger_widget_refresh()
-
-    def _remove_from_watchlist(self, item_information):
-        self.post(
-            "sync/watchlist/remove", self._info_to_trakt_object(item_information, True)
-        )
-        g.container_refresh()
-        g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            g.get_language_string(30310),
-        )
-        g.trigger_widget_refresh()
-
-    def _add_to_list(self, item_information):
-        from resources.lib.modules.metadataHandler import MetadataHandler
-
-        get = MetadataHandler.get_trakt_info
-        lists = self.get_json("users/me/lists")
-        selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30313)),
-            [get(i, "name") for i in lists],
-        )
-        if selection == -1:
-            return
-        selection = lists[selection]
-        self.post_json(
-            "users/me/lists/{}/items".format(selection["trakt_id"]),
-            self._info_to_trakt_object(item_information, True),
-        )
-        g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            g.get_language_string(30311).format(get(selection, "name")),
-        )
-        g.trigger_widget_refresh()
-
-    def _remove_from_list(self, item_information):
-        from resources.lib.modules.metadataHandler import MetadataHandler
-
-        get = MetadataHandler.get_trakt_info
-        lists = self.get_json("users/me/lists")
-        selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30313)),
-            [get(i, "name") for i in lists],
-        )
-        if selection == -1:
-            return
-        selection = lists[selection]
-        self.post_json(
-            "users/me/lists/{}/items/remove".format(selection["trakt_id"]),
-            self._info_to_trakt_object(item_information, True),
-        )
-        g.container_refresh()
-        g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
-            g.get_language_string(30312).format(get(selection, "name")),
-        )
-        g.trigger_widget_refresh()
-
-    def _hide_item(self, item_information):
-        from resources.lib.database.trakt_sync.hidden import TraktSyncDatabase
-
-        sections = ["progress_watched", "calendar"]
-        sections_display = [g.get_language_string(30314), g.get_language_string(30315)]
-        selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30316)),
-            sections_display,
-        )
-        if selection == -1:
-            return
-        section = sections[selection]
-
-        self.post_json(
-            "users/hidden/{}".format(section),
-            self._info_to_trakt_object(item_information, True),
-        )
-
-        if item_information["mediatype"] == "movie":
-            TraktSyncDatabase().add_hidden_item(
-                item_information["trakt_id"], "movie", section
-            )
-        else:
-            TraktSyncDatabase().add_hidden_item(
-                item_information["trakt_show_id"], "tvshow", section
-            )
-
-        g.container_refresh()
-        g.notification(
-            g.ADDON_NAME,
-            g.get_language_string(30317).format(sections_display[selection]),
-        )
-        g.trigger_widget_refresh()
-
-    def _remove_playback_history(self, item_information):
-        media_type = "movie"
-
-        if item_information["mediatype"] != "movie":
-            media_type = "episode"
-
-        progress = self.get_json("sync/playback/{}".format(media_type + "s"))
-        if len(progress) == 0:
-            return
-        if media_type == "movie":
-            progress_ids = [
-                i["playback_id"]
-                for i in progress
-                if i["trakt_id"] == item_information["trakt_id"]
-            ]
-        else:
-            progress_ids = [
-                i["playback_id"]
-                for i in progress
-                if i["episode"]["trakt_id"] == item_information["trakt_id"]
-            ]
-
-        for i in progress_ids:
-            self.delete_request("sync/playback/{}".format(i))
-
-        from resources.lib.database.trakt_sync.bookmark import TraktSyncDatabase
-
-        TraktSyncDatabase().remove_bookmark(item_information["trakt_id"])
-
-        g.container_refresh()
-        g.notification(g.ADDON_NAME, g.get_language_string(30318))
-        g.trigger_widget_refresh()

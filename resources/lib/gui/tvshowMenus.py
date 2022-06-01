@@ -7,26 +7,48 @@ import xbmcgui
 import xbmcplugin
 
 from resources.lib.common import tools
-from resources.lib.database.searchHistory import SearchHistory
-from resources.lib.database.trakt_sync import bookmark, hidden, shows
-from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
-from resources.lib.indexers.trakt import TraktAPI, trakt_auth_guard
+from resources.lib.common.tools import cached_property
+from resources.lib.indexers import trakt_auth_guard
 from resources.lib.modules.globals import g
-from resources.lib.modules.list_builder import ListBuilder
 
 
-class Menus:
+class Menus(object):
     def __init__(self):
-        self.trakt = TraktAPI()
-        self.language_code = g.get_language_code()
-        self.trakt_database = TraktSyncDatabase()
-        self.hidden_database = hidden.TraktSyncDatabase()
-        self.bookmark_database = bookmark.TraktSyncDatabase()
-        self.shows_database = shows.TraktSyncDatabase()
-        self.list_builder = ListBuilder()
         self.page_limit = g.get_int_setting("item.limit")
         self.page_start = (g.PAGE - 1) * self.page_limit
         self.page_end = g.PAGE * self.page_limit
+
+    # Cached properties to lazy load imports
+
+    @cached_property
+    def shows_database(self):
+        from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
+        return TraktSyncDatabase()
+
+    @cached_property
+    def search_history(self):
+        from resources.lib.database.searchHistory import SearchHistory
+        return SearchHistory()
+
+    @cached_property
+    def hidden_database(self):
+        from resources.lib.database.trakt_sync.hidden import TraktSyncDatabase as HiddenDatabase
+        return HiddenDatabase()
+
+    @cached_property
+    def bookmark_database(self):
+        from resources.lib.database.trakt_sync.bookmark import TraktSyncDatabase as BookmarkDatabase
+        return BookmarkDatabase()
+
+    @cached_property
+    def trakt_api(self):
+        from resources.lib.indexers.trakt import TraktAPI
+        return TraktAPI()
+
+    @cached_property
+    def list_builder(self):
+        from resources.lib.modules.list_builder import ListBuilder
+        return ListBuilder()
 
     ######################################################
     # MENUS
@@ -52,68 +74,68 @@ class Menus:
             action="genericEndpoint",
             mediatype="shows",
             endpoint="popular",
-            description=g.get_language_string(30438),
+            description=g.get_language_string(30416),
         )
         g.add_directory_item(
-            g.get_language_string(30367),
+            g.get_language_string(30345),
             action="showsPopularRecent",
-            description=g.get_language_string(30439),
+            description=g.get_language_string(30417),
         )
         if g.get_setting("trakt.auth"):
             g.add_directory_item(
                 g.get_language_string(30005),
                 action="showsRecommended",
-                description=g.get_language_string(30440),
+                description=g.get_language_string(30418),
             )
         g.add_directory_item(
             g.get_language_string(30006),
             action="genericEndpoint",
             mediatype="shows",
             endpoint="trending",
-            description=g.get_language_string(30441),
+            description=g.get_language_string(30419),
         )
         g.add_directory_item(
-            g.get_language_string(30368),
+            g.get_language_string(30346),
             action="showsTrendingRecent",
-            description=g.get_language_string(30442),
+            description=g.get_language_string(30420),
         )
         g.add_directory_item(
             g.get_language_string(30046),
             action="showsNew",
-            description=g.get_language_string(30443),
+            description=g.get_language_string(30421),
         )
         g.add_directory_item(
             g.get_language_string(30007),
             action="genericEndpoint",
             mediatype="shows",
             endpoint="played",
-            description=g.get_language_string(30444),
+            description=g.get_language_string(30422),
         )
         g.add_directory_item(
             g.get_language_string(30008),
             action="genericEndpoint",
             mediatype="shows",
             endpoint="watched",
-            description=g.get_language_string(30445),
+            description=g.get_language_string(30423),
         )
         g.add_directory_item(
             g.get_language_string(30009),
             action="genericEndpoint",
             mediatype="shows",
             endpoint="collected",
-            description=g.get_language_string(30446),
+            description=g.get_language_string(30424),
         )
         g.add_directory_item(
-            g.get_language_string(30374),
+            g.get_language_string(30352),
             action="TrendingLists",
             mediatype="shows",
-            description=g.get_language_string(30447),
+            description=g.get_language_string(30425),
         )
         g.add_directory_item(
-            g.get_language_string(30376),
+            g.get_language_string(30354),
             action="PopularLists",
             mediatype="shows",
-            description=g.get_language_string(30448),
+            description=g.get_language_string(30426),
         )
         if not g.get_bool_setting("general.hideUnAired"):
             g.add_directory_item(
@@ -121,45 +143,45 @@ class Menus:
                 action="genericEndpoint",
                 mediatype="shows",
                 endpoint="anticipated",
-                description=g.get_language_string(30449),
+                description=g.get_language_string(30427),
             )
 
         g.add_directory_item(
             g.get_language_string(30011),
             action="showsUpdated",
-            description=g.get_language_string(30450),
+            description=g.get_language_string(30428),
         )
         g.add_directory_item(
-            g.get_language_string(30182),
+            g.get_language_string(30169),
             action="showsNetworks",
-            description=g.get_language_string(30451),
+            description=g.get_language_string(30429),
         )
         g.add_directory_item(
-            g.get_language_string(30184),
+            g.get_language_string(30171),
             action="showYears",
-            description=g.get_language_string(30452),
+            description=g.get_language_string(30430),
         )
         g.add_directory_item(
             g.get_language_string(30042),
             action="tvGenres",
-            description=g.get_language_string(30453),
+            description=g.get_language_string(30431),
         )
         g.add_directory_item(
-            g.get_language_string(30203),
+            g.get_language_string(30190),
             action="showsByActor",
-            description=g.get_language_string(30454),
+            description=g.get_language_string(30432),
         )
         if not g.get_bool_setting("searchHistory"):
             g.add_directory_item(
                 g.get_language_string(30013),
                 action="showsSearch",
-                description=g.get_language_string(30394),
+                description=g.get_language_string(30372),
             )
         else:
             g.add_directory_item(
                 g.get_language_string(30013),
                 action="showsSearchHistory",
-                description=g.get_language_string(30396),
+                description=g.get_language_string(30374),
             )
         g.close_directory(g.CONTENT_MENU)
 
@@ -169,59 +191,59 @@ class Menus:
         g.add_directory_item(
             g.get_language_string(30043),
             action="onDeckShows",
-            description=g.get_language_string(30455),
+            description=g.get_language_string(30433),
         )
         g.add_directory_item(
             g.get_language_string(30014),
             action="showsMyCollection",
-            description=g.get_language_string(30456),
+            description=g.get_language_string(30434),
         )
         g.add_directory_item(
             g.get_language_string(30015),
             action="showsMyWatchlist",
-            description=g.get_language_string(30457),
+            description=g.get_language_string(30435),
         )
         g.add_directory_item(
-            g.get_language_string(30092),
+            g.get_language_string(30090),
             action="showsRecentlyWatched",
-            description=g.get_language_string(30507),
+            description=g.get_language_string(30479),
         )
         g.add_directory_item(
-            g.get_language_string(30223),
+            g.get_language_string(30210),
             action="showsNextUp",
-            description=g.get_language_string(30458),
+            description=g.get_language_string(30436),
         )
         g.add_directory_item(
-            g.get_language_string(30224),
+            g.get_language_string(30211),
             action="myUpcomingEpisodes",
-            description=g.get_language_string(30459),
+            description=g.get_language_string(30437),
         )
         g.add_directory_item(
-            g.get_language_string(30225),
+            g.get_language_string(30212),
             action="showsMyProgress",
-            description=g.get_language_string(30460),
+            description=g.get_language_string(30438),
         )
         g.add_directory_item(
-            g.get_language_string(30226),
+            g.get_language_string(30213),
             action="showsMyRecentEpisodes",
-            description=g.get_language_string(30461),
+            description=g.get_language_string(30439),
         )
         g.add_directory_item(
-            g.get_language_string(30227),
+            g.get_language_string(30214),
             action="myTraktLists",
             mediatype="shows",
-            description=g.get_language_string(30462),
+            description=g.get_language_string(30440),
         )
         g.add_directory_item(
-            g.get_language_string(30372),
+            g.get_language_string(30350),
             action="myLikedLists",
             mediatype="shows",
-            description=g.get_language_string(30463),
+            description=g.get_language_string(30441),
         )
         g.add_directory_item(
-            g.get_language_string(30346),
+            g.get_language_string(30325),
             action="myWatchedEpisodes",
-            description=g.get_language_string(30464),
+            description=g.get_language_string(30442),
         )
         g.close_directory(g.CONTENT_MENU)
 
@@ -253,7 +275,7 @@ class Menus:
     def my_shows_collection(self):
         no_paging = not g.get_bool_setting("general.paginatecollection")
         sort = "title" if g.get_int_setting("general.sortcollection") == 1 else False
-        trakt_list = self.trakt_database.get_collected_shows(g.PAGE)
+        trakt_list = self.shows_database.get_collected_shows(g.PAGE)
         if sort == "title" and not no_paging:
             trakt_list = sorted(trakt_list, key=lambda k: tools.SORT_TOKEN_REGEX
                                 .sub("", k["trakt_object"]["info"].get('title').lower()))
@@ -278,7 +300,7 @@ class Menus:
     def my_show_progress(self):
         no_paging = not g.get_bool_setting("general.paginatecollection")
         sort = "title" if g.get_int_setting("general.sortcollection") == 1 else False
-        trakt_list = self.trakt_database.get_unfinished_collected_shows(g.PAGE)
+        trakt_list = self.shows_database.get_unfinished_collected_shows(g.PAGE)
         if sort == "title" and not no_paging:
             trakt_list = sorted(trakt_list, key=lambda k: tools.SORT_TOKEN_REGEX
                                 .sub("", k["trakt_object"]["info"].get('title').lower()))
@@ -298,8 +320,9 @@ class Menus:
         date_string = datetime.datetime.today() - datetime.timedelta(days=29)
         trakt_list = self.shows_database.extract_trakt_page(
             "calendars/all/shows/new/{}/30".format(date_string.strftime("%d-%m-%Y")),
-            languages=','.join({'en', self.language_code}),
+            languages=','.join({'en', g.get_language_code()}),
             extended="full",
+            pull_all=True,
             no_paging=True,
             ignore_cache=True,
             hide_watched=False,
@@ -310,11 +333,12 @@ class Menus:
 
     def shows_recently_watched(self):
         self.list_builder.show_list_builder(
-            self.trakt_database.get_recently_watched_shows(), no_paging=True
+            self.shows_database.get_recently_watched_shows(),
+            no_paging=True
         )
 
     def my_next_up(self):
-        episodes = self.trakt_database.get_nextup_episodes(
+        episodes = self.shows_database.get_nextup_episodes(
             g.get_int_setting("nextup.sort") == 1
         )
         self.list_builder.mixed_episode_builder(episodes, no_paging=True)
@@ -323,10 +347,12 @@ class Menus:
     def my_recent_episodes(self):
         hidden_shows = self.hidden_database.get_hidden_items("calendar", "shows")
         date_string = datetime.datetime.today() - datetime.timedelta(days=13)
-        trakt_list = self.trakt.get_json(
+        trakt_list = self.trakt_api.get_json(
             "calendars/my/shows/{}/14".format(
                 date_string.strftime("%d-%m-%Y")
-            ), extended="full"
+            ),
+            extended="full",
+            pull_all=True
         )
         trakt_list = sorted(
             [i for i in trakt_list if i["trakt_show_id"] not in hidden_shows],
@@ -341,8 +367,10 @@ class Menus:
         tomorrow = (datetime.date.today() + datetime.timedelta(days=1)).strftime(
             g.DATE_FORMAT
         )
-        upcoming_episodes = self.trakt.get_json(
-            "calendars/my/shows/{}/30".format(tomorrow), extended="full"
+        upcoming_episodes = self.trakt_api.get_json(
+            "calendars/my/shows/{}/30".format(tomorrow),
+            extended="full",
+            pull_all=True
         )[: self.page_limit]
         self.list_builder.mixed_episode_builder(
             upcoming_episodes,
@@ -352,7 +380,7 @@ class Menus:
         )
 
     def shows_networks(self):
-        trakt_list = self.trakt.get_json_cached("networks")
+        trakt_list = self.trakt_api.get_json_cached("networks")
         list_items = []
         for i in trakt_list:
             list_items.append(
@@ -385,26 +413,32 @@ class Menus:
         )
         self.list_builder.show_list_builder(trakt_list, no_paging=True)
 
-    @staticmethod
-    def shows_search_history():
-        history = SearchHistory().get_search_history("tvshow")
+    def shows_search_history(self):
+        history = self.search_history.get_search_history("tvshow")
         g.add_directory_item(
-            g.get_language_string(30195),
+            g.get_language_string(30182),
             action="showsSearch",
-            description=g.get_language_string(30394),
+            description=g.get_language_string(30372),
         )
         g.add_directory_item(
-            g.get_language_string(30193),
+            g.get_language_string(30180),
             action="clearSearchHistory",
             mediatype="tvshow",
             is_folder=False,
-            description=g.get_language_string(30193),
+            description=g.get_language_string(30180),
         )
         for i in history:
+            remove_path = g.create_url(
+                g.BASE_URL,
+                {"action": "removeSearchHistory", "mediatype": "tvshow", "endpoint": i},
+            )
             g.add_directory_item(
                 i,
                 action="showsSearchResults",
                 action_args=tools.construct_action_args(i),
+                cm=[
+                    (g.get_language_string(30565), "RunPlugin({})".format(remove_path))
+                ],
             )
         g.close_directory(g.CONTENT_MENU)
 
@@ -416,7 +450,7 @@ class Menus:
                 return
 
         if g.get_bool_setting("searchHistory"):
-            SearchHistory().add_search_history("tvshow", query)
+            self.search_history.add_search_history("tvshow", query)
         self.shows_search_results(query)
 
     def shows_search_results(self, query):
@@ -451,7 +485,7 @@ class Menus:
                 return
 
         if g.get_bool_setting("searchHistory"):
-            SearchHistory().add_search_history("showActor", query)
+            self.search_history.add_search_history("showActor", query)
 
         query = g.transliterate_string(query)
         # Try to deal with transliterated chinese actor names as some character -> word transliterations can be joined
@@ -505,7 +539,7 @@ class Menus:
                 )
             }
         )
-        genres = self.trakt.get_json_cached("genres/shows", extended="full")
+        genres = self.trakt_api.get_json_cached("genres/shows", extended="full")
 
         if genres is None:
             g.cancel_directory()
@@ -523,22 +557,17 @@ class Menus:
         g.close_directory(g.CONTENT_GENRES)
 
     def shows_genre_list(self, args):
-        trakt_endpoint = (
-            "trending"
-            if g.get_int_setting("general.genres.endpoint") == 0
-            else "popular"
-        )
         if args is None:
             genre_display_list = []
             genre_string = ""
-            genres = self.trakt.get_json_cached("genres/shows")
+            genres = self.trakt_api.get_json_cached("genres/shows")
 
             for genre in genres:
                 gi = xbmcgui.ListItem(genre["name"])
                 gi.setArt({"thumb": "{}{}.png".format(g.GENRES_PATH, genre["slug"])})
                 genre_display_list.append(gi)
             genre_multiselect = xbmcgui.Dialog().multiselect(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30320)),
+                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30303)),
                 genre_display_list, useDetails=True
             )
 
@@ -551,7 +580,9 @@ class Menus:
             genre_string = tools.unquote(args)
 
         trakt_list = self.shows_database.extract_trakt_page(
-            "shows/{}".format(trakt_endpoint),
+            "shows/{}".format(
+                "trending" if g.get_int_setting("general.genres.endpoint.tv") == 0 else "popular"
+            ),
             genres=genre_string,
             page=g.PAGE,
             extended="full"
@@ -571,21 +602,12 @@ class Menus:
 
     def shows_years(self, year=None):
         if year is None:
-            current_year = int(
-                tools.parse_datetime(
-                    datetime.datetime.today().strftime(g.DATE_FORMAT)
-                ).year
-            )
-            all_years = reversed([year for year in range(1900, current_year + 1)])
-            menu_items = []
-            for year in all_years:
-                menu_items.append(
-                    g.add_directory_item(
-                        g.UNICODE(year), action="showYears", action_args=year, bulk_add=True
-                    )
+            current_year = datetime.datetime.today().year
+            for year in range(current_year, 1899, -1):
+                g.add_directory_item(
+                    g.UNICODE(year), action="showYears", action_args=year
                 )
-            xbmcplugin.addDirectoryItems(g.PLUGIN_HANDLE, menu_items, len(menu_items))
-            g.close_directory(g.CONTENT_SHOW)
+            g.close_directory(g.CONTENT_MENU)
         else:
             trakt_list = self.shows_database.extract_trakt_page(
                 "shows/popular", years=year, page=g.PAGE, extended="full", hide_watched=False
@@ -594,5 +616,5 @@ class Menus:
 
     @trakt_auth_guard
     def my_watched_episode(self):
-        watched_episodes = self.trakt_database.get_watched_episodes(g.PAGE)
+        watched_episodes = self.shows_database.get_watched_episodes(g.PAGE)
         self.list_builder.mixed_episode_builder(watched_episodes)

@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import collections
-import threading
 
 from resources.lib.database import Database
 from resources.lib.modules.globals import g

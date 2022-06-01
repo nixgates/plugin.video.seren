@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+import time
 from functools import wraps
 
-import time
-import requests
 import xbmc
 import xbmcgui
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 
 from resources.lib.common import tools
+from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.modules.globals import g
 
@@ -21,6 +19,7 @@ AD_ENABLED_KEY = "alldebrid.enabled"
 def alldebrid_guard_response(func):
     @wraps(func)
     def wrapper(*args, **kwarg):
+        import requests
         try:
             response = func(*args, **kwarg)
             if response.status_code in [200, 201]:
@@ -71,16 +70,18 @@ class AllDebrid:
     def __init__(self):
         self.agent_identifier = g.ADDON_NAME
         self.apikey = g.get_setting(AD_AUTH_KEY)
-        self.progress_dialog = xbmcgui.DialogProgress()
 
-        self.session = requests.Session()
+    @cached_property
+    def session(self):
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3 import Retry
+        session = requests.Session()
         retries = Retry(
             total=5, backoff_factor=0.1, status_forcelist=[429, 500, 502, 503, 504]
         )
-        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
-
-    def __del__(self):
-        self.session.close()
+        session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
+        return session
 
     @alldebrid_guard_response
     def get(self, url, **params):
@@ -119,33 +120,37 @@ class AllDebrid:
         expiry = pin_ttl = int(resp["expires_in"])
         auth_complete = False
         tools.copy2clip(resp["pin"])
-        self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30355),
-            tools.create_multiline_message(
-                line1=g.get_language_string(30018).format(
-                    g.color_string(resp["base_url"])
+        try:
+            progress_dialog = xbmcgui.DialogProgress()
+            progress_dialog.create(
+                g.ADDON_NAME + ": " + g.get_language_string(30334),
+                tools.create_multiline_message(
+                    line1=g.get_language_string(30018).format(
+                        g.color_string(resp["base_url"])
+                    ),
+                    line2=g.get_language_string(30019).format(g.color_string(resp["pin"])),
+                    line3=g.get_language_string(30047),
                 ),
-                line2=g.get_language_string(30019).format(g.color_string(resp["pin"])),
-                line3=g.get_language_string(30047),
-            ),
-        )
+            )
 
-        # Seems the All Debrid servers need some time do something with the pin before polling
-        # Polling to early will cause an invalid pin error
-        xbmc.sleep(5 * 1000)
-        self.progress_dialog.update(100)
-        while (
-            not auth_complete
-            and not expiry <= 0
-            and not self.progress_dialog.iscanceled()
-        ):
-            auth_complete, expiry = self.poll_auth(check=resp["check"], pin=resp["pin"])
-            progress_percent = 100 - int((float(pin_ttl - expiry) / pin_ttl) * 100)
-            self.progress_dialog.update(progress_percent)
-            xbmc.sleep(1 * 1000)
+            # Seems the All Debrid servers need some time do something with the pin before polling
+            # Polling to early will cause an invalid pin error
+            xbmc.sleep(5 * 1000)
+            progress_dialog.update(100)
+            while (
+                not auth_complete
+                and not expiry <= 0
+                and not progress_dialog.iscanceled()
+            ):
+                auth_complete, expiry = self.poll_auth(check=resp["check"], pin=resp["pin"])
+                progress_percent = 100 - int((float(pin_ttl - expiry) / pin_ttl) * 100)
+                progress_dialog.update(progress_percent)
+                xbmc.sleep(1 * 1000)
 
-        self.progress_dialog.close()
-        self.store_user_info()
+            progress_dialog.close()
+            self.store_user_info()
+        finally:
+            del progress_dialog
 
         if auth_complete:
             xbmcgui.Dialog().ok(

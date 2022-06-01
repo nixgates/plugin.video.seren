@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import threading
 import time
 
-import requests
 import xbmc
 import xbmcgui
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 
 from resources.lib.common import source_utils
 from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
+from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.modules.exceptions import UnexpectedResponse, RanOnceAlready
 from resources.lib.modules.global_lock import GlobalLock
@@ -40,15 +37,17 @@ class RealDebrid:
         self.oauth_time_step = 0
         self.base_url = "https://api.real-debrid.com/rest/1.0/"
         self.cache_check_results = {}
-        self.progress_dialog = xbmcgui.DialogProgress()
-        self.session = requests.Session()
-        retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
         self._load_settings()
 
-    def __del__(self):
-        self.session.close()
-        del self.progress_dialog
+    @cached_property
+    def session(self):
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3 import Retry
+        session = requests.Session()
+        retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+        session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
+        return session
 
     def _auth_loop(self):
         url = "client_id={}&code={}".format(RD_AUTH_CLIENT_ID, self.device_code)
@@ -56,14 +55,13 @@ class RealDebrid:
         response = self.session.get(url).json()
         if "error" not in response and response.get("client_secret"):
             try:
-                self.progress_dialog.close()
                 g.set_setting(RD_CLIENT_ID_KEY, response["client_id"])
                 g.set_setting(RD_SECRET_KEY, response["client_secret"])
                 self.client_secret = response["client_secret"]
                 self.client_id = response["client_id"]
                 return True
             except Exception:
-                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30067))
+                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30065))
                 raise
         return False
 
@@ -72,44 +70,47 @@ class RealDebrid:
         url = self.oauth_url + self.device_code_url.format(url)
         response = self.session.get(url).json()
         tools.copy2clip(response["user_code"])
-        self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30017),
-            tools.create_multiline_message(
-                line1=g.get_language_string(30018).format(
-                    g.color_string("https://real-debrid.com/device")
-                ),
-                line2=g.get_language_string(30019).format(
-                    g.color_string(response["user_code"])
-                ),
-                line3=g.get_language_string(30047),
-            ),
-        )
-        self.oauth_timeout = int(response["expires_in"])
-        token_ttl = int(response["expires_in"])
-        self.oauth_time_step = int(response["interval"])
-        self.device_code = response["device_code"]
         success = False
-        self.progress_dialog.update(100)
-        while (
-            not success
-            and not token_ttl <= 0
-            and not self.progress_dialog.iscanceled()
-        ):
-            xbmc.sleep(1000)
-            if token_ttl % self.oauth_time_step == 0:
-                success = self._auth_loop()
-            progress_percent = int(float((token_ttl * 100) / self.oauth_timeout))
-            self.progress_dialog.update(progress_percent)
-            token_ttl -= 1
-
-        self.progress_dialog.close()
+        try:
+            progress_dialog = xbmcgui.DialogProgress()
+            progress_dialog.create(
+                g.ADDON_NAME + ": " + g.get_language_string(30017),
+                tools.create_multiline_message(
+                    line1=g.get_language_string(30018).format(
+                        g.color_string("https://real-debrid.com/device")
+                    ),
+                    line2=g.get_language_string(30019).format(
+                        g.color_string(response["user_code"])
+                    ),
+                    line3=g.get_language_string(30047),
+                ),
+            )
+            self.oauth_timeout = int(response["expires_in"])
+            token_ttl = int(response["expires_in"])
+            self.oauth_time_step = int(response["interval"])
+            self.device_code = response["device_code"]
+            progress_dialog.update(100)
+            while (
+                not success
+                and not token_ttl <= 0
+                and not progress_dialog.iscanceled()
+            ):
+                xbmc.sleep(1000)
+                if token_ttl % self.oauth_time_step == 0:
+                    success = self._auth_loop()
+                progress_percent = int(float((token_ttl * 100) / self.oauth_timeout))
+                progress_dialog.update(progress_percent)
+                token_ttl -= 1
+            progress_dialog.close()
+        finally:
+            del progress_dialog
 
         if success:
             self.token_request()
 
             user_information = self.get_url("user")
             if user_information["type"] != "premium":
-                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30207))
+                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30194))
 
     def token_request(self):
         if not self.client_secret:

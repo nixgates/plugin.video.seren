@@ -96,10 +96,10 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             # Just in case we forgot any methods that call this
             raise TypeError("NoneType Error: Date Time Column")
         self.execute_sql(
-            "UPDATE movies SET {}=?, {}='{}' WHERE trakt_id=?".format(
-                column, datetime_column, self._get_datetime_now()
+            "UPDATE movies SET {}=?, {}=? WHERE trakt_id=?".format(
+                column, datetime_column
             ),
-            (value, trakt_id),
+            (value, self._get_datetime_now() if value > 0 else None, trakt_id),
         )
 
     def _fetch_movie_summary(self, trakt_id):
@@ -146,24 +146,28 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if not updated_items:
             return
 
-        self.save_to_meta_table(
+        self.task_queue.put(
+            self.save_to_meta_table,
             (i for i in updated_items if "tmdb_object" in i),
             "movies",
             "tmdb",
             "tmdb_id",
         )
-        self.save_to_meta_table(
+        self.task_queue.put(
+            self.save_to_meta_table,
             (i for i in updated_items if "fanart_object" in i),
             "movies",
             "fanart",
             "tmdb_id",
         )
-        self.save_to_meta_table(
+        self.task_queue.put(
+            self.save_to_meta_table,
             (i for i in updated_items if "omdb_object" in i),
             "movies",
             "omdb",
             "imdb_id",
         )
+        self.task_queue.wait_completion()
 
         formatted_items = self.metadataHandler.format_db_object(updated_items)
 

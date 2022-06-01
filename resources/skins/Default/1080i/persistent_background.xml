@@ -1,48 +1,71 @@
 <window type="dialog">
-    <defaultcontrol>2</defaultcontrol>
     <coordinates>
         <left>0</left>
         <top>0</top>
+		<width>1920</width>
+		<height>1080</height>
     </coordinates>
-    <animation effect="fade" time="500">WindowOpen</animation>
-    <animation effect="fade" end="0,576" time="500">WindowClose</animation>
+	
+    <animation effect="fade" time="350">WindowOpen</animation>
+	
     <controls>
-        <!-- Background Texture -->
-        <control type="image">
-            <texture>$INFO[Window().Property(texture.white)]</texture>
-            <colordiffuse>FF000000</colordiffuse>
-        </control>
+        
+		<!-- Background -->
+		<control type="group">
+			<top>0</top>
+			<left>0</left>
+			<width>1920</width>
+			<height>1080</height>
+			
+			<!-- Fallback -->
+			<control type="image">
+				<texture>white.png</texture>
+				<colordiffuse>FF000000</colordiffuse>
+			</control>
+			
+			<!-- Fanart -->
+			<control type="image">
+				<texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
+			</control>
 
-        <!-- Background -->
-        <control type="image">
-            <top>0</top>
-            <left>0</left>
-            <width>1920</width>
-            <height>1080</height>
-            <texture>$INFO[Window().Property(item.art.fanart)]</texture>
-        </control>
+			<!-- Overlay -->
+			<control type="image">
+				<texture background="true">white.png</texture>
+				<colordiffuse>CC000000</colordiffuse>
+			</control>
+		</control>
 
-        <control type="image">
-            <top>0</top>
-            <left>0</left>
-            <width>1920</width>
-            <height>1080</height>
-            <texture>$INFO[Window().Property(texture.white)]</texture>
-            <colordiffuse>CC000000</colordiffuse>
-        </control>
+		<!-- Seren Peacock -->
+		<control type="image">
+			<animation effect="fade" time="350">WindowOpen</animation>
+			<centerleft>50%</centerleft>
+			<centertop>45%</centertop>
+			<align>center</align>
+			<aligny>center</aligny>
+			<width>100</width>
+			<aspectratio>keep</aspectratio>
+			<texture>$INFO[Window().Property(seren.logo)]</texture>
+			<visible>String.IsEqual(Window().Property(process_started),false) | String.IsEmpty(Window().Property(item.art.clearlogo))</visible>
+		</control>
+		
+		<!-- Clearlogo -->
+		<control type="image">
+			<animation effect="fade" time="350" condition="String.IsEqual(Window().Property(process_started),true) + !String.IsEmpty(Window().Property(item.art.clearlogo))">Conditional</animation>
+			<centerleft>50%</centerleft>
+			<width>335</width>
+			<centertop>50%</centertop>
+			<align>center</align>
+			<aligny>center</aligny>
+			<aspectratio>keep</aspectratio>
+			<texture>$INFO[Window().Property(item.art.clearlogo)]</texture>
+			<visible>String.IsEqual(Window().Property(process_started),true) + !String.IsEmpty(Window().Property(item.art.clearlogo))</visible>
+		</control>
 
-        <!-- Seren Ico -->
-        <control type="image" id="1001">
-            <top>-80</top>
-            <left>900</left>
-            <width>100</width>
-            <aspectratio>keep</aspectratio>
-            <texture>$INFO[Window().Property(seren.logo)]</texture>
-        </control>
-
+		<!-- Notification Text -->
         <control type="label">
-            <left>0</left>
-            <top>220</top>
+			<animation effect="fade" time="350">WindowOpen</animation>
+            <top>210</top>
+			<centerleft>50%</centerleft>
             <width>100%</width>
             <font>font12</font>
             <align>center</align>

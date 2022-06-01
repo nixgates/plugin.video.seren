@@ -3,12 +3,10 @@ from __future__ import absolute_import, division, unicode_literals
 
 from functools import wraps
 
-import requests
 import xbmcgui
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 from resources.lib.common import tools
+from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
 from resources.lib.modules.globals import g
@@ -17,6 +15,7 @@ from resources.lib.modules.globals import g
 def fanart_guard_response(func):
     @wraps(func)
     def wrapper(*args, **kwarg):
+        import requests
         try:
             response = func(*args, **kwarg)
             if response.status_code in [200, 201]:
@@ -78,18 +77,27 @@ class FanartTv(ApiBase):
         self.fanart_support = False if not self.client_key else True
         self.headers = {'client-key': self.client_key, 'api-key': self.api_key}
 
-        self.meta_hash = tools.md5_hash(
-            [self.language, self.fanart_support, self.normalization, self.show_normalization, self.meta_objects,
+    @cached_property
+    def meta_hash(self):
+        return tools.md5_hash(
+            [self.language,
+             self.fanart_support,
+             self.normalization,
+             self.show_normalization,
+             self.meta_objects,
              self.base_url])
 
-        self.session = requests.Session()
+    @cached_property
+    def session(self):
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3 import Retry
+        session = requests.Session()
         retries = Retry(total=5,
                         backoff_factor=0.1,
                         status_forcelist=[500, 502, 503, 504])
-        self.session.mount('https://', HTTPAdapter(max_retries=retries, pool_maxsize=100))
-
-    def __del__(self):
-        self.session.close()
+        session.mount('https://', HTTPAdapter(max_retries=retries, pool_maxsize=100))
+        return session
 
     @staticmethod
     def build_image(url, art, image):

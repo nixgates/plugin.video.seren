@@ -126,9 +126,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 return True
 
             if self.requires_update(remote_activities["all"], self.activities["all_activities"]):
-                self._check_for_first_run(silent, trakt_auth)
-                self._do_sync_acitivites(remote_activities)
-                self._finalize_process(update_time)
+                try:
+                    self._check_for_first_run(silent, trakt_auth)
+                    self._do_sync_acitivites(remote_activities)
+                finally:
+                    self._finalize_process(update_time)
 
             self._update_all_shows_statisics()
             self._update_all_season_statistics()
@@ -138,6 +140,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def _finalize_process(self, update_time):
         if self.progress_dialog is not None:
             self.progress_dialog.close()
+            del self.progress_dialog
             self.progress_dialog = None
 
         if not self.sync_errors:
@@ -183,7 +186,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                 and str(self.activities["all_activities"]) == self.base_date
                 and trakt_auth is not None
         ):
-            g.notification(g.ADDON_NAME, g.get_language_string(30190))
+            g.notification(g.ADDON_NAME, g.get_language_string(30177))
             # Give the people time to read the damn notification
             xbmc.sleep(500)
             self.silent = False

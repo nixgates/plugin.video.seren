@@ -86,7 +86,7 @@ class ListBuilder(object):
 
     def show_list_builder(self, trakt_list, **params):
         """
-        Builds a mneu list of shows
+        Builds a menu list of shows
         :param trakt_list: List of show objects
         :param params: Parameters to send to common_menu_builder method
         :return: List list_items if smart_play Kwarg is True else None

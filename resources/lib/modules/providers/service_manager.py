@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+import importlib
 import json
-
-import xbmc
 
 from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.modules.globals import g
@@ -68,7 +67,7 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
         for service in package['services'].split('|'):
             if not service:
                 continue
-            module = __import__('providers.{}.{}'.format(package['pack_name'], service[:-2]), fromlist=[str('')])
+            module = importlib.import_module('providers.{}.{}'.format(package['pack_name'], service[:-2]))
             if hasattr(module, 'run_service'):
                 self._register_and_config_service(service, module, package)
 

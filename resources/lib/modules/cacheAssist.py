@@ -88,9 +88,9 @@ class _BaseCacheAssist(TorrentAssist):
     def prompt_download_style():
         return xbmcgui.Dialog().yesno(
             g.ADDON_NAME,
-            g.get_language_string(30480),
-            yeslabel=g.get_language_string(30481),
-            nolabel=g.get_language_string(30479),
+            g.get_language_string(30456),
+            yeslabel=g.get_language_string(30457),
+            nolabel=g.get_language_string(30455),
             )
 
     def _get_progress_string(self):
@@ -106,14 +106,14 @@ class _BaseCacheAssist(TorrentAssist):
         yesno = self.prompt_download_style()
 
         if yesno:
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30492))
+            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30468))
             self.thread_pool.put(self.status_update_loop)
             return {"result": "background", "source": None}
         else:
             try:
                 progress_dialog = xbmcgui.DialogProgress()
                 progress_dialog.create(
-                    g.get_language_string(30325),
+                    g.get_language_string(30308),
                     tools.create_multiline_message(
                         line1="Title: {}".format(
                             g.color_string(self.uncached_source["release_title"].upper())
@@ -157,7 +157,7 @@ class _BaseCacheAssist(TorrentAssist):
 
     @staticmethod
     def _handle_cancellation():
-        return xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30492))
+        return xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30468))
 
     def status_update_loop(self):
         while not g.abort_requested() and not self.cancelled:
@@ -173,7 +173,8 @@ class _BaseCacheAssist(TorrentAssist):
                         self.current_percent,
                         self.get_display_speed(),
                         self.seeds,
-                        )
+                        ),
+                    "debug"
                     )
                 if self.status == "finished":
                     self._notify_user_of_completion()
@@ -197,7 +198,7 @@ class _BaseCacheAssist(TorrentAssist):
         if not self.silent:
             xbmcgui.Dialog().notification(
                 g.ADDON_NAME + ": %s" % self.uncached_source["release_title"],
-                g.get_language_string(30472)
+                g.get_language_string(30449)
                 + " %s" % self.uncached_source["release_title"],
                 time=5000,
                 )
@@ -212,7 +213,7 @@ class _BaseCacheAssist(TorrentAssist):
         if not self.silent:
             xbmcgui.Dialog().notification(
                 g.ADDON_NAME,
-                g.get_language_string(30473) % self.uncached_source["release_title"],
+                g.get_language_string(30450) % self.uncached_source["release_title"],
                 time=5000,
                 )
         self.status = "failed"
@@ -448,7 +449,7 @@ class CacheAssistHelper:
             debrid_class = self._get_cache_location()
 
         if not debrid_class:
-            xbmcgui.Dialog().ok("Seren", g.get_language_string(30199))
+            xbmcgui.Dialog().ok("Seren", g.get_language_string(30186))
             return
 
         return debrid_class[1](uncached_source, silent)
@@ -480,7 +481,7 @@ class CacheAssistHelper:
                 )
             return
 
-        xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30471))
+        xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30448))
 
 
 def _approx_best_source(source_list):

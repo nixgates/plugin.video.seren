@@ -8,7 +8,9 @@ from resources.lib.modules.metadataHandler import MetadataHandler
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def extract_trakt_page(self, url, media_type, **params):
         result = []
-        page_number = params.pop("page", 1)
+        page_number = params.get("page", 1)
+        no_paging = params.get("no_paging", False)
+        pull_all = params.pop("pull_all", False)
         params["limit"] = self.page_limit
         get = MetadataHandler.get_trakt_info
         for page in self.trakt_api.get_all_pages_json(url, **params):
@@ -21,7 +23,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     **params
                 )
             results = self.task_queue.wait_completion()
-            if results is None:
+            if not results:
                 continue
             for i in page:
                 if (
@@ -31,13 +33,17 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     continue
                 result.append(i)
 
-            if len(result) >= (self.page_limit * page_number):
+            if not pull_all and len(result) >= (self.page_limit * page_number):
                 return result[
-                    self.page_limit * (page_number - 1) : self.page_limit * page_number
+                    self.page_limit * (page_number - 1): self.page_limit * page_number
                 ]
-        return result[self.page_limit * (page_number - 1) :]
+        if pull_all and no_paging:
+            return result
+        else:
+            return result[self.page_limit * (page_number - 1):self.page_limit * page_number]
 
     def _indexed_list_contents(self, username, trakt_id, media_type, **params):
+        params["page"] = 1
         return {
             trakt_id: self.get_list_content(username, trakt_id, media_type, **params)
         }

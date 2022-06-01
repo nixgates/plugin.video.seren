@@ -18,9 +18,9 @@ import xbmcvfs
 from unidecode import unidecode
 
 from resources.lib.common import tools
+from resources.lib.common.tools import cached_property
 from resources.lib.modules.settings_cache import PersistedSettingsCache, RuntimeSettingsCache
-from resources.lib.third_party import pytz, tzlocal
-from resources.lib.third_party.cached_property import cached_property
+from resources.lib.third_party import pytz
 
 viewTypes = [
     ("Default", 50),
@@ -428,6 +428,7 @@ class GlobalVariables(object):
             # If Kodi detection failed, fall back on tzlocal
             try:
                 if not self.LOCAL_TIMEZONE or self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
+                    from resources.lib.third_party import tzlocal
                     self.LOCAL_TIMEZONE = tzlocal.get_localzone()
             except Exception as e:
                 self.log("Error detecting local timezone with alternative approach: {}".format(e), "warning")
@@ -686,6 +687,8 @@ class GlobalVariables(object):
             return "116"
         elif self.KODI_VERSION == 19:
             return "119"
+        elif self.KODI_VERSION == 20:
+            return "121"
 
         raise KeyError("Unsupported kodi version")
 
@@ -978,7 +981,7 @@ class GlobalVariables(object):
             color -= 1
             self.set_setting("general.textColor", colorChart[color])
             self.set_setting("general.displayColor", colorChart[color])
-        xbmc.executebuiltin("Addon.OpenSettings({})".format(self.ADDON_ID))
+        self.open_addon_settings(1, 2)
 
     @staticmethod
     def _try_get_color_from_skin():
@@ -1049,11 +1052,11 @@ class GlobalVariables(object):
             elif "default" in skin_theme:
                 skin_color = "FF33b5e5"
         elif skin_dir == "skin.aura":
-            skin_color = "ffededed"
+            skin_color = "deepskyblue"
         elif skin_dir == "skin.fuse.neue":
             skin_color = "ffe53564"
         elif skin_dir == "skin.auramod":
-            skin_color = "ffededed"
+            skin_color = "deepskyblue"
 
         result = xbmc.getInfoLabel(
             "Skin.String({})".format("focuscolor.name")  # jurial based skins.
@@ -1222,14 +1225,21 @@ class GlobalVariables(object):
             g.set_runtime_setting("widget_refreshing", True)
             while not self.abort_requested():
                 if xbmcgui.getCurrentWindowId() == 10000:
-                    self.log("TRIGGERING WIDGET REFRESH")
-                    xbmc.executebuiltin('UpdateLibrary(video,widget_refresh,true)')
+                    if not (
+                            self.wait_for_abort(0.2) or  # Short wait to see if anything else kicks off a widget refresh
+                            xbmc.getCondVisibility("Container().isUpdating")  # Check if widgets currently refreshing
+                    ):
+                        self.log("TRIGGERING WIDGET REFRESH")
+                        xbmc.executebuiltin('UpdateLibrary(video,widget_refresh,true)')
+                    else:
+                        self.log("Aborting widget refresh as container on home screen already refreshing", "debug")
                     break
                 elif (
-                        self.wait_for_abort(0.5) or
+                        self.wait_for_abort(0.3) or
                         player.isPlaying() or
                         xbmc.getCondVisibility("Library.IsScanningVideo")
                 ):
+                    self.log("Aborting queued widget refresh as another process will trigger it", "debug")
                     break
         finally:
             del player
@@ -1637,6 +1647,20 @@ class GlobalVariables(object):
         utc = self.UTC_TIMEZONE.localize(utc)
         local_time = utc.astimezone(self.LOCAL_TIMEZONE)
         return local_time.strftime(self.DATE_TIME_FORMAT)
+
+    def open_addon_settings(self, section_offset, setting_offset=None):
+        """
+        Open seren settings at a particular section and setting
+        :param section_offset: Section number starting at 0
+        :type section_offset: int
+        :param setting_offset: Setting number within section, starting at 0.  Note that sep / lsep are counted.
+        :type setting_offset: None|int
+        :return:
+        """
+        xbmc.executebuiltin("Addon.OpenSettings({})".format(self.ADDON_ID))
+        xbmc.executebuiltin("SetFocus({})".format(-(100 - section_offset)))
+        if setting_offset is not None:
+            xbmc.executebuiltin("SetFocus({})".format(-(80 - setting_offset)))
 
 
 g = GlobalVariables()

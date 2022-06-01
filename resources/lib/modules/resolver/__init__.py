@@ -4,6 +4,7 @@ Resolver Module for resolving supplied source information into an object that ca
 """
 from __future__ import absolute_import, division, unicode_literals
 
+import importlib
 import sys
 
 import requests
@@ -49,13 +50,14 @@ class Resolver:
         :return: streamable URL or dictionary of adaptive source information
         """
         stream_link = None
+        release_title = None
 
         for source in sources:
-            stream_link = self.resolve_single_source(source, item_information, pack_select, silent)
+            stream_link, release_title = self.resolve_single_source(source, item_information, pack_select, silent)
             if stream_link:
                 break
 
-        return stream_link
+        return stream_link, release_title
 
     def resolve_single_source(self, source, item_information, pack_select=False, silent=False):
         """
@@ -69,7 +71,7 @@ class Resolver:
         stream_link = None
 
         try:
-            if source["type"] == "Adaptive":
+            if source["type"] == "adaptive":
                 stream_link = source
 
             elif source["type"] == "torrent":
@@ -81,7 +83,7 @@ class Resolver:
                     )
 
                 if not stream_link and self.torrent_resolve_failure_style == 1 and not pack_select and not silent:
-                    if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30519)):
+                    if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30490)):
                         stream_link = self._resolve_debrid_source(
                             self.resolvers[source["debrid_provider"]],
                             source,
@@ -93,18 +95,19 @@ class Resolver:
                 stream_link = self._resolve_hoster_or_cloud(source, item_information)
 
             if stream_link:
-                return stream_link
+                return stream_link, source['release_title']
             else:
                 g.log("Failed to resolve source: {}".format(source), "error")
+                return None, None
         except ResolverFailure as e:
             g.log('Failed to resolve source: {}'.format(e))
 
     @staticmethod
     def _handle_provider_imports_resolving(source):
         provider = source["provider_imports"]
-        provider_module = __import__(
-            "{}.{}".format(provider[0], provider[1]), fromlist=[str("")]
-            )
+        provider_module = importlib.import_module(
+            "{}.{}".format(provider[0], provider[1])
+        )
         if hasattr(provider_module, "source"):
             provider_module = provider_module.source()
 
@@ -235,6 +238,6 @@ class Resolver:
             thread_pool.wait_completion()
         except ValueError:
             g.log_stacktrace()
-            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30513))
+            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30485))
             return hosters
         return hosters

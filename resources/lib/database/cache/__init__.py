@@ -89,7 +89,7 @@ class CacheBase:
         """
 
     @abc.abstractmethod
-    def set(self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)):
+    def set(self, cache_id, data, checksum=None, expiration=None):
         """
         Stores new value in cache location
         :param cache_id: ID of cache to create
@@ -163,8 +163,12 @@ class Cache(CacheBase):
         return result
 
     def set(
-            self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)
+            self, cache_id, data, checksum=None, expiration=None
             ):
+
+        if expiration is None:
+            expiration = datetime.timedelta(hours=24)
+
         checksum = self._get_checksum(checksum)
         if self.enable_mem_cache and not self._exit:
             self._mem_cache.set(cache_id, data, checksum, expiration)
@@ -242,7 +246,10 @@ class DatabaseCache(Database, CacheBase):
             return cache_data["data"]
         return self.NOT_CACHED
 
-    def set(self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)):
+    def set(self, cache_id, data, checksum=None, expiration=None):
+        if expiration is None:
+            expiration = datetime.timedelta(hours=24)
+
         expires = self._get_timestamp(expiration)
         query = "INSERT OR REPLACE INTO {}( id, expires, data, checksum) " \
                 "VALUES (?, ?, ?, ?)".format(self.cache_table_name)
@@ -292,9 +299,10 @@ class MemCache(CacheBase):
                 g.clear_runtime_setting(cache_id)
         return self.NOT_CACHED
 
-    def set(
-            self, cache_id, data, checksum=None, expiration=datetime.timedelta(hours=24)
-            ):
+    def set(self, cache_id, data, checksum=None, expiration=None):
+        if expiration is None:
+            expiration = datetime.timedelta(hours=24)
+
         expires = self._get_timestamp(expiration)
         cached = (expires, data, checksum)
         g.set_runtime_setting(

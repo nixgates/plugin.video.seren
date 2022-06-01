@@ -1,27 +1,37 @@
 <window type="dialog">
-    <defaultcontrol>3000</defaultcontrol>
     <coordinates>
         <left>0</left>
         <top>0</top>
-        <origin x="0" y="0"></origin>
+		<width>1920</width>
+		<height>1080</height>
     </coordinates>
-    <animation effect="fade" time="500">WindowOpen</animation>
-    <animation effect="fade" end="0,576" time="500">WindowClose</animation>
-    <controls>
-        <!-- Background Texture -->
-        <control type="image">
-            <texture>$INFO[Window().Property(texture.white)]</texture>
-            <colordiffuse>FF000000</colordiffuse>
-        </control>
 
-        <!-- Background -->
-        <control type="image">
+	<controls>
+        
+		<!-- Background -->
+        <control type="group">
             <top>0</top>
             <left>0</left>
             <width>1920</width>
             <height>1080</height>
-            <texture background="true">$INFO[Window().Property(seren.fanart)]</texture>
-            <colordiffuse>66FFFFFF</colordiffuse>
+
+            <!-- Fallback -->
+            <control type="image">
+                <texture>white.png</texture>
+                <colordiffuse>FF000000</colordiffuse>
+            </control>
+
+            <!-- Fanart -->
+            <control type="image">    
+                <texture background="true">$INFO[Window().Property(seren.fanart)]</texture>
+                <colordiffuse>66FFFFFF</colordiffuse>
+            </control>
+
+            <!-- Overlay -->
+            <control type="image">
+				<texture background="true">white.png</texture>
+				<colordiffuse>CC000000</colordiffuse>
+			</control>
         </control>
 
         <!--Title-->
@@ -34,333 +44,717 @@
             <font>font37</font>
             <textcolor>white</textcolor>
         </control>
+		
+		<!-- Scrollbar -->
+		<control type="scrollbar" id="1111">
+			<animation effect="fade" time="350" tween="cubic" easing="in" delay="350">WindowOpen</animation>
+			<animation effect="fade" end="0" time="350" tween="cubic" easing="in">WindowClose</animation>
+			<left>10</left>
+			<top>110</top>
+			<width>20</width>
+			<height>890</height>
+			<onright>2000</onright>
+			<showonepage>false</showonepage>
+			<texturesliderbackground colordiffuse="99362e33">white.png</texturesliderbackground>
+			<texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
+			<texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
+		</control>
 
-        <!-- Settings List -->
-        <control type="image">
-            <top>113</top>
-            <left>40</left>
-            <width>700</width>
-            <height>890</height>
-            <texture>$INFO[Window().Property(texture.white)]</texture>
-            <colordiffuse>FF362e33</colordiffuse>
-        </control>
-        <control type="label">
-            <top>123</top>
-            <left>60</left>
-            <label>$ADDON[plugin.video.seren 30503]</label>
-            <visible>!String.IsEqual(Window().Property(hassettings),true)</visible>
-        </control>
-        <control type="list" id="1000">
-            <viewtype label="Sources">list</viewtype>
-            <onright>2000</onright>
-            <left>40</left>
-            <top>113</top>
-            <width>700</width>
-            <height>890</height>
-            <orientation>vertical</orientation>
-            <focusposition>1</focusposition>
-            <itemlayout height="60">
-                <control type="image">
-                    <top>15</top>
-                    <width>100%</width>
-                    <height>100%</height>
-                    <texture>$INFO[Window().Property(texture.white)]</texture>
-                    <colordiffuse>22000000</colordiffuse>
-                </control>
-                <control type="label">
-                    <top>15</top>
-                    <left>10</left>
-                    <width>1400</width>
-                    <height>50</height>
-                    <font>font_tiny</font>
-                    <textcolor>66FFFFFF</textcolor>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
-                </control>
-                <control type="label">
-                    <top>20</top>
-                    <right>10</right>
-                    <width>350</width>
-                    <height>50</height>
-                    <font>font_tiny</font>
-                    <textcolor>66FFFFFF</textcolor>
-                    <align>left</align>
-                    <label>[COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(value)][/COLOR]
-                    </label>
-                </control>
-            </itemlayout>
+		<!-- Providers -->
+		<control type="list" id="2000">
+			<animation effect="slide" start="-1400,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
+			<animation effect="slide" end="-1400,0" time="350" tween="cubic" easing="in">WindowClose</animation>
+			<viewtype label="Providers">list</viewtype>
+			<onright>1000</onright>
+			<onleft>1111</onleft>
+			<width>1340</width>
+			<left>40</left>
+			<height>900</height>
+			<top>100</top>
+			<itemgap>20</itemgap>
+			<orientation>vertical</orientation>
+			<pagecontrol>1111</pagecontrol>
+			
+			<itemlayout height="160" condition="String.IsEqual(Window().Property(hassettings),true)">
+				<control type="group">
+					<width>660</width>
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<texture>white.png</texture>
+						<colordiffuse>99362e33</colordiffuse>
+					</control>
+					
+					<!-- Provider Name -->
+					<control type="label">
+						<top>30</top>
+						<left>20</left>
+						<width>640</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+					</control>
+					
+					<!-- Provider Status -->
+					<control type="group">
+						<top>70</top>
+						<left>20</left>
+						
+						<!-- Enabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>66FFFFFF</textcolor>
+							<align>left</align>
+							<visible>String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR green]$INFO[ListItem.Property(status)][/UPPERCASE][/COLOR]</label>
+						</control>
+						
+						<!-- Disabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>66FFFFFF</textcolor>
+							<align>left</align>
+							<visible>!String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR indianred]$INFO[ListItem.Property(status)][/UPPERCASE][/COLOR]</label>
+						</control>
+					</control>
+					
+					<!-- Provider Type -->
+					<control type="label">
+						<top>110</top>
+						<left>20</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<label>[UPPERCASE]$ADDON[plugin.video.seren 30622]: $INFO[ListItem.Property(provider_type)][/UPPERCASE]</label>
+					</control>
+				</control>
+			</itemlayout>
+			
+			<itemlayout height="160" condition="!String.IsEqual(Window().Property(hassettings),true)">
+				<control type="group">
+					<width>1200</width>
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<texture>white.png</texture>
+						<colordiffuse>99362e33</colordiffuse>
+					</control>
+					
+					<!-- Provider Name -->
+					<control type="label">
+						<top>30</top>
+						<left>20</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+					</control>
+					
+					<!-- Provider Status -->
+					<control type="group">
+						<top>70</top>
+						<left>20</left>
+						
+						<!-- Enabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>66FFFFFF</textcolor>
+							<align>left</align>
+							<visible>String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR green]$INFO[ListItem.Property(status)][/UPPERCASE][/COLOR]</label>
+						</control>
+						
+						<!-- Disabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>66FFFFFF</textcolor>
+							<align>left</align>
+							<visible>!String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR indianred]$INFO[ListItem.Property(status)][/UPPERCASE][/COLOR]</label>
+						</control>
+					</control>
+					
+					<!-- Provider Type -->
+					<control type="label">
+						<top>110</top>
+						<left>20</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<label>[UPPERCASE]$ADDON[plugin.video.seren 30622]: $INFO[ListItem.Property(provider_type)][/UPPERCASE]</label>
+					</control>
+				</control>
+			</itemlayout>
+			
+			<focusedlayout height="160" condition="!Control.HasFocus(2000) + !String.IsEqual(Window().Property(hassettings),true)">
+				<control type="group">
+					<width>1200</width>
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<texture>white.png</texture>
+						<colordiffuse>99362e33</colordiffuse>
+					</control>
+					
+					<!-- Provider Name -->
+					<control type="label">
+						<top>30</top>
+						<left>20</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+					</control>
+					
+					<!-- Provider Status -->
+					<control type="group">
+						<top>70</top>
+						<left>20</left>
+						
+						<!-- Enabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>66FFFFFF</textcolor>
+							<align>left</align>
+							<visible>String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR green]$INFO[ListItem.Property(status)][/UPPERCASE][/COLOR]</label>
+						</control>
+						
+						<!-- Disabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>66FFFFFF</textcolor>
+							<align>left</align>
+							<visible>!String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR indianred]$INFO[ListItem.Property(status)][/UPPERCASE][/COLOR]</label>
+						</control>
+					</control>
+					
+					<!-- Provider Type -->
+					<control type="label">
+						<top>110</top>
+						<left>20</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<label>[UPPERCASE]$ADDON[plugin.video.seren 30622]: $INFO[ListItem.Property(provider_type)][/UPPERCASE]</label>
+					</control>
+				</control>
+			</focusedlayout>
 
-            <focusedlayout height="60">
-                <control type="image">
-                    <top>15</top>
-                    <width>100%</width>
-                    <height>90%</height>
-                    <texture>$INFO[Window().Property(texture.white)]</texture>
-                    <colordiffuse>FFFFFFFF</colordiffuse>
-                </control>
-                <control type="label">
-                    <top>15</top>
-                    <left>10</left>
-                    <width>1400</width>
-                    <height>50</height>
-                    <font>font_tiny</font>
-                    <textcolor>FF000000</textcolor>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
-                </control>
-                <control type="label">
-                    <top>20</top>
-                    <right>10</right>
-                    <width>350</width>
-                    <height>50</height>
-                    <font>font_tiny</font>
-                    <textcolor>FF000000</textcolor>
-                    <align>left</align>
-                    <label>[COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(value)][/COLOR]
-                    </label>
-                </control>
-            </focusedlayout>
-        </control>
+			<focusedlayout height="270" condition="Control.HasFocus(2000) + !String.IsEqual(Window().Property(hassettings),true)">
+				<control type="group">
+					<width>1340</width>
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<height>260</height>
+						<texture>white.png</texture>
+						<colordiffuse>FF362e33</colordiffuse>
+					</control>
+					
+					<!-- Source Icon -->
+					<control type="group">
+						<top>40</top>
+						<width>200</width>
+						<height>200</height>                        
+						
+						<!-- Seren Peacock -->
+						<control type="image">
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[Window().Property(seren.logo)]</texture>
+							<visible>String.IsEmpty(ListItem.Property(provider.image))</visible>
+						</control>
+						
+						<!-- Provider Icon -->
+						<control type="image">
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[ListItem.Property(provider.image)]</texture>
+							<visible>!String.IsEmpty(ListItem.Property(provider.image))</visible>
+						</control>
+					</control>
+					
+					<!-- Provider Name -->
+					<control type="label">
+						<top>40</top>
+						<left>210</left>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<align>left</align>
+						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
+					</control>
+					
+					<!-- Provider Status -->
+					<control type="group">
+						<top>80</top>
+						<left>210</left>
+					
+						<!-- Enabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<align>left</align>
+							<visible>!String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR indianred]$INFO[ListItem.Property(status)][/UPPERCASE][/B][/COLOR]</label>
+						</control>
+						
+						<!-- Disabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<align>left</align>
+							<visible>String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR green]$INFO[ListItem.Property(status)][/UPPERCASE][/B][/COLOR]</label>
+						</control>
+					</control>
+					
+					<!-- Provider Type -->
+					<control type="label">
+						<top>120</top>
+						<left>210</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<align>left</align>
+						<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30622]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(provider_type)][/COLOR][/UPPERCASE][/B]</label>
+					</control>
+					
+					<!-- Info -->
+					<control type="label">
+						<top>220</top>
+						<right>20</right>
+						<font>font12</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<align>right</align>
+						<label>$INFO[ListItem.Property(info)]</label>
+					</control>
+				</control>
+			</focusedlayout>
+			
+			<focusedlayout height="160" condition="!Control.HasFocus(2000) + String.IsEqual(Window().Property(hassettings),true)">
+				<control type="group">
+					<width>660</width>
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<texture>white.png</texture>
+						<colordiffuse>99362e33</colordiffuse>
+					</control>
+					
+					<!-- Provider Name -->
+					<control type="label">
+						<top>30</top>
+						<left>20</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+					</control>
+					
+					<!-- Provider Status -->
+					<control type="group">
+						<top>70</top>
+						<left>20</left>
+						
+						<!-- Enabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>66FFFFFF</textcolor>
+							<align>left</align>
+							<visible>String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR green]$INFO[ListItem.Property(status)][/UPPERCASE][/COLOR]</label>
+						</control>
+						
+						<!-- Disabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>66FFFFFF</textcolor>
+							<align>left</align>
+							<visible>!String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR indianred]$INFO[ListItem.Property(status)][/UPPERCASE][/COLOR]</label>
+						</control>
+					</control>
+					
+					<!-- Provider Type -->
+					<control type="label">
+						<top>110</top>
+						<left>20</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<label>[UPPERCASE]$ADDON[plugin.video.seren 30622]: $INFO[ListItem.Property(provider_type)][/UPPERCASE]</label>
+					</control>
+				</control>
+			</focusedlayout>
 
-        <!-- Provider List -->
+			<focusedlayout height="270" condition="Control.HasFocus(2000) + String.IsEqual(Window().Property(hassettings),true)">
+				<control type="group">
+					<width>660</width>
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<height>260</height>
+						<texture>white.png</texture>
+						<colordiffuse>FF362e33</colordiffuse>
+					</control>
+					
+					<!-- Source Icon -->
+					<control type="group">
+						<top>40</top>
+						<width>200</width>
+						<height>200</height>                        
+						
+						<!-- Seren Peacock -->
+						<control type="image">
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[Window().Property(seren.logo)]</texture>
+							<visible>String.IsEmpty(ListItem.Property(provider.image))</visible>
+						</control>
+						
+						<!-- Provider Icon -->
+						<control type="image">
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[ListItem.Property(provider.image)]</texture>
+							<visible>!String.IsEmpty(ListItem.Property(provider.image))</visible>
+						</control>
+					</control>
+					
+					<!-- Provider Name -->
+					<control type="label">
+						<top>40</top>
+						<left>210</left>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<align>left</align>
+						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
+					</control>
+					
+					<!-- Provider Status -->
+					<control type="group">
+						<top>80</top>
+						<left>210</left>
+					
+						<!-- Enabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<align>left</align>
+							<visible>!String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR indianred]$INFO[ListItem.Property(status)][/UPPERCASE][/B][/COLOR]</label>
+						</control>
+						
+						<!-- Disabled -->
+						<control type="label">
+							<height>20</height>
+							<font>font12</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<align>left</align>
+							<visible>String.IsEqual(ListItem.Property(status),Enabled)</visible>
+							<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30568]: [COLOR green]$INFO[ListItem.Property(status)][/UPPERCASE][/B][/COLOR]</label>
+						</control>
+					</control>
+					
+					<!-- Provider Type -->
+					<control type="label">
+						<top>120</top>
+						<left>210</left>
+						<width>1100</width>
+						<height>20</height>
+						<font>font12</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<align>left</align>
+						<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30622]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(provider_type)][/COLOR][/UPPERCASE][/B]</label>
+					</control>
+					
+					<!-- Info -->
+					<control type="label">
+						<top>220</top>
+						<right>20</right>
+						<font>font12</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<align>right</align>
+						<label>$INFO[ListItem.Property(info)]</label>
+					</control>
+				</control>
+			</focusedlayout>
+		</control>
+		
+		<!-- Settings -->
+		<control type="group">
+			<width>660</width>
+			<left>720</left>
+			<height>890</height>
+			<top>110</top>
+			<animation effect="slide" start="0,1200" time="350" tween="cubic" easing="in" condition="String.IsEqual(Window().Property(hassettings),true)">Conditional</animation>
+			<animation effect="slide" end="0,1200" time="350" tween="cubic" easing="in" condition="!String.IsEqual(Window().Property(hassettings),true)">Conditional</animation>
+			
+			<!-- Card -->
+			<control type="image">
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+			
+			<control type="list" id="1000">
+				<viewtype label="Settings">list</viewtype>
+				<onleft>2000</onleft>
+				<onright>3000</onright>
+				<left>20</left>
+				<top>10</top>
+				<width>610</width>
+				<orientation>vertical</orientation>
+				<focusposition>1</focusposition>
+				<visible>String.IsEqual(Window().Property(hassettings),true)</visible>
+				
+				<!-- Unfocused Setting -->
+				<itemlayout height="60">
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<texture>white.png</texture>
+						<colordiffuse>22000000</colordiffuse>
+					</control>
+					
+					<!-- Setting -->
+					<control type="label">
+						<top>10</top>
+						<left>10</left>
+						<width>350</width>
+						<height>50</height>
+						<font>font_tiny</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<aligny>center</aligny>
+						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
+					</control>
+					
+					<!-- Value -->
+					<control type="label">
+						<top>10</top>
+						<right>10</right>
+						<width>350</width>
+						<height>50</height>
+						<font>font_tiny</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<label>[COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(value)][/COLOR]</label>
+					</control>
+				</itemlayout>
+				
+				<!-- Unfocused Setting -->
+				<focusedlayout height="60" condition="!Control.HasFocus(1000)">
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<texture>white.png</texture>
+						<colordiffuse>22000000</colordiffuse>
+					</control>
+					
+					<!-- Setting -->
+					<control type="label">
+						<top>10</top>
+						<left>10</left>
+						<width>350</width>
+						<height>50</height>
+						<font>font_tiny</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>left</align>
+						<aligny>center</aligny>
+						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
+					</control>
+					
+					<!-- Value -->
+					<control type="label">
+						<top>10</top>
+						<right>10</right>
+						<width>350</width>
+						<height>50</height>
+						<font>font_tiny</font>
+						<textcolor>66FFFFFF</textcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<label>[COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(value)][/COLOR]</label>
+					</control>
+				</focusedlayout>
 
-        <control type="list" id="2000">
-            <viewtype label="Sources">list</viewtype>
-            <onright>3000</onright>
-            <onleft>1000</onleft>
-            <left>790</left>
-            <top>113</top>
-            <width>650</width>
-            <height>890</height>
-            <itemgap>20</itemgap>
-            <orientation>vertical</orientation>
-            <focusposition>1</focusposition>
-            <itemlayout height="146">
-                <control type="group">
-                    <width>1200</width>
-                    <left>0</left>
-                    <control type="image">
-                        <left>0</left>
-                        <width>100%</width>
-                        <height>136</height>
-                        <texture>white.png</texture>
-                        <colordiffuse>99362e33</colordiffuse>
-                    </control>
-                    <control type="label">
-                        <top>20</top>
-                        <left>25</left>
-                        <width>800</width>
-                        <height>200</height>
-                        <font>font10</font>
-                        <textcolor>66FFFFFF</textcolor>
-                        <align>left</align>
-                        <aligny>top</aligny>
-                        <label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
-                    </control>
-                    <control type="label">
-                        <top>75</top>
-                        <left>25</left>
-                        <width>800</width>
-                        <height>200</height>
-                        <font>font10</font>
-                        <textcolor>66FFFFFF</textcolor>
-                        <align>left</align>
-                        <aligny>top</aligny>
-                        <visible>String.IsEqual(ListItem.Property(status),Enabled)</visible>
-                        <label>$ADDON[plugin.video.seren 30594]: [COLOR green][B][UPPERCASE]$INFO[ListItem.Property(status)][/UPPERCASE][/B][/COLOR]</label>
-                    </control>
-                    <control type="label">
-                        <top>75</top>
-                        <left>25</left>
-                        <width>800</width>
-                        <height>200</height>
-                        <font>font10</font>
-                        <textcolor>66FFFFFF</textcolor>
-                        <align>left</align>
-                        <aligny>top</aligny>
-                        <visible>!String.IsEqual(ListItem.Property(status),Enabled)</visible>
-                        <label>$ADDON[plugin.video.seren 30594]: [COLOR indianred][B][UPPERCASE]$INFO[ListItem.Property(status)][/UPPERCASE][/B][/COLOR]</label>
-                    </control>
-                    <control type="image">
-                            <left>0</left>
-                            <width>100%</width>
-                            <height>136</height>
-                            <texture>white.png</texture>
-                            <colordiffuse>55000000</colordiffuse>
-                    </control>
-                </control>
-            </itemlayout>
+				<!-- Focused Setting -->
+				<focusedlayout height="60" condition="Control.HasFocus(1000)">
+					
+					<!-- Card -->
+					<control type="image">
+						<top>10</top>
+						<texture>white.png</texture>
+						<colordiffuse>Window().Property(settings.color)</colordiffuse>
+					</control>
+					
+					<!-- Setting -->
+					<control type="label">
+						<top>10</top>
+						<left>10</left>
+						<width>350</width>
+						<height>50</height>
+						<font>font_tiny</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<align>left</align>
+						<aligny>center</aligny>
+						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
+					</control>
+					
+					<!-- Value -->
+					<control type="label">
+						<top>10</top>
+						<right>10</right>
+						<width>350</width>
+						<height>50</height>
+						<font>font_tiny</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<align>right</align>
+						<aligny>center</aligny>
+						<label>$INFO[ListItem.Property(value)]</label>
+					</control>
+				</focusedlayout>
+			</control>	
+		</control>
 
-            <focusedlayout height="320">
-                <control type="group">
-                    <control type="image">
-                        <left>0</left>
-                        <top>10</top>
-                        <width>100%</width>
-                        <height>290</height>
-                        <texture>white.png</texture>
-                        <colordiffuse>FF362e33</colordiffuse>
-                    </control>
-                    <control type="image">
-                        <visible>!String.IsEmpty(ListItem.Property(provider.image))</visible>
-                        <texture>$INFO[ListItem.Property(provider.image)]</texture>
-                    </control>
-                    <control type="image">
-                        <top>50</top>
-                        <left>10</left>
-                        <width>200</width>
-                        <height>200</height>
-                        <aspectratio>keep</aspectratio>
-                        <texture>$INFO[Window().Property(seren.logo)]</texture>
-                    </control>
-                    <control type="label">
-                        <top>75</top>
-                        <left>210</left>
-                        <width>800</width>
-                        <height>50</height>
-                        <font>font45</font>
-                        <textcolor>FFFFFFFF</textcolor>
-                        <align>left</align>
-                        <aligny>center</aligny>
-                        <label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
-                    </control>
-                    <control type="label">
-                        <top>125</top>
-                        <left>210</left>
-                        <width>800</width>
-                        <height>200</height>
-                        <font>font10</font>
-                        <textcolor>66FFFFFF</textcolor>
-                        <align>left</align>
-                        <aligny>top</aligny>
-                        <wrapmultiline>true</wrapmultiline>
-                        <visible>!String.IsEqual(ListItem.Property(status),Enabled)</visible>
-                        <label>$ADDON[plugin.video.seren 30594]: [COLOR indianred][B][UPPERCASE]$INFO[ListItem.Property(status)][/UPPERCASE][/B][/COLOR]</label>
-                    </control>
-                    <control type="label">
-                        <top>125</top>
-                        <left>210</left>
-                        <width>800</width>
-                        <height>200</height>
-                        <font>font10</font>
-                        <textcolor>66FFFFFF</textcolor>
-                        <align>left</align>
-                        <aligny>top</aligny>
-                        <wrapmultiline>true</wrapmultiline>
-                        <visible>String.IsEqual(ListItem.Property(status),Enabled)</visible>
-                        <label>$ADDON[plugin.video.seren 30594]: [COLOR green][B][UPPERCASE]$INFO[ListItem.Property(status)][/UPPERCASE][/B][/COLOR]</label>
-                    </control>
-                    <control type="label">
-                        <top>160</top>
-                        <left>210</left>
-                        <width>800</width>
-                        <height>200</height>
-                        <font>font10</font>
-                        <textcolor>66FFFFFF</textcolor>
-                        <align>left</align>
-                        <aligny>top</aligny>
-                        <wrapmultiline>true</wrapmultiline>
-                        <label>$INFO[ListItem.Property(info)]</label>
-                    </control>
-                </control>
-            </focusedlayout>
-        </control>
-
-        <!-- Side Info -->
+		<!-- Buttons -->
         <control type="group">
-            <top>120</top>
-            <right>27</right>
-            <width>400</width>
+			<animation effect="slide" start="600,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
+			<animation effect="slide" end="600,0" time="350" tween="cubic" easing="in">WindowClose</animation>
+            <top>110</top>
+            <right>20</right>
+            <width>500</width>
+			
             <control type="group">
-                <top>0</top>
-                <height>700</height>
+                <height>670</height>
+				
+				<!-- Card -->
                 <control type="image">
-                    <width>400</width>
-                    <height>660</height>
                     <texture>white.png</texture>
                     <colordiffuse>99362e33</colordiffuse>
                 </control>
+				
                 <control type="grouplist" id="3000">
-                    <top>20</top>
-                    <onleft>2000</onleft>
-                    <height>100%</height>
-                    <width>100%</width>
+                    <top>25</top>
+                    <onleft>1000</onleft>
                     <itemgap>10</itemgap>
-                    <control type="button" id="3001">
-                        <width>100%</width>
+					
+					<!-- Enable All Hosters -->
+					<control type="button" id="3001">
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30255]</label>
+                        <label>$ADDON[plugin.video.seren 30242]</label>
                         <align>right</align>
-                        <textcolor>white</textcolor>
+                        <textcolor>FFFFFFFF</textcolor>
                     </control>
+					
+					<!-- Enable All Torrents -->
                     <control type="button" id="3002">
-                        <width>100%</width>
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30256]</label>
+                        <label>$ADDON[plugin.video.seren 30243]</label>
                         <align>right</align>
-                        <textcolor>white</textcolor>
+                        <textcolor>FFFFFFFF</textcolor>
                      </control>
+					 
+					<!-- Disable All Hosters -->
                     <control type="button" id="3003">
-                        <width>100%</width>
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30257]</label>
+                        <label>$ADDON[plugin.video.seren 30244]</label>
                         <align>right</align>
-                        <textcolor>white</textcolor>
+                        <textcolor>FFFFFFFF</textcolor>
                      </control>
+					 
+					<!-- Disable All Torrents -->
                     <control type="button" id="3004">
-                        <width>100%</width>
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30258]</label>
+                        <label>$ADDON[plugin.video.seren 30245]</label>
                         <align>right</align>
-                        <textcolor>white</textcolor>
-                     </control>
+                        <textcolor>FFFFFFFF</textcolor>
+                    </control>
+					
+					<!-- Enable All -->
                     <control type="button" id="3005">
-                        <width>100%</width>
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30259]</label>
+                        <label>$ADDON[plugin.video.seren 30246]</label>
                         <align>right</align>
-                        <textcolor>white</textcolor>
-                     </control>
-                    <control type="button" id="3006">
-                        <width>100%</width>
+                        <textcolor>FFFFFFFF</textcolor>
+                    </control>
+					
+					<!-- Disable All -->
+					<control type="button" id="3006">
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30260]</label>
+                        <label>$ADDON[plugin.video.seren 30247]</label>
                         <align>right</align>
-                        <textcolor>white</textcolor>
-                     </control>
-                    <control type="button" id="2001">
-                        <width>100%</width>
+                        <textcolor>FFFFFFFF</textcolor>
+                    </control>
+					
+					<!-- Close -->
+                    <control type="button" id="2999">
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
                         <texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
                         <texturenofocus colordiffuse="22000000">white.png</texturenofocus>
-                        <label>$ADDON[plugin.video.seren 30483]</label>
+                        <label>$ADDON[plugin.video.seren 30623]</label>
                         <align>right</align>
-                        <textcolor>white</textcolor>
+                        <textcolor>FFFFFFFF</textcolor>
                      </control>
                 </control>
             </control>
-
         </control>
     </controls>
 </window>

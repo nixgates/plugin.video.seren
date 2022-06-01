@@ -103,11 +103,13 @@ def dispatch(params):
         from resources.lib.indexers import trakt
 
         trakt.TraktAPI().auth()
+        g.open_addon_settings(3, 6)
 
     elif action == "revokeTrakt":
         from resources.lib.indexers import trakt
 
         trakt.TraktAPI().revoke_auth()
+        g.open_addon_settings(3, 5)
 
     elif action == "getSources":
         from resources.lib.modules.smartPlay import SmartPlay
@@ -125,8 +127,8 @@ def dispatch(params):
                 xbmcgui.Dialog().ok(
                     g.ADDON_NAME,
                     tools.create_multiline_message(
-                        line1=g.get_language_string(30199),
-                        line2=g.get_language_string(30200),
+                        line1=g.get_language_string(30186),
+                        line2=g.get_language_string(30187),
                     ),
                 )
                 return None
@@ -143,13 +145,25 @@ def dispatch(params):
                 resume, force_resume_off, force_resume_on, force_resume_check
             )
             background = helpers.show_persistent_window_if_required(item_information)
-            sources = helpers.SourcesHelper().get_sources(
-                action_args, overwrite_cache=overwrite_cache
-            )
+            # Clear out last resolved title for a show if we are doing a rescrape
+            if overwrite_cache and item_information['info']['mediatype'] == g.MEDIA_EPISODE:
+                g.clear_runtime_setting(
+                    "last_resolved_release_title.{}".format(item_information['info']['trakt_show_id'])
+                )
 
+            # Get Sources
+            sources_helper = helpers.SourcesHelper()
+            uncached, sources_list, ii = sources_helper.get_sources(action_args, overwrite_cache=overwrite_cache)
+            if background:
+                background.set_process_started()
+
+            # Sort sources
+            sources = sources_helper.sort_sources(ii, sources_list)
             if sources is None:
                 return
-            if item_information["info"]["mediatype"] == "episode":
+
+            # Select and resolve source
+            if item_information['info']['mediatype'] == g.MEDIA_EPISODE:
                 source_select_style = "Episodes"
             else:
                 source_select_style = "Movie"
@@ -161,17 +175,18 @@ def dispatch(params):
             ):
 
                 if background:
-                    background.set_text(g.get_language_string(30191))
+                    background.set_text(g.get_language_string(30178))
                 from resources.lib.modules import sourceSelect
 
+                xbmc.sleep(750)
                 stream_link = sourceSelect.source_select(
-                    sources[0], sources[1], item_information
+                    uncached, sources, item_information
                 )
             else:
                 if background:
                     background.set_text(g.get_language_string(30031))
                 stream_link = helpers.Resolverhelper().resolve_silent_or_visible(
-                    sources[1], sources[2], pack_select
+                    sources, ii, pack_select, overwrite_cache=overwrite_cache
                 )
                 if stream_link is None:
                     g.close_busy_dialog()
@@ -182,19 +197,23 @@ def dispatch(params):
             g.show_busy_dialog()
 
             if background:
-                background.close()
-                del background
+                try:
+                    background.close()
+                finally:
+                    del background
 
             if not stream_link:
                 raise NoPlayableSourcesException
 
             from resources.lib.modules import player
 
-            seren_player = player.SerenPlayer()
-            seren_player.play_source(
-                stream_link, item_information, resume_time=resume_time
-            )
-            del seren_player
+            try:
+                seren_player = player.SerenPlayer()
+                seren_player.play_source(
+                    stream_link, item_information, resume_time=resume_time
+                )
+            finally:
+                del seren_player
 
         except NoPlayableSourcesException:
             try:
@@ -220,12 +239,19 @@ def dispatch(params):
 
             item_information = tools.get_item_information(action_args)
 
-            if item_information["info"]["mediatype"] == "episode":
+            # Get Sources
+            sources_helper = helpers.SourcesHelper()
+            uncached, sources_list, ii = sources_helper.get_sources(action_args)
+
+            # Sort sources
+            sources = sources_helper.sort_sources(ii, sources_list)
+            if sources is None:
+                return
+
+            if item_information["info"]["mediatype"] == g.MEDIA_EPISODE:
                 source_select_style = "Episodes"
             else:
                 source_select_style = "Movie"
-
-            sources = helpers.SourcesHelper().get_sources(action_args)
             if (
                 g.get_int_setting("general.playstyle{}".format(source_select_style))
                 == 0
@@ -234,7 +260,7 @@ def dispatch(params):
                 from resources.lib.modules import resolver
 
                 helpers.Resolverhelper().resolve_silent_or_visible(
-                    sources[1], sources[2], pack_select
+                    sources, ii, pack_select
                 )
         finally:
             g.set_runtime_setting("tempSilent", False)
@@ -245,6 +271,7 @@ def dispatch(params):
         from resources.lib.debrid import real_debrid
 
         real_debrid.RealDebrid().auth()
+        g.open_addon_settings(3, 27)
 
     elif action == "showsHome":
         from resources.lib.gui import tvshowMenus
@@ -337,10 +364,10 @@ def dispatch(params):
         g.clear_cache()
 
     elif action == "traktManager":
-        from resources.lib.indexers import trakt
+        from resources.lib.gui.trakt_context_menu import TraktContextMenu
         from resources.lib.common import tools
 
-        trakt.TraktManager(tools.get_item_information(action_args))
+        TraktContextMenu(tools.get_item_information(action_args))
 
     elif action == "onDeckShows":
         from resources.lib.gui import tvshowMenus
@@ -385,7 +412,7 @@ def dispatch(params):
     elif action == "resetSilent":
         g.set_runtime_setting("tempSilent", False)
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30319)),
+            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30302)),
             g.get_language_string(30033),
             time=5000,
         )
@@ -493,7 +520,11 @@ def dispatch(params):
         )
 
         ProviderInstallManager().manual_update()
+    elif action == "removeSearchHistory":
+        from resources.lib.database.searchHistory import SearchHistory
 
+        SearchHistory().remove_search_history(mediatype, endpoint)
+        g.container_refresh()
     elif action == "clearSearchHistory":
         from resources.lib.database.searchHistory import SearchHistory
 
@@ -505,7 +536,7 @@ def dispatch(params):
         )
 
         confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30178)
+            g.ADDON_NAME, g.get_language_string(30166)
         )
         if confirmation == 0:
             return
@@ -517,7 +548,7 @@ def dispatch(params):
         )
 
         confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30180).format(url)
+            g.ADDON_NAME, g.get_language_string(30168).format(url)
         )
         if confirmation == 0:
             return
@@ -585,6 +616,12 @@ def dispatch(params):
 
         TraktSyncDatabase().re_build_database()
 
+    elif action == "cleanOrphanedMetadata":
+        from resources.lib.database.trakt_sync import TraktSyncDatabase
+
+        trakt_db = TraktSyncDatabase()
+        trakt_db.clean_orphaned_metadata()
+
     elif action == "myUpcomingEpisodes":
         from resources.lib.gui import tvshowMenus
 
@@ -642,11 +679,13 @@ def dispatch(params):
         from resources.lib.gui.windows.provider_packages import ProviderPackages
         from resources.lib.database.skinManager import SkinManager
 
-        window = ProviderPackages(
-            *SkinManager().confirm_skin_path("provider_packages.xml")
-        )
-        window.doModal()
-        del window
+        try:
+            window = ProviderPackages(
+                *SkinManager().confirm_skin_path("provider_packages.xml")
+            )
+            window.doModal()
+        finally:
+            del window
 
     elif action == "flatEpisodes":
         from resources.lib.gui.tvshowMenus import Menus
@@ -664,6 +703,7 @@ def dispatch(params):
         from resources.lib.debrid.all_debrid import AllDebrid
 
         AllDebrid().auth()
+        g.open_addon_settings(3, 36)
 
     elif action == "checkSkinUpdates":
         from resources.lib.database.skinManager import SkinManager
@@ -674,6 +714,7 @@ def dispatch(params):
         from resources.lib.debrid.premiumize import Premiumize
 
         Premiumize().auth()
+        g.open_addon_settings(3, 13)
 
     elif action == "testWindows":
         from resources.lib.gui.homeMenu import Menus
@@ -690,6 +731,11 @@ def dispatch(params):
 
         mock_windows.mock_still_watching()
 
+    elif action == "testGetSourcesWindow":
+        from resources.lib.gui import mock_windows
+
+        mock_windows.mock_get_sources()
+
     elif action == "testResolverWindow":
         from resources.lib.gui import mock_windows
 
@@ -704,6 +750,11 @@ def dispatch(params):
         from resources.lib.gui import mock_windows
 
         mock_windows.mock_cache_assist()
+
+    elif action == "testDownloadManagerWindow":
+        from resources.lib.gui import mock_windows
+
+        mock_windows.mock_download_manager()
 
     elif action == "showsPopularRecent":
         from resources.lib.gui.tvshowMenus import Menus
@@ -734,11 +785,13 @@ def dispatch(params):
         from resources.lib.gui.windows.download_manager import DownloadManager
         from resources.lib.database.skinManager import SkinManager
 
-        window = DownloadManager(
-            *SkinManager().confirm_skin_path("download_manager.xml")
-        )
-        window.doModal()
-        del window
+        try:
+            window = DownloadManager(
+                *SkinManager().confirm_skin_path("download_manager.xml")
+            )
+            window.doModal()
+        finally:
+            del window
 
     elif action == "longLifeServiceManager":
         from resources.lib.modules.providers.service_manager import (
@@ -758,8 +811,11 @@ def dispatch(params):
 
     elif action == "runMaintenance":
         from resources.lib.common.maintenance import run_maintenance
-
         run_maintenance()
+
+    elif action == "torrentCacheCleanup":
+        from resources.lib.database import torrentCache
+        torrentCache.TorrentCache().do_cleanup()
 
     elif action == "chooseTimeZone":
         from resources.lib.modules.manual_timezone import choose_timezone
@@ -776,3 +832,12 @@ def dispatch(params):
 
     elif action == "updateLocalTimezone":
         g.init_local_timezone()
+
+    elif action == "chooseFilters":
+        import resources.lib.gui.windows.filter_select as filter_select
+
+        try:
+            window = filter_select.FilterSelect("filter_select.xml", g.ADDON_PATH)
+            window.doModal()
+        finally:
+            del window

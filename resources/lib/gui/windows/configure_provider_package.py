@@ -20,19 +20,22 @@ class PackageConfiguration(BaseWindow):
 
         self.package_name = package_name
         self.settings = []
-        self.update_settings()
         self.provider_list = None
         self.settings_list = None
 
     def onInit(self):
-        g.close_busy_dialog()
-
-        self.setProperty("package.name", self.package_name)
         self.settings_list = self.getControlList(1000)
         self.provider_list = self.getControlList(2000)
-        self._populate_settings()
+
+        self.update_settings()
         self.fill_providers()
-        self.setProperty("hassettings", "true" if self.settings_list.size() > 0 else "false")
+        self.setProperty("package.name", self.package_name)
+        self.setProperty(
+            "hassettings", "true" if self.settings_list.size() > 0 else "false"
+        )
+
+        self.set_default_focus(self.provider_list, 2999, control_list_reset=True)
+        super(PackageConfiguration, self).onInit()
 
     def refresh_data(self):
         self.providers_class.poll_database()
@@ -90,6 +93,7 @@ class PackageConfiguration(BaseWindow):
                 self.manager.get_all_visible_package_settings(self.package_name)
             )
         ]
+        self._populate_settings()
 
     def flip_provider_status(self):
         provider_item = self.provider_list.getSelectedItem()
@@ -101,9 +105,8 @@ class PackageConfiguration(BaseWindow):
         self.providers = self.providerCache.get_providers()
 
     def flip_mutliple_providers(self, status, provider_type=None):
-
         g.show_busy_dialog()
-        providers = self.providers
+        providers = [i for i in self.providers if i["package"] == self.package_name]
 
         if provider_type:
             providers = [i for i in providers if i["provider_type"] == provider_type]
@@ -116,10 +119,8 @@ class PackageConfiguration(BaseWindow):
         self.providers = self.providerCache.get_providers()
         self.fill_providers()
 
+        self.set_default_focus(self.provider_list, 3000)
         g.close_busy_dialog()
-
-    def onClick(self, control_id):
-        self.handle_action(7, control_id)
 
     def handle_action(self, action, control_id=None):
         if action == 7:
@@ -128,22 +129,20 @@ class PackageConfiguration(BaseWindow):
                 self._edit_setting(self.settings[position])
             elif control_id == 2000:
                 self.flip_provider_status()
-            elif control_id == 2001:
+            elif control_id == 2999:
                 self.close()
-            elif control_id == 3001:
-                self.flip_mutliple_providers("enabled", provider_type="hosters")
-            elif control_id == 3002:
-                self.flip_mutliple_providers("enabled", provider_type="torrent")
-            elif control_id == 3003:
-                self.flip_mutliple_providers("disabled", provider_type="hosters")
-            elif control_id == 3004:
-                self.flip_mutliple_providers("disabled", provider_type="torrent")
-            elif control_id == 3005:
-                self.flip_mutliple_providers("enabled")
-            elif control_id == 3006:
-                self.flip_mutliple_providers("disabled")
-        else:
-            super(PackageConfiguration, self).handle_action(action, control_id)
+            elif control_id in {3001, 3002, 3003, 3004, 3005, 3006}:
+                options = {
+                    3001: ("enabled", "hosters"),
+                    3002: ("enabled", "torrent"),
+                    3003: ("disabled", "hosters"),
+                    3004: ("disabled", "torrent"),
+                    3005: ("enabled", None),
+                    3006: ("disabled", None),
+                }
+
+                option = options.get(control_id)
+                self.flip_mutliple_providers(option[0], provider_type=option[1])
 
     def _edit_setting(self, setting):
         keyboard = xbmc.Keyboard("", setting.get("label"))
@@ -160,10 +159,3 @@ class PackageConfiguration(BaseWindow):
                 self.update_settings()
             except TypeError:
                 xbmcgui.Dialog().ok(g.ADDON_NAME, "The setting value was invalid")
-
-    def onAction(self, action):
-        super(PackageConfiguration, self).onAction(action)
-
-    def doModal(self):
-        super(PackageConfiguration, self).doModal()
-        self.clearProperties()

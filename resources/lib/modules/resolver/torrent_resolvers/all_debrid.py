@@ -3,11 +3,10 @@ from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.debrid.all_debrid import AllDebrid
 from resources.lib.modules.exceptions import UnexpectedResponse
+from resources.lib.modules.globals import g
 from resources.lib.modules.resolver.torrent_resolvers.base_resolver import (
     TorrentResolverBase,
 )
-
-from resources.lib.modules.globals import g
 
 
 class AllDebridResolver(TorrentResolverBase):
