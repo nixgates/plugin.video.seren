@@ -3,13 +3,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 import time
 
-import requests
 import xbmc
 import xbmcgui
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 
 from resources.lib.common import tools
+from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.database.premiumizeTransfers import PremiumizeTransfers
 from resources.lib.modules.globals import g
@@ -29,14 +27,16 @@ class Premiumize:
             "Authorization": "Bearer {}".format(g.get_setting(PM_TOKEN_KEY)),
         }
         self.premiumize_transfers = PremiumizeTransfers()
-        self.progress_dialog = xbmcgui.DialogProgress()
 
-        self.session = requests.Session()
+    @cached_property
+    def session(self):
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3 import Retry
+        session = requests.Session()
         retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
-
-    def __del__(self):
-        self.session.close()
+        session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
+        return session
 
     @staticmethod
     def _error_handler(request):
@@ -60,29 +60,33 @@ class Premiumize:
         poll_again = True
         success = False
         tools.copy2clip(token["user_code"])
-        self.progress_dialog.create(
-            g.ADDON_NAME + ": " + g.get_language_string(30371),
-            tools.create_multiline_message(
-                line1=g.get_language_string(30018).format(
-                    g.color_string(token["verification_uri"])
+        try:
+            progress_dialog = xbmcgui.DialogProgress()
+            progress_dialog.create(
+                g.ADDON_NAME + ": " + g.get_language_string(30349),
+                tools.create_multiline_message(
+                    line1=g.get_language_string(30018).format(
+                        g.color_string(token["verification_uri"])
+                    ),
+                    line2=g.get_language_string(30019).format(
+                        g.color_string(token["user_code"])
+                    ),
+                    line3=g.get_language_string(30047),
                 ),
-                line2=g.get_language_string(30019).format(
-                    g.color_string(token["user_code"])
-                ),
-                line3=g.get_language_string(30047),
-            ),
-        )
-        self.progress_dialog.update(100)
+            )
+            progress_dialog.update(100)
 
-        while poll_again and not token_ttl <= 0 and not self.progress_dialog.iscanceled():
-            xbmc.sleep(1000)
-            if token_ttl % interval == 0:
-                poll_again, success = self._poll_token(token["device_code"])
-            progress_percent = int(float((token_ttl * 100) / expiry))
-            self.progress_dialog.update(progress_percent)
-            token_ttl -= 1
+            while poll_again and not token_ttl <= 0 and not progress_dialog.iscanceled():
+                xbmc.sleep(1000)
+                if token_ttl % interval == 0:
+                    poll_again, success = self._poll_token(token["device_code"])
+                progress_percent = int(float((token_ttl * 100) / expiry))
+                progress_dialog.update(progress_percent)
+                token_ttl -= 1
 
-        self.progress_dialog.close()
+            progress_dialog.close()
+        finally:
+            del progress_dialog
 
         if success:
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30020))
@@ -235,7 +239,12 @@ class Premiumize:
         """
         url = "/transfer/list"
         post_data = {}
-        return self.post_url(url, post_data)
+        response = self.post_url(url, post_data)
+        for transfer in response.get("transfers", []):
+            if transfer.get("progress") is None:
+                transfer["progress"] = 1.0 if transfer.get("status") == "finished" else 0.0
+
+        return response
 
     def delete_transfer(self, id):
         """

@@ -2,14 +2,28 @@ import xbmcgui
 
 from resources.lib.modules.globals import g
 
-last_update_required = "2.1.4"
+update_news_versions = {
+    "2.1.4": 30530,
+    "2.2.0": 30566,
+}
 
 
 def do_update_news():
-    if last_update_required == g.get_setting("update.news.version"):
+    last_update_news_version = g.get_setting("update.news.version")
+    max_update_news_version = max(update_news_versions)
+
+    if last_update_news_version == "":
+        g.set_setting("update.news.version", max_update_news_version)
         return
 
-    for msg in [g.get_language_string(30559)]:
-        xbmcgui.Dialog().ok(g.ADDON_NAME, msg)
+    if max_update_news_version == last_update_news_version:
+        return
 
-    g.set_setting("update.news.version", last_update_required)
+    for msg in [
+        g.get_language_string(update_news_versions[v])
+        for v in sorted(update_news_versions)
+        if v > last_update_news_version
+    ]:
+        xbmcgui.Dialog().ok("{} - {}".format(g.ADDON_NAME, g.get_language_string(30567)), msg)
+
+    g.set_setting("update.news.version", max_update_news_version)

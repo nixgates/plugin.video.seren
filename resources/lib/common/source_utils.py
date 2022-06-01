@@ -22,11 +22,12 @@ BROWSER_AGENTS = [
 
 exclusions = ["soundtrack", "gesproken"]
 _APOSTROPHE_SUBS = re.compile(r"\\'s|'s|&#039;s| 039 s")
-_SEPARATORS = re.compile(r'[:|/,!?()"+[\]\-_.{}]')
+_SEPARATORS = re.compile(r'[:|/,!?()"[\]\-\\_.{}]|(?<![:|/,!?()"[\]\-\\_.{}\s]dd)\+')
 _WHITESPACE = re.compile(r'\s+')
 _SINGLE_QUOTE = re.compile(r"['`]")
 _AMPERSAND = re.compile(r'&#038;|&amp;|&')
 _EPISODE_NUMBERS = re.compile(r'.*((?:s\d+ ?e\d+ )|(?:season ?\d+ ?(?:episode|ep) ?\d+)|(?: \d+ ?x ?\d+ ))')
+_ASCII_NON_PRINTABLE = re.compile(r'[^{}]'.format(re.escape(string.printable)))
 
 
 class CannotGenerateRegexFilterException(Exception):
@@ -42,78 +43,156 @@ def get_quality(release_title):
     :return: stringed resolution
     """
     release_title = release_title.lower()
-    quality = "SD"
-    if "4k" in release_title:
-        quality = "4K"
-    if "2160" in release_title:
-        quality = "4K"
-    if "1080" in release_title:
-        quality = "1080p"
-    if "720" in release_title:
-        quality = "720p"
-    if any(
-        i in release_title
-        for i in [
-            " cam ",
-            "camrip",
-            "hdcam",
-            "hd cam",
-            " ts ",
-            "hd ts",
-            "hdts",
-            "telesync",
-            " tc ",
-            "hd tc",
-            "hdtc",
-            "telecine",
-            "xbet",
-        ]
-    ):
-        quality = "CAM"
 
-    return quality
+    if any(q in release_title for q in ["720", "72o"]):
+        return "720p"
+    if any(q in release_title for q in ["1080", "1o80", "108o", "1o8o"]):
+        return "1080p"
+    if any(q in release_title for q in ["2160", "216o"]):
+        return "4K"
+    try:
+        if not release_title[release_title.index("4k") + 2].isalnum():
+            return "4K"
+    except (ValueError, IndexError):
+        pass
+
+    return "SD"
 
 
-def info_list_to_dict(info_list):
+INFO_STRUCT = {
+        "videocodec": {
+            "AVC",
+            "HEVC",
+            "XVID",
+            "DIVX",
+            "WMV",
+            "MP4",
+            "MPEG",
+        },
+        "hdrcodec": {
+            "DV",
+            "HDR",
+            "HYBRID",
+            "SDR",
+        },
+        "audiocodec": {
+            "AAC",
+            "DTS",
+            "DTS-HD",
+            "DTS-HDHR",
+            "DTS-HDMA",
+            "DTS-X",
+            "ATMOS",
+            "TRUEHD",
+            "DD+",
+            "DD",
+            "MP3",
+            "WMA",
+        },
+        "audiochannels": {
+            "2.0",
+            "5.1",
+            "7.1",
+        },
+        "misc": {
+            "CAM",
+            "HDTV",
+            "PDTV",
+            "REMUX",
+            "HD-RIP",
+            "BLURAY",
+            "DVDRIP",
+            "WEB",
+            "HC",
+            "SCR",
+            "3D",
+        }
+    }
+
+
+def info_set_to_dict(info_set):
     """
-    Converts a info list to a structured dictionary
-    :param info_list: info list built with get_info
+    Converts an info set to a structured dictionary
+    :param info_set: info set built with get_info
     :return: structured dictionary
     """
     info = {}
 
-    info_struct = {
-        "videocodec": {
-            "AVC": ["x264", "x 264", "h264", "h 264", "avc"],
-            "HEVC": ["x265", "x 265", "h265", "h 265", "hevc"],
-            "XviD": ["xvid"],
-            "DivX": ["divx"],
-            "WMV": ["wmv"],
-        },
-        "audiocodec": {
-            "AAC": ["aac"],
-            "DTS": ["dts"],
-            "HD-MA": ["hd ma", "hdma"],
-            "ATMOS": ["atmos"],
-            "TRUEHD": ["truehd", "true hd"],
-            "DD+": ["ddp", "dd+", "eac3"],
-            "DD": [" dd ", "dd2", "dd5", "dd7", " ac3"],
-            "MP3": ["mp3"],
-            "WMA": [" wma "],
-        },
-        "audiochannels": {
-            "2.0": ["2 0 ", "2 0ch", "2ch"],
-            "5.1": ["5 1 ", "5 1ch", "6ch"],
-            "7.1": ["7 1 ", "7 1ch", "8ch"],
-        },
-    }
-
-    for info_prop in info_struct:
-        for codec in info_struct[info_prop]:
-            if codec in info_list:
-                info[info_prop] = codec
-                break
+    for info_prop, codecs in INFO_STRUCT.items():
+        intersection = info_set & codecs
+        info[info_prop] = sorted(list(intersection))
     return info
+
+
+INFO_TYPES = {
+    "AVC": ["x264", "x 264", "h264", "h 264", "avc"],
+    "HEVC": ["x265", "x 265", "h265", "h 265", "hevc"],
+    "XVID": ["xvid"],
+    "DIVX": ["divx"],
+    "MP4": ["mp4"],
+    "WMV": ["wmv"],
+    "MPEG": ["mpeg"],
+    "REMUX": ["remux", "bdremux"],
+    "DV": [" dv ", "dovi", "dolby vision", "dolbyvision"],
+    "HDR": [
+        " hdr ",
+        "hdr10",
+        "hdr 10",
+        "uhd bluray 2160p",
+        "uhd blu ray 2160p",
+        "2160p uhd bluray",
+        "2160p uhd blu ray",
+        "2160p bluray hevc truehd",
+        "2160p bluray hevc dts",
+        "2160p bluray hevc lpcm",
+        "2160p us bluray hevc truehd",
+        "2160p us bluray hevc dts",
+    ],
+    "SDR": [" sdr"],
+    "AAC": ["aac"],
+    "DTS-HDMA": ["hd ma", "hdma"],
+    "DTS-HDHR": ["hd hr", "hdhr", "dts hr", "dtshr"],
+    "DTS-X": ["dtsx", " dts x"],
+    "ATMOS": ["atmos"],
+    "TRUEHD": ["truehd", "true hd"],
+    "DD+": ["ddp", "eac3", " e ac3", " e ac 3", "dd+", "digital plus", "digitalplus"],
+    "DD": [" dd ", "dd2", "dd5", "dd7", " ac3", " ac 3", "dolby digital", "dolbydigital", "dolby5"],
+    "MP3": ["mp3"],
+    "WMA": [" wma"],
+    "2.0": ["2 0 ", "2 0ch", "2ch"],
+    "5.1": ["5 1 ", "5 1ch", "6ch"],
+    "7.1": ["7 1 ", "7 1ch", "8ch"],
+    "BLURAY": ["bluray", "blu ray", "bdrip", "bd rip", "brrip", "br rip"],
+    "WEB": [" web ", "webrip", "webdl", "web rip", "web dl", "webmux"],
+    "HD-RIP": [" hdrip", " hd rip"],
+    "DVDRIP": ["dvdrip", "dvd rip"],
+    "HDTV": ["hdtv"],
+    "PDTV": ["pdtv"],
+    "CAM": [
+        " cam ", "camrip", "cam rip",
+        "hdcam", "hd cam",
+        " ts ", " ts1", " ts7",
+        "hd ts", "hdts",
+        "telesync",
+        " tc ", " tc1", " tc7",
+        "hd tc", "hdtc",
+        "telecine",
+        "xbet",
+        "hcts", "hc ts",
+        "hctc", "hc tc",
+        "hqcam", "hq cam",
+    ],
+    "SCR": ["scr ", "screener"],
+    "HC": [
+        "korsub", " kor ",
+        " hc ", "hcsub", "hcts", "hctc", "hchdrip",
+        "hardsub", "hard sub",
+        "sub hard",
+        "hardcode", "hard code",
+        "vostfr", "vo stfr",
+    ],
+    "3D": [" 3d"],
+}
 
 
 def get_info(release_title):
@@ -122,76 +201,31 @@ def get_info(release_title):
     :param release_title: Release title of source
     :return: List of info meta
     """
-
-    def tag_check(string_list, title_string):
-        """
-        Checks the see if provided info strings exist in title
-        :param string_list: list of strings
-        :param title_string: source release title
-        :return: True if found else False
-        """
-        return any(i in title_string for i in string_list)
-
-    info_types = {
-        "AVC": ["x264", "x 264", "h264", "h 264", "avc"],
-        "HEVC": ["x265", "x 265", "h265", "h 265", "hevc"],
-        "XVID": ["xvid"],
-        "DIVX": ["divx"],
-        "MP4": ["mp4"],
-        "WMV": ["wmv"],
-        "MPEG": ["mpeg"],
-        "REMUX": ["remux", "bdremux"],
-        "HDR": [
-            " hdr ",
-            "hdr10",
-            "hdr 10",
-            "2160p bluray remux",
-            "uhd bluray 2160p",
-            "2160p uhd bluray",
-        ],
-        "AAC": ["aac"],
-        "DTS": ["dts"],
-        "HD-MA": ["hd ma", "hdma"],
-        "ATMOS": ["atmos"],
-        "TRUEHD": ["truehd", "true hd"],
-        "DD+": ["ddp", "dd+", "eac3"],
-        "DD": [" dd ", "dd2", "dd5", "dd7", " ac3"],
-        "MP3": ["mp3"],
-        "WMA": [" wma"],
-        "2.0": ["2 0 ", "2 0ch", "2ch"],
-        "5.1": ["5 1 ", "5 1ch", "6ch"],
-        "7.1": ["7 1 ", "7 1ch", "8ch"],
-        "BLURAY": ["bluray", "blu ray", "bdrip", "bd rip", "brrip", "br rip"],
-        "WEB": [" web ", "webrip", "webdl", "web rip", "web dl"],
-        "HDRIP": ["hdrip", "hd rip"],
-        "DVDRIP": ["dvdrip", "dvd rip"],
-        "HDTV": ["hdtv"],
-        "PDTV": ["pdtv"],
-        "CAM": [
-            " cam ",
-            "camrip",
-            "hdcam",
-            "hd cam",
-            " ts ",
-            "hd ts",
-            "hdts",
-            "telesync",
-            " tc ",
-            "hd tc",
-            "hdtc",
-            "telecine",
-            "xbet",
-        ],
-        "SCR": ["dvdscr", " scr ", "screener"],
-        "HC": ["korsub", " kor ", " hc"],
-        "BLUR": ["blurred"],
-        "3D": [" 3d"],
+    title = clean_title(release_title) + " "
+    info = {
+        info_prop for info_prop, string_list in INFO_TYPES.items()
+        if any(i in title for i in string_list)
     }
-
-    title = clean_title(release_title)
-    info = [key for key, value in sorted(info_types.items()) if tag_check(value, title)]
-    if " sdr" in title and "HDR" in info:
+    if all(i in info for i in ["SDR", "HDR"]):
         info.remove("HDR")
+    elif all(i in title for i in ["2160p", "remux"]) and all(i not in info for i in ["HDR", "SDR"]):
+        info.add("HDR")
+    elif "DV" in info and "hybrid" in title and all(i not in info for i in ["HDR", "SDR"]):
+        info.add("HDR")
+    if all(i in info for i in ["HDR", "DV"]) and all(i not in title for i in ["hybrid", " hdr"]):
+        info.remove("HDR")
+    if all(i in info for i in ["HDR", "DV"]):
+        info.add("HYBRID")
+    if any(i in info for i in ["HDR", "DV"]) and all(i not in info for i in ["HEVC", "AVC"]):
+        info.add("HEVC")
+    if all(i in info for i in ["DD", "DD+"]):
+        info.remove("DD")
+    elif any(i in title for i in ["dtshd", "dts hd"]) and all(i not in info for i in ["DTS-HDMA", "DTS-HDHR"]):
+        info.add("DTS-HD")
+    elif " dts" in title and all(i not in info for i in ["DTS-HDMA", "DTS-HDHR", "DTS-X", "DTS-HD"]):
+        info.add("DTS")
+    if all(i in title for i in ["sub", "forced"]):
+        info.add("HC")
     return info
 
 
@@ -201,8 +235,8 @@ def strip_non_ascii_and_unprintable(text):
     :param text: text to clean
     :return: cleaned text
     """
-    result = "".join(char for char in text if char in string.printable)
-    return result.encode("ascii", errors="ignore").decode("ascii", errors="ignore")
+    return _ASCII_NON_PRINTABLE.sub("", text)
+
 
 def clean_title(title, broken=None):
     """
@@ -211,9 +245,9 @@ def clean_title(title, broken=None):
     :param broken: set to 1 to remove apostophes, 2 to replace with spaces
     :return: cleaned title
     """
-    title = title.lower()
     title = g.deaccent_string(title)
     title = strip_non_ascii_and_unprintable(title)
+    title = title.lower()
 
     apostrophe_replacement = "s"
     if broken == 1:
@@ -427,7 +461,7 @@ def get_filter_single_episode_fn(simple_info):
     for title in titles:
         clean_titles.append(re.escape(clean_title_with_simple_info(title, simple_info)))
 
-    pattern = r"^(?:{titles})+(?:{year} )? ?(?:s0?{ss}e0?{ep}(?: |e\d\d?)|season\ 0?{ss}\ episode\ 0?{ep})+".format(
+    pattern = r"^(?:{titles})+ ?(?:{year})? ?(?:s0?{ss}e0?{ep}(?: |e\d\d?)|season\ 0?{ss}\ episode\ 0?{ep})+".format(
         titles=" ?|".join(clean_titles),
         year=re.escape(simple_info["year"]),
         ss=re.escape(season),
@@ -805,15 +839,10 @@ def de_string_size(size):
     """
     Attempts to take a stringed size eg(1GB) and return a integer size in MB
     :param size: identified size
+    :type size: str
     :return: size in MB if string can be converted else None
+    :rtype int|None:
     """
-    if "Mib" in size:
-        size = int(size.replace("Mib", "").replace(" ", "").split(".")[0])
-        return size
-    if "GiB" in size:
-        size = float(size.replace("GiB", ""))
-        size = int(size * 1024)
-        return size
     if "GB" in size:
         size = float(size.replace("GB", ""))
         size = int(size * 1024)
@@ -821,23 +850,31 @@ def de_string_size(size):
     if "MB" in size:
         size = int(size.replace("MB", "").replace(" ", "").split(".")[0])
         return size
+    if "KB" in size:
+        size = float(size.replace("KB", ""))
+        size = int(size * 0.001)
+        return size
+    if "MiB" in size:
+        size = int(size.replace("MiB", "").replace(" ", "").split(".")[0])
+        return size
+    if "GiB" in size:
+        size = float(size.replace("GiB", ""))
+        size = int(size * 1024)
+        return size
+    if "KiB" in size:
+        size = float(size.replace("KiB", ""))
+        size = int(size * 0.001024)
+        return size
 
 
-def get_accepted_resolution_list():
+def get_accepted_resolution_set():
     """
-    Fetches list of accepted resolutions per settings
-    :return: list of resolutions
+    Fetches set of accepted resolutions per settings
+    :return: set of resolutions
+    :rtype set
     """
-    resolutions = []
-
+    resolutions = ["4K", "1080p", "720p", "SD"]
     max_res = g.get_int_setting("general.maxResolution")
-    if max_res <= 3:
-        resolutions.append("SD")
-    if max_res < 3:
-        resolutions.append("720p")
-    if max_res < 2:
-        resolutions.append("1080p")
-    if max_res < 1:
-        resolutions.append("4K")
+    min_res = g.get_int_setting("general.minResolution")
 
-    return resolutions
+    return set(resolutions[max_res:min_res+1])

@@ -2,26 +2,15 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import re
-from collections import OrderedDict
 from functools import wraps
 
-import requests
 import xbmcgui
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-
-from resources.lib.third_party import xml_to_dict
-
-try:
-    import xml.etree.cElementTree as ElementTree
-except ImportError:
-    import xml.etree.ElementTree as ElementTree
 
 from resources.lib.common import tools
+from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
 from resources.lib.modules.globals import g
-
 
 OMDB_STATUS_CODES = {
     200: "Success",
@@ -39,6 +28,7 @@ OMDB_STATUS_CODES = {
 def omdb_guard_response(func):
     @wraps(func)
     def wrapper(*args, **kwarg):
+        import requests
         try:
             response = func(*args, **kwarg)
 
@@ -86,7 +76,6 @@ class OmdbApi(ApiBase):
     def __init__(self):
         self.api_key = g.get_setting("omdb.apikey", None)
         self.omdb_support = False if not self.api_key else True
-        self.meta_hash = tools.md5_hash((self.omdb_support, self.ApiUrl))
 
         self.normalization = [
             (
@@ -111,7 +100,7 @@ class OmdbApi(ApiBase):
                 "@genre",
                 "genre",
                 lambda d: sorted(
-                    OrderedDict.fromkeys({x.strip() for x in d.split(",")})
+                    set(x.strip() for x in d.split(","))
                 )
                 if not self._is_value_none(d)
                 else None,
@@ -120,9 +109,7 @@ class OmdbApi(ApiBase):
                 "@director",
                 "director",
                 lambda d: sorted(
-                    OrderedDict.fromkeys(
-                        {re.sub(r"\(.*?\)", "", x).strip() for x in d.split(",")}
-                    )
+                    set(re.sub(r"\(.*?\)", "", x).strip() for x in d.split(","))
                 )
                 if not self._is_value_none(d)
                 else None,
@@ -131,9 +118,7 @@ class OmdbApi(ApiBase):
                 "@writer",
                 "writer",
                 lambda d: sorted(
-                    OrderedDict.fromkeys(
-                        {re.sub(r"\(.*?\)", "", x).strip() for x in d.split(",")}
-                    )
+                    set(re.sub(r"\(.*?\)", "", x).strip() for x in d.split(","))
                 )
                 if not self._is_value_none(d)
                 else None,
@@ -241,19 +226,25 @@ class OmdbApi(ApiBase):
             ),
         ]
 
-        self.session = requests.Session()
+    @cached_property
+    def meta_hash(self):
+        return tools.md5_hash((
+            self.omdb_support,
+            self.ApiUrl))
+
+    @cached_property
+    def session(self):
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3 import Retry
+        session = requests.Session()
         retries = Retry(
             total=5,
             backoff_factor=0.1,
             status_forcelist=[500, 503, 504, 520, 521, 522, 524],
         )
-        self.session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
-
-    def __del__(self):
-        try:
-            self.session.close()
-        except NameError:
-            pass
+        session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
+        return session
 
     def _extract_awards(self, value, *params):
         try:
@@ -289,16 +280,24 @@ class OmdbApi(ApiBase):
 
     @wrap_omdb_object
     def get_json(self, **params):
+        from resources.lib.third_party import xml_to_dict
+        from xml.parsers.expat import ExpatError  # pylint: disable=no-name-in-module
+
         response = self.get(**params)
         if response is None:
             return None
         try:
             if not response.content:
                 return None
+            elif xml_to_dict.parse(response.text).get("root", {}).get("@response", {}) == "False":
+                return None
+            elif xml_to_dict.parse(response.text).get("root", {}).get("error", {}):
+                return None
+
             return self._handle_response(
                 xml_to_dict.parse(response.text).get("root", {}).get("movie")
             )
-        except (ValueError, AttributeError):
+        except (ValueError, AttributeError, ExpatError):
             g.log_stacktrace()
             g.log(
                 "Failed to receive JSON from OMDb response - response: {}".format(

@@ -3,17 +3,14 @@ from __future__ import absolute_import, division, unicode_literals
 
 import time
 import traceback
-from collections import OrderedDict
 from functools import wraps
 from math import sin, pi  # pylint: disable=no-name-in-module
 
-import requests
 import xbmcgui
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
+from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
 from resources.lib.modules.exceptions import RanOnceAlready
@@ -25,6 +22,7 @@ def tvdb_guard_response(func):
     @wraps(func)
     def wrapper(*args, **kwarg):
         method_class = args[0]
+        import requests
         try:
             response = func(*args, **kwarg)
             if response.status_code in [200, 201]:
@@ -118,7 +116,7 @@ class TVDBAPI(ApiBase):
             ("status", "status", None),
             ("runtime", "runtime", lambda d: int(d) * 60),
             ("network", "studio", None),
-            ("genre", "genre", lambda t: sorted(OrderedDict.fromkeys(t))),
+            ("genre", "genre", lambda t: sorted(set(t))),
             ("seriesName", ("title", "tvshowtitle"), None),
             ("rating", "mpaa", None),
             ("language", "language", None),
@@ -138,8 +136,8 @@ class TVDBAPI(ApiBase):
             ("seriesId", "tvdb_show_id", None),
             ("airedEpisodeNumber", ("episode", "sortepisode"), None),
             ("airedSeason", ("season", "sortseason"), None),
-            ("directors", "director", lambda t: sorted(OrderedDict.fromkeys(t))),
-            ("writers", "writer", lambda t: sorted(OrderedDict.fromkeys(t))),
+            ("directors", "director", lambda t: sorted(set(t))),
+            ("writers", "writer", lambda t: sorted(set(t))),
             ("overview", "plot", None),
             ("contentRating", "mpaa", None),
         ],
@@ -824,11 +822,9 @@ class TVDBAPI(ApiBase):
         },
         {"id": 262, "abbreviation": "zu", "name": "isiZulu", "englishName": "Zulu"},
     ]
-    retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
-    
+
     def __init__(self):
-        self.session = requests.Session()
-        self.session.mount("https://", HTTPAdapter(max_retries=self.retries, pool_maxsize=100))
+
         self._load_settings()
 
         self.lang_code = g.get_language_code(False)
@@ -848,7 +844,10 @@ class TVDBAPI(ApiBase):
             self.try_refresh_token()
 
         self.preferred_artwork_size = g.get_int_setting("artwork.preferredsize")
-        self.meta_hash = tools.md5_hash(
+
+    @cached_property
+    def meta_hash(self):
+        return tools.md5_hash(
             (
                 self.lang_code,
                 self.art_map,
@@ -858,8 +857,15 @@ class TVDBAPI(ApiBase):
             )
         )
 
-    def __del__(self):
-        self.session.close()
+    @cached_property
+    def session(self):
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3 import Retry
+        session = requests.Session()
+        retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+        session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
+        return session
 
     def _get_headers(self, lang=None):
         headers = {"content-type": "application/json"}
@@ -1018,13 +1024,13 @@ class TVDBAPI(ApiBase):
         if item is None:
             return result
 
-        if not isinstance(item, (list, set)):
+        if not isinstance(item, list):
             if item.get("filename"):
                 result.update(
                     {"thumb": self._get_absolute_image_path(item["filename"])}
                 )
 
-        if key_name is not None and isinstance(item, (set, list)):
+        if key_name is not None and isinstance(item, list):
             art = [
                 self._get_image(i, self.art_map[key_name], language)
                 for i in item
@@ -1083,7 +1089,7 @@ class TVDBAPI(ApiBase):
             for art_type in art_types:
                 thread_pool.put(self._get_show_art, tvdb_id, art_type, language)
         item = thread_pool.wait_completion()
-        if not item or len(item) == 0:
+        if not item:
             return None
         return item
 
@@ -1100,7 +1106,7 @@ class TVDBAPI(ApiBase):
             for art_type in art_types:
                 thread_pool.put(self._get_show_art, tvdb_id, art_type, language)
         item = thread_pool.wait_completion()
-        if not item or len(item) == 0:
+        if not item:
             return None
         return item
 
@@ -1111,7 +1117,7 @@ class TVDBAPI(ApiBase):
         for language in self.languages:
             thread_pool.put(self._get_show_info, tvdb_id, language)
         item = thread_pool.wait_completion()
-        if not item or len(item) == 0:
+        if not item:
             return None
         return item
 
@@ -1122,7 +1128,7 @@ class TVDBAPI(ApiBase):
             keys="siteRating,siteRatingCount,seriesName",
         )
 
-        if not item or len(item) == 0:
+        if not item:
             return None
 
         return {"info": tools.filter_dictionary(item["info"], "rating.tvdb")}
@@ -1177,7 +1183,7 @@ class TVDBAPI(ApiBase):
                     self._get_season_art, tvdb_id, art_type, season, language
                 )
         item = thread_pool.wait_completion()
-        if not item or len(item) == 0:
+        if not item:
             return None
         return item
 
@@ -1203,20 +1209,19 @@ class TVDBAPI(ApiBase):
             language=language,
         )
 
-        if result is None:
+        if not result:
             return None
-        if isinstance(result, (list, set)):
-            return next(iter(result))
+        if isinstance(result, list):
+            return result[0]
         return result
 
     @wrap_tvdb_object
     def get_episode(self, tvdb_id, season, episode):
-        item = {}
         thread_pool = ThreadPool()
         for language in self.languages:
             thread_pool.put(self._get_episode_info, tvdb_id, season, episode, language)
         item = thread_pool.wait_completion()
-        if not item or len(item) == 0:
+        if not item:
             return None
         return item
 
@@ -1224,7 +1229,7 @@ class TVDBAPI(ApiBase):
     def get_episode_rating(self, tvdb_id, season, episode):
         item = self._get_episode_info(tvdb_id, season, episode, None)
 
-        if not item or len(item) == 0:
+        if not item:
             return None
 
         return {"info": tools.filter_dictionary(item["info"], "rating.tvdb")}
@@ -1232,8 +1237,7 @@ class TVDBAPI(ApiBase):
     def _get_absolute_image_path(self, relative_path):
         if not relative_path:
             return None
-        if self.preferred_artwork_size > 1:
+        if self.preferred_artwork_size == 2:
             splitted_path = relative_path.split(".")
             relative_path = "{}_t.{}".format(splitted_path[0], splitted_path[1])
         return "/".join([self.imageBaseUrl.strip("/"), relative_path.strip("/")])
-

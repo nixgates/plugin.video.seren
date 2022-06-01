@@ -23,7 +23,6 @@ class ListsHelper:
             widget_loaded_setting = "widget_loaded.{}.{}".format(media_type, arguments)
             if not g.get_bool_runtime_setting(widget_loaded_setting):
                 ignore_cache = False
-            else:
                 g.set_runtime_setting(widget_loaded_setting, True)
         list_items = self.lists_database.get_list_content(arguments['username'],
                                                           arguments['trakt_id'],
@@ -48,6 +47,7 @@ class ListsHelper:
                                                    media_type,
                                                    page=g.PAGE,
                                                    no_paging=self.no_paging,
+                                                   pull_all=True,
                                                    ignore_cache=True),
             media_type=media_type)
 
@@ -57,6 +57,7 @@ class ListsHelper:
                                                    media_type,
                                                    page=g.PAGE,
                                                    no_paging=self.no_paging,
+                                                   pull_all=True,
                                                    ignore_cache=True),
             media_type=media_type)
 

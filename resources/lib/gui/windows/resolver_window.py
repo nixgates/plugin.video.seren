@@ -1,19 +1,21 @@
 import threading
 
 from resources.lib.common import tools
-from resources.lib.gui.windows.base_window import BaseWindow
+from resources.lib.gui.windows.single_item_window import SingleItemWindow
 from resources.lib.modules.resolver import Resolver
+from . import set_info_properties
 
 
-class ResolverWindow(BaseWindow):
+class ResolverWindow(SingleItemWindow):
     """
     Window for Resolver
     """
 
     def __init__(self, xml_file, location=None, item_information=None):
-        super(ResolverWindow, self).__init__(xml_file, location, item_information=item_information)
+        super(ResolverWindow, self).__init__(
+            xml_file, location, item_information=item_information
+        )
         self.return_data = None
-        self.canceled = False
         self.progress = 1
         self.resolver = None
         self.sources = None
@@ -34,16 +36,18 @@ class ResolverWindow(BaseWindow):
     def _background_thread(self, test):
         if not test:
             stream_link = None
+            release_title = None
 
             for source in self.sources:
                 if self.canceled:
                     return
                 self._update_window_properties(source)
-                stream_link = self.resolver.resolve_single_source(source, self.item_information, self.pack_select)
+                stream_link, release_title = self.resolver.resolve_single_source(
+                    source, self.item_information, self.pack_select
+                )
                 if stream_link:
                     break
-
-            self.return_data = stream_link
+            self.return_data = stream_link, release_title
             self.close()
 
     def _update_window_properties(self, source):
@@ -55,10 +59,15 @@ class ResolverWindow(BaseWindow):
         self.setProperty("debrid_provider", debrid_provider)
         self.setProperty("source_provider", source["provider"])
         self.setProperty("source_resolution", source["quality"])
-        self.setProperty("source_info", " ".join(source["info"] + [tools.source_size_display(source["size"])]))
+        set_info_properties(source.get("info", {}), self)
         self.setProperty("source_type", source["type"])
 
-    def doModal(self, sources=None, item_information=None, pack_select=False):
+    def doModal(
+        self,
+        sources=None,
+        pack_select=False,
+        from_source_select=False,
+    ):
         """
         Opens window in an intractable mode and runs background scripts
         :param sources: List of sources to attempt to resolve
@@ -67,43 +76,26 @@ class ResolverWindow(BaseWindow):
         :type item_information: dict
         :param pack_select: Set to True to enable manual file selection
         :type pack_select: bool
+        :param from_source_select: Set to True to set a window property with same name for skinning purposes
+        :type pack_select: bool
         :return: Stream link
         :rtype: str
         """
         self.sources = sources if sources else []
-        self.item_information = item_information if item_information else {}
         self.pack_select = pack_select
 
         if not self.sources:
-            return
-            
+            return None, None
+
         self.resolver = Resolver()
         self._update_window_properties(self.sources[0])
+        self.setProperty(
+            "from_source_select", "true" if from_source_select else "false"
+        )
 
         super(ResolverWindow, self).doModal()
 
         if not self.canceled:
             return self.return_data
         else:
-            return None
-
-    def onAction(self, action):
-        """
-        Callback method from Kodi when an action is performed within dialog
-        :param action: Action Object
-        :type action: action
-        :return: None
-        :rtype: None
-        """
-        action = action.getId()
-        if action == 92 or action == 10:
-            self.canceled = True
-            self.close()
-
-    def close(self):
-        """
-        Closes this window
-        :return: None
-        :rtype: None
-        """
-        super(ResolverWindow, self).close()
+            return None, None

@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import random
-from copy import deepcopy
+from difflib import SequenceMatcher
 
 import xbmcgui
 
-from resources.lib.common import tools
-from resources.lib.common.source_utils import get_accepted_resolution_list
-from resources.lib.debrid import get_debrid_priorities
+from resources.lib.common.source_utils import get_accepted_resolution_set
+from resources.lib.common.tools import FixedSortPositionObject
 from resources.lib.modules.globals import g
 
 
@@ -17,249 +15,271 @@ class SourceSorter:
     Handles sorting of sources according to users preferences
     """
 
-    def __init__(self, media_type, uncached=False):
+    FIXED_SORT_POSITION_OBJECT = FixedSortPositionObject()
+
+    def __init__(self, item_information):
         """
         Handles sorting of sources according to users preference
-        :param media_type: Type of media to be sorted (movie/episode)
-        :type media_type: str
-        :param uncached: Whether to include uncached torrents or not
-        :type uncached: bool
         """
-        self.sort_method = g.get_int_setting("general.sortsources")
-        self.resolution_list = reversed(get_accepted_resolution_list())
-        self.media_type = media_type
-        self.torrent_list = []
-        self.hoster_list = []
-        self.cloud_files = []
-        self.source_types = ["torrent_list", "hoster_list", "cloud_files"]
-        self.debrid_priorities = get_debrid_priorities()
-        self._resolution_lambda = lambda i, j, k: i == k["quality"] and \
-                                                  (j["slug"] == k.get("debrid_provider", "")
-                                                   or (not k.get("debrid_provider", "") and uncached))
-        self.group_style = [
-            self._group_method_zero,
-            self._group_method_one,
-            self._group_method_two,
-            lambda: self.torrent_list + self.hoster_list + self.cloud_files
-            ]
+        self.item_information = item_information
+        self.mediatype = self.item_information['info']['mediatype']
 
-    def _apply_sort_to_all_types(self, **kwargs):
-        for i in self.source_types:
-            setattr(self, i, sorted(getattr(self, i, []), **kwargs))
+        # Filter settings
+        self.resolution_set = get_accepted_resolution_set()
+        self.disable_dv = False
+        self.disable_hdr = False
+        self.filter_set = self._get_filters()
 
-    def _filter_all_by_methods(self, lambda_methods):
-        for idx, i in enumerate(self.source_types):
-            lists = []
-            for method in lambda_methods:
-                lists.append(
-                    self._filter_list_by_method(
-                        getattr(self, self.source_types[idx], []), method
-                        )
-                    )
+        # Size filter settings
+        self.enable_size_limit = g.get_bool_setting("general.enablesizelimit")
+        setting_mediatype = g.MEDIA_EPISODE if self.mediatype == g.MEDIA_EPISODE else g.MEDIA_MOVIE
+        self.size_limit = g.get_int_setting("general.sizelimit.{}".format(setting_mediatype)) * 1024
+        self.size_minimum = int(g.get_float_setting("general.sizeminimum.{}".format(setting_mediatype)) * 1024)
 
-            setattr(self, i, [item for sublist in lists for item in sublist])
+        # Sort Settings
+        self.quality_priorities = {
+            "4K": 3,
+            "1080p": 2,
+            "720p": 1,
+            "SD": 0
+        }
 
-    @staticmethod
-    def _filter_list_by_method(unfiltered_list, lambda_method):
-        return [i for i in unfiltered_list if lambda_method(i)]
+        # Sort Methods
+        self._get_sort_methods()
 
-    def _stacked_for_loops_filter(self, stacked_lists, lambda_methods, *args):
-        args = [i for i in args]
-        if args:
-            args = args.pop(0)
-        if stacked_lists:
-            results = []
-            for i in stacked_lists[0]:
-                results += self._stacked_for_loops_filter(
-                    stacked_lists[1:], lambda_methods, args + [i]
-                    )
-            return results
-        else:
-            filtered = []
-            for method in lambda_methods:
-                if not method(*args):
-                    return []
-            filtered.append(args[-1])
-            return filtered
+    def _get_filters(self):
+        filter_string = g.get_setting("general.filters")
+        current_filters = set() if filter_string is None else set(filter_string.split(","))
 
-    def _size_sort(self):
-        if g.get_bool_setting("general.sizesort"):
-            self._apply_sort_to_all_types(
-                key=lambda k: int(k["size"]),
-                reverse=not g.get_bool_setting("general.reversesizesort"),
-                )
-        else:
-            random.shuffle(self.torrent_list)
+        # Set HR filters and remove from set before returning due to HYBRID
+        self.disable_dv = "DV" in current_filters
+        self.disable_hdr = "HDR" in current_filters
 
-    def _filter_3d(self):
-        if g.get_bool_setting("general.disable3d"):
-            self._filter_all_by_methods([lambda i: "3D" not in i["info"]])
+        return current_filters.difference({"HDR", "DV"})
 
-    def _filter_cam_quality(self):
-        if g.get_bool_setting("general.disablelowQuality"):
-            self._filter_all_by_methods([lambda i: "CAM" not in i["info"]])
+    def filter_sources(self, source_list):
+        # Iterate sources, yielding only those that are not filtered
+        for source in source_list:
+            # Quality filter
+            if source['quality'] not in self.resolution_set:
+                continue
+            # Info Filter
+            if self.filter_set & source['info']:
+                continue
+            # DV filter
+            if self.disable_dv and "DV" in source['info'] and "HYBRID" not in source['info']:
+                continue
+            # HDR Filter
+            if self.disable_hdr and "HDR" in source['info'] and "HYBRID" not in source['info']:
+                continue
+            # Hybrid Filter
+            if self.disable_dv and self.disable_hdr and "HYBRID" in source['info']:
+                continue
+            # File size limits filter
+            if self.enable_size_limit and not (
+                    self.size_limit >= int(source.get("size", 0)) >= self.size_minimum
+            ):
+                continue
 
-    def _apply_size_limits(self):
-        if g.get_bool_setting("general.enablesizelimit"):
-            if self.media_type == "episode":
-                size_limit = g.get_int_setting("general.sizelimit.episode") * 1024
-                size_minimum = int(g.get_float_setting("general.sizeminimum.episode") * 1024)
-            else:
-                size_limit = g.get_int_setting("general.sizelimit.movie") * 1024
-                size_minimum = int(g.get_float_setting("general.sizeminimum.movie") * 1024)
-            self._filter_all_by_methods(
-                [lambda i: size_limit >= int(i.get("size", 0)) >= size_minimum]
-                )
+            # If not filtered, yield source
+            yield source
 
-    def _apply_hevc_priority(self):
-        if g.get_bool_setting("general.265sort"):
-            self._filter_all_by_methods(
-                [lambda i: "HEVC" in i["info"], lambda i: "HEVC" not in i["info"]]
-                )
+    def sort_sources(self, sources_list):
+        """Takes in a list of sources and filters and sorts them according to Seren's sort settings
 
-    def _low_cam_sort(self):
-        if g.get_bool_setting("general.lowQualitysort"):
-            self._filter_all_by_methods(
-                [lambda i: "CAM" not in i["info"], lambda i: "CAM" in i["info"]]
-                )
-
-    def _filter_hevc(self):
-        if g.get_bool_setting("general.disable265"):
-            self._filter_all_by_methods([lambda i: "HEVC" not in i["info"]])
-
-    def _filter_sd(self):
-        if g.get_bool_setting("general.hidesd"):
-            self._filter_all_by_methods([lambda i: i["quality"] != "SD"])
-
-    def _filter_hdr(self):
-        if g.get_bool_setting("general.disablehdrsources"):
-            self._filter_all_by_methods([lambda i: "HDR" not in i["info"]])
-
-    def _resolution_sort_helper(self, resolution, methods, list_to_filter):
-        return self._stacked_for_loops_filter(
-            [[resolution], self.debrid_priorities, list_to_filter], [methods]
-            )
-
-    def _group_method_zero(self):
-        sorted_list = []
-
-        for resolution in self.resolution_list:
-            sorted_list += self._resolution_sort_helper(
-                resolution, self._resolution_lambda,  tools.extend_array(self.torrent_list, self.cloud_files)
-                )
-            sorted_list += self._resolution_sort_helper(
-                resolution, self._resolution_lambda, self.hoster_list
-                )
-
-            for file in self.hoster_list:
-                if (
-                        "debrid_provider" not in file
-                        and file.get("direct")
-                        and file.get("quality") == resolution
-                ):
-                    sorted_list.append(file)
-
-        for resolution in self.resolution_list:
-            sorted_list += self._resolution_sort_helper(
-                resolution, self._resolution_lambda, self.hoster_list
-                )
-
-            for file in self.hoster_list:
-                if (
-                        "debrid_provider" not in file
-                        and file.get("direct")
-                        and file.get("quality") == resolution
-                ):
-                    sorted_list.append(file)
-
-        return sorted_list
-
-    def _group_method_one(self):
-        sorted_list = []
-        for resolution in self.resolution_list:
-            sorted_list += self._resolution_sort_helper(
-                resolution, self._resolution_lambda, self.hoster_list
-                )
-
-            for file in self.hoster_list:
-                if "debrid_provider" not in file and file["quality"] == resolution and file.get("direct"):
-                    sorted_list.append(file)
-
-        sorted_list += self._stacked_for_loops_filter(
-            [self.resolution_list, self.debrid_priorities, tools.extend_array(self.torrent_list, self.cloud_files)],
-            [self._resolution_lambda],
-            )
-
-        return sorted_list
-
-    def _group_method_two(self):
-        sorted_list = []
-
-        for resolution in self.resolution_list:
-            sorted_list += self._resolution_sort_helper(
-                resolution, self._resolution_lambda, tools.extend_array(self.torrent_list, self.cloud_files)
-                )
-            sorted_list += self._resolution_sort_helper(
-                resolution, self._resolution_lambda, self.hoster_list
-                )
-
-            for file in self.hoster_list:
-                if "debrid_provider" not in file and file["quality"] == resolution and file.get("direct"):
-                    sorted_list.append(file)
-
-        return sorted_list
-
-    def _do_filters(self):
-        self._filter_3d()
-        self._filter_cam_quality()
-        self._apply_size_limits()
-        self._low_cam_sort()
-        self._filter_sd()
-        self._filter_hevc()
-        self._filter_hdr()
-
-    def _do_priorities(self):
-        self._apply_hevc_priority()
-
-    def _do_sorts(self):
-        self._size_sort()
-        self._do_priorities()
-        sorted_list = self.group_style[self.sort_method]()
-        return [i for i in sorted_list if i.get("type") == "cloud"] +\
-               [i for i in sorted_list if i.get("type") != "cloud"]
-
-    def sort_sources(self, torrents=None, hosters=None, cloud=None):
-        """Takes in multiple optional lists of sources and sorts them according to Seren's sort settings
-
-         :param torrents: list of torrent sources
-         :type torrents: list
-         :param hosters: list of hoster sources
-         :type hosters: list
-         :param cloud: list of cloud sources
-         :type cloud: list
+         :param sources_list: list of sources
+         :type sources_list: list
          :return: sorted list of sources
          :rtype: list
          """
-        torrents = torrents if torrents else []
-        hosters = hosters if hosters else []
-        cloud = cloud if cloud else []
 
-        self.torrent_list = deepcopy(torrents)
-        self.hoster_list = deepcopy(hosters)
-        self.cloud_files = deepcopy(cloud)
-
-        self._do_filters()
+        filtered_sources = list(self.filter_sources(sources_list))
         if (
-                len(self.torrent_list + self.hoster_list + self.cloud_files) == 0
-                and len(torrents + hosters + cloud) > 0
+                len(filtered_sources) == 0
+                and len(sources_list) > 0
         ):
             response = None
             if not g.get_bool_runtime_setting('tempSilent'):
                 response = xbmcgui.Dialog().yesno(
-                    g.ADDON_NAME, g.get_language_string(30498)
-                    )
+                    g.ADDON_NAME, g.get_language_string(30474)
+                )
             if response or g.get_bool_runtime_setting('tempSilent'):
-                self.torrent_list = deepcopy(torrents)
-                self.hoster_list = deepcopy(hosters)
-                self.cloud_files = deepcopy(cloud)
-        return self._do_sorts()
+                return self._sort_sources(sources_list)
+            else:
+                return []
+        return self._sort_sources(filtered_sources)
+
+    def _get_sort_methods(self):
+        """
+        Get Seren settings for sort methods
+        """
+        sort_methods = []
+        sort_method_settings = {
+            0: None,
+            1: self._get_quality_sort_key,
+            2: self._get_type_sort_key,
+            3: self._get_debrid_priority_key,
+            4: self._get_size_sort_key,
+            5: self._get_low_cam_sort_key,
+            6: self._get_hevc_sort_key,
+            7: self._get_hdr_sort_key,
+            8: self._get_audio_channels_sort_key
+        }
+
+        if self.mediatype == g.MEDIA_EPISODE and g.get_bool_setting("general.lastreleasenamepriority"):
+            self.last_release_name = g.get_runtime_setting(
+                "last_resolved_release_title.{}".format(self.item_information['info']['trakt_show_id'])
+            )
+            if self.last_release_name:
+                sort_methods.append((self._get_last_release_name_sort_key, False))
+
+        for i in range(1, 9):
+            sm = g.get_int_setting("general.sortmethod.{}".format(i))
+            reverse = g.get_bool_setting("general.sortmethod.{}.reverse".format(i))
+
+            if sort_method_settings[sm] is None:
+                break
+
+            if sort_method_settings[sm] == self._get_type_sort_key:
+                self._get_type_sort_order()
+            if sort_method_settings[sm] == self._get_debrid_priority_key:
+                self._get_debrid_sort_order()
+            if sort_method_settings[sm] == self._get_hdr_sort_key:
+                self._get_hdr_sort_order()
+
+            sort_methods.append((sort_method_settings[sm], reverse))
+
+        self.sort_methods = sort_methods
+
+    def _get_type_sort_order(self):
+        """
+        Get seren settings for type sort priority
+        """
+        type_priorities = {}
+        type_priority_settings = {
+            0: None,
+            1: "cloud",
+            2: "adaptive",
+            3: "torrent",
+            4: "hoster"
+        }
+
+        for i in range(1, 5):
+            tp = type_priority_settings.get(
+                g.get_int_setting("general.sourcetypesort.{}".format(i))
+            )
+            if tp is None:
+                break
+            type_priorities[tp] = -i
+        self.type_priorities = type_priorities
+
+    def _get_hdr_sort_order(self):
+        """
+        Get seren settings for type sort priority
+        """
+        hdr_priorities = {}
+        hdr_priority_settings = {
+            0: None,
+            1: "DV",
+            2: "HDR",
+        }
+
+        for i in range(1, 3):
+            hdrp = hdr_priority_settings.get(g.get_int_setting("general.hdrsort.{}".format(i)))
+            if hdrp is None:
+                break
+            hdr_priorities[hdrp] = -i
+        self.hdr_priorities = hdr_priorities
+
+    def _get_debrid_sort_order(self):
+        """
+        Get seren settings for debrid sort priority
+        """
+        debrid_priorities = {}
+        debrid_priority_settings = {
+            0: None,
+            1: "premiumize",
+            2: "real_debrid",
+            3: "all_debrid",
+        }
+
+        for i in range(1, 4):
+            debridp = debrid_priority_settings.get(
+                g.get_int_setting("general.debridsort.{}".format(i))
+            )
+            if debridp is None:
+                break
+            debrid_priorities[debridp] = -i
+        self.debrid_priorities = debrid_priorities
+
+    def _sort_sources(self, sources_list):
+        """
+        Sort a source list based on sort_methods defined by settings
+        All sort method key methods should return key values for *descending* sort.  If a reversed sort is required,
+        reverse is specified as a boolean for the second item of each tuple in sort_methods
+        :param sources_list: The list of sources to sort
+        :return: The list of sorted sources
+        :rtype: list
+        """
+        sources_list = sorted(sources_list, key=lambda s: s['release_title'])
+        return sorted(sources_list, key=self._get_sort_key_tuple, reverse=True)
+
+    def _get_sort_key_tuple(self, source):
+        return tuple(
+            -sm(source) if reverse else sm(source)
+            for (sm, reverse) in self.sort_methods
+            if sm
+        )
+
+    def _get_type_sort_key(self, source):
+        return self.type_priorities.get(source.get("type"), -99)
+
+    def _get_quality_sort_key(self, source):
+        return self.quality_priorities.get(source.get("quality"), -99)
+
+    def _get_debrid_priority_key(self, source):
+        return self.debrid_priorities.get(source.get("debrid_provider"), self.FIXED_SORT_POSITION_OBJECT)
+
+    def _get_size_sort_key(self, source):
+        size = source.get("size", None)
+        if size == "Variable":
+            return self.FIXED_SORT_POSITION_OBJECT
+        if size is None or not isinstance(size, (int, float)) or size < 0:
+            size = 0
+        return size
+
+    @staticmethod
+    def _get_low_cam_sort_key(source):
+        return "CAM" not in source.get("info", {})
+
+    @staticmethod
+    def _get_hevc_sort_key(source):
+        return "HEVC" in source.get("info", {})
+
+    def _get_hdr_sort_key(self, source):
+        hdrp = -99
+        dvp = -99
+
+        if "HDR" in source.get("info", {}):
+            hdrp = self.hdr_priorities.get("HDR", -99)
+        if "DV" in source.get("info", {}):
+            dvp = self.hdr_priorities.get("DV", -99)
+
+        return max(hdrp, dvp)
+
+    def _get_last_release_name_sort_key(self, source):
+        sm = SequenceMatcher(None, self.last_release_name, source['release_title'], autojunk=False)
+        if sm.real_quick_ratio() < 1:
+            return 0
+        ratio = sm.ratio()
+        if ratio < 0.85:
+            return 0
+        return ratio
+
+    @staticmethod
+    def _get_audio_channels_sort_key(source):
+        audio_channels = None
+        info = source['info']
+        if info:
+            audio_channels = {"2.0", "5.1", "7.1"} & info
+        return float(max(audio_channels)) if audio_channels else 0

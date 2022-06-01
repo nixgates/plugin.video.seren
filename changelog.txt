@@ -1,3 +1,60 @@
+Changelog 2.2.0
+[FEATURE] Complete refactor of source sorting
+[FEATURE] Add enhanced filtering options
+[FEATURE] Improve release title info detection
+[FEATURE] Improved source statistics, filtering and pretermination
+[FEATURE] Updated default seren skin
+[FEATURE] Window class refactors
+[FEATURE] Add adaptive source selection when smartplaying
+[FEATURE] "Original" for TMDB for High artwork size
+[FEATURE] Allow deleting single search terms from search history
+[FEATURE] Base List Types for Genres default setting switch
+[FEATURE] Add trakt user blocked notification.
+[FEATURE] Auto clean torrent cache
+[FEATURE] Re-open settings at correct place
+[FEATURE] Add verbiage in our news function about source sorting changes
+[FEATURE] Update pytz to 2022.1
+[FEATURE] Add Kodi 20 Alpha1 Videodb support (Note: Kodi 20 is not officially supported yet)
+[PERFORMANCE] Lazy load dependencies and optimize imports
+[PERFORMANCE] Improve performance of pre-emptive termination checks
+[PERFORMANCE] Improve performance of source sorting and cloud scrapers
+[PERFORMANCE] Improve performance of source filtering
+[PERFORMANCE] Optimize TVDB
+[PERFORMANCE] Optimise year generation code for menus
+[BUG] Fix background updating of shows
+[BUG] List cache on first boot for widgets broken
+[BUG] Marking an episode as unwatched via CM does not remove last_watched_at in DB
+[BUG] Marking show watched/unwatched shouldn't affect specials
+[BUG] Handle error response from OMDb
+[BUG] Increase read timeout for trakt when milling all seasons
+[BUG] Try close session for trakt.tv
+[BUG] Double widget refresh can occur when playback ends and trakt manager
+[BUG] Trakt Manager --> Hide Show
+[BUG] Duplicate episodes when trakt_id changes
+[BUG] Tvdb fallback is not working as it should
+[BUG] TMDB Show meta never up to par
+[BUG] TMDB air_dates have no time component
+[BUG] Fix TMDB Rate limiting handler
+[BUG] My Lists don't pull all lists
+[BUG] Duplicate my lists lists when no_paging enabled
+[BUG] Remove a4kSubtitles Integration
+[BUG] IndexError from sort_sources
+[BUG] TVDB errors when there is no item in the iterator
+[BUG] Shuffle Play not working when "Flatten Season Episodes" enabled
+[BUG] Seren not passing aliases to a4kScrapers for movies
+[BUG] Cloud Scrapers don't find episodes that include year after title
+[BUG] Change NoPlayableSourcesExcetion to log at info level
+[BUG] Fix getSources progress calculation
+[BUG] Fixup adaptive handling since the source sorting and statistic changes
+[BUG] Limit flip multiple providers to the current package
+[BUG] Ensure we have a valid integer value for torrent seeds
+[BUG] Fix Premiumize transfer progress values
+[BUG] Return gracefully when we have no valid zipfile from install package
+[BUG] Handles source sizes in KB
+[BUG] Fix focus issues on windows
+[BUG] Fix provider module import issues
+[BUG] Improve handling of Kodi object cleanup
+
 Changelog 2.1.9
 Fix PM Application Authorization
 Fix show pack retrieval in torrent cache

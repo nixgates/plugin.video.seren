@@ -80,7 +80,7 @@ class TorrentResolverBase(ApiBase):
     def _user_selection(self, folder_details):
         folder_details = self._filter_non_playable_files(folder_details)
         folder_details = sorted(folder_details, key= lambda k: k['path'].split("/")[-1])
-        selection = xbmcgui.Dialog().select(g.get_language_string(30511),
+        selection = xbmcgui.Dialog().select(g.get_language_string(30483),
                                             [i['path'].split('/')[-1] for i in folder_details])
         return folder_details[selection] if selection >= 0 else None
 

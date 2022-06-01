@@ -4,11 +4,7 @@ from __future__ import absolute_import, division, unicode_literals
 from collections import OrderedDict
 
 from resources.lib.common import tools
-from resources.lib.indexers.fanarttv import FanartTv
-from resources.lib.indexers.omdb import OmdbApi
-from resources.lib.indexers.tmdb import TMDBAPI
-from resources.lib.indexers.trakt import TraktAPI
-from resources.lib.indexers.tvdb import TVDBAPI
+from resources.lib.common.tools import cached_property
 from resources.lib.modules.globals import g
 
 META_TRAKT = 0
@@ -21,20 +17,8 @@ ART_TVDB = 2
 
 
 class MetadataHandler(object):
-    def __init__(
-            self,
-            tmdb_api=None,
-            tvdb_api=None,
-            fanarttv_api=None,
-            trakt_api=None,
-            omdb_api=None,
-    ):
-        self.tmdb_api = tmdb_api if tmdb_api else TMDBAPI()
-        self.tvdb_api = tvdb_api if tvdb_api else TVDBAPI()
-        self.fanarttv_api = fanarttv_api if fanarttv_api else FanartTv()
-        self.trakt_api = trakt_api if trakt_api else TraktAPI()
-        self.omdb_api = omdb_api if omdb_api else OmdbApi()
 
+    def __init__(self):
         self.lang_code = g.get_language_code()
         self.lang_full_code = g.get_language_code(True)
         self.lang_region_code = self.lang_full_code.split("-")[:1]
@@ -74,48 +58,50 @@ class MetadataHandler(object):
         self.preferred_artwork_size = g.get_int_setting("artwork.preferredsize", 1)
 
         self.genres = {
-            "action": g.get_language_string(30520),
-            "adventure": g.get_language_string(30521),
-            "animation": g.get_language_string(30522),
-            "anime": g.get_language_string(30523),
-            "biography": g.get_language_string(30524),
-            "children": g.get_language_string(30525),
-            "comedy": g.get_language_string(30526),
-            "crime": g.get_language_string(30527),
-            "documentary": g.get_language_string(30528),
-            "drama": g.get_language_string(30529),
-            "family": g.get_language_string(30530),
-            "fantasy": g.get_language_string(30531),
-            "game-show": g.get_language_string(30532),
-            "history": g.get_language_string(30533),
-            "holiday": g.get_language_string(30534),
-            "home-and-garden": g.get_language_string(30535),
-            "horror": g.get_language_string(30536),
-            "mini-series": g.get_language_string(30537),
-            "music": g.get_language_string(30538),
-            "musical": g.get_language_string(30539),
-            "mystery": g.get_language_string(30540),
-            "news": g.get_language_string(30541),
-            "none": g.get_language_string(30542),
-            "reality": g.get_language_string(30543),
-            "romance": g.get_language_string(30544),
-            "science-fiction": g.get_language_string(30545),
-            "sci-fi": g.get_language_string(30545),
-            "short": g.get_language_string(30546),
-            "soap": g.get_language_string(30547),
-            "special-interest": g.get_language_string(30548),
-            "sporting-event": g.get_language_string(30549),
-            "superhero": g.get_language_string(30550),
-            "suspense": g.get_language_string(30551),
-            "talk-show": g.get_language_string(30552),
-            "talkshow": g.get_language_string(30552),
-            "thriller": g.get_language_string(30553),
-            "tv-movie": g.get_language_string(30554),
-            "war": g.get_language_string(30555),
-            "western": g.get_language_string(30556),
+            "action": g.get_language_string(30491),
+            "adventure": g.get_language_string(30492),
+            "animation": g.get_language_string(30493),
+            "anime": g.get_language_string(30494),
+            "biography": g.get_language_string(30495),
+            "children": g.get_language_string(30496),
+            "comedy": g.get_language_string(30497),
+            "crime": g.get_language_string(30498),
+            "documentary": g.get_language_string(30499),
+            "drama": g.get_language_string(30500),
+            "family": g.get_language_string(30501),
+            "fantasy": g.get_language_string(30502),
+            "game-show": g.get_language_string(30503),
+            "history": g.get_language_string(30504),
+            "holiday": g.get_language_string(30505),
+            "home-and-garden": g.get_language_string(30506),
+            "horror": g.get_language_string(30507),
+            "mini-series": g.get_language_string(30508),
+            "music": g.get_language_string(30509),
+            "musical": g.get_language_string(30510),
+            "mystery": g.get_language_string(30511),
+            "news": g.get_language_string(30512),
+            "none": g.get_language_string(30513),
+            "reality": g.get_language_string(30514),
+            "romance": g.get_language_string(30515),
+            "science-fiction": g.get_language_string(30516),
+            "sci-fi": g.get_language_string(30516),
+            "short": g.get_language_string(30517),
+            "soap": g.get_language_string(30518),
+            "special-interest": g.get_language_string(30519),
+            "sporting-event": g.get_language_string(30520),
+            "superhero": g.get_language_string(30521),
+            "suspense": g.get_language_string(30522),
+            "talk-show": g.get_language_string(30523),
+            "talkshow": g.get_language_string(30523),
+            "thriller": g.get_language_string(30524),
+            "tv-movie": g.get_language_string(30525),
+            "war": g.get_language_string(30526),
+            "western": g.get_language_string(30527),
         }
 
-        self.meta_hash = tools.md5_hash(
+    @cached_property
+    def meta_hash(self):
+        return tools.md5_hash(
             [
                 self.lang_code,
                 self.movies_poster_limit,
@@ -152,6 +138,31 @@ class MetadataHandler(object):
                 self.fanarttv_api.fanart_support,
             ]
         )
+
+    @cached_property
+    def trakt_api(self):
+        from resources.lib.indexers.trakt import TraktAPI
+        return TraktAPI()
+
+    @cached_property
+    def tmdb_api(self):
+        from resources.lib.indexers.tmdb import TMDBAPI
+        return TMDBAPI()
+
+    @cached_property
+    def tvdb_api(self):
+        from resources.lib.indexers.tvdb import TVDBAPI
+        return TVDBAPI()
+
+    @cached_property
+    def omdb_api(self):
+        from resources.lib.indexers.omdb import OmdbApi
+        return OmdbApi()
+
+    @cached_property
+    def fanarttv_api(self):
+        from resources.lib.indexers.fanarttv import FanartTv
+        return FanartTv()
 
     # region format art
     def format_db_object(self, db_object):
@@ -206,7 +217,7 @@ class MetadataHandler(object):
             if not result["info"].get("country_origin"):
                 result["info"]["country_origin"] = show_info.get("country_origin")
             if not result["info"].get("aliases") and show_info.get("aliases"):
-                    result["info"]["aliases"] = show_info.get("aliases")
+                result["info"]["aliases"] = show_info.get("aliases")
             result["info"].update(
                 {
                     "tvshow.{}".format(key): value
@@ -317,20 +328,21 @@ class MetadataHandler(object):
     def _apply_best_fit_info(
             self, result, trakt_data, tmdb_data, tvdb_data, omdb_object,
     ):
-        result.update({"info": trakt_data.get("info")})
+        result.update({"info": tools.safe_dict_get(trakt_data, "info")})
 
         if tmdb_data:
             result["info"] = tools.smart_merge_dictionary(
                 result["info"],
-                tmdb_data.get("info", {}),
+                tools.safe_dict_get(tmdb_data, "info"),
                 keep_original=self.metadata_location != META_TMDB,
                 extend_array=False
             )
+            self._use_trakt_air_date_when_tmdb_is_selected_as_meta_provider(trakt_data, result)
 
         if tvdb_data:
             result["info"] = tools.smart_merge_dictionary(
                 result["info"],
-                tvdb_data.get("info", {}),
+                tools.safe_dict_get(tvdb_data, "info"),
                 keep_original=self.metadata_location != META_TVDB,
                 extend_array=False
             )
@@ -338,13 +350,18 @@ class MetadataHandler(object):
         if omdb_object:
             result["info"] = tools.smart_merge_dictionary(
                 result["info"],
-                omdb_object.get("info", {}),
+                tools.safe_dict_get(omdb_object, "info"),
                 keep_original=True,
                 extend_array=False
             )
 
         self._normalize_genres(result)
         self._title_fallback(result)
+
+    def _use_trakt_air_date_when_tmdb_is_selected_as_meta_provider(self, trakt_data, result):
+        trakt_air_date = tools.safe_dict_get(trakt_data, "info", "air_date")
+        if self.metadata_location == META_TMDB and trakt_air_date:
+            result["info"]["air_date"] = trakt_air_date
 
     def _normalize_genres(self, meta):
         meta["info"]["genre"] = sorted(
@@ -362,9 +379,9 @@ class MetadataHandler(object):
             media_type = meta["info"]["mediatype"]
             title = None
             if media_type == "season":
-                title = g.get_language_string(30557).format(meta["info"]["season"])
+                title = g.get_language_string(30528).format(meta["info"]["season"])
             if media_type == "episode":
-                title = g.get_language_string(30558).format(meta["info"]["episode"])
+                title = g.get_language_string(30529).format(meta["info"]["episode"])
             if title:
                 meta["info"]["sorttitle"] = title
                 meta["info"]["title"] = title
@@ -604,16 +621,16 @@ class MetadataHandler(object):
         if (
                 (media_type == "movie" and not db_object.get("tmdb_object"))
                 or (
-                        media_type in ["tvshow", "season", "episode"]
-                        and not db_object.get("tmdb_object")
-                        and not db_object.get("tvdb_object")
-                )
+                media_type in ["tvshow", "season", "episode"]
+                and not db_object.get("tmdb_object")
+                and not db_object.get("tvdb_object")
+        )
         ):
             g.log("Unable to lookup some meta for {}".format(db_object.get("trakt_id")), "debug")
         if (
                 self.fanarttv_api.fanart_support and not
-                media_type == "episode" and not
-                db_object.get("fanart_object")
+        media_type == "episode" and not
+        db_object.get("fanart_object")
         ):
             g.log("Unable to lookup fanart meta for {}".format(db_object.get("trakt_id")), "debug")
 
@@ -708,7 +725,7 @@ class MetadataHandler(object):
         self._update_tvshow_tvdb(db_object)
         self._update_tvshow_fanart(db_object)
         self._update_tvshow_fallback(db_object)
-        self._update_tvshow_rating(db_object)
+        # self._update_tvshow_rating(db_object)  # Commenting for now to reduce tvdb calls
         self._update_tvshow_cast(db_object)
 
     def _update_tvshow_trakt(self, db_object):
@@ -973,7 +990,7 @@ class MetadataHandler(object):
         self._update_episode_tmdb(db_object)
         self._update_episode_tvdb(db_object)
         self._update_episode_fallback(db_object)
-        self._update_episode_rating(db_object)
+        # self._update_episode_rating(db_object)  # Commenting for now to reduce tvdb calls
 
     def _update_episode_tmdb(self, db_object):
         if (
@@ -1038,7 +1055,7 @@ class MetadataHandler(object):
                         tools.safe_dict_get(
                             db_object, "trakt_object", "info", "season"
                         ),
-                        tools.safe_dict_get(db_object, "trakt_object", "info", "e"),
+                        tools.safe_dict_get(db_object, "trakt_object", "info", "episode"),
                     ),
                 )
             if (
@@ -1297,4 +1314,3 @@ class MetadataHandler(object):
     def sort_list_items(db_list, trakt_list):
         db_list_dict = {tools.safe_dict_get(t, "info", "trakt_id"): t for t in db_list}
         return [db_list_dict.get(o.get('trakt_id')) for o in trakt_list]
-

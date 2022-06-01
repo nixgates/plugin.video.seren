@@ -5,7 +5,6 @@ import os
 import shutil
 import zipfile
 
-import requests
 import xbmc
 import xbmcgui
 import xbmcvfs
@@ -46,7 +45,7 @@ class ZipManager:
     @staticmethod
     def _get_zip_location_type():
         return xbmcgui.Dialog().select(
-            g.ADDON_NAME, [g.get_language_string(30321), g.get_language_string(30322)]
+            g.ADDON_NAME, [g.get_language_string(30304), g.get_language_string(30305)]
         )
 
     def _get_new_package_location(self, install_style):
@@ -59,15 +58,15 @@ class ZipManager:
         if install_style == 0:
             zip_location = xbmcgui.Dialog().browse(
                 1,
-                g.get_language_string(30323).format("Provider"),
+                g.get_language_string(30306).format("Provider"),
                 "",
                 ".zip",
-                True,
+                False,
                 False,
             )
         elif install_style == 1:
             zip_location = xbmc.Keyboard(
-                "", "{}: {}".format(g.ADDON_NAME, g.get_language_string(30324))
+                "", "{}: {}".format(g.ADDON_NAME, g.get_language_string(30307))
             )
             zip_location.doModal()
             if zip_location.isConfirmed() and zip_location.getText():
@@ -91,6 +90,8 @@ class ZipManager:
             return
 
         if zip_location.startswith("http"):
+            import requests
+
             response = requests.get(zip_location, stream=True)
             if not response.ok and not silent:
                 raise requests.exceptions.ConnectionError

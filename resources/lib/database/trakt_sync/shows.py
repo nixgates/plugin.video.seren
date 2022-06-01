@@ -43,7 +43,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     @guard_against_none()
     def mark_show_watched(self, show_id, watched):
         """
-        Mark watched status for all items of a show
+        Mark watched status for all items of a show except specials
         :param show_id: Trakt ID of the show to update
         :type show_id: int
         :param watched: 1 for watched 0 for unwatched
@@ -54,8 +54,8 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         g.log("Marking show {} as watched in sync database".format(show_id), "debug")
         self._mill_if_needed([{"trakt_id": show_id}])
         self.execute_sql(
-            "UPDATE episodes SET watched=?, last_watched_at=? WHERE trakt_show_id=?",
-            (watched, self._get_datetime_now(), show_id),
+            "UPDATE episodes SET watched=?, last_watched_at=? WHERE trakt_show_id = ? AND season != 0",
+            (watched, self._get_datetime_now() if watched > 0 else None, show_id),
         )
         self._update_shows_statistics_from_show_id(show_id)
 
@@ -76,7 +76,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self.execute_sql(
             "UPDATE episodes SET watched=?, last_watched_at=?"
             " WHERE trakt_show_id=? AND season=?",
-            (watched, self._get_datetime_now(), show_id, season),
+            (
+                watched,
+                self._get_datetime_now() if watched > 0 else None,
+                show_id,
+                season,
+            ),
         )
         self._update_shows_statistics_from_show_id(show_id)
 
@@ -95,7 +100,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self._mill_if_needed([{"trakt_id": show_id}])
         self.execute_sql(
             "UPDATE episodes SET collected=?, collected_at=? WHERE trakt_show_id=?",
-            (collected, self._get_datetime_now(), show_id),
+            (collected, self._get_datetime_now() if collected > 0 else None, show_id),
         )
 
     @guard_against_none()
@@ -111,7 +116,12 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: None
         :rtype: None
         """
-        g.log("Marking episode {} S{}E{} as watched in sync database".format(show_id, season, number), "debug")
+        g.log(
+            "Marking episode {} S{}E{} as watched in sync database".format(
+                show_id, season, number
+            ),
+            "debug",
+        )
         play_count = self.fetchone(
             "SELECT watched from episodes "
             "where trakt_show_id=? and season=? and number=?",
@@ -135,11 +145,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: None
         :rtype: None
         """
-        g.log("Marking episode {} S{}E{} as unwatched in sync database".format(show_id, season, number), "debug")
-        self.execute_sql(
-            "UPDATE episodes SET watched=0 WHERE trakt_show_id=? and season=? and number=?",
-            (show_id, season, number),
+        g.log(
+            "Marking episode {} S{}E{} as unwatched in sync database".format(
+                show_id, season, number
+            ),
+            "debug",
         )
+
+        self._mark_episode_record("watched", 0, show_id, season, number)
         self._update_shows_statistics_from_show_id(show_id)
 
     @guard_against_none()
@@ -163,7 +176,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self.execute_sql(
             "UPDATE episodes SET {}=?, {}=? WHERE trakt_show_id=? AND season=? AND "
             "number=?".format(column, datetime_column),
-            (value, self._get_datetime_now(), show_id, season, number),
+            (
+                value,
+                self._get_datetime_now() if value > 0 else None,
+                show_id,
+                season,
+                number,
+            ),
         )
         self._update_shows_statistics_from_show_id(show_id)
 
@@ -308,7 +327,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         g.log("Fetching Episode list from sync database and updating", "debug")
         self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
         g.log("Updated required episodes", "debug")
-        statement = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count,
+        statement = """SELECT e.trakt_id, e.trakt_show_id, e.trakt_season_id, e.info, e.cast, e.art, e.args, e.watched as play_count,
          b.resume_time as resume_time, b.percent_played as percent_played, e.user_rating FROM episodes as e 
          LEFT JOIN bookmarks as b on e.trakt_id = b.trakt_id WHERE """
 
@@ -451,36 +470,42 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
         updated_items = [i for i in updated_items if i is not None]
 
-        self.save_to_meta_table(
+        threadpool.put(
+            self.save_to_meta_table,
             (i for i in updated_items if "trakt_object" in i),
             media_type,
             "trakt",
             "trakt_id",
         )
-        self.save_to_meta_table(
+        threadpool.put(
+            self.save_to_meta_table,
             (i for i in updated_items if "tmdb_object" in i),
             media_type,
             "tmdb",
             "tmdb_id",
         )
-        self.save_to_meta_table(
+        threadpool.put(
+            self.save_to_meta_table,
             (i for i in updated_items if "tvdb_object" in i),
             media_type,
             "tvdb",
             "tvdb_id",
         )
-        self.save_to_meta_table(
+        threadpool.put(
+            self.save_to_meta_table,
             (i for i in updated_items if "fanart_object" in i),
             media_type,
             "fanart",
             "tvdb_id",
         )
-        self.save_to_meta_table(
+        threadpool.put(
+            self.save_to_meta_table,
             (i for i in updated_items if "omdb_object" in i),
             media_type,
             "omdb",
             "imdb_id",
         )
+        threadpool.wait_completion()
 
         return updated_items
 

@@ -56,7 +56,7 @@ class SmartPlay:
 
     def resume_show(self):
         """
-        Identifies resumse point for a show and plays from there
+        Identifies resume point for a show and plays from there
         :return:
         :rtype:
         """
@@ -66,20 +66,20 @@ class SmartPlay:
 
         window = self._get_window()
 
-        window.set_text(g.get_language_string(30062))
+        window.set_text(g.get_language_string(30060))
         window.show()
 
-        window.set_text(g.get_language_string(30063))
+        window.set_text(g.get_language_string(30061))
 
         season_id, episode = self.get_resume_episode()
 
-        window.set_text(g.get_language_string(30064))
+        window.set_text(g.get_language_string(30062))
 
-        window.set_text(g.get_language_string(30065))
+        window.set_text(g.get_language_string(30063))
 
         self.build_playlist(season_id, episode)
 
-        window.set_text(g.get_language_string(30328))
+        window.set_text(g.get_language_string(30311))
 
         g.log(
             "Begining play from Season ID {} Episode {}".format(season_id, episode),
@@ -245,7 +245,7 @@ class SmartPlay:
         g.PLAYLIST.clear()
         window = self._get_window()
         window.show()
-        window.set_text(g.get_language_string(30064))
+        window.set_text(g.get_language_string(30062))
 
         season_list = self.trakt_api.get_json(
             "shows/{}/seasons".format(self.show_trakt_id), extended="episodes"
@@ -253,7 +253,7 @@ class SmartPlay:
         if season_list[0]["trakt_object"]["info"]["season"] == 0:
             season_list.pop(0)
 
-        window.set_text(g.get_language_string(30065))
+        window.set_text(g.get_language_string(30063))
 
         episode_list = [
             episode
@@ -271,7 +271,7 @@ class SmartPlay:
             episode_list, smart_play=True
         )
 
-        window.set_text(g.get_language_string(30066))
+        window.set_text(g.get_language_string(30064))
 
         for episode in playlist:
             if episode is not None:
@@ -424,10 +424,10 @@ class SmartPlay:
                 selection = xbmcgui.Dialog().contextmenu(
                     [
                         "{} {}".format(
-                            g.get_language_string(30061),
+                            g.get_language_string(30059),
                             datetime.timedelta(seconds=int(resume_switch)),
                         ),
-                        g.get_language_string(30352),
+                        g.get_language_string(30331),
                     ]
                 )
                 if selection == -1:
@@ -442,6 +442,7 @@ class SmartPlay:
 
     def _get_window(self):
         if self.display_style == 0:
+            # not sure about this one either
             return PersistentBackground(
                 *SkinManager().confirm_skin_path("persistent_background.xml"),
                 item_information=self.item_information

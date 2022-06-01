@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals, print_function
 
+from functools import total_ordering
+
 try:  # Python >= 3.3
     from collections.abc import Mapping
 except ImportError:  # Python < 3.3
@@ -14,10 +16,14 @@ import os
 import re
 import sys
 import time
-import traceback
 
 import xbmc
 import xbmcvfs
+
+try:
+    from functools import cached_property  # Supported from py3.8
+except ImportError:
+    from resources.lib.third_party.cached_property import cached_property
 
 try:
     # Try to get Python 3 versions
@@ -372,7 +378,7 @@ def smart_merge_dictionary(dictionary, merge_dict, keep_original=False, extend_a
     if not isinstance(dictionary, dict) or not isinstance(merge_dict, dict):
         return dictionary
     for new_key, new_value in merge_dict.items():
-        original_value = dictionary.get(new_key)
+        original_value = copy.deepcopy(dictionary.get(new_key))
         if isinstance(new_value, (dict, Mapping)):
             if original_value is None:
                 original_value = {}
@@ -418,6 +424,12 @@ def freeze_object(o):
     return o
 
 
+def serialize_sets(obj):
+    if isinstance(obj, set):
+        return sorted([unicode(i) for i in obj])
+    return obj
+
+
 def md5_hash(value):
     """
     Returns MD5 hash of given value
@@ -427,7 +439,7 @@ def md5_hash(value):
     :rtype: str
     """
     if isinstance(value, (tuple, dict, list, set)):
-        value = json.dumps(value, sort_keys=True)
+        value = json.dumps(value, sort_keys=True, default=serialize_sets)
     return hashlib.md5(unicode(value).encode("utf-8")).hexdigest()
 
 
@@ -654,7 +666,7 @@ def filter_dictionary(dictionary, *keys):
 
 
 def safe_dict_get(dictionary, *path):
-    """Safely get the value from a given path taken into account taht the path can be none.
+    """Safely get the value from a given path taken into account that the path can be none.
 
     :param dictionary:Dictionary to take the path from
     :type dictionary:dict
@@ -670,10 +682,25 @@ def safe_dict_get(dictionary, *path):
     result = dictionary
 
     for element in path:
-        result = result.get(element)
+        result = copy.deepcopy(result.get(element))
         if isinstance(result, dict):
             continue
         else:
             break
 
     return result
+
+
+@total_ordering
+class FixedSortPositionObject(object):
+    """
+    A class that always returns equality for a comparison with any other object
+    """
+    def __lt__(self, other):
+        return False
+
+    def __eq__(self, other):
+        return True
+
+    def __neg__(self):
+        return self

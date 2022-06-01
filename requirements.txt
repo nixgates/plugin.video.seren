@@ -16,7 +16,7 @@ flake8-docstrings
 parameterized~=0.7.5
 darglint; python_version>"3.5"
 kodistubs==18.0.0; python_version<"3.7"
-kodistubs==19.0.1; python_version>="3.7"
+kodistubs==19.0.3; python_version>="3.7"
 contextlib2; python_version<"3"
 requests-mock
 Mock~=3.0.5
