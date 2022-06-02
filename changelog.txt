@@ -1,3 +1,8 @@
+Changelog 2.2.1
+[BUG] Error on fresh install from update news
+[BUG] Discover TV Shows Genre multi-select not working
+[PERFORMANCE] Limit search to title and aliases only
+
 Changelog 2.2.0
 [FEATURE] Complete refactor of source sorting
 [FEATURE] Add enhanced filtering options

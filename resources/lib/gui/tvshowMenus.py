@@ -457,6 +457,7 @@ class Menus(object):
         trakt_list = self.shows_database.extract_trakt_page(
             "search/show",
             query=query,
+            fields="title,aliases",
             page=g.PAGE,
             extended="full",
             field="title",
@@ -532,7 +533,7 @@ class Menus(object):
 
     def shows_genres(self):
         g.add_directory_item(
-            g.get_language_string(30045), action="showsGenresGet",
+            g.get_language_string(30045), action="showGenresGet",
             menu_item={
                 "art": dict.fromkeys(
                     ['icon', 'poster', 'thumb', 'fanart'], g.GENRES_PATH + "list.png"

@@ -325,6 +325,7 @@ class Menus(object):
         trakt_list = self.movies_database.extract_trakt_page(
             "search/movie",
             query=query,
+            fields="title,aliases",
             extended="full",
             page=g.PAGE,
             hide_watched=False,

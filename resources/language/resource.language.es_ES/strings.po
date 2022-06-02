@@ -85,9 +85,9 @@ msgstr "Top 10 en Taquilla"
 
 #: /resources/lib/gui/homeMenu.py:29 /resources/lib/gui/movieMenus.py:157
 #: /resources/lib/gui/movieMenus.py:163 /resources/lib/gui/movieMenus.py:313
-#: /resources/lib/gui/movieMenus.py:372 /resources/lib/gui/tvshowMenus.py:175
+#: /resources/lib/gui/movieMenus.py:373 /resources/lib/gui/tvshowMenus.py:175
 #: /resources/lib/gui/tvshowMenus.py:181 /resources/lib/gui/tvshowMenus.py:446
-#: /resources/lib/gui/tvshowMenus.py:481
+#: /resources/lib/gui/tvshowMenus.py:482
 msgctxt "#30013"
 msgid "Search..."
 msgstr "Buscar..."
@@ -267,7 +267,7 @@ msgctxt "#30044"
 msgid "My Movie Lists"
 msgstr "Mi Lista de Películas"
 
-#: /resources/lib/gui/movieMenus.py:413 /resources/lib/gui/tvshowMenus.py:534
+#: /resources/lib/gui/movieMenus.py:414 /resources/lib/gui/tvshowMenus.py:535
 msgctxt "#30045"
 msgid "Multi Select..."
 msgstr "Selección Múltiple..."
@@ -1805,7 +1805,7 @@ msgctxt "#30302"
 msgid "Silent scrape"
 msgstr "Búsqueda Silenciosa"
 
-#: /resources/lib/gui/movieMenus.py:444 /resources/lib/gui/tvshowMenus.py:569
+#: /resources/lib/gui/movieMenus.py:445 /resources/lib/gui/tvshowMenus.py:570
 msgctxt "#30303"
 msgid "Genre Selection"
 msgstr "Selección de Género"
@@ -2717,7 +2717,7 @@ msgstr "Estado Premium"
 #: /resources/skins/Default/1080i/still_watching.xml:179
 #: /resources/skins/Default/1080i/playing_next.xml:154
 #: /resources/skins/Default/1080i/source_select.xml:543
-#: /resources/lib/gui/windows/manual_caching.py:17
+#: /resources/lib/gui/windows/manual_caching.py:19
 #: /resources/lib/gui/windows/download_manager.py:74
 msgctxt "#30459"
 msgid "Close"
