@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="2.2.0" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="2.2.1" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.addon" version="17.9.910" />
         <import addon="script.module.future" version="0.17.1"/>
@@ -62,6 +62,11 @@
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
         <news>
+            Changelog 2.2.1
+            [BUG] Error on fresh install from update news
+            [BUG] Discover TV Shows Genre multi-select not working
+            [PERFORMANCE] Limit search to title and aliases only
+
             Changelog 2.2.0
             [FEATURE] Complete refactor of source sorting
             [FEATURE] Add enhanced filtering options

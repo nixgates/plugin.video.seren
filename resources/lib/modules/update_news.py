@@ -12,7 +12,7 @@ def do_update_news():
     last_update_news_version = g.get_setting("update.news.version")
     max_update_news_version = max(update_news_versions)
 
-    if last_update_news_version == "":
+    if not last_update_news_version:
         g.set_setting("update.news.version", max_update_news_version)
         return
 
