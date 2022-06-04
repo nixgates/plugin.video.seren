@@ -16,7 +16,7 @@ def set_info_properties(info, item):
 
     item.setProperty(
         "info_text",
-        " | ".join(
+        " ".join(
             [
                 " ".join(struct_info[c])
                 for c in codec_type_display_list
