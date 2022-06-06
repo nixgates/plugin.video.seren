@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-13 00:54+0300\n"
-"PO-Revision-Date: 2021-03-19 07:31+0000\n"
+"PO-Revision-Date: 2022-06-06 05:01+0000\n"
 "Last-Translator: psp2111 <>\n"
 "Language-Team: Arabic (Saudi Arabia)\n"
 "Language: ar-SA\n"
@@ -644,7 +644,7 @@ msgstr "الحد الأدنى من الثواني المتبقية قبل إظه
 #: /resources/settings.xml:799
 msgctxt "#30106"
 msgid "Enable Smart Play"
-msgstr "تمكين اللعب الذكي"
+msgstr "تمكين التشغيل الذكي"
 
 #: /resources/settings.xml:787
 msgctxt "#30107"
@@ -714,7 +714,7 @@ msgstr "الحد الأقصى لحجم ملف الحلقة بـ(GB)"
 #: /resources/settings.xml:402
 msgctxt "#30120"
 msgid "Max Resolution"
-msgstr "حد الدقة القصوى"
+msgstr "أعلى دقة وضوح"
 
 #: /resources/settings.xml:366
 msgctxt "#30121"
@@ -819,7 +819,7 @@ msgstr "Real-Debrid"
 #: /resources/lib/modules/providers/install_manager.py:55
 msgctxt "#30136"
 msgid "Providers"
-msgstr "موفري المصادر"
+msgstr "موفر المصادر"
 
 #: /resources/settings.xml:913
 msgctxt "#30137"
@@ -841,7 +841,7 @@ msgstr "تحقق من وجود تحديثات"
 #: /resources/lib/gui/homeMenu.py:111
 msgctxt "#30140"
 msgid "Manage Provider Packages"
-msgstr "إدارة حزم موفري المصادر"
+msgstr "إدارة حزم موفر المصادر"
 
 #: /resources/settings.xml:872
 msgctxt "#30141"
@@ -1031,7 +1031,7 @@ msgstr "الملفات الخاصة بي"
 #: /resources/settings.xml:332
 msgctxt "#30174"
 msgid "Scraper Display Style"
-msgstr "أسلوب عرض الباحث"
+msgstr "أسلوب عرض محرك البحث"
 
 #: /resources/settings.xml:333 /resources/settings.xml:803
 msgctxt "#30175"
@@ -1116,7 +1116,7 @@ msgstr "إنهاء إذا تم العثور على مصادر السحابة"
 #: /resources/settings.xml:339
 msgctxt "#30189"
 msgid "Cloud Scraping"
-msgstr "كشط السحابة"
+msgstr "البحث السحابي"
 
 #: /resources/lib/gui/movieMenus.py:151 /resources/lib/gui/tvshowMenus.py:169
 msgctxt "#30190"
@@ -1145,7 +1145,7 @@ msgid ""
 "You appear to have authorized a non-premium account and will not be able to play items using this account"
 msgstr ""
 "ملاحظة:\n"
-"يبدو أنك قد سمحت بحساب غير مميز ولن تتمكن من تشغيل العناصر باستخدام هذا الحساب"
+"يبدو أنك قد سمحت بالمصادقة مع حساب غير مفعل ولن تتمكن من تشغيل العناصر باستخدام هذا الحساب"
 
 #: /resources/settings.xml:793
 msgctxt "#30195"
@@ -1456,7 +1456,7 @@ msgstr "تعطيل الكل"
 #: /resources/skins/Default/1080i/get_sources.xml:433
 msgctxt "#30248"
 msgid "Cached"
-msgstr "مخزنة مؤقتاً"
+msgstr "المخزنة"
 
 #: /resources/settings.xml:435 /resources/settings.xml:439
 #: /resources/settings.xml:443 /resources/settings.xml:447
@@ -1477,7 +1477,7 @@ msgstr "مخزنة مؤقتاً"
 #: /resources/skins/Default/1080i/get_sources.xml:557
 msgctxt "#30249"
 msgid "Cloud"
-msgstr "خدمة التخزين السحابية Cloud"
+msgstr "السحابة"
 
 #: /resources/skins/Default/1080i/get_sources.xml:786
 msgctxt "#30250"
@@ -2019,7 +2019,7 @@ msgstr "حجم العمل الفني المفضل"
 #: /resources/settings.xml:112
 msgctxt "#30342"
 msgid "Largest Available"
-msgstr "أكبر عدد متوفر"
+msgstr "أكبر حجم متوفر"
 
 #: /resources/settings.xml:112
 msgctxt "#30343"
@@ -2277,7 +2277,7 @@ msgstr ""
 #: /resources/lib/gui/homeMenu.py:139
 msgctxt "#30391"
 msgid "Opens the next playing window"
-msgstr "يفتح نافذة التشغيل التالية"
+msgstr "يفتح نافذة: تشغيل الحلقة التالية"
 
 #: /resources/lib/gui/homeMenu.py:143
 msgctxt "#30392"
@@ -2609,7 +2609,7 @@ msgstr "ترقيم تجميعات Trakt"
 #: /resources/settings.xml:21
 msgctxt "#30445"
 msgid "Show Remaining Unwatched Season Episodes in Mixed Lists"
-msgstr "إظهار حلقات الموسم غير المراقبة المتبقية في القوائم المختلطة"
+msgstr "إظهار حلقات الموسم التي لم يتم مشاهدتها في القوائم المختلطة"
 
 #: /resources/lib/modules/local_downloader.py:189
 #: /resources/lib/modules/download_manager.py:601
@@ -2640,7 +2640,7 @@ msgstr "فشل في مساعد ذاكرة التخزين المؤقت لـ%s"
 #: /resources/settings.xml:11
 msgctxt "#30451"
 msgid "Hide Watched Items"
-msgstr "Hide سلع تحت المراقبة"
+msgstr "اخفاء العناصر التي تم مشاهدتها"
 
 #: /resources/settings.xml:16
 msgctxt "#30452"
@@ -2705,7 +2705,7 @@ msgstr "عرض الملفات الغير مخزنة مؤقتاً"
 #: /resources/settings.xml:848 /resources/lib/gui/homeMenu.py:136
 msgctxt "#30462"
 msgid "Test Playing Next"
-msgstr "اختبار التشغيل التالي"
+msgstr "اختبار نافذة: تشغيل الحلقة التالية"
 
 #: /resources/settings.xml:850 /resources/lib/gui/homeMenu.py:140
 msgctxt "#30463"
@@ -2730,7 +2730,7 @@ msgstr "اختبار ذاكرة التخزين المؤقت اليدوية"
 #: /resources/settings.xml:22
 msgctxt "#30467"
 msgid "General Episode Title Display Style"
-msgstr "نمط عرض عنوان الحلقة العامة"
+msgstr "نمط عرض عنوان الحلقة العام"
 
 #: /resources/lib/modules/cacheAssist.py:108
 #: /resources/lib/modules/cacheAssist.py:159
@@ -2741,7 +2741,7 @@ msgstr "هذه المهمة تعمل الآن في الخلفية"
 #: /resources/skins/Default/1080i/download_manager.xml:354
 msgctxt "#30469"
 msgid "Clear Completed"
-msgstr "مسح المكتملة"
+msgstr "مسح التنزيلات المكتملة"
 
 #: /resources/settings.xml:435 /resources/settings.xml:439
 #: /resources/settings.xml:443 /resources/settings.xml:447
@@ -2762,7 +2762,7 @@ msgstr "مسح المكتملة"
 #: /resources/skins/Default/1080i/get_sources.xml:619
 msgctxt "#30470"
 msgid "Adaptive"
-msgstr "ملفات متكيفة"
+msgstr "متكيفة"
 
 #: /resources/lib/indexers/__init__.py:28
 msgctxt "#30471"
@@ -2811,12 +2811,12 @@ msgstr ""
 #: /resources/settings.xml:870
 msgctxt "#30477"
 msgid "Force widget refresh after playback ends"
-msgstr "فرض تحديث عنصر واجهة المستخدم بعد انتهاء التشغيل"
+msgstr "فرض تحديث عنصر واجهة المستخدم بعد الانتهاء من المشاهدة"
 
 #: /resources/settings.xml:390
 msgctxt "#30478"
 msgid "Terminate if Adaptive Sources are Found"
-msgstr "إنهاء إذا تم العثور على المصادر التكيفية"
+msgstr "إنهاء إذا تم العثور على المصادر المتكيفة"
 
 #: /resources/lib/gui/tvshowMenus.py:208
 msgctxt "#30479"
@@ -3178,7 +3178,7 @@ msgstr "أبجديا"
 #: /resources/settings.xml:931
 msgctxt "#30540"
 msgid "Threading Scale"
-msgstr "مقياس الخيوط"
+msgstr "مقياس المسارات"
 
 #: /resources/settings.xml:932
 msgctxt "#30541"
@@ -3203,7 +3203,7 @@ msgstr "اكستريم"
 #: /resources/settings.xml:871
 msgctxt "#30545"
 msgid "Enable Tools menu item for Window Tests"
-msgstr "تمكين عنصر القائمة أدوات لاختبارات الإطار"
+msgstr "تمكين قائمة الأدوات من أجل اختبارات النافذة"
 
 #: /resources/settings.xml:847
 msgctxt "#30546"
@@ -3239,7 +3239,7 @@ msgstr ""
 #: /resources/skins/Default/1080i/download_manager.xml:305
 msgctxt "#30551"
 msgid "ETA"
-msgstr "إيتا"
+msgstr "الوقت المتبقي"
 
 #: /resources/skins/Default/1080i/download_manager.xml:114
 #: /resources/skins/Default/1080i/download_manager.xml:180
@@ -3251,7 +3251,7 @@ msgstr "السرعة"
 #: /resources/skins/Default/1080i/playing_next.xml:115
 msgctxt "#30553"
 msgid "Playing in"
-msgstr "اللعب في"
+msgstr "بدء تشغيل الحلقة التالية بعد"
 
 #: /resources/skins/Default/1080i/playing_next.xml:115
 #: /resources/lib/modules/getSources.py:1230
@@ -3262,17 +3262,17 @@ msgstr "ثواني"
 #: /resources/skins/Default/1080i/playing_next.xml:138
 msgctxt "#30555"
 msgid "Play now"
-msgstr "تشغيل الآن"
+msgstr "التشغيل الآن"
 
 #: /resources/skins/Default/1080i/provider_packages.xml:42
 msgctxt "#30556"
 msgid "Provider Packages"
-msgstr "حزم الموفر"
+msgstr "حزم موفر المصادر"
 
 #: /resources/skins/Default/1080i/source_select.xml:478
 msgctxt "#30557"
 msgid "Year"
-msgstr "عام"
+msgstr "العام"
 
 #: /resources/skins/Default/1080i/source_select.xml:478
 msgctxt "#30558"
@@ -3304,7 +3304,7 @@ msgstr "الإصدار"
 #: /resources/skins/Default/1080i/download_manager.xml:42
 msgctxt "#30563"
 msgid "Download Manager"
-msgstr "مدير تحميل الإضافات"
+msgstr "مدير التنزيلات"
 
 #: /resources/skins/Default/1080i/download_manager.xml:125
 #: /resources/skins/Default/1080i/download_manager.xml:191
@@ -3315,7 +3315,7 @@ msgstr "تم"
 #: /resources/lib/gui/movieMenus.py:307 /resources/lib/gui/tvshowMenus.py:439
 msgctxt "#30565"
 msgid "Remove from History"
-msgstr "Remove from History"
+msgstr "ازالة من سجل البحث"
 
 #: /resources/lib/modules/update_news.py:6
 msgctxt "#30566"
@@ -3324,14 +3324,14 @@ msgid ""
 "\n"
 "The new sort approach sorts in levels. Each sort groups the results and the next level sort applies within those groups. Therefore, the order of sorts matter."
 msgstr ""
-"حدثت تغييرات كبيرة في فرز المصدر وتصفيته في هذا الإصدار. يرجى مراجعة إعدادات فرز المصدر والتصفية. تم توفير بعض الافتراضات المعقولة. \n"
+"حدثت تغييرات كبيرة في طريقة فرز و تصفية المصادر في هذا التحديث. يرجى مراجعة إعدادات التصنيف والفلترة. تم توفير بعض الخيارات الجديدة. \n"
 "\n"
-"نهج النوع الجديد يصنف في المستويات. يقوم كل نوع بتجميع النتائج وينطبق ترتيب المستوى التالي داخل تلك المجموعات. لذلك ، فإن ترتيب الأنواع مهم."
+"تم تغيير طريقة فرز وتصنيف المصادر الى مستويات. بحيث يقوم المستوى الأول من الفرز بتجميع النتائج الى مجموعات وينطبق ترتيب المستوى التالي داخل تلك المجموعات. لذلك ، فإن ترتيب مستويات الفرز مهم."
 
 #: /resources/lib/modules/update_news.py:26
 msgctxt "#30567"
 msgid "Update News"
-msgstr "تحديث الاخبار"
+msgstr "تغييرات التحديث"
 
 #: /resources/skins/Default/1080i/configure_provider_package.xml:112
 #: /resources/skins/Default/1080i/configure_provider_package.xml:122
@@ -3352,7 +3352,7 @@ msgstr "الحالة"
 #: /resources/settings.xml:428
 msgctxt "#30569"
 msgid "Prioritize the Last Resolved Show Release Name"
-msgstr "إعطاء الأولوية لاسم الإصدار الأخير الذي تم حله"
+msgstr "إعطاء الأولوية لأخر اسم تم الكشف عنه للـ مسلسل\حلقة"
 
 #: /resources/settings.xml:433 /resources/settings.xml:475
 #: /resources/settings.xml:518 /resources/settings.xml:561
@@ -3368,7 +3368,7 @@ msgstr "مزود DEBRIDE"
 #: /resources/settings.xml:690 /resources/settings.xml:733
 msgctxt "#30571"
 msgid "Low Cam Sort"
-msgstr "فرز الحدبة المنخفضة"
+msgstr "الدقة المنخفضة CAM"
 
 #: /resources/settings.xml:433 /resources/settings.xml:475
 #: /resources/settings.xml:518 /resources/settings.xml:561
@@ -3396,7 +3396,7 @@ msgstr "DV/HDR"
 #: /resources/settings.xml:752 /resources/settings.xml:756
 msgctxt "#30574"
 msgid "HDR"
-msgstr "خاصية التصوير بالمدى الديناميكي العالي / اتش دي ار"
+msgstr "HDR"
 
 #: /resources/settings.xml:433 /resources/settings.xml:475
 #: /resources/settings.xml:518 /resources/settings.xml:561
@@ -3421,7 +3421,7 @@ msgstr "قنوات الصوت"
 #: /resources/settings.xml:751 /resources/settings.xml:759
 msgctxt "#30576"
 msgid "First Priority"
-msgstr "First Priority"
+msgstr "الأولوية الأولى"
 
 #: /resources/settings.xml:438 /resources/settings.xml:454
 #: /resources/settings.xml:462 /resources/settings.xml:481
@@ -3437,7 +3437,7 @@ msgstr "First Priority"
 #: /resources/settings.xml:755 /resources/settings.xml:763
 msgctxt "#30577"
 msgid "Second Priority"
-msgstr "Second Priority"
+msgstr "الأولوية الثانية"
 
 #: /resources/settings.xml:442 /resources/settings.xml:466
 #: /resources/settings.xml:485 /resources/settings.xml:509
@@ -3449,7 +3449,7 @@ msgstr "Second Priority"
 #: /resources/settings.xml:743 /resources/settings.xml:767
 msgctxt "#30578"
 msgid "Third Priority"
-msgstr "Third Priority"
+msgstr "الأولوية الثالثة"
 
 #: /resources/settings.xml:446 /resources/settings.xml:489
 #: /resources/settings.xml:532 /resources/settings.xml:575
@@ -3465,7 +3465,7 @@ msgstr "الأولوية الرابعة"
 #: /resources/settings.xml:728 /resources/settings.xml:771
 msgctxt "#30580"
 msgid "Reverse Sort Direction"
-msgstr "اتجاه الفرز العكسي"
+msgstr "عكس اتجاه الفرز"
 
 #: /resources/settings.xml:439 /resources/settings.xml:443
 #: /resources/settings.xml:447 /resources/settings.xml:482
@@ -3486,42 +3486,42 @@ msgstr "غير ذلك"
 #: /resources/settings.xml:432
 msgctxt "#30582"
 msgid "Sort Level 1"
-msgstr "Sort المستوى 1"
+msgstr "المستوى الأول للفرز"
 
 #: /resources/settings.xml:474
 msgctxt "#30583"
 msgid "Sort Level 2"
-msgstr "Sort المستوى 2"
+msgstr "المستوى الثاني للفرز"
 
 #: /resources/settings.xml:517
 msgctxt "#30584"
 msgid "Sort Level 3"
-msgstr "Sort المستوى 3"
+msgstr "المستوى الثالث للفرز"
 
 #: /resources/settings.xml:560
 msgctxt "#30585"
 msgid "Sort Level 4"
-msgstr "Sort المستوى الرابع"
+msgstr "المستوى الرابع للفرز"
 
 #: /resources/settings.xml:603
 msgctxt "#30586"
 msgid "Sort Level 5"
-msgstr "Sort المستوى الخامس"
+msgstr "المستوى الخامس للفرز"
 
 #: /resources/settings.xml:646
 msgctxt "#30587"
 msgid "Sort Level 6"
-msgstr "Sort المستوى السادس"
+msgstr "المستوى السادس للفرز"
 
 #: /resources/settings.xml:689
 msgctxt "#30588"
 msgid "Sort Level 7"
-msgstr "Sort المستوى السابع"
+msgstr "المستوى السابع للفرز"
 
 #: /resources/settings.xml:732
 msgctxt "#30589"
 msgid "Sort Level 8"
-msgstr "Sort المستوى الثامن"
+msgstr "المستوى الثامن للفرز"
 
 #: /resources/settings.xml:451 /resources/settings.xml:455
 #: /resources/settings.xml:494 /resources/settings.xml:498
@@ -3533,7 +3533,7 @@ msgstr "Sort المستوى الثامن"
 #: /resources/settings.xml:752 /resources/settings.xml:756
 msgctxt "#30590"
 msgid "DV"
-msgstr "(DV) الفيديو الرقمي"
+msgstr "DV"
 
 #: /resources/settings.xml:7
 msgctxt "#30591"
@@ -3553,7 +3553,7 @@ msgstr "قوائم Trakt"
 #: /resources/settings.xml:47 /resources/settings.xml:50
 msgctxt "#30594"
 msgid "Download Location"
-msgstr "تنزيل الموقع"
+msgstr "مسار التنزيلات"
 
 #: /resources/settings.xml:78
 msgctxt "#30595"
@@ -3563,18 +3563,18 @@ msgstr "الألوان"
 #: /resources/settings.xml:99
 msgctxt "#30596"
 msgid "Metadata & Artwork"
-msgstr "البيانات الوصفية والأعمال الفنية"
+msgstr "البيانات التعريفية والأعمال الفنية"
 
 #: /resources/settings.xml:102
 msgctxt "#30597"
 msgid "Metadata"
-msgstr "بيانات تعريفية"
+msgstr "البيانات التعريفية"
 
 #: /resources/settings.xml:369 /resources/settings.xml:373
 #: /resources/settings.xml:403 /resources/settings.xml:405
 msgctxt "#30598"
 msgid "4K"
-msgstr "فيديوهات 4K"
+msgstr "4K"
 
 #: /resources/settings.xml:369 /resources/settings.xml:373
 #: /resources/settings.xml:403 /resources/settings.xml:405
@@ -3586,13 +3586,13 @@ msgstr "1080p"
 #: /resources/settings.xml:403 /resources/settings.xml:405
 msgctxt "#30600"
 msgid "720p"
-msgstr "الخطوط العامودية بدقة 720 المطورة"
+msgstr "720p"
 
 #: /resources/settings.xml:369 /resources/settings.xml:373
 #: /resources/settings.xml:403 /resources/settings.xml:405
 msgctxt "#30601"
 msgid "SD"
-msgstr "حلول"
+msgstr "SD"
 
 #: /resources/settings.xml:786
 msgctxt "#30602"
@@ -3607,7 +3607,7 @@ msgstr "Resolving"
 #: /resources/settings.xml:798
 msgctxt "#30604"
 msgid "Smart Play"
-msgstr "اللعب الذكي"
+msgstr "التشغيل الذكي"
 
 #: /resources/settings.xml:868
 msgctxt "#30605"
@@ -3643,12 +3643,12 @@ msgstr "الإجمالي"
 #: /resources/skins/Default/1080i/get_sources.xml:680
 msgctxt "#30611"
 msgid "Playable"
-msgstr "قابل للعب"
+msgstr "النتائج"
 
 #: /resources/settings.xml:404
 msgctxt "#30612"
 msgid "Min Resolution"
-msgstr "أقل Resolution"
+msgstr "أقل دقة وضوح"
 
 #: /resources/settings.xml:852 /resources/lib/gui/homeMenu.py:144
 msgctxt "#30613"
@@ -3658,12 +3658,12 @@ msgstr "اختبار الحصول على المصادر"
 #: /resources/lib/gui/homeMenu.py:147
 msgctxt "#30614"
 msgid "Opens the Get Sources Window"
-msgstr "يفتح نافذة Get Sources (الحصول على المصادر)"
+msgstr "يفتح نافذة الحصول على مصادر"
 
 #: /resources/lib/modules/getSources.py:162
 msgctxt "#30615"
 msgid "No providers currently enabled, please enable some"
-msgstr "لا يوجد مزودون ممكنون حاليًا ، يرجى تمكين بعض"
+msgstr "لا يوجد موفري مصادر ممكنون حاليًا ، يرجى تمكين البعض"
 
 #: /resources/settings.xml:384
 msgctxt "#30616"
@@ -3678,7 +3678,7 @@ msgstr "اختر العناصر المراد تصفيتها..."
 #: /resources/skins/Default/1080i/filter_select.xml:45
 msgctxt "#30618"
 msgid "Filter Configuration"
-msgstr "تصفية إعدادات"
+msgstr "إعدادات التصفية"
 
 #: /resources/skins/Default/1080i/filter_select.xml:71
 msgctxt "#30619"
@@ -3688,7 +3688,7 @@ msgstr "ترميزات الفيديو"
 #: /resources/skins/Default/1080i/filter_select.xml:240
 msgctxt "#30620"
 msgid "HDR Codecs"
-msgstr "ترميزات تقرير التنمية البشرية"
+msgstr "ترميزات الـHDR"
 
 #: /resources/skins/Default/1080i/filter_select.xml:409
 msgctxt "#30621"
@@ -3708,27 +3708,27 @@ msgstr "النوع"
 #: /resources/skins/Default/1080i/configure_provider_package.xml:751
 msgctxt "#30623"
 msgid "Return to Packages"
-msgstr "العودة إلى الباقات"
+msgstr "الرجوع"
 
 #: /resources/lib/gui/windows/source_select.py:89
 msgctxt "#30624"
 msgid "Return to Source Select"
-msgstr "العودة إلى تحديد المصدر"
+msgstr "العودة إلى اختيار المصادر"
 
 #: /resources/settings.xml:860 /resources/lib/gui/homeMenu.py:163
 msgctxt "#30625"
 msgid "Test Download Manager Window"
-msgstr "اختبار نافذة مدير التنزيل"
+msgstr "اختبار نافذة مدير التنزيلات"
 
 #: /resources/lib/gui/homeMenu.py:160
 msgctxt "#30626"
 msgid "Test Download Manager"
-msgstr "Test مدير تحميل الإضافات"
+msgstr "اختبار مدير التنزيلات"
 
 #: /resources/skins/Default/1080i/download_manager.xml:282
 msgctxt "#30627"
 msgid "Downloaded"
-msgstr "المحمل"
+msgstr "تم تنزيلها"
 
 #: /resources/skins/Default/1080i/download_manager.xml:294
 msgctxt "#30628"
