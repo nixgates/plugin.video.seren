@@ -3352,7 +3352,7 @@ msgstr "الحالة"
 #: /resources/settings.xml:428
 msgctxt "#30569"
 msgid "Prioritize the Last Resolved Show Release Name"
-msgstr "إعطاء الأولوية لأخر اسم تم الكشف عنه للـ مسلسل\حلقة"
+msgstr "إعطاء الأولوية لأخر اسم تم الكشف عنه للمسلسل أثناء البحث"
 
 #: /resources/settings.xml:433 /resources/settings.xml:475
 #: /resources/settings.xml:518 /resources/settings.xml:561
