@@ -37,7 +37,7 @@ def set_info_properties(info, item):
     )
 
     item.setProperty(
-        "info_text_formatted",
+        "info_text_piped_color",
         " | ".join(
             [
                 "{}{}[/COLOR]".format(color_tag, " ".join(struct_info[c]))

@@ -191,7 +191,7 @@
 					<font>font12</font>
 					<align>right</align>
 					<textcolor>FFFFFFFF</textcolor>
-					<label>[B][UPPERCASE]$INFO[Window().Property(info_text_formatted)][/UPPERCASE][/B]</label>
+					<label>[B][UPPERCASE]$INFO[Window().Property(info_text_piped_color)][/UPPERCASE][/B]</label>
 				</control>
 			</control>
 		</control>
