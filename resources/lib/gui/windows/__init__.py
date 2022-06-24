@@ -26,6 +26,17 @@ def set_info_properties(info, item):
     )
 
     item.setProperty(
+        "info_text_piped",
+        " | ".join(
+            [
+                " ".join(struct_info[c])
+                for c in codec_type_display_list
+                if struct_info[c]
+            ]
+        ),
+    )
+
+    item.setProperty(
         "info_text_formatted",
         " | ".join(
             [
