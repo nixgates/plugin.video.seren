@@ -1065,7 +1065,7 @@ msgstr "Neue Film Suche"
 #: /resources/lib/gui/tvshowMenus.py:418
 msgctxt "#30182"
 msgid "New Show Search..."
-msgstr "Neue Serien Sucche"
+msgstr "Neue Serien Suche"
 
 #: /resources/settings.xml:255
 msgctxt "#30183"
