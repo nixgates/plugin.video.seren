@@ -163,8 +163,8 @@
 									<align>right</align>
 									<height>20</height>
 									<textcolor>66FFFFFF</textcolor>
-									<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR] | $INFO[ListItem.Property(info_text_formatted)][/UPPERCASE]</label>
-									<visible>!String.IsEmpty(ListItem.Property(info_text_formatted))</visible>
+									<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR] | $INFO[ListItem.Property(info_text_piped_color)][/UPPERCASE]</label>
+									<visible>!String.IsEmpty(ListItem.Property(info_text_piped_color))</visible>
 								</control>
 								
 								<!-- Resolution -->
@@ -174,7 +174,7 @@
 									<height>20</height>
 									<textcolor>66FFFFFF</textcolor>
 									<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR][/UPPERCASE]</label>
-									<visible>String.IsEmpty(ListItem.Property(info_text_formatted))</visible>
+									<visible>String.IsEmpty(ListItem.Property(info_text_piped_color))</visible>
 								</control>
 							</control>
 						</control>
@@ -266,8 +266,8 @@
 									<align>right</align>
 									<height>20</height>
 									<textcolor>66FFFFFF</textcolor>
-									<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR] | $INFO[ListItem.Property(info_text_formatted)][/UPPERCASE]</label>
-									<visible>!String.IsEmpty(ListItem.Property(info_text_formatted))</visible>
+									<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR] | $INFO[ListItem.Property(info_text_piped_color)][/UPPERCASE]</label>
+									<visible>!String.IsEmpty(ListItem.Property(info_text_piped_color))</visible>
 								</control>
 								
 								<!-- Resolution -->
@@ -277,7 +277,7 @@
 									<height>20</height>
 									<textcolor>66FFFFFF</textcolor>
 									<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR][/UPPERCASE]</label>
-									<visible>String.IsEmpty(ListItem.Property(info_text_formatted))</visible>
+									<visible>String.IsEmpty(ListItem.Property(info_text_piped_color))</visible>
 								</control>
 							</control>
 						</control>
@@ -408,7 +408,7 @@
 							<font>font12</font>
 							<align>right</align>
 							<textcolor>FFFFFFFF</textcolor>
-							<label>[B][UPPERCASE]$INFO[ListItem.Property(info_text_formatted)][/UPPERCASE][/B]</label>
+							<label>[B][UPPERCASE]$INFO[ListItem.Property(info_text_piped_color)][/UPPERCASE][/B]</label>
 						</control>
                     </control>
                 </control>

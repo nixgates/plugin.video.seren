@@ -16,7 +16,16 @@ from resources.lib.modules.timeLogger import TimeLogger
 g.init_globals(sys.argv)
 
 try:
-    with TimeLogger('{}'.format(g.REQUEST_PARAMS.get('action', ''))):
-        router.dispatch(g.REQUEST_PARAMS)
+    g.init_globals(sys.argv)
+    if g.PLATFORM == "android" and g.get_bool_runtime_setting("system.sleeping", False):
+        g.log(
+            "Ignoring {} plugin action as system is supposed to be \"sleeping\".".format(
+                g.REQUEST_PARAMS.get('action', '')
+            ),
+            "info"
+        )
+    else:
+        with TimeLogger('{}'.format(g.REQUEST_PARAMS.get('action', ''))):
+            router.dispatch(g.REQUEST_PARAMS)
 finally:
     g.deinit()

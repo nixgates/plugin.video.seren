@@ -1,0 +1,66 @@
+name: PR
+on:
+  - pull_request
+jobs:
+  tests:
+    name: Add-on testing
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "2.7"
+          - "3.9"
+          - "3.10"
+    steps:
+      - name: Check out ${{ github.sha }} from repository ${{ github.repository }}
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Update pip for 2.7
+        if: matrix.python-version == 2.7
+        run: python -m pip install --upgrade pip==20.3.4
+      - name: Update pip
+        if: matrix.python-version != 2.7
+        run: python -m pip install --upgrade pip
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install lintly
+          pip install --upgrade jinja2  # Workaround for pinned jinja2 version dependent library bug in py3
+      - name: Mark PR with flake8 lint results
+        run: flake8 resources/lib/ tests/ | lintly --format=flake8 --log --use-checks
+        env:
+          LINTLY_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        if: always()
+      - name: Mark PR with pylint lint results
+        run: pylint resources/lib/ tests/ --output-format=json | lintly --format=pylint-json --log --use-checks
+        env:
+          LINTLY_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        if: always()
+      - name: Generate coverage report
+        run: |
+          pip install pytest
+          pip install pytest-cov
+          pip install pytest-xdist
+          pytest -n=auto --dist=loadscope --verbose --color=yes --cov=./ --cov-report=xml --assert=plain tests/
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          flags: unittests
+          env_vars: OS,PYTHON
+          name: codecov-umbrella
+          fail_ci_if_error: false
+  label_issues:
+    name: Label PR "Work In Progress"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label PR "Work In Progress"
+        uses: andymckay/labeler@master
+        with:
+          add-labels: "Work In Progress"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

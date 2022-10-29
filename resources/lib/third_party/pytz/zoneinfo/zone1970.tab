@@ -330,10 +330,7 @@ TO	-210800-1751200	Pacific/Tongatapu
 TR	+4101+02858	Europe/Istanbul
 TV	-0831+17913	Pacific/Funafuti
 TW	+2503+12130	Asia/Taipei
-UA	+5026+03031	Europe/Kiev	Ukraine (most areas)
-UA	+4837+02218	Europe/Uzhgorod	Transcarpathia
-UA	+4750+03510	Europe/Zaporozhye	Zaporozhye and east Lugansk
-UM	+1917+16637	Pacific/Wake	Wake Island
+UA	+5026+03031	Europe/Kyiv	Ukraine (most areas)
 US	+404251-0740023	America/New_York	Eastern (most areas)
 US	+421953-0830245	America/Detroit	Eastern - MI (most areas)
 US	+381515-0854534	America/Kentucky/Louisville	Eastern - KY (Louisville area)
@@ -372,3 +369,27 @@ VU	-1740+16825	Pacific/Efate
 WF	-1318-17610	Pacific/Wallis
 WS	-1350-17144	Pacific/Apia
 ZA,LS,SZ	-2615+02800	Africa/Johannesburg
+#
+# The next section contains experimental tab-separated comments for
+# use by user agents like tzselect that identify continents and oceans.
+#
+# For example, the comment "#@AQ<tab>Antarctica/" means the country code
+# AQ is in the continent Antarctica regardless of the Zone name,
+# so Pacific/Auckland should be listed under Antarctica as well as
+# under the Pacific because its line's country codes include AQ.
+#
+# If more than one country code is affected each is listed separated
+# by commas, e.g., #@IS,SH<tab>Atlantic/".  If a country code is in
+# more than one continent or ocean, each is listed separated by
+# commas, e.g., the second column of "#@CY,TR<tab>Asia/,Europe/".
+#
+# These experimental comments are present only for country codes where
+# the continent or ocean is not already obvious from the Zone name.
+# For example, there is no such comment for RU since it already
+# corresponds to Zone names starting with both "Europe/" and "Asia/".
+#
+#@AQ	Antarctica/
+#@IS,SH	Atlantic/
+#@CY,TR	Asia/,Europe/
+#@SJ	Arctic/
+#@CC,CX,KM,MG,YT	Indian/

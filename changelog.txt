@@ -1,3 +1,9 @@
+Changelog 2.2.2
+[BUG] Trakt scrobbling hitting rate limiter
+[BUG] Improve onWake and sleeping service calls
+[FEATURE] Update pytz to 2022.5
+[FEATURE] Fixed 'info_text' item property for themes
+
 Changelog 2.2.1
 [BUG] Error on fresh install from update news
 [BUG] Discover TV Shows Genre multi-select not working

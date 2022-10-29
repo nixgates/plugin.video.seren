@@ -27,15 +27,22 @@ class SerenMonitor(xbmc.Monitor):
 
     def onNotification(self, sender, method, data):
         if method == "System.OnWake":
-            g.log("System.OnWake notification received" "info")
-            xbmc.executebuiltin(
-                'RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")'
-            )
-            xbmc.executebuiltin(
-                'RunPlugin("plugin://plugin.video.seren/?action=torrentCacheCleanup")'
-            )
+            g.log("System.OnWake notification received", "info")
+            if not g.wait_for_abort(5):  # Sleep for 5 seconds to make sure network is up
+                if g.PLATFORM == "android":
+                    g.clear_runtime_setting("system.sleeping")
+                xbmc.executebuiltin(
+                    'RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")'
+                )
+                xbmc.executebuiltin(
+                    'RunPlugin("plugin://plugin.video.seren/?action=torrentCacheCleanup")'
+                )
             if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
                 xbmc.executebuiltin(
                     'RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")'
                 )
-        return
+
+        if method == "System.OnSleep":
+            g.log("System.OnSleep notification received", "info")
+            if g.PLATFORM == "android":
+                g.set_runtime_setting("system.sleeping", True)
