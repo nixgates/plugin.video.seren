@@ -464,7 +464,9 @@ class GlobalVariables(object):
         get platform on which xbmc run
         """
         platform = "unknown"
-        if xbmc.getCondVisibility("system.platform.linux"):
+        if xbmc.getCondVisibility("system.platform.android"):
+            platform = "android"
+        elif xbmc.getCondVisibility("system.platform.linux"):
             platform = "linux"
         elif xbmc.getCondVisibility("system.platform.xbox"):
             platform = "xbox"

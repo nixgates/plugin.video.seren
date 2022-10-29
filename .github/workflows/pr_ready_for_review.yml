@@ -1,0 +1,15 @@
+name: PR Ready for review
+on:
+  pull_request:
+    types: [ready_for_review, review_requested]
+
+jobs:
+  label_issues:
+    name: Remove "Work In Progress" Label
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove "Work In Progress" Label
+        uses: andymckay/labeler@master
+        with:
+          remove-labels: "Work In Progress"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
