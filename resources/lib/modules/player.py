@@ -611,18 +611,15 @@ class SerenPlayer(xbmc.Player):
 
                 self._update_progress()
 
-            if not self.scrobble_started:
-                self._trakt_start_watching()
+                if not self.scrobble_started:
+                    self._trakt_start_watching()
 
-            time_left = int(self.total_time) - int(self.current_time)
+                time_left = int(self.total_time) - int(self.current_time)
 
-            if (
-                self.min_time_before_scrape > time_left
-                and not self.pre_scrape_initiated
-            ):
-                self._handle_pre_scrape()
+                if self.min_time_before_scrape > time_left and not self.pre_scrape_initiated:
+                    self._handle_pre_scrape()
 
-            if (
+                if (
                     self.watched_percentage >= self.playCountMinimumPercent
                     and self.scrobble_started
                     and not self.scrobbled
@@ -630,12 +627,10 @@ class SerenPlayer(xbmc.Player):
                     self._handle_bookmark()
                     self._trakt_stop_watching()
 
-            if self.dialogs_enabled and not self.dialogs_triggered:
-                if time_left <= self.playing_next_time:
-                    xbmc.executebuiltin(
-                        'RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")'
-                    )
-                    self.dialogs_triggered = True
+                if self.dialogs_enabled and not self.dialogs_triggered:
+                    if time_left <= self.playing_next_time:
+                        xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')
+                        self.dialogs_triggered = True
 
         self._end_playback()
 

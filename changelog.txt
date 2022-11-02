@@ -1,3 +1,7 @@
+Changelog 2.2.3
+[BUG] Fix Trakt Scrobbling and Playing Next
+[FEATURE] Update pytz to 2022.6
+
 Changelog 2.2.2
 [BUG] Trakt scrobbling hitting rate limiter
 [BUG] Improve onWake and sleeping service calls
