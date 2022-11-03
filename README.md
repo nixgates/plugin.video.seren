@@ -8,13 +8,6 @@
 
 Seren is a multi-source addon for Kodi with the added ability to install custom provider modules. Unlike other Kodi addons which are generally built for a single service use, Seren allows users to connect to multiple online/offline services at once for their viewing with a single click.
 
-## Contribution
-
-Configure hooks for automated pre commit changes:
-```sh
-git config core.hooksPath .githooks
-```
-
 ## FAQ
 
 > #### How do I install a new provider?
