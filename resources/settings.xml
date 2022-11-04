@@ -332,6 +332,7 @@
         <setting type="lsep" label="30084"/>
         <setting id="general.scrapedisplay" type="enum"   label="30174" default="0"
                  lvalues="30175|30176"/>
+        <setting id="general.resolverHide"  type="bool"   label="30634" default="false"/>
         <setting id="general.torrentCache"  type="bool"   label="30111" default="true"/>
         <setting id="general.timeout"       type="slider" label="30112" default="60"
                  option="int" range="10,180"/>
@@ -400,27 +401,37 @@
         <setting type="lsep" label="30117"/>
         <setting type="action" label="30617"
                  action="RunPlugin(plugin://plugin.video.seren/?action=chooseFilters)" option="close"/>
+        <setting id="general.autoMaxResolution"   type="bool"   label="30635" default="false"/>
         <setting id="general.maxResolution"       type="enum"   label="30120" default="0"
-                 lvalues="30598|30599|30600|30601"/>
+                 lvalues="30598|30599|30600|30601"
+                 visible="eq(-1,false)"/>
         <setting id="general.minResolution"       type="enum"   label="30612" default="3"
                  lvalues="30598|30599|30600|30601"/>
-        <setting id="general.enablesizelimit"     type="bool"   label="30118" default="true"/>
+        <setting id="general.enablesizelimit"     type="enum"   label="30118" default="0" lvalues="30632|30629|30631"/>
         <setting id="general.sizelimit.movie"     type="slider" label="30192" default="10"
                  option="int" range="0,1,300"
                  subsetting="true"
-                 visible="eq(-1,true)"/>
+                 visible="eq(-1,2)"/>
         <setting id="general.sizelimit.episode"   type="slider" label="30119" default="10"
                  option="int" range="0,1,300"
                  subsetting="true"
-                 visible="eq(-2,true)"/>
+                 visible="eq(-2,2)"/>
         <setting id="general.sizeminimum.movie"   type="slider" label="30534" default="0"
                  option="float" range="0.0,0.1,30.0"
                  subsetting="true"
-                 visible="eq(-3,true)"/>
+                 visible="eq(-3,2)"/>
         <setting id="general.sizeminimum.episode" type="slider" label="30535" default="0"
                  option="float" range="0.0,0.1,30.0"
                  subsetting="true"
-                 visible="eq(-4,true)"/>
+                 visible="eq(-4,2)"/>
+        <setting id="general.speedlimit" type="slider" label="30630" default="10"
+                 option="float" range="0.0,0.5,300.0"
+                 subsetting="true"
+                 visible="eq(-5,1)"/>
+        <setting id="general.speedminimum" type="slider" label="30633" default="0"
+                 option="float" range="0.0,0.5,300.0"
+                 subsetting="true"
+                 visible="eq(-6,1)"/>
         <setting id="general.filters"      type="text"  default="3D"
                  visible="false"/>
 
