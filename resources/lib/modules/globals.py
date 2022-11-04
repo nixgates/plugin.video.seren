@@ -349,6 +349,7 @@ class GlobalVariables(object):
         self.NEXT_PAGE_ICON = self.IMAGES_PATH + "next.png"
         self.init_request(argv)
         self._init_cache()
+        #TODO: Add speedtest here perhaps
 
     def _init_kodi(self):
         self.PLAYLIST = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
