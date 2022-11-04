@@ -16,7 +16,7 @@ def set_info_properties(info, item):
 
     item.setProperty(
         "info_text",
-        " | ".join(
+        " ".join(
             [
                 " ".join(struct_info[c])
                 for c in codec_type_display_list
@@ -26,7 +26,18 @@ def set_info_properties(info, item):
     )
 
     item.setProperty(
-        "info_text_formatted",
+            "info_text_piped",
+            " | ".join(
+                [
+                    " ".join(struct_info[c])
+                    for c in codec_type_display_list
+                    if struct_info[c]
+                ]
+            ),
+        )
+
+    item.setProperty(
+        "info_text_piped_color",
         " | ".join(
             [
                 "{}{}[/COLOR]".format(color_tag, " ".join(struct_info[c]))
