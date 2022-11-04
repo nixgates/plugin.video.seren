@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 import string
+import xbmcgui
 
 from resources.lib.modules.globals import g
 
@@ -106,6 +107,7 @@ INFO_STRUCT = {
             "HC",
             "SCR",
             "3D",
+            "60-FPS"
         }
     }
 
@@ -191,7 +193,8 @@ INFO_TYPES = {
         "hardcode", "hard code",
         "vostfr", "vo stfr",
     ],
-    "3D": [" 3d"],
+    "3D": [" 3d", " half ou", " half sbs"],
+    "60-FPS": [" 60 fps", " 60fps"]
 }
 
 
@@ -877,4 +880,19 @@ def get_accepted_resolution_set():
     max_res = g.get_int_setting("general.maxResolution")
     min_res = g.get_int_setting("general.minResolution")
 
+    if g.get_bool_setting("general.autoMaxResolution"):
+        widthRes = xbmcgui.getScreenWidth()
+        heightRes = xbmcgui.getScreenHeight()
+
+        if widthRes > 1920 and heightRes > 1080:
+            max_res = 0
+        elif widthRes > 1280 and heightRes > 720:
+            max_res = 1
+        elif widthRes > 720 and heightRes > 480:
+            max_res = 2
+        else:
+            max_res = 3
+    else:
+        max_res = g.get_int_setting("general.maxResolution")
+        
     return set(resolutions[max_res:min_res+1])

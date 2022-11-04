@@ -31,10 +31,12 @@ class SourceSorter:
         self.filter_set = self._get_filters()
 
         # Size filter settings
-        self.enable_size_limit = g.get_bool_setting("general.enablesizelimit")
+        self.enable_size_limit = g.get_int_setting("general.enablesizelimit")
         setting_mediatype = g.MEDIA_EPISODE if self.mediatype == g.MEDIA_EPISODE else g.MEDIA_MOVIE
         self.size_limit = g.get_int_setting("general.sizelimit.{}".format(setting_mediatype)) * 1024
         self.size_minimum = int(g.get_float_setting("general.sizeminimum.{}".format(setting_mediatype)) * 1024)
+        self.speed_limit = g.get_float_setting("general.speedlimit", 10)
+        self.speed_minimum = g.get_float_setting("general.speedminimum", 0)
 
         # Sort Settings
         self.quality_priorities = {
@@ -59,6 +61,11 @@ class SourceSorter:
 
     def filter_sources(self, source_list):
         # Iterate sources, yielding only those that are not filtered
+        if self.enable_size_limit == 1 :
+            duration = self.item_information["info"]["duration"] or (5400 if self.mediatype == "movie" else 2400)
+            max_size = self.speed_limit * 0.125 * duration * 0.9
+            min_size = self.speed_minimum * 0.125 * duration * 0.9
+        # import web_pdb; web_pdb.set_trace()
         for source in source_list:
             # Quality filter
             if source['quality'] not in self.resolution_set:
@@ -76,10 +83,15 @@ class SourceSorter:
             if self.disable_dv and self.disable_hdr and "HYBRID" in source['info']:
                 continue
             # File size limits filter
-            if self.enable_size_limit and not (
+            if self.enable_size_limit :
+                if self.enable_size_limit == 1 and not (
+                    max_size >= int(source.get("size", 0)) >= min_size
+                ):
+                    continue
+                elif self.enable_size_limit == 2 and not(
                     self.size_limit >= int(source.get("size", 0)) >= self.size_minimum
-            ):
-                continue
+                ):
+                    continue
 
             # If not filtered, yield source
             yield source

@@ -3724,3 +3724,38 @@ msgstr "Downloaded"
 msgctxt "#30628"
 msgid "Progress"
 msgstr "Progress"
+
+#: /resources/settings.xml:407
+msgctxt "#30629"
+msgid "Use Internet Speed"
+msgstr "Use Internet Speed"
+
+#: /resources/settings.xml:424
+msgctxt "#30630"
+msgid "Download Speed (Mbit/s)"
+msgstr "Download Speed (Mbit/s)"
+
+#: /resources/settings.xml:407
+msgctxt "#30631"
+msgid "Use Max Size"
+msgstr "Use Max Size"
+
+#: /resources/settings.xml:407
+msgctxt "#30632"
+msgid "Off"
+msgstr "Off"
+
+#: /resources/settings.xml:428
+msgctxt "#30633"
+msgid "Min Speed (Mbit/s)"
+msgstr "Min Speed (Mbit/s)"
+
+#: /resources/lib/modules/helpers.py:36
+msgctxt "#30634"
+msgid "Hide Resolver Window"
+msgstr "Hide Resolver Window"
+
+#: /resources/settings.xml:428
+msgctxt "#30635"
+msgid "Auto Max Resolution"
+msgstr "Auto Max Resolution"

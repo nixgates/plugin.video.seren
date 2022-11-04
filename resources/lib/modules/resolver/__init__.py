@@ -206,13 +206,15 @@ class Resolver:
                 return None
             except Exception:
                 g.log("Failing Magnet: {}".format(source["magnet"]))
-                raise ResolverFailure(source)
+                # raise ResolverFailure(source)
+                return None
         elif source["type"] in ["hoster", "cloud"]:
             try:
                 stream_link = api.resolve_stream_url({"link": source["url"]})
             except (UnexpectedResponse, FileIdentification) as e:
                 g.log(e, "error")
-                raise ResolverFailure(source)
+                # raise ResolverFailure(source)
+                return None
 
         return stream_link
 

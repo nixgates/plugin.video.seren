@@ -33,7 +33,7 @@ class Resolverhelper(object):
         stream_link = ""
         release_title = ""
 
-        if g.get_bool_runtime_setting('tempSilent'):
+        if g.get_bool_runtime_setting('tempSilent') or g.get_bool_setting("general.resolverHide", False):
             stream_link, release_title = Resolver().resolve_multiple_until_valid_link(sources, item_information, pack_select, True)
         else:
             try:
