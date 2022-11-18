@@ -927,6 +927,14 @@ class TraktSyncDatabase(Database):
 
                 self.execute_sql(
                     [
+                        "delete from episodes where trakt_show_id = {} and trakt_season_id not in ({})".format(
+                            trakt_id,
+                            ",".join(map(str, season)))
+                        for trakt_id, season in season_ids.items()
+                    ]
+                )
+                self.execute_sql(
+                    [
                         "delete from seasons where trakt_show_id = {} and trakt_id not in ({})".format(
                             trakt_id,
                             ",".join(map(str, season)))

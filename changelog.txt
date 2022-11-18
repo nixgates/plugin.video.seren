@@ -1,3 +1,6 @@
+Changelog 2.2.4
+[BUG] Fix bugs related to foreign key constraints
+
 Changelog 2.2.3
 [BUG] Fix Trakt Scrobbling and Playing Next
 [FEATURE] Update pytz to 2022.6
