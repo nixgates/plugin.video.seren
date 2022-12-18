@@ -5,22 +5,22 @@
 		<width>1920</width>
 		<height>1080</height>
     </coordinates>
-	
+
     <controls>
-        
+
 		<!-- Background -->
 		<control type="group">
 			<top>0</top>
 			<left>0</left>
 			<width>1920</width>
 			<height>1080</height>
-			
+
 			<!-- Fallback -->
 			<control type="image">
 				<texture>white.png</texture>
 				<colordiffuse>FF000000</colordiffuse>
 			</control>
-			
+
 			<!-- Fanart -->
 			<control type="image">
 				<texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
@@ -34,25 +34,23 @@
 		</control>
 
 
-        <!-- Seren Peacock -->
+		<!-- Seren Logo -->
 		<control type="image">
 			<centerleft>50%</centerleft>
-			<centertop>45%</centertop>
+			<bottom>80</bottom>
 			<align>center</align>
 			<aligny>center</aligny>
-			<width>100</width>
+			<width>335</width>
 			<aspectratio>keep</aspectratio>
 			<texture>$INFO[Window().Property(seren.logo)]</texture>
 			<visible>String.IsEmpty(Window().Property(item.art.clearlogo))</visible>
 		</control>
-		
+
 		<!-- Clearlogo -->
 		<control type="image">
-			<animation effect="fade" time="350" condition="String.IsEqual(Window().Property(from_source_select),true)">WindowOpen</animation>
-			<animation effect="fade" end="0" time="350">WindowClose</animation>
 			<centerleft>50%</centerleft>
 			<width>335</width>
-			<centertop>50%</centertop>
+			<bottom>80</bottom>
 			<align>center</align>
 			<aligny>center</aligny>
 			<aspectratio>keep</aspectratio>
@@ -71,7 +69,7 @@
             <textcolor>FFDDDDDD</textcolor>
             <label>$INFO[Window().Property(notification_text)]</label>
         </control>
-		
+
 		<control type="group">
 			<animation effect="slide" start="-2000,0" time="350" tween="cubic" easing="in" reversible="false">WindowOpen</animation>
 			<animation effect="slide" end="2000,0" time="350" tween="cubic" easing="in" reversible="false">WindowClose</animation>
@@ -80,28 +78,28 @@
 			<centertop>10</centertop>
 			<centerleft>50%</centerleft>
 			<top>692</top>
-			
+
 			<!-- Source Icon -->
 			<control type="group">
 				<top>40</top>
 				<width>200</width>
-				<height>200</height>                        
-				
+				<height>200</height>
+
 				<!-- Seren Peacock -->
 				<control type="image">
 					<aspectratio>keep</aspectratio>
 					<texture>$INFO[Window().Property(seren.logo)]</texture>
-					<visible>String.IsEmpty(ListItem.Property(provider.image))</visible>
+					<visible>String.IsEmpty(Window().Property(source.icon))</visible>
 				</control>
-				
+
 				<!-- Provider Icon -->
 				<control type="image">
 					<aspectratio>keep</aspectratio>
-					<texture>$INFO[ListItem.Property(provider.image)]</texture>
-					<visible>!String.IsEmpty(ListItem.Property(provider.image))</visible>
+					<texture>$INFO[Window().Property(source.icon)]</texture>
+					<visible>!String.IsEmpty(Window().Property(source.icon))</visible>
 				</control>
 			</control>
-			
+
 			<!-- Release Title -->
 			<control type="label">
 				<top>40</top>
@@ -119,9 +117,9 @@
 			<control type="group">
 				<width>800</width>
 				<height>70</height>
-				<left>210</left>	
+				<left>210</left>
 				<top>100</top>
-				
+
 				<!-- Debrid Provider -->
 				<control type="label">
 					<font>font12</font>
@@ -131,7 +129,7 @@
 					<wrapmultiline>true</wrapmultiline>
 					<label>[B][UPPERCASE]$INFO[Window().Property(debrid_provider)][/UPPERCASE][/B]</label>
 				</control>
-				
+
 				<!-- Provider -->
 				<control type="label">
 					<top>40</top>
@@ -143,12 +141,12 @@
 					<label>[B][UPPERCASE]$INFO[Window().Property(source_provider)][/UPPERCASE][/B]</label>
 				</control>
 			</control>
-			
+
 			<control type="group">
 				<right>20</right>
 				<top>100</top>
 				<height>140</height>
-				
+
 				<!-- Size -->
 				<control type="label">
 					<right>0</right>
@@ -183,7 +181,7 @@
 					<textcolor>FFFFFFFF</textcolor>
 					<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30252]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(source_type)][/COLOR][/UPPERCASE][/B]</label>
 				</control>
-				
+
 				<!-- Info -->
 				<control type="label">
 					<top>120</top>

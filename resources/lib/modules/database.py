@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 # This whole file is for backwards compatibility
 import datetime
 
@@ -9,7 +6,7 @@ from resources.lib.modules.globals import g
 
 def cache_get(key):
     value = g.CACHE.get(key)
-    return value if not value == g.CACHE.NOT_CACHED else None
+    return value if value != g.CACHE.NOT_CACHED else None
 
 
 def cache_insert(key, value, expiration=None):
@@ -22,9 +19,9 @@ def cache_insert(key, value, expiration=None):
 def get(func, duration, *args, **kwargs):
     method_class = args[0]
     method_class_name = method_class.__class__.__name__
-    cache_str = "{}.{}".format(method_class_name, func.__name__)
+    cache_str = f"{method_class_name}.{func.__name__}"
     for item in args[1:]:
-        cache_str += ".{}".format(item)
+        cache_str += f".{item}"
     cache_str = cache_str.lower()
     cached_data = g.CACHE.get(cache_str)
     if cached_data == g.CACHE.NOT_CACHED:
@@ -34,10 +31,7 @@ def get(func, duration, *args, **kwargs):
     overwrite_cache = kwargs.pop("overwrite_cache", False)
     if cached_data is not None and ignore_cache and not global_cache_ignore:
         return cached_data
-    else:
-        result = func(*args, **kwargs)
-        if result and (not ignore_cache or overwrite_cache):
-            g.CACHE.set(
-                cache_str, result, expiration=datetime.timedelta(hours=duration)
-            )
-        return result
+    result = func(*args, **kwargs)
+    if result and (not ignore_cache or overwrite_cache):
+        g.CACHE.set(cache_str, result, expiration=datetime.timedelta(hours=duration))
+    return result

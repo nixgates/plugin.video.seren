@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import calendar
 import datetime
 import time
@@ -39,8 +38,6 @@ def assert_tz_offset(tz):
     tz_offset = get_tz_offset(tz)
     system_offset = get_system_offset()
     if tz_offset != system_offset:
-        msg = ('Timezone offset does not match system offset: {0} != {1}. '
-               'Please, check your config files.').format(
-                   tz_offset, system_offset
-               )
+        msg = (f'Timezone offset does not match system offset: {tz_offset} != {system_offset}. '
+               'Please, check your config files.')
         raise ValueError(msg)

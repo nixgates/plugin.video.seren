@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import xbmcgui
 
 from resources.lib.common import tools
@@ -14,50 +11,56 @@ from resources.lib.modules.resolver import Resolver
 from resources.lib.modules.source_sorter import SourceSorter
 
 
-class Resolverhelper(object):
+class Resolverhelper:
     """
     Helper object to stream line resolving items
     """
+
+    window = None
+
     @use_cache(1)
-    def resolve_silent_or_visible(self, sources, item_information,
-                                  pack_select=False, from_source_select=False, overwrite_cache=False):
+    def resolve_silent_or_visible(self, sources, item_information, pack_select=False, overwrite_cache=False):
         """
         Method to handle automatic background or foreground resolving
         :param sources: list of sources to handle
         :param item_information: information on item to play
         :param pack_select: True if you want to perform a manual file selection
-        :param from_source_select: True if we were called from SS screen
         :param overwrite_cache: Set to true if you wish to overwrite the current cached return value
         :return: None if unsuccessful otherwise a playable object
         """
-        stream_link = ""
-        release_title = ""
+        stream_link = None
+        release_title = None
 
         if g.get_bool_runtime_setting('tempSilent'):
-            stream_link, release_title = Resolver().resolve_multiple_until_valid_link(sources, item_information, pack_select, True)
+            stream_link, release_title = Resolver().resolve_multiple_until_valid_link(
+                sources, item_information, pack_select, True
+            )
         else:
-            try:
-                window = ResolverWindow(
-                    *SkinManager().confirm_skin_path('resolver.xml'),
-                    item_information=item_information
-                )
-                stream_link, release_title = window.doModal(
-                    sources,
-                    pack_select,
-                    from_source_select=from_source_select,
-                )
-            finally:
-                del window
+            self.window = ResolverWindow(
+                *SkinManager().confirm_skin_path('resolver.xml'),
+                item_information=item_information,
+                close_callback=self.close_window,
+            )
+            tools.run_threaded(self.window.doModal, sources, pack_select)
+            while not g.wait_for_abort(0.30):
+                stream_link, release_title = self.window.get_return_data()
+                if stream_link:
+                    break
 
         if item_information['info']['mediatype'] == g.MEDIA_EPISODE and release_title:
             g.set_runtime_setting(
-                "last_resolved_release_title.{}".format(item_information['info']['trakt_show_id']),
-                release_title
+                f"last_resolved_release_title.{item_information['info']['trakt_show_id']}", release_title
             )
         return stream_link
 
+    def close_window(self):
+        if self.window:
+            self.window.close()
+            del self.window
+            self.window = None
 
-class SourcesHelper(object):
+
+class SourcesHelper:
     """
     Helper object to stream line scraping of items
     """
@@ -75,8 +78,7 @@ class SourcesHelper(object):
             yesno = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30443))
             if not yesno:
                 return
-        sources = Sources(item_information).get_sources(overwrite_torrent_cache=overwrite_cache)
-        return sources
+        return Sources(item_information).get_sources(overwrite_torrent_cache=overwrite_cache)
 
     def sort_sources(self, item_information, sources_list):
         """
@@ -103,17 +105,14 @@ def show_persistent_window_if_required(item_information):
     :param item_information:
     :return: WindowDialog
     """
-    if g.PLAYLIST.getposition() <= 0 and g.get_int_setting('general.scrapedisplay') == 0:
-        from resources.lib.database.skinManager import SkinManager
-        from resources.lib.gui.windows.persistent_background import PersistentBackground
-
-        # dunno about this one?
-        background = PersistentBackground(
-            *SkinManager().confirm_skin_path('persistent_background.xml'),
-            item_information=item_information
-        )
-        background.set_text(g.get_language_string(30030))
-        background.show()
-        return background
-    else:
+    if g.get_int_setting('general.scrapedisplay') != 0 or g.get_runtime_setting('tempSilent'):
         return None
+    from resources.lib.database.skinManager import SkinManager
+    from resources.lib.gui.windows.persistent_background import PersistentBackground
+
+    background = PersistentBackground(
+        *SkinManager().confirm_skin_path('persistent_background.xml'), item_information=item_information
+    )
+    background.set_text(g.get_language_string(30030))
+    background.show()
+    return background

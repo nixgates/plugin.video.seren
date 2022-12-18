@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import time
+from functools import cached_property
 from functools import wraps
+from urllib import parse
 
 import xbmc
 import xbmcgui
 
 from resources.lib.common import tools
-from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.modules.globals import g
 
@@ -20,33 +18,27 @@ def alldebrid_guard_response(func):
     @wraps(func)
     def wrapper(*args, **kwarg):
         import requests
+
         try:
             response = func(*args, **kwarg)
             if response.status_code in [200, 201]:
                 return response
 
             if response.status_code == 429:
-                g.log(
-                    "Alldebrid Throttling Applied, Sleeping for {} seconds".format(1),
-                )
+                g.log('Alldebrid Throttling Applied, Sleeping for 1 seconds')
                 xbmc.sleep(1 * 1000)
                 response = func(*args, **kwarg)
 
             g.log(
-                "AllDebrid returned a {} ({}): while requesting {}".format(
-                    response.status_code,
-                    AllDebrid.http_codes[response.status_code],
-                    response.url,
-                ),
+                f"AllDebrid returned a {response.status_code} ({AllDebrid.http_codes[response.status_code]}): "
+                f"while requesting {response.url}",
                 "warning",
             )
             return None
         except requests.exceptions.ConnectionError:
             return None
         except Exception:
-            xbmcgui.Dialog().notification(
-                g.ADDON_NAME, g.get_language_string(30024).format("AllDebrid")
-            )
+            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30024).format("AllDebrid"))
             raise
 
     return wrapper
@@ -64,7 +56,7 @@ class AllDebrid:
         502: "Bad Gateway",
         503: "Service Unavailable",
         504: "Gateway Timeout",
-        524: "Internal Server Error"
+        524: "Internal Server Error",
     }
 
     def __init__(self):
@@ -76,10 +68,9 @@ class AllDebrid:
         import requests
         from requests.adapters import HTTPAdapter
         from urllib3 import Retry
+
         session = requests.Session()
-        retries = Retry(
-            total=5, backoff_factor=0.1, status_forcelist=[429, 500, 502, 503, 504]
-        )
+        retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[429, 500, 502, 503, 504])
         session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
         return session
 
@@ -88,11 +79,9 @@ class AllDebrid:
         if not g.get_bool_setting(AD_ENABLED_KEY):
             return
 
-        params.update({
-            "agent": self.agent_identifier,
-            "apikey": self.apikey if not params.pop("reauth", None) else None}
-        )
-        return self.session.get(tools.urljoin(self.base_url, url), params=params)
+        params.update({"agent": self.agent_identifier, "apikey": None if params.pop("reauth", None) else self.apikey})
+
+        return self.session.get(parse.urljoin(self.base_url, url), params=params)
 
     def get_json(self, url, **params):
         return self._extract_data(self.get(url, **params).json())
@@ -102,32 +91,26 @@ class AllDebrid:
         if not g.get_bool_setting(AD_ENABLED_KEY) or not self.apikey:
             return
         params.update({"agent": self.agent_identifier, "apikey": self.apikey})
-        return self.session.post(
-            tools.urljoin(self.base_url, url), data=post_data, params=params
-        )
+        return self.session.post(parse.urljoin(self.base_url, url), data=post_data, params=params)
 
     def post_json(self, url, post_data=None, **params):
         return self._extract_data(self.post(url, post_data, **params).json())
 
     def _extract_data(self, response):
-        if "data" in response:
-            return response["data"]
-        else:
-            return response
+        return response["data"] if "data" in response else response
 
     def auth(self):
         resp = self.get_json("pin/get", reauth=True)
         expiry = pin_ttl = int(resp["expires_in"])
         auth_complete = False
+        auth_check = None
         tools.copy2clip(resp["pin"])
         try:
             progress_dialog = xbmcgui.DialogProgress()
             progress_dialog.create(
-                g.ADDON_NAME + ": " + g.get_language_string(30334),
+                f"{g.ADDON_NAME}: {g.get_language_string(30334)}",
                 tools.create_multiline_message(
-                    line1=g.get_language_string(30018).format(
-                        g.color_string(resp["base_url"])
-                    ),
+                    line1=g.get_language_string(30018).format(g.color_string(resp["base_url"])),
                     line2=g.get_language_string(30019).format(g.color_string(resp["pin"])),
                     line3=g.get_language_string(30047),
                 ),
@@ -137,36 +120,31 @@ class AllDebrid:
             # Polling to early will cause an invalid pin error
             xbmc.sleep(5 * 1000)
             progress_dialog.update(100)
-            while (
-                not auth_complete
-                and not expiry <= 0
-                and not progress_dialog.iscanceled()
-            ):
-                auth_complete, expiry = self.poll_auth(check=resp["check"], pin=resp["pin"])
-                progress_percent = 100 - int((float(pin_ttl - expiry) / pin_ttl) * 100)
-                progress_dialog.update(progress_percent)
-                xbmc.sleep(1 * 1000)
+
+            while not auth_complete and expiry > 0 and not progress_dialog.iscanceled():
+                auth_check = self.get_json("pin/check", check=resp["check"], pin=resp["pin"])
+                if auth_check["activated"]:
+                    auth_complete = True
+                    break
+                else:
+                    expiry = int(auth_check["expires_in"])
+                    progress_percent = 100 - int((float(pin_ttl - expiry) / pin_ttl) * 100)
+                    progress_dialog.update(progress_percent)
+                    xbmc.sleep(1 * 1000)
 
             progress_dialog.close()
-            self.store_user_info()
+
+            if auth_complete and not progress_dialog.iscanceled() and auth_check is not None:
+                g.set_setting(AD_AUTH_KEY, auth_check["apikey"])
+                self.apikey = auth_check["apikey"]
+                self.store_user_info()
         finally:
             del progress_dialog
 
         if auth_complete:
-            xbmcgui.Dialog().ok(
-                g.ADDON_NAME, "AllDebrid {}".format(g.get_language_string(30020))
-            )
+            xbmcgui.Dialog().ok(g.ADDON_NAME, f"AllDebrid {g.get_language_string(30020)}")
         else:
             return
-
-    def poll_auth(self, **params):
-        resp = self.get_json("pin/check", **params)
-        if resp["activated"]:
-            g.set_setting(AD_AUTH_KEY, resp["apikey"])
-            self.apikey = resp["apikey"]
-            return True, 0
-
-        return False, int(resp["expires_in"])
 
     def get_user_info(self):
         return self._extract_data(self.get_json("user")).get("user", {})
@@ -218,10 +196,7 @@ class AllDebrid:
 
     @staticmethod
     def is_service_enabled():
-        return (
-            g.get_bool_setting(AD_ENABLED_KEY)
-            and g.get_setting(AD_AUTH_KEY) is not None
-        )
+        return g.get_bool_setting(AD_ENABLED_KEY) and g.get_setting(AD_AUTH_KEY) is not None
 
     def get_account_status(self):
         user_info = self.get_user_info()

@@ -1,16 +1,17 @@
+from functools import cached_property
+
 import xbmcgui
 
-from resources.lib.common.tools import cached_property
 from resources.lib.modules.globals import g
 
 
-class TraktContextMenu(object):
+class TraktContextMenu:
     """
     Handles manual user interactions to the Trakt API
     """
 
     def __init__(self, item_information):
-        super(TraktContextMenu, self).__init__()
+        super().__init__()
         trakt_id = item_information["trakt_id"]
         item_type = item_information["action_args"]["mediatype"].lower()
         display_type = self._get_display_name(item_type)
@@ -30,13 +31,11 @@ class TraktContextMenu(object):
             g.get_language_string(30283),
         ]
 
-        for i in standard_list:
-            self.dialog_list.append(i)
-
+        self.dialog_list.extend(iter(standard_list))
         self._handle_progress_option(item_type, trakt_id)
 
         selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             self.dialog_list,
         )
 
@@ -101,6 +100,7 @@ class TraktContextMenu(object):
     @cached_property
     def trakt_api(self):
         from resources.lib.indexers.trakt import TraktAPI
+
         return TraktAPI()
 
     @staticmethod
@@ -120,41 +120,24 @@ class TraktContextMenu(object):
     def _handle_progress_option(self, item_type, trakt_id):
         from resources.lib.database.trakt_sync.bookmark import TraktSyncDatabase
 
-        if item_type not in ["show", "season"] and TraktSyncDatabase().get_bookmark(
-            trakt_id
-        ):
+        if item_type not in ["show", "season"] and TraktSyncDatabase().get_bookmark(trakt_id):
             self.dialog_list.append(g.get_language_string(30284))
 
     def _handle_collected_options(self, item_information, trakt_id, display_type):
         if item_information["info"]["mediatype"] == "movie":
             from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
 
-            collection = [
-                i["trakt_id"] for i in TraktSyncDatabase().get_all_collected_movies()
-            ]
-            if trakt_id in collection:
-                self.dialog_list.append(
-                    g.get_language_string(30275).format(display_type)
-                )
-            else:
-                self.dialog_list.append(
-
-                    g.get_language_string(30274).format(display_type)
-                )
+            collection = [i["trakt_id"] for i in TraktSyncDatabase().get_all_collected_movies()]
         else:
             from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
 
             collection = TraktSyncDatabase().get_collected_shows(force_all=True)
-            collection = set(i["trakt_id"] for i in collection if i is not None)
+            collection = {i["trakt_id"] for i in collection if i is not None}
             trakt_id = self._get_show_id(item_information["info"])
-            if trakt_id in collection:
-                self.dialog_list.append(
-                    g.get_language_string(30275).format(display_type)
-                )
-            else:
-                self.dialog_list.append(
-                    g.get_language_string(30274).format(display_type)
-                )
+        if trakt_id in collection:
+            self.dialog_list.append(g.get_language_string(30275).format(display_type))
+        else:
+            self.dialog_list.append(g.get_language_string(30274).format(display_type))
 
     def _handle_watched_options(self, item_information, item_type):
         if item_type in ["movie", "episode"]:
@@ -162,11 +145,10 @@ class TraktContextMenu(object):
                 self.dialog_list.append(g.get_language_string(30279))
             else:
                 self.dialog_list.append(g.get_language_string(30278))
+        elif item_information.get("unwatched_episodes", 0) > 0:
+            self.dialog_list.append(g.get_language_string(30278))
         else:
-            if item_information.get("unwatched_episodes", 0) > 0:
-                self.dialog_list.append(g.get_language_string(30278))
-            else:
-                self.dialog_list.append(g.get_language_string(30279))
+            self.dialog_list.append(g.get_language_string(30279))
 
     @staticmethod
     def _confirm_item_information(item_information):
@@ -177,9 +159,7 @@ class TraktContextMenu(object):
     def _refresh_meta_information(trakt_object):
         from resources.lib.database import trakt_sync
 
-        trakt_sync.TraktSyncDatabase().clear_specific_item_meta(
-            trakt_object["trakt_id"], trakt_object["mediatype"]
-        )
+        trakt_sync.TraktSyncDatabase().clear_specific_item_meta(trakt_object["trakt_id"], trakt_object["mediatype"])
         g.container_refresh()
         g.trigger_widget_refresh()
 
@@ -187,28 +167,24 @@ class TraktContextMenu(object):
     def _confirm_marked_watched(response, type):
         if response["added"][type] > 0:
             return True
-        else:
-            g.notification(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
-                g.get_language_string(30287),
-            )
-            g.log("Failed to mark item as watched\nTrakt Response: {}".format(response))
+        g.notification(
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
+            g.get_language_string(30287),
+        )
+        g.log(f"Failed to mark item as watched\nTrakt Response: {response}")
 
-            return False
+        return False
 
     @staticmethod
     def _confirm_marked_unwatched(response, type):
         if response["deleted"][type] > 0:
             return True
-        else:
-            g.notification(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
-                g.get_language_string(30287),
-            )
-            g.log(
-                "Failed to mark item as unwatched\nTrakt Response: {}".format(response)
-            )
-            return False
+        g.notification(
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
+            g.get_language_string(30287),
+        )
+        g.log(f"Failed to mark item as unwatched\nTrakt Response: {response}")
+        return False
 
     @staticmethod
     def _info_to_trakt_object(item_information, force_show=False):
@@ -227,16 +203,14 @@ class TraktContextMenu(object):
 
     @staticmethod
     def _get_show_id(item_information):
-        if item_information["mediatype"] != "tvshow":
-            trakt_id = item_information["trakt_show_id"]
-        else:
-            trakt_id = item_information["trakt_id"]
-        return trakt_id
+        return (
+            item_information["trakt_show_id"]
+            if item_information["mediatype"] != "tvshow"
+            else item_information["trakt_id"]
+        )
 
     def _mark_watched(self, item_information, silent=False):
-        response = self.trakt_api.post_json(
-            "sync/history", self._info_to_trakt_object(item_information)
-        )
+        response = self.trakt_api.post_json("sync/history", self._info_to_trakt_object(item_information))
 
         if item_information["mediatype"] == "movie":
             from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
@@ -263,7 +237,7 @@ class TraktContextMenu(object):
                 TraktSyncDatabase().mark_show_watched(item_information["trakt_id"], 1)
 
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             g.get_language_string(30288),
         )
         if not silent:
@@ -271,9 +245,7 @@ class TraktContextMenu(object):
             g.trigger_widget_refresh()
 
     def _mark_unwatched(self, item_information):
-        response = self.trakt_api.post_json(
-            "sync/history/remove", self._info_to_trakt_object(item_information)
-        )
+        response = self.trakt_api.post_json("sync/history/remove", self._info_to_trakt_object(item_information))
 
         if item_information["mediatype"] == "movie":
             from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
@@ -305,7 +277,7 @@ class TraktContextMenu(object):
         TraktSyncDatabase().remove_bookmark(item_information["trakt_id"])
 
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             g.get_language_string(30289),
         )
         g.container_refresh()
@@ -325,15 +297,13 @@ class TraktContextMenu(object):
             TraktSyncDatabase().mark_show_collected(trakt_id, 1)
 
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             g.get_language_string(30290),
         )
         g.trigger_widget_refresh()
 
     def _remove_from_collection(self, item_information):
-        self.trakt_api.post(
-            "sync/collection/remove", self._info_to_trakt_object(item_information, True)
-        )
+        self.trakt_api.post("sync/collection/remove", self._info_to_trakt_object(item_information, True))
 
         if item_information["mediatype"] == "movie":
             from resources.lib.database.trakt_sync.movies import TraktSyncDatabase
@@ -347,7 +317,7 @@ class TraktContextMenu(object):
 
         g.container_refresh()
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             g.get_language_string(30291),
         )
         g.trigger_widget_refresh()
@@ -355,18 +325,16 @@ class TraktContextMenu(object):
     def _add_to_watchlist(self, item_information):
         self.trakt_api.post("sync/watchlist", self._info_to_trakt_object(item_information, True))
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             g.get_language_string(30292),
         )
         g.trigger_widget_refresh()
 
     def _remove_from_watchlist(self, item_information):
-        self.trakt_api.post(
-            "sync/watchlist/remove", self._info_to_trakt_object(item_information, True)
-        )
+        self.trakt_api.post("sync/watchlist/remove", self._info_to_trakt_object(item_information, True))
         g.container_refresh()
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             g.get_language_string(30293),
         )
         g.trigger_widget_refresh()
@@ -377,18 +345,18 @@ class TraktContextMenu(object):
         get = MetadataHandler.get_trakt_info
         lists = self.trakt_api.get_json("users/me/lists")
         selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30296)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30296)}",
             [get(i, "name") for i in lists],
         )
         if selection == -1:
             return
         selection = lists[selection]
         self.trakt_api.post_json(
-            "users/me/lists/{}/items".format(selection["trakt_id"]),
+            f"users/me/lists/{selection['trakt_id']}/items",
             self._info_to_trakt_object(item_information, True),
         )
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             g.get_language_string(30294).format(get(selection, "name")),
         )
         g.trigger_widget_refresh()
@@ -399,19 +367,19 @@ class TraktContextMenu(object):
         get = MetadataHandler.get_trakt_info
         lists = self.trakt_api.get_json("users/me/lists")
         selection = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30296)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30296)}",
             [get(i, "name") for i in lists],
         )
         if selection == -1:
             return
         selection = lists[selection]
         self.trakt_api.post_json(
-            "users/me/lists/{}/items/remove".format(selection["trakt_id"]),
-            self._info_to_trakt_object(item_information, True),
+            f'users/me/lists/{selection["trakt_id"]}/items/remove', self._info_to_trakt_object(item_information, True)
         )
+
         g.container_refresh()
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30286)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30286)}",
             g.get_language_string(30295).format(get(selection, "name")),
         )
         g.trigger_widget_refresh()
@@ -424,25 +392,23 @@ class TraktContextMenu(object):
             sections_display = [g.get_language_string(30298)]
             selection = 0
         else:
-            sections = ["progress_watched", "calendar"]
             sections_display = [g.get_language_string(30297), g.get_language_string(30298)]
             selection = xbmcgui.Dialog().select(
-                "{}: {}".format(g.ADDON_NAME, g.get_language_string(30299)),
+                f"{g.ADDON_NAME}: {g.get_language_string(30299)}",
                 sections_display,
             )
             if selection == -1:
                 return
+            sections = ["progress_watched", "calendar"]
             section = sections[selection]
 
         self.trakt_api.post_json(
-            "users/hidden/{}".format(section),
+            f"users/hidden/{section}",
             self._info_to_trakt_object(item_information, True),
         )
 
         if item_information['mediatype'] == "movie":
-            TraktSyncDatabase().add_hidden_item(
-                item_information['trakt_id'], "movie", section
-            )
+            TraktSyncDatabase().add_hidden_item(item_information['trakt_id'], "movie", section)
         else:
             TraktSyncDatabase().add_hidden_item(
                 item_information.get("trakt_show_id", item_information['trakt_id']), "tvshow", section
@@ -456,29 +422,19 @@ class TraktContextMenu(object):
         g.trigger_widget_refresh()
 
     def _remove_playback_history(self, item_information):
-        media_type = "movie"
-
-        if item_information["mediatype"] != "movie":
-            media_type = "episode"
-
-        progress = self.trakt_api.get_json("sync/playback/{}".format(media_type + "s"))
+        media_type = "episode" if item_information["mediatype"] != "movie" else "movie"
+        progress = self.trakt_api.get_json(f"sync/playback/{media_type}s")
         if len(progress) == 0:
             return
         if media_type == "movie":
-            progress_ids = [
-                i["playback_id"]
-                for i in progress
-                if i["trakt_id"] == item_information["trakt_id"]
-            ]
+            progress_ids = [i["playback_id"] for i in progress if i["trakt_id"] == item_information["trakt_id"]]
         else:
             progress_ids = [
-                i["playback_id"]
-                for i in progress
-                if i["episode"]["trakt_id"] == item_information["trakt_id"]
+                i["playback_id"] for i in progress if i["episode"]["trakt_id"] == item_information["trakt_id"]
             ]
 
         for i in progress_ids:
-            self.trakt_api.delete_request("sync/playback/{}".format(i))
+            self.trakt_api.delete_request(f"sync/playback/{i}")
 
         from resources.lib.database.trakt_sync.bookmark import TraktSyncDatabase
 

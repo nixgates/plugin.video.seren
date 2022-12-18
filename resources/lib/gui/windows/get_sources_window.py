@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import threading
 
 from resources.lib.gui.windows.single_item_window import SingleItemWindow
@@ -9,9 +6,7 @@ from resources.lib.modules.globals import g
 
 class GetSourcesWindow(SingleItemWindow):
     def __init__(self, xml, location, item_information=None):
-        super(GetSourcesWindow, self).__init__(
-            xml, location, item_information=item_information
-        )
+        super().__init__(xml, location, item_information=item_information)
         self.scraper_class = None
 
     def update_properties(self, source_statistics):
@@ -20,14 +15,16 @@ class GetSourcesWindow(SingleItemWindow):
         #     "torrentsCached": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #     "hosters": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #     "cloudFiles": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
-        #     "adaptive": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
+        #     "adaptiveSources": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
+        #     "directSources": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #     "totals": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #     "filtered": {
         #         "torrents": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #         "torrentsCached": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #         "hosters": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #         "cloudFiles": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
-        #         "adaptive": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
+        #         "adaptiveSources": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
+        #         "directSources": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #         "totals": {"4K": 0, "1080p": 0, "720p": 0, "SD": 0, "total": 0},
         #     },
         #     "remainingProviders": []
@@ -35,13 +32,13 @@ class GetSourcesWindow(SingleItemWindow):
         try:
 
             def set_stats_property(source_type, quality, filtered=False):
-                property = "{}_{}".format(source_type, quality)
+                prop = f"{source_type}_{quality}"
                 if filtered:
-                    property += "_filtered"
+                    prop += "_filtered"
                     stat = source_statistics['filtered'][source_type][quality]
                 else:
                     stat = source_statistics[source_type][quality]
-                self.setProperty(property, g.UNICODE(stat))
+                self.setProperty(prop, str(stat))
 
             source_types = [
                 "totals",
@@ -49,7 +46,8 @@ class GetSourcesWindow(SingleItemWindow):
                 "torrentsCached",
                 "hosters",
                 "cloudFiles",
-                "adaptive",
+                "adaptiveSources",
+                "directSources",
             ]
             qualities = ["4K", "1080p", "720p", "SD", "total"]
 
@@ -61,24 +59,22 @@ class GetSourcesWindow(SingleItemWindow):
             # Set remaining providers string
             self.setProperty(
                 "remaining_providers_count",
-                g.UNICODE(len(source_statistics["remainingProviders"])),
+                str(len(source_statistics["remainingProviders"])),
             )
 
             self.setProperty(
                 "remaining_providers_list",
-                g.color_string(' | ').join(
-                    [i.upper() for i in source_statistics["remainingProviders"]]
-                ),
+                g.color_string(' | ').join([i.upper() for i in source_statistics["remainingProviders"]]),
             )
 
             remaining_providers_list = self.getControlList(2000)
             remaining_providers_list.reset()
             remaining_providers_list.addItems(source_statistics["remainingProviders"])
         except (KeyError, IndexError) as e:
-            g.log('Failed to set window properties, {}'.format(e), 'error')
+            g.log(f'Failed to set window properties, {e}', 'error')
 
     def setProgress(self, progress):
-        self.setProperty('progress', g.UNICODE(progress))
+        self.setProperty('progress', str(progress))
 
     def show(self):
         threading.Thread(target=self.doModal).start()
@@ -90,4 +86,4 @@ class GetSourcesWindow(SingleItemWindow):
 
     def close(self):
         self.scraper_class.canceled = True
-        super(GetSourcesWindow, self).close()
+        super().close()

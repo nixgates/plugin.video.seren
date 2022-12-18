@@ -1,18 +1,14 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.gui.windows.source_window import SourceWindow
 from resources.lib.modules.cacheAssist import CacheAssistHelper
-from resources.lib.modules.exceptions import GeneralCachingFailure, FailureAtRemoteParty
+from resources.lib.modules.exceptions import FailureAtRemoteParty
+from resources.lib.modules.exceptions import GeneralCachingFailure
 from resources.lib.modules.globals import g
 from resources.lib.modules.source_sorter import SourceSorter
 
 
 class ManualCacheWindow(SourceWindow):
     def __init__(self, xml_file, location, item_information=None, sources=None, close_text=None):
-        super(ManualCacheWindow, self).__init__(
-            xml_file, location, item_information=item_information, sources=sources
-        )
+        super().__init__(xml_file, location, item_information=item_information, sources=sources)
         self.sources = SourceSorter(self.item_information).sort_sources(self.sources)
         self.cache_assist_helper = CacheAssistHelper()
         self.cached_source = None
@@ -40,5 +36,5 @@ class ManualCacheWindow(SourceWindow):
                 self.close()
 
     def doModal(self):
-        super(ManualCacheWindow, self).doModal()
+        super().doModal()
         return self.cached_source

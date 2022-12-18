@@ -2,13 +2,13 @@
     <coordinates>
         <left>0</left>
         <top>0</top>
-		<width>1920</width>
-		<height>1080</height>
+        <width>1920</width>
+        <height>1080</height>
     </coordinates>
-	
+
     <controls>
-        
-		<!-- Background -->
+
+        <!-- Background -->
         <control type="group">
             <top>0</top>
             <left>0</left>
@@ -22,16 +22,16 @@
             </control>
 
             <!-- Fanart -->
-            <control type="image">    
+            <control type="image">
                 <texture background="true">$INFO[Window().Property(seren.fanart)]</texture>
                 <colordiffuse>66FFFFFF</colordiffuse>
             </control>
 
             <!-- Overlay -->
             <control type="image">
-				<texture background="true">white.png</texture>
-				<colordiffuse>CC000000</colordiffuse>
-			</control>
+                <texture background="true">white.png</texture>
+                <colordiffuse>CC000000</colordiffuse>
+            </control>
         </control>
 
         <!--Title-->
@@ -44,29 +44,29 @@
             <font>font37</font>
             <textcolor>white</textcolor>
         </control>
-		
-		<!-- Scrollbar -->
-		<control type="scrollbar" id="1111">
-			<animation effect="fade" time="350" tween="cubic" easing="in" delay="750">WindowOpen</animation>
-			<animation effect="fade" time="350" tween="cubic" easing="in">WindowClose</animation>
-			<left>10</left>
-			<top>110</top>
-			<width>20</width>
-			<height>890</height>
-			<onright>1000</onright>
-			<showonepage>false</showonepage>
-			<texturesliderbackground colordiffuse="99362e33">white.png</texturesliderbackground>
-			<texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
-			<texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
-		</control>
 
-		<!-- Providers List -->
+        <!-- Scrollbar -->
+        <control type="scrollbar" id="1111">
+            <animation effect="fade" time="350" tween="cubic" easing="in" delay="750">WindowOpen</animation>
+            <animation effect="fade" time="350" tween="cubic" easing="in">WindowClose</animation>
+            <left>10</left>
+            <top>110</top>
+            <width>20</width>
+            <height>890</height>
+            <onright>1000</onright>
+            <showonepage>false</showonepage>
+            <texturesliderbackground colordiffuse="99362e33">white.png</texturesliderbackground>
+            <texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
+            <texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
+        </control>
+
+        <!-- Providers List -->
         <control type="list" id="1000">
-			<animation effect="slide" start="-1400,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
-			<animation effect="slide" end="-1400,0" time="350" tween="cubic" easing="in">WindowClose</animation>
+            <animation effect="slide" start="-1400,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
+            <animation effect="slide" end="-1400,0" time="350" tween="cubic" easing="in">WindowClose</animation>
             <viewtype label="Providers">list</viewtype>
-			<pagecontrol>1111</pagecontrol>
-			<onleft>1111</onleft>
+            <pagecontrol>1111</pagecontrol>
+            <onleft>1111</onleft>
             <onright>2000</onright>
             <left>40</left>
             <top>100</top>
@@ -75,19 +75,19 @@
             <itemgap>20</itemgap>
             <orientation>vertical</orientation>
 
-			<!-- Unfocused Provider -->
+            <!-- Unfocused Provider -->
             <itemlayout height="160">
                 <control type="group">
                     <width>1200</width>
 
-					<!-- Card -->
+                    <!-- Card -->
                     <control type="image">
                         <top>10</top>
-						<texture>white.png</texture>
+                        <texture>white.png</texture>
                         <colordiffuse>99362e33</colordiffuse>
                     </control>
 
-					<!-- Provider Name -->
+                    <!-- Provider Name -->
                     <control type="label">
                         <top>30</top>
                         <left>20</left>
@@ -98,34 +98,34 @@
                         <align>left</align>
                         <label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
                     </control>
-						
-					<!-- Version -->
-					<control type="label">
-						<top>70</top>
-						<left>20</left>
-						<width>600</width>
-						<height>20</height>
-						<font>font12</font>
-						<textcolor>66FFFFFF</textcolor>
-						<align>left</align>
-						<label>[UPPERCASE]$ADDON[plugin.video.seren 30562]: $INFO[ListItem.Property(version)][/UPPERCASE]</label>
-					</control>               
+
+                    <!-- Version -->
+                    <control type="label">
+                        <top>70</top>
+                        <left>20</left>
+                        <width>600</width>
+                        <height>20</height>
+                        <font>font12</font>
+                        <textcolor>66FFFFFF</textcolor>
+                        <align>left</align>
+                        <label>[UPPERCASE]$ADDON[plugin.video.seren 30562]: $INFO[ListItem.Property(version)][/UPPERCASE]</label>
+                    </control>
                 </control>
             </itemlayout>
-			
-			<!-- Unfocused Provider -->
+
+            <!-- Unfocused Provider -->
             <focusedlayout height="160" condition="!Control.HasFocus(1000)">
                 <control type="group">
                     <width>1200</width>
 
-					<!-- Card -->
+                    <!-- Card -->
                     <control type="image">
                         <top>10</top>
-						<texture>white.png</texture>
+                        <texture>white.png</texture>
                         <colordiffuse>99362e33</colordiffuse>
                     </control>
 
-					<!-- Provider Name -->
+                    <!-- Provider Name -->
                     <control type="label">
                         <top>30</top>
                         <left>20</left>
@@ -136,56 +136,56 @@
                         <align>left</align>
                         <label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
                     </control>
-						
-					<!-- Version -->
-					<control type="label">
-						<top>70</top>
-						<left>20</left>
-						<width>600</width>
-						<height>20</height>
-						<font>font12</font>
-						<textcolor>66FFFFFF</textcolor>
-						<align>left</align>
-						<label>[UPPERCASE]$ADDON[plugin.video.seren 30562]: $INFO[ListItem.Property(version)][/UPPERCASE]</label>
-					</control>               
+
+                    <!-- Version -->
+                    <control type="label">
+                        <top>70</top>
+                        <left>20</left>
+                        <width>600</width>
+                        <height>20</height>
+                        <font>font12</font>
+                        <textcolor>66FFFFFF</textcolor>
+                        <align>left</align>
+                        <label>[UPPERCASE]$ADDON[plugin.video.seren 30562]: $INFO[ListItem.Property(version)][/UPPERCASE]</label>
+                    </control>
                 </control>
             </focusedlayout>
 
-			<!-- Focused Provider -->
+            <!-- Focused Provider -->
             <focusedlayout height="270" condition="Control.HasFocus(1000)">
                 <control type="group">
-					<width>1340</width>
-				
-					<!-- Card -->
+                    <width>1340</width>
+
+                    <!-- Card -->
                     <control type="image">
                         <top>10</top>
                         <height>260</height>
                         <texture>white.png</texture>
                         <colordiffuse>FF362e33</colordiffuse>
                     </control>
-					
+
                     <!-- Provider Icon -->
                     <control type="group">
                         <top>40</top>
                         <width>200</width>
-                        <height>200</height>                        
-                        
-						<!-- Seren Peacock -->
+                        <height>200</height>
+
+                        <!-- Seren Peacock -->
                         <control type="image">
                             <aspectratio>keep</aspectratio>
                             <texture>$INFO[Window().Property(seren.logo)]</texture>
-                            <visible>String.IsEmpty(ListItem.Property(provider.image))</visible>
+                            <visible>String.IsEmpty(ListItem.Property(package.icon))</visible>
                         </control>
-						
-						<!-- Provider Icon -->
+
+                        <!-- Package Icon -->
                         <control type="image">
                             <aspectratio>keep</aspectratio>
-                            <texture>$INFO[ListItem.Property(provider.image)]</texture>
-                            <visible>!String.IsEmpty(ListItem.Property(provider.image))</visible>
+                            <texture>$INFO[ListItem.Property(package.icon)]</texture>
+                            <visible>!String.IsEmpty(ListItem.Property(package.icon))</visible>
                         </control>
                     </control>
-                    
-					<!-- Provider Name -->
+
+                    <!-- Package Name -->
                     <control type="label">
                         <top>40</top>
                         <left>210</left>
@@ -197,55 +197,55 @@
                         <aligny>center</aligny>
                         <label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
                     </control>
-					
-					<!-- Provider Version -->
-					<control type="label">
-						<left>210</left>	
-						<top>80</top>
-						<font>font12</font>
-						<height>20</height>
-						<textcolor>FFFFFFFF</textcolor>
-						<align>left</align>
-						<wrapmultiline>true</wrapmultiline>
-						<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30562]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(version)][/COLOR][/UPPERCASE][/B]</label>
-					</control>
-                    
-					<!-- Info -->
-					<control type="label">
-						<top>220</top>
-						<right>20</right>
-						<font>font12</font>
-						<align>right</align>
-						<textcolor>FFFFFFFF</textcolor>
-						<label>$INFO[ListItem.Property(info)]</label>
-					</control>
+
+                    <!-- Package Version -->
+                    <control type="label">
+                        <left>210</left>
+                        <top>80</top>
+                        <font>font12</font>
+                        <height>20</height>
+                        <textcolor>FFFFFFFF</textcolor>
+                        <align>left</align>
+                        <wrapmultiline>true</wrapmultiline>
+                        <label>[B][UPPERCASE]$ADDON[plugin.video.seren 30562]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(version)][/COLOR][/UPPERCASE][/B]</label>
+                    </control>
+
+                    <!-- Info -->
+                    <control type="label">
+                        <top>220</top>
+                        <right>20</right>
+                        <font>font12</font>
+                        <align>right</align>
+                        <textcolor>FFFFFFFF</textcolor>
+                        <label>$INFO[ListItem.Property(info)]</label>
+                    </control>
                 </control>
             </focusedlayout>
         </control>
-		
-		<!-- Buttons -->
+
+        <!-- Buttons -->
         <control type="group">
-			<animation effect="slide" start="600,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
-			<animation effect="slide" end="600,0" time="350" tween="cubic" easing="in">WindowClose</animation>
+            <animation effect="slide" start="600,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
+            <animation effect="slide" end="600,0" time="350" tween="cubic" easing="in">WindowClose</animation>
             <top>110</top>
             <right>20</right>
             <width>500</width>
-			
+
             <control type="group">
                 <height>220</height>
-				
-				<!-- Card -->
+
+                <!-- Card -->
                 <control type="image">
                     <texture>white.png</texture>
                     <colordiffuse>99362e33</colordiffuse>
                 </control>
-				
+
                 <control type="grouplist" id="2000">
                     <top>25</top>
                     <onleft>1000</onleft>
                     <itemgap>10</itemgap>
-					
-					<!-- Install Package -->
+
+                    <!-- Install Package -->
                     <control type="button" id="2002">
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
@@ -254,9 +254,9 @@
                         <label>$ADDON[plugin.video.seren 30238]</label>
                         <align>right</align>
                         <textcolor>FFFFFFFF</textcolor>
-                     </control>
-					
-					<!-- Close -->
+                    </control>
+
+                    <!-- Close -->
                     <control type="button" id="2999">
                         <height>80</height>
                         <textoffsetx>20</textoffsetx>
@@ -265,7 +265,7 @@
                         <label>$ADDON[plugin.video.seren 30459]</label>
                         <align>right</align>
                         <textcolor>FFFFFFFF</textcolor>
-                     </control>
+                    </control>
                 </control>
             </control>
         </control>

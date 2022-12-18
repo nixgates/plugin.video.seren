@@ -22,8 +22,8 @@ from pytz.tzfile import build_tzinfo
 
 
 # The IANA (nee Olson) database is updated several times a year.
-OLSON_VERSION = '2022f'
-VERSION = '2022.6'  # pip compatible version number.
+OLSON_VERSION = '2022g'
+VERSION = '2022.7'  # pip compatible version number.
 __version__ = VERSION
 
 OLSEN_VERSION = OLSON_VERSION  # Old releases had this misspelling
@@ -86,7 +86,7 @@ def open_resource(name):
     """
     name_parts = name.lstrip('/').split('/')
     for part in name_parts:
-        if part == os.path.pardir or os.path.sep in part:
+        if part == os.path.pardir or os.sep in part:
             raise ValueError('Bad path segment: %r' % part)
     zoneinfo_dir = os.environ.get('PYTZ_TZDATADIR', None)
     if zoneinfo_dir is not None:
@@ -202,7 +202,9 @@ def _case_insensitive_zone_lookup(zone):
     """case-insensitively matching timezone, else return zone unchanged"""
     global _all_timezones_lower_to_standard
     if _all_timezones_lower_to_standard is None:
-        _all_timezones_lower_to_standard = dict((tz.lower(), tz) for tz in all_timezones)  # noqa
+        global _all_timezones_unchecked
+        _all_timezones_lower_to_standard = dict((tz.lower(), tz) for tz in _all_timezones_unchecked)  # noqa
+        del _all_timezones_unchecked
     return _all_timezones_lower_to_standard.get(zone.lower()) or zone  # noqa
 
 
@@ -514,7 +516,7 @@ def _test():
 
 if __name__ == '__main__':
     _test()
-all_timezones = \
+_all_timezones_unchecked = \
 ['Africa/Abidjan',
  'Africa/Accra',
  'Africa/Addis_Ababa',
@@ -610,6 +612,7 @@ all_timezones = \
  'America/Cayman',
  'America/Chicago',
  'America/Chihuahua',
+ 'America/Ciudad_Juarez',
  'America/Coral_Harbour',
  'America/Cordoba',
  'America/Costa_Rica',
@@ -964,6 +967,7 @@ all_timezones = \
  'Europe/Kaliningrad',
  'Europe/Kiev',
  'Europe/Kirov',
+ 'Europe/Kyiv',
  'Europe/Lisbon',
  'Europe/Ljubljana',
  'Europe/London',
@@ -1110,7 +1114,7 @@ all_timezones = \
  'WET',
  'Zulu']
 all_timezones = LazyList(
-        tz for tz in all_timezones if resource_exists(tz))
+        tz for tz in _all_timezones_unchecked if resource_exists(tz))
         
 all_timezones_set = LazySet(all_timezones)
 common_timezones = \
@@ -1203,6 +1207,7 @@ common_timezones = \
  'America/Cayman',
  'America/Chicago',
  'America/Chihuahua',
+ 'America/Ciudad_Juarez',
  'America/Costa_Rica',
  'America/Creston',
  'America/Cuiaba',
@@ -1274,7 +1279,6 @@ common_timezones = \
  'America/Nuuk',
  'America/Ojinaga',
  'America/Panama',
- 'America/Pangnirtung',
  'America/Paramaribo',
  'America/Phoenix',
  'America/Port-au-Prince',
@@ -1453,8 +1457,8 @@ common_timezones = \
  'Europe/Istanbul',
  'Europe/Jersey',
  'Europe/Kaliningrad',
- 'Europe/Kiev',
  'Europe/Kirov',
+ 'Europe/Kyiv',
  'Europe/Lisbon',
  'Europe/Ljubljana',
  'Europe/London',

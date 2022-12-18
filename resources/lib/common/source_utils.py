@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 """
 Module for common utilities that may be used when working with source items
 """
-from __future__ import absolute_import, division, unicode_literals
-
+import contextlib
 import re
 import string
 
@@ -27,7 +25,7 @@ _WHITESPACE = re.compile(r'\s+')
 _SINGLE_QUOTE = re.compile(r"['`]")
 _AMPERSAND = re.compile(r'&#038;|&amp;|&')
 _EPISODE_NUMBERS = re.compile(r'.*((?:s\d+ ?e\d+ )|(?:season ?\d+ ?(?:episode|ep) ?\d+)|(?: \d+ ?x ?\d+ ))')
-_ASCII_NON_PRINTABLE = re.compile(r'[^{}]'.format(re.escape(string.printable)))
+_ASCII_NON_PRINTABLE = re.compile(fr'[^{re.escape(string.printable)}]')
 
 
 class CannotGenerateRegexFilterException(Exception):
@@ -50,64 +48,64 @@ def get_quality(release_title):
         return "1080p"
     if any(q in release_title for q in ["2160", "216o"]):
         return "4K"
-    try:
+    with contextlib.suppress(ValueError, IndexError):
         if not release_title[release_title.index("4k") + 2].isalnum():
             return "4K"
-    except (ValueError, IndexError):
-        pass
-
     return "SD"
 
 
 INFO_STRUCT = {
-        "videocodec": {
-            "AVC",
-            "HEVC",
-            "XVID",
-            "DIVX",
-            "WMV",
-            "MP4",
-            "MPEG",
-        },
-        "hdrcodec": {
-            "DV",
-            "HDR",
-            "HYBRID",
-            "SDR",
-        },
-        "audiocodec": {
-            "AAC",
-            "DTS",
-            "DTS-HD",
-            "DTS-HDHR",
-            "DTS-HDMA",
-            "DTS-X",
-            "ATMOS",
-            "TRUEHD",
-            "DD+",
-            "DD",
-            "MP3",
-            "WMA",
-        },
-        "audiochannels": {
-            "2.0",
-            "5.1",
-            "7.1",
-        },
-        "misc": {
-            "CAM",
-            "HDTV",
-            "PDTV",
-            "REMUX",
-            "HD-RIP",
-            "BLURAY",
-            "DVDRIP",
-            "WEB",
-            "HC",
-            "SCR",
-            "3D",
-        }
-    }
+    "videocodec": {
+        "AVC",
+        "HEVC",
+        "XVID",
+        "DIVX",
+        "WMV",
+        "MP4",
+        "MPEG",
+        "VP9",
+        "AV1",
+    },
+    "hdrcodec": {
+        "DV",
+        "HDR",
+        "HYBRID",
+        "SDR",
+    },
+    "audiocodec": {
+        "AAC",
+        "DTS",
+        "DTS-HD",
+        "DTS-HDHR",
+        "DTS-HDMA",
+        "DTS-X",
+        "ATMOS",
+        "TRUEHD",
+        "DD+",
+        "DD",
+        "MP3",
+        "WMA",
+        "OPUS",
+    },
+    "audiochannels": {
+        "2.0",
+        "5.1",
+        "7.1",
+    },
+    "misc": {
+        "CAM",
+        "HDTV",
+        "PDTV",
+        "REMUX",
+        "HD-RIP",
+        "BLURAY",
+        "DVDRIP",
+        "WEB",
+        "HC",
+        "SCR",
+        "3D",
+    },
+}
 
 
 def info_set_to_dict(info_set):
@@ -116,12 +114,7 @@ def info_set_to_dict(info_set):
     :param info_set: info set built with get_info
     :return: structured dictionary
     """
-    info = {}
-
-    for info_prop, codecs in INFO_STRUCT.items():
-        intersection = info_set & codecs
-        info[info_prop] = sorted(list(intersection))
-    return info
+    return {info_prop: sorted(list(info_set & codecs)) for info_prop, codecs in INFO_STRUCT.items()}
 
 
 INFO_TYPES = {
@@ -132,6 +125,8 @@ INFO_TYPES = {
     "MP4": ["mp4"],
     "WMV": ["wmv"],
     "MPEG": ["mpeg"],
+    "VP9": ["vp9"],
+    "AV1": ["av1"],
     "REMUX": ["remux", "bdremux"],
     "DV": [" dv ", "dovi", "dolby vision", "dolbyvision"],
     "HDR": [
@@ -162,34 +157,54 @@ INFO_TYPES = {
     "2.0": ["2 0 ", "2 0ch", "2ch"],
     "5.1": ["5 1 ", "5 1ch", "6ch"],
     "7.1": ["7 1 ", "7 1ch", "8ch"],
-    "BLURAY": ["bluray", "blu ray", "bdrip", "bd rip", "brrip", "br rip"],
-    "WEB": [" web ", "webrip", "webdl", "web rip", "web dl", "webmux"],
+    "BLURAY": ["bluray", "blu ray", "bdrip", "bd rip", "brrip", "br rip", "bdmux"],
+    "WEB": [" web ", "webrip", "webdl", "web rip", "web dl", "webmux", "dlmux"],
     "HD-RIP": [" hdrip", " hd rip"],
     "DVDRIP": ["dvdrip", "dvd rip"],
     "HDTV": ["hdtv"],
     "PDTV": ["pdtv"],
     "CAM": [
-        " cam ", "camrip", "cam rip",
-        "hdcam", "hd cam",
-        " ts ", " ts1", " ts7",
-        "hd ts", "hdts",
+        " cam ",
+        "camrip",
+        "cam rip",
+        "hdcam",
+        "hd cam",
+        " ts ",
+        " ts1",
+        " ts7",
+        "hd ts",
+        "hdts",
         "telesync",
-        " tc ", " tc1", " tc7",
-        "hd tc", "hdtc",
+        " tc ",
+        " tc1",
+        " tc7",
+        "hd tc",
+        "hdtc",
         "telecine",
         "xbet",
-        "hcts", "hc ts",
-        "hctc", "hc tc",
-        "hqcam", "hq cam",
+        "hcts",
+        "hc ts",
+        "hctc",
+        "hc tc",
+        "hqcam",
+        "hq cam",
     ],
     "SCR": ["scr ", "screener"],
     "HC": [
-        "korsub", " kor ",
-        " hc ", "hcsub", "hcts", "hctc", "hchdrip",
-        "hardsub", "hard sub",
+        "korsub",
+        " kor ",
+        " hc ",
+        "hcsub",
+        "hcts",
+        "hctc",
+        "hchdrip",
+        "hardsub",
+        "hard sub",
         "sub hard",
-        "hardcode", "hard code",
-        "vostfr", "vo stfr",
+        "hardcode",
+        "hard code",
+        "vostfr",
+        "vo stfr",
     ],
     "3D": [" 3d"],
 }
@@ -201,11 +216,8 @@ def get_info(release_title):
     :param release_title: Release title of source
     :return: List of info meta
     """
-    title = clean_title(release_title) + " "
-    info = {
-        info_prop for info_prop, string_list in INFO_TYPES.items()
-        if any(i in title for i in string_list)
-    }
+    title = f"{clean_title(release_title)} "
+    info = {info_prop for info_prop, string_list in INFO_TYPES.items() if any(i in title for i in string_list)}
     if all(i in info for i in ["SDR", "HDR"]):
         info.remove("HDR")
     elif all(i in title for i in ["2160p", "remux"]) and all(i not in info for i in ["HDR", "SDR"]):
@@ -216,7 +228,7 @@ def get_info(release_title):
         info.remove("HDR")
     if all(i in info for i in ["HDR", "DV"]):
         info.add("HYBRID")
-    if any(i in info for i in ["HDR", "DV"]) and all(i not in info for i in ["HEVC", "AVC"]):
+    if any(i in info for i in ["HDR", "DV"]) and all(i not in info for i in ["HEVC", "AVC", "AV1", "VP9"]):
         info.add("HEVC")
     if all(i in info for i in ["DD", "DD+"]):
         info.remove("DD")
@@ -226,6 +238,8 @@ def get_info(release_title):
         info.add("DTS")
     if all(i in title for i in ["sub", "forced"]):
         info.add("HC")
+    if "opus" in title and "AV1" in info:
+        info.add("OPUS")
     return info
 
 
@@ -276,12 +290,12 @@ def remove_from_title(title, target, clean=True):
     if not target:
         return title
 
-    title = title.replace(" {} ".format(str(target).lower()), " ")
-    title = title.replace(".{}.".format(str(target).lower()), " ")
-    title = title.replace("+{}+".format(str(target).lower()), " ")
-    title = title.replace("-{}-".format(str(target).lower()), " ")
+    title = title.replace(f" {str(target).lower()} ", " ")
+    title = title.replace(f".{str(target).lower()}.", " ")
+    title = title.replace(f"+{str(target).lower()}+", " ")
+    title = title.replace(f"-{str(target).lower()}-", " ")
     if clean:
-        title = clean_title(title) + " "
+        title = f"{clean_title(title)} "
     else:
         title += " "
 
@@ -323,18 +337,17 @@ def _get_regex_pattern(titles, suffixes_list, non_escaped_suffixes=None):
     for title in titles:
         title = title.strip()
         if len(title) > 0:
-            pattern += re.escape(title) + r" |"
-    pattern = pattern[:-1] + r")+(?:"
+            pattern += f"{re.escape(title)} |"
+    pattern = f"{pattern[:-1]})+(?:"
     for suffix in suffixes_list:
         suffix = suffix.strip()
         if len(suffix) > 0:
-            pattern += re.escape(suffix) + r"|"
+            pattern += f"{re.escape(suffix)}|"
     if non_escaped_suffixes:
         for suffix in non_escaped_suffixes:
-            pattern += suffix + r"|"
-    pattern = pattern[:-1] + r")+"
-    regex_pattern = re.compile(pattern)
-    return regex_pattern
+            pattern += f"{suffix}|"
+    pattern = f"{pattern[:-1]})+"
+    return re.compile(pattern)
 
 
 def check_title_match(title_parts, release_title, simple_info):
@@ -345,16 +358,14 @@ def check_title_match(title_parts, release_title, simple_info):
     :param simple_info: simplified meta data of item
     :return:
     """
-    title = clean_title(" ".join(title_parts)) + " "
+    title = f"{clean_title(' '.join(title_parts))} "
 
     country = simple_info.get("country", "")
     year = simple_info.get("year", "")
     title = remove_country(title, country)
     title = remove_from_title(title, year)
-    if release_title.startswith(title):
-        return True
 
-    return False
+    return release_title.startswith(title)
 
 
 def check_episode_number_match(release_title):
@@ -410,14 +421,11 @@ def filter_movie_title(org_release_title, release_title, movie_title, simple_inf
     title_broken_1 = clean_title(movie_title, broken=1)
     title_broken_2 = clean_title(movie_title, broken=2)
 
-    if (
-        not check_title_match([title], release_title, simple_info)
-        and not check_title_match([title_broken_1], release_title, simple_info)
-        and not check_title_match([title_broken_2], release_title, simple_info)
-    ):
-        return False
-
-    return True
+    return (
+        check_title_match([title], release_title, simple_info)
+        or check_title_match([title_broken_1], release_title, simple_info)
+        or check_title_match([title_broken_2], release_title, simple_info)
+    )
 
 
 def clean_title_with_simple_info(title, simple_info):
@@ -427,7 +435,7 @@ def clean_title_with_simple_info(title, simple_info):
     :param simple_info: simplified metadata
     :return: cleaned title
     """
-    title = clean_title(title) + " "
+    title = f"{clean_title(title)} "
     country = simple_info.get("country", "")
     title = remove_country(title, country)
     year = simple_info.get("year", "")
@@ -450,9 +458,7 @@ def get_filter_single_episode_fn(simple_info):
             simple_info["show_aliases"],
         )
     except KeyError:
-        raise CannotGenerateRegexFilterException(
-            "simple_info must contain (show_title, season_number, episode_number)"
-        )
+        raise CannotGenerateRegexFilterException("simple_info must contain (show_title, season_number, episode_number)")
 
     titles = list(alias_list)
     titles.insert(0, show_title)
@@ -479,10 +485,7 @@ def get_filter_single_episode_fn(simple_info):
         if regex.match(release_title):
             return True
 
-        if check_episode_title_match(clean_titles, release_title, simple_info):
-            return True
-
-        return False
+        return check_episode_title_match(clean_titles, release_title, simple_info)
 
     return filter_fn
 
@@ -503,10 +506,10 @@ def get_filter_season_pack_fn(simple_info):
     titles.insert(0, show_title)
 
     season_fill = season.zfill(2)
-    season_check = "s{}".format(season)
-    season_fill_check = "s%{}".format(season_fill)
-    season_full_check = "season {}".format(season)
-    season_full_fill_check = "season {}".format(season_fill)
+    season_check = f"s{season}"
+    season_fill_check = f"s%{season_fill}"
+    season_full_check = f"season {season}"
+    season_full_fill_check = f"season {season_fill}"
 
     clean_titles = []
     for title in titles:
@@ -522,18 +525,15 @@ def get_filter_season_pack_fn(simple_info):
 
     def filter_fn(release_title):
         """
-         Method to match release titles with supplied metadata
-         :param release_title: source release title
-         :return: True if match found, else False
-         """
+        Method to match release titles with supplied metadata
+        :param release_title: source release title
+        :return: True if match found, else False
+        """
         episode_number_match = check_episode_number_match(release_title)
         if episode_number_match:
             return False
 
-        if re.match(regex_pattern, release_title):
-            return True
-
-        return False
+        return bool(re.match(regex_pattern, release_title))
 
     return filter_fn
 
@@ -562,8 +562,8 @@ def get_filter_show_pack_fn(simple_info):
     all_seasons = "1 "
     season_count = 2
     while season_count <= int(no_seasons):
-        all_season_ranges.append(all_seasons + "and {}".format(season_count))
-        all_seasons += "{} ".format(season_count)
+        all_season_ranges.append(f"{all_seasons}and {season_count}")
+        all_seasons += f"{season_count} "
         all_season_ranges.append(all_seasons)
         season_count += 1
 
@@ -571,33 +571,33 @@ def get_filter_show_pack_fn(simple_info):
 
     def get_pack_names(release_title):
         """
-         Method to match release titles with supplied metadata
-         :param release_title: source release title
-         :return: True if match found, else False
-         """
+        Method to match release titles with supplied metadata
+        :param release_title: source release title
+        :return: True if match found, else False
+        """
         no_seasons_fill = no_seasons.zfill(2)
         no_seasons_minus_one = str(int(no_seasons) - 1)
         no_seasons_minus_one_fill = no_seasons_minus_one.zfill(2)
 
         results = [
-            'all {} seasons'.format(no_seasons),
-            'all {} seasons'.format(no_seasons_fill),
-            'all {} seasons'.format(no_seasons_minus_one),
-            'all {} seasons'.format(no_seasons_minus_one_fill),
-            "all of serie {} seasons".format(no_seasons),
-            "all of serie {} seasons".format(no_seasons_fill),
-            "all of serie {} seasons".format(no_seasons_minus_one),
-            "all of serie {} seasons".format(no_seasons_minus_one_fill),
-            "all torrent of serie {} seasons".format(no_seasons),
-            "all torrent of serie {} seasons".format(no_seasons_fill),
-            "all torrent of serie {} seasons".format(no_seasons_minus_one),
-            "all torrent of serie {} seasons".format(no_seasons_minus_one_fill),
+            f'all {no_seasons} seasons',
+            f'all {no_seasons_fill} seasons',
+            f'all {no_seasons_minus_one} seasons',
+            f'all {no_seasons_minus_one_fill} seasons',
+            f"all of serie {no_seasons} seasons",
+            f"all of serie {no_seasons_fill} seasons",
+            f"all of serie {no_seasons_minus_one} seasons",
+            f"all of serie {no_seasons_minus_one_fill} seasons",
+            f"all torrent of serie {no_seasons} seasons",
+            f"all torrent of serie {no_seasons_fill} seasons",
+            f"all torrent of serie {no_seasons_minus_one} seasons",
+            f"all torrent of serie {no_seasons_minus_one_fill} seasons",
         ]
 
         for season_range in all_season_ranges:
-            results.append("{}".format(season_range))
-            results.append("season {}".format(season_range))
-            results.append("seasons {}".format(season_range))
+            results.append(f"{season_range}")
+            results.append(f"season {season_range}")
+            results.append(f"seasons {season_range}")
 
         if "series" not in release_title:
             results.append("series")
@@ -619,52 +619,52 @@ def get_filter_show_pack_fn(simple_info):
         last_season_fill = last_season.zfill(2)
 
         return [
-            "%s seasons" % last_season,
-            "%s seasons" % last_season_fill,
-            "season 1 %s" % last_season,
-            "season 01 %s" % last_season_fill,
-            "season1 %s" % last_season,
-            "season01 %s" % last_season_fill,
-            "season 1 to %s" % last_season,
-            "season 01 to %s" % last_season_fill,
-            "season 1 thru %s" % last_season,
-            "season 01 thru %s" % last_season_fill,
-            "seasons 1 %s" % last_season,
-            "seasons 01 %s" % last_season_fill,
-            "seasons1 %s" % last_season,
-            "seasons01 %s" % last_season_fill,
-            "seasons 1 to %s" % last_season,
-            "seasons 01 to %s" % last_season_fill,
-            "seasons 1 thru %s" % last_season,
-            "seasons 01 thru %s" % last_season_fill,
-            "full season 1 %s" % last_season,
-            "full season 01 %s" % last_season_fill,
-            "full season1 %s" % last_season,
-            "full season01 %s" % last_season_fill,
-            "full season 1 to %s" % last_season,
-            "full season 01 to %s" % last_season_fill,
-            "full season 1 thru %s" % last_season,
-            "full season 01 thru %s" % last_season_fill,
-            "full seasons 1 %s" % last_season,
-            "full seasons 01 %s" % last_season_fill,
-            "full seasons1 %s" % last_season,
-            "full seasons01 %s" % last_season_fill,
-            "full seasons 1 to %s" % last_season,
-            "full seasons 01 to %s" % last_season_fill,
-            "full seasons 1 thru %s" % last_season,
-            "full seasons 01 thru %s" % last_season_fill,
-            "s1 %s" % last_season,
-            "s1 s%s" % last_season,
-            "s01 %s" % last_season_fill,
-            "s01 s%s" % last_season_fill,
-            "s1 to %s" % last_season,
-            "s1 to s%s" % last_season,
-            "s01 to %s" % last_season_fill,
-            "s01 to s%s" % last_season_fill,
-            "s1 thru %s" % last_season,
-            "s1 thru s%s" % last_season,
-            "s01 thru %s" % last_season_fill,
-            "s01 thru s%s" % last_season_fill,
+            f"{last_season} seasons",
+            f"{last_season_fill} seasons",
+            f"season 1 {last_season}",
+            f"season 01 {last_season_fill}",
+            f"season1 {last_season}",
+            f"season01 {last_season_fill}",
+            f"season 1 to {last_season}",
+            f"season 01 to {last_season_fill}",
+            f"season 1 thru {last_season}",
+            f"season 01 thru {last_season_fill}",
+            f"seasons 1 {last_season}",
+            f"seasons 01 {last_season_fill}",
+            f"seasons1 {last_season}",
+            f"seasons01 {last_season_fill}",
+            f"seasons 1 to {last_season}",
+            f"seasons 01 to {last_season_fill}",
+            f"seasons 1 thru {last_season}",
+            f"seasons 01 thru {last_season_fill}",
+            f"full season 1 {last_season}",
+            f"full season 01 {last_season_fill}",
+            f"full season1 {last_season}",
+            f"full season01 {last_season_fill}",
+            f"full season 1 to {last_season}",
+            f"full season 01 to {last_season_fill}",
+            f"full season 1 thru {last_season}",
+            f"full season 01 thru {last_season_fill}",
+            f"full seasons 1 {last_season}",
+            f"full seasons 01 {last_season_fill}",
+            f"full seasons1 {last_season}",
+            f"full seasons01 {last_season_fill}",
+            f"full seasons 1 to {last_season}",
+            f"full seasons 01 to {last_season_fill}",
+            f"full seasons 1 thru {last_season}",
+            f"full seasons 01 thru {last_season_fill}",
+            f"s1 {last_season}",
+            f"s1 s{last_season}",
+            f"s01 {last_season_fill}",
+            f"s01 s{last_season_fill}",
+            f"s1 to {last_season}",
+            f"s1 to s{last_season}",
+            f"s01 to {last_season_fill}",
+            f"s01 to s{last_season_fill}",
+            f"s1 thru {last_season}",
+            f"s1 thru s{last_season}",
+            f"s01 thru {last_season_fill}",
+            f"s01 thru s{last_season_fill}",
         ]
 
     suffixes = get_pack_names(show_title)
@@ -677,24 +677,19 @@ def get_filter_show_pack_fn(simple_info):
         "(?!season)(?<!season)complete",
     ]
 
-    regex_pattern = _get_regex_pattern(
-        titles, suffixes, non_escaped_suffixes=non_escaped_suffixes
-    )
+    regex_pattern = _get_regex_pattern(titles, suffixes, non_escaped_suffixes=non_escaped_suffixes)
 
     def filter_fn(release_title):
         """
-         Method to match release titles with supplied metadata
-         :param release_title: source release title
-         :return: True if match found, else False
-         """
+        Method to match release titles with supplied metadata
+        :param release_title: source release title
+        :return: True if match found, else False
+        """
         episode_number_match = check_episode_number_match(release_title)
         if episode_number_match:
             return False
 
-        if re.match(regex_pattern, release_title):
-            return True
-
-        return False
+        return bool(re.match(regex_pattern, release_title))
 
     return filter_fn
 
@@ -705,9 +700,7 @@ def is_file_ext_valid(file_name):
     :param file_name: name/path of file
     :return: True if video file is expected to be supported else False
     """
-    if "." + file_name.split(".")[-1] not in g.common_video_extensions:
-        return False
-    return True
+    return file_name.endswith(g.common_video_extensions)
 
 
 def _full_meta_episode_regex(args):
@@ -749,7 +742,7 @@ def _full_meta_episode_regex(args):
     reg_string = reg_string.format(show_title=show_title, country=country, year=year, season=season, episode=episode)
 
     if episode_title:
-        reg_string += "|{eptitle}".format(eptitle=episode_title)
+        reg_string += f"|{episode_title}"
 
     reg_string = reg_string.replace("*", ".")
 
@@ -768,17 +761,11 @@ def get_best_episode_match(dict_key, dictionary_list, item_information):
     files = []
 
     for i in dictionary_list:
-        i.update(
-            {
-                "regex_matches": regex.findall(
-                    clean_title(i[dict_key].split("/")[-1].replace("&", " ").lower())
-                )
-            }
-        )
+        i.update({"regex_matches": regex.findall(clean_title(i[dict_key].split("/")[-1].replace("&", " ").lower()))})
         files.append(i)
     files = [i for i in files if len(i["regex_matches"]) > 0]
 
-    if len(files) == 0:
+    if not files:
         return None
 
     files = sorted(files, key=lambda x: len(" ".join(x["regex_matches"])), reverse=True)
@@ -802,19 +789,12 @@ def clear_extras_by_string(args, extra_string, folder_details):
             return []
 
     folder_details = [
-        i
-        for i in folder_details
-        if extra_string
-        not in clean_title(i["path"].split("/")[-1].replace("&", " ").lower())
+        i for i in folder_details if extra_string not in clean_title(i["path"].split("/")[-1].replace("&", " ").lower())
     ]
     folder_details = [
         i
         for i in folder_details
-        if not any(
-            True
-            for folder in i["path"].split("/")
-            if extra_string.lower() == folder.lower()
-        )
+        if not any(True for folder in i["path"].split("/") if extra_string.lower() == folder.lower())
     ]
 
     return [i for i in folder_details if extra_string not in i["path"]]
@@ -845,26 +825,22 @@ def de_string_size(size):
     """
     if "GB" in size:
         size = float(size.replace("GB", ""))
-        size = int(size * 1024)
-        return size
+        return int(size * 1024)
     if "MB" in size:
         size = int(size.replace("MB", "").replace(" ", "").split(".")[0])
         return size
     if "KB" in size:
         size = float(size.replace("KB", ""))
-        size = int(size * 0.001)
-        return size
+        return int(size * 0.001)
     if "MiB" in size:
         size = int(size.replace("MiB", "").replace(" ", "").split(".")[0])
         return size
     if "GiB" in size:
         size = float(size.replace("GiB", ""))
-        size = int(size * 1024)
-        return size
+        return int(size * 1024)
     if "KiB" in size:
         size = float(size.replace("KiB", ""))
-        size = int(size * 0.001024)
-        return size
+        return int(size * 0.001024)
 
 
 def get_accepted_resolution_set():
@@ -877,4 +853,4 @@ def get_accepted_resolution_set():
     max_res = g.get_int_setting("general.maxResolution")
     min_res = g.get_int_setting("general.minResolution")
 
-    return set(resolutions[max_res:min_res+1])
+    return set(resolutions[max_res : min_res + 1])

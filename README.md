@@ -1,4 +1,5 @@
-[![Kodi version](https://img.shields.io/badge/kodi%20versions-18--19-blue)](https://kodi.tv/)
+[![Kodi version](https://img.shields.io/badge/kodi%20versions-19--20-blue)](https://kodi.tv/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ![CI](https://github.com/SerenKodi/SerenDevelopment/workflows/CI/badge.svg?branch=v2-Development)
 [![codecov](https://codecov.io/gh/SerenKodi/SerenDevelopment/branch/v2-Development/graph/badge.svg?token=LCX9WOPJ2M)](https://codecov.io/gh/SerenKodi/SerenDevelopment)
@@ -7,6 +8,19 @@
 # Seren (plugin.video.seren)
 
 Seren is a multi-source addon for Kodi with the added ability to install custom provider modules. Unlike other Kodi addons which are generally built for a single service use, Seren allows users to connect to multiple online/offline services at once for their viewing with a single click.
+
+## Contribution
+
+Install all dependencies in requirements.txt
+```shell
+pip install -r requirements.txt
+```
+
+Configure hooks for automated pre commit changes:
+```sh
+pre-commit install
+```
+Ensure that `git` is available in your PATH
 
 ## FAQ
 
@@ -28,3 +42,11 @@ You can often find help from users in the Addons4Kodi subreddit or you are alway
 ## License
 
 Licensed under The GPL License.
+
+
+## [![Repography logo](https://images.repography.com/logo.svg)](https://repography.com) Recent activity [![Time period](https://images.repography.com/31557107/SerenKodi/SerenDevelopment/recent-activity/54b09eb47a7d1f063e1adf376fe18f03_badge.svg)](https://repography.com)
+[![Timeline graph](https://images.repography.com/31557107/SerenKodi/SerenDevelopment/recent-activity/54b09eb47a7d1f063e1adf376fe18f03_timeline.svg)](https://github.com/SerenKodi/SerenDevelopment/commits)
+[![Issue status graph](https://images.repography.com/31557107/SerenKodi/SerenDevelopment/recent-activity/54b09eb47a7d1f063e1adf376fe18f03_issues.svg)](https://github.com/SerenKodi/SerenDevelopment/issues)
+[![Pull request status graph](https://images.repography.com/31557107/SerenKodi/SerenDevelopment/recent-activity/54b09eb47a7d1f063e1adf376fe18f03_prs.svg)](https://github.com/SerenKodi/SerenDevelopment/pulls)
+[![Trending topics](https://images.repography.com/31557107/SerenKodi/SerenDevelopment/recent-activity/54b09eb47a7d1f063e1adf376fe18f03_words.svg)](https://github.com/SerenKodi/SerenDevelopment/commits)
+

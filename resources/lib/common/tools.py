@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals, print_function
-
-from functools import total_ordering
-
-try:  # Python >= 3.3
-    from collections.abc import Mapping
-except ImportError:  # Python < 3.3
-    from collections import Mapping
-
 import copy
 import datetime
 import hashlib
@@ -15,62 +5,14 @@ import json
 import os
 import re
 import sys
-import time
+from collections.abc import Mapping
+from functools import total_ordering
+from urllib import parse
 
 import xbmc
 import xbmcvfs
 
-try:
-    from functools import cached_property  # Supported from py3.8
-except ImportError:
-    from resources.lib.third_party.cached_property import cached_property
-
-try:
-    # Try to get Python 3 versions
-    from urllib.parse import (
-        parse_qsl,
-        urlencode,
-        quote_plus,
-        parse_qs,
-        quote,
-        unquote,
-        urlparse,
-        urljoin,
-    )
-except ImportError:
-    # Fall back on future.backports to ensure we get unicode compatible PY3 versions in PY2
-    from future.backports.urllib.parse import (
-        parse_qsl,
-        urlencode,
-        quote_plus,
-        parse_qs,
-        quote,
-        unquote,
-        urlparse,
-        urljoin,
-    )
-
-try:
-    basestring = basestring  # noqa # pylint: disable=undefined-variable
-except NameError:
-    pass
-
-try:
-    unicode = unicode  # noqa # pylint: disable=undefined-variable
-except NameError:
-    unicode = str
-
-try:
-    import xml.etree.cElementTree as ElementTree
-except ImportError:
-    import xml.etree.ElementTree as ElementTree
-
 youtube_url = "plugin://plugin.video.youtube/play/?video_id={}"
-
-try:
-    xrange = range
-except NameError:
-    pass
 
 DIGIT_REGEX = re.compile(r"\d")
 SORT_TOKENS = [
@@ -92,9 +34,22 @@ SORT_TOKENS = [
     "o ",
     "the ",
 ]
-SORT_TOKEN_REGEX = re.compile(r"|".join(r"^{}".format(i) for i in SORT_TOKENS), re.IGNORECASE)
+SORT_TOKEN_REGEX = re.compile(r"|".join(fr"^{i}" for i in SORT_TOKENS), re.IGNORECASE)
 
-PYTHON3 = True if sys.version_info.major == 3 else False
+SHORT_MONTH_LOOKUP = {
+    "Jan": 1,
+    "Feb": 2,
+    "Mar": 3,
+    "Apr": 4,
+    "May": 5,
+    "Jun": 6,
+    "Jul": 7,
+    "Aug": 8,
+    "Sep": 9,
+    "Oct": 10,
+    "Nov": 11,
+    "Dec": 12,
+}
 
 
 def copy2clip(txt):
@@ -110,33 +65,31 @@ def copy2clip(txt):
     platform = sys.platform
     if platform == "win32":
         try:
-            cmd = "echo " + txt.strip() + "|clip"
+            cmd = f"echo {txt.strip()}|clip"
             return subprocess.check_call(cmd, shell=True)
         except Exception as e:
-            log("Failure to copy to clipboard, \n{}".format(e), "error")
+            log(f"Failure to copy to clipboard, \n{e}", "error")
     elif platform.startswith("linux") or platform == "darwin":
         try:
             from subprocess import Popen, PIPE
 
             cmd = "pbcopy" if platform == "darwin" else ["xsel", "-pi"]
-            kwargs = {"stdin": PIPE, "text": True} if PYTHON3 else {"stdin": PIPE}
+            kwargs = {"stdin": PIPE, "text": True}
             p = Popen(cmd, **kwargs)
             p.communicate(input=str(txt))
         except Exception as e:
-            log("Failure to copy to clipboard, \n{}".format(e), "error")
+            log(f"Failure to copy to clipboard, \n{e}", "error")
 
 
-def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True):
+def parse_datetime(string_date, date_only=True):
     """
     Attempts to pass over provided string and return a date or datetime object
     :param string_date: String to parse
     :type string_date: str
-    :param format_string: Format of str
-    :type format_string: str
     :param date_only: Whether to return a date only object or not
     :type date_only: bool
-    :return: datetime.datetime or datetime.date object
-    :rtype: object
+    :return: datetime.datetime object
+    :rtype: datetime.datetime
     """
     if not string_date:
         return None
@@ -145,12 +98,17 @@ def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True):
     # Workaround for python bug caching of strptime in datetime module.
     # Don't just try to detect TypeError because it breaks meta handler lambda calls occasionally, particularly
     # with unix style threading.
-    if date_only:
-        res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6])).date()
-    else:
-        res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6]))
+    try:
+        res = datetime.datetime.fromisoformat(string_date.rstrip("Z"))
+    except ValueError:
+        try:
+            day, month, year = string_date.split(" ", 2)
+            month = SHORT_MONTH_LOOKUP[month]
+            res = datetime.datetime(year=int(year), month=month, day=int(day))
+        except KeyError as ke:
+            raise ValueError(f"Invalid short month name: {ke}") from ke
 
-    return res
+    return res.date() if date_only else res
 
 
 def shortened_debrid(debrid):
@@ -166,9 +124,10 @@ def shortened_debrid(debrid):
         return "PM"
     if debrid == "real_debrid":
         return "RD"
-    if debrid == "all_debrid":
+    if debrid == "all_debrid":  # sourcery skip: assign-if-exp
         return "AD"
-    return ""
+    else:
+        return ""
 
 
 def source_size_display(size):
@@ -179,10 +138,12 @@ def source_size_display(size):
     :return: Formatted string for size in GB
     :rtype: str
     """
+    if size == "Variable":
+        return size
+
     size = int(size)
     size = float(size) / 1024
-    size = "{0:.2f} GB".format(size)
-    return size
+    return f"{size:.2f} GB"
 
 
 def bytes_size_display(size):
@@ -196,7 +157,7 @@ def bytes_size_display(size):
     size = float(size)
     suffix = "B"
     if size > 1024:
-        size = size / 1024
+        size /= 1024
         suffix = "KiB"
     if size > 1024:
         size = size / 1024
@@ -207,10 +168,7 @@ def bytes_size_display(size):
     if size > 1024:
         size = size / 1024
         suffix = "TiB"
-    if size.is_integer():
-        return "{0:.0f} {1:}".format(size, suffix)
-    else:
-        return "{0:.2f} {1:}".format(size, suffix)
+    return f"{size:{'.0f' if size.is_integer() else '.2f'}} {suffix}"
 
 
 def paginate_list(list_items, page, limit):
@@ -225,9 +183,9 @@ def paginate_list(list_items, page, limit):
     :return: items on page
     :rtype: list
     """
-    if page - 1 > float(len(list_items))/limit:
+    if page - 1 > float(len(list_items)) / limit:
         return []
-    return list_items[(page - 1) * limit: page * limit]
+    return list_items[(page - 1) * limit : page * limit]
 
 
 def italic_string(text):
@@ -239,7 +197,7 @@ def italic_string(text):
     :rtype: str
     """
 
-    return "[I]{}[/I]".format(text)
+    return f"[I]{text}[/I]"
 
 
 def compare_version_numbers(current, new, include_same=False):
@@ -260,15 +218,13 @@ def compare_version_numbers(current, new, include_same=False):
 
     current = current.split(".")
     new = new.split(".")
-    step = 0
-    for i in new:
+    for step, i in enumerate(new):
         if len(current) - 1 < step:
             return True
         if int(current[step]) > int(i):
             return False
         if int(current[step]) < int(i):
             return True
-        step += 1
     return False
 
 
@@ -286,34 +242,26 @@ def get_item_information(action_args):
     if action_args["mediatype"] == "tvshow":
         from resources.lib.database.trakt_sync import shows
 
-        item_information.update(
-            shows.TraktSyncDatabase().get_show(action_args["trakt_id"])
-        )
+        item_information.update(shows.TraktSyncDatabase().get_show(action_args["trakt_id"]))
         return item_information
     elif action_args["mediatype"] == "season":
         from resources.lib.database.trakt_sync import shows
 
         item_information.update(
-            shows.TraktSyncDatabase().get_season(
-                action_args["trakt_id"], action_args["trakt_show_id"]
-            )
+            shows.TraktSyncDatabase().get_season(action_args["trakt_id"], action_args["trakt_show_id"])
         )
         return item_information
     elif action_args["mediatype"] == "episode":
         from resources.lib.database.trakt_sync import shows
 
         item_information.update(
-            shows.TraktSyncDatabase().get_episode(
-                action_args["trakt_id"], action_args["trakt_show_id"]
-            )
+            shows.TraktSyncDatabase().get_episode(action_args["trakt_id"], action_args["trakt_show_id"])
         )
         return item_information
     elif action_args["mediatype"] == "movie":
         from resources.lib.database.trakt_sync import movies
 
-        item_information.update(
-            movies.TraktSyncDatabase().get_movie(action_args["trakt_id"])
-        )
+        item_information.update(movies.TraktSyncDatabase().get_movie(action_args["trakt_id"]))
         return item_information
 
 
@@ -325,7 +273,7 @@ def deconstruct_action_args(action_args):
     :return: unquoted and loaded dictionary or str if not json
     :rtype: dict, str
     """
-    action_args = unquote(action_args)
+    action_args = parse.unquote(action_args)
     try:
         return json.loads(action_args)
     except ValueError:
@@ -340,7 +288,7 @@ def construct_action_args(action_args):
     :return: Url quoted response
     :rtype: str
     """
-    return quote(json.dumps(action_args, sort_keys=True))
+    return parse.quote(json.dumps(action_args, sort_keys=True))
 
 
 def extend_array(array1, array2):
@@ -386,9 +334,7 @@ def smart_merge_dictionary(dictionary, merge_dict, keep_original=False, extend_a
         else:
             if original_value and keep_original:
                 continue
-            if extend_array and isinstance(original_value, (list, set)) and isinstance(
-                    new_value, (list, set)
-            ):
+            if extend_array and isinstance(original_value, (list, set)) and isinstance(new_value, (list, set)):
                 if isinstance(original_value, set):
                     original_value.update(x for x in new_value if x not in original_value)
                     try:
@@ -419,15 +365,13 @@ def freeze_object(o):
         return frozenset({k: freeze_object(v) for k, v in o.items()}.items())
 
     if isinstance(o, (set, tuple, list)):
-        return tuple([freeze_object(v) for v in o])
+        return tuple(freeze_object(v) for v in o)
 
     return o
 
 
 def serialize_sets(obj):
-    if isinstance(obj, set):
-        return sorted([unicode(i) for i in obj])
-    return obj
+    return sorted([str(i) for i in obj]) if isinstance(obj, set) else obj
 
 
 def md5_hash(value):
@@ -440,7 +384,7 @@ def md5_hash(value):
     """
     if isinstance(value, (tuple, dict, list, set)):
         value = json.dumps(value, sort_keys=True, default=serialize_sets)
-    return hashlib.md5(unicode(value).encode("utf-8")).hexdigest()
+    return hashlib.md5(str(value).encode("utf-8")).hexdigest()
 
 
 # Re-added for provider backwards compatibility support
@@ -468,13 +412,14 @@ def run_threaded(target_func, *args, **kwargs):
     :type args: (int) - > None
     :param kwargs: dictionary of kwargs to pass to function
     :type kwargs: (int) - > None
-    :return: None
-    :rtype: None
+    :return: The started thread
+    :rtype: threading.Thread
     """
     from threading import Thread
 
     thread = Thread(target=target_func, args=args, kwargs=kwargs)
     thread.start()
+    return thread
 
 
 def get_clean_number(value):
@@ -488,10 +433,7 @@ def get_clean_number(value):
     if isinstance(value, (int, float)):
         return value
     try:
-        if "." in value:
-            return float(value)
-        else:
-            return int(value.replace(",", ""))
+        return float(value) if "." in value else int(value.replace(",", ""))
     except ValueError:
         return None
 
@@ -508,10 +450,9 @@ def ensure_path_is_dir(path):
         if not path.endswith("\\"):
             if path.endswith("/"):
                 path = path.rstrip("/")
-            return path + "\\"
-    else:
-        if not path.endswith("/"):
-            return path + "/"
+            return f"{path}\\"
+    elif not path.endswith("/"):
+        return f"{path}/"
     return path
 
 
@@ -525,7 +466,7 @@ def safe_round(x, y=0):
     :return: rounded value
     :rtype: float
     """
-    place = 10 ** y
+    place = 10**y
     rounded = (int(x * place + 0.5 if x >= 0 else -0.5)) / place
     if rounded == int(rounded):
         rounded = int(rounded)
@@ -624,7 +565,7 @@ def makedirs(name, mode=0o777, exist_ok=False):
     raised.  This is recursive.
 
     :param name:Name of the directory to be created
-    :type name:str|unicode
+    :type name:str
     :param mode:Unix file mode for created directories
     :type mode:int
     :param exist_ok:Boolean to indicate whether is should raise on an exception
@@ -632,7 +573,7 @@ def makedirs(name, mode=0o777, exist_ok=False):
     """
     try:
         os.makedirs(name, mode)
-    except (OSError, IOError):
+    except OSError:
         if not exist_ok:
             raise
 
@@ -658,11 +599,7 @@ def filter_dictionary(dictionary, *keys):
     :return:Filtered dictionary
     :rtype:dict
     """
-    if not dictionary:
-        return None
-    key_set = set(keys)
-
-    return {k: v for k, v in dictionary.items() if k in key_set}
+    return {k: v for k in keys if (v := dictionary.get(k))} if dictionary else None
 
 
 def safe_dict_get(dictionary, *path):
@@ -675,27 +612,28 @@ def safe_dict_get(dictionary, *path):
     :return:The value for that given path
     :rtype:any
     """
-    if dictionary is None or not isinstance(dictionary, dict):
+    if not isinstance(dictionary, dict):
         return None
-    if len(path) == 0:
+    if not path:
         return dictionary
     result = dictionary
 
     for element in path:
-        result = copy.deepcopy(result.get(element))
-        if isinstance(result, dict):
+        if isinstance(result := result.get(element), dict):
             continue
         else:
             break
 
+    result = copy.deepcopy(result)
     return result
 
 
 @total_ordering
-class FixedSortPositionObject(object):
+class FixedSortPositionObject:
     """
     A class that always returns equality for a comparison with any other object
     """
+
     def __lt__(self, other):
         return False
 

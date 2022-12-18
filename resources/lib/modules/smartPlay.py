@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import random
 import sys
+from functools import cached_property
+from urllib import parse
 
 import xbmc
 import xbmcgui
 
 from resources.lib.common import tools
 from resources.lib.database.skinManager import SkinManager
-from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
 from resources.lib.gui.windows.persistent_background import PersistentBackground
 from resources.lib.indexers.trakt import TraktAPI
 from resources.lib.modules.globals import g
@@ -21,6 +19,7 @@ class SmartPlay:
     """
     Provides smart operations for playback
     """
+
     def __init__(self, item_information):
         self.list_builder = ListBuilder()
         if "info" not in item_information:
@@ -32,9 +31,7 @@ class SmartPlay:
 
         self.show_trakt_id = self.item_information.get("trakt_show_id")
         if not self.show_trakt_id and "action_args" in self.item_information:
-            self.show_trakt_id = self._extract_show_id_from_args(
-                self.item_information["action_args"]
-            )
+            self.show_trakt_id = self._extract_show_id_from_args(self.item_information["action_args"])
 
         self.display_style = g.get_int_setting("smartplay.displaystyle")
         self.trakt_api = TraktAPI()
@@ -46,13 +43,19 @@ class SmartPlay:
         elif action_args["mediatype"] in ["episode", "season"]:
             return action_args["trakt_show_id"]
 
-    def get_season_info(self):
+    @cached_property
+    def seasons_info(self):
         """
         Fetches all season information for current show from database
         :return:
         :rtype:
         """
-        return TraktSyncDatabase().get_season_list(self.show_trakt_id)
+        from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
+
+        return {
+            (info := MetadataHandler.info(item)).get("season"): info
+            for item in TraktSyncDatabase().get_season_list(self.show_trakt_id)
+        }
 
     def resume_show(self):
         """
@@ -64,30 +67,32 @@ class SmartPlay:
         g.close_all_dialogs()
         g.PLAYLIST.clear()
 
-        window = self._get_window()
+        try:
+            window = self._get_window()
 
-        window.set_text(g.get_language_string(30060))
-        window.show()
+            window.set_text(g.get_language_string(30060))
+            window.show()
 
-        window.set_text(g.get_language_string(30061))
+            window.set_text(g.get_language_string(30061))
 
-        season_id, episode = self.get_resume_episode()
+            season_id, episode = self.get_resume_episode()
 
-        window.set_text(g.get_language_string(30062))
+            window.set_text(g.get_language_string(30062))
 
-        window.set_text(g.get_language_string(30063))
+            window.set_text(g.get_language_string(30063))
 
-        self.build_playlist(season_id, episode)
+            self.build_playlist(season_id, episode)
 
-        window.set_text(g.get_language_string(30311))
+            window.set_text(g.get_language_string(30311))
 
-        g.log(
-            "Begining play from Season ID {} Episode {}".format(season_id, episode),
-            "info",
-        )
+            g.log(
+                f"Begining play from Season ID {season_id} Episode {episode}",
+                "info",
+            )
 
-        window.close()
-        del window
+            window.close()
+        finally:
+            del window
 
         xbmc.Player().play(g.PLAYLIST)
 
@@ -108,16 +113,14 @@ class SmartPlay:
             minimum_episode = int(self.item_information["info"]["episode"]) + 1
 
         try:
-            [
+            for i in self.list_builder.episode_list_builder(
+                self.show_trakt_id,
+                season_id,
+                minimum_episode=minimum_episode,
+                smart_play=True,
+                hide_unaired=True,
+            ):
                 g.PLAYLIST.add(url=i[0], listitem=i[1])
-                for i in self.list_builder.episode_list_builder(
-                    self.show_trakt_id,
-                    season_id,
-                    minimum_episode=minimum_episode,
-                    smart_play=True,
-                    hide_unaired=True,
-                )
-            ]
         except TypeError:
             g.log(
                 "Unable to add more episodes to the playlist, they may not be available for the requested season",
@@ -131,12 +134,9 @@ class SmartPlay:
         :return: (Season, Episode) tuple
         :rtype: tuple
         """
-        get = MetadataHandler().get_trakt_info
-        info = MetadataHandler().info
+        get = MetadataHandler.get_trakt_info
         try:
-            playback_history = self.trakt_api.get_json(
-                "sync/history/shows/{}".format(self.show_trakt_id), extended="full", limit=1
-            )[0]
+            playback_history = self.trakt_api.get_json(f"sync/history/shows/{self.show_trakt_id}", limit=1)[0]
             action = playback_history["action"]
             episode_info = playback_history["episode"]
             season = get(episode_info, "season")
@@ -150,10 +150,7 @@ class SmartPlay:
         if action != "watch":
             episode += 1
 
-        all_seasons = self.get_season_info()
-        season_info = [i for i in all_seasons if info(i).get("season") == season][0]
-
-        if episode >= info(season_info).get("episode_count"):
+        if episode >= self.seasons_info[season].get("episode_count"):
             season += 1
             episode = 1
 
@@ -161,8 +158,7 @@ class SmartPlay:
             season = 1
             episode = 1
 
-        season_id = info(
-            [i for i in all_seasons if info(i).get("season") == season][0]).get("trakt_id")
+        season_id = self.seasons_info[season].get("trakt_id")
 
         return season_id, episode
 
@@ -176,21 +172,16 @@ class SmartPlay:
         :return: True if item is last aired episode else false
         :rtype: bool
         """
-        get = MetadataHandler().get_trakt_info
+        get = MetadataHandler.get_trakt_info
         season = int(season)
         episode = int(episode)
 
-        last_aired = self.trakt_api.get_json(
-            "shows/{}/last_episode".format(self.show_trakt_id)
-        )
+        last_aired = self.trakt_api.get_json(f"shows/{self.show_trakt_id}/last_episode")
 
         if season > get(last_aired, "season"):
             return True
 
-        if season == get(last_aired, "season") and episode == get(last_aired, "number"):
-            return True
-
-        return False
+        return season == get(last_aired, "season") and episode == get(last_aired, "number")
 
     def append_next_season(self):
         """
@@ -200,16 +191,15 @@ class SmartPlay:
         """
         episode = self.item_information["info"]["episode"]
         season = self.item_information["info"]["season"]
-        season_info = self.get_season_info()
-        current_season_info = [i for i in season_info if season == i["info"]["season"]][0]
+        current_season_info = self.seasons_info[season]
         if episode != current_season_info["episode_count"]:
             return
 
-        next_season = [i for i in season_info if i["info"]["season"] == season + 1]
-        if len(next_season) == 0:
+        next_season = self.seasons_info.get(season + 1)
+        if not next_season:
             return
 
-        season_id = next_season[0]["trakt_id"]
+        season_id = next_season["trakt_id"]
         self.build_playlist(season_id, 1)
 
     @staticmethod
@@ -223,17 +213,15 @@ class SmartPlay:
         if next_position >= g.PLAYLIST.size():
             return
 
-        url = g.PLAYLIST[  # pylint: disable=unsubscriptable-object
-            next_position
-        ].getPath()
+        url = g.PLAYLIST[next_position].getPath()  # pylint: disable=unsubscriptable-object
 
         if not url:
             return
 
         url = url.replace("getSources", "preScrape")
         g.set_runtime_setting("tempSilent", True)
-        g.log("Running Pre-Scrape: {}".format(url))
-        xbmc.executebuiltin('RunPlugin("{}")'.format(url))
+        g.log(f"Running Pre-Scrape: {url}")
+        xbmc.executebuiltin(f'RunPlugin("{url}")')
 
     def shuffle_play(self):
         """
@@ -247,29 +235,18 @@ class SmartPlay:
         window.show()
         window.set_text(g.get_language_string(30062))
 
-        season_list = self.trakt_api.get_json(
-            "shows/{}/seasons".format(self.show_trakt_id), extended="episodes"
-        )
+        season_list = self.trakt_api.get_json(f"shows/{self.show_trakt_id}/seasons", extended="episodes")
         if season_list[0]["trakt_object"]["info"]["season"] == 0:
             season_list.pop(0)
 
         window.set_text(g.get_language_string(30063))
 
-        episode_list = [
-            episode
-            for season in season_list
-            for episode in season["trakt_object"]["info"]["episodes"]
-        ]
+        episode_list = [episode for season in season_list for episode in season["trakt_object"]["info"]["episodes"]]
         random.shuffle(episode_list)
         episode_list = episode_list[:40]
-        [
-            episode.update({"trakt_show_id": self.show_trakt_id})
-            for episode in episode_list
-        ]
+        [episode.update({"trakt_show_id": self.show_trakt_id}) for episode in episode_list]
 
-        playlist = self.list_builder.mixed_episode_builder(
-            episode_list, smart_play=True
-        )
+        playlist = self.list_builder.mixed_episode_builder(episode_list, smart_play=True)
 
         window.set_text(g.get_language_string(30064))
 
@@ -294,10 +271,8 @@ class SmartPlay:
 
         g.PLAYLIST.clear()
 
-        season_id = random.choice(self.get_season_info())["trakt_id"]
-        playlist = self.list_builder.episode_list_builder(
-            self.show_trakt_id, trakt_season=season_id, smart_play=True
-        )
+        season_id = random.choice(list(self.seasons_info.values()))["trakt_id"]
+        playlist = self.list_builder.episode_list_builder(self.show_trakt_id, trakt_season=season_id, smart_play=True)
         random_episode = random.randint(0, len(playlist) - 1)
         playlist = playlist[random_episode]
         g.PLAYLIST.add(url=playlist[0], listitem=playlist[1])
@@ -313,9 +288,14 @@ class SmartPlay:
             action_args=tools.construct_action_args(self.item_information),
             bulk_add=True,
             is_playable=True,
-            )
-        g.PLAYLIST.add(url=g.BASE_URL + "/?" + g.PARAM_STRING, listitem=item[1])
+        )
+        g.PLAYLIST.add(url=f"{g.BASE_URL}/?{g.PARAM_STRING}", listitem=item[1])
         return g.PLAYLIST
+
+    @staticmethod
+    def clear_other_playlist_items():
+        while (pos := g.PLAYLIST.getposition() + 1) < g.PLAYLIST.size():
+            g.PLAYLIST.remove(g.PLAYLIST[pos].getPath())
 
     def playlist_present_check(self, ignore_setting=False):
         """
@@ -326,49 +306,43 @@ class SmartPlay:
         :return: Playlist if playlist is present else False
         :rtype: any
         """
-        if g.get_bool_setting("smartplay.playlistcreate") or ignore_setting:
+        if not (g.get_bool_setting("smartplay.playlistcreate") or ignore_setting):
+            return
 
-            if not self.item_information["info"]["mediatype"] == "episode":
-                g.log("Movie playback requested, clearing playlist")
-                g.PLAYLIST.clear()
-                return False
+        if self.item_information["info"]["mediatype"] != "episode":
+            g.log("Movie playback requested, clearing playlist")
+            g.PLAYLIST.clear()
+            return
 
-            playlist_uris = [
-                g.PLAYLIST[i].getPath()  # pylint: disable=unsubscriptable-object
-                for i in range(g.PLAYLIST.size())
+        playlist_uris = [
+            g.PLAYLIST[i].getPath() for i in range(g.PLAYLIST.size())  # pylint: disable=unsubscriptable-object
+        ]
+
+        # Check to see if we are just starting playback and kodi has created a playlist
+        if len(playlist_uris) == 1 and playlist_uris[0].split('/')[-1].lstrip('?') == g.PARAM_STRING:
+            return
+
+        if g.PLAYLIST.getposition() == -1:
+            return self.create_single_item_playlist_from_info()
+
+        if any(g.ADDON_ID not in u for u in playlist_uris):
+            g.log("Cleaning up other addon items from playlist", "debug")
+            self.clear_other_playlist_items()
+            return
+
+        action_args = [
+            g.legacy_action_args_converter(g.legacy_params_converter(dict(parse.parse_qsl(i.split("?")[-1]))))[
+                "action_args"
             ]
+            for i in playlist_uris
+        ]
 
-            # Check to see if we are just starting playback and kodi has created a playlist
-            if len(playlist_uris) == 1 and playlist_uris[0].split('/')[-1].lstrip('?') == g.PARAM_STRING:
-                return False
+        show_ids = {tools.deconstruct_action_args(i).get('trakt_show_id') for i in action_args}
 
-            if g.PLAYLIST.getposition() == -1:
-                return self.create_single_item_playlist_from_info()
-
-            if [i for i in playlist_uris if g.ADDON_NAME.lower() not in i]:
-                g.log("Cleaning up other addon items from playlsit", "debug")
-                playlist_uris = []
-                
-            action_args = [
-                g.legacy_action_args_converter(
-                    g.legacy_params_converter(
-                        dict(tools.parse_qsl(i.split("?")[-1]))
-                        )
-                    )["action_args"]
-                for i in playlist_uris]
-  
-            show_ids = set(tools.deconstruct_action_args(i).get('trakt_show_id') for i in action_args)
-
-            if len(show_ids) > 1 and self.show_trakt_id not in show_ids:
-                g.log("Cleaning up items from other shows", "debug")
-                playlist_uris = []
-
-            if (len(playlist_uris) == 0 or
-                (len(playlist_uris) > 1 and not any(g.PARAM_STRING in i for i in playlist_uris))) or \
-                    g.PLAYLIST.getposition() == -1:
-                return self.create_single_item_playlist_from_info()
-
-        return False
+        if len(show_ids) > 1:
+            g.log("Cleaning up items from other shows", "debug")
+            self.clear_other_playlist_items()
+            return
 
     def is_season_final(self):
         """
@@ -376,13 +350,9 @@ class SmartPlay:
         :return: bool
         :rtype: True if last episode of season, else False
         """
-        season = [i for i in self.get_season_info()
-                  if int(self.item_information["info"]["season"]) == int(i["info"]["season"])][0]
+        season = self.seasons_info[self.item_information["info"]["season"]]
 
-        if self.item_information["info"]["episode"] == season["episode_count"]:
-            return True
-        else:
-            return False
+        return self.item_information["info"]["episode"] == season["episode_count"]
 
     @staticmethod
     def handle_resume_prompt(resume_switch, force_resume_off=False, force_resume_on=False, force_resume_check=False):
@@ -406,27 +376,18 @@ class SmartPlay:
 
             trakt_id = g.REQUEST_PARAMS.get("action_args").get("trakt_id")
 
-            bookmark = TraktSyncDatabase().get_bookmark(trakt_id)
-            if bookmark:
-                g.log("bookmark: {}".format(bookmark))
+            if bookmark := TraktSyncDatabase().get_bookmark(trakt_id):
+                g.log(f"bookmark: {bookmark}")
                 resume_switch = bookmark["resume_time"]
 
-        if (
-            g.PLAYLIST.size() <= 1
-            and resume_switch is not None
-            and bookmark_style != 2
-            and not force_resume_off
-        ):
+        if g.PLAYLIST.size() <= 1 and resume_switch is not None and bookmark_style != 2 and not force_resume_off:
 
             if bookmark_style == 0 and not force_resume_on:
                 import datetime
 
                 selection = xbmcgui.Dialog().contextmenu(
                     [
-                        "{} {}".format(
-                            g.get_language_string(30059),
-                            datetime.timedelta(seconds=int(resume_switch)),
-                        ),
+                        f"{g.get_language_string(30059)} {datetime.timedelta(seconds=int(resume_switch))}",
                         g.get_language_string(30331),
                     ]
                 )
@@ -444,8 +405,7 @@ class SmartPlay:
         if self.display_style == 0:
             # not sure about this one either
             return PersistentBackground(
-                *SkinManager().confirm_skin_path("persistent_background.xml"),
-                item_information=self.item_information
+                *SkinManager().confirm_skin_path("persistent_background.xml"), item_information=self.item_information
             )
         else:
             return BackgroundWindowAdapter()
@@ -455,8 +415,9 @@ class BackgroundWindowAdapter(xbmcgui.DialogProgressBG):
     """
     Ease of use adapter for handling smart play dialogs
     """
+
     def __init__(self):
-        super(BackgroundWindowAdapter, self).__init__()
+        super().__init__()
         self.text = ""
         self.created = False
 
@@ -492,4 +453,4 @@ class BackgroundWindowAdapter(xbmcgui.DialogProgressBG):
         :return:
         :rtype:
         """
-        super(BackgroundWindowAdapter, self).update(percent, heading, message)
+        super().update(percent, heading, message)

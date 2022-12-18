@@ -1,34 +1,32 @@
-# -*- coding: utf-8 -*-
 """
 Resolver Module for resolving supplied source information into an object that can be played through Player module
 """
-from __future__ import absolute_import, division, unicode_literals
-
 import importlib
 import sys
+from urllib import parse
 
 import requests
 import xbmcgui
 import xbmcvfs
 
-from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.debrid.all_debrid import AllDebrid
 from resources.lib.debrid.premiumize import Premiumize
 from resources.lib.debrid.real_debrid import RealDebrid
-from resources.lib.modules.exceptions import (
-    UnexpectedResponse,
-    FileIdentification,
-    ResolverFailure,
-)
+from resources.lib.modules.exceptions import FileIdentification
+from resources.lib.modules.exceptions import ResolverFailure
+from resources.lib.modules.exceptions import UnexpectedResponse
 from resources.lib.modules.globals import g
-from resources.lib.modules.resolver.torrent_resolvers import PremiumizeResolver, RealDebridResolver, AllDebridResolver
+from resources.lib.modules.resolver.torrent_resolvers import AllDebridResolver
+from resources.lib.modules.resolver.torrent_resolvers import PremiumizeResolver
+from resources.lib.modules.resolver.torrent_resolvers import RealDebridResolver
 
 
 class Resolver:
     """
     Handles resolving of identified sources to a playable format to supply to Player module
     """
+
     torrent_resolve_failure_style = None
 
     def __init__(self):
@@ -39,7 +37,7 @@ class Resolver:
             "all_debrid": AllDebridResolver,
             "premiumize": PremiumizeResolver,
             "real_debrid": RealDebridResolver,
-            }
+        }
 
     def resolve_multiple_until_valid_link(self, sources, item_information, pack_select=False, silent=False):
         """
@@ -53,9 +51,13 @@ class Resolver:
         release_title = None
 
         for source in sources:
-            stream_link, release_title = self.resolve_single_source(source, item_information, pack_select, silent)
-            if stream_link:
-                break
+            try:
+                stream_link, release_title = self.resolve_single_source(source, item_information, pack_select, silent)
+                if stream_link:
+                    break
+            except Exception:
+                g.log_stacktrace()
+                continue
 
         return stream_link, release_title
 
@@ -73,41 +75,45 @@ class Resolver:
         try:
             if source["type"] == "adaptive":
                 stream_link = source
-
+            elif source["type"] == "direct":
+                stream_link = source["url"]
             elif source["type"] == "torrent":
                 stream_link = self._resolve_debrid_source(
                     self.resolvers[source["debrid_provider"]],
                     source,
                     item_information,
                     pack_select,
+                )
+
+                if (
+                    not stream_link
+                    and self.torrent_resolve_failure_style == 1
+                    and not pack_select
+                    and not silent
+                    and xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30490))
+                ):
+                    stream_link = self._resolve_debrid_source(
+                        self.resolvers[source["debrid_provider"]],
+                        source,
+                        item_information,
+                        True,
                     )
 
-                if not stream_link and self.torrent_resolve_failure_style == 1 and not pack_select and not silent:
-                    if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30490)):
-                        stream_link = self._resolve_debrid_source(
-                            self.resolvers[source["debrid_provider"]],
-                            source,
-                            item_information,
-                            True,
-                            )
-
-            elif source["type"] == "hoster" or source["type"] == "cloud":
+            elif source["type"] in ["hoster", "cloud"]:
                 stream_link = self._resolve_hoster_or_cloud(source, item_information)
 
             if stream_link:
                 return stream_link, source['release_title']
-            else:
-                g.log("Failed to resolve source: {}".format(source), "error")
-                return None, None
+            g.log(f"Failed to resolve source: {source}", "error")
+            return None, None
         except ResolverFailure as e:
-            g.log('Failed to resolve source: {}'.format(e))
+            g.log(f'Failed to resolve source: {e}')
+            return None, None
 
     @staticmethod
     def _handle_provider_imports_resolving(source):
         provider = source["provider_imports"]
-        provider_module = importlib.import_module(
-            "{}.{}".format(provider[0], provider[1])
-        )
+        provider_module = importlib.import_module(f"{provider[0]}.{provider[1]}")
         if hasattr(provider_module, "source"):
             provider_module = provider_module.source()
 
@@ -117,7 +123,7 @@ class Resolver:
     def _handle_debrid_hoster_resolving(self, source, item_information):
         stream_link = self._resolve_debrid_source(
             self.resolvers[source["debrid_provider"]], source, item_information, False
-            )
+        )
 
         if not stream_link:
             return
@@ -137,11 +143,9 @@ class Resolver:
 
         if source["type"] == "cloud" and source["debrid_provider"] == "premiumize":
             selected_file = Premiumize().item_details(source["url"])
-            if g.get_bool_setting("premiumize.transcoded"):
-                stream_link = selected_file["stream_link"]
-            else:
-                stream_link = selected_file["link"]
-            return stream_link
+            return (
+                selected_file["stream_link"] if g.get_bool_setting("premiumize.transcoded") else selected_file["link"]
+            )
 
         if "provider_imports" in source:
             source = self._handle_provider_imports_resolving(source)
@@ -176,25 +180,22 @@ class Resolver:
             except IndexError:
                 headers = ""
 
-            headers = tools.quote_plus(headers).replace("%3D", "=") if " " in headers else headers
-            headers = dict(tools.parse_qsl(headers))
+            headers = parse.quote_plus(headers).replace("%3D", "=") if " " in headers else headers
+            headers = dict(parse.parse_qsl(headers))
 
             live_check = requests.head(source["url"], headers=headers, timeout=10)
 
-            if not live_check.status_code == 200:
+            if live_check.status_code != 200:
                 g.log("Head Request failed link likely dead, skipping")
                 return
 
             stream_link = source["url"]
-        except IndexError:
+        except (IndexError, KeyError):
             stream_link = None
-        except KeyError:
-            stream_link = None
-
         return stream_link
 
     @staticmethod
-    def _resolve_debrid_source(api, source, item_information, pack_select = False):
+    def _resolve_debrid_source(api, source, item_information, pack_select=False):
         stream_link = None
         api = api()
 
@@ -204,15 +205,15 @@ class Resolver:
             except (UnexpectedResponse, FileIdentification) as e:
                 g.log(e, "error")
                 return None
-            except Exception:
-                g.log("Failing Magnet: {}".format(source["magnet"]))
-                raise ResolverFailure(source)
+            except Exception as e:
+                g.log(f"Failing Magnet: {source['magnet']}")
+                raise ResolverFailure(source) from e
         elif source["type"] in ["hoster", "cloud"]:
             try:
                 stream_link = api.resolve_stream_url({"link": source["url"]})
             except (UnexpectedResponse, FileIdentification) as e:
                 g.log(e, "error")
-                raise ResolverFailure(source)
+                raise ResolverFailure(source) from e
 
         return stream_link
 

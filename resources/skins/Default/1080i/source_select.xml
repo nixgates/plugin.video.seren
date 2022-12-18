@@ -7,7 +7,7 @@
     </coordinates>
 
     <controls>
-        
+
         <!-- Background -->
         <control type="group">
             <top>0</top>
@@ -19,26 +19,38 @@
             <control type="image">
                 <texture>white.png</texture>
                 <colordiffuse>FF000000</colordiffuse>
+                <animation effect="fade" end="0" time="350" tween="cubic" easing="in" condition="String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
+                <visible>!String.IsEqual(Window().Property(instant_close),true)</visible>
             </control>
 
             <!-- Fanart -->
-            <control type="image">    
+            <control type="image">
                 <texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
                 <colordiffuse>66FFFFFF</colordiffuse>
+                <animation effect="fade" end="0" time="350" tween="cubic" easing="in" condition="String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
+                <visible>!String.IsEqual(Window().Property(instant_close),true)</visible>
             </control>
 
             <!-- Overlay -->
             <control type="image">
 				<texture background="true">white.png</texture>
 				<colordiffuse>CC000000</colordiffuse>
+                <animation effect="fade" end="0" time="350" tween="cubic" easing="in" condition="String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
+                <visible>!String.IsEqual(Window().Property(instant_close),true)</visible>
 			</control>
         </control>
 
 		<!-- Clearlogo -->
 		<control type="image">
 			<animation type="WindowOpen">
-				<effect type="slide" start="841,481" time="350" tween="cubic" easing="in"/>
+                <effect type="slide" start="841,401" time="350" tween="cubic" easing="in"/>
 				<effect type="zoom" start="140,140" time="350" center="auto" tween="cubic" easing="in"/>
+			</animation>
+            <animation effect="fade" end="0" time="350" tween="cubic" easing="in" condition="!String.IsEqual(Window().Property(instant_close),true)">WindowClose</animation>
+            <animation effect="fade" end="0" time="350" tween="cubic" easing="in" condition="String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
+            <animation type="Conditional" condition="!String.IsEqual(Window().Property(resolving),true)">
+                <effect type="slide" start="841,401" time="350" delay="350" tween="cubic" easing="in"/>
+				<effect type="zoom" start="140,140" time="350" delay="350" center="auto" tween="cubic" easing="in"/>
 			</animation>
 			<top>20</top>
 			<left>40</left>
@@ -46,13 +58,15 @@
 			<height>78</height>
 			<aspectratio>keep</aspectratio>
 			<texture>$INFO[Window().Property(item.art.clearlogo)]</texture>
-			<visible>!String.IsEmpty(Window().Property(item.art.clearlogo))</visible>
+			<visible>!String.IsEmpty(Window().Property(item.art.clearlogo)) + !String.IsEqual(Window().Property(instant_close),true)</visible>
 		</control>
-		
+
 		<!-- Scrollbar -->
 		<control type="scrollbar" id="1111">
 			<animation effect="fade" time="350" tween="cubic" easing="in" delay="350">WindowOpen</animation>
-			<animation effect="fade" end="0" time="350" tween="cubic" easing="in">WindowClose</animation>
+			<animation effect="fade" end="0" time="350" tween="cubic" easing="in" condition="!String.IsEqual(Window().Property(instant_close),true)">WindowClose</animation>
+            <animation effect="fade" end="0" time="350" tween="cubic" easing="in" condition="String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
+            <animation effect="fade" time="350" delay="700" tween="cubic" easing="in" condition="!String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
 			<left>10</left>
 			<top>110</top>
 			<width>20</width>
@@ -62,12 +76,15 @@
 			<texturesliderbackground colordiffuse="99362e33">white.png</texturesliderbackground>
 			<texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
 			<texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
+            <visible>!String.IsEqual(Window().Property(instant_close),true)</visible>
 		</control>
 
         <!-- Sources List -->
         <control type="list" id="1000">
 			<animation effect="slide" start="-1400,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
-			<animation effect="slide" end="-1400,0" time="350" tween="cubic" easing="in">WindowClose</animation>
+			<animation effect="slide" end="-1400,0" time="350" tween="cubic" easing="in" condition="!String.IsEqual(Window().Property(instant_close),true)">WindowClose</animation>
+            <animation effect="slide" end="-1400,0" time="350" tween="cubic" easing="in" condition="String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
+            <animation effect="slide" start="-1400,0" time="350" delay="350" tween="cubic" easing="in" condition="!String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
             <viewtype label="Sources">list</viewtype>
 			<pagecontrol>1111</pagecontrol>
 			<onleft>1111</onleft>
@@ -78,6 +95,7 @@
             <height>900</height>
             <itemgap>20</itemgap>
             <orientation>vertical</orientation>
+            <visible>!String.IsEqual(Window().Property(instant_close),true)</visible>
 
 			<!-- Unfocused Source -->
             <itemlayout height="160">
@@ -102,14 +120,14 @@
                         <align>left</align>
                         <label>[UPPERCASE]$INFO[ListItem.Property(release_title)][/UPPERCASE]</label>
                     </control>
-                    
+
 					<control type="group">
 						<top>40</top>
 						<left>20</left>
 
 						<control type="group">
 							<top>30</top>
-						
+
 							<!-- Debrid Provider -->
 							<control type="label">
 								<width>600</width>
@@ -119,7 +137,7 @@
 								<align>left</align>
 								<label>[UPPERCASE]$INFO[ListItem.Property(debrid_provider)][/UPPERCASE]</label>
 							</control>
-						
+
 							<!-- Size -->
 							<control type="label">
 								<height>20</height>
@@ -143,7 +161,7 @@
 
 						<control type="group">
 							<top>70</top>
-							
+
 							<!-- Provider -->
 							<control type="label">
 								<width>600</width>
@@ -153,10 +171,10 @@
 								<align>left</align>
 								<label>[UPPERCASE]$INFO[ListItem.Property(provider)][/UPPERCASE]</label>
 							</control>
-							
+
 							<control type="group">
 								<right>20</right>
-								
+
 								<!-- Resolution & Info -->
 								<control type="label">
 									<font>font12</font>
@@ -166,7 +184,7 @@
 									<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR] | $INFO[ListItem.Property(info_text_piped_color)][/UPPERCASE]</label>
 									<visible>!String.IsEmpty(ListItem.Property(info_text_piped_color))</visible>
 								</control>
-								
+
 								<!-- Resolution -->
 								<control type="label">
 									<font>font12</font>
@@ -178,10 +196,10 @@
 								</control>
 							</control>
 						</control>
-					</control>                    
+					</control>
                 </control>
             </itemlayout>
-			
+
 			<!-- Unfocused Source -->
             <focusedlayout height="160" condition="!Control.HasFocus(1000)">
                 <control type="group">
@@ -205,14 +223,14 @@
                         <align>left</align>
                         <label>[UPPERCASE]$INFO[ListItem.Property(release_title)][/UPPERCASE]</label>
                     </control>
-                    
+
 					<control type="group">
 						<top>40</top>
 						<left>20</left>
 
 						<control type="group">
 							<top>30</top>
-						
+
 							<!-- Debrid Provider -->
 							<control type="label">
 								<width>600</width>
@@ -222,7 +240,7 @@
 								<align>left</align>
 								<label>[UPPERCASE]$INFO[ListItem.Property(debrid_provider)][/UPPERCASE]</label>
 							</control>
-						
+
 							<!-- Size -->
 							<control type="label">
 								<height>20</height>
@@ -246,7 +264,7 @@
 
 						<control type="group">
 							<top>70</top>
-							
+
 							<!-- Provider -->
 							<control type="label">
 								<width>600</width>
@@ -256,10 +274,10 @@
 								<align>left</align>
 								<label>[UPPERCASE]$INFO[ListItem.Property(provider)][/UPPERCASE]</label>
 							</control>
-							
+
 							<control type="group">
 								<right>20</right>
-								
+
 								<!-- Resolution & Info -->
 								<control type="label">
 									<font>font12</font>
@@ -269,7 +287,7 @@
 									<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(quality)][/COLOR] | $INFO[ListItem.Property(info_text_piped_color)][/UPPERCASE]</label>
 									<visible>!String.IsEmpty(ListItem.Property(info_text_piped_color))</visible>
 								</control>
-								
+
 								<!-- Resolution -->
 								<control type="label">
 									<font>font12</font>
@@ -281,7 +299,7 @@
 								</control>
 							</control>
 						</control>
-					</control>                    
+					</control>
                 </control>
             </focusedlayout>
 
@@ -289,7 +307,7 @@
             <focusedlayout height="270" condition="Control.HasFocus(1000)">
                 <control type="group">
 					<width>1340</width>
-				
+
 					<!-- Card -->
                     <control type="image">
                         <top>10</top>
@@ -297,28 +315,28 @@
                         <texture>white.png</texture>
                         <colordiffuse>FF362e33</colordiffuse>
                     </control>
-					
+
                     <!-- Source Icon -->
                     <control type="group">
                         <top>40</top>
                         <width>200</width>
-                        <height>200</height>                        
-                        
+                        <height>200</height>
+
 						<!-- Seren Peacock -->
                         <control type="image">
                             <aspectratio>keep</aspectratio>
                             <texture>$INFO[Window().Property(seren.logo)]</texture>
-                            <visible>String.IsEmpty(ListItem.Property(provider.image))</visible>
+                            <visible>String.IsEmpty(ListItem.Property(source.icon))</visible>
                         </control>
-						
-						<!-- Provider Icon -->
+
+                        <!-- Provider Icon -->
                         <control type="image">
                             <aspectratio>keep</aspectratio>
-                            <texture>$INFO[ListItem.Property(provider.image)]</texture>
-                            <visible>!String.IsEmpty(ListItem.Property(provider.image))</visible>
+                            <texture>$INFO[ListItem.Property(source.icon)]</texture>
+                            <visible>!String.IsEmpty(ListItem.Property(source.icon))</visible>
                         </control>
                     </control>
-                    
+
 					<!-- Release Title -->
                     <control type="label">
                         <top>40</top>
@@ -336,9 +354,9 @@
 					<control type="group">
 						<width>800</width>
 						<height>70</height>
-						<left>210</left>	
+						<left>210</left>
 						<top>100</top>
-						
+
 						<!-- Debrid Provider -->
 						<control type="label">
 							<font>font12</font>
@@ -348,7 +366,7 @@
 							<wrapmultiline>true</wrapmultiline>
 							<label>[B][UPPERCASE]$INFO[ListItem.Property(debrid_provider)][/UPPERCASE][/B]</label>
 						</control>
-						
+
 						<!-- Provider -->
 						<control type="label">
 							<top>40</top>
@@ -360,12 +378,12 @@
 							<label>[B][UPPERCASE]$INFO[ListItem.Property(provider)][/UPPERCASE][/B]</label>
 						</control>
 					</control>
-                    
+
                     <control type="group">
                         <right>20</right>
                         <top>100</top>
 						<height>140</height>
-						
+
 						<!-- Size -->
                         <control type="label">
                             <right>0</right>
@@ -400,7 +418,7 @@
                             <textcolor>FFFFFFFF</textcolor>
                             <label>[B][UPPERCASE]$ADDON[plugin.video.seren 30252]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(type)][/COLOR][/UPPERCASE][/B]</label>
                         </control>
-                        
+
 						<!-- Info -->
 						<control type="label">
 							<top>120</top>
@@ -418,16 +436,19 @@
         <!-- Side Info -->
         <control type="group">
 			<animation effect="slide" start="600,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
-			<animation effect="slide" end="600,0" time="350" tween="cubic" easing="in">WindowClose</animation>
+			<animation effect="slide" end="600,0" time="350" tween="cubic" easing="in" condition="!String.IsEqual(Window().Property(instant_close),true)">WindowClose</animation>
+            <animation effect="slide" end="600,0" time="350" tween="cubic" easing="in" condition="String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
+            <animation effect="slide" start="600,0" delay="350" time="350" tween="cubic" easing="in" condition="!String.IsEqual(Window().Property(resolving),true)">Conditional</animation>
             <top>110</top>
             <right>20</right>
             <width>500</width>
-            
+            <visible>!String.IsEqual(Window().Property(instant_close),true)</visible>
+
 			<!-- Media Info -->
             <control type="group">
                 <width>500</width>
                 <height>120</height>
-                
+
 				<!-- Card -->
                 <control type="image">
                     <texture>white.png</texture>
@@ -446,7 +467,7 @@
                         <visible>!String.IsEmpty(Window().Property(item.info.season))</visible>
                         <label>[B][COLOR $INFO[Window().Property(settings.color)]][UPPERCASE]$INFO[Window().Property(item.info.tvshowtitle)][/UPPERCASE][/COLOR][/B]</label>
                     </control>
-                    
+
 					<!-- Movie Title -->
                     <control type="label">
                         <top>25</top>
@@ -456,7 +477,7 @@
                         <visible>String.IsEmpty(Window().Property(item.info.season))</visible>
                         <label>[B][COLOR $INFO[Window().Property(settings.color)]][UPPERCASE]$INFO[Window().Property(item.info.title)][/UPPERCASE][/COLOR][/B]</label>
                     </control>
-                    
+
 					<!-- Season & Episode -->
                     <control type="label">
                         <top>65</top>
@@ -467,7 +488,7 @@
                         <visible>!String.IsEmpty(Window().Property(item.info.season))</visible>
                         <label>Season: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.season)] [/COLOR] | Episode: [COLOR $INFO[Window().Property(settings.color)]]$INFO[Window().Property(item.info.episode)][/COLOR]</label>
                     </control>
-                    
+
 					<!-- Year & Rating -->
                     <control type="label">
                         <top>65</top>
@@ -486,13 +507,13 @@
                 <width>500</width>
                 <height>530</height>
                 <top>130</top>
-                
+
 				<!-- Card -->
                 <control type="image">
                     <texture>white.png</texture>
                     <colordiffuse>99362e33</colordiffuse>
                 </control>
-                
+
                 <control type="label">
                     <wrapmultiline>true</wrapmultiline>
                     <top>20</top>
@@ -512,18 +533,18 @@
                 <top>670</top>
                 <width>500</width>
                 <height>220</height>
-                
+
 				<!-- Card -->
                 <control type="image">
                     <texture>white.png</texture>
                     <colordiffuse>99362e33</colordiffuse>
                 </control>
-                
+
                 <control type="grouplist" id="2000">
                     <top>25</top>
                     <onleft>1000</onleft>
                     <itemgap>10</itemgap>
-                
+
 					<!-- View Uncached -->
                     <control type="button" id="2001">
                         <height>80</height>
@@ -534,7 +555,7 @@
                         <align>right</align>
                         <textcolor>FFFFFFFF</textcolor>
                     </control>
-                
+
 					<!-- Close -->
                     <control type="button" id="2999">
                         <height>80</height>

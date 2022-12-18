@@ -1,36 +1,32 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.database.providerCache import ProviderCache
 from resources.lib.modules.globals import g
 
 
 class SettingsManager(ProviderCache):
     settings_template = {
-        'string': {
-            'default': '',
-            'cast': str,
+        "str": {
+            "default": "",
+            "cast": str,
         },
-        'int': {
-            'default': 0,
-            'cast': int
-        }
+        "int": {"default": 0, "cast": int},
+        "bool": {"default": False, "cast": bool},
     }
 
     def __init__(self):
         self._setting_store = {}
-        super(SettingsManager, self).__init__()
+        super().__init__()
 
     def create_settings(self, package_name, settings):
-        self.execute_sql(self.package_setting_insert_query, [self._parse_new_setting(package_name, setting)
-                                                             for setting in settings])
+        self.execute_sql(
+            self.package_setting_insert_query, [self._parse_new_setting(package_name, setting) for setting in settings]
+        )
 
     def _parse_new_setting(self, package_name, setting):
         try:
             setting_id = setting['id']
             setting_type = setting['type']
         except KeyError as e:
-            g.log('Failed to create provider setting - {}'.format(setting))
+            g.log(f'Failed to create provider setting - {setting}')
             raise e
 
         visible = 1 if setting.get('visible', False) else 0
@@ -42,7 +38,12 @@ class SettingsManager(ProviderCache):
         self.execute_sql('DELETE FROM package_settings WHERE package=?', (package_name,))
 
     def _cast_setting(self, setting, forced_value=None):
-        return self.settings_template[setting['type']]['cast'](setting['value'] if not forced_value else forced_value)
+        if setting["type"] == "bool":
+            setting["value"] = setting["value"] == "True"
+
+        return self.settings_template[setting["type"]]["cast"](
+            forced_value if forced_value is not None else setting["value"]
+        )
 
     def get_setting(self, package_name, setting_id):
         setting = self._get_package_setting(package_name, setting_id)
@@ -56,5 +57,5 @@ class SettingsManager(ProviderCache):
 
     def set_setting(self, package_name, setting_id, value):
         setting = self._get_package_setting(package_name, setting_id)
-        self._cast_setting(setting, forced_value=value)
-        self._set_package_setting(package_name, setting_id, g.UNICODE(value))
+        value = self._cast_setting(setting, forced_value=value)
+        self._set_package_setting(package_name, setting_id, str(value))

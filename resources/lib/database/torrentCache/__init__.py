@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 import datetime
 import time
@@ -21,7 +18,7 @@ schema = {
                 ("hash", ["TEXT", "NOT NULL", "UNIQUE"]),
                 ("package", ["TEXT", "NOT NULL"]),
                 ("torrent_object", ["PICKLE", "NOT NULL"]),
-                ("expires", ["INTEGER", "NOT NULL"])
+                ("expires", ["INTEGER", "NOT NULL"]),
             ]
         ),
         "table_constraints": ["PRIMARY KEY(trakt_id, hash, package)"],
@@ -34,18 +31,18 @@ schema = {
                 ("hash", ["TEXT", "NOT NULL", "UNIQUE"]),
                 ("package", ["TEXT", "NOT NULL"]),
                 ("torrent_object", ["PICKLE", "NOT NULL"]),
-                ("expires", ["INTEGER", "NOT NULL"])
+                ("expires", ["INTEGER", "NOT NULL"]),
             ]
         ),
         "table_constraints": ["PRIMARY KEY(trakt_id, hash, package)"],
         "default_seed": [],
-    }
+    },
 }
 
 
 class TorrentCache(Database):
     def __init__(self):
-        super(TorrentCache, self).__init__(g.TORRENT_CACHE, schema)
+        super().__init__(g.TORRENT_CACHE, schema)
         self.enabled = g.get_bool_setting("general.torrentCache")
 
     @staticmethod
@@ -70,26 +67,17 @@ class TorrentCache(Database):
 
         if cache_type == TV_CACHE_TYPE:
             torrent_list = self.fetchall(
-                "SELECT torrent_object from {} "
-                "WHERE expires > {} AND "
-                "   (trakt_id={} AND package='single') "
-                "   OR (trakt_id={} AND package='season') "
-                "   OR (trakt_id={} AND package='show') ".format(
-                    cache_type,
-                    time.time(),
-                    trakt_id,
-                    trakt_season_id,
-                    trakt_show_id
-                )
+                f"""
+                SELECT torrent_object from {cache_type}
+                WHERE expires > {time.time()} AND
+                   (trakt_id={trakt_id} AND package='single')
+                   OR (trakt_id={trakt_season_id} AND package='season')
+                   OR (trakt_id={trakt_show_id} AND package='show')
+                """
             )
         else:
             torrent_list = self.fetchall(
-                "SELECT torrent_object from {} "
-                "WHERE trakt_id={} AND expires > {}".format(
-                    cache_type,
-                    trakt_id,
-                    time.time()
-                )
+                f"SELECT torrent_object from {cache_type} WHERE trakt_id={trakt_id} AND expires > {time.time()}"
             )
 
         return [i["torrent_object"] for i in torrent_list]
@@ -104,19 +92,20 @@ class TorrentCache(Database):
         cache_type, trakt_id, trakt_season_id, trakt_show_id = TorrentCache._get_item_id_keys(item_meta)
 
         self.execute_sql(
-            "REPLACE INTO {} (trakt_id, hash, package, torrent_object, expires) VALUES (?, ?, ?, ?, ?)".format(
-                cache_type),
+            f"REPLACE INTO {cache_type} (trakt_id, hash, package, torrent_object, expires) VALUES (?, ?, ?, ?, ?)",
             (
                 (
                     (
-                        trakt_show_id if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "show"
-                        else trakt_season_id if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "season"
+                        trakt_show_id
+                        if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "show"
+                        else trakt_season_id
+                        if cache_type == TV_CACHE_TYPE and torrent_object["package"] == "season"
                         else trakt_id
                     ),
                     torrent_object["hash"],
                     torrent_object["package"],
                     torrent_object,
-                    time.time() + expiration.total_seconds()
+                    time.time() + expiration.total_seconds(),
                 )
                 for torrent_object in torrent_objects
             ),
@@ -127,24 +116,15 @@ class TorrentCache(Database):
 
         if cache_type == TV_CACHE_TYPE and clear_packs:
             self.execute_sql(
-                "DELETE FROM {} "
-                "WHERE (trakt_id={} AND package='single') "
-                "   OR (trakt_id={} AND package='season') "
-                "   OR (trakt_id={} AND package='show') ".format(
-                    cache_type,
-                    trakt_id,
-                    trakt_season_id,
-                    trakt_show_id
-                )
+                f"""
+                DELETE FROM {cache_type}
+                WHERE (trakt_id={trakt_id} AND package='single')
+                   OR (trakt_id={trakt_season_id} AND package='season')
+                   OR (trakt_id={trakt_show_id} AND package='show')
+                """
             )
         else:
-            self.execute_sql(
-                "DELETE FROM {} "
-                "WHERE trakt_id={} AND package='single' ".format(
-                    cache_type,
-                    trakt_id,
-                )
-            )
+            self.execute_sql(f"DELETE FROM {cache_type} WHERE trakt_id={trakt_id} AND package='single' ")
 
     def do_cleanup(self):
         busy_key = "torrentcache.db.clean.busy"
@@ -152,10 +132,10 @@ class TorrentCache(Database):
             return
         g.set_runtime_setting(busy_key, True)
 
-        self.execute_sql([
-            "DELETE FROM {} where expires < ?".format(MOVIE_CACHE_TYPE),
-            "DELETE FROM {} where expires < ?".format(TV_CACHE_TYPE)],
-            (time.time(),))
+        self.execute_sql(
+            [f"DELETE FROM {MOVIE_CACHE_TYPE} where expires < ?", f"DELETE FROM {TV_CACHE_TYPE} where expires < ?"],
+            (time.time(),),
+        )
         g.clear_runtime_setting(busy_key)
 
     def clear_all(self):

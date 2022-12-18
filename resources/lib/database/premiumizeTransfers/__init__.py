@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 
 from resources.lib.database import Database
@@ -8,11 +5,13 @@ from resources.lib.modules.globals import g
 
 schema = {
     'transfers': {
-        'columns': collections.OrderedDict([
-            ("transfer_id", ["TEXT", "NOT NULL"]),
-        ]),
+        'columns': collections.OrderedDict(
+            [
+                ("transfer_id", ["TEXT", "NOT NULL"]),
+            ]
+        ),
         "table_constraints": ["UNIQUE(transfer_id)"],
-        "default_seed": []
+        "default_seed": [],
     }
 }
 
@@ -21,8 +20,9 @@ class PremiumizeTransfers(Database):
     """
     Databsae for recording background transfer created by Seren
     """
+
     def __init__(self):
-        super(PremiumizeTransfers, self).__init__(g.PREMIUMIZE_DB_PATH, schema)
+        super().__init__(g.PREMIUMIZE_DB_PATH, schema)
         self.table_name = next(iter(schema))
 
     def get_premiumize_transfers(self):

@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import copy
 import importlib
 import json
 import sys
 import time
+from functools import cached_property
+from urllib import parse
 
 import xbmc
 import xbmcgui
@@ -24,9 +23,8 @@ class SerenPlayer(xbmc.Player):
     """
 
     def __init__(self):
-        super(SerenPlayer, self).__init__()
+        super().__init__()
 
-        self._trakt_api = trakt.TraktAPI()
         self.trakt_id = None
         self.mediatype = None
         self.offset = None
@@ -39,17 +37,14 @@ class SerenPlayer(xbmc.Player):
         self.total_time = 0
         self.watched_percentage = 0
         self.ignoreSecondsAtStart = g.get_int_setting("trakt.ignoreSecondsAtStart")
-        self.min_time_before_scrape = max(self.total_time * 0.2, 600)
-        self.playCountMinimumPercent = g.get_int_setting(
-            "trakt.playCountMinimumPercent"
+        self.min_time_before_scrape = 600
+        self.playCountMinimumPercent = g.get_int_setting("trakt.playCountMinimumPercent")
+        self.dialogs_enabled = g.get_bool_setting("smartplay.playingnextdialog") or g.get_bool_setting(
+            "smartplay.stillwatching"
         )
-        self.dialogs_enabled = g.get_bool_setting(
-            "smartplay.playingnextdialog"
-        ) or g.get_bool_setting("smartplay.stillwatching")
         self.pre_scrape_enabled = g.get_bool_setting("smartPlay.preScrape")
         self.playing_next_time = g.get_int_setting("playingnext.time")
-        self.bookmark_sync = bookmark.TraktSyncDatabase()
-        self.trakt_enabled = True if g.get_setting("trakt.auth", "") else False
+        self.trakt_enabled = bool(g.get_setting("trakt.auth", ""))
         self._running_path = None
 
         # Flags
@@ -62,10 +57,18 @@ class SerenPlayer(xbmc.Player):
         self.scrobble_started = False
         self.last_attempted_scrobble_stop = 0
         self.last_attempted_scrobble_pause = 0
-        self._force_marked_watched = False
+        self.marked_watched = False
         self.dialogs_triggered = False
         self.pre_scrape_initiated = False
         self.playback_timestamp = 0
+
+    @cached_property
+    def _trakt_api(self):
+        return trakt.TraktAPI()
+
+    @cached_property
+    def bookmark_sync(self):
+        return bookmark.TraktSyncDatabase()
 
     def play_source(self, stream_link, item_information, resume_time=None):
         """Method for handling playing of sources.
@@ -99,9 +102,6 @@ class SerenPlayer(xbmc.Player):
         self._handle_bookmark()
         self._add_support_for_external_trakt_scrobbling()
 
-        g.close_busy_dialog()
-        g.close_all_dialogs()
-
         xbmcplugin.setResolvedUrl(g.PLUGIN_HANDLE, True, self._create_list_item(stream_link))
 
         self._keep_alive()
@@ -113,9 +113,10 @@ class SerenPlayer(xbmc.Player):
         :return: Total length of file else 0 if not playing an item
         :rtype: int
         """
-        if self.isPlaying():
-            return xbmc.Player().getTotalTime()
-        else:
+        try:
+            return super().getTotalTime()
+        except RuntimeError:
+            g.log("Trying to get player total time while not playing", "warning")
             return 0
 
     def getTime(self):
@@ -124,18 +125,11 @@ class SerenPlayer(xbmc.Player):
         :return: Current position or 0 if not playing a file
         :rtype: int
         """
-        if self.isPlaying():
-            return xbmc.Player().getTime()
-        else:
+        try:
+            return current_time if (current_time := super().getTime()) > 0 else 0
+        except RuntimeError:
+            g.log("Trying to get player time while not playing", "warning")
             return 0
-
-    def isPlaying(self):
-        """
-        Retuns True if currently playing an item else False
-        :return: True if playing an item else False
-        :rtype: bool
-        """
-        return xbmc.Player().isPlaying()
 
     def isPlayingVideo(self):
         """
@@ -143,7 +137,7 @@ class SerenPlayer(xbmc.Player):
         :return: True if playing a file and it is video else False
         :rtype: bool
         """
-        return xbmc.Player().isPlayingVideo()
+        return super().isPlayingVideo()
 
     def seekTime(self, time):
         """
@@ -154,10 +148,10 @@ class SerenPlayer(xbmc.Player):
         :return: None
         :rtype: None
         """
-        if self.isPlaying():
-            return xbmc.Player().seekTime(time)
-        else:
-            return None
+        try:
+            super().seekTime(time)
+        except RuntimeError:
+            g.log("Trying to seek player when not playing a file", "warning")
 
     def getSubtitles(self):
         """
@@ -165,10 +159,7 @@ class SerenPlayer(xbmc.Player):
         :return: Stream Name if playing a file else None
         :rtype: str, None
         """
-        if self.isPlaying():
-            return xbmc.Player().getSubtitles()
-        else:
-            return None
+        return subtitles if (subtitles := super().getSubtitles()) else None
 
     def getAvailableSubtitleStreams(self):
         """
@@ -176,10 +167,7 @@ class SerenPlayer(xbmc.Player):
         :return: List of available subtitle streams
         :rtype: list, None
         """
-        if self.isPlaying():
-            return xbmc.Player().getAvailableSubtitleStreams()
-        else:
-            return None
+        return super().getAvailableSubtitleStreams() if self.isPlaying() else None
 
     def setSubtitles(self, subtitle):
         """
@@ -190,9 +178,9 @@ class SerenPlayer(xbmc.Player):
         :rtype: None
         """
         if self.isPlaying():
-            xbmc.Player().setSubtitles(subtitle)
+            super().setSubtitles(subtitle)
         else:
-            return None
+            g.log("Trying to set subtitles when not playing a file", "warning")
 
     def getPlayingFile(self):
         """
@@ -200,25 +188,11 @@ class SerenPlayer(xbmc.Player):
         :return: Path to file
         :rtype: str/None
         """
-        if self.isPlaying():
-            try:
-                return xbmc.Player().getPlayingFile()
-            except RuntimeError:
-                # seems that we have a racing condition between isPlaying() and getPlayingFile()
-                return None
-        else:
-            return None
-
-    def pause(self):
-        """
-        Pauses playing item if item is playing
-        :return: None
-        :rtype: None
-        """
-        if self.isPlaying():
-            return xbmc.Player().pause()
-        else:
-            return None
+        try:
+            return super().getPlayingFile()
+        except RuntimeError:
+            # seems that we have a racing condition between isPlaying() and getPlayingFile()
+            g.log("Trying to get playing file when not playing a file", "warning")
 
     # endregion
 
@@ -277,7 +251,7 @@ class SerenPlayer(xbmc.Player):
         :return: None
         :rtype: None
         """
-        self.playback_ended = True if self.playback_started else False
+        self.playback_ended = bool(self.playback_started)
         self._end_playback()
         if g.PLAYLIST.getposition() == g.PLAYLIST.size() or g.PLAYLIST.size() == 1:
             g.PLAYLIST.clear()
@@ -288,8 +262,10 @@ class SerenPlayer(xbmc.Player):
         :return: None
         :rtype: None
         """
-        self.playback_stopped = True if self.playback_started else False
+        self.playback_stopped = bool(self.playback_started)
         g.PLAYLIST.clear()
+        g.close_busy_dialog()
+        g.close_all_dialogs()
         self._end_playback()
 
     def onPlayBackPaused(self):
@@ -310,8 +286,9 @@ class SerenPlayer(xbmc.Player):
         g.log("Kodi has reported an error and has stopped playback!", "warning")
         self.playback_error = True
         g.PLAYLIST.clear()
+        g.close_busy_dialog()
+        g.close_all_dialogs()
         self._end_playback()
-        sys.exit(1)
 
     # endregion
 
@@ -320,10 +297,10 @@ class SerenPlayer(xbmc.Player):
             return
 
         self.playback_started = True
-        self.plaback_stopped = False
-        self.scrobbled = False
         self.playback_timestamp = time.time()
+        self._running_path = self.getPlayingFile()
 
+        g.close_busy_dialog()
         g.close_all_dialogs()
 
         if self.smart_playlists and self.mediatype == "episode":
@@ -334,24 +311,21 @@ class SerenPlayer(xbmc.Player):
 
     def _end_playback(self):
         self._handle_bookmark()
-        self._mark_watched_dialog()
         self._trakt_stop_watching()
+        self._trakt_mark_playing_item_watched()
         if g.get_bool_setting("general.force.widget.refresh.playback"):
             g.trigger_widget_refresh()
 
-    @staticmethod
-    def _get_kodi_preferred_subtitle_language():
+    def _get_kodi_preferred_subtitle_language(self):
         language = g.get_kodi_preferred_subtitle_language(True)
         if language == "original":
-            audio_streams = xbmc.Player().getAvailableAudioStreams()
+            audio_streams = self.getAvailableAudioStreams()
             if not audio_streams or len(audio_streams) == 0:
                 return None
             return audio_streams[0]
         elif language == "default":
             return xbmc.getLanguage(xbmc.ISO_639_2)
-        elif language == "none":
-            return None
-        elif language == "forced_only":
+        elif language in ["none", "forced_only"]:
             return None
         else:
             return language
@@ -365,18 +339,14 @@ class SerenPlayer(xbmc.Player):
             if g.ADDON_USERDATA_PATH not in sys.path:
                 sys.path.append(g.ADDON_USERDATA_PATH)
             provider = stream_link["provider_imports"]
-            provider_module = importlib.import_module(
-                "{}.{}".format(provider[0], provider[1])
-            )
-            if not hasattr(provider_module, "get_listitem") and hasattr(
-                provider_module, "sources"
-            ):
+            provider_module = importlib.import_module(f"{provider[0]}.{provider[1]}")
+            if not hasattr(provider_module, "get_listitem") and hasattr(provider_module, "sources"):
                 provider_module = provider_module.sources()
             item = provider_module.get_listitem(stream_link)
             item.setInfo("video", info)
         else:
             item = xbmcgui.ListItem(path=stream_link)
-            info["FileNameAndPath"] = tools.unquote(self.playing_file)
+            info["FileNameAndPath"] = parse.unquote(self.playing_file)
             item.setInfo("video", info)
             item.setProperty("IsPlayable", "true")
 
@@ -401,46 +371,37 @@ class SerenPlayer(xbmc.Player):
 
         info = self.item_information.get("info", {})
         for id in keys:
-            meta_id = info.get(
-                "tvshow." + id if info.get("mediatype") == "episode" else id
-            )
+            meta_id = info.get(f"tvshow.{id}" if info.get("mediatype") == "episode" else id)
             if meta_id:
                 trakt_meta[keys[id]] = meta_id
 
-        g.HOME_WINDOW.setProperty(
-            "script.trakt.ids", json.dumps(trakt_meta, sort_keys=True)
-        )
+        g.HOME_WINDOW.setProperty("script.trakt.ids", json.dumps(trakt_meta, sort_keys=True))
 
     def _update_progress(self, offset=None):
+        if not self._is_file_playing():
+            return
+
         self.current_time = self.getTime()
-
-        if not self.total_time:
-            return 0
-
-        self.watched_percentage = 0
 
         if offset is not None:
             self.current_time += offset
 
         if self.total_time > 0:
             try:
-                self.watched_percentage = tools.safe_round(
-                    float(self.current_time) / float(self.total_time) * 100, 2
-                )
-                if self.watched_percentage > 100:
-                    self.watched_percentage = 100
+                self.watched_percentage = tools.safe_round(float(self.current_time) / float(self.total_time) * 100, 2)
+                self.watched_percentage = min(self.watched_percentage, 100)
             except TypeError:
                 pass
 
     def _log_debug_information(self):
-        g.log("PlaybackIdentifedAt: {}".format(self.getTime()), "debug")
-        g.log("IgnoringSecondsAtStart: {}".format(self.ignoreSecondsAtStart), "debug")
-        g.log("PreScrapeSeconds: {}".format(self.min_time_before_scrape), "debug")
-        g.log("PlayCountMin: {}".format(self.playCountMinimumPercent), "debug")
-        g.log("DialogsEnabled: {}".format(self.dialogs_enabled), "debug")
-        g.log("TraktEnabled: {}".format(self.trakt_enabled), "debug")
-        g.log("DialogSeconds: {}".format(self.playing_next_time), "debug")
-        g.log("TotalMediaLength: {}".format(self.getTotalTime()), "debug")
+        g.log(f"PlaybackIdentifedAt: {self.getTime()}", "debug")
+        g.log(f"IgnoringSecondsAtStart: {self.ignoreSecondsAtStart}", "debug")
+        g.log(f"PreScrapeSeconds: {self.min_time_before_scrape}", "debug")
+        g.log(f"PlayCountMin: {self.playCountMinimumPercent}", "debug")
+        g.log(f"DialogsEnabled: {self.dialogs_enabled}", "debug")
+        g.log(f"TraktEnabled: {self.trakt_enabled}", "debug")
+        g.log(f"DialogSeconds: {self.playing_next_time}", "debug")
+        g.log(f"TotalMediaLength: {self.getTotalTime()}", "debug")
 
     # region Trakt
     def _trakt_start_watching(self, offset=None, re_scrobble=False):
@@ -452,10 +413,7 @@ class SerenPlayer(xbmc.Player):
         ):
             return
 
-        if (
-            self.watched_percentage >= self.playCountMinimumPercent
-            or self.current_time < self.ignoreSecondsAtStart
-        ):
+        if self.watched_percentage >= self.playCountMinimumPercent or self.current_time < self.ignoreSecondsAtStart:
             return
 
         try:
@@ -471,22 +429,16 @@ class SerenPlayer(xbmc.Player):
             not self.trakt_enabled
             or not self.scrobbling_enabled
             or self.scrobbled
-            or g.get_bool_runtime_setting("marked_watched_dialog_open")
             or self.current_time < self.ignoreSecondsAtStart
         ):
             return
 
         post_data = self._build_trakt_object()
 
-        if (
-            post_data["progress"] >= self.playCountMinimumPercent
-            or self._force_marked_watched
-        ):
-            if time.time() - self.last_attempted_scrobble_stop < 30:
+        if post_data["progress"] >= self.playCountMinimumPercent:
+            if time.time() - self.last_attempted_scrobble_stop < 30 and not g.abort_requested():
                 return
-            post_data["progress"] = (
-                80 if post_data["progress"] < 80 else post_data["progress"]
-            )
+            post_data["progress"] = max(post_data["progress"], 80)
             try:
                 scrobble_response = self._trakt_api.post("scrobble/stop", post_data)
             except Exception:
@@ -500,30 +452,16 @@ class SerenPlayer(xbmc.Player):
                 if scrobble_response.status_code == 201:
                     try:
                         action = scrobble_response.json()["action"]
-                        if not action == "scrobble":
-                            g.log(
-                                "Trakt scrobble/stop returned action: {}".format(
-                                    action
-                                ),
-                                "warning",
-                            )
+                        if action != "scrobble":
+                            g.log(f"Trakt scrobble/stop returned action: {action}", "warning")
                     except Exception:
                         g.log_stacktrace()
                 return
             else:
-                g.log(
-                    "Trakt scrobble/stop returned status code: {}".format(
-                        scrobble_response.status_code
-                    ),
-                    "warning",
-                )
+                g.log(f"Trakt scrobble/stop returned status code: {scrobble_response.status_code}", "warning")
         elif self.current_time > self.ignoreSecondsAtStart:
-            pause_time = time.time() - self.last_attempted_scrobble_pause
-            if pause_time < 5:
-                g.log(
-                    "Trakt scrobble/pause repeat called: {}s".format(pause_time),
-                    "warning",
-                )
+            if (pause_time := time.time() - self.last_attempted_scrobble_pause) < 5:
+                g.log(f"Trakt scrobble/pause repeat called: {pause_time}s", "warning")
             try:
                 scrobble_response = self._trakt_api.post("scrobble/pause", post_data)
             except Exception:
@@ -531,20 +469,19 @@ class SerenPlayer(xbmc.Player):
                 return
             finally:
                 self.last_attempted_scrobble_pause = time.time()
-            if not scrobble_response.status_code == 201:
-                g.log(
-                    "Trakt scrobble/pause returned status code: {}".format(
-                        scrobble_response.status_code
-                    ),
-                    "warning",
-                )
-        else:
-            return
-
-        if not scrobble_response.status_code == 201:
-            g.log("Error scrobbling item to Trakt")
+            if scrobble_response.status_code != 201:
+                g.log(f"Trakt scrobble/pause returned status code: {scrobble_response.status_code}", "warning")
 
     def _trakt_mark_playing_item_watched(self):
+        if (
+            self.marked_watched
+            or not self.playback_started
+            or not self.watched_percentage >= self.playCountMinimumPercent
+        ):
+            return
+
+        self.marked_watched = True
+
         if self.mediatype == "episode":
             from resources.lib.database.trakt_sync.shows import TraktSyncDatabase
 
@@ -558,8 +495,6 @@ class SerenPlayer(xbmc.Player):
 
             TraktSyncDatabase().mark_movie_watched(self.trakt_id)
 
-        self._force_marked_watched = False
-
     def _build_trakt_object(self, offset=None):
         post_data = {self.mediatype: {"ids": {"trakt": self.trakt_id}}}
         if offset:
@@ -569,36 +504,15 @@ class SerenPlayer(xbmc.Player):
         post_data["progress"] = self.watched_percentage
         return post_data
 
-    def _mark_watched_dialog(self):
-        if g.get_bool_runtime_setting("marked_watched_dialog_open"):
-            return
-
-        if (
-            self.getPlayingFile()
-            and self._running_path
-            and self._running_path != self.getPlayingFile()
-            and self.watched_percentage < self.playCountMinimumPercent
-            and (time.time() - self.playback_timestamp) > 600
-        ):
-            if not g.wait_for_abort(10):
-                g.set_runtime_setting("marked_watched_dialog_open", True)
-                if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30486)):
-                    self._force_marked_watched = True
-            g.set_runtime_setting("marked_watched_dialog_open", False)
-
     # endregion
 
     def _keep_alive(self):
-        for i in range(0, 480):
-            self._running_path = self.getPlayingFile()
-            if (
-                self._is_file_playing()
-                or self._playback_has_stopped()
-                or g.wait_for_abort(0.25)
-            ):
+        for _ in range(480):
+            if self._is_file_playing() or self._playback_has_stopped() or g.wait_for_abort(0.25):
                 break
 
         self.total_time = self.getTotalTime()
+        self.min_time_before_scrape = max(self.total_time * 0.2, self.min_time_before_scrape)
 
         if self.offset and not self.resumed:
             self.seekTime(self.offset)
@@ -606,33 +520,27 @@ class SerenPlayer(xbmc.Player):
 
         self._log_debug_information()
 
-        if not g.wait_for_abort(5):
-            while self._is_file_playing() and not g.wait_for_abort(0.5):
+        while not g.wait_for_abort(0.5) and self._is_file_playing():  # This order is correct! Wait then check.
+            self._update_progress()
 
-                self._update_progress()
+            if not self.scrobble_started:
+                self._trakt_start_watching()
 
-                if not self.scrobble_started:
-                    self._trakt_start_watching()
+            time_left = int(self.total_time) - int(self.current_time)
 
-                time_left = int(self.total_time) - int(self.current_time)
+            if self.min_time_before_scrape > time_left and not self.pre_scrape_initiated:
+                self._handle_pre_scrape()
 
-                if self.min_time_before_scrape > time_left and not self.pre_scrape_initiated:
-                    self._handle_pre_scrape()
+            if self.watched_percentage >= self.playCountMinimumPercent and self.scrobble_started and not self.scrobbled:
+                self._handle_bookmark()
+                self._trakt_stop_watching()
 
-                if (
-                    self.watched_percentage >= self.playCountMinimumPercent
-                    and self.scrobble_started
-                    and not self.scrobbled
-                ):
-                    self._handle_bookmark()
-                    self._trakt_stop_watching()
+            if self.dialogs_enabled and not self.dialogs_triggered and time_left <= self.playing_next_time:
+                xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')
+                self.dialogs_triggered = True
 
-                if self.dialogs_enabled and not self.dialogs_triggered:
-                    if time_left <= self.playing_next_time:
-                        xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=runPlayerDialogs")')
-                        self.dialogs_triggered = True
-
-        self._end_playback()
+        if not self._playback_has_stopped():  # Kodi does not fire the onPlaybackStopped event if early in playback
+            self._end_playback()
 
     def _playback_has_stopped(self):
         return self.playback_stopped or self.playback_error or self.playback_ended
@@ -644,27 +552,18 @@ class SerenPlayer(xbmc.Player):
 
     def _try_get_bookmark(self):
         bm = self.bookmark_sync.get_bookmark(self.trakt_id)
-        self.offset = bm["resumeTime"] if bm is not None else None
+        self.offset = bm.get("resumeTime") if bm else None
 
     def _handle_bookmark(self):
-        if g.get_bool_runtime_setting("marked_watched_dialog_open"):
-            return
-
         try:
             g.clear_kodi_bookmarks()
         except Exception:
             g.log_stacktrace()
-            pass
-
         if self.current_time == 0 or self.total_time == 0:
             self.bookmark_sync.remove_bookmark(self.trakt_id)
             return
 
-        if (
-            self.watched_percentage < self.playCountMinimumPercent
-            and self.current_time >= self.ignoreSecondsAtStart
-            and not self._force_marked_watched
-        ):
+        if self.watched_percentage < self.playCountMinimumPercent and self.current_time >= self.ignoreSecondsAtStart:
             self.bookmark_sync.set_bookmark(
                 self.trakt_id,
                 int(self.current_time),
@@ -675,17 +574,10 @@ class SerenPlayer(xbmc.Player):
             self.bookmark_sync.remove_bookmark(self.trakt_id)
 
     def _is_file_playing(self):
-        if self._playback_has_stopped():
+        if not self.playback_started or self._playback_has_stopped() or self._running_path is None:
             return False
 
-        if not self.playback_started:
-            return False
-
-        if self._running_path is None or self._running_path.startswith("plugin://"):
-            return False
-
-        playing_file = self.getPlayingFile()
-        return self._running_path == playing_file
+        return self.isPlayingVideo()
 
 
 class PlayerDialogs(xbmc.Player):
@@ -694,7 +586,7 @@ class PlayerDialogs(xbmc.Player):
     """
 
     def __init__(self):
-        super(PlayerDialogs, self).__init__()
+        super().__init__()
         self._min_time = g.get_int_setting("playingnext.time")
         self.playing_file = None
 
@@ -707,17 +599,10 @@ class PlayerDialogs(xbmc.Player):
         try:
             self.playing_file = self.getPlayingFile()
         except RuntimeError:
-            g.log(
-                "Kodi did not return a playing file, killing playback dialogs", "error"
-            )
+            g.log("Kodi did not return a playing file, killing playback dialogs", "error")
             return
-        if g.PLAYLIST.size() > 0 and g.PLAYLIST.getposition() != (
-            g.PLAYLIST.size() - 1
-        ):
-            if (
-                g.get_bool_setting("smartplay.stillwatching")
-                and self._still_watching_calc()
-            ):
+        if g.PLAYLIST.size() > 0 and g.PLAYLIST.getposition() != (g.PLAYLIST.size() - 1):
+            if g.get_bool_setting("smartplay.stillwatching") and self._still_watching_calc():
                 target = self._show_still_watching
             elif g.get_bool_setting("smartplay.playingnextdialog"):
                 target = self._show_playing_next
@@ -737,14 +622,9 @@ class PlayerDialogs(xbmc.Player):
 
     @staticmethod
     def _still_watching_calc():
-        calculation = float(g.PLAYLIST.getposition() + 1) / g.get_float_setting(
-            "stillwatching.numepisodes"
-        )
+        calculation = float(g.PLAYLIST.getposition() + 1) / g.get_float_setting("stillwatching.numepisodes")
 
-        if calculation == 0:
-            return False
-
-        return calculation.is_integer()
+        return False if calculation == 0 else calculation.is_integer()
 
     def _show_playing_next(self):
         from resources.lib.gui.windows.playing_next import PlayingNext
@@ -753,7 +633,7 @@ class PlayerDialogs(xbmc.Player):
         try:
             window = PlayingNext(
                 *SkinManager().confirm_skin_path("playing_next.xml"),
-                item_information=self._get_next_item_item_information()
+                item_information=self._get_next_item_item_information(),
             )
             window.doModal()
         finally:
@@ -766,7 +646,7 @@ class PlayerDialogs(xbmc.Player):
         try:
             window = StillWatching(
                 *SkinManager().confirm_skin_path("still_watching.xml"),
-                item_information=self._get_next_item_item_information()
+                item_information=self._get_next_item_item_information(),
             )
             window.doModal()
         finally:
@@ -775,16 +655,10 @@ class PlayerDialogs(xbmc.Player):
     @staticmethod
     def _get_next_item_item_information():
         current_position = g.PLAYLIST.getposition()
-        url = g.PLAYLIST[  # pylint: disable=unsubscriptable-object
-            current_position + 1
-        ].getPath()
-        params = dict(tools.parse_qsl(tools.unquote(url.split("?")[1])))
-        return tools.get_item_information(
-            tools.deconstruct_action_args(params.get("action_args"))
-        )
+        url = g.PLAYLIST[current_position + 1].getPath()  # pylint: disable=unsubscriptable-object
+        params = dict(parse.parse_qsl(parse.unquote(url.split("?")[1])))
+        return tools.get_item_information(tools.deconstruct_action_args(params.get("action_args")))
 
     @staticmethod
     def _is_video_window_open():
-        if xbmcgui.getCurrentWindowId() != 12005:
-            return False
-        return True
+        return xbmcgui.getCurrentWindowId() == 12005

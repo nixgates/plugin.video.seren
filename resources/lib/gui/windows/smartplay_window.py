@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import abc
 
 import xbmc
@@ -16,15 +13,17 @@ class SmartPlayWindow(BaseWindow):
 
     def __init__(self, xml_file, xml_location, item_information=None):
         try:
-            super(SmartPlayWindow, self).__init__(
-                xml_file, xml_location, item_information=item_information
-            )
+            super().__init__(xml_file, xml_location, item_information=item_information)
             self.player = xbmc.Player()
             self.playing_file = self.getPlayingFile()
             self.duration = self.getTotalTime() - self.getTime()
             self.closed = False
         except Exception:
             g.log_stacktrace()
+
+    def __del__(self):
+        self.player = None
+        del self.player
 
     # region player methods
     def getTotalTime(self):
@@ -33,10 +32,7 @@ class SmartPlayWindow(BaseWindow):
         :return: Total time in seconds
         :rtype: float
         """
-        if self.isPlaying():
-            return self.player.getTotalTime()
-        else:
-            return 0
+        return self.player.getTotalTime() if self.isPlaying() else 0
 
     def getTime(self):
         """
@@ -44,10 +40,7 @@ class SmartPlayWindow(BaseWindow):
         :return: Current position in seconds
         :rtype: float
         """
-        if self.isPlaying():
-            return self.player.getTime()
-        else:
-            return 0
+        return self.player.getTime() if self.isPlaying() else 0
 
     def isPlaying(self):
         """
@@ -89,7 +82,7 @@ class SmartPlayWindow(BaseWindow):
         :return:
         """
         self.background_tasks()
-        super(SmartPlayWindow, self).onInit()
+        super().onInit()
 
     def calculate_percent(self):
         """
@@ -97,9 +90,7 @@ class SmartPlayWindow(BaseWindow):
         :return: Percentage played
         :rtype: int
         """
-        return (
-            (int(self.getTotalTime()) - int(self.getTime())) / float(self.duration)
-        ) * 100
+        return ((int(self.getTotalTime()) - int(self.getTime())) / float(self.duration)) * 100
 
     def background_tasks(self):
         """
@@ -141,7 +132,7 @@ class SmartPlayWindow(BaseWindow):
         :return:
         """
         self.closed = True
-        super(SmartPlayWindow, self).close()
+        super().close()
 
     def handle_action(self, action, control_id=None):
         if action == 7:

@@ -1,20 +1,16 @@
-# encoding: utf-8
-from __future__ import absolute_import, division, unicode_literals
-
 import threading
-from abc import ABCMeta, abstractmethod
-from ast import literal_eval
+from abc import ABCMeta
+from abc import abstractmethod
 from contextlib import contextmanager
 
 import xbmc
 import xbmcaddon
 import xbmcgui
 
-from resources.lib.common.tools import unicode
 
-
-class SettingsCache:
-    __metaclass__ = ABCMeta
+class SettingsCache(metaclass=ABCMeta):
+    BOOL_VALUES_SET = {"true", "false", "1", "0"}
+    BOOL_TRUE_SET = {"true", "1"}
 
     @abstractmethod
     def set_setting(self, setting_id, value):
@@ -22,9 +18,9 @@ class SettingsCache:
         Set a setting value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param value: The value to store in settings
-        :type value: str|unicode|float|int|bool
+        :type value: str|float|int|bool
         """
         pass
 
@@ -47,7 +43,7 @@ class SettingsCache:
         Note that for persisted backed settings caches this will also clear the persisted value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         """
         pass
 
@@ -57,12 +53,12 @@ class SettingsCache:
         Get a setting value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
-        :type default_value: str|unicode|float|int|bool
+        :type default_value: str|float|int|bool
         :return: The value of the setting.
                  If the setting is not stored, the optional default_value if provided or None
-        :rtype: str|unicode|float|int|bool
+        :rtype: str|float|int|bool
         """
         pass
 
@@ -72,7 +68,7 @@ class SettingsCache:
         Get a setting as a float value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: float
         :return: The value of the setting.
@@ -82,10 +78,7 @@ class SettingsCache:
         try:
             return float(self.get_setting(setting_id, default_value))
         except (ValueError, TypeError):
-            if default_value is not None:
-                return default_value
-            else:
-                return 0.0
+            return default_value if default_value is not None else 0.0
 
     @abstractmethod
     def get_int_setting(self, setting_id, default_value=None):
@@ -93,7 +86,7 @@ class SettingsCache:
         Get a setting as an int value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: int
         :return: The value of the setting.
@@ -103,10 +96,7 @@ class SettingsCache:
         try:
             return int(float(self.get_setting(setting_id, default_value)))
         except (ValueError, TypeError):
-            if default_value is not None:
-                return default_value
-            else:
-                return 0
+            return default_value if default_value is not None else 0
 
     @abstractmethod
     def get_bool_setting(self, setting_id, default_value=None):
@@ -114,7 +104,7 @@ class SettingsCache:
         Get a setting as a bool value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: bool
         :return: The value of the setting.
@@ -124,23 +114,22 @@ class SettingsCache:
         value = self.get_setting(setting_id, default_value)
         if isinstance(value, bool):
             return value
-        if value is not None and unicode(value).lower() in ["true", "false", "1", "0"]:
-            return unicode(value).lower() in ["true", "1"]
+        if value is not None and str(value).lower() in self.BOOL_VALUES_SET:
+            return str(value).lower() in self.BOOL_TRUE_SET
         else:
-            if default_value is not None:
-                return default_value
-            else:
-                return False
+            return default_value if default_value is not None else False
 
 
 class RuntimeSettingsCache(SettingsCache):
     _KODI_HOME_WINDOW = None
     _SETTINGS_PREFIX = None
     _KODI_ADDON_ID = None
+    _KODI_ADDON_VERSION = None
 
     def __init__(self, settings_prefix="runtime"):
         self._KODI_HOME_WINDOW = xbmcgui.Window(10000)
         self._KODI_ADDON_ID = xbmcaddon.Addon().getAddonInfo("id")
+        self._KODI_ADDON_VERSION = xbmcaddon.Addon().getAddonInfo("version")
         self._SETTINGS_PREFIX = settings_prefix
 
     def __del__(self):
@@ -148,7 +137,7 @@ class RuntimeSettingsCache(SettingsCache):
         del self._KODI_HOME_WINDOW
 
     def _setting_key(self, setting_id):
-        return "{}.{}.{}".format(self._KODI_ADDON_ID, self._SETTINGS_PREFIX, setting_id)
+        return f"{self._KODI_ADDON_ID}.{self._KODI_ADDON_VERSION}.{self._SETTINGS_PREFIX}.{setting_id}"
 
     def set_setting(self, setting_id, value):
         """
@@ -157,14 +146,14 @@ class RuntimeSettingsCache(SettingsCache):
         Lists and Dict may only contain simple types
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param value: The value to store in settings
-        :type value: str|unicode|float|int|bool|list|dict
+        :type value: str|float|int|bool
         """
-        self._KODI_HOME_WINDOW.setProperty(self._setting_key(setting_id), repr(value))
+        self._KODI_HOME_WINDOW.setProperty(self._setting_key(setting_id), str(value))
 
     def update_settings(self, dictionary):
-        super(RuntimeSettingsCache, self).update_settings(dictionary)
+        super().update_settings(dictionary)
 
     def clear_setting(self, setting_id):
         self._KODI_HOME_WINDOW.clearProperty(self._setting_key(setting_id))
@@ -172,26 +161,21 @@ class RuntimeSettingsCache(SettingsCache):
     def get_setting(self, setting_id, default_value=None):
         try:
             value = self._KODI_HOME_WINDOW.getProperty(self._setting_key(setting_id))
-            if value is not None and not value == "":
-                value = literal_eval(value)
             if value is None or value == "":
-                if default_value is not None:
-                    return default_value
-                else:
-                    return None
+                return default_value if default_value is not None else None
             else:
                 return value
         except (ValueError, TypeError):
             return None
 
     def get_float_setting(self, setting_id, default_value=None):
-        return super(RuntimeSettingsCache, self).get_float_setting(setting_id, default_value)
+        return super().get_float_setting(setting_id, default_value)
 
     def get_int_setting(self, setting_id, default_value=None):
-        return super(RuntimeSettingsCache, self).get_int_setting(setting_id, default_value)
+        return super().get_int_setting(setting_id, default_value)
 
     def get_bool_setting(self, setting_id, default_value=None):
-        return super(RuntimeSettingsCache, self).get_bool_setting(setting_id, default_value)
+        return super().get_bool_setting(setting_id, default_value)
 
 
 class PersistedSettingsCache(SettingsCache):
@@ -241,11 +225,11 @@ class PersistedSettingsCache(SettingsCache):
         if settings_list is None or settings_list == "":
             settings_list = set()
         else:
-            settings_list = set(settings_list)
+            settings_list = set(settings_list.split(","))
         return settings_list
 
     def _store_setting_list_set(self, settings_list):
-        self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_LIST_NAME, list(settings_list))
+        self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_LIST_NAME, ",".join(settings_list))
 
     def _set_settings_persisted_flag(self):
         self._RUNTIME_SETTINGS.set_setting(self.SETTINGS_PERSISTED_FLAG, True)
@@ -275,36 +259,38 @@ class PersistedSettingsCache(SettingsCache):
 
     def set_setting(self, setting_id, value):
         if isinstance(value, bool):
-            value_string = unicode(value).lower()
+            value_string = str(value).lower()
         else:
-            value_string = (
-                unicode(value) if value is not None and not value == "" else self.EMPTY_PERSISTED_SETTING_VALUE
-            )
+            value_string = str(value) if value is not None and value != "" else self.EMPTY_PERSISTED_SETTING_VALUE
+
         cache_value = self._SETTINGS_CACHE.get_setting(setting_id)
         if cache_value is not None and cache_value == value_string:
             return
-        else:
-            try:
-                with self._settings_lock():
-                    settings_list = self._get_settings_list_set()
-                    settings_list.add(setting_id)
-                    self._store_setting_list_set(settings_list)
+        try:
+            with self._settings_lock():
+                self._set_setting(setting_id, value_string)
+        except self.KodiShutdown:
+            return
 
-                    self._SETTINGS_CACHE.set_setting(setting_id, value_string)
-                    kodi_addon = xbmcaddon.Addon()
-                    if not kodi_addon.getSetting(setting_id) == (
-                        value_string if not value_string == self.EMPTY_PERSISTED_SETTING_VALUE else ""
-                    ):
-                        kodi_addon.setSetting(
-                            setting_id, value_string if not value_string == self.EMPTY_PERSISTED_SETTING_VALUE else ""
-                        )
-                        self._set_settings_persisted_flag()
-                    del kodi_addon
-            except self.KodiShutdown:
-                return
+    def _set_setting(self, setting_id, value_string):
+        settings_list = self._get_settings_list_set()
+        settings_list.add(setting_id)
+        self._store_setting_list_set(settings_list)
+
+        self._SETTINGS_CACHE.set_setting(setting_id, value_string)
+        kodi_addon = xbmcaddon.Addon()
+        if kodi_addon.getSetting(setting_id) != (
+            value_string if value_string != self.EMPTY_PERSISTED_SETTING_VALUE else ""
+        ):
+            kodi_addon.setSetting(
+                setting_id, value_string if value_string != self.EMPTY_PERSISTED_SETTING_VALUE else ""
+            )
+
+            self._set_settings_persisted_flag()
+        del kodi_addon
 
     def update_settings(self, dictionary):
-        super(PersistedSettingsCache, self).update_settings(dictionary)
+        super().update_settings(dictionary)
 
     def clear_setting(self, setting_id):
         try:
@@ -341,16 +327,16 @@ class PersistedSettingsCache(SettingsCache):
         Get a setting value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value:
-        :type default_value: str|unicode
+        :type default_value: str
         :return: The value of the setting as a string
                  If the setting is not stored, the optional default_value if provided or None
-        :rtype: str|unicode
+        :rtype: str
         """
         value = self._SETTINGS_CACHE.get_setting(setting_id)
         if value == self.EMPTY_PERSISTED_SETTING_VALUE:
-            return unicode(default_value) if default_value else None
+            return str(default_value) if default_value else None
         if value is None or value == "":
             try:
                 with self._settings_lock():
@@ -358,9 +344,7 @@ class PersistedSettingsCache(SettingsCache):
                     value = kodi_addon.getSetting(setting_id)
                     del kodi_addon
                     if value is None or value == "":
-                        value = (
-                            unicode(default_value) if default_value is not None else self.EMPTY_PERSISTED_SETTING_VALUE
-                        )
+                        value = str(default_value) if default_value is not None else self.EMPTY_PERSISTED_SETTING_VALUE
 
                     settings_list = self._get_settings_list_set()
                     settings_list.add(setting_id)
@@ -369,13 +353,13 @@ class PersistedSettingsCache(SettingsCache):
                     self._SETTINGS_CACHE.set_setting(setting_id, value)
             except self.KodiShutdown:
                 return
-        return value if not value == self.EMPTY_PERSISTED_SETTING_VALUE else None
+        return value if value != self.EMPTY_PERSISTED_SETTING_VALUE else None
 
     def get_float_setting(self, setting_id, default_value=None):
-        return super(PersistedSettingsCache, self).get_float_setting(setting_id, default_value)
+        return super().get_float_setting(setting_id, default_value)
 
     def get_int_setting(self, setting_id, default_value=None):
-        return super(PersistedSettingsCache, self).get_int_setting(setting_id, default_value)
+        return super().get_int_setting(setting_id, default_value)
 
     def get_bool_setting(self, setting_id, default_value=None):
-        return super(PersistedSettingsCache, self).get_bool_setting(setting_id, default_value)
+        return super().get_bool_setting(setting_id, default_value)

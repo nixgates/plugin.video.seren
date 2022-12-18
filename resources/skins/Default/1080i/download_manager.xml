@@ -7,7 +7,7 @@
     </coordinates>
 
     <controls>
-        
+
 		<!-- Background -->
         <control type="group">
             <top>0</top>
@@ -22,7 +22,7 @@
             </control>
 
             <!-- Fanart -->
-            <control type="image">    
+            <control type="image">
                 <texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
                 <colordiffuse>66FFFFFF</colordiffuse>
             </control>
@@ -86,10 +86,10 @@
 						<texture>white.png</texture>
                         <colordiffuse>99362e33</colordiffuse>
                     </control>
-                    
+
 					<control type="group">
 						<left>20</left>
-						
+
 						<!-- Filename -->
 						<control type="label">
 							<top>30</top>
@@ -98,12 +98,12 @@
 							<font>font12</font>
 							<textcolor>66FFFFFF</textcolor>
 							<align>left</align>
-							<label>[UPPERCASE]$INFO[ListItem.Property(filename)] - $INFO[ListItem.Property(progress)][/UPPERCASE]</label>
+							<label>[UPPERCASE]$INFO[ListItem.Property(filename)] - $INFO[ListItem.Property(progress),,%][/UPPERCASE]</label>
 						</control>
 
 						<control type="group">
 							<top>70</top>
-							
+
 							<!-- Speed -->
 							<control type="label">
 								<width>600</width>
@@ -114,7 +114,7 @@
 								<visible>!String.Contains(ListItem.Property(speed),-)</visible>
 								<label>[UPPERCASE]$ADDON[plugin.video.seren 30552]: $INFO[ListItem.Property(speed)][/UPPERCASE]</label>
 							</control>
-						
+
 							<!-- Done -->
 							<control type="label">
 								<width>600</width>
@@ -126,7 +126,7 @@
 								<label>[UPPERCASE]$ADDON[plugin.video.seren 30564][/UPPERCASE]</label>
 							</control>
 						</control>
-						
+
 						<!-- ETA -->
 						<control type="label">
 							<top>110</top>
@@ -137,10 +137,10 @@
 							<align>left</align>
 							<label>[UPPERCASE]$ADDON[plugin.video.seren 30551]: $INFO[ListItem.Property(eta)][/UPPERCASE]</label>
 						</control>
-					</control>                    
+					</control>
                 </control>
             </itemlayout>
-			
+
 			<!-- Unfocused Source -->
             <focusedlayout height="160" condition="!Control.HasFocus(1000)">
                 <control type="group">
@@ -155,7 +155,7 @@
 
 					<control type="group">
 						<left>20</left>
-						
+
 						<!-- Filename -->
 						<control type="label">
 							<top>30</top>
@@ -164,12 +164,12 @@
 							<font>font12</font>
 							<textcolor>66FFFFFF</textcolor>
 							<align>left</align>
-							<label>[UPPERCASE]$INFO[ListItem.Property(filename)] - $INFO[ListItem.Property(progress)][/UPPERCASE]</label>
+							<label>[UPPERCASE]$INFO[ListItem.Property(filename)] - $INFO[ListItem.Property(progress),,%][/UPPERCASE]</label>
 						</control>
 
 						<control type="group">
 							<top>70</top>
-							
+
 							<!-- Speed -->
 							<control type="label">
 								<width>600</width>
@@ -180,7 +180,7 @@
 								<visible>!String.Contains(ListItem.Property(speed),-)</visible>
 								<label>[UPPERCASE]$ADDON[plugin.video.seren 30552]: $INFO[ListItem.Property(speed)][/UPPERCASE]</label>
 							</control>
-						
+
 							<!-- Done -->
 							<control type="label">
 								<width>600</width>
@@ -192,7 +192,7 @@
 								<label>[UPPERCASE]$ADDON[plugin.video.seren 30564][/UPPERCASE]</label>
 							</control>
 						</control>
-						
+
 						<!-- ETA -->
 						<control type="label">
 							<top>110</top>
@@ -203,7 +203,7 @@
 							<align>left</align>
 							<label>[UPPERCASE]$ADDON[plugin.video.seren 30551]: $INFO[ListItem.Property(eta)][/UPPERCASE]</label>
 						</control>
-					</control>                   
+					</control>
                 </control>
             </focusedlayout>
 
@@ -211,7 +211,7 @@
             <focusedlayout height="270" condition="Control.HasFocus(1000)">
                 <control type="group">
 					<width>1340</width>
-				
+
 					<!-- Card -->
                     <control type="image">
                         <top>10</top>
@@ -219,31 +219,31 @@
                         <texture>white.png</texture>
                         <colordiffuse>FF362e33</colordiffuse>
                     </control>
-					
+
                     <!-- Source Icon -->
                     <control type="group">
                         <top>40</top>
                         <width>200</width>
-                        <height>200</height>                        
-                        
+                        <height>200</height>
+
 						<!-- Seren Peacock -->
-                        <control type="image">
-                            <aspectratio>keep</aspectratio>
-                            <texture>$INFO[Window().Property(seren.logo)]</texture>
-                            <visible>String.IsEmpty(ListItem.Property(provider.image))</visible>
-                        </control>
-						
+						<control type="image">
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[Window().Property(seren.logo)]</texture>
+							<visible>String.IsEmpty(ListItem.Property(source.icon))</visible>
+						</control>
+
 						<!-- Provider Icon -->
-                        <control type="image">
-                            <aspectratio>keep</aspectratio>
-                            <texture>$INFO[ListItem.Property(provider.image)]</texture>
-                            <visible>!String.IsEmpty(ListItem.Property(provider.image))</visible>
-                        </control>
-                    </control>
-                    
+						<control type="image">
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[ListItem.Property(source.icon)]</texture>
+							<visible>!String.IsEmpty(ListItem.Property(source.icon))</visible>
+						</control>
+					</control>
+
 					<control type="group">
 						<left>220</left>
-						
+
 						<!-- Filename -->
 						<control type="label">
 							<top>40</top>
@@ -254,7 +254,7 @@
 							<align>left</align>
 							<label>[B][UPPERCASE]$INFO[ListItem.Property(filename)][/UPPERCASE][/B]</label>
 						</control>
-						
+
 						<!-- Hash -->
 						<control type="label">
 							<top>80</top>
@@ -266,12 +266,12 @@
 							<label>[B][UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(hash)][/COLOR][/UPPERCASE][/B]</label>
 						</control>
 					</control>
-					
+
 					<control type="group">
                         <right>20</right>
                         <top>100</top>
 						<height>140</height>
-						
+
 						<!-- Downloaded -->
 						<control type="label">
 							<right>0</right>
@@ -292,9 +292,9 @@
                             <font>font12</font>
                             <align>right</align>
                             <textcolor>FFFFFFFF</textcolor>
-                            <label>[B][UPPERCASE]$ADDON[plugin.video.seren 30628]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(progress)][/COLOR][/UPPERCASE][/B]</label>
+							<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30628]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(progress),,%][/COLOR][/UPPERCASE][/B]</label>
                         </control>
-                        
+
 						<!-- ETA -->
 						<control type="label">
 							<top>80</top>
@@ -305,7 +305,7 @@
 							<textcolor>FFFFFFFF</textcolor>
 							<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30551]: [COLOR $INFO[Window().Property(settings.color)]]$INFO[ListItem.Property(eta)][/COLOR][/UPPERCASE][/B]</label>
 						</control>
-						
+
 						<!-- Speed -->
 						<control type="label">
 							<top>120</top>
@@ -330,22 +330,22 @@
             <top>110</top>
             <right>20</right>
             <width>500</width>
-			
+
 			<!-- Buttons -->
 			<control type="group">
 				<height>220</height>
-				
+
 				<!-- Card -->
 				<control type="image">
 					<texture>white.png</texture>
 					<colordiffuse>99362e33</colordiffuse>
 				</control>
-				
+
 				<control type="grouplist" id="2000">
 					<top>25</top>
 					<onleft>1000</onleft>
 					<itemgap>10</itemgap>
-					
+
 					<!-- Clear Completed -->
 					<control type="button" id="2001">
 						<height>80</height>
@@ -356,7 +356,7 @@
 						<align>right</align>
 						<textcolor>FFFFFFFF</textcolor>
 					</control>
-				
+
 					<!-- Close -->
 					<control type="button" id="2999">
 						<height>80</height>

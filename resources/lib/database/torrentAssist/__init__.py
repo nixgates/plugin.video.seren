@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 
 from resources.lib.database import Database
@@ -8,15 +5,17 @@ from resources.lib.modules.globals import g
 
 schema = {
     'torrents': {
-        'columns': collections.OrderedDict([
-            ("debrid_id", ["TEXT", "NOT NULL", "PRIMARY KEY"]),
-            ("provider", ["TEXT", "NOT NULL"]),
-            ("status", ["TEXT", "NOT NULL"]),
-            ("release_title", ["TEXT", "NOT NULL"]),
-            ("progress", ["TEXT", "NOT NULL"])
-        ]),
+        'columns': collections.OrderedDict(
+            [
+                ("debrid_id", ["TEXT", "NOT NULL", "PRIMARY KEY"]),
+                ("provider", ["TEXT", "NOT NULL"]),
+                ("status", ["TEXT", "NOT NULL"]),
+                ("release_title", ["TEXT", "NOT NULL"]),
+                ("progress", ["TEXT", "NOT NULL"]),
+            ]
+        ),
         "table_constraints": [],
-        "default_seed": []
+        "default_seed": [],
     }
 }
 
@@ -25,8 +24,9 @@ class TorrentAssist(Database):
     """
     Database to monitor downloads of torrents initiated by Seren
     """
+
     def __init__(self):
-        super(TorrentAssist, self).__init__(g.TORRENT_ASSIST, schema)
+        super().__init__(g.TORRENT_ASSIST, schema)
         self.table_name = next(iter(schema))
 
     def get_assist_torrents(self):
@@ -43,8 +43,9 @@ class TorrentAssist(Database):
         :return: None
         :rtype: None
         """
-        self.execute_sql(["DELETE FROM torrents WHERE status = 'failed'",
-                          "DELETE FROM torrents WHERE status = 'finished'"])
+        self.execute_sql(
+            ["DELETE FROM torrents WHERE status = 'failed'", "DELETE FROM torrents WHERE status = 'finished'"]
+        )
 
     def add_assist_torrent(self, debrid_id, provider, status, release_title, progress):
         """
@@ -62,5 +63,7 @@ class TorrentAssist(Database):
         :return: None
         :rtype: None
         """
-        self.execute_sql("REPLACE INTO torrents (debrid_id, provider, status, release_title, progress) "
-                         "VALUES (?, ?, ?, ?, ?)", (debrid_id, provider, status, release_title, progress))
+        self.execute_sql(
+            "REPLACE INTO torrents (debrid_id, provider, status, release_title, progress) " "VALUES (?, ?, ?, ?, ?)",
+            (debrid_id, provider, status, release_title, progress),
+        )

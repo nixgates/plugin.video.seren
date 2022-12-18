@@ -1,75 +1,85 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.database import trakt_sync
 from resources.lib.modules.globals import g
-from resources.lib.modules.guard_decorators import (
-    guard_against_none,
-    guard_against_none_or_empty,
-)
+from resources.lib.modules.guard_decorators import guard_against_none
+from resources.lib.modules.guard_decorators import guard_against_none_or_empty
 from resources.lib.modules.metadataHandler import MetadataHandler
 
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def extract_trakt_page(self, url, **params):
-        return super(TraktSyncDatabase, self)._extract_trakt_page(
-            url, "movies", **params
-        )
+        return super()._extract_trakt_page(url, "movies", **params)
 
     @guard_against_none(list)
     def get_movie_list(self, trakt_list, **params):
         self._update_movies(trakt_list)
-        query = """SELECT m.trakt_id, m.info, m.art, m.cast, m.args, b.resume_time, b.percent_played, m.watched as 
-        play_count, m.user_rating FROM movies as m left join bookmarks as b on m.trakt_id = b.trakt_id WHERE m.trakt_id 
-        in ({})""".format(
-            ",".join((str(i.get("trakt_id")) for i in trakt_list))
-        )
+        query = f"""
+            SELECT m.trakt_id,
+                   m.info,
+                   m.art,
+                   m.cast,
+                   m.args,
+                   b.resume_time,
+                   b.percent_played,
+                   m.watched AS play_count,
+                   m.user_rating
+            FROM movies AS m
+                     LEFT JOIN bookmarks AS b
+                               ON m.trakt_id = b.trakt_id
+            WHERE m.trakt_id IN ({','.join(str(i.get('trakt_id')) for i in trakt_list)})
+            """
 
         if params.get("hide_unaired", self.hide_unaired):
-            query += " AND Datetime(air_date) < Datetime('{}')".format(self._get_datetime_now())
+            query += f" AND Datetime(air_date) < Datetime('{self._get_datetime_now()}')"
         if params.get("hide_watched", self.hide_watched):
             query += " AND watched = 0"
 
-        return MetadataHandler.sort_list_items(
-            self.fetchall(query), trakt_list
-        )
+        return MetadataHandler.sort_list_items(self.fetchall(query), trakt_list)
 
     @guard_against_none(list)
     def get_collected_movies(self, page):
         paginate = g.get_bool_setting("general.paginatecollection")
 
-        query = """SELECT m.trakt_id, meta.value as trakt_object FROM movies as m LEFT JOIN 
-        movies_meta as meta on m.trakt_id = meta.id and meta.type = 'trakt' WHERE collected = 1 
-        """
+        query = """
+            SELECT m.trakt_id, meta.value AS trakt_object
+            FROM movies AS m
+                     LEFT JOIN movies_meta AS meta
+                               ON m.trakt_id = meta.id
+            WHERE collected = TRUE
+            """
 
         if paginate:
-            query += "ORDER BY collected_at desc LIMIT {} OFFSET {}".format(
-                self.page_limit, self.page_limit * (page - 1)
-            )
+            query += f"ORDER BY collected_at desc LIMIT {self.page_limit} OFFSET {self.page_limit * (page - 1)}"
 
         return self.fetchall(query)
 
     @guard_against_none(list)
     def get_watched_movies(self, page):
         return self.fetchall(
-            """SELECT m.trakt_id, meta.value as trakt_object FROM movies as m LEFT JOIN 
-        movies_meta as meta on m.trakt_id = meta.id and meta.type = 'trakt' WHERE watched = 1 
-        ORDER BY last_watched_at desc LIMIT {} OFFSET {}""".format(
-                self.page_limit, self.page_limit * (page - 1)
-            )
+            f"""
+            SELECT m.trakt_id, meta.value AS trakt_object
+            FROM movies AS m
+                     LEFT JOIN movies_meta AS meta
+                               ON m.trakt_id = meta.id
+            WHERE watched = 1
+            ORDER BY last_watched_at DESC
+            LIMIT {self.page_limit} OFFSET {self.page_limit * (page - 1)}
+            """
         )
 
     def get_all_collected_movies(self):
         return self.fetchall(
-            """SELECT m.trakt_id, meta.value as trakt_object FROM movies as m LEFT JOIN 
-        movies_meta as meta on m.trakt_id = meta.id and meta.type = 'trakt' WHERE collected = 1"""
+            """
+            SELECT m.trakt_id, meta.value AS trakt_object
+            FROM movies AS m
+                     LEFT JOIN movies_meta AS meta
+                         ON m.trakt_id = meta.id
+            WHERE collected = TRUE
+            """
         )
 
     @guard_against_none()
     def mark_movie_watched(self, trakt_id):
-        play_count = self.fetchone(
-            "select watched from movies where trakt_id=?", (trakt_id,)
-        )["watched"]
+        play_count = self.fetchone("SELECT watched FROM movies WHERE trakt_id=?", (trakt_id,))["watched"]
         self._mark_movie_record("watched", play_count + 1, trakt_id)
 
     @guard_against_none()
@@ -96,46 +106,52 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             # Just in case we forgot any methods that call this
             raise TypeError("NoneType Error: Date Time Column")
         self.execute_sql(
-            "UPDATE movies SET {}=?, {}=? WHERE trakt_id=?".format(
-                column, datetime_column
-            ),
+            f"UPDATE movies SET {column}=?, {datetime_column}=? WHERE trakt_id=?",
             (value, self._get_datetime_now() if value > 0 else None, trakt_id),
         )
 
     def _fetch_movie_summary(self, trakt_id):
-        return self.trakt_api.get_json_cached(
-            "movies/{}".format(trakt_id), extended=True
-        )
+        return self.trakt_api.get_json_cached(f"movies/{trakt_id}", extended=True)
 
     @guard_against_none(list)
     def get_movie(self, trakt_id):
-        return self.get_movie_list(
-            [self._get_single_movie_meta(trakt_id)],
-            hide_unaired=False,
-            hide_watched=False
-        )[0]
+        return self.get_movie_list([self._get_single_movie_meta(trakt_id)], hide_unaired=False, hide_watched=False)[0]
 
     @guard_against_none()
     def _get_single_movie_meta(self, trakt_id):
-        return self._get_single_meta("/movies/{}".format(trakt_id), trakt_id, "movies")
+        return self._get_single_meta(f"/movies/{trakt_id}", trakt_id, "movies")
 
     @guard_against_none_or_empty()
     def _update_movies(self, list_to_update):
         get = MetadataHandler.get_trakt_info
 
-        sql_statement = """WITH requested(trakt_id, last_updated) AS (VALUES {}) SELECT r.trakt_id, trakt.value as  
-        trakt_object, trakt.meta_hash as trakt_meta_hash, tmdb_id, tmdb.value as tmdb_object, tmdb.meta_hash as 
-        tmdb_meta_hash, fanart.value as fanart_object, fanart.meta_hash as fanart_meta_hash, m.imdb_id, omdb.value as 
-        omdb_object, omdb.meta_hash as omdb_meta_hash, m.needs_update FROM requested as r LEFT JOIN movies 
-        as m on r.trakt_id = m.trakt_id LEFT JOIN movies_meta as trakt on trakt.id = m.trakt_id and trakt.type = 
-        'trakt' LEFT JOIN movies_meta as tmdb on tmdb.id = m.tmdb_id and tmdb.type = 'tmdb' LEFT JOIN movies_meta as 
-        fanart on fanart.id = m.tmdb_id and fanart.type = 'fanart' LEFT JOIN movies_meta as omdb on omdb.id = 
-        m.imdb_id and omdb.type = 'omdb' """.format(
-            ",".join(
-                "({},'{}')".format(i.get("trakt_id"), get(i, "dateadded"))
-                for i in list_to_update
-            )
-        )
+        sql_statement = f"""
+            WITH requested(trakt_id, last_updated) AS (VALUES
+                    {','.join(f"({i.get('trakt_id')},'{get(i, 'dateadded')}')" for i in list_to_update)})
+            SELECT r.trakt_id,
+                   trakt.value      AS trakt_object,
+                   trakt.meta_hash  AS trakt_meta_hash,
+                   tmdb_id,
+                   tmdb.value       AS tmdb_object,
+                   tmdb.meta_hash   AS tmdb_meta_hash,
+                   fanart.value     AS fanart_object,
+                   fanart.meta_hash AS fanart_meta_hash,
+                   m.imdb_id,
+                   omdb.value       AS omdb_object,
+                   omdb.meta_hash   AS omdb_meta_hash,
+                   m.needs_update
+            FROM requested as r
+                     LEFT JOIN movies AS m
+                               ON r.trakt_id = m.trakt_id
+                     LEFT JOIN movies_meta AS trakt
+                               ON trakt.id = m.trakt_id AND trakt.type = 'trakt'
+                     LEFT JOIN movies_meta AS tmdb
+                               ON tmdb.id = m.tmdb_id AND tmdb.type = 'tmdb'
+                     LEFT JOIN movies_meta AS omdb
+                               ON omdb.id = m.imdb_id AND omdb.type = 'omdb'
+                     LEFT JOIN movies_meta AS fanart
+                               ON fanart.id = m.tmdb_id AND fanart.type = 'fanart'
+            """
 
         db_list_to_update = self.fetchall(sql_statement)
 
@@ -190,7 +206,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     None,
                     None,
                     None,
-                    i["info"]["trakt_id"],
                 )
                 for i in formatted_items
             ],

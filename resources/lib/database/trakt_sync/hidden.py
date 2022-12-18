@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.database import trakt_sync
-from resources.lib.modules.globals import g
 
 
 class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
@@ -16,9 +12,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def get_hidden_items(self, section, media_type=None):
 
         if media_type is None:
-            return self.fetchall(
-                "SELECT trakt_id FROM hidden WHERE section=?", (section,)
-            )
+            return self.fetchall("SELECT trakt_id FROM hidden WHERE section=?", (section,))
         else:
             return self.fetchall(
                 "SELECT trakt_id FROM hidden WHERE section=? and mediatype=?",
@@ -28,5 +22,5 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def remove_item(self, section, trakt_id):
         self.execute_sql(
             "DELETE FROM hidden WHERE section=? AND trakt_id=?",
-            (g.UNICODE(section), int(trakt_id)),
+            (str(section), int(trakt_id)),
         )

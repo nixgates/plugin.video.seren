@@ -1,940 +1,2550 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings>
+<?xml version="1.0" ?>
+<settings version="1">
+	<section id="plugin.video.seren">
+		<category id="general" label="30084" help="">
+			<group id="1" label="30591">
+				<setting id="searchHistory" type="boolean" label="30161" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.hideSpecials" type="boolean" label="30172" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.hideUnAired" type="boolean" label="30170" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.hideWatched" type="boolean" label="30451" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.genres.endpoint.movies" type="integer" label="30447" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30006">0</option>
+							<option label="30004">1</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.genres.endpoint.tv" type="integer" label="30609" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30006">0</option>
+							<option label="30004">1</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.widget.hide_next" type="boolean" label="30452" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="2" label="30592">
+				<setting id="general.flatten.episodes" type="boolean" label="30208" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.showRemainingUnwatched" type="boolean" label="30445" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.appendepisodegeneral" type="integer" label="30467" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30356">0</option>
+							<option label="30357">1</option>
+							<option label="30358">2</option>
+							<option label="30359">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.appendtitles" type="integer" label="30143" help="">
+					<level>0</level>
+					<default>3</default>
+					<constraints>
+						<options>
+							<option label="30356">0</option>
+							<option label="30357">1</option>
+							<option label="30358">2</option>
+							<option label="30359">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+			</group>
+			<group id="3" label="30593">
+				<setting id="nextup.sort" type="integer" label="30088" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30089">0</option>
+							<option label="30090">1</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="!is" setting="trakt.auth"/>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortcollection" type="integer" label="30537" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30538">0</option>
+							<option label="30539">1</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.paginatetraktlists" type="boolean" label="30324" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.paginatecollection" type="boolean" label="30444" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.appendListTitles" type="integer" label="30361" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30362">0</option>
+							<option label="30363">1</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+			</group>
+			<group id="4" label="30608">
+				<setting id="general.datedelay" type="boolean" label="30165" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="item.limit" type="integer" label="30092" help="">
+					<level>0</level>
+					<default>20</default>
+					<constraints>
+						<minimum>10</minimum>
+						<maximum>100</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="general.disableNotificationSound" type="boolean" label="30360" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="download.location" type="path" label="30594" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+						<writable>true</writable>
+					</constraints>
+					<control type="button" format="path"/>
+				</setting>
+				<setting id="tvdb.jw" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+				</setting>
+				<setting id="tvdb.expiry" type="string" help="">
+					<level>4</level>
+					<default>0</default>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="trakt.auth" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="trakt.refresh" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="trakt.expires" type="integer" help="">
+					<level>4</level>
+					<default>0</default>
+				</setting>
+				<setting id="rd.auth" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="rd.refresh" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="rd.client_id" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+				</setting>
+				<setting id="rd.expiry" type="string" help="">
+					<level>4</level>
+					<default>0</default>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="rd.secret" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="premiumize.token" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="general.textColor" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="alldebrid.apikey" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="general.trakt.failure.timeout" type="integer" help="">
+					<level>4</level>
+					<default>0</default>
+					<control type="edit" format="integer">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="update.news.version" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+				</setting>
+				<setting id="seren.version" type="string" help="">
+					<level>4</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+			</group>
+		</category>
+		<category id="themes" label="30199" help="">
+			<group id="1" label="30595">
+				<setting id="general.displayColor" type="string" label="30103" help="">
+					<level>0</level>
+					<default>None</default>
+					<enable>false</enable>
+					<control type="edit" format="string">
+						<heading>30103</heading>
+					</control>
+				</setting>
+				<setting id="general.textColorSelect" type="action" label="30102" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=colorPicker)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+			</group>
+			<group id="2" label="30199">
+				<setting id="skin.updateAutomatic" type="boolean" label="30338" help="">
+					<level>0</level>
+					<default>True</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="skin.active" type="string" label="30200" help="">
+					<level>0</level>
+					<default>Seren Default</default>
+					<enable>false</enable>
+					<control type="edit" format="string">
+						<heading>30200</heading>
+					</control>
+				</setting>
+				<setting id="skin.install" type="action" label="30203" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=installSkin)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="skin.uninstall" type="action" label="30202" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=uninstallSkin)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="skin.switch" type="action" label="30201" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=switchSkin)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="skin.checkSkinUpdates" type="action" label="30139" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=checkSkinUpdates)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+			</group>
+		</category>
+		<category id="metadata &amp; artwork" label="30596" help="">
+			<group id="1" label="30597">
+				<setting id="general.metalocation" type="integer" label="30091" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30129">0</option>
+							<option label="30256">1</option>
+							<option label="30257">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.meta.showoriginaltitle" type="boolean" label="30453" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.meta.studiolimit" type="boolean" label="30640" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="movies.language_based_releases" type="boolean" label="30629" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="omdb.apikey" type="string" label="30454" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30454</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="2" label="30259">
+				<setting id="general.fanart.fallback" type="boolean" label="30484" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="artwork.preferredsize" type="integer" label="30341" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30342">0</option>
+							<option label="30343">1</option>
+							<option label="30344">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="fanart.apikey" type="string" label="30163" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30163</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="3" label="30268">
+				<setting id="movies.preferedsource" type="integer" label="30254" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30164">0</option>
+							<option label="30256">1</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="!is" setting="fanart.apikey"/>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="movie.artwork.advanced" type="boolean" label="30265" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="movies.poster_limit" type="integer" label="30224" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<minimum>1</minimum>
+						<step>1</step>
+						<maximum>10</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="movie.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="movies.fanart_limit" type="integer" label="30231" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<minimum>1</minimum>
+						<step>1</step>
+						<maximum>20</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="movie.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="movies.banner" type="boolean" label="30230" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="movie.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="movies.landscape" type="boolean" label="30314" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="movie.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="movies.keyart_limit" type="integer" label="30312" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<minimum>0</minimum>
+						<step>1</step>
+						<maximum>10</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="movie.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="movies.clearlogo" type="boolean" label="30313" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="movie.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="movies.clearart" type="boolean" label="30316" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="movie.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="movies.discart" type="boolean" label="30317" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="movie.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="movies.characterart_limit" type="integer" label="30315" help="" parent="movie.artwork.advanced">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<minimum>0</minimum>
+						<step>1</step>
+						<maximum>20</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="movie.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+			</group>
+			<group id="4" label="30269">
+				<setting id="tvshows.preferedsource" type="integer" label="30255" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30164">0</option>
+							<option label="30256">1</option>
+							<option label="30257">2</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="!is" setting="fanart.apikey"/>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="tv.artwork.advanced" type="boolean" label="30266" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="tvshows.poster_limit" type="integer" label="30224" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<minimum>1</minimum>
+						<step>1</step>
+						<maximum>10</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="tvshows.fanart_limit" type="integer" label="30231" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<minimum>1</minimum>
+						<step>1</step>
+						<maximum>20</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="tvshows.banner" type="boolean" label="30230" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="tvshows.landscape" type="boolean" label="30314" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="tvshows.keyart_limit" type="integer" label="30312" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<minimum>0</minimum>
+						<step>1</step>
+						<maximum>10</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="tv.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="tvshows.clearlogo" type="boolean" label="30313" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="tv.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="tvshows.clearart" type="boolean" label="30316" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="tv.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="tvshows.characterart_limit" type="integer" label="30315" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<minimum>0</minimum>
+						<step>1</step>
+						<maximum>20</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="tv.artwork.advanced">true</condition>
+								<condition operator="!is" setting="fanart.apikey"/>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="season.poster" type="boolean" label="30638" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="season.banner" type="boolean" label="30639" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="season.landscape" type="boolean" label="30263" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="season.fanart" type="boolean" label="30262" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="episode.fanart" type="boolean" label="30261" help="" parent="tv.artwork.advanced">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="tv.artwork.advanced">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+			</group>
 
-    <!-- General -->
-    <category label="30084">
 
-        <!-- All Menus -->
-        <setting type="lsep" label="30591"/>
-        <setting id="searchHistory"            type="bool" label="30161" default="false"/>
-        <setting id="general.hideSpecials"     type="bool" label="30172" default="true"/>
-        <setting id="general.hideUnAired"      type="bool" label="30170" default="true"/>
-        <setting id="general.hideWatched"      type="bool" label="30451" default="false"/>
-		<setting id="general.genres.endpoint.movies"  type="enum" label="30447" default="1"
-                 lvalues="30006|30004"/>
-        <setting id="general.genres.endpoint.tv"  type="enum" label="30609" default="1"
-                 lvalues="30006|30004"/>
-		<setting id="general.widget.hide_next" type="bool" label="30452" default="false"/>
-		
-        <!-- Episode Menus -->
-		<setting type="lsep" label="30592"/>
-		<setting id="general.flatten.episodes"       type="bool" label="30208" default="false"/>
-		<setting id="general.showRemainingUnwatched" type="bool" label="30445" default="false"/>
-		<setting id="general.appendepisodegeneral"   type="enum" label="30467" default="0"
-                 lvalues="30356|30357|30358|30359"/>
-		<setting id="general.appendtitles"           type="enum" label="30143" default="3"
-                 lvalues="30356|30357|30358|30359"/>
-        
-        <!-- Trakt Menus -->
-		<setting type="lsep" label="30593"/>
-		<setting id="trakt.auth"                 type="text"               default=""
-                 visible="false"/>
-        <setting id="nextup.sort"                type="enum" label="30088" default="0"
-                 enable="!eq(-1,)"
-                 lvalues="30089|30090"/>
-        <setting id="general.sortcollection"     type="enum" label="30537" default="0"
-                 lvalues="30538|30539"/>
-		<setting id="general.paginatetraktlists" type="bool" label="30324" default="true"/>
-        <setting id="general.paginatecollection" type="bool" label="30444" default="true"/>
-		<setting id="general.appendListTitles"   type="enum" label="30361" default="1"
-                 lvalues="30362|30363"/>
-
-        <!-- Miscellaneous -->
-        <setting type="lsep" label="30608"/>
-        <setting id="general.datedelay"                type="bool"   label="30165" default="false"/>
-        <setting id="item.limit"                       type="slider" label="30092" default="20"
-                 option="int" range="10,100"/>
-		<setting id="general.disableNotificationSound" type="bool"   label="30360" default="false"/>
-		<setting id="download.location"                type="text"   label="30594" default="userdata"
-                 enable="false"
-                 visible="false"/>
-        <setting id="download.location"                type="action" label="30594"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=setDownloadLocation)"/>
-
-        <!-- HIDDEN SETTINGS BELONG HERE -->
-        <setting id="migration.attempted"           type="bool"   default="false" visible="false"/>
-        <setting id="tvdb.jw"                       type="text"   default=""      visible="false"/>
-        <setting id="tvdb.expiry"                   type="text"   default="0"     visible="false"/>
-        <setting id="trakt.auth"                    type="text"   default=""      visible="false"/>
-        <setting id="trakt.refresh"                 type="text"   default=""      visible="false"/>
-        <setting id="trakt.expires"                 type="number" default=""      visible="false"/>
-        <setting id="rd.auth"                       type="text"   default=""      visible="false"/>
-        <setting id="rd.refresh"                    type="text"   default=""      visible="false"/>
-        <setting id="rd.client_id"                  type="text"   default=""      visible="false"/>
-        <setting id="rd.expiry"                     type="text"   default="0"     visible="false"/>
-        <setting id="rd.secret"                     type="text"   default=""      visible="false"/>
-        <setting id="premiumize.token"              type="text"   default=""      visible="false"/>
-        <setting id="general.textColor"             type="text"   default=""      visible="false"/>
-        <setting id="alldebrid.apikey"              type="text"   default=""      visible="false"/>
-        <setting id="general.trakt.failure.timeout" type="number" default="0"     visible="false"/>
-        <setting id="update.news.version"           type="text"   default=""      visible="false"/>
-        <setting id="seren.version"                 type="text"   default=""      visible="false"/>
-        <!-- END HIDDEN SETTINGS -->
-    </category>
-	
-	<!-- Themes -->
-	<category label="30199">
-		
-		<!-- Colors -->
-		<setting type="lsep" label="30595"/>
-		<setting id="general.displayColor" type="text"   label="30103" default="None"
-                 enable="false"/>
-		<setting                           type="action" label="30102"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=colorPicker)" option="close"/>
-				 
-		<!-- Themes -->
-        <setting type="lsep" label="30199"/>
-		<setting id="skin.updateAutomatic" type="bool"   label="30338" default="True"/>
-        <setting id="skin.active"          type="text"   label="30200" default="Seren Default"
-                 enable="false"/>
-        <setting                           type="action" label="30203"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=installSkin)"/>
-        <setting                           type="action" label="30202"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=uninstallSkin)"/>
-        <setting                           type="action" label="30201"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=switchSkin)"/>
-        <setting                           type="action" label="30139"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=checkSkinUpdates)"/>
-	</category>
-	
-	<category label="30596">
-		
-		<!-- Metadata -->
-		<setting type="lsep" label="30597"/>
-		<setting id="general.metalocation"           type="enum" label="30091" default="1"
-                 lvalues="30129|30256|30257"/>
-        <setting id="general.meta.showoriginaltitle" type="bool" label="30453" default="false"/>
-		<setting id="omdb.apikey"                    type="text" label="30454" default=""/>
-		
-        <!-- Artwork -->
-        <setting type="lsep" label="30259"/>
-		<setting id="general.fanart.fallback" type="bool" label="30484" default="false" />
-		<setting id="artwork.preferredsize"   type="enum" label="30341" default="1"
-                 lvalues="30342|30343|30344"/>
-        <setting id="fanart.apikey"           type="text" label="30163" default=""/>
-		
-        <!-- Movies -->
-		<setting type="lsep" label="30268"/>
-        <setting id="movies.preferedsource"     type="enum" label="30254" default="1"
-                 lvalues="30164|30256"
-                 enable="!eq(-2,)"/>
-        <setting id="movie.artwork.advanced"    type="bool"   label="30265"                                                              default="false"/>
-        <setting id="movies.poster_limit"       type="slider" label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30224]" default="1"
-                 option="int" range="1,1,10"
-                 subsetting="true"
-                 visible="eq(-1,true)"/>
-        <setting id="movies.fanart_limit"       type="slider" label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30231]" default="1"
-                 option="int" range="1,1,20"
-                 subsetting="true"
-                 visible="eq(-2,true)"/>
-        <setting id="movies.banner"             type="bool"   label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30230]" default="true"
-                 subsetting="true"
-                 visible="eq(-3,true)"/>
-        <setting id="movies.landscape"          type="bool"   label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30314]" default="true"
-                 subsetting="true"
-                 visible="eq(-4,true)"/>
-        <setting id="movies.keyart_limit"       type="slider" label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30312]" default="0"
-                 option="int" range="0,1,10"
-                 subsetting="true"
-                 visible="eq(-5,true) + !eq(-8,)"/>
-        <setting id="movies.clearlogo"          type="bool"   label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30313]" default="true"
-                 subsetting="true"
-                 visible="eq(-6,true) + !eq(-9,)"/>
-        <setting id="movies.clearart"           type="bool"   label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30316]" default="true"
-                 subsetting="true" 
-                 visible="eq(-7,true) + !eq(-10,)"/>
-        <setting id="movies.discart"            type="bool"   label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30317]" default="true"
-                 subsetting="true"
-                 visible="eq(-8,true) + !eq(-11,)"/>
-        <setting id="movies.characterart_limit" type="slider" label="$ADDON[plugin.video.seren 30264]: $ADDON[plugin.video.seren 30315]" option="int" range="0,1,20" default="0"
-                 subsetting="true"
-                 visible="eq(-9,true) + !eq(-12,)"/>
-
-        <!-- TV Shows -->
-		<setting type="lsep" label="30269"/>
-        <setting id="tvshows.preferedsource"     type="enum"   label="30255"                                                              default="1"
-                 lvalues="30164|30256|30257"
-                 enable="!eq(-14,)"/>
-        <setting id="tv.artwork.advanced"        type="bool"   label="30266"                                                              default="false"/>
-        <setting id="tvshows.poster_limit"       type="slider" label="$ADDON[plugin.video.seren 30263]: $ADDON[plugin.video.seren 30224]" default="1"
-                 option="int" range="1,1,10"
-                 subsetting="true"
-                 visible="eq(-1,true)"/>
-        <setting id="tvshows.fanart_limit"       type="slider" label="$ADDON[plugin.video.seren 30263]: $ADDON[plugin.video.seren 30231]" default="1"
-                 option="int" range="1,1,20" 
-                 subsetting="true"
-                 visible="eq(-2,true)"/>
-        <setting id="tvshows.banner"             type="bool"   label="$ADDON[plugin.video.seren 30263]: $ADDON[plugin.video.seren 30230]" default="true"
-                 subsetting="true"
-                 visible="eq(-3,true)"/>
-        <setting id="tvshows.landscape"          type="bool"   label="$ADDON[plugin.video.seren 30263]: $ADDON[plugin.video.seren 30314]" default="true"
-                 subsetting="true"
-                 visible="eq(-4,true)"/>
-        <setting id="tvshows.keyart_limit"       type="slider" label="$ADDON[plugin.video.seren 30263]: $ADDON[plugin.video.seren 30312]" default="0"
-                 option="int" range="0,1,10"
-                 subsetting="true"
-                 visible="eq(-5,true) + !eq(-20,)"/>
-        <setting id="tvshows.clearlogo"          type="bool"   label="$ADDON[plugin.video.seren 30263]: $ADDON[plugin.video.seren 30313]" default="true"
-                 subsetting="true"
-                 visible="eq(-6,true) + !eq(-21,)"/>
-        <setting id="tvshows.clearart"           type="bool"   label="$ADDON[plugin.video.seren 30263]: $ADDON[plugin.video.seren 30316]" default="true"
-                 subsetting="true"
-                 visible="eq(-7,true) + !eq(-22,)"/>
-        <setting id="tvshows.characterart_limit" type="slider" label="$ADDON[plugin.video.seren 30263]: $ADDON[plugin.video.seren 30315]" default="0"
-                 option="int" range="0,1,20"
-                 subsetting="true"
-                 visible="eq(-8,true) + !eq(-23,)"/>
-        <setting id="season.poster"              type="bool"   label="$ADDON[plugin.video.seren 30261]: $ADDON[plugin.video.seren 30224]" default="true"
-                 subsetting="true"
-                 visible="eq(-9,true)"/>
-        <setting id="season.banner"              type="bool"   label="$ADDON[plugin.video.seren 30261]: $ADDON[plugin.video.seren 30230]" default="true"
-                 subsetting="true"
-                 visible="eq(-10,true)"/>
-        <setting id="season.landscape"           type="bool"   label="$ADDON[plugin.video.seren 30261]: $ADDON[plugin.video.seren 30314]" default="true"
-                 subsetting="true"
-                 visible="eq(-11,true)"/>
-        <setting id="season.fanart"              type="bool"   label="$ADDON[plugin.video.seren 30261]: $ADDON[plugin.video.seren 30231]" default="true"
-                 subsetting="true"
-                 visible="eq(-12,true)"/>
-        <setting id="episode.fanart"             type="bool"   label="$ADDON[plugin.video.seren 30262]: $ADDON[plugin.video.seren 30231]" default="true"
-                 subsetting="true"
-                 visible="eq(-13,true)"/>
-	</category>
-
-    <!-- Accounts -->
-    <category label="30127">
-
-        <!-- General -->
-        <setting type="lsep" label="30084"/>
-        <setting id="general.accountNotifications" type="bool" label="30128" default="true"/>
-
-        <!-- Trakt -->
-        <setting type="lsep" label="30129"/>
-        <setting type="sep"/>
-        <setting id="trakt.username"                type="text"   label="30130"
-                 enable="false"/>
-        <setting                                    type="action" label="30131"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=authTrakt)" option="close"
-                 visible="eq(-1,)"/>
-        <setting id="trakt.scrobbling"              type="bool"   label="30132" default="true"
-                 visible="!eq(-2,)"/>
-        <setting id="trakt.ignoreSecondsAtStart"    type="slider" label="30481" default="180"
-                 option="int" range="30,360"
-                 subsetting="true"
-                 visible="!eq(-3,) + eq(-1,true)"/>
-        <setting id="trakt.playCountMinimumPercent" type="slider" label="30482" default="80"
-                 option="int" range="80,95"
-                 subsetting="true"
-                 visible="!eq(-4,) + eq(-2,true)"/>
-        <setting                                    type="action" label="30133"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=revokeTrakt)" option="close"
-                 visible="!eq(-5,)"/>
-
-        <!-- Premiumize -->
-        <setting type="lsep" label="30134"/>
-        <setting id="premiumize.enabled"         type="bool"   label="30160" default="false"/>
-        <setting                                 type="action" label="30339"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=authPremiumize)" option="close"
-                 visible="eq(-1,true)"/>
-        <setting id="premiumize.username"        type="text"   label="30159" default=""
-                 subsetting="true"
-                 enable="false"
-                 visible="eq(-2,true)"/>
-        <setting id="premiumize.premiumstatus"   type="text"   label="30458" default=""
-                 subsetting="true"
-                 enable="false"
-                 visible="eq(-3,true)"/>
-        <setting id="premiumize.torrents"        type="bool"   label="30153" default="true"
-                 subsetting="true"
-                 visible="eq(-4,true)"/>
-        <setting id="premiumize.hosters"         type="bool"   label="30154" default="false"
-                 subsetting="true"
-                 visible="eq(-5,true)"/>
-        <setting id="premiumize.transcoded"      type="bool"   label="30158" default="false"
-                 subsetting="true"
-                 visible="eq(-6,true)"/>`
-        <setting id="premiumize.addToCloud"      type="bool"   label="30183" default="false"
-                 subsetting="true" visible="eq(-7,true)"/>
-        <setting id="premiumize.autodelete"      type="bool"   label="30157" default="true"
-                 subsetting="true"
-                 visible="eq(-8,true)"/>
-        <setting id="premiumize.threshold"       type="slider" label="30156" default="750"
-                 option="int" range="50,50,1000"
-                 subsetting="true"
-                 visible="eq(-1,true) + eq(-9,true)"/>
-
-        <!-- Real-Debrid -->
-        <setting type="lsep" label="30135"/>
-        <setting id="realdebrid.enabled" type="bool"   label="30152" default="false"/>
-        <setting id="rd.username"        type="text"   label="30151" default=""
-                 enable="false"
-                 visible="eq(-1,true)"/>
-        <setting id="rd.premiumstatus"   type="text"   label="30458" default=""
-                 subsetting="true"
-                 enable="false"
-                 visible="eq(-2,true)"/>
-        <setting                         type="action" label="30150"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=authRealDebrid)" option="close"
-                 visible="eq(-3,true)"/>
-        <setting id="rd.torrents"        type="bool"   label="30153" default="true"
-                 subsetting="true"
-                 visible="eq(-4,true)"/>
-        <setting id="rd.hosters"         type="bool"   label="30154" default="false"
-                 subsetting="true"
-                 visible="eq(-5,true)"/>
-        <setting id="rd.autodelete"      type="bool"   label="30155" default="true"
-                 subsetting="true"
-                 visible="eq(-6,true)"/>
-
-        <!-- All Debrid -->
-        <setting type="lsep" label="30333"/>
-        <setting id="alldebrid.enabled"         type="bool"   label="30335" default="false"/>
-        <setting id="alldebrid.username"        type="text"   label="30336" default=""
-                 enable="false"
-                 visible="eq(-1,true)"/>
-        <setting id="alldebrid.premiumstatus"   type="text"   label="30458" default=""
-                 subsetting="true"
-                 enable="false"
-                 visible="eq(-2,true)"/>
-        <setting                                type="action" label="30337"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=authAllDebrid)" option="close"
-                 visible="eq(-3,true)"/>
-        <setting id="alldebrid.torrents"        type="bool"   label="30153" default="true"
-                 subsetting="true"
-                 visible="eq(-4,true)"/>
-        <setting id="alldebrid.hosters"         type="bool"   label="30154" default="false"
-                 subsetting="true"
-                 visible="eq(-5,true)"/>
-        <setting id="alldebrid.autodelete"      type="bool"   label="30155" default="true"
-                 subsetting="true"
-                 visible="eq(-6,true)"/>
-    </category>
-
-    <!-- Providers -->
-    <category label="30136">
-
-        <!-- General -->
-        <setting type="lsep" label="30084"/>
-        <setting id="providers.autoupdates" type="bool" label="30138" default="true"/>
-
-        <!-- Manage Provider Packages -->
-        <setting type="lsep" label="30140"/>
-        <setting type="action" label="30139"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=manualProviderUpdate)"/>
-        <setting type="action" label="30140"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=manageProviders)"/>
-    </category>
-
-    <!-- Scraping -->
-    <category label="30110">
-
-        <!-- General -->
-        <setting type="lsep" label="30084"/>
-        <setting id="general.scrapedisplay" type="enum"   label="30174" default="0"
-                 lvalues="30175|30176"/>
-        <setting id="general.torrentCache"  type="bool"   label="30111" default="true"/>
-        <setting id="general.timeout"       type="slider" label="30112" default="60"
-                 option="int" range="10,180"/>
-
-        <!-- Cloud Scrapers -->
-        <setting type="lsep" label="30189"/>
-        <setting id="premiumize.enabled"         type="bool"   label="30160" default="false"
-                 visible="false"/>
-        <setting id="premiumize.cloudInspection" type="bool"   label="Scrape Premiumize Cloud" default="true"
-                 visible="eq(-1,true)"/>
-        <setting id="realdebrid.enabled"         type="bool"   label="30152" default="false"
-                 visible="false"/>
-        <setting id="rd.cloudInspection"         type="bool"   label="Scrape Real-Debrid Cloud" default="true"
-                 visible="eq(-1,true)"/>
-        <setting id="alldebrid.enabled"          type="bool"   label="30335" default="false"
-                 visible="false"/>
-        <setting id="alldebrid.cloudInspection"  type="bool"   label="Scrape AllDebrid Cloud" default="true"
-                 visible="eq(-1,true)"/>
-
-        <!-- Auto Caching Assistant -->
-        <setting type="lsep" label="30113"/>
-        <setting id="general.autocache"       type="bool" label="30114" default="true"/>
-        <setting id="general.cacheAssistMode" type="enum" label="30115" default="0"
-                 lvalues="30232|30233"
-                 subsetting="true"
-                 visible="eq(-1,true)"/>
-        <setting id="general.cachelocation"   type="enum" label="30116"
-                 lvalues="30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-2,true)"/>
-
-        <!-- Preemptive Termination -->
-        <setting type="lsep" label="30121"/>
-        <setting id="preem.enabled"            type="bool"   label="30122" default="true"/>
-        <setting id="preem.movieres"           type="enum"   label="30123" default="0"
-                 lvalues="30598|30599|30600|30601"
-                 subsetting="true"
-                 visible="eq(-1,true)"/>
-        <setting id="preem.tvres"              type="enum"   label="30124" default="1"
-                 lvalues="30598|30599|30600|30601"
-                 subsetting="true"
-                 visible="eq(-2,true)"/>
-        <setting id="preem.limit"              type="slider" label="30125" default="5"
-                 option="int" range="0,20"
-                 subsetting="true"
-                 visible="eq(-3,true)"/>
-        <setting id="preem.type"               type="enum"   label="30126" default="0"
-                 lvalues="30234|30235|30236"
-                 subsetting="true"
-                 visible="eq(-4,true)"/>
-        <setting id="preem.waitfor.cloudfiles" type="bool"   label="30616" default="false"
-                 subsetting="true"
-                 visible="eq(-5,true)"/>
-        <setting id="preem.cloudfiles"         type="bool"   label="30188" default="true"
-                 subsetting="true"
-                 visible="eq(-6,true)"/>
-        <setting id="preem.adaptiveSources"    type="bool"   label="30478" default="true"
-                 subsetting="true"
-                 visible="eq(-7,true)"/>
-    </category>
-
-    <!-- Sort & Filter -->
-    <category label="30148">
-
-        <!-- Source Filters -->
-        <setting type="lsep" label="30117"/>
-        <setting type="action" label="30617"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=chooseFilters)" option="close"/>
-        <setting id="general.maxResolution"       type="enum"   label="30120" default="0"
-                 lvalues="30598|30599|30600|30601"/>
-        <setting id="general.minResolution"       type="enum"   label="30612" default="3"
-                 lvalues="30598|30599|30600|30601"/>
-        <setting id="general.enablesizelimit"     type="bool"   label="30118" default="true"/>
-        <setting id="general.sizelimit.movie"     type="slider" label="30192" default="10"
-                 option="int" range="0,1,300"
-                 subsetting="true"
-                 visible="eq(-1,true)"/>
-        <setting id="general.sizelimit.episode"   type="slider" label="30119" default="10"
-                 option="int" range="0,1,300"
-                 subsetting="true"
-                 visible="eq(-2,true)"/>
-        <setting id="general.sizeminimum.movie"   type="slider" label="30534" default="0"
-                 option="float" range="0.0,0.1,30.0"
-                 subsetting="true"
-                 visible="eq(-3,true)"/>
-        <setting id="general.sizeminimum.episode" type="slider" label="30535" default="0"
-                 option="float" range="0.0,0.1,30.0"
-                 subsetting="true"
-                 visible="eq(-4,true)"/>
-        <setting id="general.filters"      type="text"  default="3D"
-                 visible="false"/>
-
-        <!-- Source Sorting -->
-        <setting type="lsep" label="30149"/>
-        <setting id="general.lastreleasenamepriority" type="bool" label="30569"
-                 default="true"/>
-
-        <!-- Sort Method 1 -->
-        <setting id="general.sortmethod.1"         type="enum" label="30582" default="5"
-                 lvalues="30513|30237|30252|30570|30251|30571|30572|30573|30575"/>
-        <setting id="general.sourcetypesort.1"     type="enum" label="30576" default="1"
-                 lvalues="30513|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-1,2)"/>
-        <setting id="general.sourcetypesort.2"     type="enum" label="30577" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-2,2) + !eq(-1,0)"/>
-        <setting id="general.sourcetypesort.3"     type="enum" label="30578" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-3,2) + !eq(-1,0)"/>
-        <setting id="general.sourcetypesort.4"     type="enum" label="30579" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-4,2) + !eq(-1,0)"/>
-        <setting id="general.hdrsort.1"        type="enum" label="30576" default="2"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-5,7)"/>
-        <setting id="general.hdrsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-6,7) + !eq(-1,0)"/>
-        <setting id="general.debridsort.1"        type="enum" label="30576" default="1"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-7,3)"/>
-        <setting id="general.debridsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-8,3) + !eq(-1,0)"/>
-        <setting id="general.debridsort.3"        type="enum" label="30578" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-9,3) + !eq(-1,0)"/>
-        <setting id="general.sortmethod.1.reverse" type="bool" label="30580" default="false"
-                 subsetting="true" visible="!eq(-10,0)"/>
-
-        <!-- Sort Method 2 -->
-        <setting id="general.sortmethod.2"         type="enum" label="30583" default="1"
-                 lvalues="30513|30237|30252|30570|30251|30571|30572|30573|30575"
-                 visible="!eq(-11,0)"/>
-        <setting id="general.sourcetypesort.1"     type="enum" label="30576" default="1"
-                 lvalues="30513|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-1,2) + !eq(-12,0)"/>
-        <setting id="general.sourcetypesort.2"     type="enum" label="30577" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-2,2) + !eq(-1,0) + !eq(-13,0)"/>
-        <setting id="general.sourcetypesort.3"     type="enum" label="30578" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-3,2) + !eq(-1,0) + !eq(-14,0)"/>
-        <setting id="general.sourcetypesort.4"     type="enum" label="30579" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-4,2) + !eq(-1,0) + !eq(-15,0)"/>
-        <setting id="general.hdrsort.1"        type="enum" label="30576" default="2"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-5,7) + !eq(-16,0)"/>
-        <setting id="general.hdrsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-6,7) + !eq(-1,0) + !eq(-17,0)"/>
-        <setting id="general.debridsort.1"        type="enum" label="30576" default="1"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-7,3) + !eq(-18,0)"/>
-        <setting id="general.debridsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-8,3) + !eq(-1,0) + !eq(-19,0)"/>
-        <setting id="general.debridsort.3"        type="enum" label="30578" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-9,3) + !eq(-1,0) + !eq(-20,0)"/>
-        <setting id="general.sortmethod.2.reverse" type="bool" label="30580" default="false"
-                 subsetting="true" visible="!eq(-10,0) + !eq(-21,0)"/>
-
-        <!-- Sort Method 3 -->
-        <setting id="general.sortmethod.3"         type="enum" label="30584" default="4"
-                 lvalues="30513|30237|30252|30570|30251|30571|30572|30573|30575"
-                 visible="!eq(-11,0) + !eq(-22,0)"/>
-        <setting id="general.sourcetypesort.1"     type="enum" label="30576" default="1"
-                 lvalues="30513|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-1,2) + !eq(-12,0) + !eq(-23,0)"/>
-        <setting id="general.sourcetypesort.2"     type="enum" label="30577" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-2,2) + !eq(-1,0) + !eq(-13,0) + !eq(-24,0)"/>
-        <setting id="general.sourcetypesort.3"     type="enum" label="30578" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-3,2) + !eq(-1,0) + !eq(-14,0) + !eq(-25,0)"/>
-        <setting id="general.sourcetypesort.4"     type="enum" label="30579" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-4,2) + !eq(-1,0) + !eq(-15,0) + !eq(-26,0)"/>
-        <setting id="general.hdrsort.1"        type="enum" label="30576" default="2"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-5,7) + !eq(-16,0) + !eq(-27,0)"/>
-        <setting id="general.hdrsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-6,7) + !eq(-1,0) + !eq(-17,0) + !eq(-28,0)"/>
-        <setting id="general.debridsort.1"        type="enum" label="30576" default="1"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-7,3) + !eq(-18,0) + !eq(-29,0)"/>
-        <setting id="general.debridsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-8,3) + !eq(-1,0) + !eq(-19,0) + !eq(-30,0)"/>
-        <setting id="general.debridsort.3"        type="enum" label="30578" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-9,3) + !eq(-1,0) + !eq(-20,0) + !eq(-31,0)"/>
-        <setting id="general.sortmethod.3.reverse" type="bool" label="30580" default="false"
-                 subsetting="true" visible="!eq(-10,0) + !eq(-21,0) + !eq(-32,0)"/>
-
-        <!-- Sort Method 4 -->
-        <setting id="general.sortmethod.4"         type="enum" label="30585" default="0"
-                 lvalues="30513|30237|30252|30570|30251|30571|30572|30573|30575"
-                 visible="!eq(-11,0) + !eq(-22,0) + !eq(-33,0)"/>
-        <setting id="general.sourcetypesort.1"     type="enum" label="30576" default="1"
-                 lvalues="30513|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-1,2) + !eq(-12,0) + !eq(-23,0) + !eq(-34,0)"/>
-        <setting id="general.sourcetypesort.2"     type="enum" label="30577" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-2,2) + !eq(-1,0) + !eq(-13,0) + !eq(-24,0) + !eq(-35,0)"/>
-        <setting id="general.sourcetypesort.3"     type="enum" label="30578" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-3,2) + !eq(-1,0) + !eq(-14,0) + !eq(-25,0) + !eq(-36,0)"/>
-        <setting id="general.sourcetypesort.4"     type="enum" label="30579" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-4,2) + !eq(-1,0) + !eq(-15,0) + !eq(-26,0) + !eq(-37,0)"/>
-        <setting id="general.hdrsort.1"        type="enum" label="30576" default="2"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-5,7) + !eq(-16,0) + !eq(-27,0) + !eq(-38,0)"/>
-        <setting id="general.hdrsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-6,7) + !eq(-1,0) + !eq(-17,0) + !eq(-28,0) + !eq(-39,0)"/>
-        <setting id="general.debridsort.1"        type="enum" label="30576" default="1"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-7,3) + !eq(-18,0) + !eq(-29,0) + !eq(-40,0)"/>
-        <setting id="general.debridsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-8,3) + !eq(-1,0) + !eq(-19,0) + !eq(-30,0) + !eq(-41,0)"/>
-        <setting id="general.debridsort.3"        type="enum" label="30578" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-9,3) + !eq(-1,0) + !eq(-20,0) + !eq(-31,0) + !eq(-42,0)"/>
-        <setting id="general.sortmethod.4.reverse" type="bool" label="30580" default="false"
-                 subsetting="true" visible="!eq(-10,0) + !eq(-21,0) + !eq(-32,0) + !eq(-43,0)"/>
-
-        <!-- Sort Method 5 -->
-        <setting id="general.sortmethod.5"         type="enum" label="30586" default="0"
-                 lvalues="30513|30237|30252|30570|30251|30571|30572|30573|30575"
-                 visible="!eq(-11,0) + !eq(-22,0) + !eq(-33,0) + !eq(-44,0) + !eq(-55,0)"/>
-        <setting id="general.sourcetypesort.1"     type="enum" label="30576" default="1"
-                 lvalues="30513|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-1,2) + !eq(-12,0) + !eq(-23,0) + !eq(-34,0) + !eq(-45,0) + !eq(-56,0)"/>
-        <setting id="general.sourcetypesort.2"     type="enum" label="30577" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-2,2) + !eq(-1,0) + !eq(-13,0) + !eq(-24,0) + !eq(-35,0) + !eq(-46,0) + !eq(-57,0)"/>
-        <setting id="general.sourcetypesort.3"     type="enum" label="30578" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-3,2) + !eq(-1,0) + !eq(-14,0) + !eq(-25,0) + !eq(-36,0) + !eq(-47,0) + !eq(-58,0)"/>
-        <setting id="general.sourcetypesort.4"     type="enum" label="30579" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-4,2) + !eq(-1,0) + !eq(-15,0) + !eq(-26,0) + !eq(-37,0) + !eq(-48,0) + !eq(-59,0)"/>
-        <setting id="general.hdrsort.1"        type="enum" label="30576" default="2"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-5,7) + !eq(-16,0) + !eq(-27,0) + !eq(-38,0) + !eq(-49,0) + !eq(-60,0)"/>
-        <setting id="general.hdrsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-6,7) + !eq(-1,0) + !eq(-17,0) + !eq(-28,0) + !eq(-39,0) + !eq(-50,0) + !eq(-61,0)"/>
-        <setting id="general.debridsort.1"        type="enum" label="30576" default="1"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-7,3) + !eq(-18,0) + !eq(-29,0) + !eq(-40,0) + !eq(-51,0) + !eq(-62,0)"/>
-        <setting id="general.debridsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-8,3) + !eq(-1,0) + !eq(-19,0) + !eq(-30,0) + !eq(-41,0) + !eq(-52,0) + !eq(-63,0)"/>
-        <setting id="general.debridsort.3"        type="enum" label="30578" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-9,3) + !eq(-1,0) + !eq(-20,0) + !eq(-31,0) + !eq(-42,0) + !eq(-53,0) + !eq(-64,0)"/>
-        <setting id="general.sortmethod.5.reverse" type="bool" label="30580" default="false"
-                 subsetting="true" visible="!eq(-10,0) + !eq(-21,0) + !eq(-32,0) + !eq(-43,0) + !eq(-54,0) + !eq(-65,0)"/>
-
-        <!-- Sort Method 6 -->
-        <setting id="general.sortmethod.6"         type="enum" label="30587" default="0"
-                 lvalues="30513|30237|30252|30570|30251|30571|30572|30573|30575"
-                 visible="!eq(-11,0) + !eq(-22,0) + !eq(-33,0) + !eq(-44,0) + !eq(-55,0) + !eq(-66,0)"/>
-        <setting id="general.sourcetypesort.1"     type="enum" label="30576" default="1"
-                 lvalues="30513|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-1,2) + !eq(-12,0) + !eq(-23,0) + !eq(-34,0) + !eq(-45,0) + !eq(-56,0) + !eq(-67,0)"/>
-        <setting id="general.sourcetypesort.2"     type="enum" label="30577" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-2,2) + !eq(-1,0) + !eq(-13,0) + !eq(-24,0) + !eq(-35,0) + !eq(-46,0) + !eq(-57,0) + !eq(-68,0)"/>
-        <setting id="general.sourcetypesort.3"     type="enum" label="30578" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-3,2) + !eq(-1,0) + !eq(-14,0) + !eq(-25,0) + !eq(-36,0) + !eq(-47,0) + !eq(-58,0) + !eq(-69,0)"/>
-        <setting id="general.sourcetypesort.4"     type="enum" label="30579" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-4,2) + !eq(-1,0) + !eq(-15,0) + !eq(-26,0) + !eq(-37,0) + !eq(-48,0) + !eq(-59,0) + !eq(-70,0)"/>
-        <setting id="general.hdrsort.1"        type="enum" label="30576" default="2"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-5,7) + !eq(-16,0) + !eq(-27,0) + !eq(-38,0) + !eq(-49,0) + !eq(-60,0) + !eq(-71,0)"/>
-        <setting id="general.hdrsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-6,7) + !eq(-1,0) + !eq(-17,0) + !eq(-28,0) + !eq(-39,0) + !eq(-50,0) + !eq(-61,0) + !eq(-72,0)"/>
-        <setting id="general.debridsort.1"        type="enum" label="30576" default="1"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-7,3) + !eq(-18,0) + !eq(-29,0) + !eq(-40,0) + !eq(-51,0) + !eq(-62,0) + !eq(-73,0)"/>
-        <setting id="general.debridsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-8,3) + !eq(-1,0) + !eq(-19,0) + !eq(-30,0) + !eq(-41,0) + !eq(-52,0) + !eq(-63,0) + !eq(-74,0)"/>
-        <setting id="general.debridsort.3"        type="enum" label="30578" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-9,3) + !eq(-1,0) + !eq(-20,0) + !eq(-31,0) + !eq(-42,0) + !eq(-53,0) + !eq(-64,0) + !eq(-75,0)"/>
-        <setting id="general.sortmethod.6.reverse" type="bool" label="30580" default="false"
-                 subsetting="true" visible="!eq(-10,0) + !eq(-21,0) + !eq(-32,0) + !eq(-43,0) + !eq(-54,0) + !eq(-65,0) + !eq(-76,0)"/>
-
-        <!-- Sort Method 7 -->
-        <setting id="general.sortmethod.7"         type="enum" label="30588" default="0"
-                 lvalues="30513|30237|30252|30570|30251|30571|30572|30573|30575"
-                 visible="!eq(-11,0) + !eq(-22,0) + !eq(-33,0) + !eq(-44,0) + !eq(-55,0) + !eq(-66,0) + !eq(-77,0)"/>
-        <setting id="general.sourcetypesort.1"     type="enum" label="30576" default="1"
-                 lvalues="30513|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-1,2) + !eq(-12,0) + !eq(-23,0) + !eq(-34,0) + !eq(-45,0) + !eq(-56,0) + !eq(-67,0) + !eq(-78,0)"/>
-        <setting id="general.sourcetypesort.2"     type="enum" label="30577" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-2,2) + !eq(-1,0) + !eq(-13,0) + !eq(-24,0) + !eq(-35,0) + !eq(-46,0) + !eq(-57,0) + !eq(-68,0) + !eq(-79,0)"/>
-        <setting id="general.sourcetypesort.3"     type="enum" label="30578" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-3,2) + !eq(-1,0) + !eq(-14,0) + !eq(-25,0) + !eq(-36,0) + !eq(-47,0) + !eq(-58,0) + !eq(-69,0) + !eq(-80,0)"/>
-        <setting id="general.sourcetypesort.4"     type="enum" label="30579" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-4,2) + !eq(-1,0) + !eq(-15,0) + !eq(-26,0) + !eq(-37,0) + !eq(-48,0) + !eq(-59,0) + !eq(-70,0) + !eq(-81,0)"/>
-        <setting id="general.hdrsort.1"        type="enum" label="30576" default="2"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-5,7) + !eq(-16,0) + !eq(-27,0) + !eq(-38,0) + !eq(-49,0) + !eq(-60,0) + !eq(-71,0) + !eq(-82,0)"/>
-        <setting id="general.hdrsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-6,7) + !eq(-1,0) + !eq(-17,0) + !eq(-28,0) + !eq(-39,0) + !eq(-50,0) + !eq(-61,0) + !eq(-72,0) + !eq(-83,0)"/>
-        <setting id="general.debridsort.1"        type="enum" label="30576" default="1"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-7,3) + !eq(-18,0) + !eq(-29,0) + !eq(-40,0) + !eq(-51,0) + !eq(-62,0) + !eq(-73,0) + !eq(-84,0)"/>
-        <setting id="general.debridsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-8,3) + !eq(-1,0) + !eq(-19,0) + !eq(-30,0) + !eq(-41,0) + !eq(-52,0) + !eq(-63,0) + !eq(-74,0) + !eq(-85,0)"/>
-        <setting id="general.debridsort.3"        type="enum" label="30578" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-9,3) + !eq(-1,0) + !eq(-20,0) + !eq(-31,0) + !eq(-42,0) + !eq(-53,0) + !eq(-64,0) + !eq(-75,0) + !eq(-86,0)"/>
-        <setting id="general.sortmethod.7.reverse" type="bool" label="30580" default="false"
-                 subsetting="true" visible="!eq(-10,0) + !eq(-21,0) + !eq(-32,0) + !eq(-43,0) + !eq(-54,0) + !eq(-65,0) + !eq(-76,0) + !eq(-87,0)"/>
-
-        <!-- Sort Method 8 -->
-        <setting id="general.sortmethod.8"         type="enum" label="30589" default="0"
-                 lvalues="30513|30237|30252|30570|30251|30571|30572|30573|30575"
-                 visible="!eq(-11,0) + !eq(-22,0) + !eq(-33,0) + !eq(-44,0) + !eq(-55,0) + !eq(-66,0) + !eq(-77,0) + !eq(-88,0)"/>
-        <setting id="general.sourcetypesort.1"     type="enum" label="30576" default="1"
-                 lvalues="30513|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-1,2) + !eq(-12,0) + !eq(-23,0) + !eq(-34,0) + !eq(-45,0) + !eq(-56,0) + !eq(-67,0) + !eq(-78,0) + !eq(-89,0)"/>
-        <setting id="general.sourcetypesort.2"     type="enum" label="30577" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-2,2) + !eq(-1,0) + !eq(-13,0) + !eq(-24,0) + !eq(-35,0) + !eq(-46,0) + !eq(-57,0) + !eq(-68,0) + !eq(-79,0) + !eq(-90,0)"/>
-        <setting id="general.sourcetypesort.3"     type="enum" label="30578" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-3,2) + !eq(-1,0) + !eq(-14,0) + !eq(-25,0) + !eq(-36,0) + !eq(-47,0) + !eq(-58,0) + !eq(-69,0) + !eq(-80,0) + !eq(-91,0)"/>
-        <setting id="general.sourcetypesort.4"     type="enum" label="30579" default="0"
-                 lvalues="30581|30249|30470|30057|30058"
-                 subsetting="true"
-                 visible="eq(-4,2) + !eq(-1,0) + !eq(-15,0) + !eq(-26,0) + !eq(-37,0) + !eq(-48,0) + !eq(-59,0) + !eq(-70,0) + !eq(-81,0) + !eq(-92,0)"/>
-        <setting id="general.hdrsort.1"        type="enum" label="30576" default="2"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-5,7) + !eq(-16,0) + !eq(-27,0) + !eq(-38,0) + !eq(-49,0) + !eq(-60,0) + !eq(-71,0) + !eq(-82,0) + !eq(-93,0)"/>
-        <setting id="general.hdrsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30590|30574"
-                 subsetting="true"
-                 visible="eq(-6,7) + !eq(-1,0) + !eq(-17,0) + !eq(-28,0) + !eq(-39,0) + !eq(-50,0) + !eq(-61,0) + !eq(-72,0) + !eq(-83,0) + !eq(-94,0)"/>
-        <setting id="general.debridsort.1"        type="enum" label="30576" default="1"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-7,3) + !eq(-18,0) + !eq(-29,0) + !eq(-40,0) + !eq(-51,0) + !eq(-62,0) + !eq(-73,0) + !eq(-84,0) + !eq(-95,0)"/>
-        <setting id="general.debridsort.2"        type="enum" label="30577" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-8,3) + !eq(-1,0) + !eq(-19,0) + !eq(-30,0) + !eq(-41,0) + !eq(-52,0) + !eq(-63,0) + !eq(-74,0) + !eq(-85,0) + !eq(-96,0)"/>
-        <setting id="general.debridsort.3"        type="enum" label="30578" default="0"
-                 lvalues="30513|30134|30135|30333"
-                 subsetting="true"
-                 visible="eq(-9,3) + !eq(-1,0) + !eq(-20,0) + !eq(-31,0) + !eq(-42,0) + !eq(-53,0) + !eq(-64,0) + !eq(-75,0) + !eq(-86,0) + !eq(-97,0)"/>
-        <setting id="general.sortmethod.8.reverse" type="bool" label="30580" default="false"
-                 subsetting="true" visible="!eq(-10,0) + !eq(-21,0) + !eq(-32,0) + !eq(-43,0) + !eq(-54,0) + !eq(-65,0) + !eq(-76,0) + !eq(-87,0) + !eq(-98,0)"/>
-    </category>
-
-    <!-- Playback -->
-    <category label="30258">
-
-        <!-- General -->
-        <setting type="lsep" label="30084"/>
-        <setting id="general.playstyleMovie"    type="enum" label="30191" default="0"
-                 lvalues="30086|30087"/>
-        <setting id="general.playstyleEpisodes" type="enum" label="30085" default="0"
-                 lvalues="30086|30087"/>
-		
-        <!-- Resume -->
-		<setting type="lsep" label="30602"/>
-		<setting id="smartplay.clickresume" type="bool" label="30107" default="false"/>
-		<setting id="general.bookmarkstyle" type="enum" label="30109" default="0"
-                 lvalues="30329|30232|30330"/>
-        
-        <!-- Resolving -->
-		<setting type="lsep" label="30603"/>
-		<setting id="general.autotrynext"            type="bool" label="30195" default="true"/>
-        <setting id="general.resolvefailurehandling" type="enum" label="30487" default="1"
-                 lvalues="30488|30489"/>
-
-        <!-- Smart Play -->
-        <setting type="lsep" label="30604"/>
-        <setting id="smartplay.playlistcreate"    type="bool"   label="30106" default="true"/>
-		<setting id="smartPlay.preScrape"         type="bool"   label="30108" default="true"
-                 visible="eq(-1,true)"/>
-		<setting id="smartplay.displaystyle"      type="enum"   label="30318" default="0"
-                 lvalues="30175|30176"
-                 visible="eq(-2,true)"/>
-        <setting id="smartplay.playingnextdialog" type="bool"   label="30104" default="true"
-                 visible="eq(-3,true) + eq(-1,0)"/>
-        <setting id="playingnext.time"            type="slider" label="30105" default="30"
-                 option="int" range="10,180"
-                 subsetting="true"
-                 visible="eq(-4,true) + eq(-1,true) + eq(-2,0)"/>
-        <setting id="playingnext.defaultaction"   type="enum"   label="30319" default="0"
-                 lvalues="30320|30321"
-                 subsetting="true"
-                 visible="eq(-5,true) + eq(-2,true) + eq(-3,0)"/>
-        <setting id="smartplay.stillwatching"     type="bool"   label="30322" default="false"
-                 visible="eq(-6,true) + eq(-4,0)"/>
-        <setting id="stillwatching.numepisodes"   type="slider" label="30323" default="3"
-                 option="int" range="1,10"
-                 subsetting="true"
-                 visible="eq(-7,true) + eq(-1,true) + eq(-5,0)"/>
-    </category>
-
-    <!-- Shortcuts -->
-    <category label="30142">
-
-        <!-- Clear Cache -->
-        <setting type="lsep" label="30028"/>
-        <setting type="action" label="30028"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=clearCache)"/>
-        <setting type="action" label="30039"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)"/>
-        <setting type="action" label="30180"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=clearSearchHistory)"/>
-        <setting type="action" label="30041"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=cleanInstall)" option="close"/>
-
-        <!-- Trakt Sync Tools -->
-        <setting type="lsep" label="30215"/>
-        <setting type="action" label="30216"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=flushTraktActivities)"/>
-        <setting type="action" label="30217"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=forceTraktSync)"/>
-        <setting type="action" label="30218"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=rebuildTraktDatabase)"/>
-
-        <!-- Window Tests -->
-        <setting type="lsep" label="30546"/>
-        <setting type="action" label="30462"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=testPlayingNext)"/>
-        <setting type="action" label="30463"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=testStillWatching)"/>
-        <setting type="action" label="30613"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=testGetSourcesWindow)"/>
-        <setting type="action" label="30464"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=testResolverWindow)"/>
-        <setting type="action" label="30465"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=testSourceSelectWindow)"/>
-        <setting type="action" label="30466"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=testManualCacheWindow)"/>
-        <setting type="action" label="30625"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=testDownloadManagerWindow)"/>
-    </category>
-	
-	<!-- Advanced -->
-	<category label="30260">
-	
-		<!-- Menus -->
-		<setting type="lsep" label="30605"/>
-		<setting id="general.menucaching"                   type="bool"   label="30193" default="true"/>
-		<setting id="general.force.widget.refresh.playback" type="bool"   label="30477" default="false"/>
-		<setting id="skin.testmenu"                         type="bool"   label="30545" default="false"/>
-		<setting id="general.setViews"                      type="bool"   label="30141" default="false"/>
-        <setting id="general.viewidswitch"                  type="bool"   label="30093" default="false"
-                 subsetting="true"
-                 visible="eq(-1,true)"/>
-        <setting id="addon.view"                            type="enum"   label="30184" default="0"
-                 lvalues="30223|30224|30225|30226|30227|30228|30229|30230|30231"
-                 subsetting="true"
-                 visible="eq(-1,false) + eq(-2,true)"/>
-        <setting id="addon.view.id"                         type="number" label="30185" default=""
-                 subsetting="true"
-                 visible="eq(-2,true) + eq(-3,true)"/>
-        <setting id="movie.view"                            type="enum"   label="30094" default="0"
-                 lvalues="30223|30224|30225|30226|30227|30228|30229|30230|30231"
-                 subsetting="true"
-                 visible="eq(-3,false) + eq(-4,true)"/>
-        <setting id="movie.view.id"                         type="number" label="30095" default=""
-                 subsetting="true"
-                 visible="eq(-4,true) + eq(-5,true)"/>
-        <setting id="show.view"                             type="enum"   label="30096" default="0"
-                 lvalues="30223|30224|30225|30226|30227|30228|30229|30230|30231"
-                 subsetting="true"
-                 visible="eq(-5,false) + eq(-6,true)"/>
-        <setting id="show.view.id"                          type="number" label="30097" default=""
-                 subsetting="true"
-                 visible="eq(-6,true) + eq(-7,true)"/>
-        <setting id="episode.view"                          type="enum"   label="30098" default="0"
-                 lvalues="30223|30224|30225|30226|30227|30228|30229|30230|30231"
-                 subsetting="true"
-                 visible="eq(-7,false) + eq(-8,true)"/>
-        <setting id="episode.view.id"                       type="number" label="30099" default=""
-                 subsetting="true"
-                 visible="eq(-8,true) + eq(-9,true)"/>
-        <setting id="season.view"                           type="enum"   label="30100" default="0"
-                 lvalues="30223|30224|30225|30226|30227|30228|30229|30230|30231"
-                 subsetting="true"
-                 visible="eq(-9,false) + eq(-10,true)"/>
-        <setting id="season.view.id"                        type="number" label="30101" default=""
-                 subsetting="true"
-                 visible="eq(-10,true) + eq(-11,true)"/>
-	
-		<!-- API Keys -->
-        <setting type="lsep" label="30137"/>
-        <setting id="tmdb.apikey"    type="text" label="30144" default=""/>
-        <setting id="tvdb.apikey"    type="text" label="30147" default=""/>
-		<setting id="trakt.clientid" type="text" label="30145" default=""/>
-        <setting id="trakt.secret"   type="text" label="30146" default=""/>
-	
-		<!-- Time Zone -->
-		<setting type="lsep" label="30547"/>
-		<setting id="general.localtimezone"  type="text"   label="30606" default=""
-                 enable="false"/>
-        <setting id="general.manualtimezone" type="bool"                 default="false"
-                 visible="false"/>
-        <setting                             type="action" label="30548"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=chooseTimeZone)"
-                 visible="eq(-1,true)"/>
-		
-		<!-- Performance -->
-        <setting type="lsep" label="30607"/>
-		<setting id="general.threadpoolScale"     type="enum"   label="30540" default="1"
-                 lvalues="30541|30542|30543|30544"/>
-        <setting id="reuselanguageinvoker.status" type="text"   label="30532" default="Disabled"
-                 enable="false"
-                 visible="false"/>
-        <setting id="reuselanguageinvoker.status" type="action" label="30533"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=toggleLanguageInvoker)" option="close"/>
-	</category>
+		</category>
+		<category id="accounts" label="30127" help="">
+			<group id="1" label="30084">
+				<setting id="general.accountNotifications" type="boolean" label="30128" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="2" label="30129"/>
+			<group id="3">
+				<setting id="trakt.username" type="string" label="30130" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<enable>false</enable>
+					<control type="edit" format="string">
+						<heading>30130</heading>
+					</control>
+				</setting>
+				<setting id="trakt.authTrakt" type="action" label="30131" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=authTrakt)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="trakt.username"/>
+						</dependency>
+					</dependencies>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+				<setting id="trakt.scrobbling" type="boolean" label="30132" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="!is" setting="trakt.username"/>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="trakt.ignoreSecondsAtStart" type="integer" label="30481" help="" parent="trakt.scrobbling">
+					<level>0</level>
+					<default>180</default>
+					<constraints>
+						<minimum>30</minimum>
+						<maximum>360</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="!is" setting="trakt.username"/>
+								<condition operator="is" setting="trakt.scrobbling">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="trakt.playCountMinimumPercent" type="integer" label="30482" help="" parent="trakt.scrobbling">
+					<level>0</level>
+					<default>80</default>
+					<constraints>
+						<minimum>80</minimum>
+						<maximum>95</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="!is" setting="trakt.username"/>
+								<condition operator="is" setting="trakt.scrobbling">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="trakt.revokeTrakt" type="action" label="30133" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=revokeTrakt)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="!is" setting="trakt.username"/>
+						</dependency>
+					</dependencies>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+			</group>
+			<group id="4" label="30134">
+				<setting id="premiumize.enabled" type="boolean" label="30160" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="premiumize.auth" type="action" label="30339" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=authPremiumize)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+				<setting id="premiumize.username" type="string" label="30159" help="" parent="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<enable>false</enable>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>30159</heading>
+					</control>
+				</setting>
+				<setting id="premiumize.premiumstatus" type="string" label="30458" help="" parent="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<enable>false</enable>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>30458</heading>
+					</control>
+				</setting>
+				<setting id="premiumize.torrents" type="boolean" label="30153" help="" parent="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="premiumize.hosters" type="boolean" label="30154" help="" parent="">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="premiumize.transcoded" type="boolean" label="30158" help="" parent="">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="premiumize.addToCloud" type="boolean" label="30183" help="" parent="">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="premiumize.autodelete" type="boolean" label="30157" help="" parent="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="premiumize.threshold" type="integer" label="30156" help="" parent="">
+					<level>0</level>
+					<default>750</default>
+					<constraints>
+						<minimum>50</minimum>
+						<step>50</step>
+						<maximum>1000</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="premiumize.autodelete">true</condition>
+								<condition operator="is" setting="premiumize.enabled">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+			</group>
+			<group id="5" label="30135">
+				<setting id="realdebrid.enabled" type="boolean" label="30152" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="rd.username" type="string" label="30151" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<enable>false</enable>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="realdebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>30151</heading>
+					</control>
+				</setting>
+				<setting id="rd.premiumstatus" type="string" label="30458" help="" parent="rd.username">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<enable>false</enable>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="realdebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>30458</heading>
+					</control>
+				</setting>
+				<setting id="rd.authRealDebrid" type="action" label="30150" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=authRealDebrid)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="realdebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+				<setting id="rd.torrents" type="boolean" label="30153" help="" parent="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="realdebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="rd.hosters" type="boolean" label="30154" help="" parent="">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="realdebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="rd.autodelete" type="boolean" label="30155" help="" parent="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="realdebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="6" label="30333">
+				<setting id="alldebrid.enabled" type="boolean" label="30335" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="alldebrid.username" type="string" label="30336" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<enable>false</enable>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="alldebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>30336</heading>
+					</control>
+				</setting>
+				<setting id="alldebrid.premiumstatus" type="string" label="30458" help="" parent="alldebrid.username">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<enable>false</enable>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="alldebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>30458</heading>
+					</control>
+				</setting>
+				<setting id="alldebrid.authAllDebrid" type="action" label="30337" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=authAllDebrid)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="alldebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+				<setting id="alldebrid.torrents" type="boolean" label="30153" help="" parent="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="alldebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="alldebrid.hosters" type="boolean" label="30154" help="" parent="">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="alldebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="alldebrid.autodelete" type="boolean" label="30155" help="" parent="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="alldebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+			</group>
+		</category>
+		<category id="providers" label="30136" help="">
+			<group id="1" label="30084">
+				<setting id="providers.autoupdates" type="boolean" label="30138" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="2" label="30140">
+				<setting id="providers.manualProviderUpdate" type="action" label="30139" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=manualProviderUpdate)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="providers.manageProviders" type="action" label="30140" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=manageProviders)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+			</group>
+		</category>
+		<category id="scraping" label="30110" help="">
+			<group id="1" label="30084">
+				<setting id="general.scrapedisplay" type="integer" label="30174" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30175">0</option>
+							<option label="30176">1</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.torrentCache" type="boolean" label="30111" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.timeout" type="integer" label="30112" help="">
+					<level>0</level>
+					<default>60</default>
+					<constraints>
+						<minimum>10</minimum>
+						<maximum>180</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+			</group>
+			<group id="2" label="30189">
+				<setting id="premiumize.cloudInspection" type="boolean" label="30635" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="premiumize.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="rd.cloudInspection" type="boolean" label="30636" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="realdebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="alldebrid.cloudInspection" type="boolean" label="30637" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="alldebrid.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="3" label="30113">
+				<setting id="general.autocache" type="boolean" label="30114" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.cacheAssistMode" type="integer" label="30115" help="" parent="general.autocache">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30232">0</option>
+							<option label="30233">1</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.autocache">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.cachelocation" type="integer" label="30116" help="" parent="general.autocache">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30134">0</option>
+							<option label="30135">1</option>
+							<option label="30333">2</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.autocache">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+			</group>
+			<group id="4" label="30121">
+				<setting id="preem.enabled" type="boolean" label="30122" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="preem.movieres" type="integer" label="30123" help="" parent="preem.enabled">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30598">0</option>
+							<option label="30599">1</option>
+							<option label="30600">2</option>
+							<option label="30601">3</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="preem.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="preem.tvres" type="integer" label="30124" help="" parent="preem.enabled">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30598">0</option>
+							<option label="30599">1</option>
+							<option label="30600">2</option>
+							<option label="30601">3</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="preem.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="preem.limit" type="integer" label="30125" help="" parent="preem.enabled">
+					<level>0</level>
+					<default>5</default>
+					<constraints>
+						<minimum>0</minimum>
+						<maximum>20</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="preem.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="preem.type" type="integer" label="30126" help="" parent="preem.enabled">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30234">0</option>
+							<option label="30235">1</option>
+							<option label="30236">2</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="preem.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="preem.waitfor.cloudfiles" type="boolean" label="30616" help="" parent="preem.enabled">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="preem.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="preem.cloudfiles" type="boolean" label="30188" help="" parent="preem.enabled">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="preem.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="preem.adaptiveSources" type="boolean" label="30478" help="" parent="preem.enabled">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="preem.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="preem.directSources" type="boolean" label="30630" help="" parent="preem.enabled">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="preem.enabled">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+			</group>
+		</category>
+		<category id="sort &amp; filter" label="30148" help="">
+			<group id="1" label="30117">
+				<setting id="general.chooseFilters" type="action" label="30617" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=chooseFilters)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+				<setting id="general.maxResolution" type="integer" label="30120" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30598">0</option>
+							<option label="30599">1</option>
+							<option label="30600">2</option>
+							<option label="30601">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.minResolution" type="integer" label="30612" help="">
+					<level>0</level>
+					<default>3</default>
+					<constraints>
+						<options>
+							<option label="30598">0</option>
+							<option label="30599">1</option>
+							<option label="30600">2</option>
+							<option label="30601">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.enablesizelimit" type="boolean" label="30118" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sizelimit.movie" type="integer" label="30192" help="" parent="general.enablesizelimit">
+					<level>0</level>
+					<default>10</default>
+					<constraints>
+						<minimum>0</minimum>
+						<step>1</step>
+						<maximum>300</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.enablesizelimit">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="general.sizelimit.episode" type="integer" label="30119" help="" parent="general.enablesizelimit">
+					<level>0</level>
+					<default>10</default>
+					<constraints>
+						<minimum>0</minimum>
+						<step>1</step>
+						<maximum>300</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.enablesizelimit">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="general.sizeminimum.movie" type="number" label="30534" help="" parent="general.enablesizelimit">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<minimum>0.0</minimum>
+						<step>0.1</step>
+						<maximum>30.0</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.enablesizelimit">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="number">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="general.sizeminimum.episode" type="number" label="30535" help="" parent="general.enablesizelimit">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<minimum>0.0</minimum>
+						<step>0.1</step>
+						<maximum>30.0</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.enablesizelimit">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="number">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="general.filters" type="string" help="">
+					<level>4</level>
+					<default>3D,AV1</default>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+			</group>
+			<group id="2" label="30149">
+				<setting id="general.chooseSorting" type="action" label="30633" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=chooseSorting)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>X
+				</setting>
+				<setting id="general.lastreleasenamepriority" type="boolean" label="30569" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sortmethod.1" type="integer" label="30582" help="">
+					<level>4</level>
+					<default>2</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30237">1</option>
+							<option label="30252">2</option>
+							<option label="30570">3</option>
+							<option label="30251">4</option>
+							<option label="30571">5</option>
+							<option label="30572">6</option>
+							<option label="30573">7</option>
+							<option label="30575">8</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortmethod.1.reverse" type="boolean" label="30580" help="" parent="general.sortmethod.1">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sortmethod.2" type="integer" label="30583" help="">
+					<level>4</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30237">1</option>
+							<option label="30252">2</option>
+							<option label="30570">3</option>
+							<option label="30251">4</option>
+							<option label="30571">5</option>
+							<option label="30572">6</option>
+							<option label="30573">7</option>
+							<option label="30575">8</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortmethod.2.reverse" type="boolean" label="30580" help="" parent="general.sortmethod.2">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sortmethod.3" type="integer" label="30584" help="">
+					<level>4</level>
+					<default>4</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30237">1</option>
+							<option label="30252">2</option>
+							<option label="30570">3</option>
+							<option label="30251">4</option>
+							<option label="30571">5</option>
+							<option label="30572">6</option>
+							<option label="30573">7</option>
+							<option label="30575">8</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortmethod.3.reverse" type="boolean" label="30580" help="" parent="general.sortmethod.3">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sortmethod.4" type="integer" label="30585" help="">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30237">1</option>
+							<option label="30252">2</option>
+							<option label="30570">3</option>
+							<option label="30251">4</option>
+							<option label="30571">5</option>
+							<option label="30572">6</option>
+							<option label="30573">7</option>
+							<option label="30575">8</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortmethod.4.reverse" type="boolean" label="30580" help="" parent="general.sortmethod.4">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sortmethod.5" type="integer" label="30586" help="">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30237">1</option>
+							<option label="30252">2</option>
+							<option label="30570">3</option>
+							<option label="30251">4</option>
+							<option label="30571">5</option>
+							<option label="30572">6</option>
+							<option label="30573">7</option>
+							<option label="30575">8</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortmethod.5.reverse" type="boolean" label="30580" help="" parent="general.sortmethod.5">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sortmethod.6" type="integer" label="30587" help="">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30237">1</option>
+							<option label="30252">2</option>
+							<option label="30570">3</option>
+							<option label="30251">4</option>
+							<option label="30571">5</option>
+							<option label="30572">6</option>
+							<option label="30573">7</option>
+							<option label="30575">8</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortmethod.6.reverse" type="boolean" label="30580" help="" parent="general.sortmethod.6">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sortmethod.7" type="integer" label="30588" help="">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30237">1</option>
+							<option label="30252">2</option>
+							<option label="30570">3</option>
+							<option label="30251">4</option>
+							<option label="30571">5</option>
+							<option label="30572">6</option>
+							<option label="30573">7</option>
+							<option label="30575">8</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortmethod.7.reverse" type="boolean" label="30580" help="" parent="general.sortmethod.7">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sortmethod.8" type="integer" label="30589" help="">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30237">1</option>
+							<option label="30252">2</option>
+							<option label="30570">3</option>
+							<option label="30251">4</option>
+							<option label="30571">5</option>
+							<option label="30572">6</option>
+							<option label="30573">7</option>
+							<option label="30575">8</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sortmethod.8.reverse" type="boolean" label="30580" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.sourcetypesort.1" type="integer" label="30576" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30249">1</option>
+							<option label="30470">2</option>
+							<option label="30057">3</option>
+							<option label="30058">4</option>
+							<option label="30315">5</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sourcetypesort.2" type="integer" label="30577" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30581">0</option>
+							<option label="30249">1</option>
+							<option label="30470">2</option>
+							<option label="30057">3</option>
+							<option label="30058">4</option>
+							<option label="30315">5</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sourcetypesort.3" type="integer" label="30578" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30581">0</option>
+							<option label="30249">1</option>
+							<option label="30470">2</option>
+							<option label="30057">3</option>
+							<option label="30058">4</option>
+							<option label="30315">5</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sourcetypesort.4" type="integer" label="30579" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30581">0</option>
+							<option label="30249">1</option>
+							<option label="30470">2</option>
+							<option label="30057">3</option>
+							<option label="30058">4</option>
+							<option label="30315">5</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.sourcetypesort.5" type="integer" label="30031" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30581">0</option>
+							<option label="30249">1</option>
+							<option label="30470">2</option>
+							<option label="30057">3</option>
+							<option label="30058">4</option>
+							<option label="30315">5</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.hdrsort.1" type="integer" label="30576" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>2</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30590">1</option>
+							<option label="30574">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.hdrsort.2" type="integer" label="30577" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30590">1</option>
+							<option label="30574">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.debridsort.1" type="integer" label="30576" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30134">1</option>
+							<option label="30135">2</option>
+							<option label="30333">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.debridsort.2" type="integer" label="30577" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30134">1</option>
+							<option label="30135">2</option>
+							<option label="30333">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.debridsort.3" type="integer" label="30578" help="" parent="general.sortmethod.8">
+					<level>4</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30513">0</option>
+							<option label="30134">1</option>
+							<option label="30135">2</option>
+							<option label="30333">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+			</group>
+		</category>
+		<category id="playback" label="30258" help="">
+			<group id="1" label="30084">
+				<setting id="general.playstyleMovie" type="integer" label="30191" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30086">0</option>
+							<option label="30087">1</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.playstyleEpisodes" type="integer" label="30085" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30086">0</option>
+							<option label="30087">1</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+			</group>
+			<group id="2" label="30602">
+				<setting id="smartplay.clickresume" type="boolean" label="30107" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.bookmarkstyle" type="integer" label="30109" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30329">0</option>
+							<option label="30232">1</option>
+							<option label="30330">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+			</group>
+			<group id="3" label="30603">
+				<setting id="general.autotrynext" type="boolean" label="30195" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.resolvefailurehandling" type="integer" label="30487" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30488">0</option>
+							<option label="30489">1</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+			</group>
+			<group id="4" label="30604">
+				<setting id="smartplay.playlistcreate" type="boolean" label="30106" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="smartPlay.preScrape" type="boolean" label="30108" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="smartplay.playlistcreate">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="smartplay.displaystyle" type="integer" label="30318" help="">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30175">0</option>
+							<option label="30176">1</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="smartplay.playlistcreate">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="smartplay.playingnextdialog" type="boolean" label="30104" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="smartplay.playlistcreate">true</condition>
+								<condition operator="is" setting="smartplay.displaystyle">0</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="playingnext.time" type="integer" label="30105" help="" parent="smartplay.playingnextdialog">
+					<level>0</level>
+					<default>30</default>
+					<constraints>
+						<minimum>10</minimum>
+						<maximum>180</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="smartplay.playlistcreate">true</condition>
+								<condition operator="is" setting="smartplay.playingnextdialog">true</condition>
+								<condition operator="is" setting="smartplay.displaystyle">0</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+				<setting id="playingnext.defaultaction" type="integer" label="30319" help="" parent="smartplay.playingnextdialog">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30320">0</option>
+							<option label="30321">1</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="smartplay.playlistcreate">true</condition>
+								<condition operator="is" setting="smartplay.playingnextdialog">true</condition>
+								<condition operator="is" setting="smartplay.displaystyle">0</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="smartplay.stillwatching" type="boolean" label="30322" help="">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="smartplay.playlistcreate">true</condition>
+								<condition operator="is" setting="smartplay.displaystyle">0</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="stillwatching.numepisodes" type="integer" label="30323" help="" parent="smartplay.stillwatching">
+					<level>0</level>
+					<default>3</default>
+					<constraints>
+						<minimum>1</minimum>
+						<maximum>10</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="smartplay.playlistcreate">true</condition>
+								<condition operator="is" setting="smartplay.stillwatching">true</condition>
+								<condition operator="is" setting="smartplay.displaystyle">0</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+			</group>
+		</category>
+		<category id="shortcuts" label="30142" help="">
+			<group id="1" label="30028">
+				<setting id="cache.clear" type="action" label="30028" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=clearCache)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="cache.cleartorrent" type="action" label="30039" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=clearTorrentCache)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="cache.clearsearch" type="action" label="30180" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=clearSearchHistory)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="cache.wipeaddon" type="action" label="30041" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=cleanInstall)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+			</group>
+			<group id="2" label="30215">
+				<setting id="traktdb.flush" type="action" label="30216" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=flushTraktActivities)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="traktdb.force" type="action" label="30217" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=forceTraktSync)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="traktdb.rebuild" type="action" label="30218" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=rebuildTraktDatabase)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+			</group>
+			<group id="3" label="30546">
+				<setting id="windowtests.testPlayingNext" type="action" label="30462" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=testPlayingNext)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="windowtests.testStillWatching" type="action" label="30463" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=testStillWatching)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="windowtests.testGetSourcesWindow" type="action" label="30613" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=testGetSourcesWindow)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="windowtests.testResolverWindow" type="action" label="30464" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=testResolverWindow)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="windowtests.testSourceSelectWindow" type="action" label="30465" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=testSourceSelectWindow)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="windowtests.testManualCacheWindow" type="action" label="30466" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=testManualCacheWindow)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="windowtests.testDownloadManagerWindow" type="action" label="30625" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=testDownloadManagerWindow)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action"/>
+				</setting>
+			</group>
+		</category>
+		<category id="advanced" label="30260" help="">
+			<group id="1" label="30605">
+				<setting id="general.menucaching" type="boolean" label="30193" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.force.widget.refresh.playback" type="boolean" label="30477" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="skin.testmenu" type="boolean" label="30545" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.setViews" type="boolean" label="30141" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.viewidswitch" type="boolean" label="30093" help="" parent="general.setViews">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.setViews">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="addon.view" type="integer" label="30184" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30223">0</option>
+							<option label="30224">1</option>
+							<option label="30225">2</option>
+							<option label="30226">3</option>
+							<option label="30227">4</option>
+							<option label="30228">5</option>
+							<option label="30229">6</option>
+							<option label="30230">7</option>
+							<option label="30231">8</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">false</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="addon.view.id" type="integer" label="30185" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">true</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30185</heading>
+					</control>
+				</setting>
+				<setting id="movie.view" type="integer" label="30094" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30223">0</option>
+							<option label="30224">1</option>
+							<option label="30225">2</option>
+							<option label="30226">3</option>
+							<option label="30227">4</option>
+							<option label="30228">5</option>
+							<option label="30229">6</option>
+							<option label="30230">7</option>
+							<option label="30231">8</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">false</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="movie.view.id" type="integer" label="30095" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">true</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30095</heading>
+					</control>
+				</setting>
+				<setting id="show.view" type="integer" label="30096" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30223">0</option>
+							<option label="30224">1</option>
+							<option label="30225">2</option>
+							<option label="30226">3</option>
+							<option label="30227">4</option>
+							<option label="30228">5</option>
+							<option label="30229">6</option>
+							<option label="30230">7</option>
+							<option label="30231">8</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">false</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="show.view.id" type="integer" label="30097" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">true</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30097</heading>
+					</control>
+				</setting>
+				<setting id="episode.view" type="integer" label="30098" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30223">0</option>
+							<option label="30224">1</option>
+							<option label="30225">2</option>
+							<option label="30226">3</option>
+							<option label="30227">4</option>
+							<option label="30228">5</option>
+							<option label="30229">6</option>
+							<option label="30230">7</option>
+							<option label="30231">8</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">false</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="episode.view.id" type="integer" label="30099" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">true</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30099</heading>
+					</control>
+				</setting>
+				<setting id="season.view" type="integer" label="30100" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="30223">0</option>
+							<option label="30224">1</option>
+							<option label="30225">2</option>
+							<option label="30226">3</option>
+							<option label="30227">4</option>
+							<option label="30228">5</option>
+							<option label="30229">6</option>
+							<option label="30230">7</option>
+							<option label="30231">8</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">false</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="season.view.id" type="integer" label="30101" help="" parent="general.setViews">
+					<level>0</level>
+					<default>0</default>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="general.viewidswitch">true</condition>
+								<condition operator="is" setting="general.setViews">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30101</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="2" label="30137">
+				<setting id="tmdb.apikey" type="string" label="30144" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30144</heading>
+					</control>
+				</setting>
+				<setting id="tvdb.apikey" type="string" label="30147" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30147</heading>
+					</control>
+				</setting>
+				<setting id="trakt.clientid" type="string" label="30145" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30145</heading>
+					</control>
+				</setting>
+				<setting id="trakt.secret" type="string" label="30146" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30146</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="3" label="30547">
+				<setting id="general.localtimezone" type="string" label="30606" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<enable>false</enable>
+					<control type="edit" format="string">
+						<heading>30606</heading>
+					</control>
+				</setting>
+				<setting id="general.manualtimezone" type="boolean" help="">
+					<level>4</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="general.chooseTimeZone" type="action" label="30548" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=chooseTimeZone)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.manualtimezone">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="button" format="action"/>
+				</setting>
+			</group>
+			<group id="4" label="30607">
+				<setting id="general.threadpoolScale" type="integer" label="30540" help="">
+					<level>0</level>
+					<default>1</default>
+					<constraints>
+						<options>
+							<option label="30541">0</option>
+							<option label="30542">1</option>
+							<option label="30543">2</option>
+							<option label="30544">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="reuselanguageinvoker.status" type="string" label="30532" help="">
+					<level>0</level>
+					<default>Disabled</default>
+					<enable>false</enable>
+					<control type="edit" format="string">
+						<heading>30532</heading>
+					</control>
+				</setting>
+				<setting id="reuselanguageinvoker.toggle" type="action" label="30533" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.seren/?action=toggleLanguageInvoker)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+			</group>
+		</category>
+	</section>
 </settings>

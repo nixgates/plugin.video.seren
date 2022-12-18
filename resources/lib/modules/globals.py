@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 # Import Thread lock workaround
 # noinspection PyUnresolvedReferences
-import _strptime
+import contextlib
 import json
 import os
 import re
 import traceback
 import unicodedata
+from functools import cached_property
+from urllib import parse
+from xml.etree import ElementTree
 
 import xbmc
 import xbmcaddon
@@ -18,8 +18,8 @@ import xbmcvfs
 from unidecode import unidecode
 
 from resources.lib.common import tools
-from resources.lib.common.tools import cached_property
-from resources.lib.modules.settings_cache import PersistedSettingsCache, RuntimeSettingsCache
+from resources.lib.modules.settings_cache import PersistedSettingsCache
+from resources.lib.modules.settings_cache import RuntimeSettingsCache
 from resources.lib.third_party import pytz
 
 viewTypes = [
@@ -176,7 +176,7 @@ colorChart = [
     "saddlebrown",
 ]
 
-info_labels = [
+info_labels = {
     "genre",
     "country",
     "year",
@@ -225,22 +225,22 @@ info_labels = [
     "dateadded",
     "mediatype",
     "dbid",
-]
+}
 
-info_dates = [
+info_dates = {
     "premiered",
     "aired",
     "lastplayed",
     "dateadded",
-]
+}
 
 listitem_properties = [
-    ("awards", "Awards"),
-    ("oscar_wins", "Oscar_Wins"),
-    ("oscar_nominations", "Oscar_Nominations"),
-    ("award_wins", "Award_Wins"),
-    ("award_nominations", "Award_Nominations"),
-    ("metacritic_rating", "Metacritic_Rating"),
+    (("awards",), "Awards"),
+    (("oscar_wins",), "Oscar_Wins"),
+    (("oscar_nominations",), "Oscar_Nominations"),
+    (("award_wins",), "Award_Wins"),
+    (("award_nominations",), "Award_Nominations"),
+    (("metacritic_rating",), "Metacritic_Rating"),
     (("rating.tmdb", "rating"), "TMDb_Rating"),
     (("rating.tmdb", "votes"), "TMDb_Votes"),
     (("rating.tvdb", "rating"), "Tvdb_Rating"),
@@ -249,18 +249,18 @@ listitem_properties = [
     (("rating.imdb", "votes"), "IMDb_Votes"),
     (("rating.trakt", "rating"), "Trakt_Rating"),
     (("rating.trakt", "votes"), "Trakt_Votes"),
-    ("rottentomatoes_rating", "RottenTomatoes_Rating"),
-    ("rottentomatoes_image", "RottenTomatoes_Image"),
-    ("rottentomatoes_reviewstotal", "RottenTomatoes_ReviewsTotal"),
-    ("rottentomatoes_reviewsfresh", "RottenTomatoes_ReviewsFresh"),
-    ("rottentomatoes_reviewsrotten", "RottenTomatoes_ReviewsRotten"),
-    ("rottentomatoes_consensus", "RottenTomatoes_Consensus"),
-    ("rottentomatoes_usermeter", "RottenTomatoes_UserMeter"),
-    ("rottentomatoes_userreviews", "RottenTomatoes_UserReviews"),
+    (("rottentomatoes_rating",), "RottenTomatoes_Rating"),
+    (("rottentomatoes_image",), "RottenTomatoes_Image"),
+    (("rottentomatoes_reviewstotal",), "RottenTomatoes_ReviewsTotal"),
+    (("rottentomatoes_reviewsfresh",), "RottenTomatoes_ReviewsFresh"),
+    (("rottentomatoes_reviewsrotten",), "RottenTomatoes_ReviewsRotten"),
+    (("rottentomatoes_consensus",), "RottenTomatoes_Consensus"),
+    (("rottentomatoes_usermeter",), "RottenTomatoes_UserMeter"),
+    (("rottentomatoes_userreviews",), "RottenTomatoes_UserReviews"),
 ]
 
 
-class GlobalVariables(object):
+class GlobalVariables:
     CONTENT_MENU = ""
     CONTENT_FILES = "files"
     CONTENT_MOVIE = "movies"
@@ -276,12 +276,6 @@ class GlobalVariables(object):
     MEDIA_SEASON = "season"
     MEDIA_EPISODE = "episode"
 
-    DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
-    DATE_TIME_FORMAT_ZULU = DATE_TIME_FORMAT + ".000Z"
-    DATE_FORMAT = "%Y-%m-%d"
-
-    PYTHON3 = tools.PYTHON3
-    UNICODE = tools.unicode
     SEMVER_REGEX = re.compile(r"^((?:\d+\.){2}\d+)")
 
     def __init__(self):
@@ -295,6 +289,8 @@ class GlobalVariables(object):
         self.USER_AGENT = None
         self.DEFAULT_FANART = None
         self.DEFAULT_ICON = None
+        self.DEFAULT_LOGO = None
+        self.DEFAULT_POSTER = None
         self.NEXT_PAGE_ICON = None
         self.ADDON_USERDATA_PATH = None
         self.SETTINGS_CACHE = None
@@ -335,18 +331,20 @@ class GlobalVariables(object):
     def init_globals(self, argv=None, addon_id=None):
         self.IS_ADDON_FIRSTRUN = self.IS_ADDON_FIRSTRUN is None
         self.ADDON = xbmcaddon.Addon()
-        self.ADDON_ID = addon_id if addon_id else self.ADDON.getAddonInfo("id")
+        self.ADDON_ID = addon_id or self.ADDON.getAddonInfo("id")
         self.ADDON_NAME = self.ADDON.getAddonInfo("name")
         self.VERSION = self.ADDON.getAddonInfo("version")
         self.CLEAN_VERSION = self.SEMVER_REGEX.findall(self.VERSION)[0]
-        self.USER_AGENT = "{} - {}".format(self.ADDON_NAME, self.CLEAN_VERSION)
+        self.USER_AGENT = f"{self.ADDON_NAME} - {self.CLEAN_VERSION}"
         self._init_kodi()
         self._init_settings_cache()
         self._init_local_timezone()
         self._init_paths()
         self.DEFAULT_FANART = self.ADDON.getAddonInfo("fanart")
         self.DEFAULT_ICON = self.ADDON.getAddonInfo("icon")
-        self.NEXT_PAGE_ICON = self.IMAGES_PATH + "next.png"
+        self.DEFAULT_LOGO = f"{self.IMAGES_PATH}logo-seren-3.png"
+        self.DEFAULT_POSTER = f"{self.IMAGES_PATH}poster-seren-3.png"
+        self.NEXT_PAGE_ICON = f"{self.IMAGES_PATH}next.png"
         self.init_request(argv)
         self._init_cache()
 
@@ -358,8 +356,7 @@ class GlobalVariables(object):
         self.KODI_TIME_FORMAT = xbmc.getRegion("time")
         self.KODI_TIME_NO_SECONDS_FORMAT = self.KODI_TIME_FORMAT.replace(":%S", "")
         self.KODI_FULL_VERSION = xbmc.getInfoLabel("System.BuildVersion")
-        version = re.findall(r'(?:(?:((?:\d+\.?){1,3}\S+))?\s+\(((?:\d+\.?){2,3})\))', self.KODI_FULL_VERSION)
-        if version:
+        if version := re.findall(r'(?:(?:((?:\d+\.?){1,3}\S+))?\s+\(((?:\d+\.?){2,3})\))', self.KODI_FULL_VERSION):
             self.KODI_FULL_VERSION = version[0][1]
             if len(version[0][0]) > 1:
                 pre_ver = version[0][0][:2]
@@ -384,10 +381,9 @@ class GlobalVariables(object):
             if timezone_string:
                 self.LOCAL_TIMEZONE = pytz.timezone(timezone_string)
         except pytz.UnknownTimeZoneError:
-            self.log("Invalid local timezone '{}' in settings.xml".format(timezone_string), "debug")
+            self.log(f"Invalid local timezone '{timezone_string}' in settings.xml", "debug")
         except Exception as e:
-            self.log("Error using local timezone '{}' in settings.xml: {}".format(timezone_string, e),
-                     "warning")
+            self.log(f"Error using local timezone '{timezone_string}' in settings.xml: {e}", "warning")
         finally:
             if not self.LOCAL_TIMEZONE or self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
                 self.init_local_timezone()
@@ -409,29 +405,25 @@ class GlobalVariables(object):
             except pytz.UnknownTimeZoneError:
                 if timezone_string:
                     self.log(
-                        "Kodi provided an invalid local timezone '{}', trying a different approach".format(
-                            timezone_string
-                        ),
-                        "warning"
+                        f"Kodi provided an invalid local timezone '{timezone_string}', trying a different approach",
+                        "warning",
                     )
                 else:
                     self.log(
                         "Kodi does not support locale.timezone JSON RPC call on your platform, trying a different "
                         "approach",
-                        "debug"
+                        "debug",
                     )
             except Exception as e:
-                self.log(
-                    "Error detecting local timezone with Kodi, trying a different approach: {}".format(e),
-                    "warning"
-                )
+                self.log(f"Error detecting local timezone with Kodi, trying a different approach: {e}", "warning")
             # If Kodi detection failed, fall back on tzlocal
             try:
                 if not self.LOCAL_TIMEZONE or self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
                     from resources.lib.third_party import tzlocal
+
                     self.LOCAL_TIMEZONE = tzlocal.get_localzone()
             except Exception as e:
-                self.log("Error detecting local timezone with alternative approach: {}".format(e), "warning")
+                self.log(f"Error detecting local timezone with alternative approach: {e}", "warning")
             # If we still don't have a timezone, try manual setting
             try:
                 if not self.LOCAL_TIMEZONE or self.LOCAL_TIMEZONE == self.UTC_TIMEZONE:
@@ -442,10 +434,9 @@ class GlobalVariables(object):
                 else:
                     g.set_setting("general.manualtimezone", False)
             except pytz.UnknownTimeZoneError:
-                self.log("Invalid local timezone '{}' in settings.xml".format(timezone_string), "debug")
+                self.log(f"Invalid local timezone '{timezone_string}' in settings.xml", "debug")
             except Exception as e:
-                self.log("Error using local timezone '{}' in settings.xml: {}".format(timezone_string, e),
-                         "warning")
+                self.log(f"Error using local timezone '{timezone_string}' in settings.xml: {e}", "warning")
         finally:
             # If Kodi and tzocal detection fails and we don't have a valid manual setting, fallback to UTC
             if not self.LOCAL_TIMEZONE:
@@ -454,7 +445,7 @@ class GlobalVariables(object):
                 self.log(
                     "Unable to detect local timezone, defaulting to UTC for displayed dates/times. "
                     "Note that this does not affect filtering or sorting, only display",
-                    "debug"
+                    "debug",
                 )
             self.set_setting("general.localtimezone", self.LOCAL_TIMEZONE.zone)
 
@@ -471,10 +462,7 @@ class GlobalVariables(object):
         elif xbmc.getCondVisibility("system.platform.xbox"):
             platform = "xbox"
         elif xbmc.getCondVisibility("system.platform.windows"):
-            if "Users\\UserMgr" in os.environ.get("TMP"):
-                platform = "xbox"
-            else:
-                platform = "windows"
+            platform = "xbox" if "Users\\UserMgr" in os.environ.get("TMP") else "windows"
         elif xbmc.getCondVisibility("system.platform.osx"):
             platform = "osx"
 
@@ -489,7 +477,7 @@ class GlobalVariables(object):
         if argv is None:
             return
 
-        self.URL = tools.urlparse(argv[0])
+        self.URL = parse.urlparse(argv[0])
         try:
             self.PLUGIN_HANDLE = int(argv[1])
             self.IS_SERVICE = False
@@ -497,29 +485,20 @@ class GlobalVariables(object):
             self.PLUGIN_HANDLE = 0
             self.IS_SERVICE = True
 
-        if self.URL[1] != "":
-            self.BASE_URL = "{scheme}://{netloc}".format(
-                scheme=self.URL[0], netloc=self.URL[1]
-            )
-        else:
-            self.BASE_URL = ""
-        self.PATH = tools.unquote(self.URL[2])
+        self.BASE_URL = f"{self.URL[0]}://{self.URL[1]}" if self.URL[1] != "" else ""
+        self.PATH = parse.unquote(self.URL[2])
         try:
             self.PARAM_STRING = argv[2].lstrip('?/')
         except IndexError:
             self.PARAM_STRING = ""
-        self.REQUEST_PARAMS = self.legacy_params_converter(
-            dict(tools.parse_qsl(self.PARAM_STRING))
-        )
+        self.REQUEST_PARAMS = self.legacy_params_converter(dict(parse.parse_qsl(self.PARAM_STRING)))
         if "action_args" in self.REQUEST_PARAMS:
-            self.REQUEST_PARAMS["action_args"] = tools.deconstruct_action_args(
-                self.REQUEST_PARAMS["action_args"]
-            )
+            self.REQUEST_PARAMS["action_args"] = tools.deconstruct_action_args(self.REQUEST_PARAMS["action_args"])
             if isinstance(self.REQUEST_PARAMS["action_args"], dict):
                 self.REQUEST_PARAMS["action_args"] = self.legacy_action_args_converter(
                     self.REQUEST_PARAMS["action_args"]
                 )
-        self.FROM_WIDGET = self.REQUEST_PARAMS.get("from_widget", "true") == "true"
+        self.FROM_WIDGET = not self.is_addon_visible()
         self.PAGE = int(g.REQUEST_PARAMS.get("page", 1))
 
     @staticmethod
@@ -531,9 +510,7 @@ class GlobalVariables(object):
             from resources.lib.database.trakt_sync import shows
 
             action_args.update(
-                shows.TraktSyncDatabase().get_season_action_args(
-                    action_args["trakt_id"], action_args["season"]
-                )
+                shows.TraktSyncDatabase().get_season_action_args(action_args["trakt_id"], action_args["season"])
             )
 
         if "episode" in action_args["item_type"]:
@@ -558,128 +535,89 @@ class GlobalVariables(object):
         if "actionArgs" in params:
             params["action_args"] = params.pop("actionArgs")
         if "action" in params:
-            if "moviesTrending" == params["action"]:
+            if params["action"] == "moviesTrending":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "trending"
                 params["mediatype"] = "movies"
-            if "moviesPopular" == params["action"]:
+            if params["action"] == "moviesPopular":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "popular"
                 params["mediatype"] = "movies"
-            if "moviesWatched" == params["action"]:
+            if params["action"] == "moviesWatched":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "watched"
                 params["mediatype"] = "movies"
-            if "moviesCollected" == params["action"]:
+            if params["action"] == "moviesCollected":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "collected"
                 params["mediatype"] = "movies"
-            if "moviesAnticipated" == params["action"]:
+            if params["action"] == "moviesAnticipated":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "anticipated"
                 params["mediatype"] = "movies"
-            if "moviesBoxOffice" == params["action"]:
+            if params["action"] == "moviesBoxOffice":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "boxoffice"
                 params["mediatype"] = "movies"
-            if "showsTrending" == params["action"]:
+            if params["action"] == "showsTrending":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "trending"
                 params["mediatype"] = "shows"
-            if "showsPopular" == params["action"]:
+            if params["action"] == "showsPopular":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "popular"
                 params["mediatype"] = "shows"
-            if "showsWatched" == params["action"]:
+            if params["action"] == "showsWatched":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "watched"
                 params["mediatype"] = "shows"
-            if "showsCollected" == params["action"]:
+            if params["action"] == "showsCollected":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "collected"
                 params["mediatype"] = "shows"
-            if "showsAnticipated" == params["action"]:
+            if params["action"] == "showsAnticipated":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "anticipated"
                 params["mediatype"] = "shows"
-            if "showsBoxOffice" == params["action"]:
+            if params["action"] == "showsBoxOffice":
                 params["action"] = "genericEndpoint"
                 params["endpoint"] = "boxoffice"
                 params["mediatype"] = "shows"
         return params
 
     def _init_paths(self):
-        self.ADDONS_PATH = tools.translate_path(
-            os.path.join("special://home/", "addons/")
-        )
-        self.ADDON_PATH = tools.translate_path(
-            os.path.join(
-                "special://home/", "addons/{}".format(self.ADDON_ID.lower())
-            )
-        )
-        self.ADDON_DATA_PATH = tools.translate_path(
-            self.ADDON.getAddonInfo("path")
-        )  # Addon folder
+        self.ADDONS_PATH = tools.translate_path(os.path.join("special://home/", "addons/"))
+        self.ADDON_PATH = tools.translate_path(os.path.join("special://home/", f"addons/{self.ADDON_ID.lower()}"))
+        self.ADDON_DATA_PATH = tools.translate_path(self.ADDON.getAddonInfo("path"))  # Addon folder
         self.ADDON_USERDATA_PATH = tools.translate_path(
-            "special://profile/addon_data/{}/".format(self.ADDON_ID)
+            f"special://profile/addon_data/{self.ADDON_ID}/"
         )  # Addon user data folder
-        self.SETTINGS_PATH = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "settings.xml")
-        )
-        self.ADVANCED_SETTINGS_PATH = tools.translate_path(
-            "special://profile/advancedsettings.xml"
-        )
+        self.SETTINGS_PATH = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "settings.xml"))
+        self.ADVANCED_SETTINGS_PATH = tools.translate_path("special://profile/advancedsettings.xml")
         self.KODI_DATABASE_PATH = tools.translate_path("special://database/")
-        self.GUI_PATH = tools.translate_path(
-            os.path.join(self.ADDON_DATA_PATH, "resources", "lib", "gui")
-        )
-        self.IMAGES_PATH = self.ADDON.getAddonInfo("path") + "/resources/images/"
-        self.GENRES_PATH = self.IMAGES_PATH + "genres/"
-        self.SKINS_PATH = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "skins")
-        )
-        self.CACHE_DB_PATH = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "cache.db")
-        )
-        self.TORRENT_CACHE = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "torrentCache.db")
-        )
-        self.TORRENT_ASSIST = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "torentAssist.db")
-        )
-        self.PROVIDER_CACHE_DB_PATH = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "providers.db")
-        )
-        self.PREMIUMIZE_DB_PATH = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "premiumize.db")
-        )
-        self.TRAKT_SYNC_DB_PATH = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "traktSync.db")
-        )
-        self.SEARCH_HISTORY_DB_PATH = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "search.db")
-        )
-        self.SKINS_DB_PATH = tools.translate_path(
-            os.path.join(self.ADDON_USERDATA_PATH, "skins.db")
-        )
-        self._confirm_and_init_download_path()
-
-    def _confirm_and_init_download_path(self):
-        self.DOWNLOAD_PATH = self.get_setting("download.location")
-        if self.DOWNLOAD_PATH == "userdata" or self.DOWNLOAD_PATH is None:
-            self.DOWNLOAD_PATH = tools.ensure_path_is_dir(
-                os.path.join(g.ADDON_USERDATA_PATH, "Downloads")
-            )
-        if not xbmcvfs.exists(self.DOWNLOAD_PATH):
-            xbmcvfs.mkdirs(self.DOWNLOAD_PATH)
+        self.GUI_PATH = tools.translate_path(os.path.join(self.ADDON_DATA_PATH, "resources", "lib", "gui"))
+        self.IMAGES_PATH = f"{self.ADDON.getAddonInfo('path')}/resources/images/"
+        self.ICONS_PATH = f"{self.IMAGES_PATH}icons/"
+        self.GENRES_PATH = f"{self.IMAGES_PATH}genres/"
+        self.SKINS_PATH = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "skins"))
+        self.CACHE_DB_PATH = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "cache.db"))
+        self.TORRENT_CACHE = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "torrentCache.db"))
+        self.TORRENT_ASSIST = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "torentAssist.db"))
+        self.PROVIDER_CACHE_DB_PATH = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "providers.db"))
+        self.PREMIUMIZE_DB_PATH = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "premiumize.db"))
+        self.TRAKT_SYNC_DB_PATH = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "traktSync.db"))
+        self.SEARCH_HISTORY_DB_PATH = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "search.db"))
+        self.SKINS_DB_PATH = tools.translate_path(os.path.join(self.ADDON_USERDATA_PATH, "skins.db"))
 
     def get_kodi_video_db_connection(self):
         config = self.get_kodi_video_db_config()
         if config["type"] == "sqlite3":
             from resources.lib.database import SQLiteConnection
-            return SQLiteConnection(os.path.join(self.KODI_DATABASE_PATH, "{}.db".format(config["database"])))
+
+            return SQLiteConnection(os.path.join(self.KODI_DATABASE_PATH, f"{config['database']}.db"))
         elif config["type"] == "mysql":
             from resources.lib.database import MySqlConnection
+
             return MySqlConnection(config)
 
     def get_kodi_database_version(self):
@@ -695,18 +633,13 @@ class GlobalVariables(object):
         raise KeyError("Unsupported kodi version")
 
     def get_kodi_video_db_config(self):
-        result = {
-            "type": "sqlite3",
-            "database": "MyVideos{}".format(self.get_kodi_database_version())
-        }
+        result = {"type": "sqlite3", "database": f"MyVideos{self.get_kodi_database_version()}"}
 
         if xbmcvfs.exists(self.ADVANCED_SETTINGS_PATH):
-            advanced_settings_text = g.read_all_text(self.ADVANCED_SETTINGS_PATH)
-            if advanced_settings_text:
+            if advanced_settings_text := g.read_all_text(self.ADVANCED_SETTINGS_PATH):
                 try:
-                    advanced_settings = tools.ElementTree.fromstring(advanced_settings_text)
-                    settings = advanced_settings.find("videodatabase")
-                    if settings:
+                    advanced_settings = ElementTree.fromstring(advanced_settings_text)
+                    if settings := advanced_settings.find("videodatabase"):
                         for setting in settings:
                             if setting.tag == 'type':
                                 result["type"] = setting.text
@@ -720,18 +653,24 @@ class GlobalVariables(object):
                                 result["user"] = setting.text
                             elif setting.tag == 'pass':
                                 result["password"] = setting.text
-                except tools.ElementTree.ParseError as pe:
-                    g.log("Failed to parse advanced settings.xml: {}".format(pe), "warning")
+                except ElementTree.ParseError as pe:
+                    g.log(f"Failed to parse advanced settings.xml: {pe}", "warning")
         return result
 
     def clear_kodi_bookmarks(self):
         with self.get_kodi_video_db_connection() as video_database:
-            file_ids = [str(i["idFile"]) for i in video_database.fetchall(
-                "SELECT * FROM files WHERE strFilename LIKE '%plugin.video.seren%'")]
-            if not file_ids:
+            if file_ids := [
+                str(i["idFile"])
+                for i in video_database.fetchall("SELECT * FROM files WHERE strFilename LIKE '%plugin.video.seren%'")
+            ]:
+                video_database.execute_sql(
+                    [
+                        f"DELETE FROM {table} WHERE idFile IN ({','.join(file_ids)})"
+                        for table in ["bookmark", "streamdetails", "files"]
+                    ]
+                )
+            else:
                 return
-            video_database.execute_sql(["DELETE FROM {} WHERE idFile IN ({})".format(table, ",".join(file_ids))
-                                        for table in ["bookmark", "streamdetails", "files"]])
 
     # region runtime settings
     def set_runtime_setting(self, setting_id, value):
@@ -741,9 +680,9 @@ class GlobalVariables(object):
         Lists and Dict may only contain simple types
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param value: The value to store in settings
-        :type value: str|unicode|float|int|bool|list|dict
+        :type value: str|float|int|bool|list|dict
         """
         self.RUNTIME_SETTINGS_CACHE.set_setting(setting_id, value)
 
@@ -752,7 +691,7 @@ class GlobalVariables(object):
         Clear a runtime setting from the cache.
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         """
         self.RUNTIME_SETTINGS_CACHE.clear_setting(setting_id)
 
@@ -761,12 +700,12 @@ class GlobalVariables(object):
         Get a runtime setting value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
-        :type default_value: str|unicode|float|int|bool
+        :type default_value: str|float|int|bool
         :return: The value of the setting.
                  If the setting is not stored, the optional default_value if provided or None
-        :rtype: str|unicode|float|int|bool|list|dict
+        :rtype: str|float|int|bool|list|dict
         """
         return self.RUNTIME_SETTINGS_CACHE.get_setting(setting_id, default_value)
 
@@ -775,7 +714,7 @@ class GlobalVariables(object):
         Get a runtime setting as a float value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: float
         :return: The value of the setting.
@@ -789,7 +728,7 @@ class GlobalVariables(object):
         Get a runtime setting as an int value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: int
         :return: The value of the setting.
@@ -803,7 +742,7 @@ class GlobalVariables(object):
         Get a runtime setting as a bool value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: bool
         :return: The value of the setting.
@@ -811,6 +750,7 @@ class GlobalVariables(object):
         :rtype: bool
         """
         return self.RUNTIME_SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
+
     # endregion
 
     # region KODI setting
@@ -819,9 +759,9 @@ class GlobalVariables(object):
         Set a setting value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param value: The value to store in settings
-        :type value: str|unicode|float|int|bool
+        :type value: str|float|int|bool
         """
         self.SETTINGS_CACHE.set_setting(setting_id, value)
 
@@ -830,7 +770,7 @@ class GlobalVariables(object):
         Clear a setting from the cache and settings.xml
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         """
         self.SETTINGS_CACHE.clear_setting(setting_id)
 
@@ -839,12 +779,12 @@ class GlobalVariables(object):
         Get a setting value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value:
-        :type default_value: str|unicode
+        :type default_value: str
         :return: The value of the setting as a string
                  If the setting is not stored, the optional default_value if provided or None
-        :rtype: str|unicode
+        :rtype: str
         """
         return self.SETTINGS_CACHE.get_setting(setting_id, default_value)
 
@@ -853,7 +793,7 @@ class GlobalVariables(object):
         Get a setting as a float value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: float
         :return: The value of the setting.
@@ -867,7 +807,7 @@ class GlobalVariables(object):
         Get a setting as an int value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: int
         :return: The value of the setting.
@@ -881,7 +821,7 @@ class GlobalVariables(object):
         Get a setting as a bool value
 
         :param setting_id: The name of the setting
-        :type setting_id: str|unicode
+        :type setting_id: str
         :param default_value: An optional default value to provide if the setting is not stored
         :type default_value: bool
         :return: The value of the setting.
@@ -889,6 +829,7 @@ class GlobalVariables(object):
         :rtype: bool
         """
         return self.SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
+
     # endregion
 
     def get_language_string(self, localization_id, addon=True):
@@ -901,9 +842,9 @@ class GlobalVariables(object):
         :param addon: True to retrieve from addon, False from Kodi localizations.  Default True
         :type addon bool
         :return: The localized text matching the localization_id from the appropriate localization files.
-        :rtype: str|unicode
+        :rtype: str
         """
-        cache_id = "A" + str(localization_id) if addon else "K" + str(localization_id)
+        cache_id = f"A{str(localization_id)}" if addon else f"K{str(localization_id)}"
         text = self.LANGUAGE_CACHE.get(cache_id)
         if not text:
             text = self.ADDON.getLocalizedString(localization_id) if addon else xbmc.getLocalizedString(localization_id)
@@ -912,7 +853,6 @@ class GlobalVariables(object):
         return text
 
     def get_view_type(self, content_type):
-        no_view_type = 0
         view_type = None
 
         if not self.get_bool_setting("general.viewidswitch"):
@@ -943,11 +883,11 @@ class GlobalVariables(object):
             if view_type is not None and view_type.isdigit() and int(view_type) > 0:
                 return int(view_type)
 
-        return no_view_type
+        return 0
 
     def log(self, msg, level="info"):
         msg = msg
-        msg = "{} ({}): {}".format(self.ADDON_NAME.upper(), self.PLUGIN_HANDLE, msg)
+        msg = f"{self.ADDON_NAME.upper()} ({self.PLUGIN_HANDLE}): {msg}"
         if level == "error":
             xbmc.log(msg, level=xbmc.LOGERROR)
         elif level == "info":
@@ -969,11 +909,8 @@ class GlobalVariables(object):
     def color_picker(self):
         """Method that generates color list and handles the popup."""
         select_list = [self.color_string("inherit")]
-        for i in colorChart:
-            select_list.append(self.color_string(i, i))
-        color = xbmcgui.Dialog().select(
-            "{}: {}".format(self.ADDON_NAME, self.get_language_string(30016)), select_list
-        )
+        select_list.extend(self.color_string(i, i) for i in colorChart)
+        color = xbmcgui.Dialog().select(f"{self.ADDON_NAME}: {self.get_language_string(30016)}", select_list)
         if color == -1:
             return
         if color == 0:
@@ -987,83 +924,54 @@ class GlobalVariables(object):
 
     @staticmethod
     def _try_get_color_from_skin():
-        skin_dir = xbmc.getSkinDir()
-        skin_color = None
-        if not skin_dir:
-            return None
-        skin_theme = xbmc.getInfoLabel("Skin.CurrentTheme")
-        if not skin_theme:
-            return None
-        skin_theme = skin_theme.lower()
-        if skin_dir == "skin.confluence":
-            skin_color = "FFEB9E17"
-        elif skin_dir == "skin.estuary":
-            if "brown" in skin_theme:
-                skin_color = "FFFF4400"
-            elif "charcoal" in skin_theme:
-                skin_color = "FF11E7B1"
-            elif "chartreuse" in skin_theme:
-                skin_color = "FF24C6C9"
-            elif "concrete" in skin_theme:
-                skin_color = "FFFF8C00"
-            elif "default" in skin_theme:
-                skin_color = "FF11E7B1"
-            elif "gold" in skin_theme:
-                skin_color = "FFFFF000"
-            elif "green" in skin_theme:
-                skin_color = "FF14D519"
-            elif "maroon" in skin_theme:
-                skin_color = "FF24C6C9"
-            elif "midnight" in skin_theme:
-                skin_color = "FF5BE5EE"
-            elif "orange" in skin_theme:
-                skin_color = "FFFFF100"
-            elif "pink" in skin_theme:
-                skin_color = "FF94D800"
-            elif "rose" in skin_theme:
-                skin_color = "FFFF0261"
-            elif "teal" in skin_theme:
-                skin_color = "FFC67F03"
-            elif "violet" in skin_theme:
-                skin_color = "FFFF0054"
-        elif skin_dir == "skin.estouchy":
-            skin_color = "FF11E7B1"
-        elif skin_dir == "skin.arctic.horizon":
-            skin_color = "ff0385b5"
-        elif skin_dir == "skin.arctic.zephyr":
-            skin_color = "ff0385b5"
-        elif skin_dir == "skin.arctic.zephyr.2":
-            skin_color = "ff0385b5"
-        elif skin_dir == "skin.aura":
-            skin_color = "ff0385b5 "
-        elif skin_dir == "skin.eminence.2":
-            skin_color = "ff287ba8"
-        elif skin_dir == "skin.eminence":
-            if "crimson" in skin_theme:
-                skin_color = "ffdc143c"
-            elif "emerald" in skin_theme:
-                skin_color = "ff46b995"
-            elif "lilac" in skin_theme:
-                skin_color = "ffa682a6"
-            elif "lime" in skin_theme:
-                skin_color = "FFb5e533"
-            elif "magenta" in skin_theme:
-                skin_color = "FFe533b5"
-            elif "orange" in skin_theme:
-                skin_color = "ffd76c38"
-            elif "default" in skin_theme:
-                skin_color = "FF33b5e5"
-        elif skin_dir == "skin.aura":
-            skin_color = "deepskyblue"
-        elif skin_dir == "skin.fuse.neue":
-            skin_color = "ffe53564"
-        elif skin_dir == "skin.auramod":
-            skin_color = "deepskyblue"
+        skin_color_lookup = {
+            "skin.arctic.horizon": "ff0385b5",
+            "skin.arctic.horizon.2": "ff0385b5",
+            "skin.arctic.zephyr": "ff0385b5",
+            "skin.arctic.zephyr.2": "ff0385b5",
+            "skin.aura": "ff0385b5",
+            "skin.auramod": "deepskyblue",
+            "skin.confluence": "ffeb9e17",
+            "skin.eminence": {
+                "default": "ff33b5e5",
+                "crimson": "ffdc143c",
+                "emerald": "ffdc143c",
+                "lilac": "ffa682a6",
+                "lime": "ffb5e533",
+                "magenta": "ffe533b5",
+                "orange": "ffd76c38",
+            },
+            "skin.eminence.2": "ff287ba8",
+            "skin.estouchy": "ff11e7b1",
+            "skin.estuary": {
+                "default": "ff11e7b1",
+                "brown": "ffff4400",
+                "charcoal": "ff11e7b1",
+                "chartreuse": "ff24c6c9",
+                "concrete": "ffff8c00",
+                "gold": "fffff000",
+                "green": "ff14d519",
+                "maroon": "ff24c6c9",
+                "midnight": "ff5be5ee",
+                "orange": "fffff100",
+                "pink": "ff94d800",
+                "rose": "ffff0261",
+                "teal": "ffc67f03",
+                "violet": "ffff0054",
+            },
+            "skin.fuse.neue": "ffe53564",
+        }
 
-        result = xbmc.getInfoLabel(
-            "Skin.String({})".format("focuscolor.name")  # jurial based skins.
-        )
-        return result if result else skin_color
+        if focus_color := xbmc.getInfoLabel("Skin.String(focuscolor.name)"):  # jurial based skins.
+            return focus_color
+
+        if skin_dir := xbmc.getSkinDir():
+            if isinstance(skin_color := skin_color_lookup.get(skin_dir), dict):
+                skin_color = skin_color.get(
+                    xbmc.getInfoLabel("Skin.CurrentTheme").lower(), skin_color.get("default", None)
+                )
+            return skin_color
+        return None
 
     def get_user_text_color(self):
         """Get the user selected color setting when nothing is selecting it returns
@@ -1073,20 +981,13 @@ class GlobalVariables(object):
         :rtype:str
         """
         color = self.get_setting("general.displayColor")
-        skin_color = self._try_get_color_from_skin()
-        if not color or color == "None":
-            if not skin_color:
-                color = "deepskyblue"
-            else:
-                color = skin_color
-        if color == "inherit":
-            color = skin_color
-        if not color:
-            color = "deepskyblue"
+        if not color or color == "None" or color == "inherit":
+            color = self._try_get_color_from_skin() or "deepskyblue"
+
         return color
 
     def color_string(self, text, color=None):
-        """Method that wraps the the text with the supplied color, or takes the user default.
+        """Method that wraps the text with the supplied color, or takes the user default.
 
         :param text:Text that needs to be wrapped
         :type text:str|int|float
@@ -1098,26 +999,22 @@ class GlobalVariables(object):
         if color == "default" or not color or color == "inherit":
             color = self.get_user_text_color()
 
-        return "[COLOR {}]{}[/COLOR]".format(color, text)
+        return f"[COLOR {color}]{text}[/COLOR]"
 
     def clear_cache(self, silent=False):
         if not silent:
-            confirm = xbmcgui.Dialog().yesno(
-                self.ADDON_NAME, self.get_language_string(30029)
-            )
+            confirm = xbmcgui.Dialog().yesno(self.ADDON_NAME, self.get_language_string(30029))
             if confirm != 1:
                 return
         g.CACHE.clear_all()
         g._init_cache()
-        self.log(self.ADDON_NAME + ": Cache Cleared", "debug")
+        self.log(f"{self.ADDON_NAME}: Cache Cleared", "debug")
         if not silent:
             xbmcgui.Dialog().notification(self.ADDON_NAME, self.get_language_string(30052))
 
     def cancel_playback(self):
         self.PLAYLIST.clear()
-        xbmcplugin.setResolvedUrl(
-            self.PLUGIN_HANDLE, False, xbmcgui.ListItem(offscreen=True)
-        )
+        xbmcplugin.setResolvedUrl(self.PLUGIN_HANDLE, False, xbmcgui.ListItem(offscreen=True))
         self.close_busy_dialog()
         self.close_all_dialogs()
 
@@ -1139,15 +1036,12 @@ class GlobalVariables(object):
         """Deaccent the provided text leaving other unicode characters intact
         Example: Mîxéd ДљфӭЖ Tëst -> Mixed ДљфэЖ Test
         :param: text: Text to deaccent
-        :type text: str|unicode
+        :type text: str
         :return: Deaccented string
-        :rtype:str|unicode
+        :rtype:str
         """
         nfkd_form = unicodedata.normalize('NFKD', text)  # pylint: disable=c-extension-no-member
-        deaccented_text = g.UNICODE("").join(
-            [c for c in nfkd_form if not unicodedata.combining(c)]  # pylint: disable=c-extension-no-member
-        )
-        return deaccented_text
+        return "".join([c for c in nfkd_form if not unicodedata.combining(c)])  # pylint: disable=c-extension-no-member
 
     @staticmethod
     def transliterate_string(text):
@@ -1155,49 +1049,29 @@ class GlobalVariables(object):
         Example: 张新成 -> Zhang Xincheng
         Note that this method will remove any extra whitespace leaving only single spaces *between* characters
         :param: text: Text to transliterate
-        :type text: str|unicode
+        :type text: str
         :return: Transliterated string
-        :rtype:str|unicode
+        :rtype:str
         """
         transliterted_text = unidecode(text)
         # Remove extra whitespace
-        transliterted_text = g.UNICODE(" ").join(transliterted_text.split())
+        transliterted_text = " ".join(transliterted_text.split())
         return transliterted_text
 
     def premium_check(self):
-        if self.PLAYLIST.getposition() <= 0 and not self.debrid_available():
-            return False
-        else:
-            return True
+        return bool(self.PLAYLIST.getposition() > 0 or self.debrid_available())
 
     def debrid_available(self):
-        return (
-                self.premiumize_enabled()
-                or self.real_debrid_enabled()
-                or self.all_debrid_enabled()
-        )
+        return self.premiumize_enabled() or self.real_debrid_enabled() or self.all_debrid_enabled()
 
     def premiumize_enabled(self):
-        if self.get_setting("premiumize.token") != "" and self.get_bool_setting(
-                "premiumize.enabled"
-        ):
-            return True
-        else:
-            return False
+        return bool(self.get_setting("premiumize.token") != "" and self.get_bool_setting("premiumize.enabled"))
 
     def real_debrid_enabled(self):
-        if self.get_setting("rd.auth") and self.get_bool_setting("realdebrid.enabled"):
-            return True
-        else:
-            return False
+        return bool(self.get_setting("rd.auth") and self.get_bool_setting("realdebrid.enabled"))
 
     def all_debrid_enabled(self):
-        if self.get_setting("alldebrid.apikey") != "" and self.get_bool_setting(
-                "alldebrid.enabled"
-        ):
-            return True
-        else:
-            return False
+        return bool(self.get_setting("alldebrid.apikey") != "" and self.get_bool_setting("alldebrid.enabled"))
 
     def container_refresh(self):
         return xbmc.executebuiltin("Container.Refresh")
@@ -1217,9 +1091,11 @@ class GlobalVariables(object):
         """
         player = xbmc.Player()
         if (
-                self.get_bool_runtime_setting("widget_refreshing") or
-                (player.isPlaying() and not if_playing) or  # Don't wait if we are playing as it will refresh after
-                xbmc.getCondVisibility("Library.IsScanningVideo")  # Don't do library update if already scanning library
+            self.get_bool_runtime_setting("widget_refreshing")
+            or (player.isPlaying() and not if_playing)
+            or xbmc.getCondVisibility(  # Don't wait if we are playing as it will refresh after
+                "Library.IsScanningVideo"
+            )  # Don't do library update if already scanning library
         ):
             del player
             return
@@ -1228,8 +1104,10 @@ class GlobalVariables(object):
             while not self.abort_requested():
                 if xbmcgui.getCurrentWindowId() == 10000:
                     if not (
-                            self.wait_for_abort(0.2) or  # Short wait to see if anything else kicks off a widget refresh
-                            xbmc.getCondVisibility("Container().isUpdating")  # Check if widgets currently refreshing
+                        self.wait_for_abort(0.2)
+                        or xbmc.getCondVisibility(  # Short wait to see if anything else kicks off a widget refresh
+                            "Container().isUpdating"
+                        )  # Check if widgets currently refreshing
                     ):
                         self.log("TRIGGERING WIDGET REFRESH")
                         xbmc.executebuiltin('UpdateLibrary(video,widget_refresh,true)')
@@ -1237,9 +1115,7 @@ class GlobalVariables(object):
                         self.log("Aborting widget refresh as container on home screen already refreshing", "debug")
                     break
                 elif (
-                        self.wait_for_abort(0.3) or
-                        player.isPlaying() or
-                        xbmc.getCondVisibility("Library.IsScanningVideo")
+                    self.wait_for_abort(0.3) or player.isPlaying() or xbmc.getCondVisibility("Library.IsScanningVideo")
                 ):
                     self.log("Aborting queued widget refresh as another process will trigger it", "debug")
                     break
@@ -1247,24 +1123,26 @@ class GlobalVariables(object):
             del player
             g.clear_runtime_setting("widget_refreshing")
 
-    def get_language_code(self, region=None):
-        if region:
-            lang = xbmc.getLanguage(xbmc.ISO_639_1, True)
-            if lang.lower() == "en-de":
-                lang = "en-gb"
-            lang = lang.split("-")
-            if len(lang) > 1:
-                lang = "{}-{}".format(lang[0].lower(), lang[1].upper())
+    def get_language_code(self, country=None):
+        lang = self.json_rpc("Application.getProperties", {"properties": ["language"]}).get("language")
+        if lang is None:
+            g.log("Could not determine language", "warning")
+            return ""
+        if country:
+            if lang == "en_GB" and g.get_setting("general.localtimezone") in pytz.country_timezones["US"]:
+                lang = "en_US"  # Workaround for Americans that just can't comprehend that Kodi default is en_GB
+            lang = lang.split("_")
+            if len(lang) > 1 and len(lang[1]) == 2:
+                lang = f"{lang[0].lower()}-{lang[1].upper()}"
                 return lang
-        return xbmc.getLanguage(xbmc.ISO_639_1, False)
+            else:
+                g.log("Could not determine country part of language", "warning")
+                return ""
+        return lang.split("_")[0].lower()
 
     @cached_property
     def common_video_extensions(self):
-        return [
-            i
-            for i in xbmc.getSupportedMedia("video").split("|")
-            if i not in ["", ".zip", ".rar"]
-        ]
+        return tuple({ext for ext in xbmc.getSupportedMedia("video").split("|") if ext not in {"", ".zip", ".rar"}})
 
     def add_directory_item(self, name, **params):
         menu_item = params.pop("menu_item", {})
@@ -1281,55 +1159,56 @@ class GlobalVariables(object):
             info = {}
 
         self._apply_listitem_properties(item, info)
+        if self.studio_limit:
+            self.handle_studio_icon_skin_workaround(item, info)
 
         if "unwatched_episodes" in menu_item:
-            item.setProperty("UnWatchedEpisodes", g.UNICODE(menu_item["unwatched_episodes"]))
+            item.setProperty("UnWatchedEpisodes", str(menu_item["unwatched_episodes"]))
         if "watched_episodes" in menu_item:
-            item.setProperty("WatchedEpisodes", g.UNICODE(menu_item["watched_episodes"]))
-        if menu_item.get("episode_count", 0) \
-                and menu_item.get("watched_episodes", 0) \
-                and menu_item.get("episode_count", 0) == menu_item.get("watched_episodes", 0):
+            item.setProperty("WatchedEpisodes", str(menu_item["watched_episodes"]))
+        if (
+            menu_item.get("episode_count", 0)
+            and menu_item.get("watched_episodes", 0)
+            and menu_item.get("episode_count", 0) == menu_item.get("watched_episodes", 0)
+        ):
             info["playcount"] = 1
         if (
-                menu_item.get("watched_episodes", 0) == 0
-                and menu_item.get("episode_count", 0)
-                and menu_item.get("episode_count", 0) > 0
+            menu_item.get("watched_episodes", 0) == 0
+            and menu_item.get("episode_count", 0)
+            and menu_item.get("episode_count", 0) > 0
         ):
-            item.setProperty("WatchedEpisodes", g.UNICODE(0))
-            item.setProperty(
-                "UnWatchedEpisodes", g.UNICODE(menu_item.get("episode_count", 0))
-            )
+            item.setProperty("WatchedEpisodes", str(0))
+            item.setProperty("UnWatchedEpisodes", str(menu_item.get("episode_count", 0)))
         if "episode_count" in menu_item:
-            item.setProperty("TotalEpisodes", g.UNICODE(menu_item["episode_count"]))
+            item.setProperty("TotalEpisodes", str(menu_item["episode_count"]))
         if "season_count" in menu_item:
-            item.setProperty("TotalSeasons", g.UNICODE(menu_item["season_count"]))
+            item.setProperty("TotalSeasons", str(menu_item["season_count"]))
         if (
-                "percent_played" in menu_item
-                and menu_item.get("percent_played") is not None
+            "percent_played" in menu_item
+            and menu_item.get("percent_played") is not None
+            and float(menu_item.get("percent_played", 0)) > 0
         ):
-            if float(menu_item.get("percent_played", 0)) > 0:
-                item.setProperty("percentplayed", g.UNICODE(menu_item["percent_played"]))
-        if "resume_time" in menu_item and menu_item.get("resume_time") is not None:
-            if int(menu_item.get("resume_time", 0)) > 0:
-                params["resume"] = g.UNICODE(menu_item["resume_time"])
-                item.setProperty("resumetime", g.UNICODE(menu_item["resume_time"]))
-                # Temporarily disabling total time for pregoress indicators as it breaks resume
-                # item.setProperty("totaltime", g.UNICODE(info["duration"]))
+            item.setProperty("percentplayed", str(menu_item["percent_played"]))
+        if (
+            "resume_time" in menu_item
+            and menu_item.get("resume_time") is not None
+            and int(menu_item.get("resume_time", 0)) > 0
+        ):
+            params["resume"] = str(menu_item["resume_time"])
+            item.setProperty("resumetime", str(menu_item["resume_time"]))
         if "play_count" in menu_item and menu_item.get("play_count") is not None:
             info["playcount"] = menu_item["play_count"]
         if "air_date" in menu_item and menu_item.get("air_date") is not None:
             info["premiered"] = menu_item["air_date"]
             info["aired"] = menu_item["air_date"]
         if "description" in params:
-            info["plot"] = info["overview"] = info["description"] = params.pop(
-                "description", None
-            )
+            info["plot"] = info["overview"] = info["description"] = params.pop("description", None)
         if menu_item.get("user_rating"):
-            item.setProperty("userrating", g.UNICODE(menu_item["user_rating"]))
+            item.setProperty("userrating", str(menu_item["user_rating"]))
 
         special_sort = params.pop("special_sort", None)
         if special_sort is not None:
-            item.setProperty("SpecialSort", g.UNICODE(special_sort))
+            item.setProperty("SpecialSort", str(special_sort))
         label2 = params.pop("label2", None)
         if label2 is not None:
             item.setLabel2(label2)
@@ -1348,7 +1227,7 @@ class GlobalVariables(object):
 
         for key, value in info.items():
             if key.endswith("_id"):
-                item.setProperty(key, g.UNICODE(value))
+                item.setProperty(key, str(value))
 
         media_type = info.get("mediatype", None)
         id_keys = {
@@ -1358,19 +1237,15 @@ class GlobalVariables(object):
         }
         item.setUniqueIDs(
             {
-                unique_id_key: info[
-                    "tvshow." + id_key if media_type in ["episode", "season"] else id_key
-                ]
+                unique_id_key: info[f"tvshow.{id_key}" if media_type in ["episode", "season"] else id_key]
                 for id_key, unique_id_key in id_keys.items()
-                if info.get("tvshow." + id_key if media_type in ["episode", "season"] else id_key)
+                if info.get(f"tvshow.{id_key}" if media_type in ["episode", "season"] else id_key)
             }
         )
 
         for i in info:
             if i.startswith("rating."):
-                item.setRating(
-                    i.split(".")[1], float(info[i].get("rating", 0.0)), int(info[i].get("votes", 0)), False
-                )
+                item.setRating(i.split(".")[1], float(info[i].get("rating", 0.0)), int(info[i].get("votes", 0)), False)
 
         cm = params.pop("cm", [])
         if cm is None or not isinstance(cm, (set, list)):
@@ -1381,30 +1256,22 @@ class GlobalVariables(object):
         if art is None or not isinstance(art, dict):
             art = {}
         if (
-            art.get("fanart", art.get("season.fanart", art.get("tvshow.fanart", None)))
-            is None
-        ) and not self.get_bool_setting("general.fanart.fallback", False):
+            art.get("fanart", art.get("season.fanart", art.get("tvshow.fanart", None))) is None
+        ) and not self.fanart_fallback_disabled:
             art["fanart"] = self.DEFAULT_FANART
-        if (
-            art.get("poster", art.get("season.poster", art.get("tvshow.poster", None)))
-            is None
-        ):
-            art["poster"] = self.DEFAULT_ICON
-        if art.get("icon") is None:
-            art["icon"] = self.DEFAULT_FANART
-        if art.get("thumb") is None:
+        if art.get("poster", art.get("season.poster", art.get("tvshow.poster", None))) is None:
+            art["poster"] = self.DEFAULT_POSTER
+        if not art.get("icon"):
+            art["icon"] = self.DEFAULT_ICON
+        if not art.get("thumb"):
             art["thumb"] = ""
-        try:
+        with contextlib.suppress(Exception):
             item.setArt(art)
-        except Exception:
-            pass
 
         # Clear out keys not relevant to Kodi info labels
         self.clean_info_keys(info)
-        # Only TV shows/seasons/episodes have associated times, movies just have dates.
-        if media_type in [g.MEDIA_SHOW, g.MEDIA_SEASON, g.MEDIA_EPISODE]:
-            # Convert dates to localtime for display
-            self.convert_info_dates(info)
+        # Convert dates to localtime for display
+        self.convert_info_dates(info)
 
         item.setInfo("video", info)
 
@@ -1413,44 +1280,33 @@ class GlobalVariables(object):
         if bulk_add:
             return url, item, is_folder
         else:
-            xbmcplugin.addDirectoryItem(
-                handle=self.PLUGIN_HANDLE, url=url, listitem=item, isFolder=is_folder
-            )
+            xbmcplugin.addDirectoryItem(handle=self.PLUGIN_HANDLE, url=url, listitem=item, isFolder=is_folder)
 
     def add_menu_items(self, item_list):
         xbmcplugin.addDirectoryItems(self.PLUGIN_HANDLE, item_list, len(item_list))
 
     @staticmethod
     def clean_info_keys(info_dict):
-        if info_dict is None:
-            return None
-
         if not isinstance(info_dict, dict):
             return info_dict
 
-        keys_to_remove = [i for i in info_dict if i not in info_labels]
-        [info_dict.pop(key) for key in keys_to_remove]
+        for key in info_dict.keys() - info_labels:
+            info_dict.pop(key)
 
         return info_dict
 
     def convert_info_dates(self, info_dict):
-        if info_dict is None:
-            return None
-
         if not isinstance(info_dict, dict):
             return info_dict
 
-        dates_to_convert = [i for i in info_dict if i in info_dates]
-        converted_dates = {key: self.utc_to_local(info_dict.get(key))
-                           for key in dates_to_convert if info_dict.get(key)}
+        converted_dates = {key: self.utc_to_local(info_dict.get(key)) for key in info_dict.keys() & info_dates}
         info_dict.update(converted_dates)
+
         return info_dict
 
     def close_directory(self, content_type, sort=False, cache=False):
         if sort == "title":
-            xbmcplugin.addSortMethod(
-                self.PLUGIN_HANDLE, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE
-            )
+            xbmcplugin.addSortMethod(self.PLUGIN_HANDLE, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
         if sort == "episode":
             xbmcplugin.addSortMethod(self.PLUGIN_HANDLE, xbmcplugin.SORT_METHOD_EPISODE)
         if not sort:
@@ -1463,44 +1319,46 @@ class GlobalVariables(object):
     def set_view_type(self, content_type):
         def _execute_set_view_mode(view):
             xbmc.sleep(200)
-            xbmc.executebuiltin("Container.SetViewMode({})".format(view))
+            xbmc.executebuiltin(f"Container.SetViewMode({view})")
 
         if self.get_bool_setting("general.setViews") and self.is_addon_visible():
             view_type = self.get_view_type(content_type)
             if view_type > 0:
                 tools.run_threaded(_execute_set_view_mode, view_type)
 
-    @staticmethod
-    def is_addon_visible():
-        return xbmc.getCondVisibility("Window.IsMedia")
+    def is_addon_visible(self):
+        return xbmc.getInfoLabel('Container.PluginName') == "plugin.video.seren"
 
     def cancel_directory(self):
-        xbmcplugin.setContent(self.PLUGIN_HANDLE, g.CONTENT_MENU)
-        xbmcplugin.endOfDirectory(self.PLUGIN_HANDLE, cacheToDisc=False)
+        if g.FROM_WIDGET:
+            g.add_directory_item(
+                g.get_language_string(284, addon=False),
+                menu_item=g.create_icon_dict("trakt_sync", base_path=g.ICONS_PATH),
+            )
+            xbmcplugin.setContent(self.PLUGIN_HANDLE, g.CONTENT_MENU)
+            xbmcplugin.endOfDirectory(self.PLUGIN_HANDLE, succeeded=True, cacheToDisc=False)
+        else:
+            xbmcplugin.endOfDirectory(self.PLUGIN_HANDLE, succeeded=False, cacheToDisc=False)
 
     def read_all_text(self, file_path):
         try:
             f = xbmcvfs.File(file_path, "r")
             return f.read()
-        except IOError:
+        except OSError:
             return None
         finally:
-            try:
+            with contextlib.suppress(Exception):
                 f.close()
-            except Exception:
-                pass
 
     def write_all_text(self, file_path, content):
         try:
             f = xbmcvfs.File(file_path, "w")
             return f.write(content)
-        except IOError:
+        except OSError:
             return None
         finally:
-            try:
+            with contextlib.suppress(Exception):
                 f.close()
-            except Exception:
-                pass
 
     def notification(self, heading, message, time=5000, sound=True):
         if self.get_bool_setting("general.disableNotificationSound"):
@@ -1513,8 +1371,6 @@ class GlobalVariables(object):
         k = xbmc.Keyboard(default, heading, hidden)
         k.doModal()
         input_value = k.getText() if k.isConfirmed() else None
-        if not self.PYTHON3 and input_value:
-            input_value = input_value.decode("utf-8")
         del k
         return input_value
 
@@ -1527,24 +1383,18 @@ class GlobalVariables(object):
         }
         response = json.loads(xbmc.executeJSONRPC(json.dumps(request_data)))
         if "error" in response:
-            self.log(
-                "JsonRPC Error {}: {}".format(response["error"]["code"], response["error"]["message"]), "debug"
-            )
+            self.log(f"JsonRPC Error {response['error']['code']}: {response['error']['message']}", "debug")
         return response.get("result", {})
 
     def get_kodi_subtitle_languages(self, iso_format=False):
-        subtitle_language = self.json_rpc(
-            "Settings.GetSettingValue", {"setting": "subtitles.languages"}
-        )
+        subtitle_language = self.json_rpc("Settings.GetSettingValue", {"setting": "subtitles.languages"})
         if iso_format:
             return [self.convert_language_iso(x) for x in subtitle_language["value"]]
         else:
-            return [x for x in subtitle_language["value"]]
+            return list(subtitle_language["value"])
 
     def get_kodi_preferred_subtitle_language(self, iso_format=False):
-        subtitle_language = self.json_rpc(
-            "Settings.GetSettingValue", {"setting": "locale.subtitlelanguage"}
-        )
+        subtitle_language = self.json_rpc("Settings.GetSettingValue", {"setting": "locale.subtitlelanguage"})
         if subtitle_language["value"] in ["forced_only", "original", "default", "none"]:
             return subtitle_language["value"]
         if iso_format:
@@ -1557,23 +1407,55 @@ class GlobalVariables(object):
 
     @staticmethod
     def _apply_listitem_properties(item, info):
-        for i in listitem_properties:
-            if isinstance(i[0], tuple):
-                value = info
-                for subkey in i[0]:
-                    value = value.get(subkey, {})
-                if value:
-                    item.setProperty(i[1], g.UNICODE(value))
-            elif i[0] in info:
-                item.setProperty(i[1], g.UNICODE(info[i[0]]))
+        for prop in listitem_properties:
+            value = info
+            for subkey in prop[0]:
+                value = value.get(subkey, {})
+
+            if value:
+                item.setProperty(prop[1], str(value))
+
+    @cached_property
+    def fanart_fallback_disabled(self):
+        return g.get_bool_setting("general.fanart.fallback", False)
+
+    @cached_property
+    def studio_limit(self):
+        return g.get_bool_setting("general.meta.studiolimit", True)
+
+    def handle_studio_icon_skin_workaround(self, item, info):
+        media_type = info.get("mediatype")
+        studios = info.get("studio", [])
+        property_name = "studio" if media_type == g.MEDIA_MOVIE else "network"
+
+        if isinstance(studios, list) and len(studios) >= 1:
+            for studio in reversed(studios):
+                if (lower_studio := studio.lower()) in self.studio_icons or (
+                    lower_studio.endswith(" ltd.") and (lower_studio := lower_studio[:-5]) in self.studio_icons
+                ):
+                    item.setProperty(property_name, lower_studio)
+                    info['studio'] = studio
+                    return
+
+            item.setProperty(property_name, studios[0].lower())
+            info['studio'] = studios[0]
+        elif studios and isinstance(studios, str):
+            item.setProperty(property_name, studios.lower())
+            info['studio'] = studios
+
+    @cached_property
+    def studio_icons(self):
+        colored = {i[:-4] for i in xbmcvfs.listdir("resource://resource.images.studios.coloured")[1]}
+        white = {i[:-4] for i in xbmcvfs.listdir("resource://resource.images.studios.white")[1]}
+
+        return colored | white if (colored and white) else colored or white
 
     def create_url(self, base_url, params):
         if params is None:
             return base_url
         if "action_args" in params and isinstance(params["action_args"], dict):
             params["action_args"] = json.dumps(params["action_args"], sort_keys=True)
-        params["from_widget"] = "true" if not self.is_addon_visible() else "false"
-        return "{}/?{}".format(base_url, tools.urlencode(sorted(params.items())))
+        return f"{base_url}/?{parse.urlencode(sorted(params.items()))}"
 
     @staticmethod
     def abort_requested():
@@ -1591,47 +1473,45 @@ class GlobalVariables(object):
 
     @staticmethod
     def reload_profile():
-        xbmc.executebuiltin('LoadProfile({})'.format(xbmc.getInfoLabel("system.profilename")))
+        xbmc.executebuiltin(f"LoadProfile({xbmc.getInfoLabel('system.profilename')})")
 
-    def validate_date(self, date_string):
-        """Validates the path and returns only the date portion, if it invalidates it just returns none.
+    @staticmethod
+    def validate_date(date_string):
+        """Validates the date string and returns in standard date time format, if it is invalid it just returns none.
 
         :param date_string:string value with a supposed date.
         :type date_string:str
         :return:formatted datetime or none
         :rtype:str
         """
-
-        result = None
         if not date_string:
             return date_string
 
         try:
-            result = tools.parse_datetime(date_string, self.DATE_TIME_FORMAT_ZULU, False)
+            result = tools.parse_datetime(date_string, False)
         except ValueError:
-            pass
-
-        if not result:
-            try:
-                result = tools.parse_datetime(date_string, self.DATE_TIME_FORMAT, False)
-            except ValueError:
-                pass
-
-        if not result:
-            try:
-                result = tools.parse_datetime(date_string, self.DATE_FORMAT, False)
-            except ValueError:
-                pass
-
-        if not result:
-            try:
-                result = tools.parse_datetime(date_string, "%d %b %Y", False)
-            except ValueError:
-                pass
+            return None
 
         if result and result.year > 1900:
-            return g.UNICODE(result.strftime(self.DATE_TIME_FORMAT))
+            return str(g.datetime_to_string(result))
         return None
+
+    @staticmethod
+    def datetime_to_string(date_time_or_date):
+        """
+        Converts a datetime or date object to a string in ISO format truncated to seconds and without TZ offset
+        If this is a date, then the isoformat for a date without time is returned
+        :param date_time_or_date: A datetime.datetime or a datetime.date object
+        :return: Datetime or date string in ISO format truncated to seconds and without TZ offset.
+                 Empty string if invalid object provided
+        :rtype str
+        """
+        try:
+            if hasattr(date_time_or_date, "second"):
+                return date_time_or_date.isoformat(timespec="seconds").split("+", 1)[0]
+            return date_time_or_date.isoformat()
+        except (ValueError, AttributeError):
+            return ""
 
     def utc_to_local(self, utc_string):
         """
@@ -1639,16 +1519,39 @@ class GlobalVariables(object):
         :param utc_string: UTC datetime string
         :return: localized datetime string
         """
-
-        utc_string = self.validate_date(utc_string)
-
         if not utc_string:
             return None
 
-        utc = tools.parse_datetime(utc_string, self.DATE_TIME_FORMAT, False)
+        utc = tools.parse_datetime(utc_string, False)
         utc = self.UTC_TIMEZONE.localize(utc)
         local_time = utc.astimezone(self.LOCAL_TIMEZONE)
-        return local_time.strftime(self.DATE_TIME_FORMAT)
+        return g.datetime_to_string(local_time)
+
+    def local_to_utc_by_country(self, datetime_string, country_code):
+        """
+        Converts a local datetime string to the utc timezone based on a provided country code
+        Note that some countries have moe than one timezone, we choose the first as there is no perfect solution
+        :param datetime_string: Local date time string
+        :type datetime_string: str
+        :param country_code: The ISO-3166 2 char country code
+        :return: UTC datetime string
+        """
+        if not datetime_string:
+            return None
+
+        try:
+            local_time = tools.parse_datetime(datetime_string, False)
+            tz = pytz.timezone(pytz.country_timezones[country_code][0])  # First timezone for a country
+            local_time = tz.localize(local_time)
+            utc_time = local_time.astimezone(self.UTC_TIMEZONE)
+            return g.datetime_to_string(utc_time)
+        except (KeyError, IndexError, pytz.UnknownTimeZoneError) as e:
+            g.log(
+                f"Unable to covert local time to utc based on country_code='{country_code}', "
+                f"datetime_string='{datetime_string}'/n{e}",
+                "error",
+            )
+            return None
 
     def open_addon_settings(self, section_offset, setting_offset=None):
         """
@@ -1659,10 +1562,14 @@ class GlobalVariables(object):
         :type setting_offset: None|int
         :return:
         """
-        xbmc.executebuiltin("Addon.OpenSettings({})".format(self.ADDON_ID))
-        xbmc.executebuiltin("SetFocus({})".format(-(100 - section_offset)))
+        xbmc.executebuiltin(f"Addon.OpenSettings({self.ADDON_ID})")
+        xbmc.executebuiltin(f"SetFocus({-(100 - section_offset)})")
         if setting_offset is not None:
-            xbmc.executebuiltin("SetFocus({})".format(-(80 - setting_offset)))
+            xbmc.executebuiltin(f"SetFocus({-(80 - setting_offset)})")
+
+    def create_icon_dict(self, icon_slug, base_path, art_types=None):
+        keys = art_types or ['icon', 'poster', 'thumb', 'fanart']
+        return {"art": dict.fromkeys(keys, f"{base_path}{icon_slug}.png")}
 
 
 g = GlobalVariables()

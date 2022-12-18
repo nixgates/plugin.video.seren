@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import sqlite3
 import sys
 from random import randint
@@ -24,18 +21,17 @@ g.init_globals(sys.argv)
 do_version_change()
 
 g.log("##################  STARTING SERVICE  ######################")
-g.log("### {} {}".format(g.ADDON_ID, g.VERSION))
-g.log("### PLATFORM: {}".format(g.PLATFORM))
-g.log("### SQLite: {}".format(sqlite3.sqlite_version))  # pylint: disable=no-member
-g.log("### Detected Kodi Version: {}".format(g.KODI_VERSION))
-g.log("### Detected timezone: {}".format(repr(g.LOCAL_TIMEZONE.zone)))
+g.log(f"### {g.ADDON_ID} {g.VERSION}")
+g.log(f"### Platform: {g.PLATFORM}")
+g.log(f"### Python: {sys.version.split(' ', 1)[0]}")
+g.log(f"### SQLite: {sqlite3.sqlite_version}")  # pylint: disable=no-member
+g.log(f"### Detected Kodi Version: {g.KODI_VERSION}")
+g.log(f"### Detected timezone: {repr(g.LOCAL_TIMEZONE.zone)}")
 g.log("#############  SERVICE ENTERED KEEP ALIVE  #################")
 
 monitor = SerenMonitor()
 try:
-    xbmc.executebuiltin(
-        'RunPlugin("plugin://plugin.video.seren/?action=longLifeServiceManager")'
-    )
+    xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=longLifeServiceManager")')
 
     do_update_news()
     validate_timezone_detected()
@@ -44,30 +40,20 @@ try:
     except TypeError:
         g.log(
             "Unable to clear bookmarks on service init. This is not a problem if it occurs immediately after install.",
-            "warning"
+            "warning",
         )
 
-    xbmc.executebuiltin(
-        'RunPlugin("plugin://plugin.video.seren/?action=torrentCacheCleanup")'
-    )
+    xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=torrentCacheCleanup")')
 
     g.wait_for_abort(30)  # Sleep for a half a minute to allow widget loads to complete.
     while not monitor.abortRequested():
-        xbmc.executebuiltin(
-            'RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")'
-        )
+        xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=runMaintenance")')
         if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
-            xbmc.executebuiltin(
-                'RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")'
-            )
+            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=syncTraktActivities")')
         if not g.wait_for_abort(15):  # Sleep to make sure we don't possibly clobber settings
-            xbmc.executebuiltin(
-                'RunPlugin("plugin://plugin.video.seren/?action=cleanOrphanedMetadata")'
-            )
+            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=cleanOrphanedMetadata")')
         if not g.wait_for_abort(15):  # Sleep to make sure we don't possibly clobber settings
-            xbmc.executebuiltin(
-                'RunPlugin("plugin://plugin.video.seren/?action=updateLocalTimezone")'
-            )
+            xbmc.executebuiltin('RunPlugin("plugin://plugin.video.seren/?action=updateLocalTimezone")')
         if g.wait_for_abort(60 * randint(13, 17)):
             break
 finally:

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import time
+from functools import cached_property
 
 import xbmc
 import xbmcgui
@@ -9,9 +7,9 @@ import xbmcgui
 from resources.lib.common import source_utils
 from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
-from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
-from resources.lib.modules.exceptions import UnexpectedResponse, RanOnceAlready
+from resources.lib.modules.exceptions import RanOnceAlready
+from resources.lib.modules.exceptions import UnexpectedResponse
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
 
@@ -26,7 +24,6 @@ RD_AUTH_CLIENT_ID = "X245A4XAIBGVM"
 
 
 class RealDebrid:
-
     def __init__(self):
         self.oauth_url = "https://api.real-debrid.com/oauth/v2/"
         self.device_code_url = "device/code?{}"
@@ -44,13 +41,14 @@ class RealDebrid:
         import requests
         from requests.adapters import HTTPAdapter
         from urllib3 import Retry
+
         session = requests.Session()
         retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
         session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
         return session
 
     def _auth_loop(self):
-        url = "client_id={}&code={}".format(RD_AUTH_CLIENT_ID, self.device_code)
+        url = f"client_id={RD_AUTH_CLIENT_ID}&code={self.device_code}"
         url = self.oauth_url + self.device_credentials_url.format(url)
         response = self.session.get(url).json()
         if "error" not in response and response.get("client_secret"):
@@ -66,7 +64,7 @@ class RealDebrid:
         return False
 
     def auth(self):
-        url = "client_id={}&new_credentials=yes".format(self.client_id)
+        url = f"client_id={self.client_id}&new_credentials=yes"
         url = self.oauth_url + self.device_code_url.format(url)
         response = self.session.get(url).json()
         tools.copy2clip(response["user_code"])
@@ -74,14 +72,10 @@ class RealDebrid:
         try:
             progress_dialog = xbmcgui.DialogProgress()
             progress_dialog.create(
-                g.ADDON_NAME + ": " + g.get_language_string(30017),
+                f"{g.ADDON_NAME}: {g.get_language_string(30017)}",
                 tools.create_multiline_message(
-                    line1=g.get_language_string(30018).format(
-                        g.color_string("https://real-debrid.com/device")
-                    ),
-                    line2=g.get_language_string(30019).format(
-                        g.color_string(response["user_code"])
-                    ),
+                    line1=g.get_language_string(30018).format(g.color_string("https://real-debrid.com/device")),
+                    line2=g.get_language_string(30019).format(g.color_string(response["user_code"])),
                     line3=g.get_language_string(30047),
                 ),
             )
@@ -90,11 +84,7 @@ class RealDebrid:
             self.oauth_time_step = int(response["interval"])
             self.device_code = response["device_code"]
             progress_dialog.update(100)
-            while (
-                not success
-                and not token_ttl <= 0
-                and not progress_dialog.iscanceled()
-            ):
+            while not success and token_ttl > 0 and not progress_dialog.iscanceled():
                 xbmc.sleep(1000)
                 if token_ttl % self.oauth_time_step == 0:
                     success = self._auth_loop()
@@ -128,7 +118,7 @@ class RealDebrid:
         ).json()
         self._save_settings(response)
         self._save_user_status()
-        xbmcgui.Dialog().ok(g.ADDON_NAME, "Real Debrid " + g.get_language_string(30020))
+        xbmcgui.Dialog().ok(g.ADDON_NAME, f"Real Debrid {g.get_language_string(30020)}")
         g.log("Authorised Real Debrid successfully", "info")
 
     def _save_settings(self, response):
@@ -154,16 +144,15 @@ class RealDebrid:
 
     @staticmethod
     def _handle_error(response):
-        g.log("Real Debrid API return a {} response".format(response.status_code))
+        g.log(f"Real Debrid API return a {response.status_code} response")
         g.log(response.text)
         g.log(response.request.url)
 
     def _is_response_ok(self, response):
-        if 200 <= response.status_code < 400:
+        if response.ok:
             return True
-        if response.status_code > 400:
-            self._handle_error(response)
-            return False
+        self._handle_error(response)
+        return False
 
     def try_refresh_token(self, force=False):
         if not self.refresh:
@@ -173,7 +162,7 @@ class RealDebrid:
 
         try:
             with GlobalLock(self.__class__.__name__, True, self.token):
-                url = self.oauth_url + "token"
+                url = f"{self.oauth_url}token"
                 response = self.session.post(
                     url,
                     data={
@@ -185,13 +174,9 @@ class RealDebrid:
                 )
                 if not self._is_response_ok(response):
                     response = response.json()
-                    g.notification(
-                        g.ADDON_NAME, "Failed to refresh RD token, please manually re-auth"
-                    )
-                    g.log("RD Refresh error: {}".format(response["error"]))
-                    g.log(
-                        "Invalid response from Real Debrid - {}".format(response), "error"
-                    )
+                    g.notification(g.ADDON_NAME, "Failed to refresh RD token, please manually re-auth")
+                    g.log(f"RD Refresh error: {response['error']}")
+                    g.log(f"Invalid response from Real Debrid - {response}", "error")
                     return False
                 response = response.json()
                 self._save_settings(response)
@@ -206,7 +191,7 @@ class RealDebrid:
             "Content-Type": "application/json",
         }
         if self.token:
-            headers["Authorization"] = "Bearer {}".format(self.token)
+            headers["Authorization"] = f"Bearer {self.token}"
         return headers
 
     def post_url(self, url, post_data, fail_check=False):
@@ -215,7 +200,7 @@ class RealDebrid:
         if not self.token:
             return None
 
-        response = self.session.post(url, data=post_data, headers=self._get_headers(), timeout=5)
+        response = self.session.post(url, data=post_data, headers=self._get_headers(), timeout=10)
         if not self._is_response_ok(response) and not fail_check:
             self.try_refresh_token(True)
             response = self.post_url(original_url, post_data, fail_check=True)
@@ -231,7 +216,7 @@ class RealDebrid:
             g.log("No Real Debrid Token Found")
             return None
 
-        response = self.session.get(url, headers=self._get_headers(), timeout=5)
+        response = self.session.get(url, headers=self._get_headers(), timeout=10)
 
         if not self._is_response_ok(response) and not fail_check:
             self.try_refresh_token(True)
@@ -248,7 +233,7 @@ class RealDebrid:
             g.log("No Real Debrid Token Found")
             return None
 
-        response = self.session.delete(url, headers=self._get_headers(), timeout=5)
+        response = self.session.delete(url, headers=self._get_headers(), timeout=10)
 
         if not self._is_response_ok(response) and not fail_check:
             self.try_refresh_token(True)
@@ -261,37 +246,32 @@ class RealDebrid:
     def check_hash(self, hash_list):
         if isinstance(hash_list, list):
             hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
-            thread = ThreadPool()
-            for section in hash_list:
-                thread.put(self._check_hash_thread, sorted(section))
-            thread.wait_completion()
+            ThreadPool().map_results(self._check_hash_thread, ((sorted(section),) for section in hash_list))
             return self.cache_check_results
         else:
-            hash_string = "/" + hash_list
-            return self.get_url("torrents/instantAvailability" + hash_string)
+            hash_string = f"/{hash_list}"
+            return self.get_url(f"torrents/instantAvailability{hash_string}")
 
     def _check_hash_thread(self, hashes):
-        hash_string = "/" + "/".join(hashes)
-        response = self.get_url("torrents/instantAvailability" + hash_string)
+        hash_string = f"/{'/'.join(hashes)}"
+        response = self.get_url(f"torrents/instantAvailability{hash_string}")
         self.cache_check_results.update(response)
 
     def add_magnet(self, magnet):
         post_data = {"magnet": magnet}
         url = "torrents/addMagnet"
-        response = self.post_url(url, post_data)
-        return response
+        return self.post_url(url, post_data)
 
     def list_torrents(self):
         url = "torrents"
-        response = self.get_url(url)
-        return response
+        return self.get_url(url)
 
     def torrent_info(self, id):
-        url = "torrents/info/{}".format(id)
+        url = f"torrents/info/{id}"
         return self.get_url(url)
 
     def torrent_select(self, torrent_id, file_id):
-        url = "torrents/selectFiles/{}".format(torrent_id)
+        url = f"torrents/selectFiles/{torrent_id}"
         post_data = {"files": file_id}
         return self.post_url(url, post_data)
 
@@ -301,11 +281,11 @@ class RealDebrid:
         response = self.post_url(url, post_data)
         try:
             return response["download"]
-        except KeyError:
-            raise UnexpectedResponse(response)
+        except KeyError as e:
+            raise UnexpectedResponse(response) from e
 
     def delete_torrent(self, id):
-        url = "torrents/delete/{}".format(id)
+        url = f"torrents/delete/{id}"
         self.delete_url(url)
 
     @staticmethod
@@ -316,51 +296,31 @@ class RealDebrid:
         :param storage_variant:
         :return: BOOL
         """
-        return (
-            False
-            if len(
-                [
-                    i
-                    for i in storage_variant.values()
-                    if not source_utils.is_file_ext_valid(i["filename"])
-                ]
-            )
-            > 0
-            else True
-        )
+        return len([i for i in storage_variant.values() if not source_utils.is_file_ext_valid(i["filename"])]) <= 0
 
     @use_cache(1)
     def get_relevant_hosters(self):
         host_list = self.get_url("hosts/status")
         if "error" in host_list:
             return []
-        valid_hosts = []
-        for domain, status in host_list.items():
-            if status["supported"] == 1 and status["status"] == "up":
-                valid_hosts.append(domain)
-        return valid_hosts
+        return [domain for domain, status in host_list.items() if status["supported"] == 1 and status["status"] == "up"]
 
     def get_hosters(self, hosters):
         host_list = self.get_relevant_hosters()
         if host_list is None:
             host_list = self.get_relevant_hosters()
         if host_list is not None:
-            hosters["premium"]["real_debrid"] = [
-                (i, i.split(".")[0]) for i in host_list
-            ]
+            hosters["premium"]["real_debrid"] = [(i, i.split(".")[0]) for i in host_list]
         else:
             hosters["premium"]["real_debrid"] = []
 
     @staticmethod
     def is_service_enabled():
-        return (
-            g.get_bool_setting("realdebrid.enabled")
-            and g.get_setting(RD_AUTH_KEY) is not None
-        )
+        return g.get_bool_setting("realdebrid.enabled") and g.get_setting(RD_AUTH_KEY) is not None
 
     def get_account_status(self):
         status = None
         status_response = self.get_url("user")
         if isinstance(status_response, dict):
             status = status_response.get("type")
-        return status if status else "unknown"
+        return status or "unknown"

@@ -1,0 +1,1731 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<coordinates>
+		<left>0</left>
+		<top>0</top>
+		<width>1920</width>
+		<height>1080</height>
+	</coordinates>
+
+	<defaultcontrol always="true">6001</defaultcontrol>
+
+	<controls>
+
+		<!-- Background -->
+		<control type="group">
+			<top>0</top>
+			<left>0</left>
+			<width>1920</width>
+			<height>1080</height>
+
+			<!-- Fallback -->
+			<control type="image">
+				<texture>white.png</texture>
+				<colordiffuse>FF000000</colordiffuse>
+			</control>
+
+			<!-- Fanart -->
+			<control type="image">
+				<texture background="true">$INFO[Window().Property(seren.fanart)]</texture>
+				<colordiffuse>66FFFFFF</colordiffuse>
+			</control>
+
+			<!-- Overlay -->
+			<control type="image">
+				<texture background="true">white.png</texture>
+				<colordiffuse>CC000000</colordiffuse>
+			</control>
+		</control>
+
+		<!--Title-->
+		<control type="label">
+			<top>25</top>
+			<left>40</left>
+			<width>100%</width>
+			<height>50</height>
+			<label>[UPPERCASE][COLOR $INFO[Window().Property(settings.color)]]Seren[/COLOR] - $ADDON[plugin.video.seren 30632][/UPPERCASE]</label>
+			<font>font37</font>
+			<textcolor>white</textcolor>
+		</control>
+
+		<!-- Sort Level 1 -->
+		<control type="group">
+			<width>1360</width>
+			<left>20</left>
+			<height>100</height>
+			<top>110</top>
+			<visible>Integer.IsGreaterOrEqual(Window().Property(max_level), 1)</visible>
+
+			<!-- Card -->
+			<control type="image">
+				<left>92</left>
+				<width>1268</width>
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+
+			<control type="image">
+				<top>4</top>
+				<left>20</left>
+				<width>72</width>
+				<height>72</height>
+				<colordiffuse>FFFFFFFF</colordiffuse>
+				<texture border="32,48,36,24">sort_arrow.png</texture>
+			</control>
+
+			<control type="togglebutton" id="1111">
+				<top>32</top>
+				<right>20</right>
+				<width>36</width>
+				<height>36</height>
+				<onleft>1000</onleft>
+				<onright>9000</onright>
+				<ondown>2222</ondown>
+				<visible>!String.IsEqual(Window().Property(general.sortmethod.1),debridsort)</visible>
+				<texturenofocus colordiffuse="FFFFFFFF">sort_descending.png</texturenofocus>
+				<texturefocus colordiffuse="Window().Property(settings.color)">sort_descending.png</texturefocus>
+				<alttexturenofocus colordiffuse="FFFFFFFF">sort_ascending.png</alttexturenofocus>
+				<alttexturefocus colordiffuse="Window().Property(settings.color)">sort_ascending.png</alttexturefocus>
+				<usealttexture>String.IsEqual(Window().Property(general.sortmethod.1.reverse),True)</usealttexture>
+			</control>
+
+			<control type="grouplist" id="1000">
+				<viewtype label="Sort Level 1">list</viewtype>
+				<top>10</top>
+				<left>112</left>
+				<width>1172</width>
+				<height>80</height>
+				<ondown>2000</ondown>
+				<onright>1111</onright>
+				<orientation>horizontal</orientation>
+				<focusposition>1</focusposition>
+				<itemgap>10</itemgap>
+
+				<control type="button" id="1001">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onright>1002</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.1.label.0)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.0))</visible>
+				</control>
+
+				<control type="label" id="1101">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.0)) + String.IsEmpty(Window().Property(general.sortmethod.1.label.0.last))</visible>
+				</control>
+
+				<control type="button" id="1002">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>1001</onleft>
+					<onright>1003</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.1.label.1)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.1))</visible>
+				</control>
+
+				<control type="label" id="1102">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.1)) + String.IsEmpty(Window().Property(general.sortmethod.1.label.1.last))</visible>
+				</control>
+
+				<control type="button" id="1003">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>1002</onleft>
+					<onright>1004</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.1.label.2)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.2))</visible>
+				</control>
+
+				<control type="label" id="1103">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.2)) + String.IsEmpty(Window().Property(general.sortmethod.1.label.2.last))</visible>
+				</control>
+
+				<control type="button" id="1004">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>1003</onleft>
+					<onright>1005</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.1.label.3)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.3))</visible>
+				</control>
+
+				<control type="label" id="1104">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.3)) + String.IsEmpty(Window().Property(general.sortmethod.1.label.3.last))</visible>
+				</control>
+
+				<control type="button" id="1005">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>1004</onleft>
+					<onright>1006</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.1.label.4)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.4))</visible>
+				</control>
+
+				<control type="label" id="1105">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.4)) + String.IsEmpty(Window().Property(general.sortmethod.1.label.4.last))</visible>
+				</control>
+
+				<control type="button" id="1006">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>1005</onleft>
+					<onright>1111</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.1.label.5)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.5))</visible>
+				</control>
+
+				<control type="label" id="1106">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.1.label.5)) + String.IsEmpty(Window().Property(general.sortmethod.1.label.5.last))</visible>
+				</control>
+			</control>
+		</control>
+
+		<!-- Sort Level 2 -->
+		<control type="group">
+			<width>1340</width>
+			<left>40</left>
+			<height>100</height>
+			<top>220</top>
+			<visible>Integer.IsGreaterOrEqual(Window().Property(max_level), 2)</visible>
+
+			<!-- Card -->
+			<control type="image">
+				<left>92</left>
+				<width>1248</width>
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+
+			<control type="image">
+				<top>4</top>
+				<left>20</left>
+				<width>72</width>
+				<height>72</height>
+				<colordiffuse>FFFFFFFF</colordiffuse>
+				<texture border="32,48,36,24">sort_arrow.png</texture>
+			</control>
+
+			<control type="togglebutton" id="2222">
+				<top>32</top>
+				<right>20</right>
+				<width>36</width>
+				<height>36</height>
+				<onleft>2000</onleft>
+				<onright>9000</onright>
+				<onup>1111</onup>
+				<ondown>3333</ondown>
+				<visible>!String.IsEqual(Window().Property(general.sortmethod.2),debridsort)</visible>
+				<texturenofocus colordiffuse="FFFFFFFF">sort_descending.png</texturenofocus>
+				<texturefocus colordiffuse="Window().Property(settings.color)">sort_descending.png</texturefocus>
+				<alttexturenofocus colordiffuse="FFFFFFFF">sort_ascending.png</alttexturenofocus>
+				<alttexturefocus colordiffuse="Window().Property(settings.color)">sort_ascending.png</alttexturefocus>
+				<usealttexture>String.IsEqual(Window().Property(general.sortmethod.2.reverse),True)</usealttexture>
+			</control>
+
+			<control type="grouplist" id="2000">
+				<viewtype label="Sort Level 2">list</viewtype>
+				<top>10</top>
+				<left>112</left>
+				<width>1152</width>
+				<height>80</height>
+				<onup>1000</onup>
+				<ondown>3000</ondown>
+				<onright>2222</onright>
+				<orientation>horizontal</orientation>
+				<focusposition>1</focusposition>
+				<itemgap>10</itemgap>
+
+				<control type="button" id="2001">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onright>2002</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.2.label.0)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.0))</visible>
+				</control>
+
+				<control type="label" id="2101">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.0)) + String.IsEmpty(Window().Property(general.sortmethod.2.label.0.last))</visible>
+				</control>
+
+				<control type="button" id="2002">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>2001</onleft>
+					<onright>2003</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.2.label.1)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.1))</visible>
+				</control>
+
+				<control type="label" id="2102">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.1)) + String.IsEmpty(Window().Property(general.sortmethod.2.label.1.last))</visible>
+				</control>
+
+				<control type="button" id="2003">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>2002</onleft>
+					<onright>2004</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.2.label.2)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.2))</visible>
+				</control>
+
+				<control type="label" id="2103">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.2)) + String.IsEmpty(Window().Property(general.sortmethod.2.label.2.last))</visible>
+				</control>
+
+				<control type="button" id="2004">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>2003</onleft>
+					<onright>2005</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.2.label.3)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.3))</visible>
+				</control>
+
+				<control type="label" id="2104">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.3)) + String.IsEmpty(Window().Property(general.sortmethod.2.label.3.last))</visible>
+				</control>
+
+				<control type="button" id="2005">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>2004</onleft>
+					<onright>2006</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.2.label.4)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.4))</visible>
+				</control>
+
+				<control type="label" id="2105">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.4)) + String.IsEmpty(Window().Property(general.sortmethod.2.label.4.last))</visible>
+				</control>
+
+				<control type="button" id="2006">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>2005</onleft>
+					<onright>2222</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.2.label.5)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.5))</visible>
+				</control>
+
+				<control type="label" id="2106">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.2.label.5)) + String.IsEmpty(Window().Property(general.sortmethod.2.label.5.last))</visible>
+				</control>
+			</control>
+		</control>
+
+		<!-- Sort Level 3 -->
+		<control type="group">
+			<width>1320</width>
+			<left>60</left>
+			<height>100</height>
+			<top>330</top>
+			<visible>Integer.IsGreaterOrEqual(Window().Property(max_level), 3)</visible>
+
+			<!-- Card -->
+			<control type="image">
+				<left>92</left>
+				<width>1228</width>
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+
+			<control type="image">
+				<top>4</top>
+				<left>20</left>
+				<width>72</width>
+				<height>72</height>
+				<colordiffuse>FFFFFFFF</colordiffuse>
+				<texture border="32,48,36,24">sort_arrow.png</texture>
+			</control>
+
+			<control type="togglebutton" id="3333">
+				<top>32</top>
+				<right>20</right>
+				<width>36</width>
+				<height>36</height>
+				<onleft>3000</onleft>
+				<onright>9000</onright>
+				<onup>2222</onup>
+				<ondown>4444</ondown>
+				<visible>!String.IsEqual(Window().Property(general.sortmethod.3),debridsort)</visible>
+				<texturenofocus colordiffuse="FFFFFFFF">sort_descending.png</texturenofocus>
+				<texturefocus colordiffuse="Window().Property(settings.color)">sort_descending.png</texturefocus>
+				<alttexturenofocus colordiffuse="FFFFFFFF">sort_ascending.png</alttexturenofocus>
+				<alttexturefocus colordiffuse="Window().Property(settings.color)">sort_ascending.png</alttexturefocus>
+				<usealttexture>String.IsEqual(Window().Property(general.sortmethod.3.reverse),True)</usealttexture>
+			</control>
+
+			<control type="grouplist" id="3000">
+				<viewtype label="Sort Level 3">list</viewtype>
+				<top>10</top>
+				<left>112</left>
+				<width>1132</width>
+				<height>80</height>
+				<onup>2000</onup>
+				<ondown>4000</ondown>
+				<onright>3333</onright>
+				<orientation>horizontal</orientation>
+				<focusposition>1</focusposition>
+				<itemgap>10</itemgap>
+
+				<control type="button" id="3001">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onright>3002</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.3.label.0)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.0))</visible>
+				</control>
+
+				<control type="label" id="3101">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.0)) + String.IsEmpty(Window().Property(general.sortmethod.3.label.0.last))</visible>
+				</control>
+
+				<control type="button" id="3002">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>3001</onleft>
+					<onright>3003</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.3.label.1)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.1))</visible>
+				</control>
+
+				<control type="label" id="3102">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.1)) + String.IsEmpty(Window().Property(general.sortmethod.3.label.1.last))</visible>
+				</control>
+
+				<control type="button" id="3003">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>3002</onleft>
+					<onright>3004</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.3.label.2)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.2))</visible>
+				</control>
+
+				<control type="label" id="3103">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.2)) + String.IsEmpty(Window().Property(general.sortmethod.3.label.2.last))</visible>
+				</control>
+
+				<control type="button" id="3004">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>3003</onleft>
+					<onright>3005</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.3.label.3)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.3))</visible>
+				</control>
+
+				<control type="label" id="3104">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.3)) + String.IsEmpty(Window().Property(general.sortmethod.3.label.3.last))</visible>
+				</control>
+
+				<control type="button" id="3005">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>3004</onleft>
+					<onright>3006</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.3.label.4)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.4))</visible>
+				</control>
+
+				<control type="label" id="3105">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.4)) + String.IsEmpty(Window().Property(general.sortmethod.3.label.4.last))</visible>
+				</control>
+
+				<control type="button" id="3006">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>3005</onleft>
+					<onright>3333</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.3.label.5)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.5))</visible>
+				</control>
+
+				<control type="label" id="3106">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.3.label.5)) + String.IsEmpty(Window().Property(general.sortmethod.3.label.5.last))</visible>
+				</control>
+			</control>
+		</control>
+
+		<!-- Sort Level 4 -->
+		<control type="group">
+			<width>1300</width>
+			<left>80</left>
+			<height>100</height>
+			<top>440</top>
+			<visible>Integer.IsGreaterOrEqual(Window().Property(max_level), 4)</visible>
+
+			<!-- Card -->
+			<control type="image">
+				<left>92</left>
+				<width>1208</width>
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+
+			<control type="image">
+				<top>4</top>
+				<left>20</left>
+				<width>72</width>
+				<height>72</height>
+				<colordiffuse>FFFFFFFF</colordiffuse>
+				<texture border="32,48,36,24">sort_arrow.png</texture>
+			</control>
+
+			<control type="togglebutton" id="4444">
+				<top>32</top>
+				<right>20</right>
+				<width>36</width>
+				<height>36</height>
+				<onleft>4000</onleft>
+				<onright>9000</onright>
+				<onup>3333</onup>
+				<ondown>5555</ondown>
+				<visible>!String.IsEqual(Window().Property(general.sortmethod.4),debridsort)</visible>
+				<texturenofocus colordiffuse="FFFFFFFF">sort_descending.png</texturenofocus>
+				<texturefocus colordiffuse="Window().Property(settings.color)">sort_descending.png</texturefocus>
+				<alttexturenofocus colordiffuse="FFFFFFFF">sort_ascending.png</alttexturenofocus>
+				<alttexturefocus colordiffuse="Window().Property(settings.color)">sort_ascending.png</alttexturefocus>
+				<usealttexture>String.IsEqual(Window().Property(general.sortmethod.4.reverse),True)</usealttexture>
+			</control>
+
+			<control type="grouplist" id="4000">
+				<viewtype label="Sort Level 4">list</viewtype>
+				<top>10</top>
+				<left>112</left>
+				<width>1112</width>
+				<height>80</height>
+				<onup>3000</onup>
+				<ondown>5000</ondown>
+				<onright>4444</onright>
+				<orientation>horizontal</orientation>
+				<focusposition>1</focusposition>
+				<itemgap>10</itemgap>
+
+				<control type="button" id="4001">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onright>4002</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.4.label.0)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.0))</visible>
+				</control>
+
+				<control type="label" id="4101">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.0)) + String.IsEmpty(Window().Property(general.sortmethod.4.label.0.last))</visible>
+				</control>
+
+				<control type="button" id="4002">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>4001</onleft>
+					<onright>4003</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.4.label.1)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.1))</visible>
+				</control>
+
+				<control type="label" id="4102">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.1)) + String.IsEmpty(Window().Property(general.sortmethod.4.label.1.last))</visible>
+				</control>
+
+				<control type="button" id="4003">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>4002</onleft>
+					<onright>4004</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.4.label.2)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.2))</visible>
+				</control>
+
+				<control type="label" id="4103">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.2)) + String.IsEmpty(Window().Property(general.sortmethod.4.label.2.last))</visible>
+				</control>
+
+				<control type="button" id="4004">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>4003</onleft>
+					<onright>4005</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.4.label.3)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.3))</visible>
+				</control>
+
+				<control type="label" id="4104">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.3)) + String.IsEmpty(Window().Property(general.sortmethod.4.label.3.last))</visible>
+				</control>
+
+				<control type="button" id="4005">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>4004</onleft>
+					<onright>4006</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.4.label.4)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.4))</visible>
+				</control>
+
+				<control type="label" id="4105">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.4)) + String.IsEmpty(Window().Property(general.sortmethod.4.label.4.last))</visible>
+				</control>
+
+				<control type="button" id="4006">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>4005</onleft>
+					<onright>4444</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.4.label.5)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.5))</visible>
+				</control>
+
+				<control type="label" id="4106">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.4.label.5)) + String.IsEmpty(Window().Property(general.sortmethod.4.label.5.last))</visible>
+				</control>
+			</control>
+		</control>
+
+		<!-- Sort Level 5 -->
+		<control type="group">
+			<width>1280</width>
+			<left>100</left>
+			<height>100</height>
+			<top>550</top>
+			<visible>Integer.IsGreaterOrEqual(Window().Property(max_level), 5)</visible>
+
+			<!-- Card -->
+			<control type="image">
+				<left>92</left>
+				<width>1188</width>
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+
+			<control type="image">
+				<top>4</top>
+				<left>20</left>
+				<width>72</width>
+				<height>72</height>
+				<colordiffuse>FFFFFFFF</colordiffuse>
+				<texture border="32,48,36,24">sort_arrow.png</texture>
+			</control>
+
+			<control type="togglebutton" id="5555">
+				<top>32</top>
+				<right>20</right>
+				<width>36</width>
+				<height>36</height>
+				<onleft>5000</onleft>
+				<onright>9000</onright>
+				<onup>4444</onup>
+				<ondown>6666</ondown>
+				<visible>!String.IsEqual(Window().Property(general.sortmethod.5),debridsort)</visible>
+				<texturenofocus colordiffuse="FFFFFFFF">sort_descending.png</texturenofocus>
+				<texturefocus colordiffuse="Window().Property(settings.color)">sort_descending.png</texturefocus>
+				<alttexturenofocus colordiffuse="FFFFFFFF">sort_ascending.png</alttexturenofocus>
+				<alttexturefocus colordiffuse="Window().Property(settings.color)">sort_ascending.png</alttexturefocus>
+				<usealttexture>String.IsEqual(Window().Property(general.sortmethod.5.reverse),True)</usealttexture>
+			</control>
+
+			<control type="grouplist" id="5000">
+				<viewtype label="Sort Level 5">list</viewtype>
+				<top>10</top>
+				<left>112</left>
+				<width>1092</width>
+				<height>80</height>
+				<onup>4000</onup>
+				<ondown>6000</ondown>
+				<onright>5555</onright>
+				<orientation>horizontal</orientation>
+				<focusposition>1</focusposition>
+				<itemgap>10</itemgap>
+
+				<control type="button" id="5001">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onright>5002</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.5.label.0)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.0))</visible>
+				</control>
+
+				<control type="label" id="5101">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.0)) + String.IsEmpty(Window().Property(general.sortmethod.5.label.0.last))</visible>
+				</control>
+
+				<control type="button" id="5002">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>5001</onleft>
+					<onright>5003</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.5.label.1)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.1))</visible>
+				</control>
+
+				<control type="label" id="5102">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.1)) + String.IsEmpty(Window().Property(general.sortmethod.5.label.1.last))</visible>
+				</control>
+
+				<control type="button" id="5003">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>5002</onleft>
+					<onright>5004</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.5.label.2)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.2))</visible>
+				</control>
+
+				<control type="label" id="5103">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.2)) + String.IsEmpty(Window().Property(general.sortmethod.5.label.2.last))</visible>
+				</control>
+
+				<control type="button" id="5004">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>5003</onleft>
+					<onright>5005</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.5.label.3)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.3))</visible>
+				</control>
+
+				<control type="label" id="5104">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.3)) + String.IsEmpty(Window().Property(general.sortmethod.5.label.3.last))</visible>
+				</control>
+
+				<control type="button" id="5005">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>5004</onleft>
+					<onright>5006</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.5.label.4)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.4))</visible>
+				</control>
+
+				<control type="label" id="5105">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.4)) + String.IsEmpty(Window().Property(general.sortmethod.5.label.4.last))</visible>
+				</control>
+
+				<control type="button" id="5006">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>5005</onleft>
+					<onright>5555</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.5.label.5)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.5))</visible>
+				</control>
+
+				<control type="label" id="5106">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.5.label.5)) + String.IsEmpty(Window().Property(general.sortmethod.5.label.5.last))</visible>
+				</control>
+			</control>
+		</control>
+
+		<!-- Sort Level 6 -->
+		<control type="group">
+			<width>1260</width>
+			<left>120</left>
+			<height>100</height>
+			<top>660</top>
+			<visible>Integer.IsGreaterOrEqual(Window().Property(max_level), 6)</visible>
+
+			<!-- Card -->
+			<control type="image">
+				<left>92</left>
+				<width>1168</width>
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+
+			<control type="image">
+				<top>4</top>
+				<left>20</left>
+				<width>72</width>
+				<height>72</height>
+				<colordiffuse>FFFFFFFF</colordiffuse>
+				<texture border="32,48,36,24">sort_arrow.png</texture>
+			</control>
+
+			<control type="togglebutton" id="6666">
+				<top>32</top>
+				<right>20</right>
+				<width>36</width>
+				<height>36</height>
+				<onleft>6000</onleft>
+				<onright>9000</onright>
+				<onup>5555</onup>
+				<ondown>7777</ondown>
+				<visible>!String.IsEqual(Window().Property(general.sortmethod.6),debridsort)</visible>
+				<texturenofocus colordiffuse="FFFFFFFF">sort_descending.png</texturenofocus>
+				<texturefocus colordiffuse="Window().Property(settings.color)">sort_descending.png</texturefocus>
+				<alttexturenofocus colordiffuse="FFFFFFFF">sort_ascending.png</alttexturenofocus>
+				<alttexturefocus colordiffuse="Window().Property(settings.color)">sort_ascending.png</alttexturefocus>
+				<usealttexture>String.IsEqual(Window().Property(general.sortmethod.6.reverse),True)</usealttexture>
+			</control>
+
+			<control type="grouplist" id="6000">
+				<viewtype label="Sort Level 6">list</viewtype>
+				<top>10</top>
+				<left>112</left>
+				<width>1072</width>
+				<height>80</height>
+				<onup>5000</onup>
+				<ondown>7000</ondown>
+				<onright>6666</onright>
+				<orientation>horizontal</orientation>
+				<focusposition>1</focusposition>
+				<itemgap>10</itemgap>
+
+				<control type="button" id="6001">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onright>6002</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.6.label.0)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.0))</visible>
+				</control>
+
+				<control type="label" id="6101">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.0)) + String.IsEmpty(Window().Property(general.sortmethod.6.label.0.last))</visible>
+				</control>
+
+				<control type="button" id="6002">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>6001</onleft>
+					<onright>6003</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.6.label.1)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.1))</visible>
+				</control>
+
+				<control type="label" id="6102">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.1)) + String.IsEmpty(Window().Property(general.sortmethod.6.label.1.last))</visible>
+				</control>
+
+				<control type="button" id="6003">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>6002</onleft>
+					<onright>6004</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.6.label.2)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.2))</visible>
+				</control>
+
+				<control type="label" id="6103">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.2)) + String.IsEmpty(Window().Property(general.sortmethod.6.label.2.last))</visible>
+				</control>
+
+				<control type="button" id="6004">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>6003</onleft>
+					<onright>6005</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.6.label.3)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.3))</visible>
+				</control>
+
+				<control type="label" id="6104">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.3)) + String.IsEmpty(Window().Property(general.sortmethod.6.label.3.last))</visible>
+				</control>
+
+				<control type="button" id="6005">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>6004</onleft>
+					<onright>6006</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.6.label.4)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.4))</visible>
+				</control>
+
+				<control type="label" id="6105">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.4)) + String.IsEmpty(Window().Property(general.sortmethod.6.label.4.last))</visible>
+				</control>
+
+				<control type="button" id="6006">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>6005</onleft>
+					<onright>6666</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.6.label.5)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.5))</visible>
+				</control>
+
+				<control type="label" id="6106">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.6.label.5)) + String.IsEmpty(Window().Property(general.sortmethod.6.label.5.last))</visible>
+				</control>
+			</control>
+		</control>
+
+		<!-- Sort Level 7 -->
+		<control type="group">
+			<width>1240</width>
+			<left>140</left>
+			<height>100</height>
+			<top>770</top>
+			<visible>Integer.IsGreaterOrEqual(Window().Property(max_level), 7)</visible>
+
+			<!-- Card -->
+			<control type="image">
+				<left>92</left>
+				<width>1148</width>
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+
+			<control type="image">
+				<top>4</top>
+				<left>20</left>
+				<width>72</width>
+				<height>72</height>
+				<colordiffuse>FFFFFFFF</colordiffuse>
+				<texture border="32,48,36,24">sort_arrow.png</texture>
+			</control>
+
+			<control type="togglebutton" id="7777">
+				<top>32</top>
+				<right>20</right>
+				<width>36</width>
+				<height>36</height>
+				<onleft>7000</onleft>
+				<onright>9000</onright>
+				<onup>6666</onup>
+				<ondown>8888</ondown>
+				<visible>!String.IsEqual(Window().Property(general.sortmethod.7),debridsort)</visible>
+				<texturenofocus colordiffuse="FFFFFFFF">sort_descending.png</texturenofocus>
+				<texturefocus colordiffuse="Window().Property(settings.color)">sort_descending.png</texturefocus>
+				<alttexturenofocus colordiffuse="FFFFFFFF">sort_ascending.png</alttexturenofocus>
+				<alttexturefocus colordiffuse="Window().Property(settings.color)">sort_ascending.png</alttexturefocus>
+				<usealttexture>String.IsEqual(Window().Property(general.sortmethod.7.reverse),True)</usealttexture>
+			</control>
+
+			<control type="grouplist" id="7000">
+				<viewtype label="Sort Level 7">list</viewtype>
+				<top>10</top>
+				<left>112</left>
+				<width>1052</width>
+				<height>80</height>
+				<onup>6000</onup>
+				<ondown>8000</ondown>
+				<onright>7777</onright>
+				<orientation>horizontal</orientation>
+				<focusposition>1</focusposition>
+				<itemgap>10</itemgap>
+
+				<control type="button" id="7001">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onright>7002</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.7.label.0)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.0))</visible>
+				</control>
+
+				<control type="label" id="7101">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.0)) + String.IsEmpty(Window().Property(general.sortmethod.7.label.0.last))</visible>
+				</control>
+
+				<control type="button" id="7002">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>7001</onleft>
+					<onright>7003</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.7.label.1)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.1))</visible>
+				</control>
+
+				<control type="label" id="7102">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.1)) + String.IsEmpty(Window().Property(general.sortmethod.7.label.1.last))</visible>
+				</control>
+
+				<control type="button" id="7003">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>7002</onleft>
+					<onright>7004</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.7.label.2)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.2))</visible>
+				</control>
+
+				<control type="label" id="7103">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.2)) + String.IsEmpty(Window().Property(general.sortmethod.7.label.2.last))</visible>
+				</control>
+
+				<control type="button" id="7004">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>7003</onleft>
+					<onright>7005</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.7.label.3)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.3))</visible>
+				</control>
+
+				<control type="label" id="7104">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.3)) + String.IsEmpty(Window().Property(general.sortmethod.7.label.3.last))</visible>
+				</control>
+
+				<control type="button" id="7005">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>7004</onleft>
+					<onright>7006</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.7.label.4)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.4))</visible>
+				</control>
+
+				<control type="label" id="7105">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.4)) + String.IsEmpty(Window().Property(general.sortmethod.7.label.4.last))</visible>
+				</control>
+
+				<control type="button" id="7006">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>7005</onleft>
+					<onright>7777</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.7.label.5)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.5))</visible>
+				</control>
+
+				<control type="label" id="7106">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.7.label.5)) + String.IsEmpty(Window().Property(general.sortmethod.7.label.5.last))</visible>
+				</control>
+			</control>
+		</control>
+
+		<!-- Sort Level 8 -->
+		<control type="group">
+			<width>1220</width>
+			<left>160</left>
+			<height>100</height>
+			<top>880</top>
+			<visible>Integer.IsGreaterOrEqual(Window().Property(max_level), 8)</visible>
+
+			<!-- Card -->
+			<control type="image">
+				<left>92</left>
+				<width>1128</width>
+				<texture>white.png</texture>
+				<colordiffuse>99362e33</colordiffuse>
+			</control>
+
+			<control type="image">
+				<top>4</top>
+				<left>20</left>
+				<width>72</width>
+				<height>72</height>
+				<colordiffuse>FFFFFFFF</colordiffuse>
+				<texture border="32,48,36,24">sort_arrow.png</texture>
+			</control>
+
+			<control type="togglebutton" id="8888">
+				<top>32</top>
+				<right>20</right>
+				<width>36</width>
+				<height>36</height>
+				<onleft>8000</onleft>
+				<onright>9000</onright>
+				<onup>7777</onup>
+				<visible>!String.IsEqual(Window().Property(general.sortmethod.8),debridsort)</visible>
+				<texturenofocus colordiffuse="FFFFFFFF">sort_descending.png</texturenofocus>
+				<texturefocus colordiffuse="Window().Property(settings.color)">sort_descending.png</texturefocus>
+				<alttexturenofocus colordiffuse="FFFFFFFF">sort_ascending.png</alttexturenofocus>
+				<alttexturefocus colordiffuse="Window().Property(settings.color)">sort_ascending.png</alttexturefocus>
+				<usealttexture>String.IsEqual(Window().Property(general.sortmethod.8.reverse),True)</usealttexture>
+			</control>
+
+			<control type="grouplist" id="8000">
+				<viewtype label="Sort Level 8">list</viewtype>
+				<top>10</top>
+				<left>112</left>
+				<width>1032</width>
+				<height>80</height>
+				<onup>7000</onup>
+				<onright>8888</onright>
+				<orientation>horizontal</orientation>
+				<focusposition>1</focusposition>
+				<itemgap>10</itemgap>
+
+				<control type="button" id="8001">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onright>8002</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.8.label.0)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.0))</visible>
+				</control>
+
+				<control type="label" id="8101">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.0)) + String.IsEmpty(Window().Property(general.sortmethod.8.label.0.last))</visible>
+				</control>
+
+				<control type="button" id="8002">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>8001</onleft>
+					<onright>8003</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.8.label.1)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.1))</visible>
+				</control>
+
+				<control type="label" id="8102">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.1)) + String.IsEmpty(Window().Property(general.sortmethod.8.label.1.last))</visible>
+				</control>
+
+				<control type="button" id="8003">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>8002</onleft>
+					<onright>8004</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.8.label.2)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.2))</visible>
+				</control>
+
+				<control type="label" id="8103">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.2)) + String.IsEmpty(Window().Property(general.sortmethod.8.label.2.last))</visible>
+				</control>
+
+				<control type="button" id="8004">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>8003</onleft>
+					<onright>8005</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.8.label.3)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.3))</visible>
+				</control>
+
+				<control type="label" id="8104">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.3)) + String.IsEmpty(Window().Property(general.sortmethod.8.label.3.last))</visible>
+				</control>
+
+				<control type="button" id="8005">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>8004</onleft>
+					<onright>8006</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.8.label.4)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.4))</visible>
+				</control>
+
+				<control type="label" id="8105">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.4)) + String.IsEmpty(Window().Property(general.sortmethod.8.label.4.last))</visible>
+				</control>
+
+				<control type="button" id="8006">
+					<width min="60" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<focusedcolor>$INFO[Window().Property(settings.color)]</focusedcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<onleft>8005</onleft>
+					<onright>8888</onright>
+					<texturefocus></texturefocus>
+					<texturenofocus></texturenofocus>
+					<label>[B][UPPERCASE]$INFO[Window().Property(general.sortmethod.8.label.5)][/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.5))</visible>
+				</control>
+
+				<control type="label" id="8106">
+					<width min="40" max="280">auto</width>
+					<font>font12</font>
+					<textcolor>66FFFFFF</textcolor>
+					<align>left</align>
+					<aligny>center</aligny>
+					<label>[B][UPPERCASE]->[/UPPERCASE][/B]</label>
+					<visible>!String.IsEmpty(Window().Property(general.sortmethod.8.label.5)) + String.IsEmpty(Window().Property(general.sortmethod.8.label.5.last))</visible>
+				</control>
+			</control>
+		</control>
+
+		<!-- Buttons -->
+		<control type="group">
+			<animation effect="slide" start="600,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
+			<animation effect="slide" end="600,0" time="350" tween="cubic" easing="in">WindowClose</animation>
+			<top>110</top>
+			<right>20</right>
+			<width>500</width>
+			<height>130</height>
+
+			<control type="group">
+
+				<!-- Card -->
+				<control type="image">
+					<texture>white.png</texture>
+					<colordiffuse>99362e33</colordiffuse>
+				</control>
+
+				<control type="grouplist" id="9000">
+					<top>25</top>
+					<onleft>1000</onleft>
+					<itemgap>10</itemgap>
+
+					<!-- Close -->
+					<control type="button" id="9001">
+						<height>80</height>
+						<textoffsetx>20</textoffsetx>
+						<texturefocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturefocus>
+						<texturenofocus colordiffuse="22000000">white.png</texturenofocus>
+						<label>$ADDON[plugin.video.seren 30459]</label>
+						<align>right</align>
+						<textcolor>FFFFFFFF</textcolor>
+					</control>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

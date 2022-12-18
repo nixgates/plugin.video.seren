@@ -1,24 +1,18 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
-import abc
 import base64
 import collections
 import datetime
+import pickle
 import time
 import types
-from functools import reduce, wraps
+from abc import ABCMeta
+from abc import abstractmethod
+from functools import reduce
+from functools import wraps
 
 from resources.lib.common import tools
 from resources.lib.database import Database
 from resources.lib.modules.exceptions import UnsupportedCacheParamException
 from resources.lib.modules.globals import g
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 
 schema = {
     "cache": {
@@ -32,15 +26,15 @@ schema = {
         ),
         "table_constraints": ["UNIQUE(id)"],
         "default_seed": [],
-        }
     }
+}
 
 
-class CacheBase:
+class CacheBase(metaclass=ABCMeta):
     """
     Base Class for handling cache calls
     """
-    __metaclass__ = abc.ABCMeta
+
     NOT_CACHED = "____NO_CACHED_OBJECT____"
     _exit = False
 
@@ -49,7 +43,7 @@ class CacheBase:
         self.cache_prefix = "cache"
 
     def _create_key(self, value):
-        return "{}.{}".format(self.cache_prefix, value)
+        return f"{self.cache_prefix}.{value}"
 
     @staticmethod
     def _get_timestamp(timedelta=None):
@@ -70,12 +64,12 @@ class CacheBase:
         if not checksum and not self.global_checksum:
             return None
         if self.global_checksum:
-            checksum = "{}-{}".format(self.global_checksum, checksum)
+            checksum = f"{self.global_checksum}-{checksum}"
         else:
             checksum = str(checksum)
         return reduce(lambda x, y: x + y, map(ord, checksum))
 
-    @abc.abstractmethod
+    @abstractmethod
     def get(self, cache_id, checksum=None):
         """
         Method for fetching values from cache locations
@@ -88,7 +82,7 @@ class CacheBase:
         :rtype: Any
         """
 
-    @abc.abstractmethod
+    @abstractmethod
     def set(self, cache_id, data, checksum=None, expiration=None):
         """
         Stores new value in cache location
@@ -104,7 +98,7 @@ class CacheBase:
         :rtype:
         """
 
-    @abc.abstractmethod
+    @abstractmethod
     def do_cleanup(self):
         """
         Process cleaning up expired values from cache locations
@@ -112,7 +106,7 @@ class CacheBase:
         :rtype:
         """
 
-    @abc.abstractmethod
+    @abstractmethod
     def clear_all(self):
         """
         Drop all values in cache locations
@@ -135,7 +129,7 @@ class Cache(CacheBase):
     """
 
     def __init__(self):
-        super(Cache, self).__init__()
+        super().__init__()
         self.enable_mem_cache = True
         self._mem_cache = MemCache()
         self._db_cache = DatabaseCache(g.CACHE_DB_PATH, schema, rebuild_callback=self._mem_cache.do_cleanup)
@@ -149,7 +143,7 @@ class Cache(CacheBase):
         :return:
         :rtype:
         """
-        self._auto_clean_interval = datetime.timedelta(hours=4) if not interval else interval
+        self._auto_clean_interval = interval or datetime.timedelta(hours=4)
 
     def get(self, cache_id, checksum=None):
         checksum = self._get_checksum(checksum)
@@ -158,13 +152,11 @@ class Cache(CacheBase):
             result = self._mem_cache.get(cache_id, checksum)
         if result == self.NOT_CACHED:
             result = self._db_cache.get(cache_id, checksum)
-            if not result == self.NOT_CACHED and self.enable_mem_cache:
+            if result != self.NOT_CACHED and self.enable_mem_cache:
                 self._mem_cache.set(cache_id, result, checksum)
         return result
 
-    def set(
-            self, cache_id, data, checksum=None, expiration=None
-            ):
+    def set(self, cache_id, data, checksum=None, expiration=None):
 
         if expiration is None:
             expiration = datetime.timedelta(hours=24)
@@ -218,12 +210,12 @@ class DatabaseCache(Database, CacheBase):
 
     def __init__(self, db_file, database_layout, rebuild_callback=None):
         self.rebuild_callback = rebuild_callback
-        super(DatabaseCache, self).__init__(db_file, database_layout)
+        super().__init__(db_file, database_layout)
         CacheBase.__init__(self)
         self.cache_table_name = next(iter(database_layout))
 
     def rebuild_database(self):
-        super(DatabaseCache, self).rebuild_database()
+        super().rebuild_database()
         if callable(self.rebuild_callback):
             self.rebuild_callback()
 
@@ -233,16 +225,17 @@ class DatabaseCache(Database, CacheBase):
         if g.get_bool_runtime_setting(self._create_key("db.clean.busy")):
             return
         g.set_runtime_setting(self._create_key("db.clean.busy"), True)
-        query = "DELETE FROM {} where expires < ?".format(self.cache_table_name)
+        query = f"DELETE FROM {self.cache_table_name} where expires < ?"
         self.execute_sql(query, (self._get_timestamp(),))
         g.clear_runtime_setting(self._create_key("db.clean.busy"))
 
     def get(self, cache_id, checksum=None):
         cur_time = self._get_timestamp()
-        query = "SELECT expires, data, checksum FROM {} WHERE id = ? AND expires > ? " \
-                "AND (checksum IS NULL OR checksum = ?)".format(self.cache_table_name)
-        cache_data = self.fetchone(query, (cache_id, cur_time, checksum))
-        if cache_data:
+        query = f"""
+            SELECT expires, data, checksum FROM {self.cache_table_name}
+            WHERE id = ? AND expires > ? AND (checksum IS NULL OR checksum = ?)
+            """
+        if cache_data := self.fetchone(query, (cache_id, cur_time, checksum)):
             return cache_data["data"]
         return self.NOT_CACHED
 
@@ -251,15 +244,19 @@ class DatabaseCache(Database, CacheBase):
             expiration = datetime.timedelta(hours=24)
 
         expires = self._get_timestamp(expiration)
-        query = "INSERT OR REPLACE INTO {}( id, expires, data, checksum) " \
-                "VALUES (?, ?, ?, ?)".format(self.cache_table_name)
-        self.execute_sql(query, (cache_id, expires, data, checksum))
+        query = f"""
+            INSERT
+            INTO {self.cache_table_name}(id, expires, data, checksum) VALUES (?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE
+                SET (expires, data, checksum) = (?, ?, ?)
+        """
+        self.execute_sql(query, (cache_id, expires, data, checksum, expires, data, checksum))
 
     def clear_all(self):
         self.rebuild_database()
 
     def close(self):
-        super(DatabaseCache, self).close()
+        super().close()
 
 
 class MemCache(CacheBase):
@@ -268,18 +265,17 @@ class MemCache(CacheBase):
     """
 
     def __init__(self):
-        super(MemCache, self).__init__()
-        self._index_key = self._create_key("cache.index")
+        super().__init__()
+        self._index_key = self._create_key("index")
         self._index = set()
         self._get_index()
 
     def _get_index(self):
-        index = g.get_runtime_setting(self._index_key)
-        if index:
-            self._index = set(index)
+        if index := g.get_runtime_setting(self._index_key):
+            self._index = set(index.split(","))
 
     def _save_index(self):
-        cached_string = list(self._index)
+        cached_string = ",".join(self._index)
         g.set_runtime_setting(self._index_key, cached_string)
 
     def _clear_index(self):
@@ -308,9 +304,9 @@ class MemCache(CacheBase):
         g.set_runtime_setting(
             cache_id,
             base64.standard_b64encode(pickle.dumps(cached)).decode(),
-            )
+        )
         self._get_index()
-        self._index.add((cache_id, expires))
+        self._index.add(f"{cache_id}:{expires}")
         self._save_index()
 
     def do_cleanup(self):
@@ -322,20 +318,25 @@ class MemCache(CacheBase):
         g.set_runtime_setting(self._create_key("mem.clean.busy"), True)
 
         self._get_index()
-        for cache_id, expires in self._index:
-            if expires < cur_timestamp:
+        to_discard = set()
+        for item in self._index:
+            cache_id, expires = item.split(":", 1)
+            if float(expires) < cur_timestamp:
                 g.clear_runtime_setting(cache_id)
+                to_discard.add(item)
+        self._index = self._index - to_discard
+        self._save_index()
 
         g.clear_runtime_setting(self._create_key("mem.clean.busy"))
 
     def clear_all(self):
         self._get_index()
-        for cache_id, expires in self._index:
-            g.clear_runtime_setting(cache_id)
+        for item in self._index:
+            g.clear_runtime_setting(item.split(":", 1)[0])
         self._clear_index()
 
     def close(self):
-        super(MemCache, self).close()
+        super().close()
 
 
 def use_cache(cache_hours=12):
@@ -372,7 +373,8 @@ def use_cache(cache_hours=12):
 
             if func.__name__ == "get_sources":
                 overwrite_cache = kwargs.get("overwrite_cache", False)
-                kwargs_cache_value = {k: v for k, v in kwargs.items() if not k == "overwrite_cache"}
+                kwargs_cache_value = {k: v for k, v in kwargs.items() if k != "overwrite_cache"}
+
             else:
                 overwrite_cache = kwargs.pop("overwrite_cache", False)
                 kwargs_cache_value = kwargs
@@ -388,8 +390,10 @@ def use_cache(cache_hours=12):
                 method_class.__class__.__name__,
                 func.__name__,
                 tools.md5_hash(args[1:]),
-                tools.md5_hash(kwargs_cache_value))
-            cached_data = g.CACHE.get(cache_str, checksum=checksum) if not overwrite_cache else CacheBase.NOT_CACHED
+                tools.md5_hash(kwargs_cache_value),
+            )
+            cached_data = CacheBase.NOT_CACHED if overwrite_cache else g.CACHE.get(cache_str, checksum=checksum)
+
             if cached_data == CacheBase.NOT_CACHED:
                 fresh_result = func(*args, **kwargs)
                 if func.__name__ == "get_sources" and (not fresh_result or len(fresh_result[1]) == 0):
@@ -400,10 +404,9 @@ def use_cache(cache_hours=12):
                         fresh_result,
                         expiration=datetime.timedelta(hours=hours),
                         checksum=checksum,
-                        )
+                    )
                 except TypeError:
                     g.log_stacktrace()
-                    pass
                 return fresh_result
             else:
                 return cached_data

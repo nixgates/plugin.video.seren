@@ -125,3 +125,4 @@ thumbs.db
 # test cache
 .pytest_cache
 /userdata/
+*.psd

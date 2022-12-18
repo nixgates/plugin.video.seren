@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 import time
 
@@ -36,17 +33,13 @@ def update_provider_packages():
     :return: None
     :rtype: None
     """
-    provider_check_stamp = g.get_float_runtime_setting(
-        "provider.updateCheckTimeStamp", 0
-    )
+    provider_check_stamp = g.get_float_runtime_setting("provider.updateCheckTimeStamp", 0)
     automatic = g.get_bool_setting("providers.autoupdates")
     if time.time() > (provider_check_stamp + (24 * (60 * 60))):
-        available_updates = ProviderInstallManager().check_for_updates(
-            silent=True, automatic=automatic
-        )
+        available_updates = ProviderInstallManager().check_for_updates(silent=True, automatic=automatic)
         if not automatic and len(available_updates) > 0:
             g.notification(g.ADDON_NAME, g.get_language_string(30253))
-        g.set_runtime_setting("provider.updateCheckTimeStamp", g.UNICODE(time.time()))
+        g.set_runtime_setting("provider.updateCheckTimeStamp", str(time.time()))
 
 
 def refresh_apis():
@@ -72,8 +65,7 @@ def wipe_install():
 
     confirm = xbmcgui.Dialog().yesno(
         g.ADDON_NAME,
-        g.get_language_string(30034)
-        + "{}".format(g.color_string(g.get_language_string(30035))),
+        f"{g.get_language_string(30034)}{g.color_string(g.get_language_string(30035))}",
     )
     if confirm == 0:
         return
@@ -128,7 +120,7 @@ def account_premium_status_checks():
         :return: None
         :rtype: None
         """
-        g.set_setting("{}.premiumstatus".format(debrid_provider), status.title())
+        g.set_setting(f"{debrid_provider}.premiumstatus", status.title())
 
     def display_expiry_notification(display_debrid_name):
         """
@@ -140,7 +132,7 @@ def account_premium_status_checks():
         """
         if g.get_bool_setting("general.accountNotifications"):
             g.notification(
-                "{}".format(g.ADDON_NAME),
+                f"{g.ADDON_NAME}",
                 g.get_language_string(30036).format(display_debrid_name),
             )
 
@@ -156,7 +148,7 @@ def account_premium_status_checks():
             status = service_module.get_account_status()
             if status == "expired":
                 display_expiry_notification(service[0])
-            g.log("{}: {}".format(service[0], status))
+            g.log(f"{service[0]}: {status}")
             set_settings_status(service[2], status)
 
 
@@ -169,7 +161,7 @@ def toggle_reuselanguageinvoker(forced_state=None):
 
     file_path = os.path.join(g.ADDON_DATA_PATH, "addon.xml")
 
-    with open(file_path, "r") as addon_xml:
+    with open(file_path) as addon_xml:
         file_lines = addon_xml.readlines()
 
     for i in range(len(file_lines)):
@@ -226,24 +218,22 @@ def run_maintenance():
     try:
         refresh_apis()
     except Exception as e:
-        g.log("Failed to update API keys: {}".format(e), 'error')
+        g.log(f"Failed to update API keys: {e}", 'error')
 
     try:
         account_premium_status_checks()
     except Exception as e:
-        g.log("Failed to check account status: {}".format(e), 'error')
+        g.log(f"Failed to check account status: {e}", 'error')
     ProviderInstallManager()
     update_provider_packages()
     update_themes()
 
     # Check Premiumize Fair Usage for cleanup
-    if g.get_bool_setting("premiumize.enabled") and g.get_bool_setting(
-            "premiumize.autodelete"
-    ):
+    if g.get_bool_setting("premiumize.enabled") and g.get_bool_setting("premiumize.autodelete"):
         try:
             premiumize_transfer_cleanup()
         except Exception as e:
-            g.log("Failed to cleanup PM transfers: {}".format(e), 'error')
+            g.log(f"Failed to cleanup PM transfers: {e}", 'error')
 
     # clean_deprecated_settings()
     cache.Cache().check_cleanup()

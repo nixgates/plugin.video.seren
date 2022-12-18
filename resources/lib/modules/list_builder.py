@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 
 import xbmcplugin
 
 from resources.lib.common import tools
-from resources.lib.database.trakt_sync import movies, shows
+from resources.lib.database.trakt_sync import movies
+from resources.lib.database.trakt_sync import shows
 from resources.lib.modules.globals import g
 
 
-class ListBuilder(object):
+class ListBuilder:
     """
     Ease of use class to handle building menus of lists or list items
     """
@@ -23,9 +21,7 @@ class ListBuilder(object):
         self.page_limit = g.get_int_setting("item.limit")
         self.hide_unaired = g.get_bool_setting("general.hideUnAired")
         self.list_title_appends = g.get_int_setting("general.appendListTitles")
-        self.show_original_title = g.get_bool_setting(
-            "general.meta.showoriginaltitle", False
-        )
+        self.show_original_title = g.get_bool_setting("general.meta.showoriginaltitle", False)
 
     def season_list_builder(self, show_id, **params):
         """
@@ -35,10 +31,7 @@ class ListBuilder(object):
         :return: List list_items if smart_play Kwarg is True else None
         """
         return self._common_menu_builder(
-            shows.TraktSyncDatabase().get_season_list(show_id, **params),
-            g.CONTENT_SEASON,
-            "seasonEpisodes",
-            **params
+            shows.TraktSyncDatabase().get_season_list(show_id, **params), g.CONTENT_SEASON, "seasonEpisodes", **params
         )
 
     def episode_list_builder(self, trakt_show_id, trakt_season=None, **params):
@@ -55,14 +48,11 @@ class ListBuilder(object):
 
         return self._common_menu_builder(
             shows.TraktSyncDatabase().get_episode_list(
-                trakt_show_id,
-                trakt_season,
-                minimum_episode=params.pop("minimum_episode", None),
-                **params
+                trakt_show_id, trakt_season, minimum_episode=params.pop("minimum_episode", None), **params
             ),
             g.CONTENT_EPISODE,
             action,
-            **params
+            **params,
         )
 
     def mixed_episode_builder(self, trakt_list, **params):
@@ -78,10 +68,7 @@ class ListBuilder(object):
         action = "getSources"
 
         return self._common_menu_builder(
-            shows.TraktSyncDatabase().get_mixed_episode_list(trakt_list, **params),
-            g.CONTENT_EPISODE,
-            action,
-            **params
+            shows.TraktSyncDatabase().get_mixed_episode_list(trakt_list, **params), g.CONTENT_EPISODE, action, **params
         )
 
     def show_list_builder(self, trakt_list, **params):
@@ -98,10 +85,7 @@ class ListBuilder(object):
             action = "forceResumeShow"
 
         self._common_menu_builder(
-            shows.TraktSyncDatabase().get_show_list(trakt_list, **params),
-            g.CONTENT_SHOW,
-            action,
-            **params
+            shows.TraktSyncDatabase().get_show_list(trakt_list, **params), g.CONTENT_SHOW, action, **params
         )
 
     def movie_menu_builder(self, trakt_list, **params):
@@ -116,10 +100,7 @@ class ListBuilder(object):
         action = "getSources"
 
         self._common_menu_builder(
-            movies.TraktSyncDatabase().get_movie_list(trakt_list, **params),
-            g.CONTENT_MOVIE,
-            action,
-            **params
+            movies.TraktSyncDatabase().get_movie_list(trakt_list, **params), g.CONTENT_MOVIE, action, **params
         )
 
     def lists_menu_builder(self, trakt_list, **params):
@@ -129,11 +110,14 @@ class ListBuilder(object):
         :param params: Parameters to send to common_menu_builder method
         :return: List list_items if smart_play Kwarg is True else None
         """
-        self._common_menu_builder(trakt_list, g.CONTENT_MENU, "traktList", **params)
+        self._common_menu_builder(
+            [dict(item, art=g.create_icon_dict("list", g.ICONS_PATH)['art']) for item in trakt_list],
+            g.CONTENT_MENU,
+            "traktList",
+            **params,
+        )
 
-    def _common_menu_builder(
-        self, trakt_list, content_type, action="getSources", **params
-    ):
+    def _common_menu_builder(self, trakt_list, content_type, action="getSources", **params):
         if len(trakt_list) == 0:
             g.log("We received no titles to build a list", "warning")
             g.cancel_directory()
@@ -155,24 +139,16 @@ class ListBuilder(object):
             params["bulk_add"] = True
             list_items = [
                 g.add_directory_item(
-                    item.get("name"),
-                    action=action,
-                    menu_item=item,
-                    action_args=item.get("args"),
-                    **params
+                    item.get("name"), action=action, menu_item=item, action_args=item.get("args"), **params
                 )
-                for item in self._post_process_list(
-                    trakt_list, prepend_date, mixed_list
-                )
+                for item in self._post_process_list(trakt_list, prepend_date, mixed_list)
                 if item is not None
             ]
 
             if smart_play:
                 return list_items
             else:
-                xbmcplugin.addDirectoryItems(
-                    g.PLUGIN_HANDLE, list_items, len(list_items)
-                )
+                xbmcplugin.addDirectoryItems(g.PLUGIN_HANDLE, list_items, len(list_items))
         except Exception as e:
             g.log_stacktrace()
             if not smart_play:
@@ -182,9 +158,7 @@ class ListBuilder(object):
         finally:
             if not smart_play:
                 if (
-                    not (
-                        g.FROM_WIDGET and g.get_bool_setting("general.widget.hide_next")
-                    )
+                    not (g.FROM_WIDGET and g.get_bool_setting("general.widget.hide_next"))
                     and not no_paging
                     and len(list_items) >= self.page_limit
                 ):
@@ -197,12 +171,8 @@ class ListBuilder(object):
                     params.update({"special_sort": "bottom"})
                     g.add_directory_item(
                         g.get_language_string(33078, addon=False),
-                        menu_item={
-                            "art": dict.fromkeys(
-                                ['icon', 'poster', 'thumb', 'fanart'], g.NEXT_PAGE_ICON
-                            )
-                        },
-                        **params
+                        menu_item=g.create_icon_dict("next", base_path=g.ICONS_PATH),
+                        **params,
                     )
                 g.close_directory(content_type, sort=sort)
 
@@ -220,26 +190,14 @@ class ListBuilder(object):
         if int(air_date[:4]) < 1970:
             return True
 
-        time_format = g.DATE_TIME_FORMAT
-
-        if len(air_date) == 10:
-            time_format = g.DATE_FORMAT
-
+        air_date = tools.parse_datetime(air_date, False)
         if self.date_delay:
-            air_date = tools.parse_datetime(air_date, time_format, False)
             air_date += datetime.timedelta(days=1)
-        else:
-            air_date = tools.parse_datetime(air_date, time_format, False)
 
-        if air_date >= datetime.datetime.utcnow():
-            return False
-        else:
-            return True
+        return air_date < datetime.datetime.utcnow()
 
     def _post_process_list(self, item_list, prepend_date=False, mixed_list=False):
-        return [
-            self._post_process(item, prepend_date, mixed_list) for item in item_list
-        ]
+        return [self._post_process(item, prepend_date, mixed_list) for item in item_list]
 
     def _post_process(self, item, prepend_date=False, mixed_list=False):
         if not item:
@@ -251,37 +209,26 @@ class ListBuilder(object):
             name = item.get("info", {}).get("title")
 
         if not name:
-            g.log("Item has no title: {}".format(item), "error")
+            g.log(f"Item has no title: {item}", "error")
 
-        if (
-            not item["info"]["mediatype"] == "list"
-            and not self.hide_unaired
-            and not self.is_aired(item)
-        ):
+        if item["info"]["mediatype"] != "list" and not self.hide_unaired and not self.is_aired(item):
             name = g.color_string(tools.italic_string(name), "red")
 
         if item["info"]["mediatype"] == "episode":
             if self.title_appends_mixed and mixed_list:
-                name = self._handle_episode_title_appending(
-                    name, item, self.title_appends_mixed
-                )
+                name = self._handle_episode_title_appending(name, item, self.title_appends_mixed)
             elif self.title_appends_general and not mixed_list:
-                name = self._handle_episode_title_appending(
-                    name, item, self.title_appends_general
-                )
+                name = self._handle_episode_title_appending(name, item, self.title_appends_general)
 
         if item["info"]["mediatype"] == "list" and self.list_title_appends == 1:
-            name += " - {}".format(
-                g.color_string(item["info"]["username"])
-            )
+            name += f" - {g.color_string(item['info']['username'])}"
 
-        if not item["info"]["mediatype"] == "list" and prepend_date:
-            release_date = g.utc_to_local(item.get("air_date", item["info"].get("aired", None)))
-            if release_date:
-                release_day = tools.parse_datetime(release_date, g.DATE_TIME_FORMAT, date_only=False).strftime(
-                    "{} @ {}".format("%a %d %b", g.KODI_TIME_NO_SECONDS_FORMAT)
+        if item["info"]["mediatype"] != "list" and prepend_date:
+            if release_date := g.utc_to_local(item.get("air_date", item["info"].get("aired", None))):
+                release_day = tools.parse_datetime(release_date, date_only=False).strftime(
+                    f"%a %d %b @ {g.KODI_TIME_NO_SECONDS_FORMAT}"
                 )
-                name = "[{}] {}".format(release_day, name)
+                name = f"[{release_day}] {name}"
         item.update({"name": name})
         item["info"]["title"] = name
 
@@ -290,23 +237,12 @@ class ListBuilder(object):
     @staticmethod
     def _handle_episode_title_appending(name, item, title_append_style):
         if title_append_style == "1":
-            name = "{}x{} {}".format(
-                g.UNICODE(item["info"]["season"]).zfill(2),
-                g.UNICODE(item["info"]["episode"]).zfill(2),
-                name,
-            )
+            name = f"{str(item['info']['season']).zfill(2)}x{str(item['info']['episode']).zfill(2)} {name}"
 
         elif title_append_style == "2":
-            name = "{}: {}".format(
-                g.color_string(item["info"]["tvshowtitle"]), name
-            )
+            name = f"{g.color_string(item['info']['tvshowtitle'])}: {name}"
 
         elif title_append_style == "3":
-            name = "{}: {}x{} {}".format(
-                g.color_string(item["info"]["tvshowtitle"]),
-                g.UNICODE(item["info"]["season"]).zfill(2),
-                g.UNICODE(item["info"]["episode"]).zfill(2),
-                name,
-            )
+            name = f'{g.color_string(item["info"]["tvshowtitle"])}: {str(item["info"]["season"]).zfill(2)}x{str(item["info"]["episode"]).zfill(2)} {name}'
 
         return name

@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.modules.globals import g
 
 
-class SyncLock(object):
+class SyncLock:
     def __init__(self, lock_name, trakt_ids=None):
         self._lock_name = lock_name
         self._lock_format = "{}.SyncLock.{}.{}"
-        self._trakt_ids = trakt_ids if trakt_ids else []
+        self._trakt_ids = trakt_ids or []
         self._running_ids = set()
 
     def _create_key(self, value):
@@ -19,8 +16,9 @@ class SyncLock(object):
         return i
 
     def _run(self):
-        self._running_ids = {self._run_id(i) for i in self._trakt_ids
-                             if not g.get_bool_runtime_setting(self._create_key(i))}
+        self._running_ids = {
+            self._run_id(i) for i in self._trakt_ids if not g.get_bool_runtime_setting(self._create_key(i))
+        }
 
     def _still_processing(self):
         return any(g.get_bool_runtime_setting(self._create_key(i)) for i in self._trakt_ids)
@@ -36,6 +34,5 @@ class SyncLock(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         for i in self._running_ids:
             g.clear_runtime_setting(self._create_key(i))
-        while not g.abort_requested() and self._still_processing():
-            if g.wait_for_abort(.100):
-                break
+        while not g.abort_requested() and self._still_processing() and not g.wait_for_abort(0.100):
+            pass

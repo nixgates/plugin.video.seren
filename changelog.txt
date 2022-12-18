@@ -1,3 +1,48 @@
+Changelog 3.0.0
+[PERFORMANCE] Drop support for Python 2.x (Kodi Leia and below)
+[PERFORMANCE] Optimize codebase for Python 3.x (Kodi Matrix and above)
+[PERFORMANCE] Improvements to Smart Play
+[PERFORMANCE] Improve playlist creation
+[PERFORMANCE] Don't use strptime
+[PERFORMANCE] Small perf improvement to supported file type checks
+[PERFORMANCE] Optimize from_widget detection
+[PERFORMANCE] Optimize movie release date handling
+[PERFORMANCE] Use cache for pull_all if not page 1 and ignore_cache = True
+[FEATURE] Introduce support for direct sources
+[FEATURE] Better support for adaptive sources
+[FEATURE] Better passing of movie aliases to providers
+[FEATURE] Smoother resolver flow
+[FEATURE] Convert add-on settings to new format
+[FEATURE] Add AV1 filter
+[FEATURE] Rework alias passing to scrapers
+[FEATURE] Better identification of WEB and BLURAY sources
+[FEATURE] Support clearlogo from TMDB
+[FEATURE] Prioritize Trakt airdate metadata
+[FEATURE] Update Seren logo for 3.0.0
+[FEATURE] Icons for all menus
+[FEATURE] Support package and provider icons
+[FEATURE] Add Hebrew localizations
+[FEATURE] Update pytz to 2022.7
+[BUG] Improve Player resiliency and error handling (re-factor)
+[BUG] Fix Multiple issues with player up next popup and track watched reported
+[BUG] Fix Task Done error (re-write Threadpool)
+[BUG] Fix Smartplay not working after 2nd episode watched
+[BUG] Improve Database handling and Foreign Key references (DB schema refactor)
+[BUG] Increase RD timeout
+[BUG] Fix Trakt bookmark handling
+[BUG] Fix TVDB Normalization error
+[BUG] Fix Most TV Show Episodes/Seasons don't have certification (MPAA)
+[BUG] Fix Awake from sleep sometimes misses plugin calls
+[BUG] Fix Seren not playing some cached files from Premiumize
+[BUG] Fix sort_select tries to read invalid settings
+[BUG] Fix Local time conversion not happening for movies releases
+[BUG] Fix Clear logo overlap on getSources window
+[BUG] Fix Widgets Disappear on Error
+[BUG] Fix two bugs with Trakt watched/unwatched actions
+[BUG] Fix missing seeds count when Manual Caching
+[BUG] Fix typo in German localizations
+[BUG] Remove rogue \ in translations
+
 Changelog 2.2.4
 [BUG] Fix bugs related to foreign key constraints
 

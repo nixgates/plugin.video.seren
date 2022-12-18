@@ -1,0 +1,3615 @@
+# Kodi Media Center language file
+# Addon Name: Seren
+# Addon id: plugin.video.Seren
+# Addon Provider: Nixgates
+msgid ""
+msgstr ""
+
+#: /resources/lib/gui/homeMenu.py:8
+msgctxt "#30000"
+msgid "Discover Movies"
+msgstr "גלה סרטים "
+
+#: /resources/lib/gui/homeMenu.py:21
+msgctxt "#30001"
+msgid "My Movies"
+msgstr "הסרטים שלי"
+
+#: /resources/lib/gui/homeMenu.py:14
+msgctxt "#30002"
+msgid "Discover TV Shows"
+msgstr "גלה תוכניות טלוויזיה"
+
+#: /resources/lib/gui/homeMenu.py:27
+msgctxt "#30003"
+msgid "My Shows"
+msgstr "ההופעות שלי"
+
+#: /resources/settings.xml:31 /resources/settings.xml:42
+#: /resources/lib/gui/movieMenus.py:62 /resources/lib/gui/tvshowMenus.py:74
+msgctxt "#30004"
+msgid "Most Popular"
+msgstr "הכי פופולארי"
+
+#: /resources/lib/gui/movieMenus.py:77 /resources/lib/gui/tvshowMenus.py:89
+msgctxt "#30005"
+msgid "Recommended For You"
+msgstr "מומלץ עבורך"
+
+#: /resources/settings.xml:30 /resources/settings.xml:41
+#: /resources/lib/gui/movieMenus.py:83 /resources/lib/gui/tvshowMenus.py:95
+msgctxt "#30006"
+msgid "Trending"
+msgstr "טרנד"
+
+#: /resources/lib/gui/movieMenus.py:97 /resources/lib/gui/tvshowMenus.py:115
+msgctxt "#30007"
+msgid "Most Played"
+msgstr "הכי משוחק"
+
+#: /resources/lib/gui/movieMenus.py:105 /resources/lib/gui/tvshowMenus.py:123
+msgctxt "#30008"
+msgid "Most Watched"
+msgstr "הנצפים ביותר"
+
+#: /resources/lib/gui/movieMenus.py:113 /resources/lib/gui/tvshowMenus.py:131
+msgctxt "#30009"
+msgid "Most Collected"
+msgstr "הכי נאספו"
+
+#: /resources/lib/gui/movieMenus.py:136 /resources/lib/gui/tvshowMenus.py:154
+msgctxt "#30010"
+msgid "Most Anticipated"
+msgstr "הכי צפוי"
+
+#: /resources/lib/gui/movieMenus.py:152 /resources/lib/gui/tvshowMenus.py:163
+msgctxt "#30011"
+msgid "Recently Updated"
+msgstr "עודכן לאחרונה"
+
+#: /resources/lib/gui/movieMenus.py:144
+msgctxt "#30012"
+msgid "Box Office Top 10"
+msgstr "טופ 10 קופות"
+
+#: /resources/lib/gui/homeMenu.py:40 /resources/lib/gui/movieMenus.py:177
+#: /resources/lib/gui/movieMenus.py:184 /resources/lib/gui/movieMenus.py:331
+#: /resources/lib/gui/movieMenus.py:381 /resources/lib/gui/tvshowMenus.py:194
+#: /resources/lib/gui/tvshowMenus.py:201 /resources/lib/gui/tvshowMenus.py:452
+#: /resources/lib/gui/tvshowMenus.py:484
+msgctxt "#30013"
+msgid "Search..."
+msgstr "לחפש..."
+
+#: /resources/lib/gui/movieMenus.py:201 /resources/lib/gui/tvshowMenus.py:218
+msgctxt "#30014"
+msgid "Collection"
+msgstr "אוסף"
+
+#: /resources/lib/gui/movieMenus.py:207 /resources/lib/gui/tvshowMenus.py:224
+msgctxt "#30015"
+msgid "Watchlist"
+msgstr "רשימת מעקב"
+
+#: /resources/lib/modules/globals.py:912
+msgctxt "#30016"
+msgid "Color Picker"
+msgstr "בוחר הצבעים"
+
+#: /resources/lib/debrid/real_debrid.py:74
+msgctxt "#30017"
+msgid "Real-Debrid Auth"
+msgstr "Real-Debrid Auth"
+
+#: /resources/lib/indexers/trakt.py:448 /resources/lib/debrid/premiumize.py:78
+#: /resources/lib/debrid/real_debrid.py:76
+#: /resources/lib/debrid/all_debrid.py:112
+msgctxt "#30018"
+msgid "Open this link in a browser: {}"
+msgstr "פתח את הקישור הזה בדפדפן: {}"
+
+#: /resources/lib/indexers/trakt.py:449 /resources/lib/debrid/premiumize.py:79
+#: /resources/lib/debrid/real_debrid.py:77
+#: /resources/lib/debrid/all_debrid.py:113
+msgctxt "#30019"
+msgid "Enter the code: {}"
+msgstr "הכנס את הקוד: {}"
+
+#: /resources/lib/debrid/premiumize.py:98
+#: /resources/lib/debrid/real_debrid.py:120
+#: /resources/lib/debrid/all_debrid.py:144
+msgctxt "#30020"
+msgid "Authentication is completed"
+msgstr "האימות הושלם"
+
+#: /resources/lib/indexers/trakt.py:418
+msgctxt "#30021"
+msgid "Trakt Successfully Disconnected"
+msgstr "טראקט מנותק בהצלחה"
+
+#: /resources/lib/indexers/trakt.py:446
+msgctxt "#30022"
+msgid "Authorize Trakt"
+msgstr "אישור Trakt"
+
+#: /resources/lib/indexers/trakt.py:438 /resources/lib/indexers/trakt.py:482
+msgctxt "#30023"
+msgid ""
+"Error while authenticating with Trakt.\n"
+"Please try again."
+msgstr "בבקשה נסה שוב."
+
+#: /resources/lib/indexers/tvdb.py:54 /resources/lib/indexers/trakt.py:58
+#: /resources/lib/indexers/tmdb.py:33 /resources/lib/indexers/omdb.py:51
+#: /resources/lib/indexers/fanarttv.py:37
+#: /resources/lib/debrid/all_debrid.py:40
+msgctxt "#30024"
+msgid "Unknown Error Connecting to {}"
+msgstr "שגיאה לא ידועה בחיבור אל {}"
+
+#: /resources/lib/gui/homeMenu.py:57 /resources/lib/gui/homeMenu.py:70
+msgctxt "#30025"
+msgid "Search Movies..."
+msgstr "חפש סרטים..."
+
+#: /resources/lib/gui/homeMenu.py:63 /resources/lib/gui/homeMenu.py:76
+msgctxt "#30026"
+msgid "Search Shows..."
+msgstr "חפש תוכניות..."
+
+#: /resources/lib/gui/homeMenu.py:46
+msgctxt "#30027"
+msgid "Tools"
+msgstr "כלים"
+
+#: /resources/settings.xml:2082 /resources/settings.xml:2083
+#: /resources/lib/gui/homeMenu.py:112
+msgctxt "#30028"
+msgid "Clear Cache"
+msgstr "נקה מטמון"
+
+#: /resources/lib/modules/globals.py:1005
+msgctxt "#30029"
+msgid "Are you sure you wish to clear the cache?"
+msgstr "האם אתה בטוח שברצונך לנקות את המטמון?"
+
+#: /resources/lib/modules/helpers.py:115
+msgctxt "#30030"
+msgid "Starting Engines"
+msgstr "הפעלת מנועים"
+
+#: /resources/lib/gui/windows/source_select.py:88
+#: /resources/lib/modules/sourceSelect.py:27
+#: /resources/lib/modules/router.py:183 /resources/lib/modules/helpers.py:95
+msgctxt "#30032"
+msgid "No playable sources found for item"
+msgstr "לא נמצאו מקורות ניתנים להפעלה עבור הפריט"
+
+#: /resources/lib/modules/router.py:393
+msgctxt "#30033"
+msgid "Silent Scraper Setting has been reset"
+msgstr "הגדרת המגרד השקט אופסה"
+
+#: /resources/lib/common/maintenance.py:67
+msgctxt "#30034"
+msgid ""
+"Please be aware this will completely wipe the following:\n"
+"Cached Data, Settings, Installed Providers\n"
+msgstr ""
+"לידיעתך, פעולה זו תמחק לחלוטין את הדברים הבאים:\n"
+"נתונים במטמון, הגדרות, ספקים מותקנים\n"
+
+#: /resources/lib/common/maintenance.py:67
+msgctxt "#30035"
+msgid "ARE YOU SURE?"
+msgstr "האם אתה בטוח?"
+
+#: /resources/lib/common/maintenance.py:135
+msgctxt "#30036"
+msgid "Your {} Premium status has expired"
+msgstr "פג תוקף סטטוס הפרימיום שלך ב-{}"
+
+#: /resources/lib/gui/homeMenu.py:99
+msgctxt "#30037"
+msgid "Provider Tools"
+msgstr "כלים לספק"
+
+#: /resources/lib/gui/homeMenu.py:106
+msgctxt "#30038"
+msgid "Premium Services"
+msgstr "שירותי פרימיום"
+
+#: /resources/settings.xml:2091 /resources/lib/gui/homeMenu.py:119
+msgctxt "#30039"
+msgid "Clear Local Torrent Cache"
+msgstr "נקה מטמון טורנט מקומי"
+
+#: /resources/lib/gui/homeMenu.py:133
+msgctxt "#30040"
+msgid "Open Settings Menu"
+msgstr "פתח את תפריט ההגדרות"
+
+#: /resources/settings.xml:2107 /resources/lib/gui/homeMenu.py:140
+msgctxt "#30041"
+msgid "Wipe Addon Data"
+msgstr "מחק נתוני תוסף"
+
+#: /resources/lib/gui/movieMenus.py:158 /resources/lib/gui/tvshowMenus.py:181
+msgctxt "#30042"
+msgid "Genres"
+msgstr "ז'אנרים"
+
+#: /resources/lib/gui/movieMenus.py:195 /resources/lib/gui/tvshowMenus.py:212
+msgctxt "#30043"
+msgid "Finish Watching"
+msgstr "סיים לצפות"
+
+#: /resources/lib/gui/movieMenus.py:213
+msgctxt "#30044"
+msgid "My Movie Lists"
+msgstr "רשימות הסרטים שלי"
+
+#: /resources/lib/gui/movieMenus.py:416 /resources/lib/gui/tvshowMenus.py:532
+msgctxt "#30045"
+msgid "Multi Select..."
+msgstr "בחירה מרובה..."
+
+#: /resources/lib/gui/tvshowMenus.py:109
+msgctxt "#30046"
+msgid "New TV Shows"
+msgstr "תוכניות טלוויזיה חדשות"
+
+#: /resources/lib/indexers/trakt.py:450 /resources/lib/debrid/premiumize.py:80
+#: /resources/lib/debrid/real_debrid.py:78
+#: /resources/lib/debrid/all_debrid.py:114
+msgctxt "#30047"
+msgid "This code has been copied to your clipboard"
+msgstr "קוד זה הועתק ללוח שלך"
+
+#: /resources/lib/modules/providers/install_manager.py:39
+msgctxt "#30048"
+msgid "There are currently no packages installed"
+msgstr "כרגע אין חבילות מותקנות"
+
+#: /resources/lib/modules/providers/install_manager.py:42
+msgctxt "#30049"
+msgid "Uninstall"
+msgstr "הסר את ההתקנה"
+
+#: /resources/lib/modules/providers/install_manager.py:65
+msgctxt "#30050"
+msgid "Are you sure you wish to remove?"
+msgstr "האם אתה בטוח שברצונך להסיר?"
+
+#: /resources/lib/modules/providers/install_manager.py:78
+msgctxt "#30051"
+msgid "successfully uninstalled"
+msgstr "הוסר בהצלחה"
+
+#: /resources/lib/modules/globals.py:1012
+msgctxt "#30052"
+msgid "All Cache Successfully Cleared"
+msgstr "כל המטמון נוקה בהצלחה"
+
+#: /resources/lib/modules/getSources.py:292
+msgctxt "#30053"
+msgid "Checking Local Database"
+msgstr "בדיקת מסד נתונים מקומי"
+
+#: /resources/lib/gui/mock_windows.py:248
+#: /resources/lib/modules/getSources.py:148
+msgctxt "#30054"
+msgid "Initializing Providers"
+msgstr "אתחול ספקים"
+
+#: /resources/lib/modules/getSources.py:323
+msgctxt "#30055"
+msgid ""
+"No Sources found for next item in playlist.\n"
+"Clearing current playlist"
+msgstr "ניקוי רשימת ההשמעה הנוכחית"
+
+#: /resources/lib/modules/getSources.py:450
+msgctxt "#30056"
+msgid ""
+"No Playable Sources were found.\n"
+"Would you like to attempt to cache a torrent?"
+msgstr "האם תרצה לנסות לשמור טורנט במטמון?"
+
+#: /resources/settings.xml:1767 /resources/settings.xml:1782
+#: /resources/settings.xml:1797 /resources/settings.xml:1812
+#: /resources/settings.xml:1827
+#: /resources/skins/Default/1080i/get_sources.xml:377
+#: /resources/lib/gui/windows/sort_select.py:8
+msgctxt "#30057"
+msgid "Torrents"
+msgstr "טורנטים"
+
+#: /resources/settings.xml:1768 /resources/settings.xml:1783
+#: /resources/settings.xml:1798 /resources/settings.xml:1813
+#: /resources/settings.xml:1828
+#: /resources/skins/Default/1080i/get_sources.xml:501
+#: /resources/lib/gui/windows/sort_select.py:8
+msgctxt "#30058"
+msgid "Hosters"
+msgstr "מארחים"
+
+#: /resources/lib/modules/smartPlay.py:389
+msgctxt "#30059"
+msgid "Resume From: "
+msgstr "קורות חיים מאת:"
+
+#: /resources/lib/modules/smartPlay.py:72
+msgctxt "#30060"
+msgid "Begining SmartPlay"
+msgstr "Begining SmartPlay"
+
+#: /resources/lib/modules/smartPlay.py:75
+msgctxt "#30061"
+msgid "Identifying Resume Point"
+msgstr "זיהוי נקודת קורות חיים"
+
+#: /resources/lib/modules/smartPlay.py:79
+#: /resources/lib/modules/smartPlay.py:235
+msgctxt "#30062"
+msgid "Building Playlist"
+msgstr "בניית רשימת השמעה"
+
+#: /resources/lib/modules/smartPlay.py:81
+#: /resources/lib/modules/smartPlay.py:241
+msgctxt "#30063"
+msgid "Building List Items"
+msgstr "בניית פריטי רשימה"
+
+#: /resources/lib/modules/smartPlay.py:250
+msgctxt "#30064"
+msgid "Starting Scraping"
+msgstr "מתחילים לגרד"
+
+#: /resources/lib/debrid/real_debrid.py:61
+msgctxt "#30065"
+msgid "Authentication with Real-Debrid has failed, please try again"
+msgstr "האימות עם Real-Debrid נכשל, אנא נסה שוב"
+
+#: /resources/lib/modules/providers/install_manager.py:152
+msgctxt "#30066"
+msgid "Installing:"
+msgstr "מתקין:"
+
+#: /resources/lib/modules/providers/install_manager.py:153
+msgctxt "#30067"
+msgid "Author: "
+msgstr "מְחַבֵּר:"
+
+#: /resources/lib/modules/providers/install_manager.py:154
+msgctxt "#30068"
+msgid "Are you sure you wish to proceed?"
+msgstr "האם אתה בטוח שברצונך להמשיך?"
+
+#: /resources/lib/modules/providers/install_manager.py:151
+msgctxt "#30069"
+msgid "Custom Sources Install"
+msgstr "התקנת מקורות מותאמים אישית"
+
+#: /resources/lib/gui/windows/download_manager.py:68
+#: /resources/lib/modules/providers/install_manager.py:155
+msgctxt "#30070"
+msgid "Cancel"
+msgstr "לְבַטֵל"
+
+#: /resources/lib/modules/providers/install_manager.py:156
+msgctxt "#30071"
+msgid "Install"
+msgstr "להתקין"
+
+#: /resources/lib/modules/providers/install_manager.py:126
+msgctxt "#30072"
+msgid ""
+"Failed to install provider package\n"
+"Please check the log for further information"
+msgstr "אנא בדוק את היומן לקבלת מידע נוסף"
+
+#: /resources/lib/modules/providers/install_manager.py:209
+msgctxt "#30073"
+msgid "Extracting"
+msgstr "חילוץ"
+
+#: /resources/lib/modules/providers/install_manager.py:210
+msgctxt "#30074"
+msgid "Please Wait..."
+msgstr "המתן בבקשה..."
+
+#: /resources/lib/database/skinManager/__init__.py:240
+#: /resources/lib/modules/providers/install_manager.py:228
+msgctxt "#30075"
+msgid "Successfully Installed"
+msgstr "הותקן בהצלחה"
+
+#: /resources/lib/modules/providers/install_manager.py:301
+msgctxt "#30076"
+msgid "Please check the log for further details"
+msgstr "אנא בדוק את היומן לפרטים נוספים"
+
+#: /resources/lib/database/skinManager/__init__.py:244
+#: /resources/lib/modules/providers/install_manager.py:301
+msgctxt "#30077"
+msgid "Failed to install package"
+msgstr "התקנת החבילה נכשלה"
+
+#: /resources/lib/modules/providers/install_manager.py:267
+msgctxt "#30078"
+msgid ""
+"Unable to connect to file.\n"
+"Please check URL and try again."
+msgstr "בדוק את כתובת האתר ונסה שוב."
+
+#: /resources/lib/modules/providers/install_manager.py:146
+msgctxt "#30079"
+msgid "Please note, this package does not provide automatic updates"
+msgstr "שימו לב, חבילה זו אינה מספקת עדכונים אוטומטיים"
+
+#: /resources/lib/modules/providers/install_manager.py:272
+msgctxt "#30080"
+msgid "{} package has been updated"
+msgstr "החבילה {} עודכנה"
+
+#: /resources/lib/database/skinManager/__init__.py:219
+#: /resources/lib/database/skinManager/__init__.py:247
+#: /resources/lib/modules/providers/install_manager.py:284
+msgctxt "#30081"
+msgid "There are currently no updates available"
+msgstr "כרגע אין עדכונים זמינים"
+
+#: /resources/lib/database/skinManager/__init__.py:211
+#: /resources/lib/modules/providers/install_manager.py:368
+msgctxt "#30082"
+msgid "Checking for available package updates"
+msgstr "מחפש עדכוני חבילה זמינים"
+
+#: /resources/lib/common/maintenance.py:61
+msgctxt "#30083"
+msgid ""
+"This will completely wipe your addon settings.\n"
+"Are you completely sure you want to do this?"
+msgstr "האם אתה בטוח לחלוטין שאתה רוצה לעשות זאת?"
+
+#: /resources/settings.xml:3 /resources/settings.xml:802
+#: /resources/settings.xml:1195 /resources/settings.xml:1222
+#: /resources/settings.xml:1900
+msgctxt "#30084"
+msgid "General"
+msgstr "כללי"
+
+#: /resources/settings.xml:1912
+msgctxt "#30085"
+msgid "Episode Play Style"
+msgstr "סגנון משחק של פרק"
+
+#: /resources/settings.xml:1906 /resources/settings.xml:1917
+msgctxt "#30086"
+msgid "Auto Play"
+msgstr "Auto Play"
+
+#: /resources/settings.xml:1907 /resources/settings.xml:1918
+msgctxt "#30087"
+msgid "Source Select"
+msgstr "בחירת מקור"
+
+#: /resources/settings.xml:92
+msgctxt "#30088"
+msgid "Next Up Sort Style"
+msgstr "הבא למעלה מיון סגנון"
+
+#: /resources/settings.xml:97
+msgctxt "#30089"
+msgid "Release Date"
+msgstr "תאריך הוצאה"
+
+#: /resources/settings.xml:98 /resources/lib/gui/tvshowMenus.py:230
+msgctxt "#30090"
+msgid "Recently Watched"
+msgstr "נצפה לאחרונה"
+
+#: /resources/settings.xml:381
+msgctxt "#30091"
+msgid "Metadata location"
+msgstr "מיקום מטא נתונים"
+
+#: /resources/settings.xml:147
+msgctxt "#30092"
+msgid "Page Item Limit"
+msgstr "מגבלת פריטי עמוד"
+
+#: /resources/settings.xml:2225
+msgctxt "#30093"
+msgid "Use Custom View IDs (Advanced)"
+msgstr "השתמש במזהי תצוגה מותאמים אישית (מתקדם)"
+
+#: /resources/settings.xml:2276
+msgctxt "#30094"
+msgid "Movie View"
+msgstr "צפייה בסרט"
+
+#: /resources/settings.xml:2302 /resources/settings.xml:2314
+msgctxt "#30095"
+msgid "Movie View ID"
+msgstr "מזהה צפייה בסרט"
+
+#: /resources/settings.xml:2317
+msgctxt "#30096"
+msgid "Show View"
+msgstr "הצג תצוגה"
+
+#: /resources/settings.xml:2343 /resources/settings.xml:2355
+msgctxt "#30097"
+msgid "Show View ID"
+msgstr "הצג מזהה תצוגה"
+
+#: /resources/settings.xml:2358
+msgctxt "#30098"
+msgid "Episode View"
+msgstr "צפייה בפרק"
+
+#: /resources/settings.xml:2384 /resources/settings.xml:2396
+msgctxt "#30099"
+msgid "Episode View ID"
+msgstr "מזהה תצוגת פרק"
+
+#: /resources/settings.xml:2399
+msgctxt "#30100"
+msgid "Season View"
+msgstr "תצוגת עונה"
+
+#: /resources/settings.xml:2425 /resources/settings.xml:2437
+msgctxt "#30101"
+msgid "Season View ID"
+msgstr "מזהה תצוגת עונה"
+
+#: /resources/settings.xml:320
+msgctxt "#30102"
+msgid "Select Text Highlight Color..."
+msgstr "בחר צבע סימון טקסט..."
+
+#: /resources/settings.xml:312 /resources/settings.xml:317
+msgctxt "#30103"
+msgid "Current Color"
+msgstr "צבע נוכחי"
+
+#: /resources/settings.xml:1993
+msgctxt "#30104"
+msgid "Enable Playing Next Dialog"
+msgstr "הפעל את הפעלת שיח הבא"
+
+#: /resources/settings.xml:2006
+msgctxt "#30105"
+msgid "Minimum Seconds Left Before Showing Dialog"
+msgstr "שניות מינימליות שנותרו לפני הצגת דו-שיח"
+
+#: /resources/settings.xml:1962
+msgctxt "#30106"
+msgid "Enable Smart Play"
+msgstr "אפשר הפעלה חכמה"
+
+#: /resources/settings.xml:1925
+msgctxt "#30107"
+msgid "Auto Resume Shows from Next Unwatched Episode"
+msgstr "תוכניות חידוש אוטומטי מהפרק הבא שלא נצפה"
+
+#: /resources/settings.xml:1967
+msgctxt "#30108"
+msgid "Pre-emptive Scraping"
+msgstr "גרידה מונעת"
+
+#: /resources/settings.xml:1930
+msgctxt "#30109"
+msgid "Watched Progress Resume Style"
+msgstr "צפה ב-Progress Resume Style"
+
+#: /resources/settings.xml:1221
+msgctxt "#30110"
+msgid "Scraping"
+msgstr "גְרִידָה"
+
+#: /resources/settings.xml:1234
+msgctxt "#30111"
+msgid "Cache Torrent Info Locally"
+msgstr "שמור מידע על טורנט באופן מקומי"
+
+#: /resources/settings.xml:1239
+msgctxt "#30112"
+msgid "Timeout"
+msgstr "פסק זמן"
+
+#: /resources/settings.xml:1283
+msgctxt "#30113"
+msgid "Auto Caching Assistant"
+msgstr "עוזר מטמון אוטומטי"
+
+#: /resources/settings.xml:1284
+msgctxt "#30114"
+msgid "Auto Add Un-Cached Sources to Debrid"
+msgstr "Auto Add Un-Cached Sources to Debrid"
+
+#: /resources/settings.xml:1289
+msgctxt "#30115"
+msgid "Assist Mode"
+msgstr "מצב סיוע"
+
+#: /resources/settings.xml:1305
+msgctxt "#30116"
+msgid "Preferred Cloud Location"
+msgstr "מיקום ענן מועדף"
+
+#: /resources/settings.xml:1441
+msgctxt "#30117"
+msgid "Source Filters"
+msgstr "מסנני מקור"
+
+#: /resources/settings.xml:1478
+msgctxt "#30118"
+msgid "Enable File Size Limit"
+msgstr "אפשר הגבלת גודל קובץ"
+
+#: /resources/settings.xml:1500
+msgctxt "#30119"
+msgid "Episode File Size limit (GB)"
+msgstr "מגבלת גודל קובץ פרק (GB)"
+
+#: /resources/settings.xml:1452
+msgctxt "#30120"
+msgid "Max Resolution"
+msgstr "רזולוציה מקסימלית"
+
+#: /resources/settings.xml:1323
+msgctxt "#30121"
+msgid "Preemptive Termination"
+msgstr "סיום מנע"
+
+#: /resources/settings.xml:1324
+msgctxt "#30122"
+msgid "Enable Preemptive Termination"
+msgstr "אפשר סיום מנע"
+
+#: /resources/settings.xml:1329
+msgctxt "#30123"
+msgid "Minimum Movie Resolution"
+msgstr "רזולוציית סרט מינימלית"
+
+#: /resources/settings.xml:1347
+msgctxt "#30124"
+msgid "Minimum TV Shows Resolution"
+msgstr "רזולוציה מינימלית של תוכניות טלוויזיה"
+
+#: /resources/settings.xml:1365
+msgctxt "#30125"
+msgid "Minimum Sources"
+msgstr "מינימום מקורות"
+
+#: /resources/settings.xml:1381
+msgctxt "#30126"
+msgid "Terminate on... "
+msgstr "סיים ב..."
+
+#: /resources/settings.xml:801
+msgctxt "#30127"
+msgid "Accounts"
+msgstr "חשבונות"
+
+#: /resources/settings.xml:803
+msgctxt "#30128"
+msgid "Enable Account Expiry Notifications"
+msgstr "אפשר הודעות תפוגה של חשבון"
+
+#: /resources/settings.xml:386 /resources/settings.xml:809
+msgctxt "#30129"
+msgid "Trakt"
+msgstr "Trakt"
+
+#: /resources/settings.xml:811 /resources/settings.xml:819
+msgctxt "#30130"
+msgid "Trakt Username"
+msgstr "שם משתמש של Trakt"
+
+#: /resources/settings.xml:822
+msgctxt "#30131"
+msgid "Authorize Trakt..."
+msgstr "הרשאה לטרקט..."
+
+#: /resources/settings.xml:837
+msgctxt "#30132"
+msgid "Enable Trakt Scrobbling"
+msgstr "אפשר Trakt Scrobbling"
+
+#: /resources/settings.xml:885
+msgctxt "#30133"
+msgid "Revoke Trakt Authentication..."
+msgstr "בטל את אימות Trakt..."
+
+#: /resources/settings.xml:901 /resources/settings.xml:1310
+#: /resources/settings.xml:1864 /resources/settings.xml:1877
+#: /resources/settings.xml:1890 /resources/lib/gui/windows/sort_select.py:10
+msgctxt "#30134"
+msgid "Premiumize"
+msgstr "Premiumize"
+
+#: /resources/settings.xml:1025 /resources/settings.xml:1311
+#: /resources/settings.xml:1865 /resources/settings.xml:1878
+#: /resources/settings.xml:1891 /resources/lib/gui/windows/sort_select.py:10
+msgctxt "#30135"
+msgid "Real-Debrid"
+msgstr "Real-Debrid"
+
+#: /resources/settings.xml:1194
+#: /resources/lib/modules/providers/install_manager.py:42
+msgctxt "#30136"
+msgid "Providers"
+msgstr "ספקים"
+
+#: /resources/settings.xml:2441
+msgctxt "#30137"
+msgid "Optional API Keys"
+msgstr "מפתחות API אופציונליים"
+
+#: /resources/settings.xml:1196
+msgctxt "#30138"
+msgid "Enable Automatic Provider Updates"
+msgstr "הפעל עדכוני ספקים אוטומטיים"
+
+#: /resources/settings.xml:369 /resources/settings.xml:1203
+#: /resources/lib/gui/homeMenu.py:172
+msgctxt "#30139"
+msgid "Check For Updates"
+msgstr "בדוק עדכונים"
+
+#: /resources/settings.xml:1202 /resources/settings.xml:1211
+#: /resources/lib/gui/homeMenu.py:179
+msgctxt "#30140"
+msgid "Manage Provider Packages"
+msgstr "ניהול חבילות ספקים"
+
+#: /resources/settings.xml:2220
+msgctxt "#30141"
+msgid "Force view types on menus"
+msgstr "כפה סוגי תצוגות בתפריטים"
+
+#: /resources/settings.xml:2081
+msgctxt "#30142"
+msgid "Shortcuts"
+msgstr "קיצורי דרך"
+
+#: /resources/settings.xml:77
+msgctxt "#30143"
+msgid "Mixed Episode Lists Title Display Style"
+msgstr "רשימות פרקים מעורבות סגנון תצוגת כותרת"
+
+#: /resources/settings.xml:2442 /resources/settings.xml:2449
+msgctxt "#30144"
+msgid "TMDb API Key"
+msgstr "מפתח API של TMDb"
+
+#: /resources/settings.xml:2462 /resources/settings.xml:2469
+msgctxt "#30145"
+msgid "Trakt Client ID"
+msgstr "מזהה לקוח של Trakt"
+
+#: /resources/settings.xml:2472 /resources/settings.xml:2479
+msgctxt "#30146"
+msgid "Trakt Client Secret"
+msgstr "סוד הלקוח של טראקט"
+
+#: /resources/settings.xml:2452 /resources/settings.xml:2459
+msgctxt "#30147"
+msgid "TVDB API Key"
+msgstr "מפתח API של TVDB"
+
+#: /resources/settings.xml:1440
+msgctxt "#30148"
+msgid "Sort & Filter"
+msgstr "מיון וסנן"
+
+#: /resources/settings.xml:1559
+msgctxt "#30149"
+msgid "Source Sorting"
+msgstr "מיון מקור"
+
+#: /resources/settings.xml:1063
+msgctxt "#30150"
+msgid "Authorize Real-Debrid..."
+msgstr "אישור Real-Debrid..."
+
+#: /resources/settings.xml:1031 /resources/settings.xml:1044
+msgctxt "#30151"
+msgid "Real-Debrid Username"
+msgstr "שם משתמש Real-Debrid"
+
+#: /resources/settings.xml:1026
+msgctxt "#30152"
+msgid "Enable Real-Debrid"
+msgstr "אפשר Real-Debrid"
+
+#: /resources/settings.xml:954 /resources/settings.xml:1078
+#: /resources/settings.xml:1162
+msgctxt "#30153"
+msgid "Enable Torrents"
+msgstr "אפשר טורנטים"
+
+#: /resources/settings.xml:964 /resources/settings.xml:1088
+#: /resources/settings.xml:1172
+msgctxt "#30154"
+msgid "Enable Hosters"
+msgstr "אפשר Hosters"
+
+#: /resources/settings.xml:1098 /resources/settings.xml:1182
+msgctxt "#30155"
+msgid "Auto-Delete Torrents"
+msgstr "מחיקה אוטומטית של טורנטים"
+
+#: /resources/settings.xml:1004
+msgctxt "#30156"
+msgid "Max Storage Space Used Before Deletion (GB)"
+msgstr "שטח אחסון מרבי בשימוש לפני המחיקה (GB)"
+
+#: /resources/settings.xml:994
+msgctxt "#30157"
+msgid "Automatic Cloud Removal"
+msgstr "הסרת ענן אוטומטית"
+
+#: /resources/settings.xml:974
+msgctxt "#30158"
+msgid "Prefer Transcoded Files"
+msgstr "העדיפו קבצים מקודדים"
+
+#: /resources/settings.xml:922 /resources/settings.xml:935
+msgctxt "#30159"
+msgid "Premiumize Customer ID"
+msgstr "פרימיום מזהה לקוח"
+
+#: /resources/settings.xml:902
+msgctxt "#30160"
+msgid "Enable Premiumize"
+msgstr "הפעל את פרימיום"
+
+#: /resources/settings.xml:5
+msgctxt "#30161"
+msgid "Enable Search History"
+msgstr "הפעל היסטוריית חיפושים"
+
+#: /resources/lib/indexers/trakt.py:428
+msgctxt "#30162"
+msgid ""
+"Unable to contact Trakt.\n"
+"Please check Trakts outage status at:\n"
+"http://status.trakt.tv"
+msgstr ""
+"לא ניתן ליצור קשר עם Trakt.\n"
+"בדוק את סטטוס הפסקת הפעילות של Trakts בכתובת:\n"
+"http://status.trakt.tv"
+
+#: /resources/settings.xml:437 /resources/settings.xml:444
+msgctxt "#30163"
+msgid "Fanart.TV API Key"
+msgstr "מפתח API של Fanart.TV"
+
+#: /resources/settings.xml:454 /resources/settings.xml:610
+msgctxt "#30164"
+msgid "Fanart.TV"
+msgstr "Fanart.TV"
+
+#: /resources/settings.xml:142
+msgctxt "#30165"
+msgid "Delay Release Dates By a Day"
+msgstr "דחה את תאריכי ההפצה ביום"
+
+#: /resources/lib/modules/router.py:515
+msgctxt "#30166"
+msgid ""
+"Another addon is attempting to install a provider into Seren\n"
+"Do you wish to allow this?"
+msgstr "האם אתה רוצה לאפשר זאת?"
+
+#: /resources/lib/modules/providers/install_manager.py:90
+msgctxt "#30167"
+msgid ""
+"{} failed to uninstall the package: {}\n"
+"This may require manual removal"
+msgstr ""
+"{} לא הצליח להסיר את התקנת החבילה: {}\n"
+"פעולה זו עשויה לדרוש הסרה ידנית"
+
+#: /resources/lib/modules/router.py:525
+msgctxt "#30168"
+msgid ""
+"Another addon is attempting to uninstall the {} provider from Seren\n"
+"Do you wish to allow this?"
+msgstr ""
+"הרחבה נוספת מנסה להסיר את הספק {} מ - SEREN\n"
+"האם ברצונך לאפשר זאת?"
+
+#: /resources/lib/gui/tvshowMenus.py:169
+msgctxt "#30169"
+msgid "Networks"
+msgstr "רשתות"
+
+#: /resources/settings.xml:15
+msgctxt "#30170"
+msgid "Hide Unaired Items"
+msgstr "הסתר פריטים שלא שודרו"
+
+#: /resources/lib/gui/movieMenus.py:164 /resources/lib/gui/tvshowMenus.py:175
+msgctxt "#30171"
+msgid "Years"
+msgstr "שנים"
+
+#: /resources/settings.xml:10
+msgctxt "#30172"
+msgid "Hide Specials"
+msgstr "הסתר מיוחדים"
+
+#: /resources/lib/gui/homeMenu.py:34
+msgctxt "#30173"
+msgid "My Files"
+msgstr "הקבצים שלי"
+
+#: /resources/settings.xml:1223
+msgctxt "#30174"
+msgid "Scraper Display Style"
+msgstr "סגנון תצוגת מגרד"
+
+#: /resources/settings.xml:1228 /resources/settings.xml:1982
+msgctxt "#30175"
+msgid "Fancy"
+msgstr "לְחַבֵּב"
+
+#: /resources/settings.xml:1229 /resources/settings.xml:1983
+msgctxt "#30176"
+msgid "Background Task"
+msgstr "משימת רקע"
+
+#: /resources/lib/database/trakt_sync/activities.py:176
+msgctxt "#30177"
+msgid "Rebuilding Trakt Sync Database, please be patient"
+msgstr "בונה מחדש את מסד הנתונים של Trakt Sync, אנא התאזר בסבלנות"
+
+#: /resources/lib/modules/router.py:169
+msgctxt "#30178"
+msgid "Starting Source Select"
+msgstr "בחר מקור התחלה"
+
+#: /resources/lib/database/trakt_sync/__init__.py:443
+#: /resources/lib/database/trakt_sync/__init__.py:470
+msgctxt "#30179"
+msgid ""
+"[COLOR red]WARNING[/COLOR]\n"
+"This will reset all meta information, are you sure?"
+msgstr "זה יאפס את כל המטא מידע, אתה בטוח?"
+
+#: /resources/settings.xml:2099 /resources/lib/gui/homeMenu.py:126
+#: /resources/lib/gui/movieMenus.py:309 /resources/lib/gui/tvshowMenus.py:431
+#: /resources/lib/gui/tvshowMenus.py:435
+msgctxt "#30180"
+msgid "Clear Search History"
+msgstr "לנקות היסטוריית חיפוש"
+
+#: /resources/lib/gui/movieMenus.py:304
+msgctxt "#30181"
+msgid "New Movie Search..."
+msgstr "חיפוש סרטים חדש..."
+
+#: /resources/lib/gui/tvshowMenus.py:426
+msgctxt "#30182"
+msgid "New Show Search..."
+msgstr "חיפוש תוכנית חדש..."
+
+#: /resources/settings.xml:984
+msgctxt "#30183"
+msgid "Store resolved items in cloud"
+msgstr "אחסן פריטים שנפתרו בענן"
+
+#: /resources/settings.xml:2235
+msgctxt "#30184"
+msgid "General Menu View"
+msgstr "תצוגת תפריט כללי"
+
+#: /resources/settings.xml:2261 /resources/settings.xml:2273
+msgctxt "#30185"
+msgid "General Menu View ID"
+msgstr "מזהה תצוגת תפריט כללי"
+
+#: /resources/lib/modules/cacheAssist.py:403
+#: /resources/lib/modules/router.py:128
+msgctxt "#30186"
+msgid "[COLOR red]Error:[/COLOR] No Debrid accounts were identified."
+msgstr "[COLOR red]שגיאה:[/COLOR] לא זוהו חשבונות Debrid."
+
+#: /resources/lib/modules/router.py:129
+msgctxt "#30187"
+msgid ""
+"Please setup your accounts in the settings menu before attempting to play an"
+" item"
+msgstr "אנא הגדר את החשבונות שלך בתפריט ההגדרות לפני שתנסה להפעיל פריט"
+
+#: /resources/settings.xml:1408
+msgctxt "#30188"
+msgid "Terminate if Cloud Sources are Found"
+msgstr "סיום אם נמצאו מקורות ענן"
+
+#: /resources/settings.xml:1251
+msgctxt "#30189"
+msgid "Cloud Scraping"
+msgstr "גירוד עננים"
+
+#: /resources/lib/gui/movieMenus.py:170 /resources/lib/gui/tvshowMenus.py:187
+msgctxt "#30190"
+msgid "By Actor..."
+msgstr "מאת שחקן..."
+
+#: /resources/settings.xml:1901
+msgctxt "#30191"
+msgid "Movie Play Style"
+msgstr "סגנון הפעלה של סרט"
+
+#: /resources/settings.xml:1483
+msgctxt "#30192"
+msgid "Movie File Size limit (GB)"
+msgstr "מגבלת גודל קובץ סרט (GB)"
+
+#: /resources/settings.xml:2205
+msgctxt "#30193"
+msgid "Enable Kodi Menu Caching"
+msgstr "הפעל מטמון של תפריט Kodi"
+
+#: /resources/lib/debrid/real_debrid.py:102
+msgctxt "#30194"
+msgid ""
+"Please Note\n"
+"You appear to have authorized a non-premium account and will not be able to play items using this account"
+msgstr ""
+"נראה שאישרת חשבון שאינו פרימיום ולא תוכל להפעיל פריטים באמצעות חשבון זה"
+
+#: /resources/settings.xml:1944
+msgctxt "#30195"
+msgid "Auto try next link on resolve failure (Source Select)"
+msgstr "נסה אוטומטית את הקישור הבא בעת פתרון כשל (בחירת מקור)"
+
+#: /resources/lib/database/skinManager/__init__.py:322
+msgctxt "#30196"
+msgid ""
+"Successfully installed {} - {}\n"
+"Would you like to switch to this theme?"
+msgstr ""
+"\n"
+"{} - {} מותקן בהצלחה אתהאם תרצה לעבור לנושא הזה?"
+
+#: /resources/lib/database/skinManager/__init__.py:360
+msgctxt "#30197"
+msgid "Are you sure you wish to uninstall the theme {}?"
+msgstr "האם אתה בטוח שברצונך להסיר את ההתקנה של ערכת הנושא {}?"
+
+#: /resources/lib/database/skinManager/__init__.py:380
+msgctxt "#30198"
+msgid "Successfully uninstalled {}"
+msgstr "הוסר בהצלחה {}"
+
+#: /resources/settings.xml:310 /resources/settings.xml:331
+msgctxt "#30199"
+msgid "Themes"
+msgstr "ערכות נושא"
+
+#: /resources/settings.xml:337 /resources/settings.xml:342
+msgctxt "#30200"
+msgid "Active theme"
+msgstr "נושא פעיל"
+
+#: /resources/settings.xml:361
+msgctxt "#30201"
+msgid "Switch theme"
+msgstr "החלף נושא"
+
+#: /resources/settings.xml:353
+msgctxt "#30202"
+msgid "Uninstall theme"
+msgstr "הסר את ההתקנה של ערכת הנושא"
+
+#: /resources/settings.xml:345
+msgctxt "#30203"
+msgid "Install theme"
+msgstr "התקן ערכת נושא"
+
+#: /resources/lib/database/skinManager/__init__.py:367
+msgctxt "#30204"
+msgid ""
+"You are attempting to uninstall the active theme, this will switch you to "
+"the default theme."
+msgstr ""
+"אתה מנסה להסיר את ההתקנה של ערכת הנושא הפעילה, פעולה זו תעביר אותך לערכת "
+"הנושא המוגדרת כברירת מחדל."
+
+#: /resources/lib/database/skinManager/__init__.py:344
+msgctxt "#30205"
+msgid "Succesfully Switched to {}"
+msgstr "הוחלף בהצלחה ל -{}"
+
+#: /resources/lib/database/skinManager/__init__.py:313
+msgctxt "#30206"
+msgid "The theme name {} is not allowed"
+msgstr "שם ערכת הנושא {} אסור"
+
+#: /resources/lib/database/searchHistory/__init__.py:70
+msgctxt "#30207"
+msgid "Are you sure you wish to clear the search history?"
+msgstr "האם אתה בטוח שברצונך לנקות את היסטוריית החיפושים?"
+
+#: /resources/settings.xml:54
+msgctxt "#30208"
+msgid "Flatten Season Episodes"
+msgstr "כל העונות של הסדרה  יחד"
+
+#: /resources/lib/database/skinManager/__init__.py:92
+msgctxt "#30209"
+msgid ""
+"This theme package appears to be invalid, please refer to the log for more "
+"information"
+msgstr "נראה כי חבילת ערכות נושא זו אינה חוקית, אנא עיין ביומן למידע נוסף"
+
+#: /resources/skins/Default/1080i/still_watching.xml:131
+#: /resources/skins/Default/1080i/playing_next.xml:122
+#: /resources/lib/gui/tvshowMenus.py:236
+msgctxt "#30210"
+msgid "Next Up"
+msgstr "הבא בתור"
+
+#: /resources/lib/gui/tvshowMenus.py:242
+msgctxt "#30211"
+msgid "Upcoming Episodes"
+msgstr "פרקים קרובים"
+
+#: /resources/lib/gui/tvshowMenus.py:248
+msgctxt "#30212"
+msgid "Unfinished Shows in Collection"
+msgstr "מופעים לא גמורים באוסף"
+
+#: /resources/lib/gui/tvshowMenus.py:254
+msgctxt "#30213"
+msgid "Recent Episodes"
+msgstr "פרקים אחרונים"
+
+#: /resources/lib/gui/tvshowMenus.py:260
+msgctxt "#30214"
+msgid "My Show Lists"
+msgstr "רשימות ההצגות שלי"
+
+#: /resources/settings.xml:2118 /resources/lib/gui/homeMenu.py:147
+msgctxt "#30215"
+msgid "Trakt Sync Tools"
+msgstr "Trakt Sync Tools"
+
+#: /resources/settings.xml:2119 /resources/lib/gui/homeMenu.py:191
+msgctxt "#30216"
+msgid "Clear last sync time"
+msgstr "נקה את זמן הסנכרון האחרון"
+
+#: /resources/settings.xml:2127 /resources/lib/gui/homeMenu.py:198
+msgctxt "#30217"
+msgid "Force a sync with Trakt"
+msgstr "כפה סנכרון עם Trakt"
+
+#: /resources/settings.xml:2135 /resources/lib/gui/homeMenu.py:205
+msgctxt "#30218"
+msgid "Rebuild Database"
+msgstr "בניית מסד נתונים מחדש"
+
+#: /resources/lib/gui/debridServices.py:18
+msgctxt "#30219"
+msgid "Cache Assist History"
+msgstr "היסטוריית סיוע במטמון"
+
+#: /resources/lib/gui/debridServices.py:24
+msgctxt "#30220"
+msgid "Current Premiumize Transfers"
+msgstr "העברות פרימיום נוכחיות"
+
+#: /resources/lib/gui/debridServices.py:30
+msgctxt "#30221"
+msgid "Current Real-Debrid Transfers"
+msgstr "העברות נוכחיות של Real-Debrid"
+
+#: /resources/lib/gui/debridServices.py:37
+msgctxt "#30222"
+msgid "Clear Non Active..."
+msgstr "נקה לא פעיל..."
+
+#: /resources/settings.xml:2240 /resources/settings.xml:2281
+#: /resources/settings.xml:2322 /resources/settings.xml:2363
+#: /resources/settings.xml:2404
+msgctxt "#30223"
+msgid "Default"
+msgstr "בְּרִירַת מֶחדָל"
+
+#: /resources/settings.xml:470 /resources/settings.xml:627
+#: /resources/settings.xml:2241 /resources/settings.xml:2282
+#: /resources/settings.xml:2323 /resources/settings.xml:2364
+#: /resources/settings.xml:2405
+msgctxt "#30224"
+msgid "Poster"
+msgstr "פּוֹסטֵר"
+
+#: /resources/settings.xml:2242 /resources/settings.xml:2283
+#: /resources/settings.xml:2324 /resources/settings.xml:2365
+#: /resources/settings.xml:2406
+msgctxt "#30225"
+msgid "Icon Wall"
+msgstr "קיר אייקונים"
+
+#: /resources/settings.xml:2243 /resources/settings.xml:2284
+#: /resources/settings.xml:2325 /resources/settings.xml:2366
+#: /resources/settings.xml:2407
+msgctxt "#30226"
+msgid "Shift"
+msgstr "מִשׁמֶרֶת"
+
+#: /resources/settings.xml:2244 /resources/settings.xml:2285
+#: /resources/settings.xml:2326 /resources/settings.xml:2367
+#: /resources/settings.xml:2408
+msgctxt "#30227"
+msgid "Info Wall"
+msgstr "קיר מידע"
+
+#: /resources/settings.xml:2245 /resources/settings.xml:2286
+#: /resources/settings.xml:2327 /resources/settings.xml:2368
+#: /resources/settings.xml:2409
+msgctxt "#30228"
+msgid "Wide List"
+msgstr "רשימה רחבה"
+
+#: /resources/settings.xml:2246 /resources/settings.xml:2287
+#: /resources/settings.xml:2328 /resources/settings.xml:2369
+#: /resources/settings.xml:2410
+msgctxt "#30229"
+msgid "Wall"
+msgstr "קִיר"
+
+#: /resources/settings.xml:504 /resources/settings.xml:661
+#: /resources/settings.xml:2247 /resources/settings.xml:2288
+#: /resources/settings.xml:2329 /resources/settings.xml:2370
+#: /resources/settings.xml:2411
+msgctxt "#30230"
+msgid "Banner"
+msgstr "דֶגֶל"
+
+#: /resources/settings.xml:487 /resources/settings.xml:644
+#: /resources/settings.xml:2248 /resources/settings.xml:2289
+#: /resources/settings.xml:2330 /resources/settings.xml:2371
+#: /resources/settings.xml:2412
+msgctxt "#30231"
+msgid "Fanart"
+msgstr "אמנות מעריצים"
+
+#: /resources/settings.xml:1294 /resources/settings.xml:1936
+msgctxt "#30232"
+msgid "Automatic"
+msgstr "אוֹטוֹמָטִי"
+
+#: /resources/settings.xml:1295
+msgctxt "#30233"
+msgid "Manual Selection"
+msgstr "בחירה ידנית"
+
+#: /resources/settings.xml:1386
+msgctxt "#30234"
+msgid "Torrents Only"
+msgstr "טורנטים בלבד"
+
+#: /resources/settings.xml:1387
+msgctxt "#30235"
+msgid "Hosters Only"
+msgstr "מארחים בלבד"
+
+#: /resources/settings.xml:1388
+msgctxt "#30236"
+msgid "Torrents/Hosters"
+msgstr "טורנטים/מארחים"
+
+#: /resources/settings.xml:1581 /resources/settings.xml:1604
+#: /resources/settings.xml:1627 /resources/settings.xml:1650
+#: /resources/settings.xml:1673 /resources/settings.xml:1696
+#: /resources/settings.xml:1719 /resources/settings.xml:1742
+#: /resources/skins/Default/1080i/resolver.xml:169
+#: /resources/skins/Default/1080i/manual_caching.xml:415
+#: /resources/skins/Default/1080i/source_select.xml:406
+#: /resources/lib/gui/windows/sort_select.py:4
+msgctxt "#30237"
+msgid "Resolution"
+msgstr "פתרון הבעיה"
+
+#: /resources/skins/Default/1080i/provider_packages.xml:253
+msgctxt "#30238"
+msgid "Install Package"
+msgstr "התקן את החבילה"
+
+#: /resources/lib/gui/windows/provider_packages.py:80
+msgctxt "#30239"
+msgid "Uninstall Package"
+msgstr "הסר את ההתקנה של החבילה"
+
+#: /resources/lib/gui/windows/provider_packages.py:79
+msgctxt "#30240"
+msgid "Enable Package"
+msgstr "אפשר חבילה"
+
+#: /resources/lib/gui/windows/provider_packages.py:79
+msgctxt "#30241"
+msgid "Disable Package"
+msgstr "השבת את החבילה"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:817
+msgctxt "#30242"
+msgid "Enable All Hosters"
+msgstr "אפשר את כל המארחים"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:828
+msgctxt "#30243"
+msgid "Enable All Torrents"
+msgstr "הפעל את כל הטורנטים"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:839
+msgctxt "#30244"
+msgid "Disable All Hosters"
+msgstr "השבת את כל המארחים"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:850
+msgctxt "#30245"
+msgid "Disable All Torrents"
+msgstr "השבת את כל הטורנטים"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:861
+msgctxt "#30246"
+msgid "Enable All"
+msgstr "אפשר הכל"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:872
+msgctxt "#30247"
+msgid "Disable All"
+msgstr "השבת הכל"
+
+#: /resources/skins/Default/1080i/get_sources.xml:439
+msgctxt "#30248"
+msgid "Cached"
+msgstr "שמור במטמון"
+
+#: /resources/settings.xml:1765 /resources/settings.xml:1780
+#: /resources/settings.xml:1795 /resources/settings.xml:1810
+#: /resources/settings.xml:1825
+#: /resources/skins/Default/1080i/get_sources.xml:563
+#: /resources/lib/gui/windows/sort_select.py:8
+msgctxt "#30249"
+msgid "Cloud"
+msgstr "ענן"
+
+#: /resources/skins/Default/1080i/get_sources.xml:854
+msgctxt "#30250"
+msgid "Remaining providers"
+msgstr "ספקים שנותרו"
+
+#: /resources/settings.xml:1584 /resources/settings.xml:1607
+#: /resources/settings.xml:1630 /resources/settings.xml:1653
+#: /resources/settings.xml:1676 /resources/settings.xml:1699
+#: /resources/settings.xml:1722 /resources/settings.xml:1745
+#: /resources/skins/Default/1080i/resolver.xml:157
+#: /resources/skins/Default/1080i/manual_caching.xml:135
+#: /resources/skins/Default/1080i/manual_caching.xml:248
+#: /resources/skins/Default/1080i/manual_caching.xml:403
+#: /resources/skins/Default/1080i/source_select.xml:147
+#: /resources/skins/Default/1080i/source_select.xml:250
+#: /resources/skins/Default/1080i/source_select.xml:394
+#: /resources/lib/gui/windows/sort_select.py:4
+msgctxt "#30251"
+msgid "Size"
+msgstr "גודל"
+
+#: /resources/settings.xml:1582 /resources/settings.xml:1605
+#: /resources/settings.xml:1628 /resources/settings.xml:1651
+#: /resources/settings.xml:1674 /resources/settings.xml:1697
+#: /resources/settings.xml:1720 /resources/settings.xml:1743
+#: /resources/skins/Default/1080i/resolver.xml:181
+#: /resources/skins/Default/1080i/manual_caching.xml:145
+#: /resources/skins/Default/1080i/manual_caching.xml:258
+#: /resources/skins/Default/1080i/manual_caching.xml:427
+#: /resources/skins/Default/1080i/source_select.xml:157
+#: /resources/skins/Default/1080i/source_select.xml:260
+#: /resources/skins/Default/1080i/source_select.xml:418
+#: /resources/lib/gui/windows/sort_select.py:4
+msgctxt "#30252"
+msgid "Source Type"
+msgstr "סוג מקור"
+
+#: /resources/lib/common/maintenance.py:40
+msgctxt "#30253"
+msgid "One or more providers have updates pending"
+msgstr "לספק אחד או יותר יש עדכונים ממתינים"
+
+#: /resources/settings.xml:449
+msgctxt "#30254"
+msgid "Prefer Movie artwork from"
+msgstr "העדיפו יצירות אמנות של סרט מ"
+
+#: /resources/settings.xml:605
+msgctxt "#30255"
+msgid "Prefer TV Show artwork from"
+msgstr "העדיפו יצירות אמנות של תוכנית טלוויזיה"
+
+#: /resources/settings.xml:387 /resources/settings.xml:455
+#: /resources/settings.xml:611
+msgctxt "#30256"
+msgid "TMDb"
+msgstr "TMDb"
+
+#: /resources/settings.xml:388 /resources/settings.xml:612
+msgctxt "#30257"
+msgid "TVDB"
+msgstr "TVDB"
+
+#: /resources/settings.xml:1899
+msgctxt "#30258"
+msgid "Playback"
+msgstr "השמעה"
+
+#: /resources/settings.xml:419
+msgctxt "#30259"
+msgid "Artwork"
+msgstr "עבודת אומנות"
+
+#: /resources/settings.xml:2203
+msgctxt "#30260"
+msgid "Advanced"
+msgstr "מִתקַדֵם"
+
+#: /resources/lib/gui/trakt_context_menu.py:108
+msgctxt "#30264"
+msgid "Movie"
+msgstr "סרט"
+
+#: /resources/settings.xml:465
+msgctxt "#30265"
+msgid "Show Advanced Movie Artwork Settings"
+msgstr "הצג הגדרות גרפיקה מתקדמות של סרטים"
+
+#: /resources/settings.xml:622
+msgctxt "#30266"
+msgid "Show Advanced TV Artwork Settings"
+msgstr "הצג הגדרות גרפיקה מתקדמות של טלוויזיה"
+
+#: /resources/lib/gui/windows/provider_packages.py:90
+msgctxt "#30267"
+msgid "Are you sure you wish to remove the {} package?"
+msgstr "האם אתה בטוח שברצונך להסיר את החבילה {}?"
+
+#: /resources/settings.xml:448
+msgctxt "#30268"
+msgid "Movie Artwork"
+msgstr "יצירות אמנות של סרט"
+
+#: /resources/settings.xml:604
+msgctxt "#30269"
+msgid "TV Show Artwork"
+msgstr "יצירות אמנות של תוכנית טלוויזיה"
+
+#: /resources/lib/database/trakt_sync/__init__.py:435
+msgctxt "#30270"
+msgid "Previous user information has been cleared"
+msgstr "מידע משתמש קודם נמחק"
+
+#: /resources/lib/database/trakt_sync/__init__.py:466
+msgctxt "#30271"
+msgid "Metadata has been cleared"
+msgstr "מטא נתונים נוקו"
+
+#: /resources/lib/database/trakt_sync/__init__.py:485
+msgctxt "#30272"
+msgid "Database has been rebuilt"
+msgstr "מסד הנתונים נבנה מחדש"
+
+#: /resources/lib/indexers/trakt.py:467
+msgctxt "#30273"
+msgid "Sucessfully authenticated with Trakt"
+msgstr "Sucessfully authenticated with Trakt"
+
+#: /resources/lib/gui/trakt_context_menu.py:45
+#: /resources/lib/gui/trakt_context_menu.py:139
+msgctxt "#30274"
+msgid "Add {} to Collection"
+msgstr "להוסיף {} לאוסף"
+
+#: /resources/lib/gui/trakt_context_menu.py:49
+#: /resources/lib/gui/trakt_context_menu.py:137
+msgctxt "#30275"
+msgid "Remove {} from Collection"
+msgstr "הסר את {} מהאוסף"
+
+#: /resources/lib/gui/trakt_context_menu.py:53
+#: /resources/lib/gui/trakt_context_menu.py:115
+msgctxt "#30276"
+msgid "Add to Watchlist"
+msgstr "הוסף לרשימת צפייה"
+
+#: /resources/lib/gui/trakt_context_menu.py:57
+#: /resources/lib/gui/trakt_context_menu.py:116
+msgctxt "#30277"
+msgid "Remove from Watchlist"
+msgstr "הסר מרשימת המעקב"
+
+#: /resources/lib/gui/trakt_context_menu.py:61
+#: /resources/lib/gui/trakt_context_menu.py:146
+#: /resources/lib/gui/trakt_context_menu.py:148
+msgctxt "#30278"
+msgid "Mark as Watched"
+msgstr "סמן כנצפית"
+
+#: /resources/lib/gui/trakt_context_menu.py:65
+#: /resources/lib/gui/trakt_context_menu.py:144
+#: /resources/lib/gui/trakt_context_menu.py:150
+msgctxt "#30279"
+msgid "Mark as Unwatched"
+msgstr "סמן כלא נצפה"
+
+#: /resources/lib/gui/trakt_context_menu.py:27
+#: /resources/lib/gui/trakt_context_menu.py:69
+msgctxt "#30280"
+msgid "Add to List"
+msgstr "הוסף לרשימה"
+
+#: /resources/lib/gui/trakt_context_menu.py:28
+#: /resources/lib/gui/trakt_context_menu.py:73
+msgctxt "#30281"
+msgid "Remove From List"
+msgstr "הסר מהרשימה"
+
+#: /resources/lib/gui/trakt_context_menu.py:29
+#: /resources/lib/gui/trakt_context_menu.py:77
+msgctxt "#30282"
+msgid "Hide {}"
+msgstr "להתחבא {}"
+
+#: /resources/lib/gui/trakt_context_menu.py:30
+#: /resources/lib/gui/trakt_context_menu.py:81
+msgctxt "#30283"
+msgid "Refresh Item Metadata"
+msgstr "רענן מטא נתונים של פריט"
+
+#: /resources/lib/gui/trakt_context_menu.py:85
+#: /resources/lib/gui/trakt_context_menu.py:123
+msgctxt "#30284"
+msgid "Remove Playback Progress"
+msgstr "הסר התקדמות השמעה"
+
+#: /resources/lib/gui/trakt_context_menu.py:110
+msgctxt "#30285"
+msgid "Show"
+msgstr "הופעה"
+
+#: /resources/lib/gui/trakt_context_menu.py:37
+#: /resources/lib/gui/trakt_context_menu.py:170
+#: /resources/lib/gui/trakt_context_menu.py:182
+#: /resources/lib/gui/trakt_context_menu.py:239
+#: /resources/lib/gui/trakt_context_menu.py:279
+#: /resources/lib/gui/trakt_context_menu.py:299
+#: /resources/lib/gui/trakt_context_menu.py:319
+#: /resources/lib/gui/trakt_context_menu.py:327
+#: /resources/lib/gui/trakt_context_menu.py:336
+#: /resources/lib/gui/trakt_context_menu.py:358
+#: /resources/lib/gui/trakt_context_menu.py:381
+msgctxt "#30286"
+msgid "Trakt manager"
+msgstr "Trakt manager"
+
+#: /resources/lib/gui/trakt_context_menu.py:171
+#: /resources/lib/gui/trakt_context_menu.py:183
+msgctxt "#30287"
+msgid "Failed to update status, please check the log"
+msgstr "עדכון הסטטוס נכשל, אנא בדוק את היומן"
+
+#: /resources/lib/gui/trakt_context_menu.py:240
+msgctxt "#30288"
+msgid "Item marked as watched"
+msgstr "פריט מסומן כנצפה"
+
+#: /resources/lib/gui/trakt_context_menu.py:280
+msgctxt "#30289"
+msgid "Item marked as unwatched"
+msgstr "פריט מסומן כלא נצפה"
+
+#: /resources/lib/gui/trakt_context_menu.py:300
+msgctxt "#30290"
+msgid "Item added to Collection"
+msgstr "פריט נוסף לאוסף"
+
+#: /resources/lib/gui/trakt_context_menu.py:320
+msgctxt "#30291"
+msgid "Item removed from Collection"
+msgstr "הפריט הוסר מהאוסף"
+
+#: /resources/lib/gui/trakt_context_menu.py:328
+msgctxt "#30292"
+msgid "Item added to Watchlist"
+msgstr "פריט נוסף לרשימת המעקב"
+
+#: /resources/lib/gui/trakt_context_menu.py:337
+msgctxt "#30293"
+msgid "Item removed from Watchlist"
+msgstr "פריט הוסר מרשימת המעקב"
+
+#: /resources/lib/gui/trakt_context_menu.py:359
+msgctxt "#30294"
+msgid "Item added to {}"
+msgstr "פריט נוסף ל-{}"
+
+#: /resources/lib/gui/trakt_context_menu.py:382
+msgctxt "#30295"
+msgid "Item removed from {}"
+msgstr "פריט הוסר מ-{}"
+
+#: /resources/lib/gui/trakt_context_menu.py:347
+#: /resources/lib/gui/trakt_context_menu.py:369
+msgctxt "#30296"
+msgid "Select a list"
+msgstr "בחר רשימה"
+
+#: /resources/lib/gui/trakt_context_menu.py:394
+msgctxt "#30297"
+msgid "Watched Progress"
+msgstr "צפה בהתקדמות"
+
+#: /resources/lib/gui/trakt_context_menu.py:391
+#: /resources/lib/gui/trakt_context_menu.py:394
+msgctxt "#30298"
+msgid "Calendar"
+msgstr "לוּחַ שָׁנָה"
+
+#: /resources/lib/gui/trakt_context_menu.py:396
+msgctxt "#30299"
+msgid "Select Menu type to hide from"
+msgstr "בחר סוג תפריט כדי להסתתר ממנו"
+
+#: /resources/lib/gui/trakt_context_menu.py:419
+msgctxt "#30300"
+msgid "Item has been hidden from your {}"
+msgstr "הפריט הוסתר מה-{} שלך"
+
+#: /resources/lib/gui/trakt_context_menu.py:443
+msgctxt "#30301"
+msgid "Item's Progress History has been removed"
+msgstr "היסטוריית ההתקדמות של הפריט הוסרה"
+
+#: /resources/lib/modules/router.py:392
+msgctxt "#30302"
+msgid "Silent scrape"
+msgstr "גרידה שקטה"
+
+#: /resources/lib/gui/movieMenus.py:442 /resources/lib/gui/tvshowMenus.py:561
+msgctxt "#30303"
+msgid "Genre Selection"
+msgstr "בחירת ז'אנר"
+
+#: /resources/lib/modules/zip_manager.py:39
+msgctxt "#30304"
+msgid "Browse..."
+msgstr "לְדַפדֵף..."
+
+#: /resources/lib/modules/zip_manager.py:39
+msgctxt "#30305"
+msgid "Web Location..."
+msgstr "מיקום אינטרנט..."
+
+#: /resources/lib/modules/zip_manager.py:47
+msgctxt "#30306"
+msgid "Locate {} Zip"
+msgstr "אתר את {} Zip"
+
+#: /resources/lib/modules/zip_manager.py:54
+msgctxt "#30307"
+msgid "Enter Zip URL"
+msgstr "הזן כתובת Zip"
+
+#: /resources/lib/modules/cacheAssist.py:102
+#: /resources/lib/modules/getSources.py:450
+msgctxt "#30308"
+msgid "Cache Assist"
+msgstr "סיוע במטמון"
+
+#: /resources/lib/database/skinManager/__init__.py:225
+msgctxt "#30309"
+msgid "Installing"
+msgstr "מתקין"
+
+#: /resources/lib/database/skinManager/__init__.py:124
+msgctxt "#30310"
+msgid "The skin name 'Default' is not allowed."
+msgstr "שם העור 'ברירת מחדל' אינו מותר."
+
+#: /resources/lib/modules/smartPlay.py:85
+msgctxt "#30311"
+msgid "Starting Playback"
+msgstr "התחלת השמעה"
+
+#: /resources/settings.xml:524 /resources/settings.xml:681
+msgctxt "#30312"
+msgid "Keyart"
+msgstr "Keyart"
+
+#: /resources/settings.xml:544 /resources/settings.xml:701
+msgctxt "#30313"
+msgid "Clear Logo"
+msgstr "לוגו ברור"
+
+#: /resources/settings.xml:514 /resources/settings.xml:671
+msgctxt "#30314"
+msgid "Landscape"
+msgstr "נוֹף"
+
+#: /resources/settings.xml:583 /resources/settings.xml:727
+#: /resources/settings.xml:1769 /resources/settings.xml:1784
+#: /resources/settings.xml:1799 /resources/settings.xml:1814
+#: /resources/settings.xml:1829
+msgctxt "#30315"
+msgid "Character Art"
+msgstr "אמנות דמות"
+
+#: /resources/settings.xml:557 /resources/settings.xml:714
+msgctxt "#30316"
+msgid "Clear Art"
+msgstr "אמנות ברורה"
+
+#: /resources/settings.xml:570
+msgctxt "#30317"
+msgid "Disc Art"
+msgstr "אמנות דיסק"
+
+#: /resources/settings.xml:1977
+msgctxt "#30318"
+msgid "Smart Play Display Style"
+msgstr "Smart Play סגנון תצוגה"
+
+#: /resources/settings.xml:2026
+msgctxt "#30319"
+msgid "Default Action if Nothing Selected"
+msgstr "פעולת ברירת מחדל אם לא נבחר"
+
+#: /resources/settings.xml:2031 /resources/lib/gui/windows/source_select.py:38
+msgctxt "#30320"
+msgid "Play"
+msgstr "לְשַׂחֵק"
+
+#: /resources/settings.xml:2032
+msgctxt "#30321"
+msgid "Pause"
+msgstr "הַפסָקָה"
+
+#: /resources/settings.xml:2046
+msgctxt "#30322"
+msgid "Enable Still Watching Dialog"
+msgstr "אפשר דו-שיח עדיין צופה"
+
+#: /resources/settings.xml:2059
+msgctxt "#30323"
+msgid "Episodes Between Dialog Prompts"
+msgstr "פרקים בין הנחיות דיאלוג"
+
+#: /resources/settings.xml:119
+msgctxt "#30324"
+msgid "Paginate Trakt Lists"
+msgstr "עמוד ברשימות טראקט"
+
+#: /resources/lib/gui/tvshowMenus.py:274
+msgctxt "#30325"
+msgid "My Watched Episodes"
+msgstr "הפרקים שנצפו שלי"
+
+#: /resources/lib/gui/movieMenus.py:227
+msgctxt "#30326"
+msgid "My Watched Movies"
+msgstr "הסרטים שצפיתי"
+
+#: /resources/lib/gui/homeMenu.py:83
+msgctxt "#30327"
+msgid "Search Movies By Actor..."
+msgstr "חפש סרטים לפי שחקן..."
+
+#: /resources/lib/gui/homeMenu.py:89
+msgctxt "#30328"
+msgid "Search Shows By Actor..."
+msgstr "חפש תוכניות לפי שחקן..."
+
+#: /resources/settings.xml:1935
+msgctxt "#30329"
+msgid "Ask"
+msgstr "לִשְׁאוֹל"
+
+#: /resources/settings.xml:1937
+msgctxt "#30330"
+msgid "Do not resume"
+msgstr "אל תחדש"
+
+#: /resources/lib/modules/smartPlay.py:390
+msgctxt "#30331"
+msgid "Start From Beginning"
+msgstr "התחל מהתחלה"
+
+#: /resources/lib/database/trakt_sync/__init__.py:481
+msgctxt "#30332"
+msgid ""
+"There were issues when processing the synchronization with Trakt, please "
+"check the log"
+msgstr "היו בעיות בעת עיבוד הסנכרון עם Trakt, אנא בדוק את היומן"
+
+#: /resources/settings.xml:1109 /resources/settings.xml:1312
+#: /resources/settings.xml:1866 /resources/settings.xml:1879
+#: /resources/settings.xml:1892 /resources/lib/gui/windows/sort_select.py:10
+msgctxt "#30333"
+msgid "AllDebrid"
+msgstr "AllDebrid"
+
+#: /resources/lib/debrid/all_debrid.py:110
+msgctxt "#30334"
+msgid "AllDebrid Auth"
+msgstr "AllDebrid Auth"
+
+#: /resources/settings.xml:1110
+msgctxt "#30335"
+msgid "Enabled AllDebrid"
+msgstr "AllDebrid מופעל"
+
+#: /resources/settings.xml:1115 /resources/settings.xml:1128
+msgctxt "#30336"
+msgid "AllDebrid Username"
+msgstr "שם משתמש AllDebrid"
+
+#: /resources/settings.xml:1147
+msgctxt "#30337"
+msgid "Authorize AllDebrid..."
+msgstr "אשר את AllDebrid..."
+
+#: /resources/settings.xml:332
+msgctxt "#30338"
+msgid "Enable Automatic Theme Updates"
+msgstr "הפעל עדכוני ערכות נושא אוטומטיים"
+
+#: /resources/settings.xml:907
+msgctxt "#30339"
+msgid "Authorise Premiumize"
+msgstr "אישור Premiumize"
+
+#: /resources/lib/indexers/trakt.py:110 /resources/lib/indexers/trakt.py:121
+msgctxt "#30340"
+msgid ""
+"There appears to be a problem with your Trakt Authorization \n"
+"Please try re-authorizing your account"
+msgstr "אנא נסה לאשר מחדש את חשבונך"
+
+#: /resources/settings.xml:425
+msgctxt "#30341"
+msgid "Preferred Artwork Size"
+msgstr "גודל יצירות אמנות מועדף"
+
+#: /resources/settings.xml:430
+msgctxt "#30342"
+msgid "Largest Available"
+msgstr "הגדול ביותר זמין"
+
+#: /resources/settings.xml:431
+msgctxt "#30343"
+msgid "Medium"
+msgstr "בינוני"
+
+#: /resources/settings.xml:432
+msgctxt "#30344"
+msgid "Small"
+msgstr "קָטָן"
+
+#: /resources/lib/gui/tvshowMenus.py:82
+msgctxt "#30345"
+msgid "Popular Recent Shows"
+msgstr "תוכניות פופולריות אחרונות"
+
+#: /resources/lib/gui/tvshowMenus.py:103
+msgctxt "#30346"
+msgid "Trending Recent Shows"
+msgstr "תוכניות פופולריות אחרונות"
+
+#: /resources/lib/gui/movieMenus.py:70
+msgctxt "#30347"
+msgid "Popular Recent Movies"
+msgstr "סרטים פופולריים אחרונים"
+
+#: /resources/lib/gui/movieMenus.py:91
+msgctxt "#30348"
+msgid "Trending Recent Movies"
+msgstr "סרטים פופולריים אחרונים"
+
+#: /resources/lib/debrid/premiumize.py:76
+msgctxt "#30349"
+msgid "Premiumize auth"
+msgstr "ביצוע פרימיום אישור"
+
+#: /resources/lib/gui/tvshowMenus.py:267
+msgctxt "#30350"
+msgid "My Liked Show Lists"
+msgstr "רשימות הלייקים שלי"
+
+#: /resources/lib/gui/movieMenus.py:220
+msgctxt "#30351"
+msgid "My Liked Movie Lists"
+msgstr "רשימות הסרטים שאהבתי"
+
+#: /resources/lib/gui/tvshowMenus.py:139
+msgctxt "#30352"
+msgid "Trending Show Lists"
+msgstr "רשימות תוכניות פופולריות"
+
+#: /resources/lib/gui/movieMenus.py:121
+msgctxt "#30353"
+msgid "Trending Movie Lists"
+msgstr "רשימות סרטים פופולריות"
+
+#: /resources/lib/gui/tvshowMenus.py:146
+msgctxt "#30354"
+msgid "Popular Show Lists"
+msgstr "רשימות תוכניות פופולריות"
+
+#: /resources/lib/gui/movieMenus.py:128
+msgctxt "#30355"
+msgid "Popular Movie Lists"
+msgstr "רשימות סרטים פופולריות"
+
+#: /resources/settings.xml:69 /resources/settings.xml:82
+msgctxt "#30356"
+msgid "Episode Title"
+msgstr "שם הפרק"
+
+#: /resources/settings.xml:70 /resources/settings.xml:83
+msgctxt "#30357"
+msgid "01x01. Episode Title"
+msgstr "01x01. שם הפרק"
+
+#: /resources/settings.xml:71 /resources/settings.xml:84
+msgctxt "#30358"
+msgid "Show Title: Episode Title"
+msgstr "שם התוכנית: שם הפרק"
+
+#: /resources/settings.xml:72 /resources/settings.xml:85
+msgctxt "#30359"
+msgid "Show Title: 01x01. Episode Title"
+msgstr "שם התוכנית: 01x01. שם הפרק"
+
+#: /resources/settings.xml:158
+msgctxt "#30360"
+msgid "Disable Notification Sound"
+msgstr "השבת את צליל ההתראה"
+
+#: /resources/settings.xml:129
+msgctxt "#30361"
+msgid "Lists Title Display Style"
+msgstr "רשימות סגנון תצוגת כותרת"
+
+#: /resources/settings.xml:134
+msgctxt "#30362"
+msgid "List Title"
+msgstr "כותרת הרשימה"
+
+#: /resources/settings.xml:135
+msgctxt "#30363"
+msgid "List Title - Creator"
+msgstr "כותרת הרשימה - יוצר"
+
+#: /resources/lib/gui/homeMenu.py:10
+msgctxt "#30364"
+msgid ""
+"Discover movies that are Popular, Trending, Recommended for you and more."
+msgstr "גלה סרטים פופולריים, פופולריים, מומלצים עבורך ועוד."
+
+#: /resources/lib/gui/homeMenu.py:16
+msgctxt "#30365"
+msgid ""
+"Discover TV shows that are Popular, Trending, Recommended for you and more."
+msgstr "גלה תוכניות טלוויזיה שהן פופולריות, פופולריות, מומלצות עבורך ועוד."
+
+#: /resources/lib/gui/homeMenu.py:23
+msgctxt "#30366"
+msgid "View movies based on your Trakt information"
+msgstr "הצג סרטים המבוססים על מידע Trakt שלך"
+
+#: /resources/lib/gui/homeMenu.py:29
+msgctxt "#30367"
+msgid "View shows and episodes based on your Trakt information"
+msgstr "הצג תוכניות ופרקים על סמך מידע ה-Trakt שלך"
+
+#: /resources/lib/gui/homeMenu.py:36
+msgctxt "#30368"
+msgid "View or play files stored on your cloud provider"
+msgstr "הצג או הפעל קבצים המאוחסנים בספק הענן שלך"
+
+#: /resources/lib/gui/homeMenu.py:42
+msgctxt "#30369"
+msgid "Search for movies or shows"
+msgstr "חפש סרטים או תוכניות"
+
+#: /resources/lib/gui/homeMenu.py:48
+msgctxt "#30370"
+msgid "Variety of tools to help solve issues or manage your services"
+msgstr "מגוון כלים שיעזרו לפתור בעיות או לנהל את השירותים שלך"
+
+#: /resources/lib/gui/homeMenu.py:72 /resources/lib/gui/movieMenus.py:179
+#: /resources/lib/gui/movieMenus.py:306
+msgctxt "#30371"
+msgid "Search for movies by title"
+msgstr "חפש סרטים לפי כותרת"
+
+#: /resources/lib/gui/homeMenu.py:78 /resources/lib/gui/tvshowMenus.py:196
+#: /resources/lib/gui/tvshowMenus.py:428
+msgctxt "#30372"
+msgid "Search for shows by title"
+msgstr "חפש תוכניות לפי כותרת"
+
+#: /resources/lib/gui/homeMenu.py:59 /resources/lib/gui/movieMenus.py:186
+msgctxt "#30373"
+msgid "View your movie search history or start a new search"
+msgstr "הצג את היסטוריית החיפושים של הסרט שלך או התחל חיפוש חדש"
+
+#: /resources/lib/gui/homeMenu.py:65 /resources/lib/gui/tvshowMenus.py:203
+msgctxt "#30374"
+msgid "View your shows search history or start a new search"
+msgstr "הצג את היסטוריית החיפושים של התוכניות שלך או התחל חיפוש חדש"
+
+#: /resources/lib/gui/homeMenu.py:85 /resources/lib/gui/movieMenus.py:172
+msgctxt "#30375"
+msgid "Search for movies by actor name"
+msgstr "חפש סרטים לפי שם שחקן"
+
+#: /resources/lib/gui/homeMenu.py:91
+msgctxt "#30376"
+msgid "Search show by actor"
+msgstr "חפש תוכנית לפי שחקן"
+
+#: /resources/lib/gui/homeMenu.py:101
+msgctxt "#30377"
+msgid "Tools to help you update or manage your installed providers"
+msgstr "כלים שיעזרו לך לעדכן או לנהל את הספקים המותקנים שלך"
+
+#: /resources/lib/gui/homeMenu.py:108
+msgctxt "#30378"
+msgid "View your current or previous cloud transfers"
+msgstr "הצג את העברות הענן הנוכחיות או הקודמות שלך"
+
+#: /resources/lib/gui/homeMenu.py:115
+msgctxt "#30379"
+msgid "Clear the cached information from long processes or network request"
+msgstr "נקה את המידע השמור מתהליכים ארוכים או מבקשת רשת"
+
+#: /resources/lib/gui/homeMenu.py:122
+msgctxt "#30380"
+msgid "Clear the locally indexed torrent information identified by providers"
+msgstr "נקה את פרטי הטורנטים שנוספו לאינדקס מקומיים שזוהו על ידי ספקים"
+
+#: /resources/lib/gui/homeMenu.py:129 /resources/lib/gui/movieMenus.py:313
+msgctxt "#30381"
+msgid "Clear your search history"
+msgstr "נקה את היסטוריית החיפושים שלך"
+
+#: /resources/lib/gui/homeMenu.py:136
+msgctxt "#30382"
+msgid "Open Seren's settings"
+msgstr "פתח את ההגדרות של Seren"
+
+#: /resources/lib/gui/homeMenu.py:143
+msgctxt "#30383"
+msgid ""
+"Remove all settings, providers, databases, themes and cache (Fresh start)"
+msgstr ""
+"הסר את כל ההגדרות, הספקים, מסדי הנתונים, ערכות הנושא והמטמון (התחלה חדשה)"
+
+#: /resources/lib/gui/homeMenu.py:150
+msgctxt "#30384"
+msgid ""
+"A list of tools to assist with issues that may arise with the syncing of "
+"your trakt data"
+msgstr ""
+"רשימה של כלים שיסייעו בבעיות שעלולות להתעורר עם סנכרון נתוני ה-trakt שלך"
+
+#: /resources/lib/gui/homeMenu.py:164
+msgctxt "#30385"
+msgid "A set of test windows to help you debug your theme"
+msgstr "קבוצה של חלונות בדיקה שיעזרו לך לנפות באגים בערכת הנושא שלך"
+
+#: /resources/lib/gui/homeMenu.py:175
+msgctxt "#30386"
+msgid "Force Seren to check for updates for your installed provider(s)"
+msgstr "הכריח את Seren לחפש עדכונים עבור הספקים המותקנים שלך"
+
+#: /resources/lib/gui/homeMenu.py:182
+msgctxt "#30387"
+msgid "Open a window to enable/disable/install/uninstall providers in Seren"
+msgstr "פתח חלון כדי להפעיל/להשבית/להתקין/להסיר ספקים ב-Seren"
+
+#: /resources/lib/gui/homeMenu.py:194
+msgctxt "#30388"
+msgid "Clear the last sync timestamp"
+msgstr "נקה את חותמת הזמן האחרונה של הסנכרון"
+
+#: /resources/lib/gui/homeMenu.py:201
+msgctxt "#30389"
+msgid "Force Seren to perform a sync with Trakt's servers"
+msgstr "כפה על Seren לבצע סנכרון עם השרתים של Trakt"
+
+#: /resources/lib/gui/homeMenu.py:208
+msgctxt "#30390"
+msgid "Remove all information in the Trakt Sync database and force a re-sync"
+msgstr "הסר את כל המידע במסד הנתונים של Trakt Sync וכפה סנכרון מחדש"
+
+#: /resources/lib/gui/homeMenu.py:219
+msgctxt "#30391"
+msgid "Opens the next playing window"
+msgstr "פותח את חלון המשחק הבא"
+
+#: /resources/lib/gui/homeMenu.py:226
+msgctxt "#30392"
+msgid "Opens the still watching window"
+msgstr "פותח את החלון שעדיין צופה"
+
+#: /resources/lib/gui/homeMenu.py:240
+msgctxt "#30393"
+msgid "Opens the resolver window"
+msgstr "פותח את חלון הפותר"
+
+#: /resources/lib/gui/homeMenu.py:247
+msgctxt "#30394"
+msgid "Opens the source select window"
+msgstr "פותח את חלון בחירת המקור"
+
+#: /resources/lib/gui/movieMenus.py:66
+msgctxt "#30395"
+msgid ""
+"View the most popular movies. Popularity is calculated using the rating "
+"percentage and the number of ratings."
+msgstr ""
+"צפה בסרטים הפופולריים ביותר. הפופולריות מחושבת באמצעות אחוז הדירוג ומספר "
+"הדירוגים."
+
+#: /resources/lib/gui/movieMenus.py:72
+msgctxt "#30396"
+msgid ""
+"View the most recent popular movies. Popularity is calculated using the "
+"rating percentage and the number of ratings."
+msgstr ""
+"הצג את הסרטים הפופולריים ביותר האחרונים. הפופולריות מחושבת באמצעות אחוז "
+"הדירוג ומספר הדירוגים."
+
+#: /resources/lib/gui/movieMenus.py:79
+msgctxt "#30397"
+msgid "Personalized movie recommendations based on your watched history"
+msgstr "המלצות מותאמות אישית על סרטים המבוססים על היסטוריית הצפייה שלך"
+
+#: /resources/lib/gui/movieMenus.py:87
+msgctxt "#30398"
+msgid ""
+"Returns all movies being watched right now. Movies with the most viewers are"
+" returned first."
+msgstr ""
+"מחזיר את כל הסרטים שנצפו כעת. סרטים עם הכי הרבה צופים מוחזרים ראשונים."
+
+#: /resources/lib/gui/movieMenus.py:93
+msgctxt "#30399"
+msgid ""
+"Returns all recent movies being watched right now. Movies with the most "
+"viewers are returned first."
+msgstr ""
+"מחזיר את כל הסרטים האחרונים שנצפו כעת. סרטים עם הכי הרבה צופים מוחזרים "
+"ראשונים."
+
+#: /resources/lib/gui/movieMenus.py:101
+msgctxt "#30400"
+msgid "Returns the most played (not unique) movies for the week"
+msgstr "מחזיר את הסרטים המושמעים ביותר (לא ייחודיים) במשך השבוע"
+
+#: /resources/lib/gui/movieMenus.py:109
+msgctxt "#30401"
+msgid "Returns the most watched (unique views) movies for the week"
+msgstr "מחזיר את הסרטים הנצפים ביותר (צפיות ייחודיות) במשך השבוע"
+
+#: /resources/lib/gui/movieMenus.py:117
+msgctxt "#30402"
+msgid "Returns the most collected (unique users) movies for the week"
+msgstr "מחזיר את הסרטים הנאספים ביותר (משתמשים ייחודיים) לשבוע"
+
+#: /resources/lib/gui/movieMenus.py:124
+msgctxt "#30403"
+msgid "Returns the most played movie lists for the week"
+msgstr "מחזירה את רשימות הסרטים המושמעות ביותר במשך השבוע"
+
+#: /resources/lib/gui/movieMenus.py:131
+msgctxt "#30404"
+msgid "Returns the most popular movie lists of all time"
+msgstr "מחזיר את רשימות הסרטים הפופולריות ביותר בכל הזמנים"
+
+#: /resources/lib/gui/movieMenus.py:140
+msgctxt "#30405"
+msgid ""
+"Returns the most anticipated movies based on the number of Trakt lists a "
+"movie appears on."
+msgstr ""
+"מחזירה את הסרטים הצפויים ביותר בהתבסס על מספר רשימות הטרקט שסרט מופיע בהן."
+
+#: /resources/lib/gui/movieMenus.py:148
+msgctxt "#30406"
+msgid ""
+"Returns the top 10 grossing movies in the U.S. box office last weekend. "
+"Updated every Monday morning."
+msgstr ""
+"מחזיר את 10 הסרטים הרווחיים בקופות בארה\"ב בסוף השבוע האחרון. מתעדכן כל יום "
+"שני בבוקר."
+
+#: /resources/lib/gui/movieMenus.py:154
+msgctxt "#30407"
+msgid "Returns all movies updated this month."
+msgstr "מחזיר את כל הסרטים שעודכנו החודש."
+
+#: /resources/lib/gui/movieMenus.py:160
+msgctxt "#30408"
+msgid "Allows you to find movies based on genre(s)"
+msgstr "מאפשר לך למצוא סרטים המבוססים על ז'אנרים"
+
+#: /resources/lib/gui/movieMenus.py:166
+msgctxt "#30409"
+msgid "Allows you to find movies based on the year of release"
+msgstr "מאפשר לך למצוא סרטים על סמך שנת היציאה"
+
+#: /resources/lib/gui/movieMenus.py:197
+msgctxt "#30410"
+msgid "A list of Movies you have started watching but have not yet finished"
+msgstr "רשימה של סרטים שהתחלת לראות אך עדיין לא סיימתם"
+
+#: /resources/lib/gui/movieMenus.py:203
+msgctxt "#30411"
+msgid "A list of movies you have collected on Trakt"
+msgstr "רשימה של סרטים שאספתם ב-Trakt"
+
+#: /resources/lib/gui/movieMenus.py:209
+msgctxt "#30412"
+msgid "A list of movies you have noted as wanting to watch"
+msgstr "רשימה של סרטים שציינת שהם רוצים לצפות"
+
+#: /resources/lib/gui/movieMenus.py:216
+msgctxt "#30413"
+msgid "My movie Trakt Lists"
+msgstr "הסרט שלי Trakt Lists"
+
+#: /resources/lib/gui/movieMenus.py:223
+msgctxt "#30414"
+msgid "My liked Trakt Lists"
+msgstr "רשימות טראקט שאהבתי"
+
+#: /resources/lib/gui/movieMenus.py:229
+msgctxt "#30415"
+msgid "My recent watched movies"
+msgstr "My recent watched movies"
+
+#: /resources/lib/gui/tvshowMenus.py:78
+msgctxt "#30416"
+msgid ""
+"View the most popular shows. Popularity is calculated using the rating "
+"percentage and the number of ratings."
+msgstr ""
+"צפה בתוכניות הפופולריות ביותר. הפופולריות מחושבת באמצעות אחוז הדירוג ומספר "
+"הדירוגים."
+
+#: /resources/lib/gui/tvshowMenus.py:84
+msgctxt "#30417"
+msgid ""
+"View the recent most popular shows. Popularity is calculated using the "
+"rating percentage and the number of ratings."
+msgstr ""
+"צפה בתוכניות הפופולריות ביותר האחרונות. הפופולריות מחושבת באמצעות אחוז "
+"הדירוג ומספר הדירוגים."
+
+#: /resources/lib/gui/tvshowMenus.py:91
+msgctxt "#30418"
+msgid "Personalized show recommendations based on your watched history"
+msgstr "המלצות מופעים מותאמות אישית על סמך היסטוריית הצפייה שלך"
+
+#: /resources/lib/gui/tvshowMenus.py:99
+msgctxt "#30419"
+msgid ""
+"Returns all shows being watched right now. Shows with the most users are "
+"returned first."
+msgstr ""
+"מחזירה את כל התוכניות שנצפות כעת. תכניות עם הכי הרבה משתמשים מוחזרות תחילה."
+
+#: /resources/lib/gui/tvshowMenus.py:105
+msgctxt "#30420"
+msgid ""
+"Returns all recent shows being watched right now. Shows with the most users "
+"are returned first."
+msgstr ""
+"מחזיר את כל התוכניות האחרונות שנצפו כעת. תכניות עם הכי הרבה משתמשים מוחזרות "
+"תחילה."
+
+#: /resources/lib/gui/tvshowMenus.py:111
+msgctxt "#30421"
+msgid "Returns shows being released within a 30 day period"
+msgstr "מחזיר מופעים שפורסמו בתוך תקופה של 30 יום"
+
+#: /resources/lib/gui/tvshowMenus.py:119
+msgctxt "#30422"
+msgid ""
+"Returns the most played (a single user can watch multiple episodes multiple "
+"times) shows for the week"
+msgstr ""
+"מחזיר את התוכניות המושמעות ביותר (משתמש בודד יכול לצפות במספר פרקים מספר "
+"פעמים) במשך השבוע"
+
+#: /resources/lib/gui/tvshowMenus.py:127
+msgctxt "#30423"
+msgid "Returns the most watched (unique users) shows for the week"
+msgstr "מחזיר את התוכניות הנצפות ביותר (משתמשים ייחודיים) במשך השבוע"
+
+#: /resources/lib/gui/tvshowMenus.py:135
+msgctxt "#30424"
+msgid "Returns the most collected (unique users) shows for the week"
+msgstr "מחזיר את המופעים שנאספו (משתמשים ייחודיים) הכי הרבה במשך השבוע"
+
+#: /resources/lib/gui/tvshowMenus.py:142
+msgctxt "#30425"
+msgid "Returns the most played show lists for the week"
+msgstr "מחזירה את רשימות התוכניות המושמעות ביותר במשך השבוע"
+
+#: /resources/lib/gui/tvshowMenus.py:149
+msgctxt "#30426"
+msgid "Returns the most popular show lists of all time"
+msgstr "מחזיר את רשימות התוכניות הפופולריות ביותר בכל הזמנים"
+
+#: /resources/lib/gui/tvshowMenus.py:158
+msgctxt "#30427"
+msgid ""
+"Returns the most anticipated shows based on the number of Trakt lists a show"
+" appears on."
+msgstr ""
+"מחזירה את התוכניות הצפויות ביותר בהתבסס על מספר רשימות הטרקט שתוכנית מופיעה "
+"בהן."
+
+#: /resources/lib/gui/tvshowMenus.py:165
+msgctxt "#30428"
+msgid "Returns all shows updated over the past 30 days"
+msgstr "מחזיר את כל התוכניות שעודכנו במהלך 30 הימים האחרונים"
+
+#: /resources/lib/gui/tvshowMenus.py:171
+msgctxt "#30429"
+msgid "Returns a list of TV networks that can be used to filter shows by"
+msgstr "מחזירה רשימה של רשתות טלוויזיה שניתן להשתמש בהן כדי לסנן תוכניות לפי"
+
+#: /resources/lib/gui/tvshowMenus.py:177
+msgctxt "#30430"
+msgid "Returns a list of years to filter shows by their release dates"
+msgstr "מחזירה רשימה של שנים לסינון תוכניות לפי תאריכי השחרור שלהן"
+
+#: /resources/lib/gui/tvshowMenus.py:183
+msgctxt "#30431"
+msgid "Returns a list of genres to filter shows by"
+msgstr "מחזירה רשימה של ז'אנרים לפיהם ניתן לסנן תוכניות"
+
+#: /resources/lib/gui/tvshowMenus.py:189
+msgctxt "#30432"
+msgid "Search for shows by actor name"
+msgstr "חפש תוכניות לפי שם שחקן"
+
+#: /resources/lib/gui/tvshowMenus.py:214
+msgctxt "#30433"
+msgid ""
+"View episodes that you have recently started watching but have not yet "
+"finished"
+msgstr "צפה בפרקים שהתחלת לראות לאחרונה אך עדיין לא סיימתם"
+
+#: /resources/lib/gui/tvshowMenus.py:220
+msgctxt "#30434"
+msgid "View TV shows you have added to your Trakt Collection"
+msgstr "צפה בתוכניות טלוויזיה שהוספת לאוסף ה-Trakt שלך"
+
+#: /resources/lib/gui/tvshowMenus.py:226
+msgctxt "#30435"
+msgid "View TV shows you have added to your Trakt Watchlist"
+msgstr "צפה בתוכניות טלוויזיה שהוספת לרשימת המעקב שלך ב-Trakt"
+
+#: /resources/lib/gui/tvshowMenus.py:238
+msgctxt "#30436"
+msgid ""
+"View the next episode(s) you should watch for all TV shows you have started"
+msgstr "צפה בפרקים הבאים שאתה צריך לראות עבור כל תוכניות הטלוויזיה שהתחלת"
+
+#: /resources/lib/gui/tvshowMenus.py:244
+msgctxt "#30437"
+msgid "View episodes that are due to air in the next 30 days"
+msgstr "צפה בפרקים שאמורים לעלות ב-30 הימים הקרובים"
+
+#: /resources/lib/gui/tvshowMenus.py:250
+msgctxt "#30438"
+msgid "View TV shows that you have not yet finished watching"
+msgstr "צפו בתוכניות טלוויזיה שעדיין לא סיימתם לצפות בהן"
+
+#: /resources/lib/gui/tvshowMenus.py:256
+msgctxt "#30439"
+msgid ""
+"View episode(s) for shows you watch that have aired in the last 12 days"
+msgstr "צפה בפרקים של תוכניות שאתה צופה בהן וששודרו ב-12 הימים האחרונים"
+
+#: /resources/lib/gui/tvshowMenus.py:263
+msgctxt "#30440"
+msgid "View your personal show Trakt lists"
+msgstr "הצג את רשימות ההצגות האישיות שלך"
+
+#: /resources/lib/gui/tvshowMenus.py:270
+msgctxt "#30441"
+msgid "View your liked show Trakt lists"
+msgstr "הצג את רשימות ה-Trakt של התוכנית שאהבתי"
+
+#: /resources/lib/gui/tvshowMenus.py:276
+msgctxt "#30442"
+msgid "My recent watched episodes"
+msgstr "My recent watched episodes"
+
+#: /resources/lib/modules/getSources.py:471
+#: /resources/lib/modules/helpers.py:77
+msgctxt "#30443"
+msgid ""
+"It seems you have no providers installed\n"
+"Are you sure you wish to continue?"
+msgstr "האם אתה בטוח שאתה רוצה להמשיך?"
+
+#: /resources/settings.xml:124
+msgctxt "#30444"
+msgid "Paginate Trakt Collection"
+msgstr "Pagine Trakt Collection"
+
+#: /resources/settings.xml:59
+msgctxt "#30445"
+msgid "Show Remaining Unwatched Season Episodes in Mixed Lists"
+msgstr "הצג את פרקי העונות הנותרים שלא נצפו ברשימות מעורבות"
+
+#: /resources/lib/gui/windows/source_select.py:48
+msgctxt "#30446"
+msgid "No download location selected"
+msgstr "לא נבחר מיקום להורדה"
+
+#: /resources/settings.xml:25
+msgctxt "#30447"
+msgid "Base List Type for Movie Genres"
+msgstr "סוג רשימת בסיס לז'אנרים של סרטים"
+
+#: /resources/lib/modules/cacheAssist.py:435
+msgctxt "#30448"
+msgid "Cache Assist is attempting to build a torrent source"
+msgstr "Cache Assist מנסה לבנות מקור טורנט"
+
+#: /resources/lib/modules/cacheAssist.py:181
+msgctxt "#30449"
+msgid "New cached sources have been created for %s"
+msgstr "מקורות מטמון חדשים נוצרו עבור %s"
+
+#: /resources/lib/modules/cacheAssist.py:195
+msgctxt "#30450"
+msgid "Cache assist for %s has failed"
+msgstr "סיוע במטמון עבור %s נכשל"
+
+#: /resources/settings.xml:20
+msgctxt "#30451"
+msgid "Hide Watched Items"
+msgstr "הסתר פריטים שנצפו"
+
+#: /resources/settings.xml:47
+msgctxt "#30452"
+msgid "Hide Next Item in Widgets"
+msgstr "הסתר את הפריט הבא בווידג'טים"
+
+#: /resources/settings.xml:393
+msgctxt "#30453"
+msgid "Show original titles"
+msgstr "הצג כותרות מקוריות"
+
+#: /resources/settings.xml:408 /resources/settings.xml:415
+msgctxt "#30454"
+msgid "OMDb API Key"
+msgstr "מפתח API של OMDb"
+
+#: /resources/lib/modules/cacheAssist.py:81
+msgctxt "#30455"
+msgid "Follow Progress"
+msgstr "עקוב אחר התקדמות"
+
+#: /resources/lib/modules/cacheAssist.py:79
+msgctxt "#30456"
+msgid ""
+"Would you like to cache this in the background or wait for the item to "
+"finish?"
+msgstr "האם תרצה לשמור את זה ברקע או להמתין עד שהפריט יסתיים?"
+
+#: /resources/lib/modules/cacheAssist.py:80
+msgctxt "#30457"
+msgid "Run in background"
+msgstr "רץ ברקע"
+
+#: /resources/settings.xml:938 /resources/settings.xml:951
+#: /resources/settings.xml:1047 /resources/settings.xml:1060
+#: /resources/settings.xml:1131 /resources/settings.xml:1144
+msgctxt "#30458"
+msgid "Premium Status"
+msgstr "סטטוס פרימיום"
+
+#: /resources/skins/Default/1080i/sort_select.xml:1722
+#: /resources/skins/Default/1080i/provider_packages.xml:264
+#: /resources/skins/Default/1080i/download_manager.xml:365
+#: /resources/skins/Default/1080i/filter_select.xml:925
+#: /resources/skins/Default/1080i/still_watching.xml:179
+#: /resources/skins/Default/1080i/playing_next.xml:154
+#: /resources/skins/Default/1080i/source_select.xml:564
+#: /resources/lib/gui/windows/manual_caching.py:15
+#: /resources/lib/gui/windows/download_manager.py:68
+msgctxt "#30459"
+msgid "Close"
+msgstr "סגור"
+
+#: /resources/lib/gui/homeMenu.py:254
+msgctxt "#30460"
+msgid "Test Manual Cache Window"
+msgstr "בדיקת חלון מטמון ידני"
+
+#: /resources/skins/Default/1080i/source_select.xml:553
+msgctxt "#30461"
+msgid "View Uncached"
+msgstr "הצג ללא קובץ שמור"
+
+#: /resources/settings.xml:2145 /resources/lib/gui/homeMenu.py:216
+msgctxt "#30462"
+msgid "Test Playing Next"
+msgstr "מבחן משחק הבא"
+
+#: /resources/settings.xml:2153 /resources/lib/gui/homeMenu.py:223
+msgctxt "#30463"
+msgid "Test Still Watching"
+msgstr "מבחן עדיין צופה"
+
+#: /resources/settings.xml:2169 /resources/lib/gui/homeMenu.py:237
+msgctxt "#30464"
+msgid "Test Resolver Window"
+msgstr "חלון פתרון בדיקה"
+
+#: /resources/settings.xml:2177 /resources/lib/gui/homeMenu.py:244
+msgctxt "#30465"
+msgid "Test Source Select"
+msgstr "בחר מקור בדיקה"
+
+#: /resources/settings.xml:2185 /resources/lib/gui/homeMenu.py:251
+msgctxt "#30466"
+msgid "Test Manual Cache"
+msgstr "בדוק מטמון ידני"
+
+#: /resources/settings.xml:64
+msgctxt "#30467"
+msgid "General Episode Title Display Style"
+msgstr "סגנון תצוגת כותרת פרק כללי"
+
+#: /resources/lib/modules/cacheAssist.py:95
+#: /resources/lib/modules/cacheAssist.py:142
+msgctxt "#30468"
+msgid "This task is now running in the background"
+msgstr "משימה זו פועלת כעת ברקע"
+
+#: /resources/skins/Default/1080i/download_manager.xml:354
+msgctxt "#30469"
+msgid "Clear Completed"
+msgstr "הניקוי הושלם"
+
+#: /resources/settings.xml:1766 /resources/settings.xml:1781
+#: /resources/settings.xml:1796 /resources/settings.xml:1811
+#: /resources/settings.xml:1826
+#: /resources/skins/Default/1080i/get_sources.xml:625
+#: /resources/lib/gui/windows/sort_select.py:8
+msgctxt "#30470"
+msgid "Adaptive"
+msgstr "הסתגלות"
+
+#: /resources/lib/indexers/__init__.py:24
+msgctxt "#30471"
+msgid ""
+"Trakt is currently not authorized\n"
+"To access these features you will need to authorize Trakt\n"
+"Would you like to do that now?"
+msgstr "היית רוצה לעשות את זה עכשיו?"
+
+#: /resources/lib/modules/resolver/torrent_resolvers/premiumize.py:42
+msgctxt "#30472"
+msgid "Failed to create transfer at PM, please check the log"
+msgstr "יצירת ההעברה ב-PM נכשלה, אנא בדוק את היומן"
+
+#: /resources/lib/gui/windows/source_select.py:39
+#: /resources/lib/modules/download_manager.py:440
+msgctxt "#30473"
+msgid "Download"
+msgstr "הורד"
+
+#: /resources/lib/modules/source_sorter.py:103
+msgctxt "#30474"
+msgid ""
+"Your filters appear to be too restrictive for this item, would you like to "
+"try again without them?"
+msgstr ""
+"נראה שהמסננים שלך מגבילים מדי עבור פריט זה, האם תרצה לנסות שוב בלעדיהם?"
+
+#: /resources/lib/gui/windows/provider_packages.py:78
+msgctxt "#30475"
+msgid "Configure Package"
+msgstr "הגדר את החבילה"
+
+#: /resources/lib/modules/providers/install_manager.py:103
+msgctxt "#30476"
+msgid ""
+"Failed to install, please check the zip file or URL supplied and try again"
+msgstr "ההתקנה נכשלה, אנא בדוק את קובץ ה-zip או את כתובת האתר שסופקו ונסה שוב"
+
+#: /resources/settings.xml:2210
+msgctxt "#30477"
+msgid "Force widget refresh after playback ends"
+msgstr "כפה רענון של ווידג'ט לאחר סיום ההשמעה"
+
+#: /resources/settings.xml:1418
+msgctxt "#30478"
+msgid "Terminate if Adaptive Sources are Found"
+msgstr "סיום אם נמצאו מקורות מסתגלים"
+
+#: /resources/lib/gui/tvshowMenus.py:232
+msgctxt "#30479"
+msgid "A list of shows you watch sorted by most recently watched"
+msgstr "רשימה של תוכניות שבהן אתה צופה, ממוינת לפי האחרון שצפית בהם"
+
+#: /resources/lib/database/torrentCache/__init__.py:143
+msgctxt "#30480"
+msgid "Torrent cache database successfully cleared"
+msgstr "מסד הנתונים של מטמון הטורנט נוקה בהצלחה"
+
+#: /resources/settings.xml:847
+msgctxt "#30481"
+msgid "Start scrobble after seconds."
+msgstr "התחל לקשקש אחרי שניות."
+
+#: /resources/settings.xml:866
+msgctxt "#30482"
+msgid "Minimum scrobble percentage before marked watched."
+msgstr "אחוז שרבוט מינימלי לפני סימון נצפית."
+
+#: /resources/lib/gui/windows/source_select.py:40
+#: /resources/lib/modules/resolver/torrent_resolvers/base_resolver.py:78
+msgctxt "#30483"
+msgid "File Selection"
+msgstr "בחירת קובץ"
+
+#: /resources/settings.xml:420
+msgctxt "#30484"
+msgid "Disable Seren fanart fallback on items missing fanart"
+msgstr "השבת את החזרה של Seren fanart על פריטים חסרים fanart"
+
+#: /resources/lib/modules/resolver/__init__.py:241
+msgctxt "#30485"
+msgid ""
+"There was an issue getting accepted hoster domains, this may cause odd "
+"scrape results"
+msgstr ""
+"הייתה בעיה בקבלת דומיינים מארח מקובלים, זה עלול לגרום לתוצאות גרידה מוזרות"
+
+#: /resources/settings.xml:1949
+msgctxt "#30487"
+msgid "On failure to resolve torrent file"
+msgstr "על כשל בפתרון קובץ הטורנט"
+
+#: /resources/settings.xml:1954
+msgctxt "#30488"
+msgid "Skip source"
+msgstr "דלג על המקור"
+
+#: /resources/settings.xml:1955
+msgctxt "#30489"
+msgid "Ask for manual file selection"
+msgstr "בקשו בחירת קבצים ידנית"
+
+#: /resources/lib/modules/resolver/__init__.py:92
+msgctxt "#30490"
+msgid ""
+"Failed to resolve a playable file, would you like to manually try select the"
+" file?"
+msgstr ""
+"לא הצליח לפתור קובץ שניתן לשחק, האם תרצה לנסות לבחור את הקובץ באופן ידני?"
+
+#: /resources/lib/modules/metadataHandler.py:53
+msgctxt "#30491"
+msgid "Action"
+msgstr "פעולה"
+
+#: /resources/lib/modules/metadataHandler.py:54
+msgctxt "#30492"
+msgid "Adventure"
+msgstr "הַרפַּתקָה"
+
+#: /resources/lib/modules/metadataHandler.py:55
+msgctxt "#30493"
+msgid "Animation"
+msgstr "אנימציה"
+
+#: /resources/lib/modules/metadataHandler.py:56
+msgctxt "#30494"
+msgid "Anime"
+msgstr "אנימה"
+
+#: /resources/lib/modules/metadataHandler.py:57
+msgctxt "#30495"
+msgid "Biography"
+msgstr "ביוגרפיה"
+
+#: /resources/lib/modules/metadataHandler.py:58
+msgctxt "#30496"
+msgid "Children"
+msgstr "יְלָדִים"
+
+#: /resources/lib/modules/metadataHandler.py:59
+msgctxt "#30497"
+msgid "Comedy"
+msgstr "קוֹמֶדִיָה"
+
+#: /resources/lib/modules/metadataHandler.py:60
+msgctxt "#30498"
+msgid "Crime"
+msgstr "פֶּשַׁע"
+
+#: /resources/lib/modules/metadataHandler.py:61
+msgctxt "#30499"
+msgid "Documentary"
+msgstr "תיעודי"
+
+#: /resources/lib/modules/metadataHandler.py:62
+msgctxt "#30500"
+msgid "Drama"
+msgstr "דְרָמָה"
+
+#: /resources/lib/modules/metadataHandler.py:63
+msgctxt "#30501"
+msgid "Family"
+msgstr "מִשׁפָּחָה"
+
+#: /resources/lib/modules/metadataHandler.py:64
+msgctxt "#30502"
+msgid "Fantasy"
+msgstr "פנטזיה"
+
+#: /resources/lib/modules/metadataHandler.py:65
+msgctxt "#30503"
+msgid "Game Show"
+msgstr "שעשועון"
+
+#: /resources/lib/modules/metadataHandler.py:66
+msgctxt "#30504"
+msgid "History"
+msgstr "הִיסטוֹרִיָה"
+
+#: /resources/lib/modules/metadataHandler.py:67
+msgctxt "#30505"
+msgid "Holiday"
+msgstr "חַג"
+
+#: /resources/lib/modules/metadataHandler.py:68
+msgctxt "#30506"
+msgid "Home And Garden"
+msgstr "בית וגן"
+
+#: /resources/lib/modules/metadataHandler.py:69
+msgctxt "#30507"
+msgid "Horror"
+msgstr "אימה"
+
+#: /resources/lib/modules/metadataHandler.py:70
+msgctxt "#30508"
+msgid "Mini Serie"
+msgstr "מיני סדרה"
+
+#: /resources/lib/modules/metadataHandler.py:71
+msgctxt "#30509"
+msgid "Music"
+msgstr "מוּסִיקָה"
+
+#: /resources/lib/modules/metadataHandler.py:72
+msgctxt "#30510"
+msgid "Musical"
+msgstr "מוּסִיקָלִי"
+
+#: /resources/lib/modules/metadataHandler.py:73
+msgctxt "#30511"
+msgid "Mystery"
+msgstr "מִסתוֹרִין"
+
+#: /resources/lib/modules/metadataHandler.py:74
+msgctxt "#30512"
+msgid "News"
+msgstr "חֲדָשׁוֹת"
+
+#: /resources/settings.xml:1580 /resources/settings.xml:1603
+#: /resources/settings.xml:1626 /resources/settings.xml:1649
+#: /resources/settings.xml:1672 /resources/settings.xml:1695
+#: /resources/settings.xml:1718 /resources/settings.xml:1741
+#: /resources/settings.xml:1764 /resources/settings.xml:1839
+#: /resources/settings.xml:1851 /resources/settings.xml:1863
+#: /resources/settings.xml:1876 /resources/settings.xml:1889
+#: /resources/lib/gui/windows/sort_select.py:4
+#: /resources/lib/gui/windows/sort_select.py:10
+#: /resources/lib/gui/windows/sort_select.py:15
+#: /resources/lib/gui/windows/sort_select.py:89
+#: /resources/lib/gui/windows/sort_select.py:98
+#: /resources/lib/gui/windows/sort_select.py:110
+#: /resources/lib/modules/metadataHandler.py:75
+msgctxt "#30513"
+msgid "None"
+msgstr "אף אחד"
+
+#: /resources/lib/modules/metadataHandler.py:76
+msgctxt "#30514"
+msgid "Reality"
+msgstr "מְצִיאוּת"
+
+#: /resources/lib/modules/metadataHandler.py:77
+msgctxt "#30515"
+msgid "Romance"
+msgstr "רומנטיקה"
+
+#: /resources/lib/modules/metadataHandler.py:78
+#: /resources/lib/modules/metadataHandler.py:79
+msgctxt "#30516"
+msgid "Science Fiction"
+msgstr "מדע בדיוני"
+
+#: /resources/lib/modules/metadataHandler.py:80
+msgctxt "#30517"
+msgid "Short"
+msgstr "קצר"
+
+#: /resources/lib/modules/metadataHandler.py:81
+msgctxt "#30518"
+msgid "Soap"
+msgstr "סַבּוֹן"
+
+#: /resources/lib/modules/metadataHandler.py:82
+msgctxt "#30519"
+msgid "Special Interest"
+msgstr "עניין מיוחד"
+
+#: /resources/lib/modules/metadataHandler.py:83
+msgctxt "#30520"
+msgid "Sporting Event"
+msgstr "אירוע ספורט"
+
+#: /resources/lib/modules/metadataHandler.py:84
+msgctxt "#30521"
+msgid "Superhero"
+msgstr "גיבור על"
+
+#: /resources/lib/modules/metadataHandler.py:85
+msgctxt "#30522"
+msgid "Suspense"
+msgstr "מֶתַח"
+
+#: /resources/lib/modules/metadataHandler.py:86
+#: /resources/lib/modules/metadataHandler.py:87
+msgctxt "#30523"
+msgid "Talk Show"
+msgstr "טוק שואו"
+
+#: /resources/lib/modules/metadataHandler.py:88
+msgctxt "#30524"
+msgid "Thriller"
+msgstr "מוֹתְחָן"
+
+#: /resources/lib/modules/metadataHandler.py:89
+msgctxt "#30525"
+msgid "TV Movie"
+msgstr "סרט טלוויזיה"
+
+#: /resources/lib/modules/metadataHandler.py:90
+msgctxt "#30526"
+msgid "War"
+msgstr "מִלחָמָה"
+
+#: /resources/lib/modules/metadataHandler.py:91
+msgctxt "#30527"
+msgid "Western"
+msgstr "מערבית"
+
+#: /resources/lib/modules/metadataHandler.py:398
+msgctxt "#30528"
+msgid "Season {}"
+msgstr "עונה {}"
+
+#: /resources/lib/modules/metadataHandler.py:396
+msgctxt "#30529"
+msgid "Episode {}"
+msgstr "פרק {}"
+
+#: /resources/lib/modules/update_news.py:5
+msgctxt "#30530"
+msgid ""
+"Seren no longer has an update checker built in. \n"
+"\n"
+"If you wish to continue to be notified of updates, please ensure that you have the nixgates repository installed and either have automatic updates enabled or turn on notifications for addon updates in Kodi settings"
+msgstr ""
+"לסרן אין יותר בודק עדכונים מובנה.\n"
+"\n"
+"אם ברצונך להמשיך לקבל הודעה על עדכונים, אנא ודא שמותקן אצלך מאגר nixgates והפעלת עדכונים אוטומטיים או הפעל התראות עבור עדכוני תוסף בהגדרות Kodi"
+
+#: /resources/lib/common/maintenance.py:158
+msgctxt "#30531"
+msgid "Language Invoker option has been changed, reloading kodi profile"
+msgstr "אפשרות ה- Language Invoker שונתה, טוען מחדש את פרופיל הקודי"
+
+#: /resources/settings.xml:2528 /resources/settings.xml:2533
+msgctxt "#30532"
+msgid "Re-Use Language Invoker Status"
+msgstr "השתמש מחדש בסטטוס מעורר שפה"
+
+#: /resources/settings.xml:2536
+msgctxt "#30533"
+msgid "Toggle Re-Use Language Invoker"
+msgstr "Toggle Re-Use Language Invoker"
+
+#: /resources/settings.xml:1517
+msgctxt "#30534"
+msgid "Movie minimum File Size (GB)"
+msgstr "גודל קובץ מינימלי של סרט (GB)"
+
+#: /resources/settings.xml:1534
+msgctxt "#30535"
+msgid "Episode minimum File Size (GB)"
+msgstr "גודל קובץ מינימלי של פרק (GB)"
+
+#: /resources/lib/indexers/trakt.py:67
+msgctxt "#30536"
+msgid ""
+"Invalid Trakt API keys, your authentication has been reset.\n"
+"Please re-auth your Trakt account."
+msgstr "אנא אשר מחדש את חשבון Trakt שלך."
+
+#: /resources/settings.xml:108
+msgctxt "#30537"
+msgid "Collection Sort Style"
+msgstr "סגנון מיון קולקציה"
+
+#: /resources/settings.xml:113
+msgctxt "#30538"
+msgid "Date Collected"
+msgstr "תאריך איסוף"
+
+#: /resources/settings.xml:114
+msgctxt "#30539"
+msgid "Alphabetically"
+msgstr "בסדר אלפביתי"
+
+#: /resources/settings.xml:2515
+msgctxt "#30540"
+msgid "Threading Scale"
+msgstr "סולם השחלה"
+
+#: /resources/settings.xml:2520
+msgctxt "#30541"
+msgid "Low"
+msgstr "נָמוּך"
+
+#: /resources/settings.xml:2521
+msgctxt "#30542"
+msgid "Normal"
+msgstr "נוֹרמָלִי"
+
+#: /resources/settings.xml:2522
+msgctxt "#30543"
+msgid "High"
+msgstr "גָבוֹהַ"
+
+#: /resources/settings.xml:2523
+msgctxt "#30544"
+msgid "Extreme"
+msgstr "קיצוני"
+
+#: /resources/settings.xml:2215
+msgctxt "#30545"
+msgid "Enable Tools menu item for Window Tests"
+msgstr "אפשר פריט תפריט כלים עבור בדיקות חלון"
+
+#: /resources/settings.xml:2144
+msgctxt "#30546"
+msgid "Window Tests"
+msgstr "בדיקות חלונות"
+
+#: /resources/settings.xml:2483
+msgctxt "#30547"
+msgid "Time Zone"
+msgstr "אזור זמן"
+
+#: /resources/settings.xml:2500 /resources/lib/modules/manual_timezone.py:27
+msgctxt "#30548"
+msgid "Set Local Time Zone"
+msgstr "הגדר אזור זמן מקומי"
+
+#: /resources/lib/modules/manual_timezone.py:14
+msgctxt "#30549"
+msgid "Unable to detect time zone"
+msgstr "לא ניתן לזהות אזור זמן"
+
+#: /resources/lib/modules/manual_timezone.py:14
+msgctxt "#30550"
+msgid ""
+"Seren was unable to detect your local time zone automatically.  Would you "
+"like to set this now?"
+msgstr ""
+"Seren לא הצליח לזהות את אזור הזמן המקומי שלך באופן אוטומטי. האם תרצה להגדיר "
+"את זה עכשיו?"
+
+#: /resources/skins/Default/1080i/download_manager.xml:137
+#: /resources/skins/Default/1080i/download_manager.xml:203
+#: /resources/skins/Default/1080i/download_manager.xml:305
+msgctxt "#30551"
+msgid "ETA"
+msgstr "ETA"
+
+#: /resources/skins/Default/1080i/download_manager.xml:114
+#: /resources/skins/Default/1080i/download_manager.xml:180
+#: /resources/skins/Default/1080i/download_manager.xml:318
+msgctxt "#30552"
+msgid "Speed"
+msgstr "מְהִירוּת"
+
+#: /resources/skins/Default/1080i/playing_next.xml:115
+msgctxt "#30553"
+msgid "Playing in"
+msgstr "משחק ב"
+
+#: /resources/skins/Default/1080i/playing_next.xml:115
+#: /resources/lib/modules/getSources.py:1277
+msgctxt "#30554"
+msgid "seconds"
+msgstr "שניות"
+
+#: /resources/skins/Default/1080i/playing_next.xml:138
+msgctxt "#30555"
+msgid "Play now"
+msgstr "שחק עכשיו"
+
+#: /resources/skins/Default/1080i/provider_packages.xml:42
+msgctxt "#30556"
+msgid "Provider Packages"
+msgstr "חבילות ספק"
+
+#: /resources/skins/Default/1080i/source_select.xml:499
+msgctxt "#30557"
+msgid "Year"
+msgstr "שָׁנָה"
+
+#: /resources/skins/Default/1080i/source_select.xml:499
+msgctxt "#30558"
+msgid "MPAA"
+msgstr "MPAA"
+
+#: /resources/skins/Default/1080i/still_watching.xml:124
+msgctxt "#30559"
+msgid "Are you still watching?"
+msgstr "אתה עדיין צופה?"
+
+#: /resources/skins/Default/1080i/still_watching.xml:147
+msgctxt "#30560"
+msgid "Play Next"
+msgstr "שחק הבא"
+
+#: /resources/skins/Default/1080i/still_watching.xml:163
+msgctxt "#30561"
+msgid "Stop"
+msgstr "תפסיק"
+
+#: /resources/skins/Default/1080i/provider_packages.xml:110
+#: /resources/skins/Default/1080i/provider_packages.xml:148
+#: /resources/skins/Default/1080i/provider_packages.xml:209
+msgctxt "#30562"
+msgid "Version"
+msgstr "גִרְסָה"
+
+#: /resources/skins/Default/1080i/download_manager.xml:42
+msgctxt "#30563"
+msgid "Download Manager"
+msgstr "מנהל הורדות"
+
+#: /resources/skins/Default/1080i/download_manager.xml:125
+#: /resources/skins/Default/1080i/download_manager.xml:191
+msgctxt "#30564"
+msgid "Done"
+msgstr "בוצע"
+
+#: /resources/lib/gui/movieMenus.py:325 /resources/lib/gui/tvshowMenus.py:446
+msgctxt "#30565"
+msgid "Remove from History"
+msgstr "מחק מההיסטוריה"
+
+#: /resources/lib/modules/update_news.py:6
+msgctxt "#30566"
+msgid ""
+"There has been significant changes to source sorting and filtering in this release. Please review the settings for source sorting and filtering. Some sensible defaults have been provided. \n"
+"\n"
+"The new sort approach sorts in levels. Each sort groups the results and the next level sort applies within those groups. Therefore, the order of sorts matter."
+msgstr ""
+"חלו שינויים משמעותיים במיון וסינון המקורות במהדורה זו. אנא עיין בהגדרות עבור מיון וסינון מקור. סופקו כמה ברירות מחדל הגיוניות.\n"
+"\n"
+"גישת המיון החדשה ממיינת ברמות. כל מיון מקבץ את התוצאות והמיון ברמה הבאה חל בתוך הקבוצות הללו. לכן יש חשיבות לסדר המינים."
+
+#: /resources/lib/modules/update_news.py:26
+msgctxt "#30567"
+msgid "Update News"
+msgstr "חדשות עדכון"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:112
+#: /resources/skins/Default/1080i/configure_provider_package.xml:122
+#: /resources/skins/Default/1080i/configure_provider_package.xml:175
+#: /resources/skins/Default/1080i/configure_provider_package.xml:185
+#: /resources/skins/Default/1080i/configure_provider_package.xml:238
+#: /resources/skins/Default/1080i/configure_provider_package.xml:248
+#: /resources/skins/Default/1080i/configure_provider_package.xml:322
+#: /resources/skins/Default/1080i/configure_provider_package.xml:332
+#: /resources/skins/Default/1080i/configure_provider_package.xml:395
+#: /resources/skins/Default/1080i/configure_provider_package.xml:405
+#: /resources/skins/Default/1080i/configure_provider_package.xml:479
+#: /resources/skins/Default/1080i/configure_provider_package.xml:489
+msgctxt "#30568"
+msgid "Status"
+msgstr "סטָטוּס"
+
+#: /resources/settings.xml:1570
+msgctxt "#30569"
+msgid "Prioritize the Last Resolved Show Release Name"
+msgstr "תעדוף את שם ההפצה האחרון של התוכנית שנפתרה"
+
+#: /resources/settings.xml:1583 /resources/settings.xml:1606
+#: /resources/settings.xml:1629 /resources/settings.xml:1652
+#: /resources/settings.xml:1675 /resources/settings.xml:1698
+#: /resources/settings.xml:1721 /resources/settings.xml:1744
+#: /resources/lib/gui/windows/sort_select.py:4
+msgctxt "#30570"
+msgid "Debrid Provider"
+msgstr "ספק Debrid"
+
+#: /resources/settings.xml:1585 /resources/settings.xml:1608
+#: /resources/settings.xml:1631 /resources/settings.xml:1654
+#: /resources/settings.xml:1677 /resources/settings.xml:1700
+#: /resources/settings.xml:1723 /resources/settings.xml:1746
+#: /resources/lib/gui/windows/sort_select.py:4
+msgctxt "#30571"
+msgid "Low Cam Sort"
+msgstr "מיון מצלמת נמוכה"
+
+#: /resources/settings.xml:1586 /resources/settings.xml:1609
+#: /resources/settings.xml:1632 /resources/settings.xml:1655
+#: /resources/settings.xml:1678 /resources/settings.xml:1701
+#: /resources/settings.xml:1724 /resources/settings.xml:1747
+#: /resources/lib/gui/windows/sort_select.py:4
+msgctxt "#30572"
+msgid "HEVC"
+msgstr "HEVC"
+
+#: /resources/settings.xml:1587 /resources/settings.xml:1610
+#: /resources/settings.xml:1633 /resources/settings.xml:1656
+#: /resources/settings.xml:1679 /resources/settings.xml:1702
+#: /resources/settings.xml:1725 /resources/settings.xml:1748
+#: /resources/lib/gui/windows/sort_select.py:4
+msgctxt "#30573"
+msgid "DV/HDR"
+msgstr "DV/HDR"
+
+#: /resources/settings.xml:1841 /resources/settings.xml:1853
+#: /resources/lib/gui/windows/sort_select.py:15
+msgctxt "#30574"
+msgid "HDR"
+msgstr "HDR"
+
+#: /resources/settings.xml:1588 /resources/settings.xml:1611
+#: /resources/settings.xml:1634 /resources/settings.xml:1657
+#: /resources/settings.xml:1680 /resources/settings.xml:1703
+#: /resources/settings.xml:1726 /resources/settings.xml:1749
+#: /resources/skins/Default/1080i/filter_select.xml:579
+#: /resources/lib/gui/windows/sort_select.py:4
+msgctxt "#30575"
+msgid "Audio Channels"
+msgstr "ערוצי אודיו"
+
+#: /resources/settings.xml:1759 /resources/settings.xml:1834
+#: /resources/settings.xml:1858
+msgctxt "#30576"
+msgid "First Priority"
+msgstr "עדיפות ראשונה"
+
+#: /resources/settings.xml:1774 /resources/settings.xml:1846
+#: /resources/settings.xml:1871
+msgctxt "#30577"
+msgid "Second Priority"
+msgstr "עדיפות שנייה"
+
+#: /resources/settings.xml:1789 /resources/settings.xml:1884
+msgctxt "#30578"
+msgid "Third Priority"
+msgstr "עדיפות שלישית"
+
+#: /resources/settings.xml:1804
+msgctxt "#30579"
+msgid "Fourth Priority"
+msgstr "עדיפות רביעית"
+
+#: /resources/settings.xml:1593 /resources/settings.xml:1616
+#: /resources/settings.xml:1639 /resources/settings.xml:1662
+#: /resources/settings.xml:1685 /resources/settings.xml:1708
+#: /resources/settings.xml:1731 /resources/settings.xml:1754
+msgctxt "#30580"
+msgid "Reverse Sort Direction"
+msgstr "הפוך כיוון מיון"
+
+#: /resources/settings.xml:1779 /resources/settings.xml:1794
+#: /resources/settings.xml:1809 /resources/settings.xml:1824
+#: /resources/lib/gui/windows/sort_select.py:8
+#: /resources/lib/gui/windows/sort_select.py:89
+#: /resources/lib/gui/windows/sort_select.py:110
+msgctxt "#30581"
+msgid "Other"
+msgstr "אַחֵר"
+
+#: /resources/settings.xml:1575
+msgctxt "#30582"
+msgid "Sort Level 1"
+msgstr "מיון רמה 1"
+
+#: /resources/settings.xml:1598
+msgctxt "#30583"
+msgid "Sort Level 2"
+msgstr "מיון רמה 2"
+
+#: /resources/settings.xml:1621
+msgctxt "#30584"
+msgid "Sort Level 3"
+msgstr "מיון רמה 3"
+
+#: /resources/settings.xml:1644
+msgctxt "#30585"
+msgid "Sort Level 4"
+msgstr "מיון רמה 4"
+
+#: /resources/settings.xml:1667
+msgctxt "#30586"
+msgid "Sort Level 5"
+msgstr "מיון רמה 5"
+
+#: /resources/settings.xml:1690
+msgctxt "#30587"
+msgid "Sort Level 6"
+msgstr "מיון רמה 6"
+
+#: /resources/settings.xml:1713
+msgctxt "#30588"
+msgid "Sort Level 7"
+msgstr "מיון רמה 7"
+
+#: /resources/settings.xml:1736
+msgctxt "#30589"
+msgid "Sort Level 8"
+msgstr "מיון רמה 8"
+
+#: /resources/settings.xml:1840 /resources/settings.xml:1852
+#: /resources/lib/gui/windows/sort_select.py:15
+msgctxt "#30590"
+msgid "DV"
+msgstr "DV"
+
+#: /resources/settings.xml:4
+msgctxt "#30591"
+msgid "All Menus"
+msgstr "כל התפריטים"
+
+#: /resources/settings.xml:53
+msgctxt "#30592"
+msgid "Episode Menus"
+msgstr "תפריטי פרקים"
+
+#: /resources/settings.xml:91
+msgctxt "#30593"
+msgid "Trakt Menus"
+msgstr "Trakt Menus"
+
+#: /resources/settings.xml:163
+msgctxt "#30594"
+msgid "Download Location"
+msgstr "מיקום הורדה"
+
+#: /resources/settings.xml:311
+msgctxt "#30595"
+msgid "Colors"
+msgstr "צבעים"
+
+#: /resources/settings.xml:379
+msgctxt "#30596"
+msgid "Metadata & Artwork"
+msgstr "מטא נתונים ויצירות אמנות"
+
+#: /resources/settings.xml:380
+msgctxt "#30597"
+msgid "Metadata"
+msgstr "Metadata"
+
+#: /resources/settings.xml:1334 /resources/settings.xml:1352
+#: /resources/settings.xml:1457 /resources/settings.xml:1470
+msgctxt "#30598"
+msgid "4K"
+msgstr "4k"
+
+#: /resources/settings.xml:1335 /resources/settings.xml:1353
+#: /resources/settings.xml:1458 /resources/settings.xml:1471
+msgctxt "#30599"
+msgid "1080p"
+msgstr "1080p"
+
+#: /resources/settings.xml:1336 /resources/settings.xml:1354
+#: /resources/settings.xml:1459 /resources/settings.xml:1472
+msgctxt "#30600"
+msgid "720p"
+msgstr "720p"
+
+#: /resources/settings.xml:1337 /resources/settings.xml:1355
+#: /resources/settings.xml:1460 /resources/settings.xml:1473
+msgctxt "#30601"
+msgid "SD"
+msgstr "SD"
+
+#: /resources/settings.xml:1924
+msgctxt "#30602"
+msgid "Resume"
+msgstr "להתחיל שוב"
+
+#: /resources/settings.xml:1943
+msgctxt "#30603"
+msgid "Resolving"
+msgstr "פותרים"
+
+#: /resources/settings.xml:1961
+msgctxt "#30604"
+msgid "Smart Play"
+msgstr "ניגון חכם"
+
+#: /resources/settings.xml:2204
+msgctxt "#30605"
+msgid "Menus"
+msgstr "תפריטים"
+
+#: /resources/settings.xml:2484 /resources/settings.xml:2492
+msgctxt "#30606"
+msgid "Local Time Zone"
+msgstr "אזור זמן מקומי"
+
+#: /resources/settings.xml:2514
+msgctxt "#30607"
+msgid "Performance"
+msgstr "ביצועים"
+
+#: /resources/settings.xml:141
+#: /resources/skins/Default/1080i/filter_select.xml:749
+msgctxt "#30608"
+msgid "Miscellaneous"
+msgstr "שונות"
+
+#: /resources/settings.xml:36
+msgctxt "#30609"
+msgid "Base List Type for TV Genres"
+msgstr "סוג רשימת בסיס לז'אנרים של טלוויזיה"
+
+#: /resources/skins/Default/1080i/get_sources.xml:316
+msgctxt "#30610"
+msgid "Total"
+msgstr "סך הכל"
+
+#: /resources/skins/Default/1080i/get_sources.xml:748
+msgctxt "#30611"
+msgid "Playable"
+msgstr "ניתן לשחק"
+
+#: /resources/settings.xml:1465
+msgctxt "#30612"
+msgid "Min Resolution"
+msgstr "רזולוציה מינימלית"
+
+#: /resources/settings.xml:2161 /resources/lib/gui/homeMenu.py:230
+msgctxt "#30613"
+msgid "Test Get Sources"
+msgstr "בדוק קבל מקורות"
+
+#: /resources/lib/gui/homeMenu.py:233
+msgctxt "#30614"
+msgid "Opens the Get Sources Window"
+msgstr "פותח את חלון קבל מקורות"
+
+#: /resources/lib/modules/getSources.py:176
+msgctxt "#30615"
+msgid "No providers currently enabled, please enable some"
+msgstr "אין ספקים מופעלים כרגע, אנא הפעל חלק"
+
+#: /resources/settings.xml:1398
+msgctxt "#30616"
+msgid "Wait for cloud files"
+msgstr "המתן לקבצי ענן"
+
+#: /resources/settings.xml:1442
+msgctxt "#30617"
+msgid "Choose Items to Filter..."
+msgstr "בחר פריטים לסינון..."
+
+#: /resources/skins/Default/1080i/filter_select.xml:45
+msgctxt "#30618"
+msgid "Filter Configuration"
+msgstr "תצורת מסנן"
+
+#: /resources/skins/Default/1080i/filter_select.xml:71
+msgctxt "#30619"
+msgid "Video Codecs"
+msgstr "Codec וידאו"
+
+#: /resources/skins/Default/1080i/filter_select.xml:240
+msgctxt "#30620"
+msgid "HDR Codecs"
+msgstr "HDR Codec"
+
+#: /resources/skins/Default/1080i/filter_select.xml:409
+msgctxt "#30621"
+msgid "Audio Codecs"
+msgstr "Codec אודיו"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:135
+#: /resources/skins/Default/1080i/configure_provider_package.xml:198
+#: /resources/skins/Default/1080i/configure_provider_package.xml:261
+#: /resources/skins/Default/1080i/configure_provider_package.xml:345
+#: /resources/skins/Default/1080i/configure_provider_package.xml:418
+#: /resources/skins/Default/1080i/configure_provider_package.xml:502
+msgctxt "#30622"
+msgid "Type"
+msgstr "סוג"
+
+#: /resources/skins/Default/1080i/configure_provider_package.xml:883
+msgctxt "#30623"
+msgid "Return to Packages"
+msgstr "חזרה לחבילות"
+
+#: /resources/lib/gui/windows/source_select.py:100
+msgctxt "#30624"
+msgid "Return to Source Select"
+msgstr "חזור לבחירת מקור"
+
+#: /resources/settings.xml:2193 /resources/lib/gui/homeMenu.py:261
+msgctxt "#30625"
+msgid "Test Download Manager Window"
+msgstr "בדוק את חלון מנהל ההורדות"
+
+#: /resources/lib/gui/homeMenu.py:258
+msgctxt "#30626"
+msgid "Test Download Manager"
+msgstr "בדוק את מנהל ההורדות"
+
+#: /resources/skins/Default/1080i/download_manager.xml:282
+msgctxt "#30627"
+msgid "Downloaded"
+msgstr "הורד"
+
+#: /resources/skins/Default/1080i/download_manager.xml:294
+msgctxt "#30628"
+msgid "Progress"
+msgstr "התקדמות"
+
+#: /resources/skins/Default/1080i/get_sources.xml:687
+#: /resources/lib/gui/windows/sort_select.py:8
+msgctxt "#30631"
+msgid "Direct"
+msgstr "ישיר"
+
+#: /resources/settings.xml:1428
+msgctxt "#30630"
+msgid "Terminate if Direct Sources are Found"
+msgstr "סיים אם מקורות ישירים נמצאים"
+
+#: /resources/settings.xml:1560
+msgctxt "#30633"
+msgid "Choose Sorting..."
+msgstr "בחר מיון..."
+
+#: /resources/skins/Default/1080i/sort_select.xml:45
+msgctxt "#30632"
+msgid "Sorting Configuration"
+msgstr "תצורת מיון"
+
+#: /resources/settings.xml:403
+msgctxt "#30629"
+msgid "Use language based release dates for movies"
+msgstr "שימוש בתאריכי הפצה מבוססי שפה לסרטים"
+
+#: /resources/settings.xml:1819
+msgctxt "#30031"
+msgid "Fifth Priority"
+msgstr "העדיפות החמישית"
+
+#: /resources/lib/gui/windows/source_select.py:52
+msgctxt "#30634"
+msgid "Download task started"
+msgstr "משימת ההורדה החלה"
+
+#: /resources/settings.xml:1252
+msgctxt "#30635"
+msgid "Scrape Premiumize Cloud"
+msgstr "גרידת ענן פרימיום"
+
+#: /resources/settings.xml:1262
+msgctxt "#30636"
+msgid "Scrape Real-Debrid Cloud"
+msgstr "ענן סקראפ אמיתי - היברידי"
+
+#: /resources/settings.xml:1272
+msgctxt "#30637"
+msgid "Scrape AllDebrid Cloud"
+msgstr "Scrape AllDebrid Cloud"
+
+#: /resources/settings.xml:747
+msgctxt "#30638"
+msgid "Season Poster"
+msgstr "כרזת עונה"
+
+#: /resources/settings.xml:757
+msgctxt "#30639"
+msgid "Season Banner"
+msgstr "באנר העונה"
+
+#: /resources/settings.xml:767
+msgctxt "#30263"
+msgid "Season Landscape"
+msgstr "נוף עונה"
+
+#: /resources/settings.xml:777
+msgctxt "#30262"
+msgid "Season Fanart"
+msgstr "עונת הפאנארט"
+
+#: /resources/settings.xml:787
+msgctxt "#30261"
+msgid "Episode Fanart"
+msgstr "פאנארט פרק"
+
+#: /resources/settings.xml:398
+msgctxt "#30640"
+msgid "Limit to One Studio/Network"
+msgstr "הגבלה לסטודיו אחד/רשת"
+
+#: /resources/lib/modules/download_manager.py:119
+msgctxt "#30644"
+msgid "Skipped creating duplicate download task."
+msgstr "דילג על יצירת משימת הורדה כפולה."
+
+#: /resources/lib/modules/download_manager.py:232
+msgctxt "#30643"
+msgid "Download failed: {}"
+msgstr "ההורדה נכשלה: {}"
+
+#: /resources/lib/modules/download_manager.py:235
+msgctxt "#30642"
+msgid "Download complete: {}"
+msgstr "Comment: {}"
+
+#: /resources/lib/gui/windows/source_select.py:56
+msgctxt "#30641"
+msgid "Sorry, {} type sources are not available for downloading"
+msgstr "מצטערים, מקורות מסוג {} אינם זמינים להורדה"
+
+#: /resources/skins/Default/1080i/manual_caching.xml:125
+#: /resources/skins/Default/1080i/manual_caching.xml:238
+#: /resources/skins/Default/1080i/manual_caching.xml:387
+msgctxt "#30486"
+msgid "Seeds"
+msgstr "זרעים"

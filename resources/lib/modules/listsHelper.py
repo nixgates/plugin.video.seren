@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.common import tools
 from resources.lib.database.trakt_sync import lists
 from resources.lib.modules.globals import g
@@ -19,20 +16,22 @@ class ListsHelper:
         arguments = g.REQUEST_PARAMS['action_args']
         media_type = g.REQUEST_PARAMS.get('media_type', arguments.get('type'))
         ignore_cache = True
-        if g.REQUEST_PARAMS.get('from_widget') and g.REQUEST_PARAMS.get('from_widget').lower() == "true":
-            widget_loaded_setting = "widget_loaded.{}.{}".format(media_type, arguments)
+        if g.FROM_WIDGET:
+            widget_loaded_setting = f"widget_loaded.{media_type}.{arguments}"
             if not g.get_bool_runtime_setting(widget_loaded_setting):
                 ignore_cache = False
                 g.set_runtime_setting(widget_loaded_setting, True)
-        list_items = self.lists_database.get_list_content(arguments['username'],
-                                                          arguments['trakt_id'],
-                                                          self._backwards_compatibility(media_type),
-                                                          ignore_cache=ignore_cache,
-                                                          page=g.PAGE,
-                                                          no_paging=self.no_paging)
+        list_items = self.lists_database.get_list_content(
+            arguments['username'],
+            arguments['trakt_id'],
+            self._backwards_compatibility(media_type),
+            ignore_cache=ignore_cache,
+            page=g.PAGE,
+            no_paging=self.no_paging,
+        )
 
         if not list_items:
-            g.log('Failed to pull list {} from Trakt/Database'.format(arguments['trakt_id']), 'error')
+            g.log(f"Failed to pull list {arguments['trakt_id']} from Trakt/Database", 'error')
             g.cancel_directory()
             return
 
@@ -43,37 +42,29 @@ class ListsHelper:
 
     def my_trakt_lists(self, media_type):
         self._create_list_menu(
-            self.lists_database.extract_trakt_page('users/me/lists',
-                                                   media_type,
-                                                   page=g.PAGE,
-                                                   no_paging=self.no_paging,
-                                                   pull_all=True,
-                                                   ignore_cache=True),
-            media_type=media_type)
+            self.lists_database.extract_trakt_page(
+                'users/me/lists', media_type, page=g.PAGE, no_paging=self.no_paging, pull_all=True, ignore_cache=True
+            ),
+            media_type=media_type,
+        )
 
     def my_liked_lists(self, media_type):
         self._create_list_menu(
-            self.lists_database.extract_trakt_page('users/likes/lists',
-                                                   media_type,
-                                                   page=g.PAGE,
-                                                   no_paging=self.no_paging,
-                                                   pull_all=True,
-                                                   ignore_cache=True),
-            media_type=media_type)
+            self.lists_database.extract_trakt_page(
+                'users/likes/lists', media_type, page=g.PAGE, no_paging=self.no_paging, pull_all=True, ignore_cache=True
+            ),
+            media_type=media_type,
+        )
 
     def trending_lists(self, media_type):
         self._create_list_menu(
-            self.lists_database.extract_trakt_page('lists/trending',
-                                                   media_type,
-                                                   page=g.PAGE),
-            media_type=media_type)
+            self.lists_database.extract_trakt_page('lists/trending', media_type, page=g.PAGE), media_type=media_type
+        )
 
     def popular_lists(self, media_type):
         self._create_list_menu(
-            self.lists_database.extract_trakt_page('lists/popular',
-                                                   media_type,
-                                                   page=g.PAGE),
-            media_type=media_type)
+            self.lists_database.extract_trakt_page('lists/popular', media_type, page=g.PAGE), media_type=media_type
+        )
 
     def _create_list_menu(self, trakt_lists, **params):
         trakt_object = MetadataHandler.trakt_object
@@ -82,15 +73,18 @@ class ListsHelper:
             trakt_lists = []
 
         self.builder.lists_menu_builder(
-            [tools.smart_merge_dictionary(trakt_object(trakt_list),
-                                          {'args': {'trakt_id': get(trakt_list, 'trakt_id'),
-                                                    'username': get(trakt_list, 'username')}})
-             for trakt_list in trakt_lists], **params)
+            [
+                tools.smart_merge_dictionary(
+                    trakt_object(trakt_list),
+                    {'args': {'trakt_id': get(trakt_list, 'trakt_id'), 'username': get(trakt_list, 'username')}},
+                )
+                for trakt_list in trakt_lists
+            ],
+            **params,
+        )
 
     @staticmethod
     def _backwards_compatibility(media_type):
         if media_type == 'movie':
             return 'movies'
-        if media_type in ['tvshow', 'show']:
-            return 'shows'
-        return media_type
+        return 'shows' if media_type in ['tvshow', 'show'] else media_type

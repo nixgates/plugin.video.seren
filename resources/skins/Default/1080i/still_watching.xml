@@ -2,26 +2,26 @@
 <window>
     <onload>Dialog.Close(fullscreeninfo,true)</onload>
     <onload>Dialog.Close(videoosd,true)</onload>
-	
+
 	<defaultcontrol always="true">3001</defaultcontrol>
-    
+
 	<controls>
-	
+
         <control type="group">
 			<right>20</right>
 			<bottom>150</bottom>
 			<width>600</width>
 			<height>338</height>
-			
+
             <animation type="WindowOpen" reversible="false">
                 <effect type="fade" start="0" end="100" time="300" tween="cubic" easing="in"/>
                 <effect type="slide" start="400%,0" end="0,0" time="400" tween="cubic" easing="in"/>
             </animation>
-			
+
             <animation type="WindowClose" reversible="false">
                 <effect type="slide" start="0,0" end="400%,0" time="400" tween="cubic" easing="in"/>
             </animation>
-            				
+
 			<!-- Background -->
 			<control type="image">
 				<top>0</top>
@@ -30,26 +30,26 @@
 				<height>100%</height>
 				<texture colordiffuse="dd000000">$INFO[Window.Property(texture.white)]</texture>
 			</control>
-			
+
 			<!-- Thumb -->
 			<control type="group">
 				<control type="image">
 					<texture colordiffuse="FF12A0C7">$INFO[Window.Property(texture.white)]</texture>
 					<visible>String.IsEmpty(Window.Property(item.art.landscape)) + String.IsEmpty(Window.Property(item.art.fanart)) + String.IsEmpty(Window.Property(item.art.thumb))</visible>
 				</control>
-				
+
 				<control type="image">
 					<texture>$INFO[Window.Property(item.art.landscape)]</texture>
 					<aspectratio>scale</aspectratio>
 					<visible>!String.IsEmpty(Window.Property(item.art.landscape))</visible>
 				</control>
-				
+
 				<control type="image">
 					<texture>$INFO[Window.Property(item.art.fanart)]</texture>
 					<aspectratio>scale</aspectratio>
 					<visible>String.IsEmpty(Window.Property(item.art.landscape))</visible>
 				</control>
-				
+
 				<control type="image">
 					<texture>$INFO[Window.Property(item.art.thumb)]</texture>
 					<aspectratio>scale</aspectratio>
@@ -68,7 +68,7 @@
 				<texturebg colordiffuse="33FFFFFF">white.png</texturebg>
 				<midtexture colordiffuse="$INFO[Window.Property(settings.color)]">white.png</midtexture>
 			</control>
-				
+
 			<!-- Shadow -->
 			<control type="image">
 				<height>100</height>
@@ -79,13 +79,13 @@
 			<control type="group">
 				<top>20</top>
 				<left>20</left>
-				
+
 				<!-- Details -->
 				<control type="grouplist">
 					<orientation>horizontal</orientation>
 					<height>35</height>
 					<itemgap>20</itemgap>
-					
+
 					<control type="label">
 						<width>auto</width>
 						<height>20</height>
@@ -94,17 +94,17 @@
 						<label>$INFO[Window.Property(item.info.title)]</label>
 						<visible>!String.IsEmpty(Window.Property(item.info.title))</visible>
 					</control>
-					
+
 					<control type="group">
 						<visible>!String.IsEmpty(Window.Property(item.info.rating))</visible>
 						<height>20</height>
-						
+
 						<control type="image">
 							<width>20</width>
 							<aspect>keep</aspect>
 							<texture colordiffuse="Window.Property(settings.color)">star.png</texture>
 						</control>
-						
+
 						<control type="label">
 							<left>30</left>
 							<label>$INFO[Window.Property(item.info.rating)]</label>
@@ -113,11 +113,11 @@
 						</control>
 					</control>
 				</control>
-				
+
 				<!-- Time -->
 				<control type="group">
 					<top>40</top>
-					
+
 					<control type="label">
 						<height>20</height>
 						<font>font12</font>
@@ -133,7 +133,7 @@
 						<visible>Integer.IsGreater(Player.TimeRemaining,59)</visible>
 					</control>
 				</control>
-				
+
 				<!-- Buttons -->
 				<control type="grouplist">
 					<orientation>horizontal</orientation>
@@ -142,7 +142,7 @@
 					<right>20</right>
 					<itemgap>20</itemgap>
 					<align>right</align>
-					
+
 					<!-- Play Now -->
 					<control type="button" id="3001">
 						<label>$ADDON[plugin.video.seren 30560]</label>
@@ -158,7 +158,7 @@
 						<texturenofocus border="10" colordiffuse="99000000">white.png</texturenofocus>
 						<pulseonselect>no</pulseonselect>
 					</control>
-					
+
 					<!-- Stop -->
 					<control type="button" id="3003">
 						<label>$ADDON[plugin.video.seren 30561]</label>
@@ -174,7 +174,7 @@
 						<texturenofocus border="10" colordiffuse="99000000">white.png</texturenofocus>
 						<pulseonselect>no</pulseonselect>
 					</control>
-					
+
 					<!-- Close -->
 					<control type="button" id="3002">
 						<label>$ADDON[plugin.video.seren 30459]</label>

@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import importlib
 import json
 import os
 import shutil
 import sys
+from importlib import reload as reload_module
 
 import requests
 import xbmc
@@ -13,23 +11,14 @@ import xbmcgui
 import xbmcvfs
 
 from resources.lib.common import tools
-from resources.lib.modules.exceptions import (
-    FileIOError,
-    InvalidMetaFormat,
-    UnsafeZipStructure,
-)
+from resources.lib.modules.exceptions import FileIOError
+from resources.lib.modules.exceptions import InvalidMetaFormat
+from resources.lib.modules.exceptions import UnsafeZipStructure
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers import CustomProviders
 from resources.lib.modules.providers.service_manager import ProvidersServiceManager
 from resources.lib.modules.providers.settings import SettingsManager
 from resources.lib.modules.zip_manager import ZipManager
-
-try:
-    from importlib import reload as reload_module  # pylint: disable=no-name-in-module
-except ImportError:
-    # Invalid version of importlib
-    from imp import reload as reload_module
-
 
 TEMP_FORMAT = "{}.temp"
 
@@ -38,23 +27,20 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     """
     Class for handling provider package installations
     """
+
     def __init__(self, silent=False):
-        super(ProviderInstallManager, self).__init__()
+        super().__init__()
         ZipManager.__init__(self)
         self.silent = silent
-        self.output_folders = ["providerModules/", "providers/"]
+        self.output_folders = ["providerModules/", "providers/", "providerMedia/"]
 
     def _get_package_selection(self):
         packages = [i["pack_name"] for i in self.known_packages]
-        if len(packages) == 0:
+        if not packages:
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30048))
             return
         selection = xbmcgui.Dialog().select(
-            "{}: {} {}".format(
-                g.ADDON_NAME,
-                g.get_language_string(30049),
-                g.get_language_string(30136),
-            ),
+            f"{g.ADDON_NAME}: {g.get_language_string(30049)} {g.get_language_string(30136)}",
             packages,
         )
         if selection == -1:
@@ -65,7 +51,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         """
         Initiate uninstallation of a package, optionally supply package name to automate process
         :param package: (Optional) name of package to uninstall
-        :type package: basestring
+        :type package: str
         :param silent: Opiton to disable user feedback
         :type silent: bool
         :return: None
@@ -77,9 +63,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         if package_name is None:
             return
 
-        confirm = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30050) + " {}".format(package_name)
-        )
+        confirm = xbmcgui.Dialog().yesno(g.ADDON_NAME, f"{g.get_language_string(30050)} {package_name}")
         if confirm == 0:
             return
 
@@ -92,7 +76,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             if not silent:
                 xbmcgui.Dialog().ok(
                     g.ADDON_NAME,
-                    "{} {}".format(package_name, g.get_language_string(30051)),
+                    f"{package_name} {g.get_language_string(30051)}",
                 )
         except Exception as e:
             self._handle_uninstall_failure(package_name)
@@ -112,6 +96,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         self._destroy_folder_if_exists(os.path.join(self.providers_path, package_name))
         self._destroy_folder_if_exists(os.path.join(self.modules_path, package_name))
         self._destroy_folder_if_exists(os.path.join(self.meta_path, package_name))
+        self._destroy_folder_if_exists(os.path.join(self.media_path, package_name))
 
     @staticmethod
     def _handle_install_failure(exception):
@@ -125,7 +110,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         :param install_style: Method of obtaining the zip file to be installed
         :type install_style: [int,None]
         :param url: Optionally supply the url to use
-        :type url: basestring
+        :type url: str
         :return: No return
         :rtype: None
         """
@@ -153,8 +138,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             if req not in meta:
                 self._failed_prompt()
                 raise InvalidMetaFormat(
-                    "Source pack is malformed, please check and correct issue in the meta "
-                    "file_path"
+                    "Source pack is malformed, please check and correct issue in the meta " "file_path"
                 )
         return meta
 
@@ -165,11 +149,10 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     def _install_confirmation(self, pack_name, author, version):
         if not self.silent:
             accept = xbmcgui.Dialog().yesno(
-                g.ADDON_NAME + " - {}".format(g.get_language_string(30069)),
-                "{}\n{}\n{}".format(g.color_string(g.get_language_string(30066)) +
-                                    " {} - v{}".format(pack_name, version),
-                                    g.color_string(g.get_language_string(30067)) + "{}".format(author),
-                                    g.get_language_string(30068)),
+                f"{g.ADDON_NAME} - {g.get_language_string(30069)}",
+                f"{g.color_string(g.get_language_string(30066))} {pack_name} - v{version}\n"
+                f"{g.color_string(g.get_language_string(30067))}{author}\n"
+                f"{g.get_language_string(30068)}",
                 nolabel=g.get_language_string(30070),
                 yeslabel=g.get_language_string(30071),
             )
@@ -178,7 +161,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         return True
 
     def _get_meta_json(self):
-        return json.loads(self._get_file_member_contents("{}{}".format(self._root_directory, "meta.json")))
+        return self._get_file_member_contents(f"{self._root_directory}meta.json")
 
     def _output_meta_file(self, meta_output_location):
         self._extract_zip_members([i for i in self._file_list if i.endswith('meta.json')], meta_output_location)
@@ -187,13 +170,17 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         for folder in self.output_folders:
             try:
                 folder_path = os.path.join(folder.strip("/"), pack_name)
-                file_list = [i for i in self._file_list if i != "providers/__init__.py"
-                             and i.startswith(os.path.join(self._root_directory, folder))]
-                self._extract_zip_members(file_list, g.ADDON_USERDATA_PATH,
-                                          os.path.join(g.ADDON_USERDATA_PATH, folder_path))
+                file_list = [
+                    i
+                    for i in self._file_list
+                    if i != "providers/__init__.py" and i.startswith(os.path.join(self._root_directory, folder))
+                ]
+                self._extract_zip_members(
+                    file_list, g.ADDON_USERDATA_PATH, os.path.join(g.ADDON_USERDATA_PATH, folder_path)
+                )
 
             except Exception as e:
-                raise FileIOError("{} Failed to extract to folder - {}".format(e, folder))
+                raise FileIOError(f"{e} Failed to extract to folder - {folder}") from e
 
     def _install_zip(self):
         install_progress = None
@@ -210,9 +197,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         if not self._install_confirmation(pack_name, author, version):
             return
 
-        self.pre_update_collection = [
-            i for i in self.get_providers() if i["package"] == pack_name
-        ]
+        self.pre_update_collection = [i for i in self.get_providers() if i["package"] == pack_name]
         meta_output_location = os.path.join(self.meta_path, pack_name)
 
         self._output_meta_file(meta_output_location)
@@ -222,7 +207,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             install_progress.create(
                 g.ADDON_NAME,
                 tools.create_multiline_message(
-                    line1="{} - {}".format(pack_name, g.get_language_string(30073)),
+                    line1=f"{pack_name} - {g.get_language_string(30073)}",
                     line2=g.get_language_string(30074),
                 ),
             )
@@ -241,20 +226,14 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         self._do_package_pre_config(meta["name"], meta.get("setup_extension"))
 
         if not self.silent:
-            xbmcgui.Dialog().ok(
-                g.ADDON_NAME, "{} - {}".format(g.get_language_string(30075), pack_name)
-            )
-        xbmc.executebuiltin(
-            'RunPlugin("plugin://plugin.video.{}/?action=refreshProviders")'.format(
-                g.ADDON_NAME.lower()
-            )
-        )
+            xbmcgui.Dialog().ok(g.ADDON_NAME, f"{g.get_language_string(30075)} - {pack_name}")
+        xbmc.executebuiltin(f'RunPlugin("plugin://plugin.video.{g.ADDON_NAME.lower()}/?action=refreshProviders")')
 
         ProvidersServiceManager().start_package_services(pack_name)
         return True
 
     def _remove_legacy_meta_file(self, pack_name):
-        legacy_meta_file = os.path.join(self.meta_path, pack_name + ".json")
+        legacy_meta_file = os.path.join(self.meta_path, f"{pack_name}.json")
         try:
             os.remove(legacy_meta_file)
         except OSError:
@@ -281,7 +260,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
         update_directory = meta_file["update_directory"]
         package_name = meta_file["name"]
         version = meta_file["version"]
-        zip_file = "{}{}-{}.zip".format(update_directory, package_name, version)
+        zip_file = f"{update_directory}{package_name}-{version}.zip"
         try:
             self._get_zip_file(url=zip_file, silent=True)
         except requests.exceptions.ConnectionError:
@@ -291,9 +270,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
         result = self._install_zip()
         if result is not None:
-            g.notification(
-                g.ADDON_NAME, g.get_language_string(30080).format(package_name)
-            )
+            g.notification(g.ADDON_NAME, g.get_language_string(30080).format(package_name))
 
     def manual_update(self):
         """
@@ -309,7 +286,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
             return
 
         # Display available packages to update
-        display_list = ["{} - {}".format(i["name"], i["version"]) for i in update]
+        display_list = [f"{i['name']} - {i['version']}" for i in update]
         selection = xbmcgui.Dialog().select(g.ADDON_NAME, display_list)
 
         if selection == -1:
@@ -322,9 +299,7 @@ class ProviderInstallManager(CustomProviders, ZipManager):
     def _failed_prompt():
         xbmcgui.Dialog().ok(
             g.ADDON_NAME,
-            tools.create_multiline_message(
-                line1=g.get_language_string(30077), line2=g.get_language_string(30076)
-            ),
+            tools.create_multiline_message(line1=g.get_language_string(30077), line2=g.get_language_string(30076)),
         )
 
     @staticmethod
@@ -333,34 +308,48 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
         g.log("Reverting changes")
         try:
-            if xbmcvfs.exists("{}.temp".format(meta_location)):
+            if xbmcvfs.exists(f"{meta_location}.temp"):
                 os.remove(meta_location)
-                os.rename("{}.temp".format(meta_location), meta_location)
+                os.rename(f"{meta_location}.temp", meta_location)
         except Exception:
             pass
 
         for folder in folders:
-            folder_path = os.path.join(
-                g.ADDON_USERDATA_PATH, folder.strip("/"), package_name
-            )
-            if xbmcvfs.exists("{}.temp".format(folder_path)):
+            folder_path = os.path.join(g.ADDON_USERDATA_PATH, folder.strip("/"), package_name)
+            if xbmcvfs.exists(f"{folder_path}.temp"):
                 try:
                     shutil.rmtree(folder_path)
                 except Exception:
                     pass
-                os.rename("{}.temp".format(folder_path), folder_path)
+                os.rename(f"{folder_path}.temp", folder_path)
 
     @staticmethod
     def _do_package_pre_config(package_name, config_file):
         if not config_file:
             return
-        reload = False
-        config_path = "providers.{}.{}".format(package_name, config_file.strip(".py"))
-        if config_path in sys.modules:
-            reload = True
-        module = importlib.import_module(config_path)
-        if reload:
-            reload_module(module)
+
+        for root in ["providers", "providerModules"]:
+            config_path = f"{root}.{package_name}.{config_file.strip('.py')}"
+            try:
+                g.log(
+                    f"Attempting to run configuration script at {config_path}",
+                    "debug",
+                )
+                if g.ADDON_USERDATA_PATH not in sys.path:
+                    sys.path.append(g.ADDON_USERDATA_PATH)
+                    importlib.import_module(config_path)
+                else:
+                    reload_module(importlib.import_module(config_path))
+            except ImportError as ie:
+                g.log(
+                    f"Specified configuration script not found at {config_path}",
+                    "debug",
+                )
+            else:
+                g.log(
+                    f"Successfully ran configuration script at {config_path}",
+                    "info",
+                )
 
     def check_for_updates(self, silent=False, automatic=False):
         """
@@ -398,12 +387,8 @@ class ProviderInstallManager(CustomProviders, ZipManager):
 
             meta_file = json.loads(meta_file.text)
 
-            if not meta_file["name"] == package["pack_name"]:
-                g.log(
-                    "Pack name check failure - {} : {}".format(
-                        meta_file["name"], package["pack_name"]
-                    )
-                )
+            if meta_file["name"] != package["pack_name"]:
+                g.log(f"Pack name check failure - {meta_file['name']} : {package['pack_name']}")
                 continue
             if not tools.compare_version_numbers(package["version"], meta_file["version"]):
                 continue

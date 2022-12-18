@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.common.source_utils import get_best_episode_match
 from resources.lib.debrid.real_debrid import RealDebrid
 from resources.lib.modules.exceptions import FileIdentification
@@ -14,8 +11,9 @@ class RealDebridResolver(TorrentResolverBase):
     """
     Resolver for Real Debrid
     """
+
     def __init__(self):
-        super(RealDebridResolver, self).__init__()
+        super().__init__()
         self.debrid_module = RealDebrid()
         self._source_normalization = (
             ("path", "path", None),
@@ -36,8 +34,8 @@ class RealDebridResolver(TorrentResolverBase):
                 for storage_variant in hash_check
                 if self.debrid_module.is_streamable_storage_type(storage_variant)
             ]
-        except IndexError:
-            raise FileIdentification(hash_check)
+        except IndexError as e:
+            raise FileIdentification(hash_check) from e
         if self.media_type == "episode":
             hash_check = [i for i in hash_check if get_best_episode_match("filename", i.values(), item_information)][0]
         else:
@@ -54,9 +52,7 @@ class RealDebridResolver(TorrentResolverBase):
     def _fetch_source_files(self, torrent, item_information):
         hash_check = self._get_files_from_check_hash(torrent, item_information)
         cached_torrent = self.debrid_module.add_magnet(torrent["magnet"])
-        self.debrid_module.torrent_select(
-            cached_torrent["id"], ",".join([i["idx"] for i in hash_check])
-        )
+        self.debrid_module.torrent_select(cached_torrent["id"], ",".join([i["idx"] for i in hash_check]))
         self.torrent_id = cached_torrent["id"]
         return self._get_selected_files(self.torrent_id)
 

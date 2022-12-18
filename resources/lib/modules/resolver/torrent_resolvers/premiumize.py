@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import xbmcgui
 
-from resources.lib.debrid.premiumize import PremiumizeTransfers, Premiumize
+from resources.lib.debrid.premiumize import Premiumize
+from resources.lib.debrid.premiumize import PremiumizeTransfers
 from resources.lib.modules.globals import g
 from resources.lib.modules.resolver.torrent_resolvers.base_resolver import (
     TorrentResolverBase,
@@ -14,8 +12,9 @@ class PremiumizeResolver(TorrentResolverBase):
     """
     Resolver for Premiumize
     """
+
     def __init__(self):
-        super(PremiumizeResolver, self).__init__()
+        super().__init__()
         self.debrid_module = Premiumize()
         self.transfer_class = PremiumizeTransfers()
 
@@ -30,9 +29,7 @@ class PremiumizeResolver(TorrentResolverBase):
         """
         if file_info is None:
             raise TypeError("NoneType passed to _fetch_transcode_or_standard")
-        if g.get_bool_setting("premiumize.transcoded") and file_info[
-            "transcode_status"
-        ] in ["finished", "good_as_is"]:
+        if g.get_bool_setting("premiumize.transcoded") and file_info["transcode_status"] in ["finished", "good_as_is"]:
             return file_info["stream_link"]
         else:
             return file_info["link"]

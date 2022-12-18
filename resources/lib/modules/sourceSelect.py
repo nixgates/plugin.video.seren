@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.database.skinManager import SkinManager
+from resources.lib.modules.exceptions import NoPlayableSourcesException
 from resources.lib.modules.globals import g
 
 
@@ -28,7 +26,7 @@ def source_select(uncached_sources, source_list, item_information):
 
         if selection is None:
             g.notification(g.ADDON_NAME, g.get_language_string(30032), time=5000)
-            raise Exception
+            raise NoPlayableSourcesException
         if not selection:
             g.cancel_playback()
 
