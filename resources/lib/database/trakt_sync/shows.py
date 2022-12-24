@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.database import trakt_sync
 from resources.lib.modules.globals import g
-from resources.lib.modules.guard_decorators import (
-    guard_against_none,
-    guard_against_none_or_empty,
-)
+from resources.lib.modules.guard_decorators import guard_against_none
+from resources.lib.modules.guard_decorators import guard_against_none_or_empty
 from resources.lib.modules.metadataHandler import MetadataHandler
 
 
@@ -27,17 +22,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of items from page
         :rtype: list
         """
-        return super(TraktSyncDatabase, self)._extract_trakt_page(
-            url, "shows", **params
-        )
+        return super()._extract_trakt_page(url, "shows", **params)
 
     @guard_against_none()
     def _update_shows_statistics_from_show_id(self, trakt_show_id):
         self.update_shows_statistics([{"trakt_id": trakt_show_id}])
         self.update_season_statistics(
-            self.fetchall(
-                "select trakt_id from seasons where trakt_show_id=?", (trakt_show_id,)
-            )
+            self.fetchall("select trakt_id from seasons where trakt_show_id=?", (trakt_show_id,))
         )
 
     @guard_against_none()
@@ -51,7 +42,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: None
         :rtype: None
         """
-        g.log("Marking show {} as watched in sync database".format(show_id), "debug")
+        g.log(f"Marking show {show_id} as watched in sync database", "debug")
         self._mill_if_needed([{"trakt_id": show_id}])
         self.execute_sql(
             "UPDATE episodes SET watched=?, last_watched_at=? WHERE trakt_show_id = ? AND season != 0",
@@ -72,10 +63,9 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: None
         :rtype: None
         """
-        g.log("Marking season {} as watched in sync database".format(season), "debug")
+        g.log(f"Marking season {season} as watched in sync database", "debug")
         self.execute_sql(
-            "UPDATE episodes SET watched=?, last_watched_at=?"
-            " WHERE trakt_show_id=? AND season=?",
+            "UPDATE episodes SET watched=?, last_watched_at=?" " WHERE trakt_show_id=? AND season=?",
             (
                 watched,
                 self._get_datetime_now() if watched > 0 else None,
@@ -96,7 +86,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: None
         :rtype: None
         """
-        g.log("Marking show {} as collected in sync database".format(show_id), "debug")
+        g.log(f"Marking show {show_id} as collected in sync database", "debug")
         self._mill_if_needed([{"trakt_id": show_id}])
         self.execute_sql(
             "UPDATE episodes SET collected=?, collected_at=? WHERE trakt_show_id=?",
@@ -117,14 +107,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: None
         """
         g.log(
-            "Marking episode {} S{}E{} as watched in sync database".format(
-                show_id, season, number
-            ),
+            f"Marking episode {show_id} S{season}E{number} as watched in sync database",
             "debug",
         )
         play_count = self.fetchone(
-            "SELECT watched from episodes "
-            "where trakt_show_id=? and season=? and number=?",
+            "SELECT watched from episodes " "where trakt_show_id=? and season=? and number=?",
             (show_id, season, number),
         ).get("watched")
         if play_count is None:
@@ -146,9 +133,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: None
         """
         g.log(
-            "Marking episode {} S{}E{} as unwatched in sync database".format(
-                show_id, season, number
-            ),
+            f"Marking episode {show_id} S{season}E{number} as unwatched in sync database",
             "debug",
         )
 
@@ -157,9 +142,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     @guard_against_none()
     def _mark_show_record(self, column, value, show_id):
-        self.execute_sql(
-            "UPDATE shows SET {}=? WHERE trakt_id=?".format(column), (value, show_id)
-        )
+        self.execute_sql(f"UPDATE shows SET {column}=? WHERE trakt_id=?", (value, show_id))
 
     @guard_against_none()
     def _mark_episode_record(self, column, value, show_id, season, number):
@@ -174,8 +157,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
             # Just in case we forgot any methods that call this
             raise ValueError
         self.execute_sql(
-            "UPDATE episodes SET {}=?, {}=? WHERE trakt_show_id=? AND season=? AND "
-            "number=?".format(column, datetime_column),
+            f"UPDATE episodes SET {column}=?, {datetime_column}=? WHERE trakt_show_id=? AND season=? AND number=?",
             (
                 value,
                 self._get_datetime_now() if value > 0 else None,
@@ -198,14 +180,20 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :rtype: list
         """
 
-        query = """select sm.id as trakt_id, sm.value as trakt_object, MAX(ep.last_watched_at) as lw from shows_meta as
-        sm left join episodes as ep on ep.trakt_show_id = sm.id and sm.type = 'trakt' where last_watched_at not NULL
-        GROUP BY trakt_show_id ORDER BY last_watched_at DESC"""
+        query = """
+            SELECT sm.id                   AS trakt_id,
+                   sm.value                AS trakt_object,
+                   MAX(ep.last_watched_at) AS lw
+            FROM shows_meta AS sm
+                     LEFT JOIN episodes AS ep
+                               ON ep.trakt_show_id = sm.id AND sm.type = 'trakt'
+            WHERE watched > 0
+            GROUP BY trakt_show_id
+            ORDER BY last_watched_at DESC
+            """
 
         if not force_all:
-            query += " LIMIT {} OFFSET {}".format(
-                self.page_limit, self.page_limit * (page - 1)
-            )
+            query += f" LIMIT {self.page_limit} OFFSET {self.page_limit * (page - 1)}"
 
         return self.fetchall(query)
 
@@ -223,15 +211,25 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         paginate = g.get_bool_setting("general.paginatecollection")
         sort = g.get_int_setting("general.sortcollection")
 
-        query = """select e.trakt_show_id as trakt_id, m.value as trakt_object from episodes as e left 
-        join shows as sh on sh.trakt_id = e.trakt_show_id left join shows_meta as m on m.id = e.trakt_show_id and 
-        m.type='trakt' where e.collected = 1 group by e.trakt_show_id"""
+        order_by = "ORDER BY max(e.collected_at) DESC" if sort == 0 else ""
+        limit = (
+            f"LIMIT {self.page_limit} OFFSET {self.page_limit * (page - 1)}"
+            if paginate and not force_all and sort != 1
+            else ""
+        )
 
-        if sort == 0:
-            query += " ORDER BY max(e.collected_at) desc"
-
-        if paginate and not (force_all or sort == 1):
-            query += " LIMIT {} OFFSET {}".format(self.page_limit, self.page_limit * (page - 1))
+        query = f"""
+            SELECT e.trakt_show_id AS trakt_id, m.value AS trakt_object
+            FROM episodes AS e
+                     LEFT JOIN shows AS sh
+                               ON sh.trakt_id = e.trakt_show_id
+                     LEFT JOIN shows_meta AS m
+                               ON m.id = e.trakt_show_id AND m.type = 'trakt'
+            WHERE e.collected = TRUE
+            GROUP BY e.trakt_show_id
+            {order_by}
+            {limit}
+            """
 
         return self.fetchall(query)
 
@@ -241,9 +239,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of episode objects
         :rtype: list
         """
-        return self.fetchall(
-            """SELECT trakt_id as trakt_id FROM episodes WHERE collected=1"""
-        )
+        return self.fetchall("""SELECT trakt_id as trakt_id FROM episodes WHERE collected=1""")
 
     @guard_against_none(list)
     def get_show_list(self, trakt_list, **params):
@@ -258,18 +254,18 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         trakt_list = [i for i in trakt_list if i.get("trakt_id")]
         self._update_mill_format_shows(trakt_list, False)
         g.log("Show list update and milling complete", "debug")
-        statement = """SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes, 
-        s.episode_count, s.season_count, s.air_date, s.user_rating FROM shows as s WHERE s.trakt_id in ({}) """.format(
-            ",".join((g.UNICODE(i.get("trakt_id")) for i in trakt_list))
-        )
+        statement = f"""
+            SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes, s.episode_count,
+                s.season_count, s.air_date, s.user_rating
+            FROM shows AS s
+            WHERE s.trakt_id IN ({','.join(str(i.get('trakt_id')) for i in trakt_list)})
+            """
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(s.air_date) < Datetime('{}')".format(self._get_datetime_now())
+            statement += f" AND Datetime(s.air_date) < Datetime('{self._get_datetime_now()}')"
         if params.pop("hide_watched", self.hide_watched):
             statement += " AND s.watched_episodes < s.episode_count"
 
-        return MetadataHandler.sort_list_items(
-            self.fetchall(statement), trakt_list
-        )
+        return MetadataHandler.sort_list_items(self.fetchall(statement), trakt_list)
 
     @guard_against_none(list, 1)
     def get_season_list(self, trakt_show_id, trakt_id=None, **params):
@@ -285,14 +281,14 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         g.log("Fetching season list from sync database and updating", "debug")
         self._try_update_seasons(trakt_show_id, trakt_id)
         g.log("Updated requested seasons", "debug")
-        statement = """SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes, 
+        statement = """SELECT s.trakt_id, s.info, s.cast, s.art, s.args, s.watched_episodes, s.unwatched_episodes,
         s.episode_count, s.air_date, s.user_rating FROM seasons AS s WHERE """
         if trakt_id is not None:
-            statement += "s.trakt_id == {}".format(trakt_id)
+            statement += f"s.trakt_id == {trakt_id}"
         else:
-            statement += "s.trakt_show_id = {}".format(trakt_show_id)
+            statement += f"s.trakt_show_id = {trakt_show_id}"
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(s.air_date) < Datetime('{}')".format(self._get_datetime_now())
+            statement += f" AND Datetime(s.air_date) < Datetime('{self._get_datetime_now()}')"
         if params.pop("self.hide_specials", self.hide_specials):
             statement += " AND s.season != 0"
         if params.pop("hide_watched", self.hide_watched):
@@ -301,14 +297,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         return self.fetchall(statement)
 
     @guard_against_none(list, 1, 2, 4)
-    def get_episode_list(
-        self,
-        trakt_show_id,
-        trakt_season_id=None,
-        trakt_id=None,
-        minimum_episode=None,
-        **params
-    ):
+    def get_episode_list(self, trakt_show_id, trakt_season_id=None, trakt_id=None, minimum_episode=None, **params):
         """
         Retrieves a list of episodes or a given season with full meta
         :param trakt_show_id: Trakt ID of show
@@ -328,23 +317,23 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self._try_update_episodes(trakt_show_id, trakt_season_id, trakt_id)
         g.log("Updated required episodes", "debug")
         statement = """SELECT e.trakt_id, e.trakt_show_id, e.trakt_season_id, e.info, e.cast, e.art, e.args, e.watched as play_count,
-         b.resume_time as resume_time, b.percent_played as percent_played, e.user_rating FROM episodes as e 
+         b.resume_time as resume_time, b.percent_played as percent_played, e.user_rating FROM episodes as e
          LEFT JOIN bookmarks as b on e.trakt_id = b.trakt_id WHERE """
 
         if trakt_season_id is not None:
-            statement += "e.trakt_season_id = {} ".format(trakt_season_id)
+            statement += f"e.trakt_season_id = {trakt_season_id} "
         elif trakt_id is not None:
-            statement += "e.trakt_id = {} ".format(trakt_id)
+            statement += f"e.trakt_id = {trakt_id} "
         else:
-            statement += "e.trakt_show_id = {} ".format(trakt_show_id)
+            statement += f"e.trakt_show_id = {trakt_show_id} "
         if params.pop("hide_unaired", self.hide_unaired):
-            statement += " AND Datetime(e.air_date) < Datetime('{}') ".format(self._get_datetime_now())
+            statement += f" AND Datetime(e.air_date) < Datetime('{self._get_datetime_now()}') "
         if params.pop("self.hide_specials", self.hide_specials):
             statement += " AND e.season != 0"
         if params.pop("hide_watched", self.hide_watched):
             statement += " AND e.watched = 0"
         if minimum_episode:
-            statement += " AND e.number >= {}".format(int(minimum_episode))
+            statement += f" AND e.number >= {int(minimum_episode)}"
         statement += " order by e.season, e.number "
         return self.fetchall(statement)
 
@@ -359,37 +348,47 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         """
         g.log("Fetching mixed episode list from sync database", "debug")
         self._try_update_mixed_episodes(trakt_items)
-        in_predicate = ",".join(
-            [g.UNICODE(i["trakt_id"]) for i in trakt_items if i["trakt_id"] is not None]
-        )
+        in_predicate = ",".join([str(i["trakt_id"]) for i in trakt_items if i["trakt_id"] is not None])
         if g.get_bool_setting("general.showRemainingUnwatched"):
-            query = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count, b.resume_time as 
-            resume_time, b.percent_played as percent_played, se.watched_episodes, se.unwatched_episodes, 
-            se.episode_count, e.user_rating FROM episodes as e INNER JOIN seasons se on e.trakt_season_id = se.trakt_id
-            LEFT JOIN bookmarks as b on e.Trakt_id = b.Trakt_id WHERE e.trakt_id in ({})""".format(
-                in_predicate
-            )
+            query = f"""
+                SELECT e.trakt_id,
+                       e.info,
+                       e.cast,
+                       e.art,
+                       e.args,
+                       e.watched        AS play_count,
+                       b.resume_time    AS resume_time,
+                       b.percent_played AS percent_played,
+                       se.watched_episodes,
+                       se.unwatched_episodes,
+                       se.episode_count,
+                       e.user_rating
+                FROM episodes AS e
+                         INNER JOIN seasons se
+                                    ON e.trakt_season_id = se.trakt_id
+                         LEFT JOIN bookmarks AS b
+                                   ON e.trakt_id = b.trakt_id
+                WHERE e.trakt_id IN ({in_predicate})
+                """
         else:
-            query = """SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched as play_count, b.resume_time as 
-            resume_time, b.percent_played as percent_played, e.user_rating FROM episodes as e LEFT JOIN bookmarks as b on e.Trakt_id = 
-            b.Trakt_id WHERE e.trakt_id in ({})""".format(
-                in_predicate
-            )
-
+            query = f"""
+                SELECT e.trakt_id, e.info, e.cast, e.art, e.args, e.watched AS play_count, b.resume_time AS resume_time,
+                    b.percent_played AS percent_played, e.user_rating
+                FROM episodes AS e LEFT JOIN bookmarks AS b ON e.Trakt_id = b.Trakt_id
+                WHERE e.trakt_id IN ({in_predicate})
+                """
         if params.pop("hide_unaired", self.hide_unaired):
-            query += " AND Datetime(e.air_date) < Datetime('{}') ".format(self._get_datetime_now())
+            query += f" AND Datetime(e.air_date) < Datetime('{self._get_datetime_now()}') "
         if params.pop("hide_specials", self.hide_specials):
             query += " AND e.season != 0"
         if params.pop("hide_watched", self.hide_watched):
             query += " AND e.watched = 0"
 
-        return MetadataHandler.sort_list_items(
-            self.fetchall(query), trakt_items
-        )
+        return MetadataHandler.sort_list_items(self.fetchall(query), trakt_items)
 
     @guard_against_none()
     def _get_single_show_meta(self, trakt_id):
-        return self._get_single_meta("/shows/{}".format(trakt_id), trakt_id, "shows")
+        return self._get_single_meta(f"/shows/{trakt_id}", trakt_id, "shows")
 
     @guard_against_none(list)
     def get_show(self, trakt_id):
@@ -400,11 +399,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Show item with full meta
         :rtype: dict
         """
-        result = self.get_show_list(
-            [self._get_single_show_meta(trakt_id)],
-            hide_unaired=False,
-            hide_watched=False
-        )
+        result = self.get_show_list([self._get_single_show_meta(trakt_id)], hide_unaired=False, hide_watched=False)
         return result[0] if len(result) > 0 else []
 
     @guard_against_none(list)
@@ -418,11 +413,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Season item with full meta
         :rtype: dict
         """
-        result = self.get_season_list(
-            trakt_show_id, trakt_id,
-            hide_unaired=False,
-            hide_watched=False
-        )
+        result = self.get_season_list(trakt_show_id, trakt_id, hide_unaired=False, hide_watched=False)
         return result[0] if len(result) > 0 else []
 
     @guard_against_none(list)
@@ -436,23 +427,34 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: Episode object with full meta
         :rtype: dict
         """
-        result = self.get_episode_list(
-            trakt_show_id, trakt_id=trakt_id,
-            hide_unaired=False,
-            hide_watched=False
-        )
+        result = self.get_episode_list(trakt_show_id, trakt_id=trakt_id, hide_unaired=False, hide_watched=False)
         if len(result) > 0:
             result = result[0]
             result.update(
                 self.fetchone(
-                    """select s.season_count, s.episode_count as show_episode_count, 
-            se.episode_count, se.is_airing, a.absoluteNumber, e.user_rating from episodes as e INNER JOIN seasons as se 
-            on se.trakt_id = e.trakt_season_id INNER JOIN shows as s on s.trakt_id = e.trakt_show_id INNER JOIN 
-            (select e.trakt_show_id, count(distinct e.trakt_id) as absoluteNumber from episodes as e inner join 
-            (select e.trakt_show_id, (e.season*10 + e.number) as identifier from episodes as e where e.trakt_id = ?) as 
-            agg on agg.trakt_show_id = e.trakt_show_id and agg.identifier >= (e.season*10 + number) group by 
-            e.trakt_show_id) as a on a.trakt_show_id = e.trakt_show_id WHERE e.trakt_id = ?""",
-                    (trakt_id, trakt_id),
+                    f"""
+                    SELECT s.season_count,
+                           s.episode_count AS show_episode_count,
+                           se.episode_count,
+                           se.is_airing,
+                           a.absoluteNumber,
+                           e.user_rating
+                    FROM episodes AS e
+                             INNER JOIN seasons AS se
+                                        ON se.trakt_id = e.trakt_season_id
+                             INNER JOIN shows AS s ON s.trakt_id = e.trakt_show_id
+                             INNER JOIN (SELECT e.trakt_show_id, count(DISTINCT e.trakt_id) AS absoluteNumber
+                                         FROM episodes AS e
+                                                  INNER JOIN (SELECT e.trakt_show_id,
+                                                                     (e.season * 10 + e.number) AS identifier
+                                                              FROM episodes AS e
+                                                              WHERE e.trakt_id = {trakt_id}) AS agg
+                                                             ON agg.trakt_show_id = e.trakt_show_id
+                                                                 AND agg.identifier >= (e.season * 10 + number)
+                                         GROUP BY e.trakt_show_id) AS a
+                                        ON a.trakt_show_id = e.trakt_show_id
+                    WHERE e.trakt_id = {trakt_id}
+                    """
                 )
             )
         return result
@@ -468,39 +470,37 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         if updated_items is None:
             return
 
-        updated_items = [i for i in updated_items if i is not None]
-
         threadpool.put(
             self.save_to_meta_table,
-            (i for i in updated_items if "trakt_object" in i),
+            (i for i in updated_items if i and "trakt_object" in i),
             media_type,
             "trakt",
             "trakt_id",
         )
         threadpool.put(
             self.save_to_meta_table,
-            (i for i in updated_items if "tmdb_object" in i),
+            (i for i in updated_items if i and "tmdb_object" in i),
             media_type,
             "tmdb",
             "tmdb_id",
         )
         threadpool.put(
             self.save_to_meta_table,
-            (i for i in updated_items if "tvdb_object" in i),
+            (i for i in updated_items if i and "tvdb_object" in i),
             media_type,
             "tvdb",
             "tvdb_id",
         )
         threadpool.put(
             self.save_to_meta_table,
-            (i for i in updated_items if "fanart_object" in i),
+            (i for i in updated_items if i and "fanart_object" in i),
             media_type,
             "fanart",
             "tvdb_id",
         )
         threadpool.put(
             self.save_to_meta_table,
-            (i for i in updated_items if "omdb_object" in i),
+            (i for i in updated_items if i and "omdb_object" in i),
             media_type,
             "omdb",
             "imdb_id",
@@ -515,22 +515,33 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     @guard_against_none_or_empty()
     def _update_shows(self, list_to_update):
         get = MetadataHandler.get_trakt_info
-        sql_statement = """WITH requested(trakt_id, last_updated) AS (VALUES {}) select r.trakt_id, trakt.value as 
-        trakt_object, trakt.meta_hash as trakt_meta_hash, tmdb_id, tmdb.value as tmdb_object, tmdb.meta_hash as 
-        tmdb_meta_hash, tvdb_id, tvdb.value as tvdb_object, tvdb.meta_hash as tvdb_meta_hash, fanart.value as 
-        fanart_object, fanart.meta_hash as fanart_meta_hash, s.imdb_id, omdb.value as omdb_object, omdb.meta_hash as 
-        omdb_meta_hash, s.needs_update FROM requested as r LEFT JOIN shows as s on r.trakt_id = 
-        s.trakt_id LEFT JOIN shows_meta as trakt on trakt.id = s.trakt_id and trakt.type = 'trakt' LEFT JOIN 
-        shows_meta as tmdb on tmdb.id = s.tmdb_id and tmdb.type = 'tmdb' LEFT JOIN shows_meta as tvdb on tvdb.id = 
-        s.tvdb_id and tvdb.type = 'tvdb' LEFT JOIN shows_meta as fanart on fanart.id = s.tvdb_id and fanart.type = 
-        'fanart' LEFT JOIN shows_meta as omdb on omdb.id = s.imdb_id and omdb.type = 'omdb' """.format(
-            ",".join(
-                "({},'{}')".format(
-                    i.get("trakt_show_id", i.get("trakt_id")), get(i, "dateadded")
-                )
-                for i in list_to_update
-            )
-        )
+        sql_statement = f"""
+            WITH requested(trakt_id, last_updated) AS (VALUES
+                {','.join("({},'{}')".format(i.get('trakt_show_id', i.get('trakt_id')), get(i, 'dateadded'))
+                          for i in list_to_update)})
+            SELECT r.trakt_id,
+                   trakt.value      AS trakt_object,
+                   trakt.meta_hash  AS trakt_meta_hash,
+                   tmdb_id,
+                   tmdb.value       AS tmdb_object,
+                   tmdb.meta_hash   AS tmdb_meta_hash,
+                   tvdb_id,
+                   tvdb.value       AS tvdb_object,
+                   tvdb.meta_hash   AS tvdb_meta_hash,
+                   fanart.value     AS fanart_object,
+                   fanart.meta_hash AS fanart_meta_hash,
+                   s.imdb_id,
+                   omdb.value       AS omdb_object,
+                   omdb.meta_hash   AS omdb_meta_hash,
+                   s.needs_update
+            FROM requested AS r
+                     LEFT JOIN shows AS s ON r.trakt_id = s.trakt_id
+                     LEFT JOIN shows_meta AS trakt ON trakt.id = s.trakt_id AND trakt.type = 'trakt'
+                     LEFT JOIN shows_meta AS tmdb ON tmdb.id = s.tmdb_id AND tmdb.type = 'tmdb'
+                     LEFT JOIN shows_meta AS tvdb ON tvdb.id = s.tvdb_id AND tvdb.type = 'tvdb'
+                     LEFT JOIN shows_meta AS omdb ON omdb.id = s.imdb_id AND omdb.type = 'omdb'
+                     LEFT JOIN shows_meta AS fanart ON fanart.id = s.tvdb_id AND fanart.type = 'fanart'
+            """
 
         db_list_to_update = self.fetchall(sql_statement)
         updated_items = self._update_objects(db_list_to_update, "shows")
@@ -561,12 +572,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     i["info"].get("last_watched_at"),
                     i["info"].get("last_collected_at"),
                     i["info"].get("user_rating"),
-                    i["info"]["trakt_id"],
                 )
                 for i in formatted_items
             ),
         )
-        self.update_shows_statistics(({"trakt_id": i["info"]["trakt_id"]} for i in formatted_items))
+        self.update_shows_statistics({"trakt_id": i["info"]["trakt_id"]} for i in formatted_items)
 
     def _update_mill_format_shows(self, trakt_list, mill_episodes=False):
         if not trakt_list:
@@ -579,21 +589,34 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     @guard_against_none_or_empty()
     def _identify_seasons_to_update(self, list_to_update):
         get = MetadataHandler.get_trakt_info
-        sql_statement = """WITH requested(trakt_id, last_updated) AS (VALUES {}) SELECT r.trakt_id as trakt_id, 
-        trakt.value as trakt_object, trakt.meta_hash as trakt_meta_hash, sh.tmdb_id as tmdb_show_id, se.tmdb_id as 
-        tmdb_id, tmdb.value as tmdb_object, tmdb.meta_hash as tmdb_meta_hash, sh.tvdb_id as tvdb_show_id, se.tvdb_id 
-        as tvdb_id, tvdb.value as tvdb_object, tvdb.meta_hash as tvdb_meta_hash, fanart.value as fanart_object, 
-        fanart.meta_hash as fanart_meta_hash, sh.info as show_info, sh.art as show_art, sh.cast as show_cast, 
-        se.needs_update FROM requested as r LEFT JOIN seasons as se on r.trakt_id = se.trakt_id LEFT JOIN shows as sh 
-        on sh.trakt_id = se.trakt_show_id LEFT JOIN seasons_meta as trakt on trakt.id = se.trakt_id and trakt.type = 
-        'trakt' LEFT JOIN seasons_meta as tmdb on tmdb.id = se.tmdb_id and tmdb.type = 'tmdb' LEFT JOIN seasons_meta 
-        as tvdb on tvdb.id = se.tvdb_id and tvdb.type = 'tvdb' LEFT JOIN seasons_meta as fanart on fanart.id = 
-        se.tvdb_id and fanart.type = 'fanart' """.format(
-            ",".join(
-                "({},'{}')".format(i.get("trakt_id"), get(i, "dateadded"))
-                for i in list_to_update
-            )
-        )
+        sql_statement = f"""
+            WITH requested(trakt_id, last_updated) AS (VALUES
+                    {','.join(f"({i.get('trakt_id')},'{get(i, 'dateadded')}')" for i in list_to_update)})
+            SELECT r.trakt_id       AS trakt_id,
+                   trakt.value      AS trakt_object,
+                   trakt.meta_hash  AS trakt_meta_hash,
+                   sh.tmdb_id       AS tmdb_show_id,
+                   se.tmdb_id       AS tmdb_id,
+                   tmdb.value       AS tmdb_object,
+                   tmdb.meta_hash   AS tmdb_meta_hash,
+                   sh.tvdb_id       AS tvdb_show_id,
+                   se.tvdb_id       AS tvdb_id,
+                   tvdb.value       AS tvdb_object,
+                   tvdb.meta_hash   AS tvdb_meta_hash,
+                   fanart.value     AS fanart_object,
+                   fanart.meta_hash AS fanart_meta_hash,
+                   sh.info          AS show_info,
+                   sh.art           AS show_art,
+                   sh.cast          AS show_cast,
+                   se.needs_update
+            FROM requested AS r
+                     LEFT JOIN seasons AS se ON r.trakt_id = se.trakt_id
+                     LEFT JOIN shows AS sh ON sh.trakt_id = se.trakt_show_id
+                     LEFT JOIN seasons_meta AS trakt ON trakt.id = se.trakt_id AND trakt.type = 'trakt'
+                     LEFT JOIN seasons_meta AS tmdb ON tmdb.id = se.tmdb_id AND tmdb.type = 'tmdb'
+                     LEFT JOIN seasons_meta AS tvdb ON tvdb.id = se.tvdb_id AND tvdb.type = 'tvdb'
+                     LEFT JOIN seasons_meta AS fanart ON fanart.id = se.tvdb_id AND fanart.type = 'fanart'
+            """
 
         return self.fetchall(sql_statement)
 
@@ -632,35 +655,56 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     i["info"].get("last_watched_at"),
                     i["info"].get("last_collected_at"),
                     i["info"].get("user_rating"),
-                    i["info"]["trakt_id"],
                 )
                 for i in formatted_items
             ),
         )
-        self.update_season_statistics(({"trakt_id": i["info"]["trakt_id"]} for i in formatted_items))
+        self.update_season_statistics({"trakt_id": i["info"]["trakt_id"]} for i in formatted_items)
 
     @guard_against_none_or_empty()
     def _identify_episodes_to_update(self, list_to_update):
         get = MetadataHandler.get_trakt_info
-        query = """WITH requested(trakt_id, last_updated) AS (VALUES {}) SELECT r.trakt_id as trakt_id, 
-        ep.trakt_season_id, ep.trakt_show_id, trakt.value as trakt_object, trakt.meta_hash as trakt_meta_hash, 
-        ep.tmdb_id as tmdb_id, tmdb.value as tmdb_object, tmdb.meta_hash as tmdb_meta_hash, ep.tvdb_id as tvdb_id, 
-        tvdb.value as tvdb_object, tvdb.meta_hash as tvdb_meta_hash, fanart.value as fanart_object, fanart.meta_hash 
-        as fanart_meta_hash, ep.imdb_id, omdb.value as omdb_object, omdb.meta_hash as omdb_meta_hash, sh.tmdb_id as 
-        tmdb_show_id, sh.tvdb_id as tvdb_show_id, sh.info as show_info, sh.art as show_art, sh.cast as show_cast, 
-        ep.trakt_season_id, se.tmdb_id as tmdb_season_id, sh.tvdb_id as tvdb_season_id, se.info as season_info, 
-        se.art as season_art, se.cast as season_cast, ep.needs_update FROM requested as r LEFT JOIN 
-        episodes as ep on r.trakt_id = ep.trakt_id LEFT JOIN shows as sh on sh.trakt_id = ep.trakt_show_id LEFT JOIN 
-        seasons as se on se.trakt_id = ep.trakt_season_id LEFT JOIN episodes_meta as trakt on trakt.id = ep.trakt_id 
-        and trakt.type = 'trakt' LEFT JOIN episodes_meta as tmdb on tmdb.id = ep.tmdb_id and tmdb.type = 'tmdb' LEFT 
-        JOIN episodes_meta as tvdb on tvdb.id = ep.tvdb_id and tvdb.type = 'tvdb' LEFT JOIN episodes_meta as fanart 
-        on fanart.id = ep.tvdb_id and fanart.type = 'fanart' LEFT JOIN episodes_meta as omdb on omdb.id = ep.imdb_id 
-        and omdb.type = 'omdb' """.format(
-            ",".join(
-                "({},'{}')".format(i.get("trakt_id"), get(i, "dateadded"))
-                for i in list_to_update
-            )
-        )
+        query = f"""
+            WITH requested(trakt_id, last_updated) AS (VALUES
+                    {','.join(f"({i.get('trakt_id')},'{get(i, 'dateadded')}')" for i in list_to_update)})
+            SELECT r.trakt_id       AS trakt_id,
+                   ep.trakt_season_id,
+                   ep.trakt_show_id,
+                   trakt.value      AS trakt_object,
+                   trakt.meta_hash  AS trakt_meta_hash,
+                   ep.tmdb_id       AS tmdb_id,
+                   tmdb.value       AS tmdb_object,
+                   tmdb.meta_hash   AS tmdb_meta_hash,
+                   ep.tvdb_id       AS tvdb_id,
+                   tvdb.value       AS tvdb_object,
+                   tvdb.meta_hash   AS tvdb_meta_hash,
+                   fanart.value     AS fanart_object,
+                   fanart.meta_hash AS fanart_meta_hash,
+                   ep.imdb_id,
+                   omdb.value       AS omdb_object,
+                   omdb.meta_hash   AS omdb_meta_hash,
+                   sh.tmdb_id       AS tmdb_show_id,
+                   sh.tvdb_id       AS tvdb_show_id,
+                   sh.info          AS show_info,
+                   sh.art           AS show_art,
+                   sh.cast          AS show_cast,
+                   ep.trakt_season_id,
+                   se.tmdb_id       AS tmdb_season_id,
+                   sh.tvdb_id       AS tvdb_season_id,
+                   se.info          AS season_info,
+                   se.art           AS season_art,
+                   se.cast          AS season_cast,
+                   ep.needs_update
+            FROM requested AS r
+                     LEFT JOIN episodes AS ep ON r.trakt_id = ep.trakt_id
+                     LEFT JOIN shows AS sh ON sh.trakt_id = ep.trakt_show_id
+                     LEFT JOIN seasons AS se ON se.trakt_id = ep.trakt_season_id
+                     LEFT JOIN episodes_meta AS trakt ON trakt.id = ep.trakt_id AND trakt.type = 'trakt'
+                     LEFT JOIN episodes_meta AS tmdb ON tmdb.id = ep.tmdb_id AND tmdb.type = 'tmdb'
+                     LEFT JOIN episodes_meta AS tvdb ON tvdb.id = ep.tvdb_id AND tvdb.type = 'tvdb'
+                     LEFT JOIN episodes_meta AS omdb ON omdb.id = ep.imdb_id AND omdb.type = 'omdb'
+                     LEFT JOIN episodes_meta AS fanart ON fanart.id = ep.tvdb_id AND fanart.type = 'fanart'
+            """
 
         return self.fetchall(query)
 
@@ -703,7 +747,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
                     None,
                     None,
                     self.metadataHandler.meta_hash,
-                    i["info"]["trakt_id"],
                 )
                 for i in formatted_items
             ),
@@ -713,14 +756,22 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def _try_update_seasons(self, trakt_show_id, trakt_season_id=None):
         show_meta = self._get_single_show_meta(trakt_show_id)
         self._update_mill_format_shows(show_meta, True)
-        query = """SELECT s.trakt_id, value as trakt_object, s.trakt_show_id, sh.tmdb_id as tmdb_show_id, sh.tvdb_id 
-        as tvdb_show_id FROM seasons as s INNER JOIN shows as sh on s.trakt_show_id = sh.trakt_id LEFT JOIN 
-        seasons_meta as m on m.id = s.trakt_id and m.type = \'trakt\' where """
 
         if trakt_season_id is not None:
-            query += "s.trakt_id = {}".format(trakt_season_id)
+            where_clause = f"WHERE s.trakt_id = {trakt_season_id}"
         else:
-            query += "sh.trakt_id = {}".format(trakt_show_id)
+            where_clause = f"WHERE sh.trakt_id = {trakt_show_id}"
+        query = f"""
+            SELECT s.trakt_id,
+                   value      AS trakt_object,
+                   s.trakt_show_id,
+                   sh.tmdb_id AS tmdb_show_id,
+                   sh.tvdb_id AS tvdb_show_id
+            FROM seasons AS s
+                     INNER JOIN shows AS sh ON s.trakt_show_id = sh.trakt_id
+                     LEFT JOIN seasons_meta AS m ON m.id = s.trakt_id AND m.type = 'trakt'
+            {where_clause}
+            """
 
         seasons_to_update = self.fetchall(query)
 
@@ -731,16 +782,24 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def _try_update_episodes(self, trakt_show_id, trakt_season_id=None, trakt_id=None):
         show_meta = self._get_single_show_meta(trakt_show_id)
         self._update_mill_format_shows(show_meta, True)
-        query = """SELECT value as trakt_object, e.trakt_id, e.trakt_show_id, sh.tmdb_id as tmdb_show_id, sh.tvdb_id 
-        as tvdb_show_id FROM episodes as e INNER JOIN shows as sh on e.trakt_show_id = sh.trakt_id INNER JOIN 
-        episodes_meta as m on m.id = e.trakt_id and m.type='trakt' where """
-
         if trakt_id is not None:
-            query += "e.trakt_id = {}".format(trakt_id)
+            where_clause = f"WHERE e.trakt_id = {trakt_id}"
         elif trakt_season_id is not None:
-            query += "e.trakt_season_id = {}".format(trakt_season_id)
+            where_clause = f"WHERE e.trakt_season_id = {trakt_season_id}"
         else:
-            query += "sh.trakt_id = {}".format(trakt_show_id)
+            where_clause = f"WHERE sh.trakt_id = {trakt_show_id}"
+        query = f"""
+            SELECT value      AS trakt_object,
+                   e.trakt_id,
+                   e.trakt_show_id,
+                   sh.tmdb_id AS tmdb_show_id,
+                   sh.tvdb_id
+                              AS tvdb_show_id
+            FROM episodes AS e
+                     INNER JOIN shows AS sh ON e.trakt_show_id = sh.trakt_id
+                     INNER JOIN episodes_meta AS m ON m.id = e.trakt_id AND m.type = 'trakt'
+            {where_clause}
+            """
 
         episodes_to_update = self.fetchall(query)
 
@@ -757,31 +816,51 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self.task_queue.wait_completion()
 
         shows = self.fetchall(
-            """SELECT value as trakt_object, s.trakt_id, s.tvdb_id, s.tmdb_id FROM shows as s 
-        INNER JOIN shows_meta as m on m.id = s.trakt_id and  m.type='trakt' where s.trakt_id in ({})""".format(
-                ",".join(g.UNICODE(i.get("trakt_show_id")) for i in trakt_items)
-            )
+            f"""
+            SELECT value AS trakt_object,
+                   s.trakt_id,
+                   s.tvdb_id,
+                   s.tmdb_id
+            FROM shows AS s
+                     INNER JOIN shows_meta AS m ON m.id = s.trakt_id and m.type = 'trakt'
+            WHERE s.trakt_id IN ({','.join(str(i.get('trakt_show_id')) for i in trakt_items)})
+            """
         )
 
         self._update_mill_format_shows(shows, True)
 
         seasons_to_update = self.fetchall(
-                    """SELECT value as trakt_object, se.trakt_id, se.trakt_show_id, sh.tmdb_id as tmdb_show_id, 
-                    sh.tvdb_id as tvdb_show_id FROM seasons as se INNER JOIN shows as sh on se.trakt_show_id = 
-                    sh.trakt_id INNER JOIN seasons_meta as sm on sm.id = se.trakt_id and sm.type='trakt' where 
-                    se.trakt_id in (select e.trakt_season_id FROM episodes e where e.trakt_id in ({}))""".format(
-                        ",".join(g.UNICODE(i.get("trakt_id")) for i in trakt_items)
-                    )
-                )
+            f"""
+                SELECT value      AS trakt_object,
+                       se.trakt_id,
+                       se.trakt_show_id,
+                       sh.tmdb_id AS tmdb_show_id,
+                       sh.tvdb_id AS tvdb_show_id
+                FROM seasons AS se
+                         INNER JOIN shows AS sh ON se.trakt_show_id = sh.trakt_id
+                         INNER JOIN seasons_meta AS sm ON sm.id = se.trakt_id AND sm.type = 'trakt'
+                WHERE se.trakt_id IN (SELECT e.trakt_season_id
+                                      FROM episodes e
+                                      WHERE e.trakt_id IN ({','.join(str(i.get('trakt_id')) for i in trakt_items)})
+            )
+            """
+        )
 
         episodes_to_update = self.fetchall(
-                """SELECT value as trakt_object, 
-        e.trakt_id, e.trakt_show_id, sh.tmdb_id as tmdb_show_id, sh.tvdb_id as tvdb_show_id FROM episodes as e INNER 
-        JOIN shows as sh on e.trakt_show_id = sh.trakt_id INNER JOIN episodes_meta as em on em.id = e.trakt_id and 
-        em.type='trakt' where e.trakt_id in ({})""".format(
-                        ",".join(g.UNICODE(i.get("trakt_id")) for i in trakt_items)
-                    )
-                )
+            f"""
+            SELECT value      AS trakt_object,
+                   e.trakt_id,
+                   e.trakt_show_id,
+                   sh.tmdb_id AS tmdb_show_id,
+                   sh.tvdb_id AS tvdb_show_id
+            FROM episodes AS e
+                     INNER JOIN shows AS sh
+                                ON e.trakt_show_id = sh.trakt_id
+                     INNER JOIN episodes_meta AS em
+                                ON em.id = e.trakt_id
+            WHERE e.trakt_id IN ({','.join(str(i.get('trakt_id')) for i in trakt_items)})
+            """
+        )
 
         self._update_seasons(seasons_to_update)
         self._update_episodes(episodes_to_update)
@@ -797,31 +876,84 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         :return: List of mixed episode/show pairs
         :rtype: list
         """
-        query = """SELECT e.trakt_id, e.number AS episode_x, e.season AS season_x, e.trakt_show_id, em.value AS 
-        episode, sm.value AS show, s.tmdb_id AS tmdb_show_id, s.tvdb_id AS tvdb_show_id, inner.last_watched_at, 
-        e.air_date FROM episodes AS e INNER JOIN shows AS s ON s.trakt_id = e.trakt_show_id INNER JOIN (SELECT 
-        e.trakt_show_id, Min(e.season) AS season, Min(e.number) AS number, nw.last_watched_at AS last_watched_at FROM 
-        episodes AS e INNER JOIN (SELECT e.trakt_show_id, CASE WHEN Max(e.season) == max_watched_season AND Max(
-        e.number) == max_watched_episode_number THEN 1 ELSE Min(e.season) END AS season, CASE WHEN Max(e.season) == 
-        max_watched_season AND Max(e.number) == max_watched_episode_number THEN 1 ELSE Max(e.number) END AS number, 
-        mw.last_watched_at AS last_watched_at FROM episodes e LEFT JOIN (SELECT mw_se.trakt_show_id, 
-        Max(mw_se.season) AS max_watched_season, mw_ep.number AS max_watched_episode_number, mw_ep.last_watched_at AS 
-        last_watched_at FROM episodes AS mw_se INNER JOIN (SELECT trakt_show_id, season, Max(number) AS number, 
-        Max(last_watched_at) AS last_watched_at FROM episodes WHERE watched >= 1 AND season > 0 GROUP BY 
-        trakt_show_id, season) AS mw_ep ON mw_se.trakt_show_id = mw_ep.trakt_show_id AND mw_se.season = mw_ep.season 
-        GROUP BY mw_se.trakt_show_id) AS mw ON e.trakt_show_id = mw.trakt_show_id WHERE (e.season = 
-        mw.max_watched_season AND e.number = mw.max_watched_episode_number + 1 AND watched = 0) OR (e.season = 
-        mw.max_watched_season + 1 AND e.number = 1) GROUP BY e.trakt_show_id) AS nw ON (e.trakt_show_id == 
-        nw.trakt_show_id AND e.season == nw.season AND e.number >= nw.number) WHERE e.season > 0 AND watched = 0 AND 
-        e.trakt_show_id NOT IN (SELECT trakt_id AS trakt_show_id FROM hidden WHERE SECTION IN ('progress_watched')) 
-        AND Datetime(air_date) < Datetime('{}') GROUP BY e.trakt_show_id) AS INNER ON e.trakt_show_id == 
-        inner.trakt_show_id AND e.season == inner.season AND e.number == inner.number LEFT JOIN episodes_meta AS em 
-        ON e.trakt_id = em.id AND em.TYPE = 'trakt' LEFT JOIN shows_meta AS sm ON e.trakt_show_id = sm.id AND sm.TYPE 
-        = 'trakt' """.format(self._get_datetime_now())
         if sort_by_last_watched:
-            query += " ORDER BY inner.last_watched_at DESC"
+            order_by = "ORDER BY inner_episodes.last_watched_at DESC"
         else:
-            query += " ORDER BY e.air_date DESC"
+            order_by = "ORDER BY e.air_date DESC"
+        query = f"""
+            SELECT e.trakt_id,
+                   e.number  AS episode_x,
+                   e.season  AS season_x,
+                   e.trakt_show_id,
+                   em.value  AS episode,
+                   sm.value  AS show,
+                   s.tmdb_id AS tmdb_show_id,
+                   s.tvdb_id AS tvdb_show_id,
+                   inner_episodes.last_watched_at,
+                   e.air_date
+            FROM episodes AS e
+                     INNER JOIN shows AS s
+                                ON s.trakt_id = e.trakt_show_id
+                     INNER JOIN (SELECT e.trakt_show_id,
+                                        Min(e.season)      AS season,
+                                        Min(e.number)      AS number,
+                                        nw.last_watched_at AS last_watched_at
+                                 FROM episodes AS e
+                                      INNER JOIN (SELECT e.trakt_show_id,
+                                                         CASE
+                                                             WHEN Max(e.season) == max_watched_season AND
+                                                                  Max(e.number) == max_watched_episode_number
+                                                                 THEN 1
+                                                             ELSE Min(e.season)
+                                                             END            AS season,
+                                                         CASE
+                                                             WHEN Max(e.season) == max_watched_season AND
+                                                                  Max(e.number) == max_watched_episode_number
+                                                                 THEN 1
+                                                             ELSE Max(e.number)
+                                                             END            AS number,
+                                                         mw.last_watched_at AS last_watched_at
+                                                  FROM episodes e
+                                                       LEFT JOIN (SELECT mw_se.trakt_show_id,
+                                                                         Max(mw_se.season) AS max_watched_season,
+                                                                         mw_ep.number     AS max_watched_episode_number,
+                                                                         mw_ep.last_watched_at AS last_watched_at
+                                                                  FROM episodes AS mw_se
+                                                                       INNER JOIN (SELECT trakt_show_id,
+                                                                                          season,
+                                                                                          Max(number)         AS number,
+                                                                                          Max(last_watched_at)
+                                                                                                AS last_watched_at
+                                                                                   FROM episodes
+                                                                                   WHERE watched >= 1 AND season > 0
+                                                                                   GROUP BY trakt_show_id, season
+                                                                       ) AS mw_ep
+                                                                          ON mw_se.trakt_show_id = mw_ep.trakt_show_id
+                                                                              AND mw_se.season = mw_ep.season
+                                                                  GROUP BY mw_se.trakt_show_id) AS mw
+                                                            ON e.trakt_show_id = mw.trakt_show_id
+                                                  WHERE (e.season = mw.max_watched_season AND
+                                                         e.number = mw.max_watched_episode_number + 1
+                                                      AND watched = 0)
+                                                     OR (e.season = mw.max_watched_season + 1 AND e.number = 1)
+                                                  GROUP BY e.trakt_show_id) AS nw
+                                                 ON (e.trakt_show_id == nw.trakt_show_id
+                                                     AND e.season == nw.season
+                                                     AND e.number >= nw.number)
+                                 WHERE e.season > 0
+                                   AND watched = 0
+                                   AND e.trakt_show_id NOT IN (SELECT trakt_id AS trakt_show_id
+                                                               FROM hidden
+                                                               WHERE SECTION IN ('progress_watched'))
+                                   AND Datetime(air_date) < Datetime('{self._get_datetime_now()}')
+                                 GROUP BY e.trakt_show_id) AS inner_episodes
+                            ON e.trakt_show_id == inner_episodes.trakt_show_id
+                                AND e.season == inner_episodes.season
+                                AND e.number == inner_episodes.number
+                     LEFT JOIN episodes_meta AS em ON e.trakt_id = em.id AND em.type = 'trakt'
+                     LEFT JOIN shows_meta AS sm ON e.trakt_show_id = sm.id AND sm.type = 'trakt'
+            {order_by}
+            """
 
         return self.wrap_in_trakt_object(self.fetchall(query))
 
@@ -835,13 +967,26 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         """
         return self.wrap_in_trakt_object(
             self.fetchall(
-                """SELECT e.trakt_id, e.number as episode_x, e.season as 
-        season_x, e.trakt_show_id, em.value AS episode, sm.value AS show, s.tmdb_id AS tmdb_show_id, s.tvdb_id AS 
-        tvdb_show_id, e.last_watched_at FROM episodes AS e inner join shows AS s ON s.trakt_id = e.trakt_show_id left 
-        join episodes_meta AS em ON e.trakt_id = em.id AND em.TYPE = 'trakt' left join shows_meta AS sm ON 
-        e.trakt_show_id = sm.id AND sm.TYPE = 'trakt' order by e.last_watched_at desc LIMIT {} OFFSET {} """.format(
-                    self.page_limit, self.page_limit * (page - 1)
-                )
+                f"""
+                SELECT e.trakt_id,
+                       e.number  AS episode_x,
+                       e.season  AS season_x,
+                       e.trakt_show_id,
+                       em.value  AS episode,
+                       sm.value  AS show,
+                       s.tmdb_id AS tmdb_show_id,
+                       s.tvdb_id AS tvdb_show_id,
+                       e.last_watched_at
+                FROM episodes AS e
+                         INNER JOIN shows AS s
+                             ON s.trakt_id = e.trakt_show_id
+                         LEFT JOIN episodes_meta AS em
+                             ON e.trakt_id = em.id
+                         LEFT JOIN shows_meta AS sm
+                             ON e.trakt_show_id = sm.id
+                ORDER BY e.last_watched_at DESC
+                LIMIT {self.page_limit} OFFSET {self.page_limit * (page - 1)}
+                """
             )
         )
 
@@ -856,16 +1001,23 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         paginate = g.get_bool_setting("general.paginatecollection")
         sort = g.get_int_setting("general.sortcollection")
 
-        query = """select m.id as trakt_id, value as trakt_object from shows_meta as m inner join(
-        select ep.trakt_show_id, max(ep.collected_at) as collected_at from episodes as ep where ep.season != 0 and 
-        ep.watched = 0 and ep.collected = 1 GROUP BY ep.trakt_show_id HAVING count(*) > 0) as u on u.trakt_show_id = 
-        m.id and m.type='trakt'"""
+        order_by = "ORDER BY collected_at DESC" if sort == 0 else ""
+        limit = f" LIMIT {self.page_limit} OFFSET {self.page_limit * (page - 1)}" if paginate and sort != 1 else ""
 
-        if sort == 0:
-            query += " ORDER BY collected_at desc"
-
-        if paginate and not sort == 1:
-            query += " LIMIT {} OFFSET {}".format(self.page_limit, self.page_limit * (page - 1))
+        query = f"""
+            SELECT m.id AS trakt_id, value AS trakt_object
+            FROM shows_meta AS m
+                     INNER JOIN(SELECT ep.trakt_show_id, max(ep.collected_at) AS collected_at
+                                FROM episodes AS ep
+                                WHERE ep.season != 0
+                                  AND ep.watched = 0
+                                  AND ep.collected = 1
+                                GROUP BY ep.trakt_show_id
+                                HAVING count(*) > 0) AS u
+                         ON u.trakt_show_id = m.id AND m.type = 'trakt'
+            {order_by}
+            {limit}
+            """
 
         return self.fetchall(query)
 
@@ -884,7 +1036,7 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self.insert_trakt_shows(show)
         self._mill_if_needed(show)
         return self.fetchone(
-            """select trakt_id, trakt_show_id from seasons where trakt_show_id=? and season =? """,
+            "SELECT trakt_id, trakt_show_id FROM seasons WHERE trakt_show_id=? AND season =?",
             (trakt_show_id, season),
         )
 
@@ -905,8 +1057,6 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
         self.insert_trakt_shows(show)
         self._mill_if_needed(show)
         return self.fetchone(
-            """select trakt_id, trakt_show_id from episodes where trakt_show_id=? and season =? 
-        and number=?""",
+            """SELECT trakt_id, trakt_show_id FROM episodes WHERE trakt_show_id=? AND season=? AND number=?""",
             (trakt_show_id, season, episode),
         )
-

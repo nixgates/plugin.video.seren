@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
+import json
 import os
 import shutil
 import zipfile
+from io import BytesIO as BytesIO
 
 import xbmc
 import xbmcgui
@@ -12,12 +11,6 @@ import xbmcvfs
 from resources.lib.common import tools
 from resources.lib.modules.exceptions import UnsafeZipStructure
 from resources.lib.modules.globals import g
-
-try:
-    from StringIO import StringIO as BytesIO
-except ImportError:
-    # Python 3 Support
-    from io import BytesIO as BytesIO
 
 TEMP_FORMAT = "{}.temp"
 
@@ -44,16 +37,10 @@ class ZipManager:
 
     @staticmethod
     def _get_zip_location_type():
-        return xbmcgui.Dialog().select(
-            g.ADDON_NAME, [g.get_language_string(30304), g.get_language_string(30305)]
-        )
+        return xbmcgui.Dialog().select(g.ADDON_NAME, [g.get_language_string(30304), g.get_language_string(30305)])
 
     def _get_new_package_location(self, install_style):
-        install_style = (
-            self._get_zip_location_type()
-            if install_style is None
-            else int(install_style)
-        )
+        install_style = self._get_zip_location_type() if install_style is None else int(install_style)
 
         if install_style == 0:
             zip_location = xbmcgui.Dialog().browse(
@@ -65,9 +52,7 @@ class ZipManager:
                 False,
             )
         elif install_style == 1:
-            zip_location = xbmc.Keyboard(
-                "", "{}: {}".format(g.ADDON_NAME, g.get_language_string(30307))
-            )
+            zip_location = xbmc.Keyboard("", f"{g.ADDON_NAME}: {g.get_language_string(30307)}")
             zip_location.doModal()
             if zip_location.isConfirmed() and zip_location.getText():
                 zip_location = zip_location.getText()
@@ -112,10 +97,7 @@ class ZipManager:
                 raise UnsafeZipStructure("Zip contains invalid or dirty paths")
 
     def _get_zip_root_directory(self):
-        if self._file_list[0].endswith("/"):
-            return self._file_list[0]
-        else:
-            return ""
+        return self._file_list[0] if self._file_list[0].endswith("/") else ""
 
     def _create_temp_item(self, file_path):
         if os.path.exists(file_path):
@@ -151,7 +133,7 @@ class ZipManager:
             self._destroy_file_if_exists(TEMP_FORMAT.format(i))
 
     def _extract_zip_members(self, members, output_path, backup_paths=None):
-        self._create_temp_item(output_path if not backup_paths else backup_paths)
+        self._create_temp_item(backup_paths or output_path)
         try:
             for i in members:
                 self._extract_zip_member(i, output_path)
@@ -161,16 +143,12 @@ class ZipManager:
 
     def _get_file_member_contents(self, member_path):
         if member_path.endswith("/"):
-            raise IOError(member_path)
+            raise OSError(member_path)
+
         contents = self._zip_file.open(member_path)
-        contents = contents.readlines()
-        contents = "".join(
-            [
-                value if not isinstance(value, bytes) else value.decode('utf-8')
-                for value in contents
-            ]
-        )
-        return contents.replace(" ", "").replace("\r", "").replace("\n", "")
+        contents = json.load(contents)
+
+        return contents
 
     def _extract_zip_member(self, member, output_path):
         target_path = os.path.join(output_path, member.replace(self._root_directory, ""))
@@ -187,7 +165,8 @@ class ZipManager:
     def _create_file_member(self, member, target_path):
         with self._zip_file.open(member) as source, open(target_path, 'wb') as target:
             contents = source.read()
-            contents = contents.decode('utf-8') if not isinstance(contents, bytes) else contents
+            contents = contents if isinstance(contents, bytes) else contents.decode('utf-8')
+
             target.write(contents)
             target.close()
             self._extracted_members.append(target_path)

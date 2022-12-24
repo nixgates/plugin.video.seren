@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import re
+from functools import cached_property
 from functools import wraps
 
 import xbmcgui
 
+from . import valid_id_or_none
 from resources.lib.common import tools
-from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
-from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
+from resources.lib.indexers.apibase import ApiBase
+from resources.lib.indexers.apibase import handle_single_item_or_list
 from resources.lib.modules.globals import g
 
 OMDB_STATUS_CODES = {
@@ -24,11 +23,14 @@ OMDB_STATUS_CODES = {
     504: "Service Unavailable - server overloaded (try again in 30s)",
 }
 
+REMOVE_TEXT_IN_BRACKETS_REGEX = re.compile(r"\(.*?\)")
+
 
 def omdb_guard_response(func):
     @wraps(func)
     def wrapper(*args, **kwarg):
         import requests
+
         try:
             response = func(*args, **kwarg)
 
@@ -36,23 +38,18 @@ def omdb_guard_response(func):
                 return response
 
             g.log(
-                "OMDb returned a {} ({}): while requesting {}".format(
-                    response.status_code,
-                    OMDB_STATUS_CODES[response.status_code],
-                    "&".join(x for x in response.url.split('&') if not x.lower().startswith("apikey")),
-                ),
+                f"OMDb returned a {response.status_code} ({OMDB_STATUS_CODES[response.status_code]}): while requesting "
+                f"{'&'.join(x for x in response.url.split('&') if not x.lower().startswith('apikey'))}",
                 "error",
             )
 
             return None
         except requests.exceptions.ConnectionError as e:
-            g.log("Connection Error to OMDb: {} - {}".format(args, kwarg), "error")
+            g.log(f"Connection Error to OMDb: {args} - {kwarg}", "error")
             g.log(e, "error")
             return None
         except Exception:
-            xbmcgui.Dialog().notification(
-                g.ADDON_NAME, g.get_language_string(30024).format("OMDb")
-            )
+            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30024).format("OMDb"))
             if g.get_runtime_setting("run.mode") == "test":
                 raise
             else:
@@ -75,22 +72,12 @@ class OmdbApi(ApiBase):
 
     def __init__(self):
         self.api_key = g.get_setting("omdb.apikey", None)
-        self.omdb_support = False if not self.api_key else True
+        self.omdb_support = bool(self.api_key)
 
         self.normalization = [
-            (
-                "@title",
-                ("title", "sorttitle"),
-                lambda d: d if not self._is_value_none(d) else None,
-            ),
-            ("@rated", "mpaa", lambda d: d if not self._is_value_none(d) else None),
-            (
-                "@released",
-                ("premiered", "aired"),
-                lambda d: g.validate_date(d)
-                if not self._is_value_none(d)
-                else None,
-            ),
+            ("@title", ("title", "sorttitle"), lambda d: None if self._is_value_none(d) else d),
+            ("@rated", "mpaa", lambda d: None if self._is_value_none(d) else d),
+            ("@released", ("premiered", "aired"), lambda d: None if self._is_value_none(d) else g.validate_date(d)),
             (
                 "@runtime",
                 "duration",
@@ -99,37 +86,25 @@ class OmdbApi(ApiBase):
             (
                 "@genre",
                 "genre",
-                lambda d: sorted(
-                    set(x.strip() for x in d.split(","))
-                )
-                if not self._is_value_none(d)
-                else None,
+                lambda d: None if self._is_value_none(d) else sorted({x.strip() for x in d.split(",")}),
             ),
             (
                 "@director",
                 "director",
-                lambda d: sorted(
-                    set(re.sub(r"\(.*?\)", "", x).strip() for x in d.split(","))
-                )
-                if not self._is_value_none(d)
-                else None,
+                lambda d: None
+                if self._is_value_none(d)
+                else sorted({REMOVE_TEXT_IN_BRACKETS_REGEX.sub("", x).strip() for x in d.split(",")}),
             ),
             (
                 "@writer",
                 "writer",
-                lambda d: sorted(
-                    set(re.sub(r"\(.*?\)", "", x).strip() for x in d.split(","))
-                )
-                if not self._is_value_none(d)
-                else None,
+                lambda d: None
+                if self._is_value_none(d)
+                else sorted({REMOVE_TEXT_IN_BRACKETS_REGEX.sub("", x).strip() for x in d.split(",")}),
             ),
             ("@plot", ("plot", "overview", "plotoutline"), None),
-            (
-                "@country",
-                "country",
-                lambda d: d if not self._is_value_none(d) else None,
-            ),
-            ("@imdbID", ("imdbnumber", "imdb_id"), None),
+            ("@country", "country", lambda d: None if self._is_value_none(d) else d),
+            ("@imdbID", ("imdbnumber", "imdb_id"), lambda i: valid_id_or_none(i)),
             (
                 None,
                 "rating.imdb",
@@ -143,12 +118,8 @@ class OmdbApi(ApiBase):
                     else None,
                 ),
             ),
-            (
-                "@Production",
-                "studio",
-                lambda d: d if not self._is_value_none(d) else None,
-            ),
-            ("@awards", "awards", lambda d: d if not self._is_value_none(d) else None),
+            ("@Production", "studio", lambda d: None if self._is_value_none(d) else d),
+            ("@awards", "awards", lambda d: None if self._is_value_none(d) else d),
             (
                 "@awards",
                 "oscar_wins",
@@ -167,76 +138,45 @@ class OmdbApi(ApiBase):
             (
                 "@awards",
                 "award_nominations",
-                lambda d: self._extract_awards(
-                    d, ("wins &", "nominations"), ("", "nominations")
-                ),
+                lambda d: self._extract_awards(d, ("wins &", "nominations"), ("", "nominations")),
             ),
-            (
-                "@metascore",
-                "metacritic_rating",
-                lambda d: d if not self._is_value_none(d) else None,
-            ),
-            (
-                "@tomatoMeter",
-                "rottentomatoes_rating",
-                lambda d: d if not self._is_value_none(d) else None,
-            ),
-            (
-                "@tomatoImage",
-                "rottentomatoes_image",
-                lambda d: d if not self._is_value_none(d) else None,
-            ),
+            ("@metascore", "metacritic_rating", lambda d: None if self._is_value_none(d) else d),
+            ("@tomatoMeter", "rottentomatoes_rating", lambda d: None if self._is_value_none(d) else d),
+            ("@tomatoImage", "rottentomatoes_image", lambda d: None if self._is_value_none(d) else d),
             (
                 "@tomatoReviews",
                 "rottentomatoes_reviewstotal",
-                lambda d: tools.get_clean_number(d)
-                if not self._is_value_none(d)
-                else None,
+                lambda d: None if self._is_value_none(d) else tools.get_clean_number(d),
             ),
             (
                 "@tomatoFresh",
                 "rottentomatoes_reviewsfresh",
-                lambda d: tools.get_clean_number(d)
-                if not self._is_value_none(d)
-                else None,
+                lambda d: None if self._is_value_none(d) else tools.get_clean_number(d),
             ),
             (
                 "@tomatoRotten",
                 "rottentomatoes_reviewsrotten",
-                lambda d: tools.get_clean_number(d)
-                if not self._is_value_none(d)
-                else None,
+                lambda d: None if self._is_value_none(d) else tools.get_clean_number(d),
             ),
-            (
-                "@tomatoConsensus",
-                "rottentomatoes_consensus",
-                lambda d: d if not self._is_value_none(d) else None,
-            ),
-            (
-                "@tomatoUserMeter",
-                "rottentomatoes_usermeter",
-                lambda d: d if not self._is_value_none(d) else None,
-            ),
+            ("@tomatoConsensus", "rottentomatoes_consensus", lambda d: None if self._is_value_none(d) else d),
+            ("@tomatoUserMeter", "rottentomatoes_usermeter", lambda d: None if self._is_value_none(d) else d),
             (
                 "@tomatoUserReviews",
                 "rottentomatoes_userreviews",
-                lambda d: tools.get_clean_number(d)
-                if not self._is_value_none(d)
-                else None,
+                lambda d: None if self._is_value_none(d) else tools.get_clean_number(d),
             ),
         ]
 
     @cached_property
     def meta_hash(self):
-        return tools.md5_hash((
-            self.omdb_support,
-            self.ApiUrl))
+        return tools.md5_hash((self.omdb_support, self.ApiUrl))
 
     @cached_property
     def session(self):
         import requests
         from requests.adapters import HTTPAdapter
         from urllib3 import Retry
+
         session = requests.Session()
         retries = Retry(
             total=5,
@@ -247,34 +187,28 @@ class OmdbApi(ApiBase):
         return session
 
     def _extract_awards(self, value, *params):
-        try:
-            if self._is_value_none(value):
-                return None
-        except AttributeError:
+        if self._is_value_none(value):
             return None
         for i in params:
-            exp = i[0] + "(.+?)" + i[1]
+            exp = f"{i[0]}(.+?){i[1]}"
             try:
-                result = re.search(exp, value).group(1).strip()
+                result = re.search(exp, value)[1].strip()
                 if not self._is_value_none(result):
                     return result
-            except AttributeError:
+            except TypeError:
                 continue
         return None
 
     @staticmethod
     def _is_value_none(value):
-        if value in ["", "N/A", "0.0", "0", 0, 0.0, None]:
-            return True
-        else:
-            return False
+        return value in ["", "N/A", "0.0", "0", 0, 0.0, None]
 
     @omdb_guard_response
     def get(self, **params):
-        params.update({"tomatoes": "True"})
-        params.update({"plot": "full"})
-        params.update({"r": "xml"})
-        params.update({"apikey": self.api_key})
+        params["tomatoes"] = "True"
+        params["plot"] = "full"
+        params["r"] = "xml"
+        params["apikey"] = self.api_key
         timeout = params.pop("timeout", 10)
         return self.session.get(self.ApiUrl, params=params, timeout=timeout)
 
@@ -289,20 +223,17 @@ class OmdbApi(ApiBase):
         try:
             if not response.content:
                 return None
-            elif xml_to_dict.parse(response.text).get("root", {}).get("@response", {}) == "False":
+            parsed = xml_to_dict.parse(response.text)
+            if parsed.get("root", {}).get("@response", {}) == "False":
                 return None
-            elif xml_to_dict.parse(response.text).get("root", {}).get("error", {}):
+            elif parsed.get("root", {}).get("error", {}):
                 return None
 
-            return self._handle_response(
-                xml_to_dict.parse(response.text).get("root", {}).get("movie")
-            )
+            return self._handle_response(parsed.get("root", {}).get("movie"))
         except (ValueError, AttributeError, ExpatError):
             g.log_stacktrace()
             g.log(
-                "Failed to receive JSON from OMDb response - response: {}".format(
-                    response
-                ),
+                f"Failed to receive JSON from OMDb response - response: {response}",
                 "error",
             )
             return None
@@ -322,7 +253,7 @@ class OmdbApi(ApiBase):
     @handle_single_item_or_list
     def _try_detect_type(item):
         if "type" in item:
-            if "series" == item["type"]:
+            if item["type"] == "series":
                 item.update({"mediatype": "tvshow"})
             else:
                 item.update({"mediatype": item["type"]})

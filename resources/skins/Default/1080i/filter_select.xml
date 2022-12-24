@@ -8,9 +8,9 @@
     </coordinates>
 
 	<defaultcontrol always="true">6001</defaultcontrol>
-    
+
 	<controls>
-        
+
 		<!-- Background -->
         <control type="group">
             <top>0</top>
@@ -25,7 +25,7 @@
             </control>
 
             <!-- Fanart -->
-            <control type="image">    
+            <control type="image">
                 <texture background="true">$INFO[Window().Property(seren.fanart)]</texture>
                 <colordiffuse>66FFFFFF</colordiffuse>
             </control>
@@ -54,13 +54,13 @@
 			<left>20</left>
 			<height>680</height>
 			<top>110</top>
-			
+
 			<!-- Card -->
 			<control type="image">
 				<texture>white.png</texture>
 				<colordiffuse>99362e33</colordiffuse>
 			</control>
-			
+
 			<control type="label">
 				<top>10</top>
 				<left>40</left>
@@ -71,7 +71,7 @@
 				<align>left</align>
 				<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30619][/UPPERCASE][/B]</label>
 			</control>
-			
+
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="1111">
 				<animation effect="fade" time="350" tween="cubic" easing="in" delay="350">WindowOpen</animation>
@@ -86,7 +86,7 @@
 				<texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
 				<texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
 			</control>
-			
+
 			<control type="list" id="1000">
 				<viewtype label="Video Codec">list</viewtype>
 				<left>40</left>
@@ -99,17 +99,17 @@
 				<pagecontrol>1111</pagecontrol>
 				<orientation>vertical</orientation>
 				<focusposition>1</focusposition>
-				
+
 				<!-- Unfocused Setting -->
 				<itemlayout height="60">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -123,7 +123,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -136,19 +136,19 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
-					
+
 				</itemlayout>
-				
+
 				<!-- Unfocused Setting -->
 				<focusedlayout height="60" condition="!Control.HasFocus(1000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -162,7 +162,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -179,14 +179,14 @@
 
 				<!-- Focused Setting -->
 				<focusedlayout height="60" condition="Control.HasFocus(1000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>22000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -200,7 +200,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -214,22 +214,22 @@
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
 				</focusedlayout>
-			</control>	
+			</control>
 		</control>
-		
+
 		<!-- Settings -->
 		<control type="group">
 			<width>430</width>
 			<left>20</left>
 			<height>260</height>
 			<top>800</top>
-			
+
 			<!-- Card -->
 			<control type="image">
 				<texture>white.png</texture>
 				<colordiffuse>99362e33</colordiffuse>
 			</control>
-			
+
 			<control type="label">
 				<top>10</top>
 				<left>40</left>
@@ -240,7 +240,7 @@
 				<align>left</align>
 				<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30620][/UPPERCASE][/B]</label>
 			</control>
-			
+
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="2222">
 				<animation effect="fade" time="350" tween="cubic" easing="in" delay="350">WindowOpen</animation>
@@ -255,7 +255,7 @@
 				<texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
 				<texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
 			</control>
-			
+
 			<control type="list" id="2000">
 				<viewtype label="HDR Codec">list</viewtype>
 				<left>40</left>
@@ -268,17 +268,17 @@
 				<pagecontrol>2222</pagecontrol>
 				<orientation>vertical</orientation>
 				<focusposition>1</focusposition>
-				
+
 				<!-- Unfocused Setting -->
 				<itemlayout height="60">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -292,7 +292,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -305,19 +305,19 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
-					
+
 				</itemlayout>
-				
+
 				<!-- Unfocused Setting -->
 				<focusedlayout height="60" condition="!Control.HasFocus(2000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -331,7 +331,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -348,14 +348,14 @@
 
 				<!-- Focused Setting -->
 				<focusedlayout height="60" condition="Control.HasFocus(2000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>22000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -369,7 +369,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -383,22 +383,22 @@
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
 				</focusedlayout>
-			</control>	
+			</control>
 		</control>
-		
+
 		<!-- Settings -->
 		<control type="group">
 			<width>430</width>
 			<left>470</left>
 			<height>680</height>
 			<top>110</top>
-			
+
 			<!-- Card -->
 			<control type="image">
 				<texture>white.png</texture>
 				<colordiffuse>99362e33</colordiffuse>
 			</control>
-			
+
 			<control type="label">
 				<top>10</top>
 				<left>40</left>
@@ -409,7 +409,7 @@
 				<align>left</align>
 				<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30621][/UPPERCASE][/B]</label>
 			</control>
-			
+
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="3333">
 				<animation effect="fade" time="350" tween="cubic" easing="in" delay="350">WindowOpen</animation>
@@ -425,7 +425,7 @@
 				<texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
 				<texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
 			</control>
-			
+
 			<control type="list" id="3000">
 				<viewtype label="Audio Codec">list</viewtype>
 				<left>40</left>
@@ -438,17 +438,17 @@
 				<pagecontrol>3333</pagecontrol>
 				<orientation>vertical</orientation>
 				<focusposition>1</focusposition>
-				
+
 				<!-- Unfocused Setting -->
 				<itemlayout height="60">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -462,7 +462,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -475,19 +475,19 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
-					
+
 				</itemlayout>
-				
+
 				<!-- Unfocused Setting -->
 				<focusedlayout height="60" condition="!Control.HasFocus(3000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -501,7 +501,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -518,14 +518,14 @@
 
 				<!-- Focused Setting -->
 				<focusedlayout height="60" condition="Control.HasFocus(3000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>22000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -539,7 +539,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -553,22 +553,22 @@
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
 				</focusedlayout>
-			</control>	
+			</control>
 		</control>
-		
+
 		<!-- Settings -->
 		<control type="group">
 			<width>430</width>
 			<left>470</left>
 			<height>260</height>
 			<top>800</top>
-			
+
 			<!-- Card -->
 			<control type="image">
 				<texture>white.png</texture>
 				<colordiffuse>99362e33</colordiffuse>
 			</control>
-			
+
 			<control type="label">
 				<top>10</top>
 				<left>40</left>
@@ -579,7 +579,7 @@
 				<align>left</align>
 				<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30575][/UPPERCASE][/B]</label>
 			</control>
-			
+
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="4444">
 				<animation effect="fade" time="350" tween="cubic" easing="in" delay="350">WindowOpen</animation>
@@ -595,7 +595,7 @@
 				<texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
 				<texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
 			</control>
-			
+
 			<control type="list" id="4000">
 				<viewtype label="Audio Channels">list</viewtype>
 				<left>40</left>
@@ -608,17 +608,17 @@
 				<pagecontrol>4444</pagecontrol>
 				<orientation>vertical</orientation>
 				<focusposition>1</focusposition>
-				
+
 				<!-- Unfocused Setting -->
 				<itemlayout height="60">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -632,7 +632,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -645,19 +645,19 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
-					
+
 				</itemlayout>
-				
+
 				<!-- Unfocused Setting -->
 				<focusedlayout height="60" condition="!Control.HasFocus(4000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -671,7 +671,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -688,14 +688,14 @@
 
 				<!-- Focused Setting -->
 				<focusedlayout height="60" condition="Control.HasFocus(4000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>22000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -709,7 +709,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -723,22 +723,22 @@
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
 				</focusedlayout>
-			</control>	
+			</control>
 		</control>
-		
+
 		<!-- Settings -->
 		<control type="group">
 			<width>430</width>
 			<left>920</left>
 			<height>950</height>
 			<top>110</top>
-			
+
 			<!-- Card -->
 			<control type="image">
 				<texture>white.png</texture>
 				<colordiffuse>99362e33</colordiffuse>
 			</control>
-			
+
 			<control type="label">
 				<top>10</top>
 				<left>40</left>
@@ -749,7 +749,7 @@
 				<align>left</align>
 				<label>[B][UPPERCASE]$ADDON[plugin.video.seren 30608][/UPPERCASE][/B]</label>
 			</control>
-			
+
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="5555">
 				<animation effect="fade" time="350" tween="cubic" easing="in" delay="350">WindowOpen</animation>
@@ -765,7 +765,7 @@
 				<texturesliderbar colordiffuse="66FFFFFF">white.png</texturesliderbar>
 				<texturesliderbarfocus colordiffuse="$INFO[Window().Property(settings.color)]">white.png</texturesliderbarfocus>
 			</control>
-			
+
 			<control type="list" id="5000">
 				<viewtype label="Miscellaneous">list</viewtype>
 				<left>40</left>
@@ -777,17 +777,17 @@
 				<pagecontrol>5555</pagecontrol>
 				<orientation>vertical</orientation>
 				<focusposition>1</focusposition>
-				
+
 				<!-- Unfocused Setting -->
 				<itemlayout height="60">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -801,7 +801,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -814,19 +814,19 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
-					
+
 				</itemlayout>
-				
+
 				<!-- Unfocused Setting -->
 				<focusedlayout height="60" condition="!Control.HasFocus(5000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>00000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -840,7 +840,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -857,14 +857,14 @@
 
 				<!-- Focused Setting -->
 				<focusedlayout height="60" condition="Control.HasFocus(5000)">
-					
+
 					<!-- Card -->
 					<control type="image">
 						<top>10</top>
 						<texture>white.png</texture>
 						<colordiffuse>22000000</colordiffuse>
 					</control>
-					
+
 					<!-- Setting -->
 					<control type="label">
 						<top>10</top>
@@ -878,7 +878,7 @@
 						<label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
 						<visible>String.IsEqual(ListItem.Property(value),False)</visible>
 					</control>
-					
+
 					<control type="label">
 						<top>10</top>
 						<left>10</left>
@@ -892,9 +892,9 @@
 						<visible>String.IsEqual(ListItem.Property(value),True)</visible>
 					</control>
 				</focusedlayout>
-			</control>	
+			</control>
 		</control>
-	
+
 		<!-- Buttons -->
 		<control type="group">
 			<animation effect="slide" start="600,0" time="350" tween="cubic" easing="in">WindowOpen</animation>
@@ -903,20 +903,20 @@
 			<right>20</right>
 			<width>500</width>
 			<height>130</height>
-			
+
 			<control type="group">
-				
+
 				<!-- Card -->
 				<control type="image">
 					<texture>white.png</texture>
 					<colordiffuse>99362e33</colordiffuse>
 				</control>
-				
+
 				<control type="grouplist" id="6000">
 					<top>25</top>
 					<onleft>5000</onleft>
 					<itemgap>10</itemgap>
-				
+
 					<!-- Close -->
 					<control type="button" id="6001">
 						<height>80</height>

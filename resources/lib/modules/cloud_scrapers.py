@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.common import source_utils
 from resources.lib.debrid.all_debrid import AllDebrid
 from resources.lib.debrid.premiumize import Premiumize
@@ -9,7 +6,7 @@ from resources.lib.indexers.apibase import ApiBase
 from resources.lib.modules.globals import g
 
 
-class CloudScraper(ApiBase, object):
+class CloudScraper(ApiBase):
     def __init__(self, terminate_check):
         self.terminate_check = terminate_check
         self.provider_name = self.__class__.__name__.split("Scraper")[0]
@@ -35,7 +32,7 @@ class CloudScraper(ApiBase, object):
 
     def _preterm_check(self):
         if self.terminate_check():
-            g.log("{} Pre-Terminated".format(self.__class__.__name__), "info")
+            g.log(f"{self.__class__.__name__} Pre-Terminated", "info")
             return True
         return False
 
@@ -53,8 +50,7 @@ class CloudScraper(ApiBase, object):
         cloud_items = self._fetch_cloud_items()
 
         if type(cloud_items) != list:
-            g.log("There was a faliure at the API level getting the cloud files from {}".format(self.debrid_provider),
-                  "error")
+            g.log(f"There was a faliure at the API level getting the cloud files from {self.debrid_provider}", "error")
             return []
 
         if self._preterm_check():
@@ -76,7 +72,7 @@ class CloudScraper(ApiBase, object):
         if self._preterm_check():
             return []
         cloud_items = self._finalise_identified_items(cloud_items)
-        g.log("{} cloud scraper found {} source".format(self.debrid_provider, len(cloud_items)), "info")
+        g.log(f"{self.debrid_provider} cloud scraper found {len(cloud_items)} source", "info")
         return cloud_items
 
     def _normalize_item(self, item):
@@ -84,7 +80,7 @@ class CloudScraper(ApiBase, object):
 
     @staticmethod
     def _apply_general_filter(cloud_items):
-        return [i for i in cloud_items if any(i['release_title'].endswith(ext) for ext in g.common_video_extensions)]
+        return [i for i in cloud_items if i['release_title'].endswith(g.common_video_extensions)]
 
     def _identify_items(self, cloud_items):
         sources = []
@@ -92,19 +88,28 @@ class CloudScraper(ApiBase, object):
         if self.media_type == g.MEDIA_EPISODE:
             for item in cloud_items:
                 release_title = source_utils.clean_title(item["release_title"])
-                if self.episode_regex(release_title) or \
-                        self.show_regex(release_title) or \
-                        self.season_regex(release_title):
+                if (
+                    self.episode_regex(release_title)
+                    or self.show_regex(release_title)
+                    or self.season_regex(release_title)
+                ):
                     sources.append(item)
 
         else:
-            simple_info = {"year": self.item_information.get("info", {}).get("year"),
-                           "title": self.item_information.get("info").get("title")}
-            for item in cloud_items:
-                if source_utils.filter_movie_title(None, source_utils.clean_title(item['release_title']),
-                                                   self.item_information['info']['title'],
-                                                   simple_info):
-                    sources.append(item)
+            simple_info = {
+                "year": self.item_information.get("info", {}).get("year"),
+                "title": self.item_information.get("info").get("title"),
+            }
+            sources.extend(
+                item
+                for item in cloud_items
+                if source_utils.filter_movie_title(
+                    None,
+                    source_utils.clean_title(item['release_title']),
+                    self.item_information['info']['title'],
+                    simple_info,
+                )
+            )
 
             return sources
 
@@ -122,14 +127,21 @@ class CloudScraper(ApiBase, object):
 
     def _finalise_identified_items(self, items):
         for item in items:
-            item.update({
-                "quality": source_utils.get_quality(item['release_title']),
-                "language": self.language,
-                "provider": self.provider_name,
-                "type": "cloud",
-                "info": source_utils.get_info(item['release_title']),
-                "debrid_provider": self.debrid_provider,
-            })
+            item.update(
+                {
+                    "quality": source_utils.get_quality(item['release_title']),
+                    "language": self.language,
+                    "provider": self.provider_name,
+                    "type": "cloud",
+                    "info": source_utils.get_info(item['release_title']),
+                    "debrid_provider": self.debrid_provider,
+                    "provider_imports": (
+                        '.'.join(["providers", "cloud_scrapers", self.language, "cloud"]),
+                        self.provider_name,
+                        "cloud_scrapers",
+                    ),
+                }
+            )
 
         return items
 
@@ -140,10 +152,10 @@ class CloudScraper(ApiBase, object):
     def _is_valid_pack(self, item):
         clean_title = self._get_clean_title(item)
         if self.media_type == g.MEDIA_EPISODE:
-            if self.episode_regex(clean_title) or self.season_regex(clean_title) or self.show_regex(clean_title):
-                return True
-            else:
-                return False
+            return bool(
+                self.episode_regex(clean_title) or self.season_regex(clean_title) or self.show_regex(clean_title)
+            )
+
         else:
             # Always return true on a movie item as packs do not count
             return True
@@ -152,16 +164,15 @@ class CloudScraper(ApiBase, object):
         return False
 
 
-class PremiumizeCloudScaper(CloudScraper, ApiBase):
-
+class PremiumizeCloudScraper(CloudScraper, ApiBase):
     def __init__(self, terminate_flag):
-        super(PremiumizeCloudScaper, self).__init__(terminate_flag)
+        super().__init__(terminate_flag)
         self.api_adapter = Premiumize()
         self.debrid_provider = "premiumize"
         self._source_normalization = (
             ("name", "release_title", None),
             ("id", "url", None),
-            ("size", "size", lambda k: (int(k) / 1024) / 1024)
+            ("size", "size", lambda k: (int(k) / 1024) / 1024),
         )
 
     def _fetch_cloud_items(self):
@@ -175,9 +186,8 @@ class PremiumizeCloudScaper(CloudScraper, ApiBase):
 
 
 class RealDebridCloudScraper(CloudScraper):
-
     def __init__(self, terminate_flag):
-        super(RealDebridCloudScraper, self).__init__(terminate_flag)
+        super().__init__(terminate_flag)
         self.api_adapter = RealDebrid()
         self.debrid_provider = "real_debrid"
         self._source_normalization = (
@@ -187,7 +197,7 @@ class RealDebridCloudScraper(CloudScraper):
             ("filename", "release_title", None),
             ("id", "id", None),
             ("links", "links", None),
-            ("selected", "selected", None)
+            ("selected", "selected", None),
         )
 
     def _fetch_cloud_items(self):
@@ -206,10 +216,10 @@ class RealDebridCloudScraper(CloudScraper):
     def _is_enabled(self):
         return g.real_debrid_enabled()
 
-class AllDebridCloudScraper(CloudScraper):
 
+class AllDebridCloudScraper(CloudScraper):
     def __init__(self, terminate_flag):
-        super(AllDebridCloudScraper, self).__init__(terminate_flag)
+        super().__init__(terminate_flag)
         self.api_adapter = AllDebrid()
         self.debrid_provider = "all_debrid"
         self._source_normalization = (

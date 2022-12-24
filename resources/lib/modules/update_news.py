@@ -24,6 +24,6 @@ def do_update_news():
         for v in sorted(update_news_versions)
         if v > last_update_news_version
     ]:
-        xbmcgui.Dialog().ok("{} - {}".format(g.ADDON_NAME, g.get_language_string(30567)), msg)
+        xbmcgui.Dialog().ok(f"{g.ADDON_NAME} - {g.get_language_string(30567)}", msg)
 
     g.set_setting("update.news.version", max_update_news_version)

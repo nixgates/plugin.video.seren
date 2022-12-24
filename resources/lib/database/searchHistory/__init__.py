@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 
 import xbmcgui
@@ -10,19 +7,16 @@ from resources.lib.modules.globals import g
 
 schema = {
     'search_history': {
-        'columns': collections.OrderedDict([
-            ("type", ["TEXT", "NOT NULL"]),
-            ("value", ["TEXT", "NOT NULL"])
-        ]),
+        'columns': collections.OrderedDict([("type", ["TEXT", "NOT NULL"]), ("value", ["TEXT", "NOT NULL"])]),
         "table_constraints": ["UNIQUE(value, type) ON CONFLICT REPLACE"],
-        "default_seed": []
+        "default_seed": [],
     }
 }
 
 
 class SearchHistory(Database):
     def __init__(self):
-        super(SearchHistory, self).__init__(g.SEARCH_HISTORY_DB_PATH, schema)
+        super().__init__(g.SEARCH_HISTORY_DB_PATH, schema)
 
     def get_search_history(self, media_type):
         """
@@ -32,9 +26,12 @@ class SearchHistory(Database):
         :return: List of all search terms
         :rtype: list
         """
-        return [i['value'] for i in self.fetchall(
-            "SELECT * FROM search_history where type = ? order by RowID desc LIMIT 50",
-            (media_type,))]
+        return [
+            i['value']
+            for i in self.fetchall(
+                "SELECT * FROM search_history where type = ? order by RowID desc LIMIT 50", (media_type,)
+            )
+        ]
 
     def add_search_history(self, media_type, search_string):
         """
@@ -73,9 +70,7 @@ class SearchHistory(Database):
         """
         if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30207)):
             if media_type is not None:
-                self.execute_sql(
-                    "DELETE FROM search_history where type = ?", (media_type,)
-                )
+                self.execute_sql("DELETE FROM search_history where type = ?", (media_type,))
                 g.container_refresh()
             else:
                 self.execute_sql("DELETE FROM search_history")

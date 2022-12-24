@@ -14,12 +14,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.2\n"
 
-#: /resources/lib/gui/homeMenu.py:11
+#: /resources/lib/gui/homeMenu.py:8
 msgctxt "#30000"
 msgid "Discover Movies"
 msgstr "Ontdek films"
 
-#: /resources/lib/gui/homeMenu.py:18
+#: /resources/lib/gui/homeMenu.py:21
 msgctxt "#30001"
 msgid "My Movies"
 msgstr "Mijn films"
@@ -29,119 +29,119 @@ msgctxt "#30002"
 msgid "Discover TV Shows"
 msgstr "Ontdek series"
 
-#: /resources/lib/gui/homeMenu.py:22
+#: /resources/lib/gui/homeMenu.py:27
 msgctxt "#30003"
 msgid "My Shows"
 msgstr "Mijn series"
 
-#: /resources/settings.xml:13 /resources/settings.xml:15
-#: /resources/lib/gui/movieMenus.py:58 /resources/lib/gui/tvshowMenus.py:72
+#: /resources/settings.xml:31 /resources/settings.xml:42
+#: /resources/lib/gui/movieMenus.py:62 /resources/lib/gui/tvshowMenus.py:74
 msgctxt "#30004"
 msgid "Most Popular"
 msgstr "Populairst"
 
-#: /resources/lib/gui/movieMenus.py:71 /resources/lib/gui/tvshowMenus.py:85
+#: /resources/lib/gui/movieMenus.py:77 /resources/lib/gui/tvshowMenus.py:89
 msgctxt "#30005"
 msgid "Recommended For You"
 msgstr "Aanbevolen voor jou"
 
-#: /resources/settings.xml:13 /resources/settings.xml:15
-#: /resources/lib/gui/movieMenus.py:76 /resources/lib/gui/tvshowMenus.py:90
+#: /resources/settings.xml:30 /resources/settings.xml:41
+#: /resources/lib/gui/movieMenus.py:83 /resources/lib/gui/tvshowMenus.py:95
 msgctxt "#30006"
 msgid "Trending"
 msgstr "Trending"
 
-#: /resources/lib/gui/movieMenus.py:88 /resources/lib/gui/tvshowMenus.py:107
+#: /resources/lib/gui/movieMenus.py:97 /resources/lib/gui/tvshowMenus.py:115
 msgctxt "#30007"
 msgid "Most Played"
 msgstr "Meest gespeeld"
 
-#: /resources/lib/gui/movieMenus.py:95 /resources/lib/gui/tvshowMenus.py:114
+#: /resources/lib/gui/movieMenus.py:105 /resources/lib/gui/tvshowMenus.py:123
 msgctxt "#30008"
 msgid "Most Watched"
 msgstr "Meest bekeken"
 
-#: /resources/lib/gui/movieMenus.py:102 /resources/lib/gui/tvshowMenus.py:121
+#: /resources/lib/gui/movieMenus.py:113 /resources/lib/gui/tvshowMenus.py:131
 msgctxt "#30009"
 msgid "Most Collected"
 msgstr "Meest verzameld"
 
-#: /resources/lib/gui/movieMenus.py:122 /resources/lib/gui/tvshowMenus.py:141
+#: /resources/lib/gui/movieMenus.py:136 /resources/lib/gui/tvshowMenus.py:154
 msgctxt "#30010"
 msgid "Most Anticipated"
 msgstr "Meest verwacht"
 
-#: /resources/lib/gui/movieMenus.py:136 /resources/lib/gui/tvshowMenus.py:149
+#: /resources/lib/gui/movieMenus.py:152 /resources/lib/gui/tvshowMenus.py:163
 msgctxt "#30011"
 msgid "Recently Updated"
 msgstr "Recent geüpdate"
 
-#: /resources/lib/gui/movieMenus.py:129
+#: /resources/lib/gui/movieMenus.py:144
 msgctxt "#30012"
 msgid "Box Office Top 10"
 msgstr "Box Office Top 10"
 
-#: /resources/lib/gui/homeMenu.py:29 /resources/lib/gui/movieMenus.py:157
-#: /resources/lib/gui/movieMenus.py:163 /resources/lib/gui/movieMenus.py:313
-#: /resources/lib/gui/movieMenus.py:373 /resources/lib/gui/tvshowMenus.py:175
-#: /resources/lib/gui/tvshowMenus.py:181 /resources/lib/gui/tvshowMenus.py:446
-#: /resources/lib/gui/tvshowMenus.py:482
+#: /resources/lib/gui/homeMenu.py:40 /resources/lib/gui/movieMenus.py:177
+#: /resources/lib/gui/movieMenus.py:184 /resources/lib/gui/movieMenus.py:331
+#: /resources/lib/gui/movieMenus.py:381 /resources/lib/gui/tvshowMenus.py:194
+#: /resources/lib/gui/tvshowMenus.py:201 /resources/lib/gui/tvshowMenus.py:452
+#: /resources/lib/gui/tvshowMenus.py:484
 msgctxt "#30013"
 msgid "Search..."
 msgstr "Zoeken..."
 
-#: /resources/lib/gui/movieMenus.py:178 /resources/lib/gui/tvshowMenus.py:196
+#: /resources/lib/gui/movieMenus.py:201 /resources/lib/gui/tvshowMenus.py:218
 msgctxt "#30014"
 msgid "Collection"
 msgstr "Collectie"
 
-#: /resources/lib/gui/movieMenus.py:183 /resources/lib/gui/tvshowMenus.py:201
+#: /resources/lib/gui/movieMenus.py:207 /resources/lib/gui/tvshowMenus.py:224
 msgctxt "#30015"
 msgid "Watchlist"
 msgstr "Volglijst"
 
-#: /resources/lib/modules/globals.py:972
+#: /resources/lib/modules/globals.py:912
 msgctxt "#30016"
 msgid "Color Picker"
 msgstr "Kleurkiezer"
 
-#: /resources/lib/debrid/real_debrid.py:76
+#: /resources/lib/debrid/real_debrid.py:74
 msgctxt "#30017"
 msgid "Real-Debrid Auth"
 msgstr "Real-Debrid autorisatie"
 
-#: /resources/lib/indexers/trakt.py:496 /resources/lib/debrid/premiumize.py:67
-#: /resources/lib/debrid/real_debrid.py:78
-#: /resources/lib/debrid/all_debrid.py:127
+#: /resources/lib/indexers/trakt.py:448 /resources/lib/debrid/premiumize.py:78
+#: /resources/lib/debrid/real_debrid.py:76
+#: /resources/lib/debrid/all_debrid.py:112
 msgctxt "#30018"
 msgid "Open this link in a browser: {}"
 msgstr "Open deze link in een browser: {}"
 
-#: /resources/lib/indexers/trakt.py:499 /resources/lib/debrid/premiumize.py:70
-#: /resources/lib/debrid/real_debrid.py:81
-#: /resources/lib/debrid/all_debrid.py:130
+#: /resources/lib/indexers/trakt.py:449 /resources/lib/debrid/premiumize.py:79
+#: /resources/lib/debrid/real_debrid.py:77
+#: /resources/lib/debrid/all_debrid.py:113
 msgctxt "#30019"
 msgid "Enter the code: {}"
 msgstr "Voer de code in: {}"
 
-#: /resources/lib/debrid/premiumize.py:91
-#: /resources/lib/debrid/real_debrid.py:130
-#: /resources/lib/debrid/all_debrid.py:156
+#: /resources/lib/debrid/premiumize.py:98
+#: /resources/lib/debrid/real_debrid.py:120
+#: /resources/lib/debrid/all_debrid.py:144
 msgctxt "#30020"
 msgid "Authentication is completed"
 msgstr "Authenticatie is voltooid"
 
-#: /resources/lib/indexers/trakt.py:466
+#: /resources/lib/indexers/trakt.py:418
 msgctxt "#30021"
 msgid "Trakt Successfully Disconnected"
 msgstr "Trakt succesvol verbroken"
 
-#: /resources/lib/indexers/trakt.py:494
+#: /resources/lib/indexers/trakt.py:446
 msgctxt "#30022"
 msgid "Authorize Trakt"
 msgstr "Autoriseer Trakt"
 
-#: /resources/lib/indexers/trakt.py:486 /resources/lib/indexers/trakt.py:542
+#: /resources/lib/indexers/trakt.py:438 /resources/lib/indexers/trakt.py:482
 msgctxt "#30023"
 msgid ""
 "Error while authenticating with Trakt.\n"
@@ -150,63 +150,58 @@ msgstr ""
 "Fout tijdens authenticatie met Trakt.\n"
 "Probeer het a.u.b. opnieuw."
 
-#: /resources/lib/indexers/tvdb.py:55 /resources/lib/indexers/trakt.py:60
-#: /resources/lib/indexers/tmdb.py:36 /resources/lib/indexers/omdb.py:53
-#: /resources/lib/indexers/fanarttv.py:34
-#: /resources/lib/debrid/all_debrid.py:47
+#: /resources/lib/indexers/tvdb.py:54 /resources/lib/indexers/trakt.py:58
+#: /resources/lib/indexers/tmdb.py:33 /resources/lib/indexers/omdb.py:51
+#: /resources/lib/indexers/fanarttv.py:37
+#: /resources/lib/debrid/all_debrid.py:40
 msgctxt "#30024"
 msgid "Unknown Error Connecting to {}"
 msgstr "Onbekende fout bij het verbinden met {}"
 
-#: /resources/lib/gui/homeMenu.py:40 /resources/lib/gui/homeMenu.py:47
+#: /resources/lib/gui/homeMenu.py:57 /resources/lib/gui/homeMenu.py:70
 msgctxt "#30025"
 msgid "Search Movies..."
 msgstr "Films zoeken ..."
 
-#: /resources/lib/gui/homeMenu.py:43 /resources/lib/gui/homeMenu.py:50
+#: /resources/lib/gui/homeMenu.py:63 /resources/lib/gui/homeMenu.py:76
 msgctxt "#30026"
 msgid "Search Shows..."
 msgstr "Series zoeken ..."
 
-#: /resources/lib/gui/homeMenu.py:32
+#: /resources/lib/gui/homeMenu.py:46
 msgctxt "#30027"
 msgid "Tools"
 msgstr "Gereedschap"
 
-#: /resources/settings.xml:827 /resources/settings.xml:828
-#: /resources/lib/gui/homeMenu.py:71
+#: /resources/settings.xml:2082 /resources/settings.xml:2083
+#: /resources/lib/gui/homeMenu.py:112
 msgctxt "#30028"
 msgid "Clear Cache"
 msgstr "Cache wissen"
 
-#: /resources/lib/modules/globals.py:1103
+#: /resources/lib/modules/globals.py:1005
 msgctxt "#30029"
 msgid "Are you sure you wish to clear the cache?"
 msgstr "Weet u zeker dat u de cache wilt wissen?"
 
-#: /resources/lib/modules/helpers.py:114
+#: /resources/lib/modules/helpers.py:115
 msgctxt "#30030"
 msgid "Starting Engines"
 msgstr "Motoren starten"
 
-#: /resources/lib/modules/router.py:186
-msgctxt "#30031"
-msgid "Starting Resolver..."
-msgstr "Resolver starten ..."
-
-#: /resources/lib/gui/windows/source_select.py:78
-#: /resources/lib/modules/sourceSelect.py:29
-#: /resources/lib/modules/router.py:193 /resources/lib/modules/helpers.py:93
+#: /resources/lib/gui/windows/source_select.py:88
+#: /resources/lib/modules/sourceSelect.py:27
+#: /resources/lib/modules/router.py:183 /resources/lib/modules/helpers.py:95
 msgctxt "#30032"
 msgid "No playable sources found for item"
 msgstr "Geen afspeelbare bronnen gevonden voor item"
 
-#: /resources/lib/modules/router.py:415
+#: /resources/lib/modules/router.py:393
 msgctxt "#30033"
 msgid "Silent Scraper Setting has been reset"
 msgstr "Verborgen scraper instellingen zijn gereset"
 
-#: /resources/lib/common/maintenance.py:74
+#: /resources/lib/common/maintenance.py:67
 msgctxt "#30034"
 msgid ""
 "Please be aware this will completely wipe the following:\n"
@@ -215,110 +210,110 @@ msgstr ""
 "Houd er rekening mee dat hiermee het volgende volledig wordt gewist:\n"
 "Gegevens in cache, instellingen, geïnstalleerde providers\n"
 
-#: /resources/lib/common/maintenance.py:75
+#: /resources/lib/common/maintenance.py:67
 msgctxt "#30035"
 msgid "ARE YOU SURE?"
 msgstr "Weet je het zeker?"
 
-#: /resources/lib/common/maintenance.py:143
+#: /resources/lib/common/maintenance.py:135
 msgctxt "#30036"
 msgid "Your {} Premium status has expired"
 msgstr "Uw {} premium-status is verlopen"
 
-#: /resources/lib/gui/homeMenu.py:64
+#: /resources/lib/gui/homeMenu.py:99
 msgctxt "#30037"
 msgid "Provider Tools"
 msgstr "Provider Tools"
 
-#: /resources/lib/gui/homeMenu.py:68
+#: /resources/lib/gui/homeMenu.py:106
 msgctxt "#30038"
 msgid "Premium Services"
 msgstr "Premium diensten"
 
-#: /resources/settings.xml:830 /resources/lib/gui/homeMenu.py:75
+#: /resources/settings.xml:2091 /resources/lib/gui/homeMenu.py:119
 msgctxt "#30039"
 msgid "Clear Local Torrent Cache"
 msgstr "Lokale torrent-cache wissen"
 
-#: /resources/lib/gui/homeMenu.py:83
+#: /resources/lib/gui/homeMenu.py:133
 msgctxt "#30040"
 msgid "Open Settings Menu"
 msgstr "Open het instellingen menu"
 
-#: /resources/settings.xml:834 /resources/lib/gui/homeMenu.py:87
+#: /resources/settings.xml:2107 /resources/lib/gui/homeMenu.py:140
 msgctxt "#30041"
 msgid "Wipe Addon Data"
 msgstr "Wis add-on gegevens"
 
-#: /resources/lib/gui/movieMenus.py:141 /resources/lib/gui/tvshowMenus.py:164
+#: /resources/lib/gui/movieMenus.py:158 /resources/lib/gui/tvshowMenus.py:181
 msgctxt "#30042"
 msgid "Genres"
 msgstr "Genres"
 
-#: /resources/lib/gui/movieMenus.py:173 /resources/lib/gui/tvshowMenus.py:191
+#: /resources/lib/gui/movieMenus.py:195 /resources/lib/gui/tvshowMenus.py:212
 msgctxt "#30043"
 msgid "Finish Watching"
 msgstr "Voltooi het kijken"
 
-#: /resources/lib/gui/movieMenus.py:188
+#: /resources/lib/gui/movieMenus.py:213
 msgctxt "#30044"
 msgid "My Movie Lists"
 msgstr "Mijn filmlijsten"
 
-#: /resources/lib/gui/movieMenus.py:414 /resources/lib/gui/tvshowMenus.py:535
+#: /resources/lib/gui/movieMenus.py:416 /resources/lib/gui/tvshowMenus.py:532
 msgctxt "#30045"
 msgid "Multi Select..."
 msgstr "Multi Select..."
 
-#: /resources/lib/gui/tvshowMenus.py:102
+#: /resources/lib/gui/tvshowMenus.py:109
 msgctxt "#30046"
 msgid "New TV Shows"
 msgstr "Nieuwe series"
 
-#: /resources/lib/indexers/trakt.py:500 /resources/lib/debrid/premiumize.py:73
-#: /resources/lib/debrid/real_debrid.py:84
-#: /resources/lib/debrid/all_debrid.py:131
+#: /resources/lib/indexers/trakt.py:450 /resources/lib/debrid/premiumize.py:80
+#: /resources/lib/debrid/real_debrid.py:78
+#: /resources/lib/debrid/all_debrid.py:114
 msgctxt "#30047"
 msgid "This code has been copied to your clipboard"
 msgstr "Deze code is naar je klembord gekopieerd"
 
-#: /resources/lib/modules/providers/install_manager.py:49
+#: /resources/lib/modules/providers/install_manager.py:39
 msgctxt "#30048"
 msgid "There are currently no packages installed"
 msgstr "Er zijn momenteel geen provider pakketten geïnstalleerd"
 
-#: /resources/lib/modules/providers/install_manager.py:54
+#: /resources/lib/modules/providers/install_manager.py:42
 msgctxt "#30049"
 msgid "Uninstall"
 msgstr "Deïnstalleren"
 
-#: /resources/lib/modules/providers/install_manager.py:80
+#: /resources/lib/modules/providers/install_manager.py:65
 msgctxt "#30050"
 msgid "Are you sure you wish to remove?"
 msgstr "Weet u zeker dat u deze wilt verwijderen?"
 
-#: /resources/lib/modules/providers/install_manager.py:94
+#: /resources/lib/modules/providers/install_manager.py:78
 msgctxt "#30051"
 msgid "successfully uninstalled"
 msgstr "Succesvol verwijderd"
 
-#: /resources/lib/modules/globals.py:1111
+#: /resources/lib/modules/globals.py:1012
 msgctxt "#30052"
 msgid "All Cache Successfully Cleared"
 msgstr "Alle cache succesvol gewist"
 
-#: /resources/lib/modules/getSources.py:258
+#: /resources/lib/modules/getSources.py:292
 msgctxt "#30053"
 msgid "Checking Local Database"
 msgstr "Lokale database controleren"
 
-#: /resources/lib/gui/mock_windows.py:209
-#: /resources/lib/modules/getSources.py:142
+#: /resources/lib/gui/mock_windows.py:248
+#: /resources/lib/modules/getSources.py:148
 msgctxt "#30054"
 msgid "Initializing Providers"
 msgstr "Providers initialiseren"
 
-#: /resources/lib/modules/getSources.py:283
+#: /resources/lib/modules/getSources.py:323
 msgctxt "#30055"
 msgid ""
 "No Sources found for next item in playlist.\n"
@@ -327,7 +322,7 @@ msgstr ""
 "Geen bronnen gevonden voor het volgende item in de afspeellijst.\n"
 "De huidige afspeellijst wordt gewist"
 
-#: /resources/lib/modules/getSources.py:415
+#: /resources/lib/modules/getSources.py:450
 msgctxt "#30056"
 msgid ""
 "No Playable Sources were found.\n"
@@ -336,117 +331,93 @@ msgstr ""
 "Er zijn geen afspeelbare bronnen gevonden.\n"
 "Wil je proberen een torrent in de cache te plaatsen?"
 
-#: /resources/settings.xml:435 /resources/settings.xml:439
-#: /resources/settings.xml:443 /resources/settings.xml:447
-#: /resources/settings.xml:478 /resources/settings.xml:482
-#: /resources/settings.xml:486 /resources/settings.xml:490
-#: /resources/settings.xml:521 /resources/settings.xml:525
-#: /resources/settings.xml:529 /resources/settings.xml:533
-#: /resources/settings.xml:564 /resources/settings.xml:568
-#: /resources/settings.xml:572 /resources/settings.xml:576
-#: /resources/settings.xml:607 /resources/settings.xml:611
-#: /resources/settings.xml:615 /resources/settings.xml:619
-#: /resources/settings.xml:650 /resources/settings.xml:654
-#: /resources/settings.xml:658 /resources/settings.xml:662
-#: /resources/settings.xml:693 /resources/settings.xml:697
-#: /resources/settings.xml:701 /resources/settings.xml:705
-#: /resources/settings.xml:736 /resources/settings.xml:740
-#: /resources/settings.xml:744 /resources/settings.xml:748
-#: /resources/skins/Default/1080i/get_sources.xml:371
+#: /resources/settings.xml:1767 /resources/settings.xml:1782
+#: /resources/settings.xml:1797 /resources/settings.xml:1812
+#: /resources/settings.xml:1827
+#: /resources/skins/Default/1080i/get_sources.xml:377
+#: /resources/lib/gui/windows/sort_select.py:8
 msgctxt "#30057"
 msgid "Torrents"
 msgstr "Torrents"
 
-#: /resources/settings.xml:435 /resources/settings.xml:439
-#: /resources/settings.xml:443 /resources/settings.xml:447
-#: /resources/settings.xml:478 /resources/settings.xml:482
-#: /resources/settings.xml:486 /resources/settings.xml:490
-#: /resources/settings.xml:521 /resources/settings.xml:525
-#: /resources/settings.xml:529 /resources/settings.xml:533
-#: /resources/settings.xml:564 /resources/settings.xml:568
-#: /resources/settings.xml:572 /resources/settings.xml:576
-#: /resources/settings.xml:607 /resources/settings.xml:611
-#: /resources/settings.xml:615 /resources/settings.xml:619
-#: /resources/settings.xml:650 /resources/settings.xml:654
-#: /resources/settings.xml:658 /resources/settings.xml:662
-#: /resources/settings.xml:693 /resources/settings.xml:697
-#: /resources/settings.xml:701 /resources/settings.xml:705
-#: /resources/settings.xml:736 /resources/settings.xml:740
-#: /resources/settings.xml:744 /resources/settings.xml:748
-#: /resources/skins/Default/1080i/get_sources.xml:495
+#: /resources/settings.xml:1768 /resources/settings.xml:1783
+#: /resources/settings.xml:1798 /resources/settings.xml:1813
+#: /resources/settings.xml:1828
+#: /resources/skins/Default/1080i/get_sources.xml:501
+#: /resources/lib/gui/windows/sort_select.py:8
 msgctxt "#30058"
 msgid "Hosters"
 msgstr "Hosters"
 
-#: /resources/lib/modules/smartPlay.py:426
+#: /resources/lib/modules/smartPlay.py:389
 msgctxt "#30059"
 msgid "Resume From: "
 msgstr "Hervatten vanaf: "
 
-#: /resources/lib/modules/smartPlay.py:68
+#: /resources/lib/modules/smartPlay.py:72
 msgctxt "#30060"
 msgid "Begining SmartPlay"
 msgstr "Beginnen met SmartPlay"
 
-#: /resources/lib/modules/smartPlay.py:71
+#: /resources/lib/modules/smartPlay.py:75
 msgctxt "#30061"
 msgid "Identifying Resume Point"
 msgstr "Hervatpunt identificeren"
 
-#: /resources/lib/modules/smartPlay.py:75
-#: /resources/lib/modules/smartPlay.py:247
+#: /resources/lib/modules/smartPlay.py:79
+#: /resources/lib/modules/smartPlay.py:235
 msgctxt "#30062"
 msgid "Building Playlist"
 msgstr "Afspeellijst bouwen"
 
-#: /resources/lib/modules/smartPlay.py:77
-#: /resources/lib/modules/smartPlay.py:255
+#: /resources/lib/modules/smartPlay.py:81
+#: /resources/lib/modules/smartPlay.py:241
 msgctxt "#30063"
 msgid "Building List Items"
 msgstr "Lijstitems bouwen"
 
-#: /resources/lib/modules/smartPlay.py:273
+#: /resources/lib/modules/smartPlay.py:250
 msgctxt "#30064"
 msgid "Starting Scraping"
 msgstr "Beginnen met scrapen"
 
-#: /resources/lib/debrid/real_debrid.py:63
+#: /resources/lib/debrid/real_debrid.py:61
 msgctxt "#30065"
 msgid "Authentication with Real-Debrid has failed, please try again"
 msgstr "Authenticatie met Real-Debrid is mislukt, probeer het opnieuw"
 
-#: /resources/lib/modules/providers/install_manager.py:168
+#: /resources/lib/modules/providers/install_manager.py:152
 msgctxt "#30066"
 msgid "Installing:"
 msgstr "Bezig met installeren:"
 
-#: /resources/lib/modules/providers/install_manager.py:170
+#: /resources/lib/modules/providers/install_manager.py:153
 msgctxt "#30067"
 msgid "Author: "
 msgstr "Auteur: "
 
-#: /resources/lib/modules/providers/install_manager.py:171
+#: /resources/lib/modules/providers/install_manager.py:154
 msgctxt "#30068"
 msgid "Are you sure you wish to proceed?"
 msgstr "Wilt u doorgaan?"
 
-#: /resources/lib/modules/providers/install_manager.py:167
+#: /resources/lib/modules/providers/install_manager.py:151
 msgctxt "#30069"
 msgid "Custom Sources Install"
 msgstr "Aangepaste bronnen installeren"
 
-#: /resources/lib/gui/windows/download_manager.py:74
-#: /resources/lib/modules/providers/install_manager.py:172
+#: /resources/lib/gui/windows/download_manager.py:68
+#: /resources/lib/modules/providers/install_manager.py:155
 msgctxt "#30070"
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: /resources/lib/modules/providers/install_manager.py:173
+#: /resources/lib/modules/providers/install_manager.py:156
 msgctxt "#30071"
 msgid "Install"
 msgstr "Installeer"
 
-#: /resources/lib/modules/providers/install_manager.py:141
+#: /resources/lib/modules/providers/install_manager.py:126
 msgctxt "#30072"
 msgid ""
 "Failed to install provider package\n"
@@ -455,34 +426,34 @@ msgstr ""
 "Kan providerpakket niet installeren.\n"
 "Controleer het logboek voor meer informatie."
 
-#: /resources/lib/modules/providers/install_manager.py:224
+#: /resources/lib/modules/providers/install_manager.py:209
 msgctxt "#30073"
 msgid "Extracting"
 msgstr "Uitpakken"
 
-#: /resources/lib/modules/providers/install_manager.py:225
+#: /resources/lib/modules/providers/install_manager.py:210
 msgctxt "#30074"
 msgid "Please Wait..."
 msgstr "Even geduld a.u.b...."
 
-#: /resources/lib/database/skinManager/__init__.py:277
-#: /resources/lib/modules/providers/install_manager.py:244
+#: /resources/lib/database/skinManager/__init__.py:240
+#: /resources/lib/modules/providers/install_manager.py:228
 msgctxt "#30075"
 msgid "Successfully Installed"
 msgstr "Succesvol geïnstalleerd"
 
-#: /resources/lib/modules/providers/install_manager.py:325
+#: /resources/lib/modules/providers/install_manager.py:301
 msgctxt "#30076"
 msgid "Please check the log for further details"
 msgstr "Controleer het logboek voor meer informatie"
 
-#: /resources/lib/database/skinManager/__init__.py:281
-#: /resources/lib/modules/providers/install_manager.py:325
+#: /resources/lib/database/skinManager/__init__.py:244
+#: /resources/lib/modules/providers/install_manager.py:301
 msgctxt "#30077"
 msgid "Failed to install package"
 msgstr "Kon pakket niet installeren"
 
-#: /resources/lib/modules/providers/install_manager.py:288
+#: /resources/lib/modules/providers/install_manager.py:267
 msgctxt "#30078"
 msgid ""
 "Unable to connect to file.\n"
@@ -491,30 +462,30 @@ msgstr ""
 "Kan geen verbinding maken met bestand.\n"
 "Controleer de URL en probeer het opnieuw."
 
-#: /resources/lib/modules/providers/install_manager.py:162
+#: /resources/lib/modules/providers/install_manager.py:146
 msgctxt "#30079"
 msgid "Please note, this package does not provide automatic updates"
 msgstr "Let op, dit pakket biedt geen automatische updates"
 
-#: /resources/lib/modules/providers/install_manager.py:294
+#: /resources/lib/modules/providers/install_manager.py:272
 msgctxt "#30080"
 msgid "{} package has been updated"
 msgstr "{} pakket is bijgewerkt"
 
-#: /resources/lib/database/skinManager/__init__.py:255
-#: /resources/lib/database/skinManager/__init__.py:284
-#: /resources/lib/modules/providers/install_manager.py:307
+#: /resources/lib/database/skinManager/__init__.py:219
+#: /resources/lib/database/skinManager/__init__.py:247
+#: /resources/lib/modules/providers/install_manager.py:284
 msgctxt "#30081"
 msgid "There are currently no updates available"
 msgstr "Er zijn momenteel geen updates beschikbaar"
 
-#: /resources/lib/database/skinManager/__init__.py:246
-#: /resources/lib/modules/providers/install_manager.py:379
+#: /resources/lib/database/skinManager/__init__.py:211
+#: /resources/lib/modules/providers/install_manager.py:368
 msgctxt "#30082"
 msgid "Checking for available package updates"
 msgstr "Controleren op beschikbare pakketupdates"
 
-#: /resources/lib/common/maintenance.py:68
+#: /resources/lib/common/maintenance.py:61
 msgctxt "#30083"
 msgid ""
 "This will completely wipe your addon settings.\n"
@@ -523,430 +494,410 @@ msgstr ""
 "Hiermee worden uw add-on-instellingen volledig gewist.\n"
 " Weet je helemaal zeker dat je dit wilt doen?"
 
-#: /resources/settings.xml:4 /resources/settings.xml:207
-#: /resources/settings.xml:316 /resources/settings.xml:331
-#: /resources/settings.xml:779
+#: /resources/settings.xml:3 /resources/settings.xml:802
+#: /resources/settings.xml:1195 /resources/settings.xml:1222
+#: /resources/settings.xml:1900
 msgctxt "#30084"
 msgid "General"
 msgstr "Algemeen"
 
-#: /resources/settings.xml:782
+#: /resources/settings.xml:1912
 msgctxt "#30085"
 msgid "Episode Play Style"
 msgstr "Aflevering speelstijl"
 
-#: /resources/settings.xml:781 /resources/settings.xml:783
+#: /resources/settings.xml:1906 /resources/settings.xml:1917
 msgctxt "#30086"
 msgid "Auto Play"
 msgstr "Automatisch afspelen"
 
-#: /resources/settings.xml:781 /resources/settings.xml:783
+#: /resources/settings.xml:1907 /resources/settings.xml:1918
 msgctxt "#30087"
 msgid "Source Select"
 msgstr "Bronselectie"
 
-#: /resources/settings.xml:31
+#: /resources/settings.xml:92
 msgctxt "#30088"
 msgid "Next Up Sort Style"
 msgstr "Next Up sorteerstijl"
 
-#: /resources/settings.xml:33
+#: /resources/settings.xml:97
 msgctxt "#30089"
 msgid "Release Date"
 msgstr "Datum van publicatie"
 
-#: /resources/settings.xml:33 /resources/lib/gui/tvshowMenus.py:206
+#: /resources/settings.xml:98 /resources/lib/gui/tvshowMenus.py:230
 msgctxt "#30090"
 msgid "Recently Watched"
 msgstr "Onlangs bekeken"
 
-#: /resources/settings.xml:103
+#: /resources/settings.xml:381
 msgctxt "#30091"
 msgid "Metadata location"
 msgstr "Metadata locatie"
 
-#: /resources/settings.xml:44
+#: /resources/settings.xml:147
 msgctxt "#30092"
 msgid "Page Item Limit"
 msgstr "Limiet pagina items"
 
-#: /resources/settings.xml:873
+#: /resources/settings.xml:2225
 msgctxt "#30093"
 msgid "Use Custom View IDs (Advanced)"
 msgstr "Aangepaste weergave ID's gebruiken (geavanceerd)"
 
-#: /resources/settings.xml:883
+#: /resources/settings.xml:2276
 msgctxt "#30094"
 msgid "Movie View"
 msgstr "Film weergave"
 
-#: /resources/settings.xml:887
+#: /resources/settings.xml:2302 /resources/settings.xml:2314
 msgctxt "#30095"
 msgid "Movie View ID"
 msgstr "Film weergave ID"
 
-#: /resources/settings.xml:890
+#: /resources/settings.xml:2317
 msgctxt "#30096"
 msgid "Show View"
 msgstr "Series weergave"
 
-#: /resources/settings.xml:894
+#: /resources/settings.xml:2343 /resources/settings.xml:2355
 msgctxt "#30097"
 msgid "Show View ID"
 msgstr "Series weergave ID"
 
-#: /resources/settings.xml:897
+#: /resources/settings.xml:2358
 msgctxt "#30098"
 msgid "Episode View"
 msgstr "Aflevering weergave"
 
-#: /resources/settings.xml:901
+#: /resources/settings.xml:2384 /resources/settings.xml:2396
 msgctxt "#30099"
 msgid "Episode View ID"
 msgstr "Aflevering weergave ID"
 
-#: /resources/settings.xml:904
+#: /resources/settings.xml:2399
 msgctxt "#30100"
 msgid "Season View"
 msgstr "Seizoen weergave"
 
-#: /resources/settings.xml:908
+#: /resources/settings.xml:2425 /resources/settings.xml:2437
 msgctxt "#30101"
 msgid "Season View ID"
 msgstr "Seizoen weergave ID"
 
-#: /resources/settings.xml:81
+#: /resources/settings.xml:320
 msgctxt "#30102"
 msgid "Select Text Highlight Color..."
 msgstr "Selecteer tekst markering kleur ..."
 
-#: /resources/settings.xml:79
+#: /resources/settings.xml:312 /resources/settings.xml:317
 msgctxt "#30103"
 msgid "Current Color"
 msgstr "Huidige kleur"
 
-#: /resources/settings.xml:805
+#: /resources/settings.xml:1993
 msgctxt "#30104"
 msgid "Enable Playing Next Dialog"
 msgstr "Dialoogvenster volgende aflevering inschakelen"
 
-#: /resources/settings.xml:807
+#: /resources/settings.xml:2006
 msgctxt "#30105"
 msgid "Minimum Seconds Left Before Showing Dialog"
 msgstr "Minimaal aantal seconden voordat het dialoogvenster wordt weergegeven"
 
-#: /resources/settings.xml:799
+#: /resources/settings.xml:1962
 msgctxt "#30106"
 msgid "Enable Smart Play"
 msgstr "Smart Play inschakelen"
 
-#: /resources/settings.xml:787
+#: /resources/settings.xml:1925
 msgctxt "#30107"
 msgid "Auto Resume Shows from Next Unwatched Episode"
 msgstr ""
 "Automatisch hervatten wordt weergegeven vanaf de volgende niet-bekeken "
 "aflevering"
 
-#: /resources/settings.xml:800
+#: /resources/settings.xml:1967
 msgctxt "#30108"
 msgid "Pre-emptive Scraping"
 msgstr "Preventief scrapen"
 
-#: /resources/settings.xml:788
+#: /resources/settings.xml:1930
 msgctxt "#30109"
 msgid "Watched Progress Resume Style"
 msgstr "Hervatten stijl"
 
-#: /resources/settings.xml:328
+#: /resources/settings.xml:1221
 msgctxt "#30110"
 msgid "Scraping"
 msgstr "Scraper"
 
-#: /resources/settings.xml:334
+#: /resources/settings.xml:1234
 msgctxt "#30111"
 msgid "Cache Torrent Info Locally"
 msgstr "Cache Torrent-informatie lokaal"
 
-#: /resources/settings.xml:335
+#: /resources/settings.xml:1239
 msgctxt "#30112"
 msgid "Timeout"
 msgstr "Time-out"
 
-#: /resources/settings.xml:354
+#: /resources/settings.xml:1283
 msgctxt "#30113"
 msgid "Auto Caching Assistant"
 msgstr "Automatische cache-assistent"
 
-#: /resources/settings.xml:355
+#: /resources/settings.xml:1284
 msgctxt "#30114"
 msgid "Auto Add Un-Cached Sources to Debrid"
 msgstr "Automatisch niet gecashte bronnen toevoegen aan Debrid"
 
-#: /resources/settings.xml:356
+#: /resources/settings.xml:1289
 msgctxt "#30115"
 msgid "Assist Mode"
 msgstr "Hulpmodus"
 
-#: /resources/settings.xml:360
+#: /resources/settings.xml:1305
 msgctxt "#30116"
 msgid "Preferred Cloud Location"
 msgstr "Gewenste cloud locatie"
 
-#: /resources/settings.xml:399
+#: /resources/settings.xml:1441
 msgctxt "#30117"
 msgid "Source Filters"
 msgstr "Bronfilters"
 
-#: /resources/settings.xml:406
+#: /resources/settings.xml:1478
 msgctxt "#30118"
 msgid "Enable File Size Limit"
 msgstr "Beperk bestand grootte inschakelen"
 
-#: /resources/settings.xml:411
+#: /resources/settings.xml:1500
 msgctxt "#30119"
 msgid "Episode File Size limit (GB)"
 msgstr "Aflevering bestand grootte limiet (GB)"
 
-#: /resources/settings.xml:402
+#: /resources/settings.xml:1452
 msgctxt "#30120"
 msgid "Max Resolution"
 msgstr "Max resolutie"
 
-#: /resources/settings.xml:366
+#: /resources/settings.xml:1323
 msgctxt "#30121"
 msgid "Preemptive Termination"
 msgstr "Preventieve beëindiging"
 
-#: /resources/settings.xml:367
+#: /resources/settings.xml:1324
 msgctxt "#30122"
 msgid "Enable Preemptive Termination"
 msgstr "Schakel preventieve beëindiging in"
 
-#: /resources/settings.xml:368
+#: /resources/settings.xml:1329
 msgctxt "#30123"
 msgid "Minimum Movie Resolution"
 msgstr "Minimale filmresolutie"
 
-#: /resources/settings.xml:372
+#: /resources/settings.xml:1347
 msgctxt "#30124"
 msgid "Minimum TV Shows Resolution"
 msgstr "Minimale resolutie series"
 
-#: /resources/settings.xml:376
+#: /resources/settings.xml:1365
 msgctxt "#30125"
 msgid "Minimum Sources"
 msgstr "Minimaal aantal bronnen"
 
-#: /resources/settings.xml:380
+#: /resources/settings.xml:1381
 msgctxt "#30126"
 msgid "Terminate on... "
 msgstr "Beëindigen op ... "
 
-#: /resources/settings.xml:204
+#: /resources/settings.xml:801
 msgctxt "#30127"
 msgid "Accounts"
 msgstr "Accounts"
 
-#: /resources/settings.xml:208
+#: /resources/settings.xml:803
 msgctxt "#30128"
 msgid "Enable Account Expiry Notifications"
 msgstr "Meldingen over het verlopen van accounts inschakelen"
 
-#: /resources/settings.xml:104 /resources/settings.xml:211
+#: /resources/settings.xml:386 /resources/settings.xml:809
 msgctxt "#30129"
 msgid "Trakt"
 msgstr "Trakt"
 
-#: /resources/settings.xml:213
+#: /resources/settings.xml:811 /resources/settings.xml:819
 msgctxt "#30130"
 msgid "Trakt Username"
 msgstr "Trakt gebruikersnaam"
 
-#: /resources/settings.xml:215
+#: /resources/settings.xml:822
 msgctxt "#30131"
 msgid "Authorize Trakt..."
 msgstr "Autoriseer Trakt ..."
 
-#: /resources/settings.xml:218
+#: /resources/settings.xml:837
 msgctxt "#30132"
 msgid "Enable Trakt Scrobbling"
 msgstr "Schakel Trakt Scrobbling in"
 
-#: /resources/settings.xml:228
+#: /resources/settings.xml:885
 msgctxt "#30133"
 msgid "Revoke Trakt Authentication..."
 msgstr "Trakt verificatie intrekken ..."
 
-#: /resources/settings.xml:233 /resources/settings.xml:361
-#: /resources/settings.xml:459 /resources/settings.xml:463
-#: /resources/settings.xml:467 /resources/settings.xml:502
-#: /resources/settings.xml:506 /resources/settings.xml:510
-#: /resources/settings.xml:545 /resources/settings.xml:549
-#: /resources/settings.xml:553 /resources/settings.xml:588
-#: /resources/settings.xml:592 /resources/settings.xml:596
-#: /resources/settings.xml:631 /resources/settings.xml:635
-#: /resources/settings.xml:639 /resources/settings.xml:674
-#: /resources/settings.xml:678 /resources/settings.xml:682
-#: /resources/settings.xml:717 /resources/settings.xml:721
-#: /resources/settings.xml:725 /resources/settings.xml:760
-#: /resources/settings.xml:764 /resources/settings.xml:768
+#: /resources/settings.xml:901 /resources/settings.xml:1310
+#: /resources/settings.xml:1864 /resources/settings.xml:1877
+#: /resources/settings.xml:1890 /resources/lib/gui/windows/sort_select.py:10
 msgctxt "#30134"
 msgid "Premiumize"
 msgstr "Premiumize"
 
-#: /resources/settings.xml:266 /resources/settings.xml:361
-#: /resources/settings.xml:459 /resources/settings.xml:463
-#: /resources/settings.xml:467 /resources/settings.xml:502
-#: /resources/settings.xml:506 /resources/settings.xml:510
-#: /resources/settings.xml:545 /resources/settings.xml:549
-#: /resources/settings.xml:553 /resources/settings.xml:588
-#: /resources/settings.xml:592 /resources/settings.xml:596
-#: /resources/settings.xml:631 /resources/settings.xml:635
-#: /resources/settings.xml:639 /resources/settings.xml:674
-#: /resources/settings.xml:678 /resources/settings.xml:682
-#: /resources/settings.xml:717 /resources/settings.xml:721
-#: /resources/settings.xml:725 /resources/settings.xml:760
-#: /resources/settings.xml:764 /resources/settings.xml:768
+#: /resources/settings.xml:1025 /resources/settings.xml:1311
+#: /resources/settings.xml:1865 /resources/settings.xml:1878
+#: /resources/settings.xml:1891 /resources/lib/gui/windows/sort_select.py:10
 msgctxt "#30135"
 msgid "Real-Debrid"
 msgstr "Real-Debrid"
 
-#: /resources/settings.xml:313
-#: /resources/lib/modules/providers/install_manager.py:55
+#: /resources/settings.xml:1194
+#: /resources/lib/modules/providers/install_manager.py:42
 msgctxt "#30136"
 msgid "Providers"
 msgstr "Providers"
 
-#: /resources/settings.xml:913
+#: /resources/settings.xml:2441
 msgctxt "#30137"
 msgid "Optional API Keys"
 msgstr "Optionele API-sleutels"
 
-#: /resources/settings.xml:317
+#: /resources/settings.xml:1196
 msgctxt "#30138"
 msgid "Enable Automatic Provider Updates"
 msgstr "Schakel automatische providerupdates in"
 
-#: /resources/settings.xml:95 /resources/settings.xml:321
-#: /resources/lib/gui/homeMenu.py:107
+#: /resources/settings.xml:369 /resources/settings.xml:1203
+#: /resources/lib/gui/homeMenu.py:172
 msgctxt "#30139"
 msgid "Check For Updates"
 msgstr "Controleren op updates"
 
-#: /resources/settings.xml:320 /resources/settings.xml:323
-#: /resources/lib/gui/homeMenu.py:111
+#: /resources/settings.xml:1202 /resources/settings.xml:1211
+#: /resources/lib/gui/homeMenu.py:179
 msgctxt "#30140"
 msgid "Manage Provider Packages"
 msgstr "Beheer providerpakketten"
 
-#: /resources/settings.xml:872
+#: /resources/settings.xml:2220
 msgctxt "#30141"
 msgid "Force view types on menus"
 msgstr "Forceer weergavetypen in menu's"
 
-#: /resources/settings.xml:824
+#: /resources/settings.xml:2081
 msgctxt "#30142"
 msgid "Shortcuts"
 msgstr "Snelkoppelingen"
 
-#: /resources/settings.xml:24
+#: /resources/settings.xml:77
 msgctxt "#30143"
 msgid "Mixed Episode Lists Title Display Style"
 msgstr "Lijst met gemengde afleveringen weergave stijl"
 
-#: /resources/settings.xml:914
+#: /resources/settings.xml:2442 /resources/settings.xml:2449
 msgctxt "#30144"
 msgid "TMDb API Key"
 msgstr "TMDb API sleutel"
 
-#: /resources/settings.xml:916
+#: /resources/settings.xml:2462 /resources/settings.xml:2469
 msgctxt "#30145"
 msgid "Trakt Client ID"
 msgstr "Trakt Client ID"
 
-#: /resources/settings.xml:917
+#: /resources/settings.xml:2472 /resources/settings.xml:2479
 msgctxt "#30146"
 msgid "Trakt Client Secret"
 msgstr "Trakt Client Secret"
 
-#: /resources/settings.xml:915
+#: /resources/settings.xml:2452 /resources/settings.xml:2459
 msgctxt "#30147"
 msgid "TVDB API Key"
 msgstr "TVDB API sleutel"
 
-#: /resources/settings.xml:396
+#: /resources/settings.xml:1440
 msgctxt "#30148"
 msgid "Sort & Filter"
 msgstr "Sorteer & Filter"
 
-#: /resources/settings.xml:427
+#: /resources/settings.xml:1559
 msgctxt "#30149"
 msgid "Source Sorting"
 msgstr "Bron sortering"
 
-#: /resources/settings.xml:275
+#: /resources/settings.xml:1063
 msgctxt "#30150"
 msgid "Authorize Real-Debrid..."
 msgstr "Autoriseer Real-Debrid ..."
 
-#: /resources/settings.xml:268
+#: /resources/settings.xml:1031 /resources/settings.xml:1044
 msgctxt "#30151"
 msgid "Real-Debrid Username"
 msgstr "Real-Debrid gebruikersnaam"
 
-#: /resources/settings.xml:267 /resources/settings.xml:344
+#: /resources/settings.xml:1026
 msgctxt "#30152"
 msgid "Enable Real-Debrid"
 msgstr "Schakel Real-Debrid in"
 
-#: /resources/settings.xml:246 /resources/settings.xml:278
-#: /resources/settings.xml:301
+#: /resources/settings.xml:954 /resources/settings.xml:1078
+#: /resources/settings.xml:1162
 msgctxt "#30153"
 msgid "Enable Torrents"
 msgstr "Schakel Torrents in"
 
-#: /resources/settings.xml:249 /resources/settings.xml:281
-#: /resources/settings.xml:304
+#: /resources/settings.xml:964 /resources/settings.xml:1088
+#: /resources/settings.xml:1172
 msgctxt "#30154"
 msgid "Enable Hosters"
 msgstr "Schakel Hosters in"
 
-#: /resources/settings.xml:284 /resources/settings.xml:307
+#: /resources/settings.xml:1098 /resources/settings.xml:1182
 msgctxt "#30155"
 msgid "Auto-Delete Torrents"
 msgstr "Torrents automatisch verwijderen"
 
-#: /resources/settings.xml:260
+#: /resources/settings.xml:1004
 msgctxt "#30156"
 msgid "Max Storage Space Used Before Deletion (GB)"
 msgstr "Max. Gebruikte opslagruimte vóór verwijdering (GB)"
 
-#: /resources/settings.xml:257
+#: /resources/settings.xml:994
 msgctxt "#30157"
 msgid "Automatic Cloud Removal"
 msgstr "Automatische verwijdering van de cloud"
 
-#: /resources/settings.xml:252
+#: /resources/settings.xml:974
 msgctxt "#30158"
 msgid "Prefer Transcoded Files"
 msgstr "Geef de voorkeur aan getranscodeerde bestanden"
 
-#: /resources/settings.xml:238
+#: /resources/settings.xml:922 /resources/settings.xml:935
 msgctxt "#30159"
 msgid "Premiumize Customer ID"
 msgstr "Premiumize klant ID"
 
-#: /resources/settings.xml:234 /resources/settings.xml:340
+#: /resources/settings.xml:902
 msgctxt "#30160"
 msgid "Enable Premiumize"
 msgstr "Schakel Premiumize in"
 
-#: /resources/settings.xml:8
+#: /resources/settings.xml:5
 msgctxt "#30161"
 msgid "Enable Search History"
 msgstr "Zoekgeschiedenis inschakelen"
 
-#: /resources/lib/indexers/trakt.py:476
+#: /resources/lib/indexers/trakt.py:428
 msgctxt "#30162"
 msgid ""
 "Unable to contact Trakt.\n"
@@ -957,22 +908,22 @@ msgstr ""
 "Controleer de uitvalstatus van Trakt op:\n"
 "http://status.trakt.tv"
 
-#: /resources/settings.xml:113
+#: /resources/settings.xml:437 /resources/settings.xml:444
 msgctxt "#30163"
 msgid "Fanart.TV API Key"
 msgstr "Fanart.TV API sleutel"
 
-#: /resources/settings.xml:118 /resources/settings.xml:155
+#: /resources/settings.xml:454 /resources/settings.xml:610
 msgctxt "#30164"
 msgid "Fanart.TV"
 msgstr "Fanart.TV"
 
-#: /resources/settings.xml:43
+#: /resources/settings.xml:142
 msgctxt "#30165"
 msgid "Delay Release Dates By a Day"
 msgstr "Vertraag de datum van publicatie met een dag"
 
-#: /resources/lib/modules/router.py:538
+#: /resources/lib/modules/router.py:515
 msgctxt "#30166"
 msgid ""
 "Another addon is attempting to install a provider into Seren\n"
@@ -981,7 +932,7 @@ msgstr ""
 "Een andere add-on probeert een provider in Seren . te installeren\n"
 " Wilt u dit toestaan?"
 
-#: /resources/lib/modules/providers/install_manager.py:106
+#: /resources/lib/modules/providers/install_manager.py:90
 msgctxt "#30167"
 msgid ""
 "{} failed to uninstall the package: {}\n"
@@ -990,7 +941,7 @@ msgstr ""
 "{} kan het pakket niet verwijderen: {}\n"
 "Dit kan handmatige verwijdering vereisen"
 
-#: /resources/lib/modules/router.py:550
+#: /resources/lib/modules/router.py:525
 msgctxt "#30168"
 msgid ""
 "Another addon is attempting to uninstall the {} provider from Seren\n"
@@ -999,58 +950,58 @@ msgstr ""
 "Een andere add-on probeert de {} provider van Seren . te verwijderen\n"
 " Wilt u dit toestaan?"
 
-#: /resources/lib/gui/tvshowMenus.py:154
+#: /resources/lib/gui/tvshowMenus.py:169
 msgctxt "#30169"
 msgid "Networks"
 msgstr "Netwerken"
 
-#: /resources/settings.xml:10
+#: /resources/settings.xml:15
 msgctxt "#30170"
 msgid "Hide Unaired Items"
 msgstr "Verberg niet uitgezonden items"
 
-#: /resources/lib/gui/movieMenus.py:146 /resources/lib/gui/tvshowMenus.py:159
+#: /resources/lib/gui/movieMenus.py:164 /resources/lib/gui/tvshowMenus.py:175
 msgctxt "#30171"
 msgid "Years"
 msgstr "Jaren"
 
-#: /resources/settings.xml:9
+#: /resources/settings.xml:10
 msgctxt "#30172"
 msgid "Hide Specials"
 msgstr "Verberg specials"
 
-#: /resources/lib/gui/homeMenu.py:26
+#: /resources/lib/gui/homeMenu.py:34
 msgctxt "#30173"
 msgid "My Files"
 msgstr "Mijn Bestanden"
 
-#: /resources/settings.xml:332
+#: /resources/settings.xml:1223
 msgctxt "#30174"
 msgid "Scraper Display Style"
 msgstr "Scraper weergave stijl"
 
-#: /resources/settings.xml:333 /resources/settings.xml:803
+#: /resources/settings.xml:1228 /resources/settings.xml:1982
 msgctxt "#30175"
 msgid "Fancy"
 msgstr "Luxe"
 
-#: /resources/settings.xml:333 /resources/settings.xml:803
+#: /resources/settings.xml:1229 /resources/settings.xml:1983
 msgctxt "#30176"
 msgid "Background Task"
 msgstr "Achtergrond taak"
 
-#: /resources/lib/database/trakt_sync/activities.py:188
+#: /resources/lib/database/trakt_sync/activities.py:176
 msgctxt "#30177"
 msgid "Rebuilding Trakt Sync Database, please be patient"
 msgstr "Wederopbouw Trakt Sync Database, wees alstublieft geduldig"
 
-#: /resources/lib/modules/router.py:177
+#: /resources/lib/modules/router.py:169
 msgctxt "#30178"
 msgid "Starting Source Select"
 msgstr "Bronselectie starten"
 
-#: /resources/lib/database/trakt_sync/__init__.py:452
-#: /resources/lib/database/trakt_sync/__init__.py:481
+#: /resources/lib/database/trakt_sync/__init__.py:443
+#: /resources/lib/database/trakt_sync/__init__.py:470
 msgctxt "#30179"
 msgid ""
 "[COLOR red]WARNING[/COLOR]\n"
@@ -1059,46 +1010,46 @@ msgstr ""
 "[COLOR red]WAARSCHUWING[/COLOR]\n"
 "Hiermee worden alle meta informatie gereset, weet je het zeker?"
 
-#: /resources/settings.xml:832 /resources/lib/gui/homeMenu.py:79
-#: /resources/lib/gui/movieMenus.py:291 /resources/lib/gui/tvshowMenus.py:423
-#: /resources/lib/gui/tvshowMenus.py:427
+#: /resources/settings.xml:2099 /resources/lib/gui/homeMenu.py:126
+#: /resources/lib/gui/movieMenus.py:309 /resources/lib/gui/tvshowMenus.py:431
+#: /resources/lib/gui/tvshowMenus.py:435
 msgctxt "#30180"
 msgid "Clear Search History"
 msgstr "Zoekgeschiedenis wissen"
 
-#: /resources/lib/gui/movieMenus.py:286
+#: /resources/lib/gui/movieMenus.py:304
 msgctxt "#30181"
 msgid "New Movie Search..."
 msgstr "Nieuwe film zoekopdracht ..."
 
-#: /resources/lib/gui/tvshowMenus.py:418
+#: /resources/lib/gui/tvshowMenus.py:426
 msgctxt "#30182"
 msgid "New Show Search..."
 msgstr "Nieuwe serie zoekopdracht ..."
 
-#: /resources/settings.xml:255
+#: /resources/settings.xml:984
 msgctxt "#30183"
 msgid "Store resolved items in cloud"
 msgstr "Bewaar gevonden items in de cloud"
 
-#: /resources/settings.xml:876
+#: /resources/settings.xml:2235
 msgctxt "#30184"
 msgid "General Menu View"
 msgstr "Algemene menuweergave"
 
-#: /resources/settings.xml:880
+#: /resources/settings.xml:2261 /resources/settings.xml:2273
 msgctxt "#30185"
 msgid "General Menu View ID"
 msgstr "Algemeen menuweergave ID"
 
-#: /resources/lib/modules/cacheAssist.py:451
-#: /resources/lib/modules/router.py:129
+#: /resources/lib/modules/cacheAssist.py:403
+#: /resources/lib/modules/router.py:128
 msgctxt "#30186"
 msgid "[COLOR red]Error:[/COLOR] No Debrid accounts were identified."
 msgstr ""
 "[COLOR red]Fout:[/COLOR] Er zijn geen Debrid-accounts geïdentificeerd."
 
-#: /resources/lib/modules/router.py:130
+#: /resources/lib/modules/router.py:129
 msgctxt "#30187"
 msgid ""
 "Please setup your accounts in the settings menu before attempting to play an"
@@ -1107,37 +1058,37 @@ msgstr ""
 "Stel uw accounts in het instellingenmenu in voordat u probeert een item af "
 "te spelen"
 
-#: /resources/settings.xml:387
+#: /resources/settings.xml:1408
 msgctxt "#30188"
 msgid "Terminate if Cloud Sources are Found"
 msgstr "Beëindigen als cloudbronnen worden gevonden"
 
-#: /resources/settings.xml:339
+#: /resources/settings.xml:1251
 msgctxt "#30189"
 msgid "Cloud Scraping"
 msgstr "Cloud Scraping"
 
-#: /resources/lib/gui/movieMenus.py:151 /resources/lib/gui/tvshowMenus.py:169
+#: /resources/lib/gui/movieMenus.py:170 /resources/lib/gui/tvshowMenus.py:187
 msgctxt "#30190"
 msgid "By Actor..."
 msgstr "Op acteur ..."
 
-#: /resources/settings.xml:780
+#: /resources/settings.xml:1901
 msgctxt "#30191"
 msgid "Movie Play Style"
 msgstr "Film afspeelstijl"
 
-#: /resources/settings.xml:407
+#: /resources/settings.xml:1483
 msgctxt "#30192"
 msgid "Movie File Size limit (GB)"
 msgstr "Film bestandsgrootte limiet (GB)"
 
-#: /resources/settings.xml:869
+#: /resources/settings.xml:2205
 msgctxt "#30193"
 msgid "Enable Kodi Menu Caching"
 msgstr "Schakel Kodi Menu Caching in"
 
-#: /resources/lib/debrid/real_debrid.py:112
+#: /resources/lib/debrid/real_debrid.py:102
 msgctxt "#30194"
 msgid ""
 "Please Note\n"
@@ -1146,13 +1097,13 @@ msgstr ""
 "Houd er rekening mee dat\n"
 "Het lijkt erop dat je een niet premium account hebt geautoriseerd waarmee je geen items kunt spelen"
 
-#: /resources/settings.xml:793
+#: /resources/settings.xml:1944
 msgctxt "#30195"
 msgid "Auto try next link on resolve failure (Source Select)"
 msgstr ""
 "Automatisch volgende link proberen bij mislukte oplossing (bronselectie)"
 
-#: /resources/lib/database/skinManager/__init__.py:360
+#: /resources/lib/database/skinManager/__init__.py:322
 msgctxt "#30196"
 msgid ""
 "Successfully installed {} - {}\n"
@@ -1161,42 +1112,42 @@ msgstr ""
 "Succesvol geïnstalleerd {} - {}\n"
 "Wilt u overschakelen naar dit thema?"
 
-#: /resources/lib/database/skinManager/__init__.py:404
+#: /resources/lib/database/skinManager/__init__.py:360
 msgctxt "#30197"
 msgid "Are you sure you wish to uninstall the theme {}?"
 msgstr "Weet u zeker dat u het thema {} wilt verwijderen?"
 
-#: /resources/lib/database/skinManager/__init__.py:429
+#: /resources/lib/database/skinManager/__init__.py:380
 msgctxt "#30198"
 msgid "Successfully uninstalled {}"
 msgstr "Succesvol verwijderd {}"
 
-#: /resources/settings.xml:75 /resources/settings.xml:85
+#: /resources/settings.xml:310 /resources/settings.xml:331
 msgctxt "#30199"
 msgid "Themes"
 msgstr "Thema’s"
 
-#: /resources/settings.xml:87
+#: /resources/settings.xml:337 /resources/settings.xml:342
 msgctxt "#30200"
 msgid "Active theme"
 msgstr "Actief thema"
 
-#: /resources/settings.xml:93
+#: /resources/settings.xml:361
 msgctxt "#30201"
 msgid "Switch theme"
 msgstr "Van thema wisselen"
 
-#: /resources/settings.xml:91
+#: /resources/settings.xml:353
 msgctxt "#30202"
 msgid "Uninstall theme"
 msgstr "Verwijder thema"
 
-#: /resources/settings.xml:89
+#: /resources/settings.xml:345
 msgctxt "#30203"
 msgid "Install theme"
 msgstr "Installeer thema"
 
-#: /resources/lib/database/skinManager/__init__.py:413
+#: /resources/lib/database/skinManager/__init__.py:367
 msgctxt "#30204"
 msgid ""
 "You are attempting to uninstall the active theme, this will switch you to "
@@ -1205,27 +1156,27 @@ msgstr ""
 "U probeert het actieve thema te verwijderen, hierdoor schakelt u over naar "
 "het standaardthema."
 
-#: /resources/lib/database/skinManager/__init__.py:386
+#: /resources/lib/database/skinManager/__init__.py:344
 msgctxt "#30205"
 msgid "Succesfully Switched to {}"
 msgstr "Succesvol overgeschakeld naar {}"
 
-#: /resources/lib/database/skinManager/__init__.py:350
+#: /resources/lib/database/skinManager/__init__.py:313
 msgctxt "#30206"
 msgid "The theme name {} is not allowed"
 msgstr "De themanaam {} is niet toegestaan"
 
-#: /resources/lib/database/searchHistory/__init__.py:73
+#: /resources/lib/database/searchHistory/__init__.py:70
 msgctxt "#30207"
 msgid "Are you sure you wish to clear the search history?"
 msgstr "Weet u zeker dat u de zoekgeschiedenis wilt wissen?"
 
-#: /resources/settings.xml:20
+#: /resources/settings.xml:54
 msgctxt "#30208"
 msgid "Flatten Season Episodes"
 msgstr "Afleveringen van seizoenen afvlakken"
 
-#: /resources/lib/database/skinManager/__init__.py:113
+#: /resources/lib/database/skinManager/__init__.py:92
 msgctxt "#30209"
 msgid ""
 "This theme package appears to be invalid, please refer to the log for more "
@@ -1236,170 +1187,170 @@ msgstr ""
 
 #: /resources/skins/Default/1080i/still_watching.xml:131
 #: /resources/skins/Default/1080i/playing_next.xml:122
-#: /resources/lib/gui/tvshowMenus.py:211
+#: /resources/lib/gui/tvshowMenus.py:236
 msgctxt "#30210"
 msgid "Next Up"
 msgstr "Volgende afleveringen"
 
-#: /resources/lib/gui/tvshowMenus.py:216
+#: /resources/lib/gui/tvshowMenus.py:242
 msgctxt "#30211"
 msgid "Upcoming Episodes"
 msgstr "Aankomende afleveringen"
 
-#: /resources/lib/gui/tvshowMenus.py:221
+#: /resources/lib/gui/tvshowMenus.py:248
 msgctxt "#30212"
 msgid "Unfinished Shows in Collection"
 msgstr "Onvoltooide series in collectie"
 
-#: /resources/lib/gui/tvshowMenus.py:226
+#: /resources/lib/gui/tvshowMenus.py:254
 msgctxt "#30213"
 msgid "Recent Episodes"
 msgstr "Recente afleveringen"
 
-#: /resources/lib/gui/tvshowMenus.py:231
+#: /resources/lib/gui/tvshowMenus.py:260
 msgctxt "#30214"
 msgid "My Show Lists"
 msgstr "Mijn serie lijsten"
 
-#: /resources/settings.xml:838 /resources/lib/gui/homeMenu.py:91
+#: /resources/settings.xml:2118 /resources/lib/gui/homeMenu.py:147
 msgctxt "#30215"
 msgid "Trakt Sync Tools"
 msgstr "Trakt Sync gereedschap"
 
-#: /resources/settings.xml:839 /resources/lib/gui/homeMenu.py:120
+#: /resources/settings.xml:2119 /resources/lib/gui/homeMenu.py:191
 msgctxt "#30216"
 msgid "Clear last sync time"
 msgstr "Wis laatste synchronisatietijd"
 
-#: /resources/settings.xml:841 /resources/lib/gui/homeMenu.py:124
+#: /resources/settings.xml:2127 /resources/lib/gui/homeMenu.py:198
 msgctxt "#30217"
 msgid "Force a sync with Trakt"
 msgstr "Forceer een synchronisatie met Trakt"
 
-#: /resources/settings.xml:843 /resources/lib/gui/homeMenu.py:128
+#: /resources/settings.xml:2135 /resources/lib/gui/homeMenu.py:205
 msgctxt "#30218"
 msgid "Rebuild Database"
 msgstr "Database opnieuw opbouwen"
 
-#: /resources/lib/gui/debridServices.py:19
+#: /resources/lib/gui/debridServices.py:18
 msgctxt "#30219"
 msgid "Cache Assist History"
 msgstr "Cache Assist geschiedenis"
 
-#: /resources/lib/gui/debridServices.py:21
+#: /resources/lib/gui/debridServices.py:24
 msgctxt "#30220"
 msgid "Current Premiumize Transfers"
 msgstr "Huidige Premiumize overdrachten"
 
-#: /resources/lib/gui/debridServices.py:23
+#: /resources/lib/gui/debridServices.py:30
 msgctxt "#30221"
 msgid "Current Real-Debrid Transfers"
 msgstr "Huidige Real-Debrid overdrachten"
 
-#: /resources/lib/gui/debridServices.py:27
+#: /resources/lib/gui/debridServices.py:37
 msgctxt "#30222"
 msgid "Clear Non Active..."
 msgstr "Wis niet actief ..."
 
-#: /resources/settings.xml:877 /resources/settings.xml:884
-#: /resources/settings.xml:891 /resources/settings.xml:898
-#: /resources/settings.xml:905
+#: /resources/settings.xml:2240 /resources/settings.xml:2281
+#: /resources/settings.xml:2322 /resources/settings.xml:2363
+#: /resources/settings.xml:2404
 msgctxt "#30223"
 msgid "Default"
 msgstr "Standaard"
 
-#: /resources/settings.xml:121 /resources/settings.xml:158
-#: /resources/settings.xml:186 /resources/settings.xml:877
-#: /resources/settings.xml:884 /resources/settings.xml:891
-#: /resources/settings.xml:898 /resources/settings.xml:905
+#: /resources/settings.xml:470 /resources/settings.xml:627
+#: /resources/settings.xml:2241 /resources/settings.xml:2282
+#: /resources/settings.xml:2323 /resources/settings.xml:2364
+#: /resources/settings.xml:2405
 msgctxt "#30224"
 msgid "Poster"
 msgstr "Poster"
 
-#: /resources/settings.xml:877 /resources/settings.xml:884
-#: /resources/settings.xml:891 /resources/settings.xml:898
-#: /resources/settings.xml:905
+#: /resources/settings.xml:2242 /resources/settings.xml:2283
+#: /resources/settings.xml:2324 /resources/settings.xml:2365
+#: /resources/settings.xml:2406
 msgctxt "#30225"
 msgid "Icon Wall"
 msgstr "Icon Wall"
 
-#: /resources/settings.xml:877 /resources/settings.xml:884
-#: /resources/settings.xml:891 /resources/settings.xml:898
-#: /resources/settings.xml:905
+#: /resources/settings.xml:2243 /resources/settings.xml:2284
+#: /resources/settings.xml:2325 /resources/settings.xml:2366
+#: /resources/settings.xml:2407
 msgctxt "#30226"
 msgid "Shift"
 msgstr "Shift"
 
-#: /resources/settings.xml:877 /resources/settings.xml:884
-#: /resources/settings.xml:891 /resources/settings.xml:898
-#: /resources/settings.xml:905
+#: /resources/settings.xml:2244 /resources/settings.xml:2285
+#: /resources/settings.xml:2326 /resources/settings.xml:2367
+#: /resources/settings.xml:2408
 msgctxt "#30227"
 msgid "Info Wall"
 msgstr "Info Wall"
 
-#: /resources/settings.xml:877 /resources/settings.xml:884
-#: /resources/settings.xml:891 /resources/settings.xml:898
-#: /resources/settings.xml:905
+#: /resources/settings.xml:2245 /resources/settings.xml:2286
+#: /resources/settings.xml:2327 /resources/settings.xml:2368
+#: /resources/settings.xml:2409
 msgctxt "#30228"
 msgid "Wide List"
 msgstr "Wide List"
 
-#: /resources/settings.xml:877 /resources/settings.xml:884
-#: /resources/settings.xml:891 /resources/settings.xml:898
-#: /resources/settings.xml:905
+#: /resources/settings.xml:2246 /resources/settings.xml:2287
+#: /resources/settings.xml:2328 /resources/settings.xml:2369
+#: /resources/settings.xml:2410
 msgctxt "#30229"
 msgid "Wall"
 msgstr "Wall"
 
-#: /resources/settings.xml:129 /resources/settings.xml:166
-#: /resources/settings.xml:189 /resources/settings.xml:877
-#: /resources/settings.xml:884 /resources/settings.xml:891
-#: /resources/settings.xml:898 /resources/settings.xml:905
+#: /resources/settings.xml:504 /resources/settings.xml:661
+#: /resources/settings.xml:2247 /resources/settings.xml:2288
+#: /resources/settings.xml:2329 /resources/settings.xml:2370
+#: /resources/settings.xml:2411
 msgctxt "#30230"
 msgid "Banner"
 msgstr "Banner"
 
-#: /resources/settings.xml:125 /resources/settings.xml:162
-#: /resources/settings.xml:195 /resources/settings.xml:198
-#: /resources/settings.xml:877 /resources/settings.xml:884
-#: /resources/settings.xml:891 /resources/settings.xml:898
-#: /resources/settings.xml:905
+#: /resources/settings.xml:487 /resources/settings.xml:644
+#: /resources/settings.xml:2248 /resources/settings.xml:2289
+#: /resources/settings.xml:2330 /resources/settings.xml:2371
+#: /resources/settings.xml:2412
 msgctxt "#30231"
 msgid "Fanart"
 msgstr "Fanart"
 
-#: /resources/settings.xml:357 /resources/settings.xml:789
+#: /resources/settings.xml:1294 /resources/settings.xml:1936
 msgctxt "#30232"
 msgid "Automatic"
 msgstr "Automatisch"
 
-#: /resources/settings.xml:357
+#: /resources/settings.xml:1295
 msgctxt "#30233"
 msgid "Manual Selection"
 msgstr "Handmatig selecteren"
 
-#: /resources/settings.xml:381
+#: /resources/settings.xml:1386
 msgctxt "#30234"
 msgid "Torrents Only"
 msgstr "Alleen Torrents"
 
-#: /resources/settings.xml:381
+#: /resources/settings.xml:1387
 msgctxt "#30235"
 msgid "Hosters Only"
 msgstr "Alleen hosters"
 
-#: /resources/settings.xml:381
+#: /resources/settings.xml:1388
 msgctxt "#30236"
 msgid "Torrents/Hosters"
 msgstr "Torrents / Hosters"
 
-#: /resources/settings.xml:433 /resources/settings.xml:475
-#: /resources/settings.xml:518 /resources/settings.xml:561
-#: /resources/settings.xml:604 /resources/settings.xml:647
-#: /resources/settings.xml:690 /resources/settings.xml:733
-#: /resources/skins/Default/1080i/resolver.xml:171
-#: /resources/skins/Default/1080i/manual_caching.xml:384
-#: /resources/skins/Default/1080i/source_select.xml:388
+#: /resources/settings.xml:1581 /resources/settings.xml:1604
+#: /resources/settings.xml:1627 /resources/settings.xml:1650
+#: /resources/settings.xml:1673 /resources/settings.xml:1696
+#: /resources/settings.xml:1719 /resources/settings.xml:1742
+#: /resources/skins/Default/1080i/resolver.xml:169
+#: /resources/skins/Default/1080i/manual_caching.xml:415
+#: /resources/skins/Default/1080i/source_select.xml:406
+#: /resources/lib/gui/windows/sort_select.py:4
 msgctxt "#30237"
 msgid "Resolution"
 msgstr "Resolutie"
@@ -1409,12 +1360,12 @@ msgctxt "#30238"
 msgid "Install Package"
 msgstr "Installeer package"
 
-#: /resources/lib/gui/windows/provider_packages.py:82
+#: /resources/lib/gui/windows/provider_packages.py:80
 msgctxt "#30239"
 msgid "Uninstall Package"
 msgstr "Pakket verwijderen"
 
-#: /resources/lib/gui/windows/provider_packages.py:81
+#: /resources/lib/gui/windows/provider_packages.py:79
 msgctxt "#30240"
 msgid "Enable Package"
 msgstr "Inschakelen Pakket"
@@ -1424,277 +1375,242 @@ msgctxt "#30241"
 msgid "Disable Package"
 msgstr "Schakel pakket uit"
 
-#: /resources/skins/Default/1080i/configure_provider_package.xml:685
+#: /resources/skins/Default/1080i/configure_provider_package.xml:817
 msgctxt "#30242"
 msgid "Enable All Hosters"
 msgstr "Schakel alle hosters in"
 
-#: /resources/skins/Default/1080i/configure_provider_package.xml:696
+#: /resources/skins/Default/1080i/configure_provider_package.xml:828
 msgctxt "#30243"
 msgid "Enable All Torrents"
 msgstr "Schakel alle torrents in"
 
-#: /resources/skins/Default/1080i/configure_provider_package.xml:707
+#: /resources/skins/Default/1080i/configure_provider_package.xml:839
 msgctxt "#30244"
 msgid "Disable All Hosters"
 msgstr "Schakel alle hosters uit"
 
-#: /resources/skins/Default/1080i/configure_provider_package.xml:718
+#: /resources/skins/Default/1080i/configure_provider_package.xml:850
 msgctxt "#30245"
 msgid "Disable All Torrents"
 msgstr "Schakel alle torrents uit"
 
-#: /resources/skins/Default/1080i/configure_provider_package.xml:729
+#: /resources/skins/Default/1080i/configure_provider_package.xml:861
 msgctxt "#30246"
 msgid "Enable All"
 msgstr "Alles inschakelen"
 
-#: /resources/skins/Default/1080i/configure_provider_package.xml:740
+#: /resources/skins/Default/1080i/configure_provider_package.xml:872
 msgctxt "#30247"
 msgid "Disable All"
 msgstr "Alles uitschakelen"
 
-#: /resources/skins/Default/1080i/get_sources.xml:433
+#: /resources/skins/Default/1080i/get_sources.xml:439
 msgctxt "#30248"
 msgid "Cached"
 msgstr "Cache"
 
-#: /resources/settings.xml:435 /resources/settings.xml:439
-#: /resources/settings.xml:443 /resources/settings.xml:447
-#: /resources/settings.xml:478 /resources/settings.xml:482
-#: /resources/settings.xml:486 /resources/settings.xml:490
-#: /resources/settings.xml:521 /resources/settings.xml:525
-#: /resources/settings.xml:529 /resources/settings.xml:533
-#: /resources/settings.xml:564 /resources/settings.xml:568
-#: /resources/settings.xml:572 /resources/settings.xml:576
-#: /resources/settings.xml:607 /resources/settings.xml:611
-#: /resources/settings.xml:615 /resources/settings.xml:619
-#: /resources/settings.xml:650 /resources/settings.xml:654
-#: /resources/settings.xml:658 /resources/settings.xml:662
-#: /resources/settings.xml:693 /resources/settings.xml:697
-#: /resources/settings.xml:701 /resources/settings.xml:705
-#: /resources/settings.xml:736 /resources/settings.xml:740
-#: /resources/settings.xml:744 /resources/settings.xml:748
-#: /resources/skins/Default/1080i/get_sources.xml:557
+#: /resources/settings.xml:1765 /resources/settings.xml:1780
+#: /resources/settings.xml:1795 /resources/settings.xml:1810
+#: /resources/settings.xml:1825
+#: /resources/skins/Default/1080i/get_sources.xml:563
+#: /resources/lib/gui/windows/sort_select.py:8
 msgctxt "#30249"
 msgid "Cloud"
 msgstr "Cloud"
 
-#: /resources/skins/Default/1080i/get_sources.xml:786
+#: /resources/skins/Default/1080i/get_sources.xml:854
 msgctxt "#30250"
 msgid "Remaining providers"
 msgstr "Overgebleven providers"
 
-#: /resources/settings.xml:433 /resources/settings.xml:475
-#: /resources/settings.xml:518 /resources/settings.xml:561
-#: /resources/settings.xml:604 /resources/settings.xml:647
-#: /resources/settings.xml:690 /resources/settings.xml:733
-#: /resources/skins/Default/1080i/resolver.xml:159
-#: /resources/skins/Default/1080i/manual_caching.xml:125
-#: /resources/skins/Default/1080i/manual_caching.xml:228
-#: /resources/skins/Default/1080i/manual_caching.xml:372
-#: /resources/skins/Default/1080i/source_select.xml:129
-#: /resources/skins/Default/1080i/source_select.xml:232
-#: /resources/skins/Default/1080i/source_select.xml:376
+#: /resources/settings.xml:1584 /resources/settings.xml:1607
+#: /resources/settings.xml:1630 /resources/settings.xml:1653
+#: /resources/settings.xml:1676 /resources/settings.xml:1699
+#: /resources/settings.xml:1722 /resources/settings.xml:1745
+#: /resources/skins/Default/1080i/resolver.xml:157
+#: /resources/skins/Default/1080i/manual_caching.xml:135
+#: /resources/skins/Default/1080i/manual_caching.xml:248
+#: /resources/skins/Default/1080i/manual_caching.xml:403
+#: /resources/skins/Default/1080i/source_select.xml:147
+#: /resources/skins/Default/1080i/source_select.xml:250
+#: /resources/skins/Default/1080i/source_select.xml:394
+#: /resources/lib/gui/windows/sort_select.py:4
 msgctxt "#30251"
 msgid "Size"
 msgstr "Grootte"
 
-#: /resources/settings.xml:433 /resources/settings.xml:475
-#: /resources/settings.xml:518 /resources/settings.xml:561
-#: /resources/settings.xml:604 /resources/settings.xml:647
-#: /resources/settings.xml:690 /resources/settings.xml:733
-#: /resources/skins/Default/1080i/resolver.xml:183
-#: /resources/skins/Default/1080i/manual_caching.xml:135
-#: /resources/skins/Default/1080i/manual_caching.xml:238
-#: /resources/skins/Default/1080i/manual_caching.xml:396
-#: /resources/skins/Default/1080i/source_select.xml:139
-#: /resources/skins/Default/1080i/source_select.xml:242
-#: /resources/skins/Default/1080i/source_select.xml:400
+#: /resources/settings.xml:1582 /resources/settings.xml:1605
+#: /resources/settings.xml:1628 /resources/settings.xml:1651
+#: /resources/settings.xml:1674 /resources/settings.xml:1697
+#: /resources/settings.xml:1720 /resources/settings.xml:1743
+#: /resources/skins/Default/1080i/resolver.xml:181
+#: /resources/skins/Default/1080i/manual_caching.xml:145
+#: /resources/skins/Default/1080i/manual_caching.xml:258
+#: /resources/skins/Default/1080i/manual_caching.xml:427
+#: /resources/skins/Default/1080i/source_select.xml:157
+#: /resources/skins/Default/1080i/source_select.xml:260
+#: /resources/skins/Default/1080i/source_select.xml:418
+#: /resources/lib/gui/windows/sort_select.py:4
 msgctxt "#30252"
 msgid "Source Type"
 msgstr "Bronsoort"
 
-#: /resources/lib/common/maintenance.py:47
+#: /resources/lib/common/maintenance.py:40
 msgctxt "#30253"
 msgid "One or more providers have updates pending"
 msgstr "Een of meer providers hebben updates in behandeling"
 
-#: /resources/settings.xml:117
+#: /resources/settings.xml:449
 msgctxt "#30254"
 msgid "Prefer Movie artwork from"
 msgstr "Voorkeur film artwork provider"
 
-#: /resources/settings.xml:154
+#: /resources/settings.xml:605
 msgctxt "#30255"
 msgid "Prefer TV Show artwork from"
 msgstr "Voorkeur serie artwork provider"
 
-#: /resources/settings.xml:104 /resources/settings.xml:118
-#: /resources/settings.xml:155
+#: /resources/settings.xml:387 /resources/settings.xml:455
+#: /resources/settings.xml:611
 msgctxt "#30256"
 msgid "TMDb"
 msgstr "TMDb"
 
-#: /resources/settings.xml:104 /resources/settings.xml:155
+#: /resources/settings.xml:388 /resources/settings.xml:612
 msgctxt "#30257"
 msgid "TVDB"
 msgstr "TVDB"
 
-#: /resources/settings.xml:776
+#: /resources/settings.xml:1899
 msgctxt "#30258"
 msgid "Playback"
 msgstr "Afspelen"
 
-#: /resources/settings.xml:109
+#: /resources/settings.xml:419
 msgctxt "#30259"
 msgid "Artwork"
 msgstr "Artwork"
 
-#: /resources/settings.xml:865
+#: /resources/settings.xml:2203
 msgctxt "#30260"
 msgid "Advanced"
 msgstr "Geavanceerd"
 
-#: /resources/settings.xml:186 /resources/settings.xml:189
-#: /resources/settings.xml:192 /resources/settings.xml:195
-msgctxt "#30261"
-msgid "Season"
-msgstr "Seizoen"
-
-#: /resources/settings.xml:198
-msgctxt "#30262"
-msgid "Episode"
-msgstr "Aflevering"
-
-#: /resources/settings.xml:158 /resources/settings.xml:162
-#: /resources/settings.xml:166 /resources/settings.xml:169
-#: /resources/settings.xml:172 /resources/settings.xml:176
-#: /resources/settings.xml:179 /resources/settings.xml:182
-msgctxt "#30263"
-msgid "TV Show"
-msgstr "Serie"
-
-#: /resources/settings.xml:121 /resources/settings.xml:125
-#: /resources/settings.xml:129 /resources/settings.xml:132
-#: /resources/settings.xml:135 /resources/settings.xml:139
-#: /resources/settings.xml:142 /resources/settings.xml:145
-#: /resources/settings.xml:148 /resources/lib/gui/trakt_context_menu.py:108
+#: /resources/lib/gui/trakt_context_menu.py:108
 msgctxt "#30264"
 msgid "Movie"
 msgstr "Film"
 
-#: /resources/settings.xml:120
+#: /resources/settings.xml:465
 msgctxt "#30265"
 msgid "Show Advanced Movie Artwork Settings"
 msgstr "Toon geavanceerde instellingen voor film artwork"
 
-#: /resources/settings.xml:157
+#: /resources/settings.xml:622
 msgctxt "#30266"
 msgid "Show Advanced TV Artwork Settings"
 msgstr "Toon geavanceerde instellingen voor serie artwork"
 
-#: /resources/lib/gui/windows/provider_packages.py:95
+#: /resources/lib/gui/windows/provider_packages.py:90
 msgctxt "#30267"
 msgid "Are you sure you wish to remove the {} package?"
 msgstr "Weet u zeker dat u het {} pakket wilt verwijderen?"
 
-#: /resources/settings.xml:116
+#: /resources/settings.xml:448
 msgctxt "#30268"
 msgid "Movie Artwork"
 msgstr "Film artwork"
 
-#: /resources/settings.xml:153
+#: /resources/settings.xml:604
 msgctxt "#30269"
 msgid "TV Show Artwork"
 msgstr "Serie artwork"
 
-#: /resources/lib/database/trakt_sync/__init__.py:443
+#: /resources/lib/database/trakt_sync/__init__.py:435
 msgctxt "#30270"
 msgid "Previous user information has been cleared"
 msgstr "De vorige gebruikersinformatie is gewist"
 
-#: /resources/lib/database/trakt_sync/__init__.py:476
+#: /resources/lib/database/trakt_sync/__init__.py:466
 msgctxt "#30271"
 msgid "Metadata has been cleared"
 msgstr "Metadata is gewist"
 
-#: /resources/lib/database/trakt_sync/__init__.py:501
+#: /resources/lib/database/trakt_sync/__init__.py:485
 msgctxt "#30272"
 msgid "Database has been rebuilt"
 msgstr "Database is opnieuw opgebouwd"
 
-#: /resources/lib/indexers/trakt.py:522
+#: /resources/lib/indexers/trakt.py:467
 msgctxt "#30273"
 msgid "Sucessfully authenticated with Trakt"
 msgstr "Succesvol geauthentiseerd met Trakt"
 
-#: /resources/lib/gui/trakt_context_menu.py:46
-#: /resources/lib/gui/trakt_context_menu.py:141
-#: /resources/lib/gui/trakt_context_menu.py:155
+#: /resources/lib/gui/trakt_context_menu.py:45
+#: /resources/lib/gui/trakt_context_menu.py:139
 msgctxt "#30274"
 msgid "Add {} to Collection"
 msgstr "Voeg {} aan collectie toe"
 
-#: /resources/lib/gui/trakt_context_menu.py:50
-#: /resources/lib/gui/trakt_context_menu.py:136
-#: /resources/lib/gui/trakt_context_menu.py:151
+#: /resources/lib/gui/trakt_context_menu.py:49
+#: /resources/lib/gui/trakt_context_menu.py:137
 msgctxt "#30275"
 msgid "Remove {} from Collection"
 msgstr "Verwijder {} uit collectie"
 
-#: /resources/lib/gui/trakt_context_menu.py:54
+#: /resources/lib/gui/trakt_context_menu.py:53
 #: /resources/lib/gui/trakt_context_menu.py:115
 msgctxt "#30276"
 msgid "Add to Watchlist"
 msgstr "Toevoegen aan volglijst"
 
-#: /resources/lib/gui/trakt_context_menu.py:58
+#: /resources/lib/gui/trakt_context_menu.py:57
 #: /resources/lib/gui/trakt_context_menu.py:116
 msgctxt "#30277"
 msgid "Remove from Watchlist"
 msgstr "Verwijderen van volglijst"
 
-#: /resources/lib/gui/trakt_context_menu.py:62
-#: /resources/lib/gui/trakt_context_menu.py:163
-#: /resources/lib/gui/trakt_context_menu.py:166
+#: /resources/lib/gui/trakt_context_menu.py:61
+#: /resources/lib/gui/trakt_context_menu.py:146
+#: /resources/lib/gui/trakt_context_menu.py:148
 msgctxt "#30278"
 msgid "Mark as Watched"
 msgstr "Markeer als bekeken"
 
-#: /resources/lib/gui/trakt_context_menu.py:66
-#: /resources/lib/gui/trakt_context_menu.py:161
-#: /resources/lib/gui/trakt_context_menu.py:168
+#: /resources/lib/gui/trakt_context_menu.py:65
+#: /resources/lib/gui/trakt_context_menu.py:144
+#: /resources/lib/gui/trakt_context_menu.py:150
 msgctxt "#30279"
 msgid "Mark as Unwatched"
 msgstr "Markeren als niet bekeken"
 
-#: /resources/lib/gui/trakt_context_menu.py:26
-#: /resources/lib/gui/trakt_context_menu.py:70
+#: /resources/lib/gui/trakt_context_menu.py:27
+#: /resources/lib/gui/trakt_context_menu.py:69
 msgctxt "#30280"
 msgid "Add to List"
 msgstr "Toevoegen aan lijst"
 
-#: /resources/lib/gui/trakt_context_menu.py:27
-#: /resources/lib/gui/trakt_context_menu.py:74
+#: /resources/lib/gui/trakt_context_menu.py:28
+#: /resources/lib/gui/trakt_context_menu.py:73
 msgctxt "#30281"
 msgid "Remove From List"
 msgstr "Verwijderen uit lijst"
 
-#: /resources/lib/gui/trakt_context_menu.py:28
-#: /resources/lib/gui/trakt_context_menu.py:78
+#: /resources/lib/gui/trakt_context_menu.py:29
+#: /resources/lib/gui/trakt_context_menu.py:77
 msgctxt "#30282"
 msgid "Hide {}"
 msgstr "Verberg {}"
 
-#: /resources/lib/gui/trakt_context_menu.py:29
-#: /resources/lib/gui/trakt_context_menu.py:82
+#: /resources/lib/gui/trakt_context_menu.py:30
+#: /resources/lib/gui/trakt_context_menu.py:81
 msgctxt "#30283"
 msgid "Refresh Item Metadata"
 msgstr "Vernieuw metagegevens van item"
 
-#: /resources/lib/gui/trakt_context_menu.py:86
-#: /resources/lib/gui/trakt_context_menu.py:125
+#: /resources/lib/gui/trakt_context_menu.py:85
+#: /resources/lib/gui/trakt_context_menu.py:123
 msgctxt "#30284"
 msgid "Remove Playback Progress"
 msgstr "Verwijder de voortgang van het afspelen"
@@ -1704,252 +1620,254 @@ msgctxt "#30285"
 msgid "Show"
 msgstr "Tonen"
 
-#: /resources/lib/gui/trakt_context_menu.py:38
-#: /resources/lib/gui/trakt_context_menu.py:191
-#: /resources/lib/gui/trakt_context_menu.py:204
-#: /resources/lib/gui/trakt_context_menu.py:265
-#: /resources/lib/gui/trakt_context_menu.py:307
+#: /resources/lib/gui/trakt_context_menu.py:37
+#: /resources/lib/gui/trakt_context_menu.py:170
+#: /resources/lib/gui/trakt_context_menu.py:182
+#: /resources/lib/gui/trakt_context_menu.py:239
+#: /resources/lib/gui/trakt_context_menu.py:279
+#: /resources/lib/gui/trakt_context_menu.py:299
+#: /resources/lib/gui/trakt_context_menu.py:319
 #: /resources/lib/gui/trakt_context_menu.py:327
-#: /resources/lib/gui/trakt_context_menu.py:349
-#: /resources/lib/gui/trakt_context_menu.py:357
-#: /resources/lib/gui/trakt_context_menu.py:368
-#: /resources/lib/gui/trakt_context_menu.py:390
-#: /resources/lib/gui/trakt_context_menu.py:413
+#: /resources/lib/gui/trakt_context_menu.py:336
+#: /resources/lib/gui/trakt_context_menu.py:358
+#: /resources/lib/gui/trakt_context_menu.py:381
 msgctxt "#30286"
 msgid "Trakt manager"
 msgstr "Trakt manager"
 
-#: /resources/lib/gui/trakt_context_menu.py:192
-#: /resources/lib/gui/trakt_context_menu.py:205
+#: /resources/lib/gui/trakt_context_menu.py:171
+#: /resources/lib/gui/trakt_context_menu.py:183
 msgctxt "#30287"
 msgid "Failed to update status, please check the log"
 msgstr "Status bijwerken mislukt. Controleer het logboek"
 
-#: /resources/lib/gui/trakt_context_menu.py:266
+#: /resources/lib/gui/trakt_context_menu.py:240
 msgctxt "#30288"
 msgid "Item marked as watched"
 msgstr "Item gemarkeerd als bekeken"
 
-#: /resources/lib/gui/trakt_context_menu.py:308
+#: /resources/lib/gui/trakt_context_menu.py:280
 msgctxt "#30289"
 msgid "Item marked as unwatched"
 msgstr "Item gemarkeerd als niet bekeken"
 
-#: /resources/lib/gui/trakt_context_menu.py:328
+#: /resources/lib/gui/trakt_context_menu.py:300
 msgctxt "#30290"
 msgid "Item added to Collection"
 msgstr "Item toegevoegd aan collectie"
 
-#: /resources/lib/gui/trakt_context_menu.py:350
+#: /resources/lib/gui/trakt_context_menu.py:320
 msgctxt "#30291"
 msgid "Item removed from Collection"
 msgstr "Item verwijderd uit collectie"
 
-#: /resources/lib/gui/trakt_context_menu.py:358
+#: /resources/lib/gui/trakt_context_menu.py:328
 msgctxt "#30292"
 msgid "Item added to Watchlist"
 msgstr "Item toegevoegd aan volglijst"
 
-#: /resources/lib/gui/trakt_context_menu.py:369
+#: /resources/lib/gui/trakt_context_menu.py:337
 msgctxt "#30293"
 msgid "Item removed from Watchlist"
 msgstr "Item verwijderd uit volglijst"
 
-#: /resources/lib/gui/trakt_context_menu.py:391
+#: /resources/lib/gui/trakt_context_menu.py:359
 msgctxt "#30294"
 msgid "Item added to {}"
 msgstr "Item toegevoegd aan {}"
 
-#: /resources/lib/gui/trakt_context_menu.py:414
+#: /resources/lib/gui/trakt_context_menu.py:382
 msgctxt "#30295"
 msgid "Item removed from {}"
 msgstr "Item verwijderd uit {}"
 
-#: /resources/lib/gui/trakt_context_menu.py:379
-#: /resources/lib/gui/trakt_context_menu.py:401
+#: /resources/lib/gui/trakt_context_menu.py:347
+#: /resources/lib/gui/trakt_context_menu.py:369
 msgctxt "#30296"
 msgid "Select a list"
 msgstr "Selecteer een lijst"
 
-#: /resources/lib/gui/trakt_context_menu.py:427
+#: /resources/lib/gui/trakt_context_menu.py:394
 msgctxt "#30297"
 msgid "Watched Progress"
 msgstr "Voortgang bekeken"
 
-#: /resources/lib/gui/trakt_context_menu.py:423
-#: /resources/lib/gui/trakt_context_menu.py:427
+#: /resources/lib/gui/trakt_context_menu.py:391
+#: /resources/lib/gui/trakt_context_menu.py:394
 msgctxt "#30298"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: /resources/lib/gui/trakt_context_menu.py:429
+#: /resources/lib/gui/trakt_context_menu.py:396
 msgctxt "#30299"
 msgid "Select Menu type to hide from"
 msgstr "Selecteer Menutype waarvan u wilt verbergen"
 
-#: /resources/lib/gui/trakt_context_menu.py:453
+#: /resources/lib/gui/trakt_context_menu.py:419
 msgctxt "#30300"
 msgid "Item has been hidden from your {}"
 msgstr "Item is verborgen voor uw {}"
 
-#: /resources/lib/gui/trakt_context_menu.py:487
+#: /resources/lib/gui/trakt_context_menu.py:443
 msgctxt "#30301"
 msgid "Item's Progress History has been removed"
 msgstr "De voortgangsgeschiedenis van het item is verwijderd"
 
-#: /resources/lib/modules/router.py:414
+#: /resources/lib/modules/router.py:392
 msgctxt "#30302"
 msgid "Silent scrape"
 msgstr "Stil scrapen"
 
-#: /resources/lib/gui/movieMenus.py:445 /resources/lib/gui/tvshowMenus.py:570
+#: /resources/lib/gui/movieMenus.py:442 /resources/lib/gui/tvshowMenus.py:561
 msgctxt "#30303"
 msgid "Genre Selection"
 msgstr "Genre selectie"
 
-#: /resources/lib/modules/zip_manager.py:47
+#: /resources/lib/modules/zip_manager.py:39
 msgctxt "#30304"
 msgid "Browse..."
 msgstr "Bladeren…"
 
-#: /resources/lib/modules/zip_manager.py:47
+#: /resources/lib/modules/zip_manager.py:39
 msgctxt "#30305"
 msgid "Web Location..."
 msgstr "Weblocatie ..."
 
-#: /resources/lib/modules/zip_manager.py:60
+#: /resources/lib/modules/zip_manager.py:47
 msgctxt "#30306"
 msgid "Locate {} Zip"
 msgstr "Zoek {} Zip"
 
-#: /resources/lib/modules/zip_manager.py:68
+#: /resources/lib/modules/zip_manager.py:54
 msgctxt "#30307"
 msgid "Enter Zip URL"
 msgstr "Voer de zip URL in"
 
-#: /resources/lib/modules/cacheAssist.py:115
-#: /resources/lib/modules/getSources.py:414
+#: /resources/lib/modules/cacheAssist.py:102
+#: /resources/lib/modules/getSources.py:450
 msgctxt "#30308"
 msgid "Cache Assist"
 msgstr "Cache Assist"
 
-#: /resources/lib/database/skinManager/__init__.py:261
+#: /resources/lib/database/skinManager/__init__.py:225
 msgctxt "#30309"
 msgid "Installing"
 msgstr "Bezig met installeren"
 
-#: /resources/lib/database/skinManager/__init__.py:151
+#: /resources/lib/database/skinManager/__init__.py:124
 msgctxt "#30310"
 msgid "The skin name 'Default' is not allowed."
 msgstr "De skin naam 'Default' is niet toegestaan."
 
-#: /resources/lib/modules/smartPlay.py:81
+#: /resources/lib/modules/smartPlay.py:85
 msgctxt "#30311"
 msgid "Starting Playback"
 msgstr "Weergave starten"
 
-#: /resources/settings.xml:135 /resources/settings.xml:172
+#: /resources/settings.xml:524 /resources/settings.xml:681
 msgctxt "#30312"
 msgid "Keyart"
 msgstr "Keyart"
 
-#: /resources/settings.xml:139 /resources/settings.xml:176
+#: /resources/settings.xml:544 /resources/settings.xml:701
 msgctxt "#30313"
 msgid "Clear Logo"
 msgstr "Clear Logo"
 
-#: /resources/settings.xml:132 /resources/settings.xml:169
-#: /resources/settings.xml:192
+#: /resources/settings.xml:514 /resources/settings.xml:671
 msgctxt "#30314"
 msgid "Landscape"
 msgstr "Landscape"
 
-#: /resources/settings.xml:148 /resources/settings.xml:182
+#: /resources/settings.xml:583 /resources/settings.xml:727
+#: /resources/settings.xml:1769 /resources/settings.xml:1784
+#: /resources/settings.xml:1799 /resources/settings.xml:1814
+#: /resources/settings.xml:1829
 msgctxt "#30315"
 msgid "Character Art"
 msgstr "Character Art"
 
-#: /resources/settings.xml:142 /resources/settings.xml:179
+#: /resources/settings.xml:557 /resources/settings.xml:714
 msgctxt "#30316"
 msgid "Clear Art"
 msgstr "Clear Art"
 
-#: /resources/settings.xml:145
+#: /resources/settings.xml:570
 msgctxt "#30317"
 msgid "Disc Art"
 msgstr "Disc Art"
 
-#: /resources/settings.xml:802
+#: /resources/settings.xml:1977
 msgctxt "#30318"
 msgid "Smart Play Display Style"
 msgstr "Smart Play weergave stijl"
 
-#: /resources/settings.xml:811
+#: /resources/settings.xml:2026
 msgctxt "#30319"
 msgid "Default Action if Nothing Selected"
 msgstr "Standaard actie wanneer er niets is geselecteerd"
 
-#: /resources/settings.xml:812 /resources/lib/gui/windows/source_select.py:42
+#: /resources/settings.xml:2031 /resources/lib/gui/windows/source_select.py:38
 msgctxt "#30320"
 msgid "Play"
 msgstr "Afspelen"
 
-#: /resources/settings.xml:812
+#: /resources/settings.xml:2032
 msgctxt "#30321"
 msgid "Pause"
 msgstr "Pauze"
 
-#: /resources/settings.xml:815
+#: /resources/settings.xml:2046
 msgctxt "#30322"
 msgid "Enable Still Watching Dialog"
 msgstr "Schakel het dialoogvenster \"Nog steeds kijken\" in"
 
-#: /resources/settings.xml:817
+#: /resources/settings.xml:2059
 msgctxt "#30323"
 msgid "Episodes Between Dialog Prompts"
 msgstr "Afleveringen tussen dialoog prompts"
 
-#: /resources/settings.xml:36
+#: /resources/settings.xml:119
 msgctxt "#30324"
 msgid "Paginate Trakt Lists"
 msgstr "Trakt lijsten pagineren"
 
-#: /resources/lib/gui/tvshowMenus.py:243
+#: /resources/lib/gui/tvshowMenus.py:274
 msgctxt "#30325"
 msgid "My Watched Episodes"
 msgstr "Mijn bekeken afleveringen"
 
-#: /resources/lib/gui/movieMenus.py:200
+#: /resources/lib/gui/movieMenus.py:227
 msgctxt "#30326"
 msgid "My Watched Movies"
 msgstr "Mijn bekeken films"
 
-#: /resources/lib/gui/homeMenu.py:54
+#: /resources/lib/gui/homeMenu.py:83
 msgctxt "#30327"
 msgid "Search Movies By Actor..."
 msgstr "Zoek films op acteur ..."
 
-#: /resources/lib/gui/homeMenu.py:57
+#: /resources/lib/gui/homeMenu.py:89
 msgctxt "#30328"
 msgid "Search Shows By Actor..."
 msgstr "Zoek series op acteur ..."
 
-#: /resources/settings.xml:789
+#: /resources/settings.xml:1935
 msgctxt "#30329"
 msgid "Ask"
 msgstr "Vraag"
 
-#: /resources/settings.xml:789
+#: /resources/settings.xml:1937
 msgctxt "#30330"
 msgid "Do not resume"
 msgstr "Niet hervatten"
 
-#: /resources/lib/modules/smartPlay.py:429
+#: /resources/lib/modules/smartPlay.py:390
 msgctxt "#30331"
 msgid "Start From Beginning"
 msgstr "Begin bij het begin"
 
-#: /resources/lib/database/trakt_sync/__init__.py:495
+#: /resources/lib/database/trakt_sync/__init__.py:481
 msgctxt "#30332"
 msgid ""
 "There were issues when processing the synchronization with Trakt, please "
@@ -1958,54 +1876,44 @@ msgstr ""
 "Er waren problemen bij het verwerken van de synchronisatie met Trakt, "
 "controleer het logboek"
 
-#: /resources/settings.xml:289 /resources/settings.xml:361
-#: /resources/settings.xml:459 /resources/settings.xml:463
-#: /resources/settings.xml:467 /resources/settings.xml:502
-#: /resources/settings.xml:506 /resources/settings.xml:510
-#: /resources/settings.xml:545 /resources/settings.xml:549
-#: /resources/settings.xml:553 /resources/settings.xml:588
-#: /resources/settings.xml:592 /resources/settings.xml:596
-#: /resources/settings.xml:631 /resources/settings.xml:635
-#: /resources/settings.xml:639 /resources/settings.xml:674
-#: /resources/settings.xml:678 /resources/settings.xml:682
-#: /resources/settings.xml:717 /resources/settings.xml:721
-#: /resources/settings.xml:725 /resources/settings.xml:760
-#: /resources/settings.xml:764 /resources/settings.xml:768
+#: /resources/settings.xml:1109 /resources/settings.xml:1312
+#: /resources/settings.xml:1866 /resources/settings.xml:1879
+#: /resources/settings.xml:1892 /resources/lib/gui/windows/sort_select.py:10
 msgctxt "#30333"
 msgid "AllDebrid"
 msgstr "AllDebrid"
 
-#: /resources/lib/debrid/all_debrid.py:125
+#: /resources/lib/debrid/all_debrid.py:110
 msgctxt "#30334"
 msgid "AllDebrid Auth"
 msgstr "AllDebrid Auth"
 
-#: /resources/settings.xml:290 /resources/settings.xml:348
+#: /resources/settings.xml:1110
 msgctxt "#30335"
 msgid "Enabled AllDebrid"
 msgstr "AllDebrid ingeschakeld"
 
-#: /resources/settings.xml:291
+#: /resources/settings.xml:1115 /resources/settings.xml:1128
 msgctxt "#30336"
 msgid "AllDebrid Username"
 msgstr "AllDebrid gebruikersnaam"
 
-#: /resources/settings.xml:298
+#: /resources/settings.xml:1147
 msgctxt "#30337"
 msgid "Authorize AllDebrid..."
 msgstr "Autoriseer AllDebrid ..."
 
-#: /resources/settings.xml:86
+#: /resources/settings.xml:332
 msgctxt "#30338"
 msgid "Enable Automatic Theme Updates"
 msgstr "Schakel automatische thema updates in"
 
-#: /resources/settings.xml:235
+#: /resources/settings.xml:907
 msgctxt "#30339"
 msgid "Authorise Premiumize"
 msgstr "Autoriseer Premiumize"
 
-#: /resources/lib/indexers/trakt.py:118 /resources/lib/indexers/trakt.py:134
+#: /resources/lib/indexers/trakt.py:110 /resources/lib/indexers/trakt.py:121
 msgctxt "#30340"
 msgid ""
 "There appears to be a problem with your Trakt Authorization \n"
@@ -2014,122 +1922,122 @@ msgstr ""
 "Er lijkt een probleem te zijn met uw Trakt autorisatie\n"
 "Probeer uw account opnieuw te autoriseren"
 
-#: /resources/settings.xml:111
+#: /resources/settings.xml:425
 msgctxt "#30341"
 msgid "Preferred Artwork Size"
 msgstr "Voorkeur afmetingen voor artwork"
 
-#: /resources/settings.xml:112
+#: /resources/settings.xml:430
 msgctxt "#30342"
 msgid "Largest Available"
 msgstr "Grootste beschikbaar"
 
-#: /resources/settings.xml:112
+#: /resources/settings.xml:431
 msgctxt "#30343"
 msgid "Medium"
 msgstr "Medium"
 
-#: /resources/settings.xml:112
+#: /resources/settings.xml:432
 msgctxt "#30344"
 msgid "Small"
 msgstr "Klein"
 
-#: /resources/lib/gui/tvshowMenus.py:79
+#: /resources/lib/gui/tvshowMenus.py:82
 msgctxt "#30345"
 msgid "Popular Recent Shows"
 msgstr "Populaire recente series"
 
-#: /resources/lib/gui/tvshowMenus.py:97
+#: /resources/lib/gui/tvshowMenus.py:103
 msgctxt "#30346"
 msgid "Trending Recent Shows"
 msgstr "Trending recente series"
 
-#: /resources/lib/gui/movieMenus.py:65
+#: /resources/lib/gui/movieMenus.py:70
 msgctxt "#30347"
 msgid "Popular Recent Movies"
 msgstr "Populaire recente films"
 
-#: /resources/lib/gui/movieMenus.py:83
+#: /resources/lib/gui/movieMenus.py:91
 msgctxt "#30348"
 msgid "Trending Recent Movies"
 msgstr "Trending recente films"
 
-#: /resources/lib/debrid/premiumize.py:65
+#: /resources/lib/debrid/premiumize.py:76
 msgctxt "#30349"
 msgid "Premiumize auth"
 msgstr "Premiumize auth"
 
-#: /resources/lib/gui/tvshowMenus.py:237
+#: /resources/lib/gui/tvshowMenus.py:267
 msgctxt "#30350"
 msgid "My Liked Show Lists"
 msgstr "Mijn Liked serie lijsten"
 
-#: /resources/lib/gui/movieMenus.py:194
+#: /resources/lib/gui/movieMenus.py:220
 msgctxt "#30351"
 msgid "My Liked Movie Lists"
 msgstr "Mijn Liked film lijsten"
 
-#: /resources/lib/gui/tvshowMenus.py:128
+#: /resources/lib/gui/tvshowMenus.py:139
 msgctxt "#30352"
 msgid "Trending Show Lists"
 msgstr "Trending serie lijsten"
 
-#: /resources/lib/gui/movieMenus.py:109
+#: /resources/lib/gui/movieMenus.py:121
 msgctxt "#30353"
 msgid "Trending Movie Lists"
 msgstr "Trending film lijsten"
 
-#: /resources/lib/gui/tvshowMenus.py:134
+#: /resources/lib/gui/tvshowMenus.py:146
 msgctxt "#30354"
 msgid "Popular Show Lists"
 msgstr "Populaire serie lijsten"
 
-#: /resources/lib/gui/movieMenus.py:115
+#: /resources/lib/gui/movieMenus.py:128
 msgctxt "#30355"
 msgid "Popular Movie Lists"
 msgstr "Populaire film lijsten"
 
-#: /resources/settings.xml:23 /resources/settings.xml:25
+#: /resources/settings.xml:69 /resources/settings.xml:82
 msgctxt "#30356"
 msgid "Episode Title"
 msgstr "Aflevering Titel"
 
-#: /resources/settings.xml:23 /resources/settings.xml:25
+#: /resources/settings.xml:70 /resources/settings.xml:83
 msgctxt "#30357"
 msgid "01x01. Episode Title"
 msgstr "01x01. Aflevering Titel"
 
-#: /resources/settings.xml:23 /resources/settings.xml:25
+#: /resources/settings.xml:71 /resources/settings.xml:84
 msgctxt "#30358"
 msgid "Show Title: Episode Title"
 msgstr "Serie Titel: Aflevering Titel"
 
-#: /resources/settings.xml:23 /resources/settings.xml:25
+#: /resources/settings.xml:72 /resources/settings.xml:85
 msgctxt "#30359"
 msgid "Show Title: 01x01. Episode Title"
 msgstr "Serie Titel: 01x01. Aflevering Titel"
 
-#: /resources/settings.xml:46
+#: /resources/settings.xml:158
 msgctxt "#30360"
 msgid "Disable Notification Sound"
 msgstr "Schakel melding geluid uit"
 
-#: /resources/settings.xml:38
+#: /resources/settings.xml:129
 msgctxt "#30361"
 msgid "Lists Title Display Style"
 msgstr "Weergavestijl van lijsten"
 
-#: /resources/settings.xml:39
+#: /resources/settings.xml:134
 msgctxt "#30362"
 msgid "List Title"
 msgstr "Lijst Titel"
 
-#: /resources/settings.xml:39
+#: /resources/settings.xml:135
 msgctxt "#30363"
 msgid "List Title - Creator"
 msgstr "Lijst Titel - Maker"
 
-#: /resources/lib/gui/homeMenu.py:13
+#: /resources/lib/gui/homeMenu.py:10
 msgctxt "#30364"
 msgid ""
 "Discover movies that are Popular, Trending, Recommended for you and more."
@@ -2143,98 +2051,98 @@ msgid ""
 msgstr ""
 "Ontdek series die populair, trending, aanbevolen voor jou en meer zijn."
 
-#: /resources/lib/gui/homeMenu.py:20
+#: /resources/lib/gui/homeMenu.py:23
 msgctxt "#30366"
 msgid "View movies based on your Trakt information"
 msgstr "Bekijk films op basis van uw Trakt-informatie"
 
-#: /resources/lib/gui/homeMenu.py:24
+#: /resources/lib/gui/homeMenu.py:29
 msgctxt "#30367"
 msgid "View shows and episodes based on your Trakt information"
 msgstr "Bekijk series en afleveringen op basis van uw Trakt informatie"
 
-#: /resources/lib/gui/homeMenu.py:28
+#: /resources/lib/gui/homeMenu.py:36
 msgctxt "#30368"
 msgid "View or play files stored on your cloud provider"
 msgstr "Bekijk of speel bestanden die zijn opgeslagen op uw cloudprovider"
 
-#: /resources/lib/gui/homeMenu.py:31
+#: /resources/lib/gui/homeMenu.py:42
 msgctxt "#30369"
 msgid "Search for movies or shows"
 msgstr "Zoek naar films of series"
 
-#: /resources/lib/gui/homeMenu.py:34
+#: /resources/lib/gui/homeMenu.py:48
 msgctxt "#30370"
 msgid "Variety of tools to help solve issues or manage your services"
 msgstr "Diverse tools om problemen op te lossen of uw services te beheren"
 
-#: /resources/lib/gui/homeMenu.py:49 /resources/lib/gui/movieMenus.py:159
-#: /resources/lib/gui/movieMenus.py:288
+#: /resources/lib/gui/homeMenu.py:72 /resources/lib/gui/movieMenus.py:179
+#: /resources/lib/gui/movieMenus.py:306
 msgctxt "#30371"
 msgid "Search for movies by title"
 msgstr "Zoek films op titel"
 
-#: /resources/lib/gui/homeMenu.py:52 /resources/lib/gui/tvshowMenus.py:177
-#: /resources/lib/gui/tvshowMenus.py:420
+#: /resources/lib/gui/homeMenu.py:78 /resources/lib/gui/tvshowMenus.py:196
+#: /resources/lib/gui/tvshowMenus.py:428
 msgctxt "#30372"
 msgid "Search for shows by title"
 msgstr "Zoek naar series op titel"
 
-#: /resources/lib/gui/homeMenu.py:42 /resources/lib/gui/movieMenus.py:165
+#: /resources/lib/gui/homeMenu.py:59 /resources/lib/gui/movieMenus.py:186
 msgctxt "#30373"
 msgid "View your movie search history or start a new search"
 msgstr ""
 "Bekijk uw zoekgeschiedenis voor films of start een nieuwe zoekopdracht"
 
-#: /resources/lib/gui/homeMenu.py:45 /resources/lib/gui/tvshowMenus.py:183
+#: /resources/lib/gui/homeMenu.py:65 /resources/lib/gui/tvshowMenus.py:203
 msgctxt "#30374"
 msgid "View your shows search history or start a new search"
 msgstr ""
 "Bekijk uw zoekgeschiedenis van uw series of start een nieuwe zoekopdracht"
 
-#: /resources/lib/gui/homeMenu.py:56 /resources/lib/gui/movieMenus.py:153
+#: /resources/lib/gui/homeMenu.py:85 /resources/lib/gui/movieMenus.py:172
 msgctxt "#30375"
 msgid "Search for movies by actor name"
 msgstr "Zoek naar films op acteur"
 
-#: /resources/lib/gui/homeMenu.py:59
+#: /resources/lib/gui/homeMenu.py:91
 msgctxt "#30376"
 msgid "Search show by actor"
 msgstr "Zoek naar series op acteur"
 
-#: /resources/lib/gui/homeMenu.py:66
+#: /resources/lib/gui/homeMenu.py:101
 msgctxt "#30377"
 msgid "Tools to help you update or manage your installed providers"
 msgstr ""
 "Tools om u te helpen bij het updaten of beheren van uw geïnstalleerde "
 "providers"
 
-#: /resources/lib/gui/homeMenu.py:70
+#: /resources/lib/gui/homeMenu.py:108
 msgctxt "#30378"
 msgid "View your current or previous cloud transfers"
 msgstr "Bekijk uw huidige of eerdere cloud overdrachten"
 
-#: /resources/lib/gui/homeMenu.py:74
+#: /resources/lib/gui/homeMenu.py:115
 msgctxt "#30379"
 msgid "Clear the cached information from long processes or network request"
 msgstr "Wis de informatie in de cache van lange processen of netwerkverzoeken"
 
-#: /resources/lib/gui/homeMenu.py:78
+#: /resources/lib/gui/homeMenu.py:122
 msgctxt "#30380"
 msgid "Clear the locally indexed torrent information identified by providers"
 msgstr "Wis de lokaal geïndexeerde Torrent-informatie"
 
-#: /resources/lib/gui/homeMenu.py:82 /resources/lib/gui/movieMenus.py:295
+#: /resources/lib/gui/homeMenu.py:129 /resources/lib/gui/movieMenus.py:313
 msgctxt "#30381"
 msgid "Clear your search history"
 msgstr "Wis uw zoekgeschiedenis"
 
-#: /resources/lib/gui/homeMenu.py:86
+#: /resources/lib/gui/homeMenu.py:136
 msgctxt "#30382"
 msgid "Open Seren's settings"
 msgstr "Open de instellingen van Seren"
 
-#: /resources/lib/gui/homeMenu.py:90
+#: /resources/lib/gui/homeMenu.py:143
 msgctxt "#30383"
 msgid ""
 "Remove all settings, providers, databases, themes and cache (Fresh start)"
@@ -2242,7 +2150,7 @@ msgstr ""
 "Verwijder alle instellingen, providers, databases, thema's en cache (nieuwe "
 "start)"
 
-#: /resources/lib/gui/homeMenu.py:94
+#: /resources/lib/gui/homeMenu.py:150
 msgctxt "#30384"
 msgid ""
 "A list of tools to assist with issues that may arise with the syncing of "
@@ -2251,64 +2159,64 @@ msgstr ""
 "Een lijst met tools om te helpen bij problemen die kunnen optreden bij het "
 "synchroniseren van uw trakt gegevens"
 
-#: /resources/lib/gui/homeMenu.py:102
+#: /resources/lib/gui/homeMenu.py:164
 msgctxt "#30385"
 msgid "A set of test windows to help you debug your theme"
 msgstr "Een reeks test vensters om u te helpen bij het debuggen van uw thema"
 
-#: /resources/lib/gui/homeMenu.py:110
+#: /resources/lib/gui/homeMenu.py:175
 msgctxt "#30386"
 msgid "Force Seren to check for updates for your installed provider(s)"
 msgstr ""
 "Forceer Seren om te controleren op updates voor uw geïnstalleerde "
 "provider(s)"
 
-#: /resources/lib/gui/homeMenu.py:114
+#: /resources/lib/gui/homeMenu.py:182
 msgctxt "#30387"
 msgid "Open a window to enable/disable/install/uninstall providers in Seren"
 msgstr ""
 "Open een venster om providers in Seren in / uit te schakelen / te "
 "installeren / verwijderen"
 
-#: /resources/lib/gui/homeMenu.py:123
+#: /resources/lib/gui/homeMenu.py:194
 msgctxt "#30388"
 msgid "Clear the last sync timestamp"
 msgstr "Wis het laatste synchronisatietijds"
 
-#: /resources/lib/gui/homeMenu.py:127
+#: /resources/lib/gui/homeMenu.py:201
 msgctxt "#30389"
-msgid "Force Seren to perform a sync with Trakt\\'s servers"
+msgid "Force Seren to perform a sync with Trakt's servers"
 msgstr ""
-"Forceer Seren om een synchronisatie uit te voeren met de servers van Trakt"
+"Dwing Seren om een synchronisatie uit te voeren met de servers van Trakt"
 
-#: /resources/lib/gui/homeMenu.py:131
+#: /resources/lib/gui/homeMenu.py:208
 msgctxt "#30390"
 msgid "Remove all information in the Trakt Sync database and force a re-sync"
 msgstr ""
 "Verwijder alle informatie in de Trakt Sync database en forceer een "
 "hersynchronisatie"
 
-#: /resources/lib/gui/homeMenu.py:139
+#: /resources/lib/gui/homeMenu.py:219
 msgctxt "#30391"
 msgid "Opens the next playing window"
 msgstr "Opent het volgende afspeel venster"
 
-#: /resources/lib/gui/homeMenu.py:143
+#: /resources/lib/gui/homeMenu.py:226
 msgctxt "#30392"
 msgid "Opens the still watching window"
 msgstr "Opent het nog steeds kijkende venster"
 
-#: /resources/lib/gui/homeMenu.py:151
+#: /resources/lib/gui/homeMenu.py:240
 msgctxt "#30393"
 msgid "Opens the resolver window"
 msgstr "Opent het resolver venster"
 
-#: /resources/lib/gui/homeMenu.py:155
+#: /resources/lib/gui/homeMenu.py:247
 msgctxt "#30394"
 msgid "Opens the source select window"
 msgstr "Opent het bronkeuzevenster"
 
-#: /resources/lib/gui/movieMenus.py:62
+#: /resources/lib/gui/movieMenus.py:66
 msgctxt "#30395"
 msgid ""
 "View the most popular movies. Popularity is calculated using the rating "
@@ -2317,7 +2225,7 @@ msgstr ""
 "Bekijk de meest populaire films. Populariteit wordt berekend aan de hand van"
 " het beoordelingspercentage en het aantal beoordelingen."
 
-#: /resources/lib/gui/movieMenus.py:67
+#: /resources/lib/gui/movieMenus.py:72
 msgctxt "#30396"
 msgid ""
 "View the most recent popular movies. Popularity is calculated using the "
@@ -2326,12 +2234,12 @@ msgstr ""
 "Bekijk de meest recente populaire films. Populariteit wordt berekend aan de "
 "hand van het beoordelingspercentage en het aantal beoordelingen."
 
-#: /resources/lib/gui/movieMenus.py:73
+#: /resources/lib/gui/movieMenus.py:79
 msgctxt "#30397"
 msgid "Personalized movie recommendations based on your watched history"
 msgstr "Gepersonaliseerde film aanbevelingen op basis van je kijkgeschiedenis"
 
-#: /resources/lib/gui/movieMenus.py:80
+#: /resources/lib/gui/movieMenus.py:87
 msgctxt "#30398"
 msgid ""
 "Returns all movies being watched right now. Movies with the most viewers are"
@@ -2340,7 +2248,7 @@ msgstr ""
 "Retourneert alle films die op dit moment worden bekeken. Films met de meeste"
 " kijkers worden als eerste geretourneerd."
 
-#: /resources/lib/gui/movieMenus.py:85
+#: /resources/lib/gui/movieMenus.py:93
 msgctxt "#30399"
 msgid ""
 "Returns all recent movies being watched right now. Movies with the most "
@@ -2349,32 +2257,32 @@ msgstr ""
 "Retourneert alle recente films die op dit moment worden bekeken. Films met "
 "de meeste kijkers worden als eerste geretourneerd."
 
-#: /resources/lib/gui/movieMenus.py:92
+#: /resources/lib/gui/movieMenus.py:101
 msgctxt "#30400"
 msgid "Returns the most played (not unique) movies for the week"
 msgstr "Retourneert de meest afgespeelde (niet unieke) films van de week"
 
-#: /resources/lib/gui/movieMenus.py:99
+#: /resources/lib/gui/movieMenus.py:109
 msgctxt "#30401"
 msgid "Returns the most watched (unique views) movies for the week"
 msgstr "Retourneert de meest bekeken films (unieke weergaven) van de week"
 
-#: /resources/lib/gui/movieMenus.py:106
+#: /resources/lib/gui/movieMenus.py:117
 msgctxt "#30402"
 msgid "Returns the most collected (unique users) movies for the week"
 msgstr "Retourneert de meest verzamelde (unieke gebruikers) films van de week"
 
-#: /resources/lib/gui/movieMenus.py:112
+#: /resources/lib/gui/movieMenus.py:124
 msgctxt "#30403"
 msgid "Returns the most played movie lists for the week"
 msgstr "Retourneert de meest afgespeelde filmlijsten voor de week"
 
-#: /resources/lib/gui/movieMenus.py:118
+#: /resources/lib/gui/movieMenus.py:131
 msgctxt "#30404"
 msgid "Returns the most popular movie lists of all time"
 msgstr "Retourneert de meest populaire filmlijsten aller tijden"
 
-#: /resources/lib/gui/movieMenus.py:126
+#: /resources/lib/gui/movieMenus.py:140
 msgctxt "#30405"
 msgid ""
 "Returns the most anticipated movies based on the number of Trakt lists a "
@@ -2383,7 +2291,7 @@ msgstr ""
 "Retourneert de meest verwachte films op basis van het aantal Trakt-lijsten "
 "waarop een film verschijnt."
 
-#: /resources/lib/gui/movieMenus.py:133
+#: /resources/lib/gui/movieMenus.py:148
 msgctxt "#30406"
 msgid ""
 "Returns the top 10 grossing movies in the U.S. box office last weekend. "
@@ -2392,54 +2300,54 @@ msgstr ""
 "Retourneert de top 10 meest winstgevende films in de Amerikaanse box office "
 "afgelopen weekend. Elke maandagochtend bijgewerkt."
 
-#: /resources/lib/gui/movieMenus.py:138
+#: /resources/lib/gui/movieMenus.py:154
 msgctxt "#30407"
 msgid "Returns all movies updated this month."
 msgstr "Retourneert alle films die deze maand zijn bijgewerkt."
 
-#: /resources/lib/gui/movieMenus.py:143
+#: /resources/lib/gui/movieMenus.py:160
 msgctxt "#30408"
 msgid "Allows you to find movies based on genre(s)"
 msgstr "Hiermee kunt u films zoeken op basis van genre(s)"
 
-#: /resources/lib/gui/movieMenus.py:148
+#: /resources/lib/gui/movieMenus.py:166
 msgctxt "#30409"
 msgid "Allows you to find movies based on the year of release"
 msgstr "Hiermee kunt u films zoeken op basis van het jaar van uitgave"
 
-#: /resources/lib/gui/movieMenus.py:175
+#: /resources/lib/gui/movieMenus.py:197
 msgctxt "#30410"
 msgid "A list of Movies you have started watching but have not yet finished"
 msgstr ""
 "Een lijst met films die u bent gaan bekijken maar nog niet afgerond hebt"
 
-#: /resources/lib/gui/movieMenus.py:180
+#: /resources/lib/gui/movieMenus.py:203
 msgctxt "#30411"
 msgid "A list of movies you have collected on Trakt"
 msgstr "Een lijst met films die u op Trakt hebt verzameld"
 
-#: /resources/lib/gui/movieMenus.py:185
+#: /resources/lib/gui/movieMenus.py:209
 msgctxt "#30412"
 msgid "A list of movies you have noted as wanting to watch"
 msgstr ""
 "Een lijst met films waarvan u hebt aangegeven dat ze deze willen bekijken"
 
-#: /resources/lib/gui/movieMenus.py:191
+#: /resources/lib/gui/movieMenus.py:216
 msgctxt "#30413"
 msgid "My movie Trakt Lists"
 msgstr "Mijn Trakt film lijsten"
 
-#: /resources/lib/gui/movieMenus.py:197
+#: /resources/lib/gui/movieMenus.py:223
 msgctxt "#30414"
 msgid "My liked Trakt Lists"
 msgstr "Mijn Liked Trakt Lijsten"
 
-#: /resources/lib/gui/movieMenus.py:202
+#: /resources/lib/gui/movieMenus.py:229
 msgctxt "#30415"
 msgid "My recent watched movies"
 msgstr "Mijn recent bekeken films"
 
-#: /resources/lib/gui/tvshowMenus.py:76
+#: /resources/lib/gui/tvshowMenus.py:78
 msgctxt "#30416"
 msgid ""
 "View the most popular shows. Popularity is calculated using the rating "
@@ -2448,7 +2356,7 @@ msgstr ""
 "Bekijk de meest populaire series. Populariteit wordt berekend aan de hand "
 "vanhet beoordelingspercentage en het aantal beoordelingen."
 
-#: /resources/lib/gui/tvshowMenus.py:81
+#: /resources/lib/gui/tvshowMenus.py:84
 msgctxt "#30417"
 msgid ""
 "View the recent most popular shows. Popularity is calculated using the "
@@ -2457,12 +2365,12 @@ msgstr ""
 "Bekijk de meest recente populaire series. Populariteit wordt berekend aan de"
 " hand van het beoordelingspercentage en het aantal beoordelingen."
 
-#: /resources/lib/gui/tvshowMenus.py:87
+#: /resources/lib/gui/tvshowMenus.py:91
 msgctxt "#30418"
 msgid "Personalized show recommendations based on your watched history"
 msgstr "Gepersonaliseerde showaanbevelingen op basis van je kijkgeschiedenis"
 
-#: /resources/lib/gui/tvshowMenus.py:94
+#: /resources/lib/gui/tvshowMenus.py:99
 msgctxt "#30419"
 msgid ""
 "Returns all shows being watched right now. Shows with the most users are "
@@ -2471,7 +2379,7 @@ msgstr ""
 "Retourneert alle series die op dit moment worden bekeken. Shows met de "
 "meestegebruikers worden als eerste geretourneerd."
 
-#: /resources/lib/gui/tvshowMenus.py:99
+#: /resources/lib/gui/tvshowMenus.py:105
 msgctxt "#30420"
 msgid ""
 "Returns all recent shows being watched right now. Shows with the most users "
@@ -2480,13 +2388,13 @@ msgstr ""
 "Retourneert alle recente series die op dit moment worden bekeken. Shows met "
 "de meeste gebruikers worden als eerste geretourneerd."
 
-#: /resources/lib/gui/tvshowMenus.py:104
+#: /resources/lib/gui/tvshowMenus.py:111
 msgctxt "#30421"
 msgid "Returns shows being released within a 30 day period"
 msgstr ""
 "Retourneert series die binnen een periode van 30 dagen worden vrijgegeven"
 
-#: /resources/lib/gui/tvshowMenus.py:111
+#: /resources/lib/gui/tvshowMenus.py:119
 msgctxt "#30422"
 msgid ""
 "Returns the most played (a single user can watch multiple episodes multiple "
@@ -2495,28 +2403,28 @@ msgstr ""
 "Retourneert de meest afgespeelde series (een enkele gebruiker kan meerdere "
 "afleveringen meerdere keren bekijken) voor de week"
 
-#: /resources/lib/gui/tvshowMenus.py:118
+#: /resources/lib/gui/tvshowMenus.py:127
 msgctxt "#30423"
 msgid "Returns the most watched (unique users) shows for the week"
 msgstr "Retourneert de meest bekeken (unieke gebruikers) series van de week"
 
-#: /resources/lib/gui/tvshowMenus.py:125
+#: /resources/lib/gui/tvshowMenus.py:135
 msgctxt "#30424"
 msgid "Returns the most collected (unique users) shows for the week"
 msgstr ""
 "Retourneert de meest verzamelde (unieke gebruikers) series voor de week"
 
-#: /resources/lib/gui/tvshowMenus.py:131
+#: /resources/lib/gui/tvshowMenus.py:142
 msgctxt "#30425"
 msgid "Returns the most played show lists for the week"
 msgstr "Retourneert de meest afgespeelde serie lijsten voor de week"
 
-#: /resources/lib/gui/tvshowMenus.py:137
+#: /resources/lib/gui/tvshowMenus.py:149
 msgctxt "#30426"
 msgid "Returns the most popular show lists of all time"
 msgstr "Retourneert de meest populaire serie lijsten aller tijden"
 
-#: /resources/lib/gui/tvshowMenus.py:145
+#: /resources/lib/gui/tvshowMenus.py:158
 msgctxt "#30427"
 msgid ""
 "Returns the most anticipated shows based on the number of Trakt lists a show"
@@ -2525,37 +2433,37 @@ msgstr ""
 "Retourneert de meest verwachte shows op basis van het aantal Trakt lijsten "
 "waarop een serie verschijnt."
 
-#: /resources/lib/gui/tvshowMenus.py:151
+#: /resources/lib/gui/tvshowMenus.py:165
 msgctxt "#30428"
 msgid "Returns all shows updated over the past 30 days"
 msgstr "Retourneert alle series die in de afgelopen 30 dagen zijn bijgewerkt"
 
-#: /resources/lib/gui/tvshowMenus.py:156
+#: /resources/lib/gui/tvshowMenus.py:171
 msgctxt "#30429"
 msgid "Returns a list of TV networks that can be used to filter shows by"
 msgstr ""
 "Retourneert een lijst met tv netwerken die kunnen worden gebruikt om series "
 "te filteren op"
 
-#: /resources/lib/gui/tvshowMenus.py:161
+#: /resources/lib/gui/tvshowMenus.py:177
 msgctxt "#30430"
 msgid "Returns a list of years to filter shows by their release dates"
 msgstr ""
 "Retourneert een lijst met jaren om series te filteren op hun datum van "
 "publicatie"
 
-#: /resources/lib/gui/tvshowMenus.py:166
+#: /resources/lib/gui/tvshowMenus.py:183
 msgctxt "#30431"
 msgid "Returns a list of genres to filter shows by"
 msgstr ""
 "Retourneert een lijst met genres waarop series kunnen worden gefilterd"
 
-#: /resources/lib/gui/tvshowMenus.py:171
+#: /resources/lib/gui/tvshowMenus.py:189
 msgctxt "#30432"
 msgid "Search for shows by actor name"
 msgstr "Zoek naar series op acteursnaam"
 
-#: /resources/lib/gui/tvshowMenus.py:193
+#: /resources/lib/gui/tvshowMenus.py:214
 msgctxt "#30433"
 msgid ""
 "View episodes that you have recently started watching but have not yet "
@@ -2564,17 +2472,17 @@ msgstr ""
 "Bekijk afleveringen die u onlangs bent gaan kijken, maar nog niet afgerond "
 "hebt"
 
-#: /resources/lib/gui/tvshowMenus.py:198
+#: /resources/lib/gui/tvshowMenus.py:220
 msgctxt "#30434"
 msgid "View TV shows you have added to your Trakt Collection"
 msgstr "Bekijk series die u aan uw Trakt collectie hebt toegevoegd"
 
-#: /resources/lib/gui/tvshowMenus.py:203
+#: /resources/lib/gui/tvshowMenus.py:226
 msgctxt "#30435"
 msgid "View TV shows you have added to your Trakt Watchlist"
 msgstr "Bekijk series die je hebt toegevoegd aan je Trakt volglijst"
 
-#: /resources/lib/gui/tvshowMenus.py:213
+#: /resources/lib/gui/tvshowMenus.py:238
 msgctxt "#30436"
 msgid ""
 "View the next episode(s) you should watch for all TV shows you have started"
@@ -2582,18 +2490,18 @@ msgstr ""
 "Bekijk de volgende aflevering (en) die u zou moeten bekijken voor alleseries"
 " waarmee u bent begonnen"
 
-#: /resources/lib/gui/tvshowMenus.py:218
+#: /resources/lib/gui/tvshowMenus.py:244
 msgctxt "#30437"
 msgid "View episodes that are due to air in the next 30 days"
 msgstr ""
 "Bekijk afleveringen die in de komende 30 dagen zullen worden uitgezonden"
 
-#: /resources/lib/gui/tvshowMenus.py:223
+#: /resources/lib/gui/tvshowMenus.py:250
 msgctxt "#30438"
 msgid "View TV shows that you have not yet finished watching"
 msgstr "Bekijk series die u nog niet hebt bekeken"
 
-#: /resources/lib/gui/tvshowMenus.py:228
+#: /resources/lib/gui/tvshowMenus.py:256
 msgctxt "#30439"
 msgid ""
 "View episode(s) for shows you watch that have aired in the last 12 days"
@@ -2601,23 +2509,23 @@ msgstr ""
 "Bekijk aflevering (en) van series die u bekijkt en die de afgelopen 12 dagen"
 " zijn uitgezonden"
 
-#: /resources/lib/gui/tvshowMenus.py:234
+#: /resources/lib/gui/tvshowMenus.py:263
 msgctxt "#30440"
 msgid "View your personal show Trakt lists"
 msgstr "Bekijk uw persoonlijke Trakt serie lijsten"
 
-#: /resources/lib/gui/tvshowMenus.py:240
+#: /resources/lib/gui/tvshowMenus.py:270
 msgctxt "#30441"
 msgid "View your liked show Trakt lists"
 msgstr "Bekijk je Liked Trakt lijsten"
 
-#: /resources/lib/gui/tvshowMenus.py:245
+#: /resources/lib/gui/tvshowMenus.py:276
 msgctxt "#30442"
 msgid "My recent watched episodes"
 msgstr "Mijn recent bekeken afleveringen"
 
-#: /resources/lib/modules/getSources.py:433
-#: /resources/lib/modules/helpers.py:74
+#: /resources/lib/modules/getSources.py:471
+#: /resources/lib/modules/helpers.py:77
 msgctxt "#30443"
 msgid ""
 "It seems you have no providers installed\n"
@@ -2626,139 +2534,140 @@ msgstr ""
 "Het lijkt erop dat u geen providers heeft geïnstalleerd\n"
 "Weet u zeker dat u wilt doorgaan?"
 
-#: /resources/settings.xml:37
+#: /resources/settings.xml:124
 msgctxt "#30444"
 msgid "Paginate Trakt Collection"
 msgstr "Pagineer Trakt collectie"
 
-#: /resources/settings.xml:21
+#: /resources/settings.xml:59
 msgctxt "#30445"
 msgid "Show Remaining Unwatched Season Episodes in Mixed Lists"
 msgstr "Toon resterende niet-bekeken seizoen afleveringen in gemengde lijsten"
 
-#: /resources/lib/modules/local_downloader.py:189
-#: /resources/lib/modules/download_manager.py:601
+#: /resources/lib/gui/windows/source_select.py:48
 msgctxt "#30446"
-msgid "Select Download Location"
-msgstr "Selecteer Downloadlocatie"
+msgid "No download location selected"
+msgstr "Geen downloadlocatie geselecteerd"
 
-#: /resources/settings.xml:12
+#: /resources/settings.xml:25
 msgctxt "#30447"
 msgid "Base List Type for Movie Genres"
 msgstr "Basis lijsttype voor filmgenres"
 
-#: /resources/lib/modules/cacheAssist.py:483
+#: /resources/lib/modules/cacheAssist.py:435
 msgctxt "#30448"
 msgid "Cache Assist is attempting to build a torrent source"
 msgstr "Cache Assist probeert een torrent bron te bouwen"
 
-#: /resources/lib/modules/cacheAssist.py:200
+#: /resources/lib/modules/cacheAssist.py:181
 msgctxt "#30449"
 msgid "New cached sources have been created for %s"
 msgstr "Er zijn nieuwe gecachte bronnen gemaakt voor %s"
 
-#: /resources/lib/modules/cacheAssist.py:215
+#: /resources/lib/modules/cacheAssist.py:195
 msgctxt "#30450"
 msgid "Cache assist for %s has failed"
 msgstr "Cache voor %s is mislukt"
 
-#: /resources/settings.xml:11
+#: /resources/settings.xml:20
 msgctxt "#30451"
 msgid "Hide Watched Items"
 msgstr "Verberg bekeken items"
 
-#: /resources/settings.xml:16
+#: /resources/settings.xml:47
 msgctxt "#30452"
 msgid "Hide Next Item in Widgets"
 msgstr "Volgend item verbergen in widgets"
 
-#: /resources/settings.xml:105
+#: /resources/settings.xml:393
 msgctxt "#30453"
 msgid "Show original titles"
 msgstr "Toon originele titels"
 
-#: /resources/settings.xml:106
+#: /resources/settings.xml:408 /resources/settings.xml:415
 msgctxt "#30454"
 msgid "OMDb API Key"
 msgstr "OMDb API sleutel"
 
-#: /resources/lib/modules/cacheAssist.py:92
+#: /resources/lib/modules/cacheAssist.py:81
 msgctxt "#30455"
 msgid "Follow Progress"
 msgstr "Volg Progress"
 
-#: /resources/lib/modules/cacheAssist.py:90
+#: /resources/lib/modules/cacheAssist.py:79
 msgctxt "#30456"
 msgid ""
 "Would you like to cache this in the background or wait for the item to "
 "finish?"
 msgstr "Wilt u dit op de achtergrond cachen of wachten tot het item klaar is?"
 
-#: /resources/lib/modules/cacheAssist.py:91
+#: /resources/lib/modules/cacheAssist.py:80
 msgctxt "#30457"
 msgid "Run in background"
 msgstr "Op de achtergrond uitvoeren"
 
-#: /resources/settings.xml:242 /resources/settings.xml:271
-#: /resources/settings.xml:294
+#: /resources/settings.xml:938 /resources/settings.xml:951
+#: /resources/settings.xml:1047 /resources/settings.xml:1060
+#: /resources/settings.xml:1131 /resources/settings.xml:1144
 msgctxt "#30458"
 msgid "Premium Status"
 msgstr "Premium-status"
 
+#: /resources/skins/Default/1080i/sort_select.xml:1722
 #: /resources/skins/Default/1080i/provider_packages.xml:264
 #: /resources/skins/Default/1080i/download_manager.xml:365
 #: /resources/skins/Default/1080i/filter_select.xml:925
 #: /resources/skins/Default/1080i/still_watching.xml:179
 #: /resources/skins/Default/1080i/playing_next.xml:154
-#: /resources/skins/Default/1080i/source_select.xml:543
-#: /resources/lib/gui/windows/manual_caching.py:19
-#: /resources/lib/gui/windows/download_manager.py:74
+#: /resources/skins/Default/1080i/source_select.xml:564
+#: /resources/lib/gui/windows/manual_caching.py:15
+#: /resources/lib/gui/windows/download_manager.py:68
 msgctxt "#30459"
 msgid "Close"
 msgstr "Afsluiten"
 
-#: /resources/lib/gui/homeMenu.py:159
+#: /resources/lib/gui/homeMenu.py:254
 msgctxt "#30460"
 msgid "Test Manual Cache Window"
 msgstr "Test handmatig cachevenster"
 
-#: /resources/skins/Default/1080i/source_select.xml:532
+#: /resources/skins/Default/1080i/source_select.xml:553
 msgctxt "#30461"
 msgid "View Uncached"
 msgstr "Bekijk niet gecachet"
 
-#: /resources/settings.xml:848 /resources/lib/gui/homeMenu.py:136
+#: /resources/settings.xml:2145 /resources/lib/gui/homeMenu.py:216
 msgctxt "#30462"
 msgid "Test Playing Next"
 msgstr "Volgende afspelen testen"
 
-#: /resources/settings.xml:850 /resources/lib/gui/homeMenu.py:140
+#: /resources/settings.xml:2153 /resources/lib/gui/homeMenu.py:223
 msgctxt "#30463"
 msgid "Test Still Watching"
 msgstr "Test nog steeds aan het kijken"
 
-#: /resources/settings.xml:854 /resources/lib/gui/homeMenu.py:148
+#: /resources/settings.xml:2169 /resources/lib/gui/homeMenu.py:237
 msgctxt "#30464"
 msgid "Test Resolver Window"
 msgstr "Test Resolver venster"
 
-#: /resources/settings.xml:856 /resources/lib/gui/homeMenu.py:152
+#: /resources/settings.xml:2177 /resources/lib/gui/homeMenu.py:244
 msgctxt "#30465"
 msgid "Test Source Select"
 msgstr "Test bronselectie"
 
-#: /resources/settings.xml:858 /resources/lib/gui/homeMenu.py:156
+#: /resources/settings.xml:2185 /resources/lib/gui/homeMenu.py:251
 msgctxt "#30466"
 msgid "Test Manual Cache"
 msgstr "Test handmatige cache"
 
-#: /resources/settings.xml:22
+#: /resources/settings.xml:64
 msgctxt "#30467"
 msgid "General Episode Title Display Style"
 msgstr "Algemene aflevering titel weergave stijl"
 
-#: /resources/lib/modules/cacheAssist.py:108
-#: /resources/lib/modules/cacheAssist.py:159
+#: /resources/lib/modules/cacheAssist.py:95
+#: /resources/lib/modules/cacheAssist.py:142
 msgctxt "#30468"
 msgid "This task is now running in the background"
 msgstr "Deze taak wordt nu op de achtergrond uitgevoerd"
@@ -2768,28 +2677,16 @@ msgctxt "#30469"
 msgid "Clear Completed"
 msgstr "Verwijderen Voltooid"
 
-#: /resources/settings.xml:435 /resources/settings.xml:439
-#: /resources/settings.xml:443 /resources/settings.xml:447
-#: /resources/settings.xml:478 /resources/settings.xml:482
-#: /resources/settings.xml:486 /resources/settings.xml:490
-#: /resources/settings.xml:521 /resources/settings.xml:525
-#: /resources/settings.xml:529 /resources/settings.xml:533
-#: /resources/settings.xml:564 /resources/settings.xml:568
-#: /resources/settings.xml:572 /resources/settings.xml:576
-#: /resources/settings.xml:607 /resources/settings.xml:611
-#: /resources/settings.xml:615 /resources/settings.xml:619
-#: /resources/settings.xml:650 /resources/settings.xml:654
-#: /resources/settings.xml:658 /resources/settings.xml:662
-#: /resources/settings.xml:693 /resources/settings.xml:697
-#: /resources/settings.xml:701 /resources/settings.xml:705
-#: /resources/settings.xml:736 /resources/settings.xml:740
-#: /resources/settings.xml:744 /resources/settings.xml:748
-#: /resources/skins/Default/1080i/get_sources.xml:619
+#: /resources/settings.xml:1766 /resources/settings.xml:1781
+#: /resources/settings.xml:1796 /resources/settings.xml:1811
+#: /resources/settings.xml:1826
+#: /resources/skins/Default/1080i/get_sources.xml:625
+#: /resources/lib/gui/windows/sort_select.py:8
 msgctxt "#30470"
 msgid "Adaptive"
 msgstr "Adaptive"
 
-#: /resources/lib/indexers/__init__.py:28
+#: /resources/lib/indexers/__init__.py:24
 msgctxt "#30471"
 msgid ""
 "Trakt is currently not authorized\n"
@@ -2800,13 +2697,13 @@ msgstr ""
 "Om toegang te krijgen tot deze functies moet u Trakt autoriseren\n"
 "Zou je dat nu willen doen?"
 
-#: /resources/lib/modules/resolver/torrent_resolvers/premiumize.py:45
+#: /resources/lib/modules/resolver/torrent_resolvers/premiumize.py:42
 msgctxt "#30472"
 msgid "Failed to create transfer at PM, please check the log"
 msgstr "Kan in Premiumize geen overdracht maken. Controleer het logboek"
 
-#: /resources/lib/gui/windows/source_select.py:43
-#: /resources/lib/modules/download_manager.py:426
+#: /resources/lib/gui/windows/source_select.py:39
+#: /resources/lib/modules/download_manager.py:440
 msgctxt "#30473"
 msgid "Download"
 msgstr "Download"
@@ -2825,7 +2722,7 @@ msgctxt "#30475"
 msgid "Configure Package"
 msgstr "Pakket configureren"
 
-#: /resources/lib/modules/providers/install_manager.py:118
+#: /resources/lib/modules/providers/install_manager.py:103
 msgctxt "#30476"
 msgid ""
 "Failed to install, please check the zip file or URL supplied and try again"
@@ -2833,50 +2730,50 @@ msgstr ""
 "Installatie mislukt. Controleer het zip-bestand of de opgegeven URL en "
 "probeer het opnieuw"
 
-#: /resources/settings.xml:870
+#: /resources/settings.xml:2210
 msgctxt "#30477"
 msgid "Force widget refresh after playback ends"
 msgstr "Forceer het vernieuwen van de widgets nadat het afspelen is beëindigd"
 
-#: /resources/settings.xml:390
+#: /resources/settings.xml:1418
 msgctxt "#30478"
 msgid "Terminate if Adaptive Sources are Found"
 msgstr "Beëindigen als adaptieve bronnen worden gevonden"
 
-#: /resources/lib/gui/tvshowMenus.py:208
+#: /resources/lib/gui/tvshowMenus.py:232
 msgctxt "#30479"
 msgid "A list of shows you watch sorted by most recently watched"
 msgstr ""
 "Een lijst met series die u bekijkt, gesorteerd op meest recent bekeken"
 
-#: /resources/lib/database/torrentCache/__init__.py:163
+#: /resources/lib/database/torrentCache/__init__.py:143
 msgctxt "#30480"
 msgid "Torrent cache database successfully cleared"
 msgstr "Torrent cache database is gewist"
 
-#: /resources/settings.xml:220
+#: /resources/settings.xml:847
 msgctxt "#30481"
 msgid "Start scrobble after seconds."
 msgstr "Start scrobble na seconden."
 
-#: /resources/settings.xml:224
+#: /resources/settings.xml:866
 msgctxt "#30482"
 msgid "Minimum scrobble percentage before marked watched."
 msgstr ""
 "Minimaal scrobble percentage voordat item gemarkeerd wordt als bekeken."
 
-#: /resources/lib/gui/windows/source_select.py:44
-#: /resources/lib/modules/resolver/torrent_resolvers/base_resolver.py:82
+#: /resources/lib/gui/windows/source_select.py:40
+#: /resources/lib/modules/resolver/torrent_resolvers/base_resolver.py:78
 msgctxt "#30483"
 msgid "File Selection"
 msgstr "Bestand selectie"
 
-#: /resources/settings.xml:110
+#: /resources/settings.xml:420
 msgctxt "#30484"
 msgid "Disable Seren fanart fallback on items missing fanart"
 msgstr "Schakel Seren fanart fallback uit voor items die fanart missen"
 
-#: /resources/lib/modules/resolver/__init__.py:240
+#: /resources/lib/modules/resolver/__init__.py:241
 msgctxt "#30485"
 msgid ""
 "There was an issue getting accepted hoster domains, this may cause odd "
@@ -2885,31 +2782,22 @@ msgstr ""
 "Er is een probleem opgetreden bij het ophalen van geaccepteerde "
 "hosterdomeinen, dit kan een lager schraapresultaat verzoorzaken"
 
-#: /resources/lib/modules/player.py:540
-msgctxt "#30486"
-msgid ""
-"The last playing file was not marked as watched, would you like to do this "
-"now?"
-msgstr ""
-"Het laatst afgespeelde item is niet gemarkeerd als bekeken, wilt u dit nu "
-"doen?"
-
-#: /resources/settings.xml:794
+#: /resources/settings.xml:1949
 msgctxt "#30487"
 msgid "On failure to resolve torrent file"
 msgstr "Bij het niet oplossen van torrent bestand"
 
-#: /resources/settings.xml:795
+#: /resources/settings.xml:1954
 msgctxt "#30488"
 msgid "Skip source"
 msgstr "Sla de bron over"
 
-#: /resources/settings.xml:795
+#: /resources/settings.xml:1955
 msgctxt "#30489"
 msgid "Ask for manual file selection"
 msgstr "Vraag om handmatige bestandsselectie"
 
-#: /resources/lib/modules/resolver/__init__.py:85
+#: /resources/lib/modules/resolver/__init__.py:92
 msgctxt "#30490"
 msgid ""
 "Failed to resolve a playable file, would you like to manually try select the"
@@ -2918,227 +2806,212 @@ msgstr ""
 "Kan een afspeelbaar bestand niet oplossen. Wilt u het bestand handmatig "
 "selecteren?"
 
-#: /resources/lib/modules/metadataHandler.py:60
+#: /resources/lib/modules/metadataHandler.py:53
 msgctxt "#30491"
 msgid "Action"
 msgstr "Actie"
 
-#: /resources/lib/modules/metadataHandler.py:61
+#: /resources/lib/modules/metadataHandler.py:54
 msgctxt "#30492"
 msgid "Adventure"
 msgstr "Avontuur"
 
-#: /resources/lib/modules/metadataHandler.py:62
+#: /resources/lib/modules/metadataHandler.py:55
 msgctxt "#30493"
 msgid "Animation"
 msgstr "Animatie"
 
-#: /resources/lib/modules/metadataHandler.py:63
+#: /resources/lib/modules/metadataHandler.py:56
 msgctxt "#30494"
 msgid "Anime"
 msgstr "Anime"
 
-#: /resources/lib/modules/metadataHandler.py:64
+#: /resources/lib/modules/metadataHandler.py:57
 msgctxt "#30495"
 msgid "Biography"
 msgstr "Biografie"
 
-#: /resources/lib/modules/metadataHandler.py:65
+#: /resources/lib/modules/metadataHandler.py:58
 msgctxt "#30496"
 msgid "Children"
 msgstr "Kinderen"
 
-#: /resources/lib/modules/metadataHandler.py:66
+#: /resources/lib/modules/metadataHandler.py:59
 msgctxt "#30497"
 msgid "Comedy"
 msgstr "Komedie"
 
-#: /resources/lib/modules/metadataHandler.py:67
+#: /resources/lib/modules/metadataHandler.py:60
 msgctxt "#30498"
 msgid "Crime"
 msgstr "Crime"
 
-#: /resources/lib/modules/metadataHandler.py:68
+#: /resources/lib/modules/metadataHandler.py:61
 msgctxt "#30499"
 msgid "Documentary"
 msgstr "Documentaire"
 
-#: /resources/lib/modules/metadataHandler.py:69
+#: /resources/lib/modules/metadataHandler.py:62
 msgctxt "#30500"
 msgid "Drama"
 msgstr "Drama"
 
-#: /resources/lib/modules/metadataHandler.py:70
+#: /resources/lib/modules/metadataHandler.py:63
 msgctxt "#30501"
 msgid "Family"
 msgstr "Familie"
 
-#: /resources/lib/modules/metadataHandler.py:71
+#: /resources/lib/modules/metadataHandler.py:64
 msgctxt "#30502"
 msgid "Fantasy"
 msgstr "Fantasie"
 
-#: /resources/lib/modules/metadataHandler.py:72
+#: /resources/lib/modules/metadataHandler.py:65
 msgctxt "#30503"
 msgid "Game Show"
 msgstr "Spelshow"
 
-#: /resources/lib/modules/metadataHandler.py:73
+#: /resources/lib/modules/metadataHandler.py:66
 msgctxt "#30504"
 msgid "History"
 msgstr "Historie"
 
-#: /resources/lib/modules/metadataHandler.py:74
+#: /resources/lib/modules/metadataHandler.py:67
 msgctxt "#30505"
 msgid "Holiday"
 msgstr "Vakantie"
 
-#: /resources/lib/modules/metadataHandler.py:75
+#: /resources/lib/modules/metadataHandler.py:68
 msgctxt "#30506"
 msgid "Home And Garden"
 msgstr "Huis en tuin"
 
-#: /resources/lib/modules/metadataHandler.py:76
+#: /resources/lib/modules/metadataHandler.py:69
 msgctxt "#30507"
 msgid "Horror"
 msgstr "Horror"
 
-#: /resources/lib/modules/metadataHandler.py:77
+#: /resources/lib/modules/metadataHandler.py:70
 msgctxt "#30508"
 msgid "Mini Serie"
 msgstr "Mini Serie"
 
-#: /resources/lib/modules/metadataHandler.py:78
+#: /resources/lib/modules/metadataHandler.py:71
 msgctxt "#30509"
 msgid "Music"
 msgstr "Muziek"
 
-#: /resources/lib/modules/metadataHandler.py:79
+#: /resources/lib/modules/metadataHandler.py:72
 msgctxt "#30510"
 msgid "Musical"
 msgstr "Musical"
 
-#: /resources/lib/modules/metadataHandler.py:80
+#: /resources/lib/modules/metadataHandler.py:73
 msgctxt "#30511"
 msgid "Mystery"
 msgstr "Mysterie"
 
-#: /resources/lib/modules/metadataHandler.py:81
+#: /resources/lib/modules/metadataHandler.py:74
 msgctxt "#30512"
 msgid "News"
 msgstr "Nieuws"
 
-#: /resources/settings.xml:433 /resources/settings.xml:435
-#: /resources/settings.xml:451 /resources/settings.xml:455
-#: /resources/settings.xml:459 /resources/settings.xml:463
-#: /resources/settings.xml:467 /resources/settings.xml:475
-#: /resources/settings.xml:478 /resources/settings.xml:494
-#: /resources/settings.xml:498 /resources/settings.xml:502
-#: /resources/settings.xml:506 /resources/settings.xml:510
-#: /resources/settings.xml:518 /resources/settings.xml:521
-#: /resources/settings.xml:537 /resources/settings.xml:541
-#: /resources/settings.xml:545 /resources/settings.xml:549
-#: /resources/settings.xml:553 /resources/settings.xml:561
-#: /resources/settings.xml:564 /resources/settings.xml:580
-#: /resources/settings.xml:584 /resources/settings.xml:588
-#: /resources/settings.xml:592 /resources/settings.xml:596
-#: /resources/settings.xml:604 /resources/settings.xml:607
-#: /resources/settings.xml:623 /resources/settings.xml:627
-#: /resources/settings.xml:631 /resources/settings.xml:635
-#: /resources/settings.xml:639 /resources/settings.xml:647
-#: /resources/settings.xml:650 /resources/settings.xml:666
-#: /resources/settings.xml:670 /resources/settings.xml:674
-#: /resources/settings.xml:678 /resources/settings.xml:682
-#: /resources/settings.xml:690 /resources/settings.xml:693
-#: /resources/settings.xml:709 /resources/settings.xml:713
-#: /resources/settings.xml:717 /resources/settings.xml:721
-#: /resources/settings.xml:725 /resources/settings.xml:733
-#: /resources/settings.xml:736 /resources/settings.xml:752
-#: /resources/settings.xml:756 /resources/settings.xml:760
-#: /resources/settings.xml:764 /resources/settings.xml:768
-#: /resources/lib/modules/metadataHandler.py:82
+#: /resources/settings.xml:1580 /resources/settings.xml:1603
+#: /resources/settings.xml:1626 /resources/settings.xml:1649
+#: /resources/settings.xml:1672 /resources/settings.xml:1695
+#: /resources/settings.xml:1718 /resources/settings.xml:1741
+#: /resources/settings.xml:1764 /resources/settings.xml:1839
+#: /resources/settings.xml:1851 /resources/settings.xml:1863
+#: /resources/settings.xml:1876 /resources/settings.xml:1889
+#: /resources/lib/gui/windows/sort_select.py:4
+#: /resources/lib/gui/windows/sort_select.py:10
+#: /resources/lib/gui/windows/sort_select.py:15
+#: /resources/lib/gui/windows/sort_select.py:89
+#: /resources/lib/gui/windows/sort_select.py:98
+#: /resources/lib/gui/windows/sort_select.py:110
+#: /resources/lib/modules/metadataHandler.py:75
 msgctxt "#30513"
 msgid "None"
 msgstr "Geen"
 
-#: /resources/lib/modules/metadataHandler.py:83
+#: /resources/lib/modules/metadataHandler.py:76
 msgctxt "#30514"
 msgid "Reality"
 msgstr "Reality"
 
-#: /resources/lib/modules/metadataHandler.py:84
+#: /resources/lib/modules/metadataHandler.py:77
 msgctxt "#30515"
 msgid "Romance"
 msgstr "Romantiek"
 
-#: /resources/lib/modules/metadataHandler.py:85
-#: /resources/lib/modules/metadataHandler.py:86
+#: /resources/lib/modules/metadataHandler.py:78
+#: /resources/lib/modules/metadataHandler.py:79
 msgctxt "#30516"
 msgid "Science Fiction"
 msgstr "Science fiction"
 
-#: /resources/lib/modules/metadataHandler.py:87
+#: /resources/lib/modules/metadataHandler.py:80
 msgctxt "#30517"
 msgid "Short"
 msgstr "Kort"
 
-#: /resources/lib/modules/metadataHandler.py:88
+#: /resources/lib/modules/metadataHandler.py:81
 msgctxt "#30518"
 msgid "Soap"
 msgstr "Soap"
 
-#: /resources/lib/modules/metadataHandler.py:89
+#: /resources/lib/modules/metadataHandler.py:82
 msgctxt "#30519"
 msgid "Special Interest"
 msgstr "Speciale interesse"
 
-#: /resources/lib/modules/metadataHandler.py:90
+#: /resources/lib/modules/metadataHandler.py:83
 msgctxt "#30520"
 msgid "Sporting Event"
 msgstr "Sport evenement"
 
-#: /resources/lib/modules/metadataHandler.py:91
+#: /resources/lib/modules/metadataHandler.py:84
 msgctxt "#30521"
 msgid "Superhero"
 msgstr "Superheld"
 
-#: /resources/lib/modules/metadataHandler.py:92
+#: /resources/lib/modules/metadataHandler.py:85
 msgctxt "#30522"
 msgid "Suspense"
 msgstr "Spanning"
 
-#: /resources/lib/modules/metadataHandler.py:93
-#: /resources/lib/modules/metadataHandler.py:94
+#: /resources/lib/modules/metadataHandler.py:86
+#: /resources/lib/modules/metadataHandler.py:87
 msgctxt "#30523"
 msgid "Talk Show"
 msgstr "Talkshow"
 
-#: /resources/lib/modules/metadataHandler.py:95
+#: /resources/lib/modules/metadataHandler.py:88
 msgctxt "#30524"
 msgid "Thriller"
 msgstr "Thriller"
 
-#: /resources/lib/modules/metadataHandler.py:96
+#: /resources/lib/modules/metadataHandler.py:89
 msgctxt "#30525"
 msgid "TV Movie"
 msgstr "Film"
 
-#: /resources/lib/modules/metadataHandler.py:97
+#: /resources/lib/modules/metadataHandler.py:90
 msgctxt "#30526"
 msgid "War"
 msgstr "Oorlog"
 
-#: /resources/lib/modules/metadataHandler.py:98
+#: /resources/lib/modules/metadataHandler.py:91
 msgctxt "#30527"
 msgid "Western"
 msgstr "Westers"
 
-#: /resources/lib/modules/metadataHandler.py:381
+#: /resources/lib/modules/metadataHandler.py:398
 msgctxt "#30528"
 msgid "Season {}"
 msgstr "Seizoen {}"
 
-#: /resources/lib/modules/metadataHandler.py:383
+#: /resources/lib/modules/metadataHandler.py:396
 msgctxt "#30529"
 msgid "Episode {}"
 msgstr "Aflevering {}"
@@ -3154,34 +3027,34 @@ msgstr ""
 "\n"
 " Als je op de hoogte wilt blijven van updates, zorg er dan voor dat je de nixgates-repository hebt geïnstalleerd en of automatische updates zijn ingeschakeld of schakel meldingen voor add-on-updates in Kodi-instellingen in"
 
-#: /resources/lib/common/maintenance.py:166
+#: /resources/lib/common/maintenance.py:158
 msgctxt "#30531"
 msgid "Language Invoker option has been changed, reloading kodi profile"
 msgstr ""
 "De optie \"Re-Use Language Invoker\" is gewijzigd, waarbij het kodi-profiel "
 "opnieuw wordt geladen"
 
-#: /resources/settings.xml:933
+#: /resources/settings.xml:2528 /resources/settings.xml:2533
 msgctxt "#30532"
 msgid "Re-Use Language Invoker Status"
 msgstr "Re-Use Language Invoker Status"
 
-#: /resources/settings.xml:936
+#: /resources/settings.xml:2536
 msgctxt "#30533"
 msgid "Toggle Re-Use Language Invoker"
 msgstr "Schakel Re-Use Language Invoker"
 
-#: /resources/settings.xml:415
+#: /resources/settings.xml:1517
 msgctxt "#30534"
 msgid "Movie minimum File Size (GB)"
 msgstr "Minimale bestandsgrootte van film (GB)"
 
-#: /resources/settings.xml:419
+#: /resources/settings.xml:1534
 msgctxt "#30535"
 msgid "Episode minimum File Size (GB)"
 msgstr "Minimale bestandsgrootte van aflevering (GB)"
 
-#: /resources/lib/indexers/trakt.py:69
+#: /resources/lib/indexers/trakt.py:67
 msgctxt "#30536"
 msgid ""
 "Invalid Trakt API keys, your authentication has been reset.\n"
@@ -3190,72 +3063,72 @@ msgstr ""
 "Ongeldige Trakt API-sleutels, uw authenticatie is gereset.\n"
 "Verifieer uw Trakt account opnieuw."
 
-#: /resources/settings.xml:34
+#: /resources/settings.xml:108
 msgctxt "#30537"
 msgid "Collection Sort Style"
 msgstr "Collectie Sorteer stijl"
 
-#: /resources/settings.xml:35
+#: /resources/settings.xml:113
 msgctxt "#30538"
 msgid "Date Collected"
 msgstr "Datum verzameld"
 
-#: /resources/settings.xml:35
+#: /resources/settings.xml:114
 msgctxt "#30539"
 msgid "Alphabetically"
 msgstr "Alfabetisch"
 
-#: /resources/settings.xml:931
+#: /resources/settings.xml:2515
 msgctxt "#30540"
 msgid "Threading Scale"
 msgstr "Threading schaal"
 
-#: /resources/settings.xml:932
+#: /resources/settings.xml:2520
 msgctxt "#30541"
 msgid "Low"
 msgstr "Laag"
 
-#: /resources/settings.xml:932
+#: /resources/settings.xml:2521
 msgctxt "#30542"
 msgid "Normal"
 msgstr "Normaal"
 
-#: /resources/settings.xml:932
+#: /resources/settings.xml:2522
 msgctxt "#30543"
 msgid "High"
 msgstr "Hoog"
 
-#: /resources/settings.xml:932
+#: /resources/settings.xml:2523
 msgctxt "#30544"
 msgid "Extreme"
 msgstr "Extreem"
 
-#: /resources/settings.xml:871
+#: /resources/settings.xml:2215
 msgctxt "#30545"
 msgid "Enable Tools menu item for Window Tests"
 msgstr "Schakel gereedschap menu item in voor venstertests"
 
-#: /resources/settings.xml:847
+#: /resources/settings.xml:2144
 msgctxt "#30546"
 msgid "Window Tests"
 msgstr "Venster tests"
 
-#: /resources/settings.xml:920
+#: /resources/settings.xml:2483
 msgctxt "#30547"
 msgid "Time Zone"
 msgstr "Tijdzone"
 
-#: /resources/settings.xml:925 /resources/lib/modules/manual_timezone.py:36
+#: /resources/settings.xml:2500 /resources/lib/modules/manual_timezone.py:27
 msgctxt "#30548"
 msgid "Set Local Time Zone"
 msgstr "Stel de lokale tijdzone in"
 
-#: /resources/lib/modules/manual_timezone.py:18
+#: /resources/lib/modules/manual_timezone.py:14
 msgctxt "#30549"
 msgid "Unable to detect time zone"
 msgstr "Tijdzone kan niet worden gedetecteerd"
 
-#: /resources/lib/modules/manual_timezone.py:18
+#: /resources/lib/modules/manual_timezone.py:14
 msgctxt "#30550"
 msgid ""
 "Seren was unable to detect your local time zone automatically.  Would you "
@@ -3284,7 +3157,7 @@ msgid "Playing in"
 msgstr "Afspelen in"
 
 #: /resources/skins/Default/1080i/playing_next.xml:115
-#: /resources/lib/modules/getSources.py:1230
+#: /resources/lib/modules/getSources.py:1277
 msgctxt "#30554"
 msgid "seconds"
 msgstr "seconden"
@@ -3299,12 +3172,12 @@ msgctxt "#30556"
 msgid "Provider Packages"
 msgstr "Provider pakketten"
 
-#: /resources/skins/Default/1080i/source_select.xml:478
+#: /resources/skins/Default/1080i/source_select.xml:499
 msgctxt "#30557"
 msgid "Year"
 msgstr "Jaar"
 
-#: /resources/skins/Default/1080i/source_select.xml:478
+#: /resources/skins/Default/1080i/source_select.xml:499
 msgctxt "#30558"
 msgid "MPAA"
 msgstr "MPAA"
@@ -3342,7 +3215,7 @@ msgctxt "#30564"
 msgid "Done"
 msgstr "Klaar"
 
-#: /resources/lib/gui/movieMenus.py:307 /resources/lib/gui/tvshowMenus.py:439
+#: /resources/lib/gui/movieMenus.py:325 /resources/lib/gui/tvshowMenus.py:446
 msgctxt "#30565"
 msgid "Remove from History"
 msgstr "Verwijderen uit geschiedenis"
@@ -3379,328 +3252,284 @@ msgctxt "#30568"
 msgid "Status"
 msgstr "Status"
 
-#: /resources/settings.xml:428
+#: /resources/settings.xml:1570
 msgctxt "#30569"
 msgid "Prioritize the Last Resolved Show Release Name"
 msgstr "Prioriteit geven aan de laatst gekozen Release Name"
 
-#: /resources/settings.xml:433 /resources/settings.xml:475
-#: /resources/settings.xml:518 /resources/settings.xml:561
-#: /resources/settings.xml:604 /resources/settings.xml:647
-#: /resources/settings.xml:690 /resources/settings.xml:733
+#: /resources/settings.xml:1583 /resources/settings.xml:1606
+#: /resources/settings.xml:1629 /resources/settings.xml:1652
+#: /resources/settings.xml:1675 /resources/settings.xml:1698
+#: /resources/settings.xml:1721 /resources/settings.xml:1744
+#: /resources/lib/gui/windows/sort_select.py:4
 msgctxt "#30570"
 msgid "Debrid Provider"
 msgstr "Debrid Provider"
 
-#: /resources/settings.xml:433 /resources/settings.xml:475
-#: /resources/settings.xml:518 /resources/settings.xml:561
-#: /resources/settings.xml:604 /resources/settings.xml:647
-#: /resources/settings.xml:690 /resources/settings.xml:733
+#: /resources/settings.xml:1585 /resources/settings.xml:1608
+#: /resources/settings.xml:1631 /resources/settings.xml:1654
+#: /resources/settings.xml:1677 /resources/settings.xml:1700
+#: /resources/settings.xml:1723 /resources/settings.xml:1746
+#: /resources/lib/gui/windows/sort_select.py:4
 msgctxt "#30571"
 msgid "Low Cam Sort"
 msgstr "Low Cam Sort"
 
-#: /resources/settings.xml:433 /resources/settings.xml:475
-#: /resources/settings.xml:518 /resources/settings.xml:561
-#: /resources/settings.xml:604 /resources/settings.xml:647
-#: /resources/settings.xml:690 /resources/settings.xml:733
+#: /resources/settings.xml:1586 /resources/settings.xml:1609
+#: /resources/settings.xml:1632 /resources/settings.xml:1655
+#: /resources/settings.xml:1678 /resources/settings.xml:1701
+#: /resources/settings.xml:1724 /resources/settings.xml:1747
+#: /resources/lib/gui/windows/sort_select.py:4
 msgctxt "#30572"
 msgid "HEVC"
 msgstr "HEVC"
 
-#: /resources/settings.xml:433 /resources/settings.xml:475
-#: /resources/settings.xml:518 /resources/settings.xml:561
-#: /resources/settings.xml:604 /resources/settings.xml:647
-#: /resources/settings.xml:690 /resources/settings.xml:733
+#: /resources/settings.xml:1587 /resources/settings.xml:1610
+#: /resources/settings.xml:1633 /resources/settings.xml:1656
+#: /resources/settings.xml:1679 /resources/settings.xml:1702
+#: /resources/settings.xml:1725 /resources/settings.xml:1748
+#: /resources/lib/gui/windows/sort_select.py:4
 msgctxt "#30573"
 msgid "DV/HDR"
 msgstr "DV/HDR"
 
-#: /resources/settings.xml:451 /resources/settings.xml:455
-#: /resources/settings.xml:494 /resources/settings.xml:498
-#: /resources/settings.xml:537 /resources/settings.xml:541
-#: /resources/settings.xml:580 /resources/settings.xml:584
-#: /resources/settings.xml:623 /resources/settings.xml:627
-#: /resources/settings.xml:666 /resources/settings.xml:670
-#: /resources/settings.xml:709 /resources/settings.xml:713
-#: /resources/settings.xml:752 /resources/settings.xml:756
+#: /resources/settings.xml:1841 /resources/settings.xml:1853
+#: /resources/lib/gui/windows/sort_select.py:15
 msgctxt "#30574"
 msgid "HDR"
 msgstr "HDR"
 
-#: /resources/settings.xml:433 /resources/settings.xml:475
-#: /resources/settings.xml:518 /resources/settings.xml:561
-#: /resources/settings.xml:604 /resources/settings.xml:647
-#: /resources/settings.xml:690 /resources/settings.xml:733
+#: /resources/settings.xml:1588 /resources/settings.xml:1611
+#: /resources/settings.xml:1634 /resources/settings.xml:1657
+#: /resources/settings.xml:1680 /resources/settings.xml:1703
+#: /resources/settings.xml:1726 /resources/settings.xml:1749
 #: /resources/skins/Default/1080i/filter_select.xml:579
+#: /resources/lib/gui/windows/sort_select.py:4
 msgctxt "#30575"
 msgid "Audio Channels"
 msgstr "Audiokanalen"
 
-#: /resources/settings.xml:434 /resources/settings.xml:450
-#: /resources/settings.xml:458 /resources/settings.xml:477
-#: /resources/settings.xml:493 /resources/settings.xml:501
-#: /resources/settings.xml:520 /resources/settings.xml:536
-#: /resources/settings.xml:544 /resources/settings.xml:563
-#: /resources/settings.xml:579 /resources/settings.xml:587
-#: /resources/settings.xml:606 /resources/settings.xml:622
-#: /resources/settings.xml:630 /resources/settings.xml:649
-#: /resources/settings.xml:665 /resources/settings.xml:673
-#: /resources/settings.xml:692 /resources/settings.xml:708
-#: /resources/settings.xml:716 /resources/settings.xml:735
-#: /resources/settings.xml:751 /resources/settings.xml:759
+#: /resources/settings.xml:1759 /resources/settings.xml:1834
+#: /resources/settings.xml:1858
 msgctxt "#30576"
 msgid "First Priority"
 msgstr "Eerste prioriteit"
 
-#: /resources/settings.xml:438 /resources/settings.xml:454
-#: /resources/settings.xml:462 /resources/settings.xml:481
-#: /resources/settings.xml:497 /resources/settings.xml:505
-#: /resources/settings.xml:524 /resources/settings.xml:540
-#: /resources/settings.xml:548 /resources/settings.xml:567
-#: /resources/settings.xml:583 /resources/settings.xml:591
-#: /resources/settings.xml:610 /resources/settings.xml:626
-#: /resources/settings.xml:634 /resources/settings.xml:653
-#: /resources/settings.xml:669 /resources/settings.xml:677
-#: /resources/settings.xml:696 /resources/settings.xml:712
-#: /resources/settings.xml:720 /resources/settings.xml:739
-#: /resources/settings.xml:755 /resources/settings.xml:763
+#: /resources/settings.xml:1774 /resources/settings.xml:1846
+#: /resources/settings.xml:1871
 msgctxt "#30577"
 msgid "Second Priority"
 msgstr "Tweede prioriteit"
 
-#: /resources/settings.xml:442 /resources/settings.xml:466
-#: /resources/settings.xml:485 /resources/settings.xml:509
-#: /resources/settings.xml:528 /resources/settings.xml:552
-#: /resources/settings.xml:571 /resources/settings.xml:595
-#: /resources/settings.xml:614 /resources/settings.xml:638
-#: /resources/settings.xml:657 /resources/settings.xml:681
-#: /resources/settings.xml:700 /resources/settings.xml:724
-#: /resources/settings.xml:743 /resources/settings.xml:767
+#: /resources/settings.xml:1789 /resources/settings.xml:1884
 msgctxt "#30578"
 msgid "Third Priority"
 msgstr "Derde prioriteit"
 
-#: /resources/settings.xml:446 /resources/settings.xml:489
-#: /resources/settings.xml:532 /resources/settings.xml:575
-#: /resources/settings.xml:618 /resources/settings.xml:661
-#: /resources/settings.xml:704 /resources/settings.xml:747
+#: /resources/settings.xml:1804
 msgctxt "#30579"
 msgid "Fourth Priority"
 msgstr "Vierde prioriteit"
 
-#: /resources/settings.xml:470 /resources/settings.xml:513
-#: /resources/settings.xml:556 /resources/settings.xml:599
-#: /resources/settings.xml:642 /resources/settings.xml:685
-#: /resources/settings.xml:728 /resources/settings.xml:771
+#: /resources/settings.xml:1593 /resources/settings.xml:1616
+#: /resources/settings.xml:1639 /resources/settings.xml:1662
+#: /resources/settings.xml:1685 /resources/settings.xml:1708
+#: /resources/settings.xml:1731 /resources/settings.xml:1754
 msgctxt "#30580"
 msgid "Reverse Sort Direction"
 msgstr "Omgekeerde sorteerrichting"
 
-#: /resources/settings.xml:439 /resources/settings.xml:443
-#: /resources/settings.xml:447 /resources/settings.xml:482
-#: /resources/settings.xml:486 /resources/settings.xml:490
-#: /resources/settings.xml:525 /resources/settings.xml:529
-#: /resources/settings.xml:533 /resources/settings.xml:568
-#: /resources/settings.xml:572 /resources/settings.xml:576
-#: /resources/settings.xml:611 /resources/settings.xml:615
-#: /resources/settings.xml:619 /resources/settings.xml:654
-#: /resources/settings.xml:658 /resources/settings.xml:662
-#: /resources/settings.xml:697 /resources/settings.xml:701
-#: /resources/settings.xml:705 /resources/settings.xml:740
-#: /resources/settings.xml:744 /resources/settings.xml:748
+#: /resources/settings.xml:1779 /resources/settings.xml:1794
+#: /resources/settings.xml:1809 /resources/settings.xml:1824
+#: /resources/lib/gui/windows/sort_select.py:8
+#: /resources/lib/gui/windows/sort_select.py:89
+#: /resources/lib/gui/windows/sort_select.py:110
 msgctxt "#30581"
 msgid "Other"
 msgstr "Overig"
 
-#: /resources/settings.xml:432
+#: /resources/settings.xml:1575
 msgctxt "#30582"
 msgid "Sort Level 1"
 msgstr "Sorteer niveau 1"
 
-#: /resources/settings.xml:474
+#: /resources/settings.xml:1598
 msgctxt "#30583"
 msgid "Sort Level 2"
 msgstr "Sorteer niveau 2"
 
-#: /resources/settings.xml:517
+#: /resources/settings.xml:1621
 msgctxt "#30584"
 msgid "Sort Level 3"
 msgstr "Sorteer niveau 3"
 
-#: /resources/settings.xml:560
+#: /resources/settings.xml:1644
 msgctxt "#30585"
 msgid "Sort Level 4"
 msgstr "Sorteer niveau 4"
 
-#: /resources/settings.xml:603
+#: /resources/settings.xml:1667
 msgctxt "#30586"
 msgid "Sort Level 5"
 msgstr "Sorteer niveau 5"
 
-#: /resources/settings.xml:646
+#: /resources/settings.xml:1690
 msgctxt "#30587"
 msgid "Sort Level 6"
 msgstr "Sorteer niveau 6"
 
-#: /resources/settings.xml:689
+#: /resources/settings.xml:1713
 msgctxt "#30588"
 msgid "Sort Level 7"
 msgstr "Sorteer niveau 7"
 
-#: /resources/settings.xml:732
+#: /resources/settings.xml:1736
 msgctxt "#30589"
 msgid "Sort Level 8"
 msgstr "Sort Niveau 8"
 
-#: /resources/settings.xml:451 /resources/settings.xml:455
-#: /resources/settings.xml:494 /resources/settings.xml:498
-#: /resources/settings.xml:537 /resources/settings.xml:541
-#: /resources/settings.xml:580 /resources/settings.xml:584
-#: /resources/settings.xml:623 /resources/settings.xml:627
-#: /resources/settings.xml:666 /resources/settings.xml:670
-#: /resources/settings.xml:709 /resources/settings.xml:713
-#: /resources/settings.xml:752 /resources/settings.xml:756
+#: /resources/settings.xml:1840 /resources/settings.xml:1852
+#: /resources/lib/gui/windows/sort_select.py:15
 msgctxt "#30590"
 msgid "DV"
 msgstr "DV"
 
-#: /resources/settings.xml:7
+#: /resources/settings.xml:4
 msgctxt "#30591"
 msgid "All Menus"
 msgstr "Alle Menu's"
 
-#: /resources/settings.xml:19
+#: /resources/settings.xml:53
 msgctxt "#30592"
 msgid "Episode Menus"
 msgstr "Aflevering menu's"
 
-#: /resources/settings.xml:28
+#: /resources/settings.xml:91
 msgctxt "#30593"
 msgid "Trakt Menus"
 msgstr "Trakt Menu's"
 
-#: /resources/settings.xml:47 /resources/settings.xml:50
+#: /resources/settings.xml:163
 msgctxt "#30594"
 msgid "Download Location"
 msgstr "Download Locatie"
 
-#: /resources/settings.xml:78
+#: /resources/settings.xml:311
 msgctxt "#30595"
 msgid "Colors"
 msgstr "Kleuren"
 
-#: /resources/settings.xml:99
+#: /resources/settings.xml:379
 msgctxt "#30596"
 msgid "Metadata & Artwork"
 msgstr "Metadata & Artwork"
 
-#: /resources/settings.xml:102
+#: /resources/settings.xml:380
 msgctxt "#30597"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: /resources/settings.xml:369 /resources/settings.xml:373
-#: /resources/settings.xml:403 /resources/settings.xml:405
+#: /resources/settings.xml:1334 /resources/settings.xml:1352
+#: /resources/settings.xml:1457 /resources/settings.xml:1470
 msgctxt "#30598"
 msgid "4K"
 msgstr "4K"
 
-#: /resources/settings.xml:369 /resources/settings.xml:373
-#: /resources/settings.xml:403 /resources/settings.xml:405
+#: /resources/settings.xml:1335 /resources/settings.xml:1353
+#: /resources/settings.xml:1458 /resources/settings.xml:1471
 msgctxt "#30599"
 msgid "1080p"
 msgstr "1080p"
 
-#: /resources/settings.xml:369 /resources/settings.xml:373
-#: /resources/settings.xml:403 /resources/settings.xml:405
+#: /resources/settings.xml:1336 /resources/settings.xml:1354
+#: /resources/settings.xml:1459 /resources/settings.xml:1472
 msgctxt "#30600"
 msgid "720p"
 msgstr "720p"
 
-#: /resources/settings.xml:369 /resources/settings.xml:373
-#: /resources/settings.xml:403 /resources/settings.xml:405
+#: /resources/settings.xml:1337 /resources/settings.xml:1355
+#: /resources/settings.xml:1460 /resources/settings.xml:1473
 msgctxt "#30601"
 msgid "SD"
 msgstr "SD"
 
-#: /resources/settings.xml:786
+#: /resources/settings.xml:1924
 msgctxt "#30602"
 msgid "Resume"
 msgstr "Doorgaan"
 
-#: /resources/settings.xml:792
+#: /resources/settings.xml:1943
 msgctxt "#30603"
 msgid "Resolving"
 msgstr "Oplossen"
 
-#: /resources/settings.xml:798
+#: /resources/settings.xml:1961
 msgctxt "#30604"
 msgid "Smart Play"
 msgstr "Smart Play"
 
-#: /resources/settings.xml:868
+#: /resources/settings.xml:2204
 msgctxt "#30605"
 msgid "Menus"
 msgstr "Menu's"
 
-#: /resources/settings.xml:921
+#: /resources/settings.xml:2484 /resources/settings.xml:2492
 msgctxt "#30606"
 msgid "Local Time Zone"
 msgstr "Lokale tijdzone"
 
-#: /resources/settings.xml:930
+#: /resources/settings.xml:2514
 msgctxt "#30607"
 msgid "Performance"
 msgstr "Prestaties"
 
-#: /resources/settings.xml:42
+#: /resources/settings.xml:141
 #: /resources/skins/Default/1080i/filter_select.xml:749
 msgctxt "#30608"
 msgid "Miscellaneous"
 msgstr "Diversen"
 
-#: /resources/settings.xml:14
+#: /resources/settings.xml:36
 msgctxt "#30609"
 msgid "Base List Type for TV Genres"
 msgstr "Basislijsttype voor tv-genres"
 
-#: /resources/skins/Default/1080i/get_sources.xml:310
+#: /resources/skins/Default/1080i/get_sources.xml:316
 msgctxt "#30610"
 msgid "Total"
 msgstr "Totaal"
 
-#: /resources/skins/Default/1080i/get_sources.xml:680
+#: /resources/skins/Default/1080i/get_sources.xml:748
 msgctxt "#30611"
 msgid "Playable"
 msgstr "Gameplay"
 
-#: /resources/settings.xml:404
+#: /resources/settings.xml:1465
 msgctxt "#30612"
 msgid "Min Resolution"
 msgstr "Min. resolutie"
 
-#: /resources/settings.xml:852 /resources/lib/gui/homeMenu.py:144
+#: /resources/settings.xml:2161 /resources/lib/gui/homeMenu.py:230
 msgctxt "#30613"
 msgid "Test Get Sources"
 msgstr "Bronnen testen"
 
-#: /resources/lib/gui/homeMenu.py:147
+#: /resources/lib/gui/homeMenu.py:233
 msgctxt "#30614"
 msgid "Opens the Get Sources Window"
 msgstr "Opent het venster Bronnen ophalen"
 
-#: /resources/lib/modules/getSources.py:162
+#: /resources/lib/modules/getSources.py:176
 msgctxt "#30615"
 msgid "No providers currently enabled, please enable some"
 msgstr "Geen providers momenteel ingeschakeld, schakel enkele in"
 
-#: /resources/settings.xml:384
+#: /resources/settings.xml:1398
 msgctxt "#30616"
 msgid "Wait for cloud files"
 msgstr "Wacht op cloudbestanden"
 
-#: /resources/settings.xml:400
+#: /resources/settings.xml:1442
 msgctxt "#30617"
 msgid "Choose Items to Filter..."
 msgstr "Items kiezen om te filteren..."
@@ -3735,22 +3564,22 @@ msgctxt "#30622"
 msgid "Type"
 msgstr "Type"
 
-#: /resources/skins/Default/1080i/configure_provider_package.xml:751
+#: /resources/skins/Default/1080i/configure_provider_package.xml:883
 msgctxt "#30623"
 msgid "Return to Packages"
 msgstr "Terug naar pakketten"
 
-#: /resources/lib/gui/windows/source_select.py:89
+#: /resources/lib/gui/windows/source_select.py:100
 msgctxt "#30624"
 msgid "Return to Source Select"
 msgstr "Terug naar bronselectie"
 
-#: /resources/settings.xml:860 /resources/lib/gui/homeMenu.py:163
+#: /resources/settings.xml:2193 /resources/lib/gui/homeMenu.py:261
 msgctxt "#30625"
 msgid "Test Download Manager Window"
 msgstr "Test Download Manager-venster"
 
-#: /resources/lib/gui/homeMenu.py:160
+#: /resources/lib/gui/homeMenu.py:258
 msgctxt "#30626"
 msgid "Test Download Manager"
 msgstr "Test Download manager"
@@ -3764,3 +3593,111 @@ msgstr "Gedownload"
 msgctxt "#30628"
 msgid "Progress"
 msgstr "Voortgang"
+
+#: /resources/skins/Default/1080i/get_sources.xml:687
+#: /resources/lib/gui/windows/sort_select.py:8
+msgctxt "#30631"
+msgid "Direct"
+msgstr "Rechtstreeks"
+
+#: /resources/settings.xml:1428
+msgctxt "#30630"
+msgid "Terminate if Direct Sources are Found"
+msgstr "Beëindigen als directe bronnen worden gevonden"
+
+#: /resources/settings.xml:1560
+msgctxt "#30633"
+msgid "Choose Sorting..."
+msgstr "Kies Sorteren..."
+
+#: /resources/skins/Default/1080i/sort_select.xml:45
+msgctxt "#30632"
+msgid "Sorting Configuration"
+msgstr "Configuratie sorteren"
+
+#: /resources/settings.xml:403
+msgctxt "#30629"
+msgid "Use language based release dates for movies"
+msgstr "Gebruik op taal gebaseerde releasedata voor films"
+
+#: /resources/settings.xml:1819
+msgctxt "#30031"
+msgid "Fifth Priority"
+msgstr "Vijfde prioriteit"
+
+#: /resources/lib/gui/windows/source_select.py:52
+msgctxt "#30634"
+msgid "Download task started"
+msgstr "Downloadtaak gestart"
+
+#: /resources/settings.xml:1252
+msgctxt "#30635"
+msgid "Scrape Premiumize Cloud"
+msgstr "Scrape Premiumize Cloud"
+
+#: /resources/settings.xml:1262
+msgctxt "#30636"
+msgid "Scrape Real-Debrid Cloud"
+msgstr "Real-Debrid Cloud schrapen"
+
+#: /resources/settings.xml:1272
+msgctxt "#30637"
+msgid "Scrape AllDebrid Cloud"
+msgstr "Schraap AllDebrid Cloud"
+
+#: /resources/settings.xml:747
+msgctxt "#30638"
+msgid "Season Poster"
+msgstr "Seizoensposter"
+
+#: /resources/settings.xml:757
+msgctxt "#30639"
+msgid "Season Banner"
+msgstr "Seizoensbanner"
+
+#: /resources/settings.xml:767
+msgctxt "#30263"
+msgid "Season Landscape"
+msgstr "Seizoenlandschap"
+
+#: /resources/settings.xml:777
+msgctxt "#30262"
+msgid "Season Fanart"
+msgstr "Seizoen Fanart"
+
+#: /resources/settings.xml:787
+msgctxt "#30261"
+msgid "Episode Fanart"
+msgstr "Aflevering Fanart"
+
+#: /resources/settings.xml:398
+msgctxt "#30640"
+msgid "Limit to One Studio/Network"
+msgstr "Beperk tot één studio/netwerk"
+
+#: /resources/lib/modules/download_manager.py:119
+msgctxt "#30644"
+msgid "Skipped creating duplicate download task."
+msgstr "Het maken van een dubbele downloadtaak is overgeslagen."
+
+#: /resources/lib/modules/download_manager.py:232
+msgctxt "#30643"
+msgid "Download failed: {}"
+msgstr "Downloaden is mislukt: {}"
+
+#: /resources/lib/modules/download_manager.py:235
+msgctxt "#30642"
+msgid "Download complete: {}"
+msgstr "Download compleet: {}"
+
+#: /resources/lib/gui/windows/source_select.py:56
+msgctxt "#30641"
+msgid "Sorry, {} type sources are not available for downloading"
+msgstr "Sorry, {} type bronnen zijn niet beschikbaar voor downloaden"
+
+#: /resources/skins/Default/1080i/manual_caching.xml:125
+#: /resources/skins/Default/1080i/manual_caching.xml:238
+#: /resources/skins/Default/1080i/manual_caching.xml:387
+msgctxt "#30486"
+msgid "Seeds"
+msgstr "Zaden"

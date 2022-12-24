@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import importlib
 import json
 
@@ -16,7 +13,7 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
     """
 
     def __init__(self):
-        super(ProvidersServiceManager, self).__init__()
+        super().__init__()
         ThreadPool.__init__(self)
         MessageServer.__init__(self, 'SERVICE_MANAGER_INDEX', 'SERVICE_MANAGER')
         self.poll_database()
@@ -42,7 +39,7 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
             self._handle_messages(self.get_messages())
 
     def _shutdown_package_services(self, package_name):
-        g.log('Request to shutdown services for package: {}'.format(package_name))
+        g.log(f'Request to shutdown services for package: {package_name}')
         services = self._registered_services.get(package_name, {}).values()
         for service in services:
             service['shutdown_method'](service['config'])
@@ -63,29 +60,31 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
         service_info['running'] = False
 
     def _start_package_services(self, package):
-        g.log('Request to start services for package: {} v{}'.format(package['pack_name'], package['version']))
+        g.log(f"Request to start services for package: {package['pack_name']} v{package['version']}")
         for service in package['services'].split('|'):
             if not service:
                 continue
-            module = importlib.import_module('providers.{}.{}'.format(package['pack_name'], service[:-2]))
+            module = importlib.import_module(f"providers.{package['pack_name']}.{service[:-2]}")
             if hasattr(module, 'run_service'):
                 self._register_and_config_service(service, module, package)
 
         self._start_registered_services()
 
     def _register_and_config_service(self, service_name, module, package):
-        self._registered_services.update({
-            package['pack_name']: {
-                service_name: {
-                    'package_name': package['pack_name'],
-                    'service_name': service_name,
-                    'run_method': module.run_service,
-                    'shutdown_method': getattr(module, 'shutdown_service', lambda a: None),
-                    'config': getattr(module, 'pre_config', lambda: None)(),
-                    'running': False
+        self._registered_services.update(
+            {
+                package['pack_name']: {
+                    service_name: {
+                        'package_name': package['pack_name'],
+                        'service_name': service_name,
+                        'run_method': module.run_service,
+                        'shutdown_method': getattr(module, 'shutdown_service', lambda a: None),
+                        'config': getattr(module, 'pre_config', lambda: None)(),
+                        'running': False,
+                    }
                 }
             }
-        })
+        )
 
     def _start_registered_services(self):
         for package in self._registered_services.values():
@@ -93,8 +92,10 @@ class ProvidersServiceManager(CustomProviders, ThreadPool, MessageServer):
                 if not service['running']:
                     self.put(self._run_service, service)
                 else:
-                    g.log('Attempt to start an already running service - {}.{}'.format(service['package_name'],
-                                                                                       service['service_name']))
+                    g.log(
+                        "Attempt to start an already running service - "
+                        f"{service['package_name']}.{service['service_name']}"
+                    )
 
     def _handle_messages(self, messages):
         if not messages:

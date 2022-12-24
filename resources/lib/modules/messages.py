@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import base64
 
 from resources.lib.modules.globals import g
@@ -16,20 +13,17 @@ class MessageServer:
         self._base_prefix = "SEREN_MESSAGING_"
         self._index_id = index_id
         self._index = []
-        self._prefix = "{}_{}".format(self._base_prefix, prefix)
+        self._prefix = f"{self._base_prefix}_{prefix}"
         self._fetch_index()
 
     def _fetch_index(self):
-        index = self._get_property(self._index_id)
-        if index:
+        if index := self._get_property(self._index_id):
             index_value = self._get_property(index)
             self._index = index_value.split("|") if index_value else []
 
     def _get_property(self, message_id):
         value = g.HOME_WINDOW.getProperty(self._prefix + message_id)
-        if not value:
-            return None
-        return base64.b64decode(value).decode("utf-8")
+        return base64.b64decode(value).decode("utf-8") if value else None
 
     def _clear_message(self, message_id):
         g.HOME_WINDOW.clearProperty(self._base_prefix + message_id)
@@ -37,9 +31,7 @@ class MessageServer:
         self._update_window_index()
 
     def _set_property(self, message_id, value):
-        g.HOME_WINDOW.setProperty(
-            self._prefix + message_id, base64.b64encode(value.encode("utf-8"))
-        )
+        g.HOME_WINDOW.setProperty(self._prefix + message_id, base64.b64encode(value.encode("utf-8")))
 
     def clear_message(self, message_ids):
         """
@@ -61,8 +53,7 @@ class MessageServer:
         :rtype: list
         """
         self._fetch_index()
-        messages = [(i, self._get_property(i)) for i in self._index if i]
-        return messages
+        return [(i, self._get_property(i)) for i in self._index if i]
 
     def _update_window_index(self):
         self._set_property(self._index_id, "|".join(self._index))

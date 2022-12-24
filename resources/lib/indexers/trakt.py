@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
+import contextlib
 import time
+from functools import cached_property
 from functools import wraps
+from urllib import parse
 
 import xbmc
 import xbmcgui
 
+from . import valid_id_or_none
 from resources.lib.common import tools
-from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
-from resources.lib.indexers.apibase import (
-    ApiBase,
-    handle_single_item_or_list,
-)
+from resources.lib.indexers.apibase import ApiBase
+from resources.lib.indexers.apibase import handle_single_item_or_list
+from resources.lib.modules.exceptions import AuthFailure
 from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
@@ -48,18 +47,17 @@ TRAKT_STATUS_CODES = {
 
 
 def _log_connection_error(args, kwarg, e):
-    g.log("Connection Error to Trakt: {} - {}".format(args, kwarg), "error")
+    g.log(f"Connection Error to Trakt: {args} - {kwarg}", "error")
     g.log(e, "error")
 
 
 def _connection_failure_dialog():
     if (
-        g.get_float_setting("general.trakt.failure.timeout") + (2 * 60 * (60 * 60))
-        < time.time()
+        g.get_float_setting("general.trakt.failure.timeout") + (2 * 60 * (60 * 60)) < time.time()
         and not xbmc.Player().isPlaying()
     ):
         xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30024).format("Trakt"))
-        g.set_setting("general.trakt.failure.timeout", g.UNICODE(time.time()))
+        g.set_setting("general.trakt.failure.timeout", str(time.time()))
 
 
 def _reset_trakt_auth(notify=True):
@@ -88,22 +86,17 @@ def trakt_guard_response(func):
         method_class = args[0]
         method_class._load_settings()
         import requests
+
         try:
             response = func(*args, **kwargs)
             if response.status_code in [200, 201, 204]:
                 return response
 
-            if (
-                response.status_code == 400
-                and response.url == "https://api.trakt.tv/oauth/device/token"
-            ):
+            if response.status_code == 400 and response.url == "https://api.trakt.tv/oauth/device/token":
                 return response
-            if (
-                response.status_code == 400
-                and response.url == "https://api.trakt.tv/oauth/token"
-            ):
+            if response.status_code == 400 and response.url == "https://api.trakt.tv/oauth/token":
                 _reset_trakt_auth()
-                raise Exception("Unable to refresh Trakt auth")
+                raise AuthFailure("Unable to refresh Trakt auth")
 
             if response.status_code == 403:
                 g.log("Trakt: invalid API key or unapproved app, resetting auth", "error")
@@ -115,45 +108,32 @@ def trakt_guard_response(func):
                 import inspect
 
                 if inspect.stack(1)[1][3] == "try_refresh_token":
-                    xbmcgui.Dialog().notification(
-                        g.ADDON_NAME, g.get_language_string(30340)
-                    )
+                    xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30340))
                     g.log(
                         "Attempts to refresh Trakt token have failed. User intervention is required",
                         "error",
                     )
                 else:
-                    try:
+                    with contextlib.suppress(RanOnceAlready):
                         with GlobalLock("trakt.oauth", run_once=True, check_sum=method_class.access_token):
                             if method_class.refresh_token is not None:
                                 method_class.try_refresh_token(True)
-                            if (
-                                method_class.refresh_token is None
-                                and method_class.username is not None
-                            ):
-                                xbmcgui.Dialog().ok(
-                                    g.ADDON_NAME, g.get_language_string(30340)
-                                )
-                    except RanOnceAlready:
-                        pass
+                            if method_class.refresh_token is None and method_class.username is not None:
+                                xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30340))
                     if method_class.refresh_token is not None:
                         return func(*args, **kwargs)
 
             if response.status_code == 423:
-                xbmcgui.Dialog().notification(
-                    g.ADDON_NAME, TRAKT_STATUS_CODES.get(response.status_code)
-                )
+                xbmcgui.Dialog().notification(g.ADDON_NAME, TRAKT_STATUS_CODES.get(response.status_code))
                 g.log(
                     "Locked User Account - Contact Trakt support",
                     "error",
                 )
 
             g.log(
-                "Trakt returned a {} ({}): while requesting {}".format(
-                    response.status_code,
-                    TRAKT_STATUS_CODES.get(response.status_code, "*Unknown status code*"),
-                    response.url,
-                ),
+                f"Trakt returned a {response.status_code} "
+                f"({TRAKT_STATUS_CODES.get(response.status_code, '*Unknown status code*')}): "
+                f"while requesting {response.url}",
                 "error",
             )
 
@@ -178,7 +158,201 @@ class TraktAPI(ApiBase):
 
     username_setting_key = "trakt.username"
 
-    trakt_db = None
+    TranslationNormalization = [
+        ("title", ("title", "originaltitle", "sorttitle"), None),
+        ("language", "language", None),
+        ("overview", ("plot", "plotoutline"), None),
+    ]
+
+    ReleaseNormalization = [
+        ("country", "country", lambda c: c.upper()),
+        ("release_date", "release_date", lambda rd: g.validate_date(rd)),
+        ("release_type", "release_type", None),
+        ("certification", "mpaa", None),
+    ]
+
+    UserRatingNormalization = [
+        (
+            "rating",
+            "user_rating",
+            lambda t: tools.safe_round(tools.get_clean_number(t), 2),
+        ),
+        ("rated_at", "rated_at", lambda t: g.validate_date(t)),
+    ]
+
+    PlayBackNormalization = [
+        ("progress", "percentplayed", None),
+        ("paused_at", "paused_at", lambda t: g.validate_date(t)),
+        ("id", "playback_id", None),
+    ]
+
+    PlayBackHistoryNormalization = [
+        ("action", "action", None),
+        ("watched_at", "watched_at", lambda t: g.validate_date(t)),
+        ("id", "playback_id", None),
+    ]
+
+    CalendarNormalization = [("first_aired", "first_aired", lambda t: g.validate_date(t))]
+
+    Normalization = tools.extend_array(
+        [
+            ("certification", "mpaa", None),
+            ("genres", "genre", None),
+            (("ids", "imdb"), ("imdbnumber", "imdb_id"), lambda i: valid_id_or_none(i)),
+            (("ids", "trakt"), "trakt_id", None),
+            (("ids", "slug"), "trakt_slug", None),
+            (("ids", "tvdb"), "tvdb_id", lambda i: valid_id_or_none(i)),
+            (("ids", "tmdb"), "tmdb_id", lambda i: valid_id_or_none(i)),
+            ("playback_id", "playback_id", None),
+            (("show", "ids", "trakt"), "trakt_show_id", None),
+            ("network", "studio", lambda n: [n]),
+            ("runtime", "duration", lambda d: d * 60),
+            ("progress", "percentplayed", None),
+            ("percentplayed", "percentplayed", None),
+            ("updated_at", "dateadded", lambda t: g.validate_date(t)),
+            ("last_updated_at", "dateadded", lambda t: g.validate_date(t)),
+            ("last_watched_at", "last_watched_at", lambda t: g.validate_date(t)),
+            ("watched_at", "watched_at", lambda t: g.validate_date(t)),
+            ("paused_at", "paused_at", lambda t: g.validate_date(t)),
+            (
+                "rating",
+                "rating",
+                lambda t: tools.safe_round(tools.get_clean_number(t), 2),
+            ),
+            ("votes", "votes", lambda t: tools.get_clean_number(t)),
+            (
+                None,
+                "rating.trakt",
+                (
+                    ("rating", "votes"),
+                    lambda r, v: {
+                        "rating": tools.safe_round(tools.get_clean_number(r), 2),
+                        "votes": tools.get_clean_number(v),
+                    },
+                ),
+            ),
+            ("tagline", "tagline", None),
+            (
+                "trailer",
+                "trailer",
+                lambda t: tools.youtube_url.format(t.split("?v=")[-1]) if t else None,
+            ),
+            ("type", "mediatype", lambda t: t if "show" not in t else "tvshow"),
+            ("available_translations", "available_translations", None),
+            ("score", "score", None),
+            ("action", "action", None),
+            ("added", "added", None),
+            ("rank", "rank", None),
+            ("listed_at", "listed_at", None),
+            (
+                "country",
+                "country_origin",
+                lambda t: t.upper() if t is not None else None,
+            ),
+            ("user_rating", "user_rating", None),
+            ("rated_at", "rated_at", None),
+        ],
+        TranslationNormalization,
+    )
+
+    MoviesNormalization = tools.extend_array(
+        [
+            ("plays", "playcount", None),
+            ("year", "year", None),
+            ("released", ("premiered", "aired"), lambda t: g.validate_date(t)),
+            ("collected_at", "collected_at", lambda t: g.validate_date(t)),
+        ],
+        Normalization,
+    )
+
+    ShowNormalization = tools.extend_array(
+        [
+            ("status", "status", None),
+            ("status", "is_airing", lambda t: not t == "ended"),
+            ("title", "tvshowtitle", None),
+            ("first_aired", "year", lambda t: g.validate_date(t)[:4] if g.validate_date(t) else None),
+            (
+                "first_aired",
+                ("premiered", "aired"),
+                lambda t: g.validate_date(t),
+            ),
+            ("last_collected_at", "last_collected_at", lambda t: g.validate_date(t)),
+        ],
+        Normalization,
+    )
+
+    SeasonNormalization = tools.extend_array(
+        [
+            ("number", ("season", "sortseason"), None),
+            ("episode_count", "episode_count", None),
+            ("aired_episodes", "aired_episodes", None),
+            ("first_aired", "year", lambda t: g.validate_date(t)[:4] if g.validate_date(t) else None),
+            (
+                "first_aired",
+                ("premiered", "aired"),
+                lambda t: g.validate_date(t),
+            ),
+            ("last_collected_at", "last_collected_at", lambda t: g.validate_date(t)),
+        ],
+        Normalization,
+    )
+
+    EpisodeNormalization = tools.extend_array(
+        [
+            ("number", ("episode", "sortepisode"), None),
+            ("season", ("season", "sortseason"), None),
+            ("collected_at", "collected", lambda t: 1),
+            ("plays", "playcount", None),
+            ("first_aired", "year", lambda t: g.validate_date(t)[:4] if g.validate_date(t) else None),
+            (
+                "first_aired",
+                ("premiered", "aired"),
+                lambda t: g.validate_date(t),
+            ),
+            ("collected_at", "collected_at", lambda t: g.validate_date(t)),
+        ],
+        Normalization,
+    )
+
+    ListNormalization = [
+        ("updated_at", "dateadded", lambda t: g.validate_date(t)),
+        (("ids", "trakt"), "trakt_id", None),
+        (("ids", "slug"), "slug", None),
+        ("sort_by", "sort_by", None),
+        ("sort_how", "sort_how", None),
+        (("user", "ids", "slug"), "username", None),
+        ("name", ("name", "title"), None),
+        ("type", "mediatype", None),
+    ]
+
+    MixedEpisodeNormalization = [
+        (("show", "ids", "trakt"), "trakt_show_id", None),
+        (("episode", "ids", "trakt"), "trakt_id", None),
+    ]
+
+    MixedSeasonNormalization = [
+        (("show", "ids", "trakt"), "trakt_show_id", None),
+        (("season", "ids", "trakt"), "trakt_id", None),
+    ]
+
+    MetaNormalization = {
+        "movie": MoviesNormalization,
+        "list": ListNormalization,
+        "show": ShowNormalization,
+        "season": SeasonNormalization,
+        "episode": EpisodeNormalization,
+        "mixedepisode": MixedEpisodeNormalization,
+        "mixedseason": MixedSeasonNormalization,
+        "playback": PlayBackNormalization,
+        "playbackhistory": PlayBackHistoryNormalization,
+        "user_rating": UserRatingNormalization,
+        "calendar": CalendarNormalization,
+        "releases": ReleaseNormalization,
+    }
+
+    MetaObjects = ("movie", "tvshow", "show", "season", "episode", "list")
+
+    MetaCollections = ("movies", "shows", "seasons", "episodes", "cast")
 
     def __init__(self):
         self.access_token = None
@@ -191,244 +365,22 @@ class TraktAPI(ApiBase):
         self.language = g.get_language_code()
         self.country = g.get_language_code(True).split("-")[-1].lower()
 
-        self.TranslationNormalization = [
-            ("title", ("title", "originaltitle", "sorttitle"), None),
-            ("language", "language", None),
-            ("overview", ("plot", "plotoutline"), None),
-        ]
-
-        self.UserRatingNormalization = [
-            (
-                "rating",
-                "user_rating",
-                lambda t: tools.safe_round(tools.get_clean_number(t), 2),
-            ),
-            ("rated_at", "rated_at", lambda t: g.validate_date(t))
-        ]
-
-        self.PlayBackNormalization = [
-            ("progress", "percentplayed", None),
-            ("paused_at", "paused_at", lambda t: g.validate_date(t)),
-            ("id", "playback_id", None)
-        ]
-
-        self.PlayBackHistoryNormalization = [
-            ("action", "action", None),
-            ("watched_at", "watched_at", lambda t: g.validate_date(t)),
-            ("id", "playback_id", None)
-        ]
-
-        self.CalendarNormalization = [
-            ("first_aired", "first_aired", lambda t: g.validate_date(t))
-        ]
-
-        self.Normalization = tools.extend_array(
-            [
-                ("certification", "mpaa", None),
-                ("genres", "genre", None),
-                (("ids", "imdb"), ("imdbnumber", "imdb_id"), None),
-                (("ids", "trakt"), "trakt_id", None),
-                (("ids", "slug"), "trakt_slug", None),
-                (("ids", "tvdb"), "tvdb_id", None),
-                (("ids", "tmdb"), "tmdb_id", None),
-                ("playback_id", "playback_id", None),
-                (("show", "ids", "trakt"), "trakt_show_id", None),
-                ("network", "studio", lambda n: [n]),
-                ("runtime", "duration", lambda d: d * 60),
-                ("progress", "percentplayed", None),
-                ("percentplayed", "percentplayed", None),
-                ("updated_at", "dateadded", lambda t: g.validate_date(t)),
-                ("last_updated_at", "dateadded", lambda t: g.validate_date(t)),
-                (
-                    "last_watched_at",
-                    "last_watched_at",
-                    lambda t: g.validate_date(t)
-                ),
-                ("watched_at", "watched_at", lambda t: g.validate_date(t)),
-                ("paused_at", "paused_at", lambda t: g.validate_date(t)),
-                (
-                    "rating",
-                    "rating",
-                    lambda t: tools.safe_round(tools.get_clean_number(t), 2),
-                ),
-                ("votes", "votes", lambda t: tools.get_clean_number(t)),
-                (
-                    None,
-                    "rating.trakt",
-                    (
-                        ("rating", "votes"),
-                        lambda r, v: {
-                            "rating": tools.safe_round(tools.get_clean_number(r), 2),
-                            "votes": tools.get_clean_number(v),
-                        },
-                    ),
-                ),
-                ("tagline", "tagline", None),
-                (
-                    "trailer",
-                    "trailer",
-                    lambda t: tools.youtube_url.format(t.split("?v=")[-1])
-                    if t
-                    else None,
-                ),
-                ("type", "mediatype", lambda t: t if "show" not in t else "tvshow"),
-                ("available_translations", "available_translations", None),
-                ("score", "score", None),
-                ("action", "action", None),
-                ("added", "added", None),
-                ("rank", "rank", None),
-                ("listed_at", "listed_at", None),
-                (
-                    "country",
-                    "country_origin",
-                    lambda t: t.upper() if t is not None else None,
-                ),
-                ("user_rating", "user_rating", None),
-                ("rated_at", "rated_at", None)
-            ],
-            self.TranslationNormalization,
-        )
-
-        self.MoviesNormalization = tools.extend_array(
-            [
-                ("plays", "playcount", None),
-                ("year", "year", None),
-                ("released", ("premiered", "aired"), lambda t: g.validate_date(t)),
-                ("collected_at", "collected_at", lambda t: g.validate_date(t)),
-            ],
-            self.Normalization,
-        )
-
-        self.ShowNormalization = tools.extend_array(
-            [
-                ("status", "status", None),
-                ("status", "is_airing", lambda t: not t == "ended"),
-                ("title", "tvshowtitle", None),
-                (
-                    "first_aired",
-                    "year",
-                    lambda t: g.validate_date(t)[:4]
-                    if g.validate_date(t)
-                    else None
-                ),
-                (
-                    "first_aired",
-                    ("premiered", "aired"),
-                    lambda t: g.validate_date(t),
-                ),
-                (
-                    "last_collected_at",
-                    "last_collected_at",
-                    lambda t: g.validate_date(t)
-                )
-            ],
-            self.Normalization
-        )
-
-        self.SeasonNormalization = tools.extend_array(
-            [
-                ("number", ("season", "sortseason"), None),
-                ("episode_count", "episode_count", None),
-                ("aired_episodes", "aired_episodes", None),
-                (
-                    "first_aired",
-                    "year",
-                    lambda t: g.validate_date(t)[:4]
-                    if g.validate_date(t)
-                    else None
-                ),
-                (
-                    "first_aired",
-                    ("premiered", "aired"),
-                    lambda t: g.validate_date(t),
-                ),
-                (
-                    "last_collected_at",
-                    "last_collected_at",
-                    lambda t: g.validate_date(t)
-                )
-            ],
-            self.Normalization,
-        )
-
-        self.EpisodeNormalization = tools.extend_array(
-            [
-                ("number", ("episode", "sortepisode"), None),
-                ("season", ("season", "sortseason"), None),
-                ("collected_at", "collected", lambda t: 1),
-                ("plays", "playcount", None),
-                (
-                    "first_aired",
-                    "year",
-                    lambda t: g.validate_date(t)[:4]
-                    if g.validate_date(t)
-                    else None
-                ),
-                (
-                    "first_aired",
-                    ("premiered", "aired"),
-                    lambda t: g.validate_date(t),
-                ),
-                (
-                    "collected_at",
-                    "collected_at",
-                    lambda t: g.validate_date(t)
-                )
-            ],
-            self.Normalization,
-        )
-
-        self.ListNormalization = [
-            ("updated_at", "dateadded", lambda t: g.validate_date(t)),
-            (("ids", "trakt"), "trakt_id", None),
-            (("ids", "slug"), "slug", None),
-            ("sort_by", "sort_by", None),
-            ("sort_how", "sort_how", None),
-            (("user", "ids", "slug"), "username", None),
-            ("name", ("name", "title"), None),
-            ("type", "mediatype", None),
-        ]
-
-        self.MixedEpisodeNormalization = [
-            (("show", "ids", "trakt"), "trakt_show_id", None),
-            (("episode", "ids", "trakt"), "trakt_id", None)
-        ]
-
-        self.MixedSeasonNormalization = [
-            (("show", "ids", "trakt"), "trakt_show_id", None),
-            (("season", "ids", "trakt"), "trakt_id", None)
-        ]
-
-        self.MetaNormalization = {
-            "movie": self.MoviesNormalization,
-            "list": self.ListNormalization,
-            "show": self.ShowNormalization,
-            "season": self.SeasonNormalization,
-            "episode": self.EpisodeNormalization,
-            "mixedepisode": self.MixedEpisodeNormalization,
-            "mixedseason": self.MixedSeasonNormalization,
-            "playback": self.PlayBackNormalization,
-            "playbackhistory": self.PlayBackHistoryNormalization,
-            "user_rating": self.UserRatingNormalization,
-            "calendar": self.CalendarNormalization
-        }
-
-        self.MetaObjects = ("movie", "tvshow", "show", "season", "episode", "list")
-
-        self.MetaCollections = ("movies", "shows", "seasons", "episodes", "cast")
-
     @cached_property
     def meta_hash(self):
-        return tools.md5_hash((
-            self.language,
-            self.ApiUrl,
-            self.username))
+        return tools.md5_hash((self.language, self.ApiUrl, self.username))
+
+    @cached_property
+    def trakt_db(self):
+        from resources.lib.database import trakt_sync
+
+        return trakt_sync.TraktSyncDatabase()
 
     @cached_property
     def session(self):
         import requests
         from requests.adapters import HTTPAdapter
         from urllib3 import Retry
+
         session = requests.Session()
         retries = Retry(
             total=4,
@@ -444,10 +396,10 @@ class TraktAPI(ApiBase):
             "Content-Type": "application/json",
             "trakt-api-key": self.client_id,
             "trakt-api-version": "2",
-            "User-Agent": g.USER_AGENT
+            "User-Agent": g.USER_AGENT,
         }
         if self.access_token:
-            headers["Authorization"] = "Bearer {}".format(self.access_token)
+            headers["Authorization"] = f"Bearer {self.access_token}"
         return headers
 
     def revoke_auth(self):
@@ -455,9 +407,9 @@ class TraktAPI(ApiBase):
         Revokes current authorisation if present
         :return:
         """
-        url = "oauth/revoke"
         post_data = {"token": self.access_token, "client_id": self.client_id, "client_secret": self.client_secret}
         if self.access_token:
+            url = "oauth/revoke"
             self.post(url, post_data)
         _reset_trakt_auth(notify=False)
         self.access_token = None
@@ -492,22 +444,15 @@ class TraktAPI(ApiBase):
         try:
             progress_dialog = xbmcgui.DialogProgress()
             progress_dialog.create(
-                g.ADDON_NAME + ": " + g.get_language_string(30022),
+                f"{g.ADDON_NAME}: {g.get_language_string(30022)}",
                 tools.create_multiline_message(
-                    line1=g.get_language_string(30018).format(
-                        g.color_string("https://trakt.tv/activate")
-                    ),
+                    line1=g.get_language_string(30018).format(g.color_string("https://trakt.tv/activate")),
                     line2=g.get_language_string(30019).format(g.color_string(user_code)),
                     line3=g.get_language_string(30047),
                 ),
             )
             progress_dialog.update(100)
-            while (
-                not failed
-                and self.username is None
-                and not token_ttl <= 0
-                and not progress_dialog.iscanceled()
-            ):
+            while not failed and self.username is None and token_ttl > 0 and not progress_dialog.iscanceled():
                 xbmc.sleep(1000)
                 if token_ttl % interval == 0:
                     failed = self._auth_poll(device)
@@ -533,13 +478,8 @@ class TraktAPI(ApiBase):
             },
         )
         if response.status_code == 200:
-            response = response.json()
-            self._save_settings(response)
-            username = self.get_username()
-            self.username = username
-            g.set_setting(self.username_setting_key, username)
-            return False
-        elif response.status_code == 404 or response.status_code == 410:
+            return self._auth_success(response)
+        elif response.status_code in [404, 410]:
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30023))
             return True
         elif response.status_code == 409:
@@ -548,20 +488,24 @@ class TraktAPI(ApiBase):
             xbmc.sleep(1 * 1000)
         return False
 
+    def _auth_success(self, response):
+        response = response.json()
+        self._save_settings(response)
+        username = self.get_username()
+        self.username = username
+        g.set_setting(self.username_setting_key, username)
+        return False
+
     def _sync_trakt_user_data_if_required(self):
         # Synchronise Trakt Database with new user
         from resources.lib.database.trakt_sync import activities
 
         database = activities.TraktSyncDatabase()
         if database.activities["trakt_username"] != self.username:
-            database.clear_user_information(
-                True if database.activities["trakt_username"] else False
-            )
+            database.clear_user_information(bool(database.activities["trakt_username"]))
             database.flush_activities(False)
             database.set_trakt_user(self.username)
-            xbmc.executebuiltin(
-                'RunPlugin("{}?action=syncTraktActivities")'.format(g.BASE_URL)
-            )
+            xbmc.executebuiltin(f'RunPlugin("{g.BASE_URL}?action=syncTraktActivities")')
 
     def try_refresh_token(self, force=False):
         """
@@ -592,6 +536,7 @@ class TraktAPI(ApiBase):
         except RanOnceAlready:
             self._load_settings()
             return
+
     # endregion
 
     # region settings
@@ -603,9 +548,7 @@ class TraktAPI(ApiBase):
             g.set_setting("trakt.refresh", response["refresh_token"])
             self.refresh_token = response["refresh_token"]
         if "expires_in" in response and "created_at" in response:
-            g.set_setting(
-                "trakt.expires", g.UNICODE(response["created_at"] + response["expires_in"])
-            )
+            g.set_setting("trakt.expires", str(response["created_at"] + response["expires_in"]))
             self.token_expires = float(response["created_at"] + response["expires_in"])
 
     def _load_settings(self):
@@ -622,6 +565,7 @@ class TraktAPI(ApiBase):
         self.token_expires = g.get_float_setting("trakt.expires")
         self.default_limit = g.get_int_setting("item.limit")
         self.username = g.get_setting(self.username_setting_key)
+
     # endregion
 
     @trakt_guard_response
@@ -636,7 +580,7 @@ class TraktAPI(ApiBase):
         self._try_add_default_paging(params)
         self._clean_params(params)
         return self.session.get(
-            tools.urljoin(self.ApiUrl, url),
+            parse.urljoin(self.ApiUrl, url),
             params=params,
             headers=self._get_headers(),
             timeout=timeout,
@@ -679,9 +623,7 @@ class TraktAPI(ApiBase):
             )
         except (ValueError, AttributeError) as e:
             g.log(
-                "Failed to receive JSON from Trakt response - response: {} - error - {}".format(
-                    response, e
-                ),
+                f"Failed to receive JSON from Trakt response - response: {response} - error - {e}",
                 "error",
             )
             return None
@@ -711,25 +653,21 @@ class TraktAPI(ApiBase):
             return self._handle_mixed_type(item)
 
         result = self._handle_single_type(item)
-        return self._create_trakt_object(result) if result.get("type", result.get("mediatype")) in self.MetaObjects else result
+        return (
+            self._create_trakt_object(result)
+            if result.get("type", result.get("mediatype")) in self.MetaObjects
+            else result
+        )
 
     @staticmethod
     def _create_trakt_object(item):
         result = {"trakt_object": {"info": item}}
-        [
-            result.update({key: value})
-            for key, value in item.items()
-            if key.endswith("_id")
-        ]
+        [result.update({key: value}) for key, value in item.items() if key.endswith("_id")]
         return result
 
     def _handle_single_type(self, item):
         translated = self._handle_translation(item)
-        collections = {
-            key: self._handle_response(translated[key])
-            for key in self.MetaCollections
-            if key in translated
-        }
+        collections = {key: self._handle_response(translated[key]) for key in self.MetaCollections if key in translated}
         normalized = self._normalize_info(self.MetaNormalization[item["type"]], translated)
         normalized.update(collections)
         return normalized
@@ -751,20 +689,17 @@ class TraktAPI(ApiBase):
 
     @staticmethod
     def _get_all_pages(func, url, **params):
-        if "progress" in params:
-            progress_callback = params.pop("progress")
-        else:
-            progress_callback = None
+        progress_callback = params.pop("progress", None)
         response = func(url, **params)
         yield response
         if "X-Pagination-Page-Count" not in response.headers:
             return
         for i in range(2, int(response.headers["X-Pagination-Page-Count"]) + 1):
-            params.update({"page": i})
+            params["page"] = i
             if "limit" not in params:
-                params.update({"limit": int(response.headers["X-Pagination-Limit"])})
-            if progress_callback is not None:
-                progress_callback(
+                params["limit"] = int(response.headers["X-Pagination-Limit"])
+            if callable(progress_callback):
+                progress_callback(  # pylint: disable=not-callable
                     (i / (int(response.headers["X-Pagination-Page-Count"]) + 1)) * 100
                 )
             yield func(url, **params)
@@ -808,9 +743,7 @@ class TraktAPI(ApiBase):
         :param data: POST Data to send to endpoint
         :return: requests response
         """
-        return self.session.post(
-            tools.urljoin(self.ApiUrl, url), json=data, headers=self._get_headers()
-        )
+        return self.session.post(parse.urljoin(self.ApiUrl, url), json=data, headers=self._get_headers())
 
     def post_json(self, url, data):
         """
@@ -828,9 +761,7 @@ class TraktAPI(ApiBase):
         :param url: URL endpoint to perform request to
         :return: requests response
         """
-        return self.session.delete(
-            tools.urljoin(self.ApiUrl, url), headers=self._get_headers()
-        )
+        return self.session.delete(parse.urljoin(self.ApiUrl, url), headers=self._get_headers())
 
     def get_username(self):
         """
@@ -842,7 +773,7 @@ class TraktAPI(ApiBase):
 
     # region Sorting
     def _try_sort(self, sort_by, sort_how, items):
-        if not isinstance(items, (set, list)):
+        if not items or not isinstance(items, (set, list)):
             return items
 
         if sort_by is None or sort_how is None:
@@ -861,11 +792,11 @@ class TraktAPI(ApiBase):
             "percentage",
             "watched",
             "collected",
-            "my_rating"
+            "my_rating",
         ]
 
         if sort_by not in supported_sorts:
-            g.log("Error sorting trakt response: Unsupported sort_by ({})".format(sort_by), "error")
+            g.log(f"Error sorting trakt response: Unsupported sort_by ({sort_by})", "error")
             return items
 
         if sort_by == "added":
@@ -881,9 +812,7 @@ class TraktAPI(ApiBase):
         elif sort_by == "popularity":
             items = sorted(
                 items,
-                key=lambda x: float(
-                    x[x["type"]].get("rating", 0) * int(x[x["type"]].get("votes", 0))
-                ),
+                key=lambda x: float(x[x["type"]].get("rating", 0) * int(x[x["type"]].get("votes", 0))),
             )
         elif sort_by == "votes":
             items = sorted(items, key=lambda x: x[x["type"]].get("votes"))
@@ -891,6 +820,7 @@ class TraktAPI(ApiBase):
             items = sorted(items, key=lambda x: x[x["type"]].get("rating"))
         elif sort_by == "random":
             import random
+
             random.shuffle(items)
         elif sort_by == "watched":
             items = self._watched_sort(items)
@@ -910,66 +840,34 @@ class TraktAPI(ApiBase):
 
     @staticmethod
     def _released_sorter(item):
-        released = item[item["type"]].get("released")
-        if not released:
-            released = item[item["type"]].get("first_aired")
-        if not released:
-            released = ""
-        return released
+        if item_type := item.get("type"):
+            return item[item_type].get("released") or item[item_type].get("first_aired") or ""
+        return ""
+
+    def __get_sorted_items(self, sort_field, item_type, items, default_sort_key):
+        sort_items = self.trakt_db.fetchall(
+            f"""
+            SELECT trakt_id, COALESCE({sort_field}, {repr(default_sort_key)}) AS {sort_field}
+            FROM {item_type}s
+            WHERE trakt_id IN ({','.join(map(lambda i: str(i[item_type]['ids']['trakt']), items))})
+            """
+        )
+        sort_items = {i['trakt_id']: i[sort_field] for i in sort_items}
+        return sorted(items, key=lambda i: sort_items.get(i[item_type]["ids"]["trakt"], default_sort_key))
 
     def _watched_sort(self, items):
-        if not items or len(items) < 1:
-            return items
-        if not self.trakt_db:
-            from resources.lib.database import trakt_sync
-            self.trakt_db = trakt_sync.TraktSyncDatabase()
-
         item_type = items[0]["type"]
-        watched_at = self.trakt_db.fetchall(
-            "select trakt_id, COALESCE(last_watched_at, '') as last_watched_at from {}s where trakt_id in ({})".format(
-                item_type,
-                ",".join(map(lambda i: str(i[item_type]["ids"]["trakt"]), items))
-            )
-        )
-        watched_at = {i['trakt_id']: i['last_watched_at'] for i in watched_at}
-        return sorted(items, key=lambda i: watched_at.get(i[item_type]["ids"]["trakt"], ""))
+        return self.__get_sorted_items("last_watched_at", item_type, items, "")
 
     def _collected_sort(self, items):
-        if not items or len(items) < 1:
-            return items
-        if not self.trakt_db:
-            from resources.lib.database import trakt_sync
-            self.trakt_db = trakt_sync.TraktSyncDatabase()
-
         item_type = items[0]["type"]
         collected_field = "last_collected_at" if item_type in ["show", "season"] else "collected_at"
-        collected_at = self.trakt_db.fetchall(
-            "select trakt_id, COALESCE({}, '') as {} from {}s where trakt_id in ({})".format(
-                collected_field,
-                collected_field,
-                item_type,
-                ",".join(map(lambda i: str(i[item_type]["ids"]["trakt"]), items))
-            )
-        )
-        collected_at = {i['trakt_id']: i[collected_field] for i in collected_at}
-        return sorted(items, key=lambda i: collected_at.get(i[item_type]["ids"]["trakt"], ""))
+        return self.__get_sorted_items(collected_field, item_type, items, "")
 
     def _rating_sort(self, items):
-        if not items or len(items) < 1:
-            return items
-        if not self.trakt_db:
-            from resources.lib.database import trakt_sync
-            self.trakt_db = trakt_sync.TraktSyncDatabase()
-
         item_type = items[0]["type"]
-        ratings = self.trakt_db.fetchall(
-            "select trakt_id, coalesce(user_rating, 0) as user_rating from {}s where trakt_id in ({})".format(
-                item_type,
-                ",".join(map(lambda i: str(i[item_type]["ids"]["trakt"]), items))
-            )
-        )
-        ratings = {i['trakt_id']: i['user_rating'] for i in ratings}
-        return sorted(items, key=lambda i: ratings.get(i[item_type]["ids"]["trakt"], 0))
+        return self.__get_sorted_items("user_rating", item_type, items, 0)
+
     # endregion
 
     @handle_single_item_or_list
@@ -1008,11 +906,7 @@ class TraktAPI(ApiBase):
             (
                 "episode",
                 lambda x: "number" in x
-                and (
-                    "season" in x
-                    or ("last_watched_at" in x and "plays" in x)
-                    or ("collected_at" in x)
-                ),
+                and ("season" in x or ("last_watched_at" in x and "plays" in x) or ("collected_at" in x)),
             ),
             ("season", lambda x: "number" in x),
             ("playback", lambda x: "paused_at" in x),
@@ -1033,14 +927,15 @@ class TraktAPI(ApiBase):
             ("trending", lambda x: "watchers" in x),
             ("sync_activities", lambda x: "all" in x),
             ("sync_watched", lambda x: "last_watched_at" in x),
-            ("sync_collected", lambda x: "last_collected_at" in x)
+            ("sync_collected", lambda x: "last_collected_at" in x),
+            ("releases", lambda x: "country" in x and "release_date" in x),
         ]
         for item_type in item_types:
             if item_type[1](item):
                 item.update({"type": item_type[0]})
                 break
         if "type" not in item:
-            g.log("Error detecting trakt item type for: {}".format(item), "error")
+            g.log(f"Error detecting trakt item type for: {item}", "error")
         return item
 
     def get_show_aliases(self, trakt_show_id):
@@ -1052,7 +947,7 @@ class TraktAPI(ApiBase):
         return sorted(
             {
                 i["title"]
-                for i in self.get_json_cached("/shows/{}/aliases".format(trakt_show_id))
+                for i in self.get_json_cached(f"/shows/{trakt_show_id}/aliases")
                 if i["country"] in [self.country, 'us']
             }
         )
@@ -1060,17 +955,13 @@ class TraktAPI(ApiBase):
     def get_show_translation(self, trakt_id):
         return self._normalize_info(
             self.TranslationNormalization,
-            self.get_json_cached("shows/{}/translations/{}".format(trakt_id, self.language))[
-                0
-            ],
+            self.get_json_cached(f"shows/{trakt_id}/translations/{self.language}")[0],
         )
 
     def get_movie_translation(self, trakt_id):
         return self._normalize_info(
             self.TranslationNormalization,
-            self.get_json_cached("movies/{}/translations/{}".format(trakt_id, self.language))[
-                0
-            ],
+            self.get_json_cached(f"movies/{trakt_id}/translations/{self.language}")[0],
         )
 
     @handle_single_item_or_list
@@ -1095,3 +986,10 @@ class TraktAPI(ApiBase):
                 and item.get("title")
                 and str(item.get("number", 0)) not in item.get("title")
             ]
+
+    def get_movie_release_info(self, trakt_id):
+        release_list = self.get_json_cached(f"movies/{trakt_id}/releases")
+        return {
+            country.upper(): [i for i in release_list if i['country'] == country]
+            for country in {c['country'] for c in release_list}
+        }

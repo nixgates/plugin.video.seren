@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import xbmc
 import xbmcgui
 
@@ -12,9 +9,7 @@ from resources.lib.modules.globals import g
 
 class DownloadManager(BaseWindow):
     def __init__(self, xml_file, location, item_information=None):
-        super(DownloadManager, self).__init__(
-            xml_file, location, item_information=item_information
-        )
+        super().__init__(xml_file, location, item_information=item_information)
         self.manager = Manager()
         self.list_control = None
         self.thread_pool = ThreadPool()
@@ -28,7 +23,7 @@ class DownloadManager(BaseWindow):
         self.set_default_focus(self.list_control, 2999, control_list_reset=True)
 
         self._background_info_updater()
-        super(DownloadManager, self).onInit()
+        super().onInit()
 
     def update_download_info(self):
         self.downloads = self.manager.get_all_tasks_info()
@@ -36,16 +31,16 @@ class DownloadManager(BaseWindow):
     @staticmethod
     def _set_menu_item_properties(menu_item, download_info):
         menu_item.setProperty('speed', download_info['speed'])
-        menu_item.setProperty('progress', g.UNICODE(download_info['progress']))
+        menu_item.setProperty('progress', str(download_info['progress']))
         menu_item.setProperty('filename', download_info['filename'])
         menu_item.setProperty('eta', download_info['eta'])
-        menu_item.setProperty('filesize', g.UNICODE(download_info['filesize']))
-        menu_item.setProperty('downloaded', g.UNICODE(download_info['downloaded']))
-        menu_item.setProperty('hash', g.UNICODE(download_info.get('hash', '')))
+        menu_item.setProperty('filesize', str(download_info['filesize']))
+        menu_item.setProperty('downloaded', str(download_info['downloaded']))
+        menu_item.setProperty('hash', str(download_info.get('hash', '')))
 
     def _populate_menu_items(self):
         def create_menu_item(download_item):
-            new_item = xbmcgui.ListItem(label='{}'.format(download_item['filename']))
+            new_item = xbmcgui.ListItem(label=f"{download_item['filename']}")
             self._set_menu_item_properties(new_item, download_item)
             return new_item
 
@@ -71,21 +66,17 @@ class DownloadManager(BaseWindow):
             self._populate_menu_items()
 
     def _cancel_download(self, position):
-        response = xbmcgui.Dialog().contextmenu(
-            [g.get_language_string(30070), g.get_language_string(30459)]
-        )
+        response = xbmcgui.Dialog().contextmenu([g.get_language_string(30070), g.get_language_string(30459)])
         if response == 0 and position > -1:
-            self.manager.cancel_task(
-                self.list_control.getListItem(position).getProperty('hash')
-            )
+            self.manager.cancel_task(self.list_control.getListItem(position).getProperty('hash'))
 
     def close(self):
         self.exit_requested = True
-        super(DownloadManager, self).close()
+        super().close()
 
     def handle_action(self, action_id, control_id=None):
         position = self.list_control.getSelectedPosition()
-
+        # sourcery skip: merge-duplicate-blocks
         if action_id == 7:
             if control_id == 2001:
                 self.manager.clear_complete()

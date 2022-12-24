@@ -1,19 +1,15 @@
-import xbmc
 import xbmcgui
 
 from resources.lib.database.providerCache import ProviderCache
 from resources.lib.gui.windows.base_window import BaseWindow
 from resources.lib.modules.globals import g
-from resources.lib.modules.providers.install_manager import ProviderInstallManager
 from resources.lib.modules.providers.settings import SettingsManager
 
 
 class PackageConfiguration(BaseWindow):
-    providers_class = ProviderInstallManager()
-
     def __init__(self, xml_file, xml_location, package_name):
-        super(PackageConfiguration, self).__init__(xml_file, xml_location)
-        self.providers = self.providers_class.known_providers
+        super().__init__(xml_file, xml_location)
+        self.providers = self.provider_class.known_providers
 
         self.manager = SettingsManager()
         self.providerCache = ProviderCache()
@@ -30,74 +26,82 @@ class PackageConfiguration(BaseWindow):
         self.update_settings()
         self.fill_providers()
         self.setProperty("package.name", self.package_name)
-        self.setProperty(
-            "hassettings", "true" if self.settings_list.size() > 0 else "false"
-        )
+        self.setProperty("hassettings", "true" if self.settings_list.size() > 0 else "false")
 
         self.set_default_focus(self.provider_list, 2999, control_list_reset=True)
-        super(PackageConfiguration, self).onInit()
+        super().onInit()
 
     def refresh_data(self):
-        self.providers_class.poll_database()
-        self.providers = self.providers_class.known_providers
+        self.provider_class.poll_database()
+        self.providers = self.provider_class.known_providers
         self.update_settings()
 
     @staticmethod
     def _set_setting_item_properties(menu_item, setting):
-        value = g.UNICODE(setting["value"])
-        if setting["definition"].get("sensitive"):
-            value = "*******"
-        menu_item.setProperty("Label", setting["label"])
-        menu_item.setProperty("value", value)
+        menu_item.setProperty("label", str(setting["label"]))
+        menu_item.setProperty("type", str(setting["type"]))
+        menu_item.setProperty(
+            "value",
+            "*******" if setting["definition"].get("sensitive") else str(setting["value"]),
+        )
+        menu_item.setProperty("has_action", "True" if setting["definition"].get("action") else "False")
+        menu_item.setProperty("hide_value", "True" if setting.get("hide_value") else "False")
 
     def _populate_settings(self):
         def create_menu_item(setting):
-            new_item = xbmcgui.ListItem(label="{}".format(setting["label"]))
-            self._set_setting_item_properties(new_item, value)
+            new_item = xbmcgui.ListItem(label=f"{setting['label']}")
+            self._set_setting_item_properties(new_item, setting)
             return new_item
 
         if len(self.settings) < self.settings_list.size():
             while len(self.settings) < self.settings_list.size():
                 self.settings_list.removeItem(self.settings_list.size() - 1)
 
-        for idx, value in enumerate(self.settings):
+        for idx, setting in enumerate(self.settings):
             try:
                 menu_item = self.settings_list.getListItem(idx)
-                self._set_setting_item_properties(menu_item, value)
+                self._set_setting_item_properties(menu_item, setting)
             except RuntimeError:
-                menu_item = create_menu_item(value)
+                menu_item = create_menu_item(setting)
                 self.settings_list.addItem(menu_item)
 
     def fill_providers(self):
         self.refresh_data()
         self.provider_list.reset()
 
-        provider_types = self.providers_class.provider_types
+        provider_types = self.provider_class.provider_types
         for provider_type in provider_types:
             for i in [
                 provider
                 for provider in self.providers
-                if provider["package"] == self.package_name
-                and provider["provider_type"] == provider_type
+                if provider["package"] == self.package_name and provider["provider_type"] == provider_type
             ]:
                 item = xbmcgui.ListItem(label=i["provider_name"])
+                provider_imports = (
+                    '.'.join(["providers", i["package"], i["country"], i["provider_type"]]),
+                    i["provider_name"],
+                    i["package"],
+                )
+                provider_icon = self.provider_class.get_icon(provider_imports)
+                if provider_icon is not None:
+                    item.setProperty(
+                        "provider.icon",
+                        provider_icon,
+                    )
+
                 for info in i:
                     item.setProperty(info, i[info])
 
                 self.provider_list.addItem(item)
 
     def update_settings(self):
-        self.settings = [
-            i
-            for i in reversed(
-                self.manager.get_all_visible_package_settings(self.package_name)
-            )
-        ]
+        self.settings = list(reversed(self.manager.get_all_visible_package_settings(self.package_name)))
+
         self._populate_settings()
 
     def flip_provider_status(self):
         provider_item = self.provider_list.getSelectedItem()
-        new_status = self.providers_class.flip_provider_status(
+        new_status = self.provider_class.flip_provider_status(
             provider_item.getProperty("package"), provider_item.getLabel()
         )
 
@@ -112,9 +116,7 @@ class PackageConfiguration(BaseWindow):
             providers = [i for i in providers if i["provider_type"] == provider_type]
 
         for i in providers:
-            self.providers_class.flip_provider_status(
-                i["package"], i["provider_name"], status
-            )
+            self.provider_class.flip_provider_status(i["package"], i["provider_name"], status)
 
         self.providers = self.providerCache.get_providers()
         self.fill_providers()
@@ -145,17 +147,38 @@ class PackageConfiguration(BaseWindow):
                 self.flip_mutliple_providers(option[0], provider_type=option[1])
 
     def _edit_setting(self, setting):
-        keyboard = xbmc.Keyboard("", setting.get("label"))
-        keyboard.doModal()
-        if keyboard.isConfirmed():
+        value = None
+        action = setting["definition"].get("action", {})
+
+        if all(i in action for i in ["module", "function"]):
+            value = self._get_action_setting_function(action, setting)
+        elif setting["type"] == "bool":
+            value = setting["value"] != "True"
+        elif setting["type"] in ["str", "int"]:
+            value = xbmcgui.Dialog().input(
+                setting.get("label", ""),
+                setting.get("value", ""),
+                xbmcgui.INPUT_NUMERIC if setting["type"] == "int" else xbmcgui.INPUT_ALPHANUM,
+            )
+
+        if value is not None:
             try:
                 self.manager.set_setting(
                     self.package_name,
                     setting["id"],
-                    self.manager.settings_template[setting["type"]]["cast"](
-                        keyboard.getText()
-                    ),
+                    self.manager.settings_template[setting["type"]]["cast"](value),
                 )
                 self.update_settings()
             except TypeError:
                 xbmcgui.Dialog().ok(g.ADDON_NAME, "The setting value was invalid")
+
+    @staticmethod
+    def _get_action_setting_function(action, setting):
+        import importlib
+
+        module = importlib.import_module(action.get("module", ""))
+        function = getattr(module, action.get("function", ""), None)
+        args = action.get("args", [])
+        kwargs = action.get("kwargs", {})
+        kwargs["setting"] = setting
+        return function(*args, **kwargs)

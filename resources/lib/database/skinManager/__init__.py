@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
-import json
 import os
 import shutil
 
@@ -11,6 +7,7 @@ import xbmcvfs
 
 from resources.lib.common import tools
 from resources.lib.database import Database
+from resources.lib.modules.exceptions import SkinInvalidException
 from resources.lib.modules.exceptions import SkinNotFoundException
 from resources.lib.modules.globals import g
 from resources.lib.modules.zip_manager import ZipManager
@@ -41,7 +38,7 @@ class SkinManager(Database, ZipManager):
     """
 
     def __init__(self):
-        super(SkinManager, self).__init__(g.SKINS_DB_PATH, schema)
+        super().__init__(g.SKINS_DB_PATH, schema)
         ZipManager.__init__(self)
         # This is a list of default skins that may not be overwritten
         self.seren_skins = [DEFAULT_SKIN_NAME]
@@ -51,7 +48,6 @@ class SkinManager(Database, ZipManager):
             self._mark_skin_active(DEFAULT_SKIN_NAME)
             self.installed_skins = self._get_all_installed()
         self._active_skin_path = self._get_active_skin_path()
-        self._progress_dialog = xbmcgui.DialogProgress()
 
     # region private methods
 
@@ -63,37 +59,22 @@ class SkinManager(Database, ZipManager):
             return os.path.join(g.ADDON_USERDATA_PATH, "skins", active_skin_name)
 
     def _get_active_skin(self):
-        active_skin = self.fetchone(
-            "SELECT * FROM skins WHERE active = 1"
-        )
+        active_skin = self.fetchone("SELECT * FROM skins WHERE active = 1")
         if active_skin is None:
             g.log("Failed to identify active skin, resetting to Default", "error")
-            self.execute_sql(
-                "UPDATE skins SET active=1 WHERE skin_name == ?", (DEFAULT_SKIN_NAME,)
-            )
+            self.execute_sql("UPDATE skins SET active=1 WHERE skin_name == ?", (DEFAULT_SKIN_NAME,))
             active_skin = self.fetchone("SELECT * FROM skins WHERE active = 1")
         return active_skin["skin_name"]
 
     def _is_skin_active(self, skin_name):
-        return (
-                self.fetchone(
-                    "SELECT * FROM skins WHERE skin_name=?", (skin_name,)
-                )["active"] == "1"
-        )
+        return self.fetchone("SELECT * FROM skins WHERE skin_name=?", (skin_name,))["active"] == "1"
 
     def _select_installed_skin(self, hide_default=False):
-        installed_skins = [
-            ("{} - {}".format(i["skin_name"], i["version"]), i["skin_name"])
-            for i in self.installed_skins
-        ]
+        installed_skins = [(f"{i['skin_name']} - {i['version']}", i["skin_name"]) for i in self.installed_skins]
         if hide_default:
-            installed_skins.remove(
-                [i for i in installed_skins if i[1] == DEFAULT_SKIN_NAME][0]
-            )
+            installed_skins.remove([i for i in installed_skins if i[1] == DEFAULT_SKIN_NAME][0])
 
-        selection = xbmcgui.Dialog().select(
-            g.ADDON_NAME, [i[0] for i in installed_skins]
-        )
+        selection = xbmcgui.Dialog().select(g.ADDON_NAME, [i[0] for i in installed_skins])
 
         if selection == -1:
             return
@@ -102,17 +83,15 @@ class SkinManager(Database, ZipManager):
 
     def _extract_zip(self, skin_meta):
         try:
-            file_path = [i for i in self._file_list if i.endswith("resources/skins/")][
-                0
-            ]
+            file_path = [i for i in self._file_list if i.endswith("resources/skins/")][0]
             file_path = file_path.split("resources/")[0]
         except IndexError:
             file_path = ""
 
-        if "{}resources/".format(file_path) not in self._file_list:
+        if f"{file_path}resources/" not in self._file_list:
             g.log('Theme Folder Structure Invalid: Missing folder "Resources"')
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30209))
-            raise Exception
+            raise SkinInvalidException(skin_meta["skin_name"])
 
         skin_path = os.path.join(g.SKINS_PATH, skin_meta["skin_name"])
         self._extract_zip_members(
@@ -122,20 +101,14 @@ class SkinManager(Database, ZipManager):
         self._destroy_created_temp_items()
 
     def _get_skin_meta(self):
-        return json.loads(
-            self._get_file_member_contents(
-                [i for i in self._file_list if i.endswith("meta.json")][0]
-            )
-        )
+        return self._get_file_member_contents([i for i in self._file_list if i.endswith("meta.json")][0])
 
     def _get_all_installed(self):
         return self.fetchall("SELECT * FROM skins")
 
     def _mark_skin_active(self, skin_name):
         self.execute_sql("UPDATE skins SET active=? WHERE active=?", ("0", "1"))
-        self.execute_sql(
-            "UPDATE skins SET active=? WHERE skin_name=?", ("1", skin_name)
-        )
+        self.execute_sql("UPDATE skins SET active=? WHERE skin_name=?", ("1", skin_name))
         g.set_setting(
             "skin.active",
             "{skin_name} - {version}".format(
@@ -152,9 +125,7 @@ class SkinManager(Database, ZipManager):
             xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30310))
             return
 
-        exists = self.fetchone("select * from skins where skin_name=?", (skin_meta["skin_name"],))
-
-        if exists:
+        if exists := self.fetchone("select * from skins where skin_name=?", (skin_meta["skin_name"],)):
             self.execute_sql(
                 "UPDATE skins SET "
                 "version=?, "
@@ -172,7 +143,7 @@ class SkinManager(Database, ZipManager):
             )
         else:
             self.execute_sql(
-                "INSERT OR REPLACE INTO skins VALUES (?,?,?,?,?,?)",
+                "REPLACE INTO skins VALUES (?,?,?,?,?,?)",
                 (
                     skin_meta["skin_name"],
                     skin_meta["version"],
@@ -194,15 +165,9 @@ class SkinManager(Database, ZipManager):
 
         try:
             remote_meta = requests.get(skin_info["remote_meta"]).json()
-            return tools.compare_version_numbers(
-                skin_info["version"], remote_meta["version"]
-            )
+            return tools.compare_version_numbers(skin_info["version"], remote_meta["version"])
         except Exception:
-            g.log(
-                "Failed to obtain remote meta information for skin: {}".format(
-                    skin_info["skin_name"]
-                )
-            )
+            g.log(f"Failed to obtain remote meta information for skin: {skin_info['skin_name']}")
             return False
 
     @staticmethod
@@ -237,61 +202,61 @@ class SkinManager(Database, ZipManager):
 
         else:
             try:
-                skins.append(
-                    [i for i in self.installed_skins if i["skin_name"] == skin_name][0]
-                )
-            except IndexError:
-                raise SkinNotFoundException(skin_name)
+                skins.append([i for i in self.installed_skins if i["skin_name"] == skin_name][0])
+            except IndexError as e:
+                raise SkinNotFoundException(skin_name) from e
 
-        if not silent:
-            self._progress_dialog.create(g.ADDON_NAME, g.get_language_string(30082))
-            self._progress_dialog.update(-1)
-
-        skins = [i for i in skins if self._skin_can_update(i)]
-        skins = [i for i in skins if self._check_skin_for_update(i)]
-
-        if len(skins) == 0:
+        try:
+            progress_dialog = xbmcgui.DialogProgress()
             if not silent:
-                self._progress_dialog.close()
+                progress_dialog.create(g.ADDON_NAME, g.get_language_string(30082))
+                progress_dialog.update(-1)
+
+            skins = [i for i in skins if self._skin_can_update(i) and self._check_skin_for_update(i)]
+
+            if not skins:
+                if not silent:
+                    progress_dialog.close()
+                    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30081))
+                return
+
+            if not silent:
+                progress_dialog.close()
+                while skins:
+                    progress_dialog.create(g.ADDON_NAME, g.get_language_string(30309))
+                    progress_dialog.update(-1)
+
+                    selection = xbmcgui.Dialog().select(
+                        g.ADDON_NAME,
+                        [f"{i['skin_name']} - {i['version']}" for i in skins],
+                    )
+                    if selection == -1:
+                        return
+
+                    skin_info = skins.pop(selection)
+
+                    try:
+                        self.install_skin(skin_info["update_directory"], True)
+                        progress_dialog.close()
+                        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30075))
+                    except SkinInvalidException:
+                        g.log_stacktrace()
+                        g.log(f"Failed to update skin: {selection}")
+                        g.notification(g.ADDON_NAME, g.get_language_string(30077))
+                        raise
+
                 xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30081))
-            return
+                return
 
-        if not silent:
-            self._progress_dialog.close()
-            while skins and len(skins) > 0:
-                self._progress_dialog.create(g.ADDON_NAME, g.get_language_string(30309))
-                self._progress_dialog.update(-1)
-
-                selection = xbmcgui.Dialog().select(
-                    g.ADDON_NAME,
-                    ["{} - {}".format(i["skin_name"], i["version"]) for i in skins],
-                )
-                if selection == -1:
-                    return
-
-                skin_info = skins[selection]
-
-                try:
-                    self.install_skin(skin_info["update_directory"], True)
-                    skins.remove(skin_info)
-                    self._progress_dialog.close()
-                    xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30075))
-                except Exception as e:
-                    g.log_stacktrace()
-                    g.log("Failed to update skin: {}".format(selection))
-                    g.notification(g.ADDON_NAME, g.get_language_string(30077))
-                    raise e
-
-            xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30081))
-            return
-
-        else:
-            for skin in skins:
-                try:
-                    self.install_skin(skin["update_directory"], True)
-                except Exception as e:
-                    g.log("Failed to update theme: {}".format(skin["skin_name"]))
-                    raise e
+            else:
+                for skin in skins:
+                    try:
+                        self.install_skin(skin["update_directory"], True)
+                    except Exception as e:
+                        g.log(f"Failed to update theme: {skin['skin_name']}")
+                        raise e
+        finally:
+            del progress_dialog
 
         g.log("Skin updates completed")
 
@@ -307,9 +272,7 @@ class SkinManager(Database, ZipManager):
         if self._active_skin_path == g.ADDON_PATH:
             return xml_file, self._active_skin_path
 
-        skins_folder = os.path.join(
-            self._active_skin_path, "resources", "skins", "Default"
-        )
+        skins_folder = os.path.join(self._active_skin_path, "resources", "skins", "Default")
 
         tools.makedirs(skins_folder, exist_ok=True)
 
@@ -355,17 +318,13 @@ class SkinManager(Database, ZipManager):
         self._extract_zip(skin_meta)
         self._add_skin_to_database(skin_meta)
 
-        if not silent:
-            switch_skin = xbmcgui.Dialog().yesno(
-                g.ADDON_NAME,
-                g.get_language_string(30196).format(
-                    skin_meta["skin_name"],
-                    skin_meta["version"],
-                ),
-            )
-            if not switch_skin:
-                return
-
+        if not silent and xbmcgui.Dialog().yesno(
+            g.ADDON_NAME,
+            g.get_language_string(30196).format(
+                skin_meta["skin_name"],
+                skin_meta["version"],
+            ),
+        ):
             self.switch_skin(skin_meta["skin_name"])
 
     def switch_skin(self, skin_name=None):
@@ -378,14 +337,12 @@ class SkinManager(Database, ZipManager):
         """
         if skin_name is None:
             skin_name = self._select_installed_skin()
-            if skin_name is None:
-                return
+        if skin_name is None:
+            return
 
         self._mark_skin_active(skin_name)
 
-        xbmcgui.Dialog().ok(
-            g.ADDON_NAME, g.get_language_string(30205).format(skin_name)
-        )
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30205).format(skin_name))
 
     def uninstall_skin(self, skin_name=None):
         """
@@ -398,25 +355,20 @@ class SkinManager(Database, ZipManager):
 
         if skin_name is None:
             skin_name = self._select_installed_skin(hide_default=True)
-            if skin_name is None:
-                return
+        if skin_name is None:
+            return
 
-        confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30197).format(skin_name)
-        )
+        confirmation = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30197).format(skin_name))
 
         if not confirmation:
             return
 
-        if self._is_skin_active(skin_name):
-            confirmation = xbmcgui.Dialog().yesno(
-                g.ADDON_NAME,
-                g.get_language_string(30204),
-                nolabel="Cancel",
-                yeslabel="Ok",
-            )
-            if not confirmation:
-                return
+        if self._is_skin_active(skin_name) and xbmcgui.Dialog().yesno(
+            g.ADDON_NAME,
+            g.get_language_string(30204),
+            nolabel="Cancel",
+            yeslabel="Ok",
+        ):
             self.switch_skin(DEFAULT_SKIN_NAME)
 
         skin_path = os.path.join(g.SKINS_PATH, skin_name)
@@ -426,8 +378,6 @@ class SkinManager(Database, ZipManager):
 
         self._remove_skin_from_database(skin_name)
 
-        xbmcgui.Dialog().ok(
-            g.ADDON_NAME, g.get_language_string(30198).format(skin_name)
-        )
+        xbmcgui.Dialog().ok(g.ADDON_NAME, g.get_language_string(30198).format(skin_name))
 
     # endregion

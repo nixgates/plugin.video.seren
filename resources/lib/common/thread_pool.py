@@ -1,120 +1,96 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
-import threading
-from time import sleep
+import concurrent.futures
+from functools import reduce
 
 from resources.lib.common import tools
 from resources.lib.modules.globals import g
 
-try:
-    from Queue import Queue
-    from Queue import Empty
-    from Queue import Full
-except ImportError:
-    from queue import Queue
-    from queue import Empty
-    from queue import Full
 
-from threading import Thread
+class ThreadPoolExecutor(concurrent.futures.ThreadPoolExecutor):
+    """
+    Support the python 3.9+ option to cancel futures on shutdown
+    """
 
+    import queue
 
-class ClearableQueue(Queue):
-    """A custom queue subclass that provides a method."""
-
-    def clear(self):
-        """Clears all items from the queue."""
-        with self.mutex:
-            unfinished = self.unfinished_tasks - len(self.queue)
-            if unfinished <= 0:
-                if unfinished < 0:
-                    raise ValueError("task_done() called too many times")
-                self.all_tasks_done.notify_all()
-            self.unfinished_tasks = unfinished
-            self.queue.clear()
-            self.not_full.notify_all()
-
-
-class ThreadPoolWorker(Thread):
-    """Worker thread that handles the execution of the consumes tasks from the main queue."""
-
-    def __init__(self, tasks, exception_handler, stop_flag=None):
-        super(ThreadPoolWorker, self).__init__()
-        self.exception_handler = exception_handler
-        self.tasks = tasks
-        self.stop_flag = stop_flag
-        self.start()
-
-    def run(self):
+    def shutdown(self, wait=True, *, cancel_futures=False):
         """
-        Executes the workload
+        Clean-up the resources associated with the Executor.
+
+        It is safe to call this method several times. Otherwise, no other methods can be called after this one.
+
+        :param wait: If True then shutdown will not return until all running futures have finished executing and the
+                     resources used by the executor have been reclaimed.
+        :param cancel_futures: If cancel_futures is True, this method will cancel all pending futures that the executor
+                               has not started running. Any futures that are completed or running won’t be cancelled,
+                               regardless of the value of cancel_futures
         :return:
-        :rtype:
         """
-        while not self.tasks.empty() and not self.stop_flag.is_set():
+        with self._shutdown_lock:
+            self._shutdown = True
+            if cancel_futures:
+                # Drain all work items from the queue, and then cancel their
+                # associated futures.
+                while True:
+                    try:
+                        work_item = self._work_queue.get_nowait()
+                    except self.queue.Empty:
+                        break
+                    if work_item is not None:
+                        work_item.future.cancel()
 
-            try:
-                func, result_callback, args, kwargs = self.tasks.get(timeout=0.1)
-                self.name = g.UNICODE(func)
-                result_callback(func(*args, **kwargs))
-            except Empty:
-                break
-            except BaseException as ex:
-                g.log_stacktrace()
-                self.exception_handler(ex)
-                break
-            finally:
-                try:
-                    self.tasks.task_done()
-                except Exception as e:
-                    g.log("task done error: {}".format(repr(e)))
-                    pass
+            # Send a wake-up to prevent threads calling
+            # _work_queue.get(block=True) for permanently blocking.
+            self._work_queue.put(None)
+        if wait:
+            for t in self._threads:
+                t.join()
 
 
 class ThreadPool:
     """
     Helper class to simplify raising worker_pool
     """
+
     # Default, Low, Medium, High, Extreme
     scaled_workers = [20, 10, 20, 40, 80]
 
     def __init__(self):
-        self.limiter = g.get_runtime_setting("threadpool.limiter")
+        self.limiter = g.get_bool_runtime_setting("threadpool.limiter")
         self.workers = self.scaled_workers[g.get_int_setting("general.threadpoolScale", -1) + 1]
-        self.tasks = ClearableQueue(2 * self.workers)
-        self.stop_event = threading.Event()
-        self.results = None
-        self.worker_pool = []
         self.max_workers = 1 if self.limiter else self.workers
-        self.exception = None
-        self.result_threading_lock = threading.Lock()
-        self.workers_threading_lock = threading.Lock()
+        self.executor = ThreadPoolExecutor(max_workers=self.max_workers)
+        self.tasks = []
 
-    def _handle_result(self, result):
-        self.result_threading_lock.acquire()
-        try:
+    def __del__(self):
+        self.executor.shutdown(wait=False, cancel_futures=True)
+
+    @staticmethod
+    def _handle_results(results):
+        result_iter = iter(results)
+
+        for result in result_iter:
             if result is not None:
-                if isinstance(result, dict):
-                    if self.results is None:
-                        self.results = {}
-                    tools.smart_merge_dictionary(self.results, result)
-                elif isinstance(result, (list, set)):
-                    if self.results is None:
-                        self.results = []
+                break
+        else:
+            return None
+
+        if isinstance(result, dict):
+            return reduce(tools.smart_merge_dictionary, result_iter, result)
+        elif isinstance(result, (list, set)):
+            result_list = list(result)
+            for result in result_iter:
+                if result is not None:
                     if isinstance(result, list):
-                        self.results.extend(result)
+                        result_list.extend(result)
                     else:
-                        self.results.append(result)
-                else:
-                    if self.results is None:
-                        self.results = []
-                    self.results.append(result)
-        finally:
-            self.result_threading_lock.release()
+                        result_list.append(result)
+            return result_list
+        else:
+            return [result for result in result_iter if result is not None]
 
     def put(self, func, *args, **kwargs):
         """
-        Adds task to queue and sets thread child to process task
+        Adds task to executor and starts it running
         :param func: method to run in task
         :type func: object
         :param args: arguments to assign to method
@@ -124,74 +100,46 @@ class ThreadPool:
         :return:
         :rtype:
         """
-        if self.exception:
-            return
-
-        while True:
-            try:
-                self.tasks.put((func, self._handle_result, args, kwargs), timeout=0.01)
-                break
-            except Full:
-                if self.exception:
-                    return
-
-        self._worker_maintenance()
-
-    def _worker_maintenance(self):
-        sleep(0.001)  # Sleep for 1ms to prevent race conditions
-        try:
-            self.workers_threading_lock.acquire()
-            # Shrink worker pool
-            for worker in [i for i in self.worker_pool if not i.is_alive()]:
-                self.worker_pool.remove(worker)
-            # Expand worker pool
-            if len(self.worker_pool) < self.max_workers:
-                self.worker_pool.append(
-                    ThreadPoolWorker(self.tasks, self._exception_handler, self.stop_event)
-                )
-        finally:
-            self.workers_threading_lock.release()
-
-    def _exception_handler(self, exception):
-        """
-        Terminates all threads and sets ThreadPool exception
-        :param exception:
-        :type exception: class
-        :return:
-        """
-        self.terminate()
-        self.exception = exception
-
-    def terminate(self):
-        """
-        Sets stop event for threads and clears current tasks
-        :return:
-        """
-        if not self.stop_event.is_set():
-            self.stop_event.set()
-        self.tasks.clear()
+        self.tasks.append(self.executor.submit(func, *args, **kwargs))
 
     def wait_completion(self):
         """
         Joins threads and waits for their completion, raises any exceptions if any present and returns results if
         present
-        :return:
-        :rtype:
+        :return: The results
+        :raises: The first exception identified if an exception is raised
         """
-        self._try_raise()
-
-        while not self.tasks.empty():
-            self._worker_maintenance()
-
-        [i.join() for i in self.worker_pool]
-        self._try_raise()
-
         try:
-            return self.results
-        finally:
-            self.results = None
+            for task in concurrent.futures.as_completed(self.tasks):
+                if exception := task.exception():
+                    self.executor.shutdown(wait=False, cancel_futures=True)
+                    raise exception
 
-    def _try_raise(self):
-        if self.exception:
+            results = self._handle_results(task.result() for task in self.tasks if task)
+            self.tasks.clear()
+            return results
+        except Exception:
             g.log_stacktrace()
-            raise self.exception  # pylint: disable-msg=E0702
+            self.executor.shutdown(wait=False, cancel_futures=True)
+            raise
+
+    def map_results(self, func, args_iterable=None, kwargs_iterable=None):
+        """
+        Takes iterables for args and kwargs and runs func with them, gathers the results and returns in order
+        :param func: The function to execute
+        :param args_iterable: An iterable of args tuples
+        :param kwargs_iterable: An iterable of kwargs dicts
+        :return: The results
+        """
+        try:
+            return self._handle_results(
+                self.executor.map(lambda args, kwargs: func(*args, **kwargs), args_iterable, kwargs_iterable)
+                if args_iterable and kwargs_iterable
+                else self.executor.map(lambda kwargs: func(**kwargs), kwargs_iterable)
+                if kwargs_iterable
+                else self.executor.map(lambda args: func(*args), args_iterable)
+            )
+        except Exception:
+            self.executor.shutdown(wait=False, cancel_futures=True)
+            g.log_stacktrace()
+            raise

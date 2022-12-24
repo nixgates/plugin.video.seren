@@ -2,6 +2,7 @@
 <!--has_torrent_providers-->
 <!--has_hoster_providers-->
 <!--has_adaptive_providers-->
+<!--has_direct_providers-->
 <!--has_cloud_scrapers-->
 <!--totals_4K-->
 <!--totals_1080p-->
@@ -28,11 +29,16 @@
 <!--cloudFiles_720p-->
 <!--cloudFiles_SD-->
 <!--cloudFiles_total-->
-<!--adaptive_4K-->
-<!--adaptive_1080p-->
-<!--adaptive_720p-->
-<!--adaptive_SD-->
-<!--adaptive_total-->
+<!--adaptiveSources_4K-->
+<!--adaptiveSources_1080p-->
+<!--adaptiveSources_720p-->
+<!--adaptiveSources_SD-->
+<!--adaptiveSources_total-->
+<!--directSources_4K-->
+<!--directSources_1080p-->
+<!--directSources_720p-->
+<!--directSources_SD-->
+<!--directSources_total-->
 
 <window type="dialog">
     <coordinates>
@@ -41,22 +47,22 @@
 		<width>1920</width>
 		<height>1080</height>
     </coordinates>
-	
+
     <controls>
-        
+
 		<!-- Background -->
 		<control type="group">
 			<top>0</top>
 			<left>0</left>
 			<width>1920</width>
 			<height>1080</height>
-			
+
 			<!-- Fallback -->
 			<control type="image">
 				<texture>white.png</texture>
 				<colordiffuse>FF000000</colordiffuse>
 			</control>
-			
+
 			<!-- Fanart -->
 			<control type="image">
 				<texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
@@ -68,27 +74,27 @@
 				<colordiffuse>CC000000</colordiffuse>
 			</control>
 		</control>
-		
-		<!-- Seren Peacock -->
+
+		<!-- Seren Logo -->
 		<control type="image">
 			<animation effect="fade" end="0" time="350">WindowClose</animation>
 			<animation effect="fade" end="0" time="350" condition="String.IsEqual(Window().Property(process_started),true) + !String.IsEmpty(Window().Property(item.art.clearlogo))">Conditional</animation>
 			<centerleft>50%</centerleft>
-			<centertop>45%</centertop>
+			<bottom>80</bottom>
 			<align>center</align>
 			<aligny>center</aligny>
-			<width>100</width>
+			<width>335</width>
 			<aspectratio>keep</aspectratio>
 			<texture>$INFO[Window().Property(seren.logo)]</texture>
 			<visible>String.IsEqual(Window().Property(process_started),false) | String.IsEmpty(Window().Property(item.art.clearlogo))</visible>
 		</control>
-		
+
 		<!-- Clearlogo -->
 		<control type="image">
 			<animation effect="fade" time="350" condition="String.IsEqual(Window().Property(process_started),true) + !String.IsEmpty(Window().Property(item.art.clearlogo))">Conditional</animation>
 			<centerleft>50%</centerleft>
 			<width>335</width>
-			<centertop>50%</centertop>
+			<bottom>80</bottom>
 			<align>center</align>
 			<aligny>center</aligny>
 			<aspectratio>keep</aspectratio>
@@ -122,7 +128,7 @@
 			<top>630</top>
 			<width>410</width>
 			<itemgap>10</itemgap>
-			
+
 			<!-- 10% -->
 			<control type="image">
 				<width>32</width>
@@ -289,7 +295,7 @@
 			<centertop>10</centertop>
 			<top>712</top>
 			<width>1920</width>
-			
+
 			<control type="grouplist">
 				<animation effect="slide" end="2000,0" time="350">WindowClose</animation>
 				<animation effect="fade" time="350" condition="String.IsEqual(Window().Property(process_started),true)">Conditional</animation>
@@ -302,7 +308,7 @@
 				<control type="grouplist">
 					<width>120</width>
 					<itemgap>40</itemgap>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -310,7 +316,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$ADDON[plugin.video.seren 30610]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -318,7 +324,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(totals_4K)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -326,7 +332,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(totals_1080p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -334,7 +340,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(totals_720p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -343,12 +349,12 @@
 						<label>$INFO[Window().Property(totals_SD)]</label>
 					</control>
 				</control>
-				
+
 				<!-- Separator -->
 				<control type="grouplist">
 					<width>10</width>
 					<itemgap>40</itemgap>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -357,13 +363,13 @@
 						<label>|</label>
 					</control>
 				</control>
-				
+
 				<!-- Torrents -->
 				<control type="grouplist">
 					<width>120</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_torrent_providers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -371,7 +377,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$ADDON[plugin.video.seren 30057]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -379,7 +385,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(torrents_4K)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -387,7 +393,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(torrents_1080p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -395,7 +401,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(torrents_720p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -404,13 +410,13 @@
 						<label>$INFO[Window().Property(torrents_SD)]</label>
 					</control>
 				</control>
-				
+
 				<!-- Separator -->
 				<control type="grouplist">
 					<width>10</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_torrent_providers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -419,13 +425,13 @@
 						<label>|</label>
 					</control>
 				</control>
-				
+
 				<!-- Cached -->
 				<control type="grouplist">
 					<width>120</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_torrent_providers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -433,7 +439,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$ADDON[plugin.video.seren 30248]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -441,7 +447,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(torrentsCached_4K)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -449,7 +455,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(torrentsCached_1080p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -457,7 +463,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(torrentsCached_720p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -466,13 +472,13 @@
 						<label>$INFO[Window().Property(torrentsCached_SD)]</label>
 					</control>
 				</control>
-				
+
 				<!-- Separator -->
 				<control type="grouplist">
 					<width>10</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_torrent_providers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -481,13 +487,13 @@
 						<label>|</label>
 					</control>
 				</control>
-				
+
 				<!-- Hosters -->
 				<control type="grouplist">
 					<width>120</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_hoster_providers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -495,7 +501,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$ADDON[plugin.video.seren 30058]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -503,7 +509,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(hosters_4K)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -511,7 +517,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(hosters_1080p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -519,7 +525,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(hosters_720p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -528,13 +534,13 @@
 						<label>$INFO[Window().Property(hosters_SD)]</label>
 					</control>
 				</control>
-				
+
 				<!-- Separator -->
 				<control type="grouplist">
 					<width>10</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_hoster_providers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -543,13 +549,13 @@
 						<label>|</label>
 					</control>
 				</control>
-				
+
 				<!-- Cloud -->
 				<control type="grouplist">
 					<width>120</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_cloud_scrapers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -557,7 +563,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$ADDON[plugin.video.seren 30249]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -565,7 +571,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(cloudFiles_4K)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -573,7 +579,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(cloudFiles_1080p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -581,7 +587,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$INFO[Window().Property(cloudFiles_720p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -590,13 +596,13 @@
 						<label>$INFO[Window().Property(cloudFiles_SD)]</label>
 					</control>
 				</control>
-				
+
 				<!-- Separator -->
 				<control type="grouplist">
 					<width>10</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_cloud_scrapers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -605,13 +611,13 @@
 						<label>|</label>
 					</control>
 				</control>
-				
+
 				<!-- Adaptive -->
 				<control type="grouplist">
 					<width>120</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_adaptive_providers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -619,46 +625,46 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>$ADDON[plugin.video.seren 30470]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
 						<width>120</width>
 						<textcolor>FFDDDDDD</textcolor>
-						<label>$INFO[Window().Property(adaptive_4K)]</label>
+						<label>$INFO[Window().Property(adaptiveSources_4K)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
 						<width>120</width>
 						<textcolor>FFDDDDDD</textcolor>
-						<label>$INFO[Window().Property(adaptive_1080p)]</label>
+						<label>$INFO[Window().Property(adaptiveSources_1080p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
 						<width>120</width>
 						<textcolor>FFDDDDDD</textcolor>
-						<label>$INFO[Window().Property(adaptive_720p)]</label>
+						<label>$INFO[Window().Property(adaptiveSources_720p)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
 						<width>120</width>
 						<textcolor>FFDDDDDD</textcolor>
-						<label>$INFO[Window().Property(adaptive_SD)]</label>
+						<label>$INFO[Window().Property(adaptiveSources_SD)]</label>
 					</control>
 				</control>
-				
+
 				<!-- Separator -->
 				<control type="grouplist">
 					<width>10</width>
 					<itemgap>40</itemgap>
 					<visible>String.IsEqual(Window().Property(has_adaptive_providers),true)</visible>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -667,12 +673,74 @@
 						<label>|</label>
 					</control>
 				</control>
-				
+
+				<!-- Direct -->
+				<control type="grouplist">
+					<width>120</width>
+					<itemgap>40</itemgap>
+					<visible>String.IsEqual(Window().Property(has_direct_providers),true)</visible>
+
+					<control type="label">
+						<font>font12</font>
+						<align>center</align>
+						<width>120</width>
+						<textcolor>FFDDDDDD</textcolor>
+						<label>$ADDON[plugin.video.seren 30631]</label>
+					</control>
+
+					<control type="label">
+						<font>font12</font>
+						<align>center</align>
+						<width>120</width>
+						<textcolor>FFDDDDDD</textcolor>
+						<label>$INFO[Window().Property(directSources_4K)]</label>
+					</control>
+
+					<control type="label">
+						<font>font12</font>
+						<align>center</align>
+						<width>120</width>
+						<textcolor>FFDDDDDD</textcolor>
+						<label>$INFO[Window().Property(directSources_1080p)]</label>
+					</control>
+
+					<control type="label">
+						<font>font12</font>
+						<align>center</align>
+						<width>120</width>
+						<textcolor>FFDDDDDD</textcolor>
+						<label>$INFO[Window().Property(directSources_720p)]</label>
+					</control>
+
+					<control type="label">
+						<font>font12</font>
+						<align>center</align>
+						<width>120</width>
+						<textcolor>FFDDDDDD</textcolor>
+						<label>$INFO[Window().Property(directSources_SD)]</label>
+					</control>
+				</control>
+
+				<!-- Separator -->
+				<control type="grouplist">
+					<width>10</width>
+					<itemgap>40</itemgap>
+					<visible>String.IsEqual(Window().Property(has_direct_providers),true)</visible>
+
+					<control type="label">
+						<font>font12</font>
+						<align>center</align>
+						<width>10</width>
+						<textcolor>FFDDDDDD</textcolor>
+						<label>|</label>
+					</control>
+				</control>
+
 				<!-- Filtered -->
 				<control type="grouplist">
 					<width>120</width>
 					<itemgap>40</itemgap>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -680,7 +748,7 @@
 						<textcolor>$INFO[Window().Property(settings.color)]</textcolor>
 						<label>$ADDON[plugin.video.seren 30611]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -688,7 +756,7 @@
 						<textcolor>$INFO[Window().Property(settings.color)]</textcolor>
 						<label>$INFO[Window().Property(totals_4K_filtered)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -696,7 +764,7 @@
 						<textcolor>$INFO[Window().Property(settings.color)]</textcolor>
 						<label>$INFO[Window().Property(totals_1080p_filtered)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -704,7 +772,7 @@
 						<textcolor>$INFO[Window().Property(settings.color)]</textcolor>
 						<label>$INFO[Window().Property(totals_720p_filtered)]</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -713,12 +781,12 @@
 						<label>$INFO[Window().Property(totals_SD_filtered)]</label>
 					</control>
 				</control>
-				
+
 				<!-- Separator -->
 				<control type="grouplist">
 					<width>10</width>
 					<itemgap>40</itemgap>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -727,12 +795,12 @@
 						<label>|</label>
 					</control>
 				</control>
-				
+
 				<!-- Resolution -->
 				<control type="grouplist">
 					<width>120</width>
 					<itemgap>40</itemgap>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -740,7 +808,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>Quality</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -748,7 +816,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>4K</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -756,7 +824,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>1080p</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -764,7 +832,7 @@
 						<textcolor>FFDDDDDD</textcolor>
 						<label>720p</label>
 					</control>
-					
+
 					<control type="label">
 						<font>font12</font>
 						<align>center</align>
@@ -774,12 +842,12 @@
 					</control>
 				</control>
 			</control>
-			
+
 			<control type="group">
 				<top>220</top>
 				<animation effect="fade" end="0" time="350">WindowClose</animation>
 				<animation effect="fade" time="350" condition="String.IsEqual(Window().Property(process_started),true)">Conditional</animation>
-				
+
 				<control type="label">
 					<font>font12</font>
 					<align>center</align>
