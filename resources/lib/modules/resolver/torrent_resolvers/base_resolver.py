@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import abc
 
 import xbmcgui
@@ -16,8 +13,9 @@ class TorrentResolverBase(ApiBase):
     Base Class to resolve torrent from debrid provider
     Extend appropriate debrid torrent resolver with this class
     """
+
     def __init__(self):
-        super(TorrentResolverBase, self).__init__()
+        super().__init__()
         self.pack_select = False
         self.debrid_module = None
         self._source_normalization = None
@@ -50,10 +48,7 @@ class TorrentResolverBase(ApiBase):
         """
 
     def _normalize_item(self, item):
-        if not self._source_normalization:
-            return item
-        else:
-            return self._normalize_info(self._source_normalization, item)
+        return self._normalize_info(self._source_normalization, item) if self._source_normalization else item
 
     @abc.abstractmethod
     def resolve_stream_url(self, file_info):
@@ -79,9 +74,10 @@ class TorrentResolverBase(ApiBase):
 
     def _user_selection(self, folder_details):
         folder_details = self._filter_non_playable_files(folder_details)
-        folder_details = sorted(folder_details, key= lambda k: k['path'].split("/")[-1])
-        selection = xbmcgui.Dialog().select(g.get_language_string(30483),
-                                            [i['path'].split('/')[-1] for i in folder_details])
+        folder_details = sorted(folder_details, key=lambda k: k['path'].split("/")[-1])
+        selection = xbmcgui.Dialog().select(
+            g.get_language_string(30483), [i['path'].split('/')[-1] for i in folder_details]
+        )
         return folder_details[selection] if selection >= 0 else None
 
     def _finalize_resolving(self, item_information, torrent, identified_file, folder_details):
@@ -94,14 +90,13 @@ class TorrentResolverBase(ApiBase):
             raise FileIdentification([i["path"] for i in folder_details])
         return stream_link
 
-    def _sort_and_filter_files(self, folder_details, item_information, sort = False):
-        filtered_files = self._filter_non_playable_files(source_utils.filter_files_for_resolving(folder_details,
-                                                                                                 item_information))
+    def _sort_and_filter_files(self, folder_details, item_information, sort=False):
+        filtered_files = self._filter_non_playable_files(
+            source_utils.filter_files_for_resolving(folder_details, item_information)
+        )
 
         if sort:
-            filtered_files = sorted(
-                filtered_files, key=lambda i: int(i["size"]), reverse=True
-                )
+            filtered_files = sorted(filtered_files, key=lambda i: int(i["size"]), reverse=True)
         return filtered_files
 
     def _multi_pack_resolve(self, item_information, torrent):
@@ -112,17 +107,10 @@ class TorrentResolverBase(ApiBase):
                 torrent,
                 self._user_selection(folder_details),
                 folder_details,
-                )
-        else:
-            folder_details = self._sort_and_filter_files(
-                folder_details, item_information
-                )
-            best_match = source_utils.get_best_episode_match(
-                "path", folder_details, item_information
-                )
-            return self._finalize_resolving(
-                item_information, torrent, best_match, folder_details
-                )
+            )
+        folder_details = self._sort_and_filter_files(folder_details, item_information)
+        best_match = source_utils.get_best_episode_match("path", folder_details, item_information)
+        return self._finalize_resolving(item_information, torrent, best_match, folder_details)
 
     @staticmethod
     def _try_m2ts_resolving(folder_details):
@@ -133,11 +121,11 @@ class TorrentResolverBase(ApiBase):
         simple_info = {
             "year": item_information.get("info", {}).get("year"),
             "title": item_information.get("info").get("title"),
-            }
+        }
 
         folder_details = self._sort_and_filter_files(
             self._normalize_item(self._fetch_source_files(torrent, item_information)), item_information, True
-            )
+        )
 
         if self.pack_select:
             return self._finalize_resolving(
@@ -145,22 +133,15 @@ class TorrentResolverBase(ApiBase):
                 torrent,
                 self._user_selection(folder_details),
                 folder_details,
-                )
+            )
 
-        m2ts_check = self._try_m2ts_resolving(folder_details)
-        if m2ts_check:
-            return self._finalize_resolving(
-                item_information, torrent, folder_details[0], [m2ts_check]
-                )
+        if m2ts_check := self._try_m2ts_resolving(folder_details):
+            return self._finalize_resolving(item_information, torrent, folder_details[0], [m2ts_check])
 
         if len(folder_details) == 1:
-            return self._finalize_resolving(
-                item_information, torrent, folder_details[0], folder_details
-                )
+            return self._finalize_resolving(item_information, torrent, folder_details[0], folder_details)
 
-        folder_details = source_utils.filter_files_for_resolving(
-            folder_details, item_information
-            )
+        folder_details = source_utils.filter_files_for_resolving(folder_details, item_information)
         filter_list = [
             i
             for i in folder_details
@@ -169,11 +150,9 @@ class TorrentResolverBase(ApiBase):
                 i["path"].split("/")[-1],
                 item_information["info"]["originaltitle"],
                 simple_info,
-                )
-            ]
+            )
+        ]
         if len(filter_list) == 1:
-            return self._finalize_resolving(
-                item_information, torrent, filter_list[0], folder_details
-                )
+            return self._finalize_resolving(item_information, torrent, filter_list[0], folder_details)
 
         raise FileIdentification([i["path"] for i in folder_details])

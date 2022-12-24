@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 
 from resources.lib.database import Database
@@ -8,39 +5,45 @@ from resources.lib.modules.globals import g
 
 schema = {
     'packages': {
-        'columns': collections.OrderedDict([
-            ("pack_name", ["TEXT", "NOT NULL"]),
-            ("author", ["TEXT", "NOT NULL"]),
-            ("remote_meta", ["TEXT", "NOT NULL"]),
-            ("version", ["TEXT", "NOT NULL"]),
-            ("services", ["TEXT", "NOT NULL"]),
-        ]),
+        'columns': collections.OrderedDict(
+            [
+                ("pack_name", ["TEXT", "NOT NULL"]),
+                ("author", ["TEXT", "NOT NULL"]),
+                ("remote_meta", ["TEXT", "NOT NULL"]),
+                ("version", ["TEXT", "NOT NULL"]),
+                ("services", ["TEXT", "NOT NULL"]),
+            ]
+        ),
         "table_constraints": ["UNIQUE(pack_name)"],
-        "default_seed": []
+        "default_seed": [],
     },
     'providers': {
-        'columns': collections.OrderedDict([
-            ("provider_name", ["TEXT", "NOT NULL"]),
-            ("package", ["TEXT", "NOT NULL"]),
-            ("status", ["TEXT", "NOT NULL"]),
-            ("country", ["TEXT", "NOT NULL"]),
-            ("provider_type", ["TEXT", "NOT NULL"])
-        ]),
+        'columns': collections.OrderedDict(
+            [
+                ("provider_name", ["TEXT", "NOT NULL"]),
+                ("package", ["TEXT", "NOT NULL"]),
+                ("status", ["TEXT", "NOT NULL"]),
+                ("country", ["TEXT", "NOT NULL"]),
+                ("provider_type", ["TEXT", "NOT NULL"]),
+            ]
+        ),
         "table_constraints": ["UNIQUE(provider_name)"],
-        "default_seed": []
+        "default_seed": [],
     },
     'package_settings': {
-        'columns': collections.OrderedDict([
-            ("package", ["TEXT", "NOT NULL"]),
-            ("id", ["TEXT", "NOT NULL"]),
-            ("type", ["TEXT", "NOT NULL"]),
-            ("visible", ["INT", "NOT NULL"]),
-            ("value", ["TEXT", "NOT NULL"]),
-            ("label", ["TEXT", "NOT NULL"]),
-            ("definition", ["PICKLE", "NOT NULL"]),
-        ]),
+        'columns': collections.OrderedDict(
+            [
+                ("package", ["TEXT", "NOT NULL"]),
+                ("id", ["TEXT", "NOT NULL"]),
+                ("type", ["TEXT", "NOT NULL"]),
+                ("visible", ["INT", "NOT NULL"]),
+                ("value", ["TEXT", "NOT NULL"]),
+                ("label", ["TEXT", "NOT NULL"]),
+                ("definition", ["PICKLE", "NOT NULL"]),
+            ]
+        ),
         "table_constraints": ["UNIQUE(package, id)"],
-        "default_seed": []
+        "default_seed": [],
     },
 }
 
@@ -49,8 +52,9 @@ class ProviderCache(Database):
     """
     Database class for handling calls to the database file
     """
+
     def __init__(self):
-        super(ProviderCache, self).__init__(g.PROVIDER_CACHE_DB_PATH, schema)
+        super().__init__(g.PROVIDER_CACHE_DB_PATH, schema)
         self.table_name = next(iter(schema))
 
     @property
@@ -60,8 +64,10 @@ class ProviderCache(Database):
         :return: Query for inserting a provider
         :rtype: str
         """
-        return "INSERT OR IGNORE INTO providers " \
-               "(provider_name, package, status, country, provider_type) VALUES (?, ?, ?, ?, ?)"
+        return (
+            "INSERT OR IGNORE INTO providers "
+            "(provider_name, package, status, country, provider_type) VALUES (?, ?, ?, ?, ?)"
+        )
 
     @property
     def package_insert_query(self):
@@ -79,8 +85,10 @@ class ProviderCache(Database):
         :return: Query for inserting a package setting
         :rtype: str
         """
-        return "INSERT OR IGNORE INTO package_settings (package, id, type, visible, value, label, definition) " \
-               "VALUES (?, ?, ?, ?, ?, ?, ?) "
+        return (
+            "INSERT OR IGNORE INTO package_settings (package, id, type, visible, value, label, definition) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?) "
+        )
 
     def get_single_provider(self, provider_name, package):
         """
@@ -146,9 +154,9 @@ class ProviderCache(Database):
         :return: None
         :rtype: None
         """
-        self.execute_sql(["DELETE FROM packages WHERE pack_name=?",
-                          "DELETE FROM providers WHERE package=?"],
-                         (pack_name,))
+        self.execute_sql(
+            ["DELETE FROM packages WHERE pack_name=?", "DELETE FROM providers WHERE package=?"], (pack_name,)
+        )
 
     def add_provider(self, provider_name, package, status, language, provider_type):
         """
@@ -161,7 +169,7 @@ class ProviderCache(Database):
         :type status: str
         :param language: language the provider supplies
         :type language: str
-        :param provider_type: Type of source provider provides (hoster,torrent,adaptive)
+        :param provider_type: Type of source provider provides (hoster,torrent,adaptive,direct)
         :type provider_type: str
         :return: None
         :rtype: None
@@ -180,8 +188,9 @@ class ProviderCache(Database):
         :return: None
         :rtype: None
         """
-        self.execute_sql("UPDATE providers SET status=? WHERE provider_name=? AND package=?",
-                         (state, provider_name, package_name))
+        self.execute_sql(
+            "UPDATE providers SET status=? WHERE provider_name=? AND package=?", (state, provider_name, package_name)
+        )
 
     def remove_individual_provider(self, provider_name, package_name):
         """
@@ -217,9 +226,14 @@ class ProviderCache(Database):
         :return: None
         :rtype: None
         """
-        self.execute_sql("UPDATE package_settings SET value=? WHERE package=? and id=?",
-                         (value, package_name, setting_id))
+        self.execute_sql(
+            "UPDATE package_settings SET value=? WHERE package=? and id=?", (value, package_name, setting_id)
+        )
 
     def _get_package_setting(self, package_name, setting_id):
-        return self.fetchone("SELECT type, value FROM package_settings WHERE package=? and id=?",
-                                (package_name, setting_id))
+        return self.fetchone(
+            "SELECT type, value FROM package_settings WHERE package=? and id=?", (package_name, setting_id)
+        )
+
+    def debrid_providers_enabed(self):
+        return any(p for p in self.get_providers() if p.get("provider_type") in ["torrent", "hoster"])

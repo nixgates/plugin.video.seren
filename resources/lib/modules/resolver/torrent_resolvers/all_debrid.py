@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 from resources.lib.debrid.all_debrid import AllDebrid
 from resources.lib.modules.exceptions import UnexpectedResponse
 from resources.lib.modules.globals import g
@@ -13,8 +10,9 @@ class AllDebridResolver(TorrentResolverBase):
     """
     Resolver for All Debrid
     """
+
     def __init__(self):
-        super(AllDebridResolver, self).__init__()
+        super().__init__()
         self.debrid_module = AllDebrid()
         self._source_normalization = (
             ("size", "size", lambda k: (k / 1024) / 1024),

@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
-
 def trakt_auth_guard(func):
     """
     Decorator to ensure method will only run if a valid Trakt auth is present
@@ -28,6 +24,7 @@ def trakt_auth_guard(func):
             if not g.get_setting("trakt.auth"):
                 if xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30471)):
                     from resources.lib.indexers.trakt import TraktAPI
+
                     TraktAPI().auth()
                 else:
                     g.cancel_directory()
@@ -38,3 +35,12 @@ def trakt_auth_guard(func):
 
     return wrapper
 
+
+def valid_id_or_none(id_number):
+    """
+    Helper function to check that an id number from an indexer is valid
+    Checks if we have an id_number and it is not 0 or "0"
+    :param id_number: The id number to check
+    :return: The id number if valid, else None
+    """
+    return id_number if id_number and id_number != "0" else None

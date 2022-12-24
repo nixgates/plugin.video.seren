@@ -1,34 +1,35 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import abc
 import os
+from functools import cached_property
 
 import xbmcgui
 import xbmcplugin
 import xbmcvfs
 
 from resources.lib.common import tools
-from resources.lib.common.tools import cached_property
 from resources.lib.modules.globals import g
 
 
-class Menus(object):
-
+class Menus:
     def __init__(self):
         self.providers = {}
         if g.all_debrid_enabled():
-            self.providers.update({'all_debrid': ('All Debrid', AllDebridWalker)})
+            self.providers['all_debrid'] = ('All Debrid', AllDebridWalker)
         if g.premiumize_enabled():
-            self.providers.update({'premiumize': ('Premiumize', PremiumizeWalker)})
+            self.providers['premiumize'] = ('Premiumize', PremiumizeWalker)
         if g.real_debrid_enabled():
-            self.providers.update({'real_debrid': ('Real Debrid', RealDebridWalker)})
-        self.providers.update({'local_downloads': ('Local Downloads', LocalFileWalker)})
+            self.providers['real_debrid'] = ('Real Debrid', RealDebridWalker)
+        self.providers['local_downloads'] = ('Local Downloads', LocalFileWalker)
 
     def home(self):
         for key, value in sorted(self.providers.items()):
             args = {'debrid_provider': key, 'id': None}
-            g.add_directory_item(value[0], action='myFilesFolder', action_args=args)
+            g.add_directory_item(
+                value[0],
+                action='myFilesFolder',
+                action_args=args,
+                menu_item=g.create_icon_dict(key, g.ICONS_PATH),
+            )
         g.close_directory(g.CONTENT_MENU, sort='title')
 
     def my_files_folder(self, args):
@@ -86,18 +87,21 @@ class BaseDebridWalker:
                 is_folder = True
                 action = 'myFilesFolder'
             else:
-                name = "{}  ({})".format(i['name'], tools.bytes_size_display(i['size'])) if i.get("size") else i['name']
+                name = f"{i['name']}  ({tools.bytes_size_display(i['size'])})" if i.get("size") else i['name']
                 is_folder = False
                 is_playable = True
                 action = 'myFilesPlay'
 
             i.pop('links', None)  # De-clutter our action args a bit
 
-            g.add_directory_item(name,
-                                 action=action,
-                                 is_playable=is_playable,
-                                 is_folder=is_folder,
-                                 action_args=i)
+            g.add_directory_item(
+                name,
+                action=action,
+                is_playable=is_playable,
+                is_folder=is_folder,
+                action_args=tools.construct_action_args(i),
+                menu_item=g.create_icon_dict(self.provider, g.ICONS_PATH),
+            )
 
     @abc.abstractmethod
     def resolve_link(self, args):
@@ -114,6 +118,7 @@ class PremiumizeWalker(BaseDebridWalker):
     @cached_property
     def premiumize(self):
         from resources.lib.debrid.premiumize import Premiumize
+
         return Premiumize()
 
     def get_init_list(self):
@@ -121,10 +126,7 @@ class PremiumizeWalker(BaseDebridWalker):
         self._format_items(items)
 
     def _is_folder(self, list_item):
-        if list_item['type'] == 'folder':
-            return True
-        else:
-            return False
+        return list_item['type'] == 'folder'
 
     def get_folder(self, list_item):
         items = self.premiumize.list_folder(list_item['id'])
@@ -140,6 +142,7 @@ class RealDebridWalker(BaseDebridWalker):
     @cached_property
     def real_debrid(self):
         from resources.lib.debrid.real_debrid import RealDebrid
+
         return RealDebrid()
 
     def get_init_list(self):
@@ -147,7 +150,7 @@ class RealDebridWalker(BaseDebridWalker):
         items = []
 
         for i in root:
-            if not i['status'] == 'downloaded':
+            if i['status'] != 'downloaded':
                 continue
             item = {
                 "id": i['id'],
@@ -163,10 +166,7 @@ class RealDebridWalker(BaseDebridWalker):
         self._format_items(items)
 
     def _is_folder(self, list_item):
-        if list_item.get('links'):
-            return True
-        else:
-            return False
+        return bool(list_item.get('links'))
 
     def get_folder(self, list_item):
         folder = self.real_debrid.torrent_info(list_item['id'])
@@ -174,12 +174,12 @@ class RealDebridWalker(BaseDebridWalker):
         items = []
 
         for p, i in enumerate(files):
-            if not i['selected'] == 1:
+            if i['selected'] != 1:
                 continue
             item = {
                 "name": i['path'].split('/')[-1] if i['path'].startswith('/') else i['path'],
                 "link": folder['links'][p],
-                "size": i.get("bytes", 0)
+                "size": i.get("bytes", 0),
             }
             items.append(item)
 
@@ -195,6 +195,7 @@ class AllDebridWalker(BaseDebridWalker):
     @cached_property
     def all_debrid(self):
         from resources.lib.debrid.all_debrid import AllDebrid
+
         return AllDebrid()
 
     def get_init_list(self):
@@ -212,14 +213,12 @@ class AllDebridWalker(BaseDebridWalker):
                         link
                         for link in i['links']
                         if (
-                            len(self._get_lowest_level_filename_for_link_files(link.get("files", []))) == 1
-                            and self._get_lowest_level_filename_for_link_files(link.get("files", []))[0].endswith(
-                                tuple(g.common_video_extensions)
-                            )
+                            len(filenames := self._get_lowest_level_filename_for_link_files(link.get("files", []))) == 1
+                            and filenames[0].endswith(g.common_video_extensions)
                         )
                     ],
-                    key=lambda x: x['filename']
-                )
+                    key=lambda x: x['filename'],
+                ),
             }
             if item.get("links"):
                 items.append(item)
@@ -227,10 +226,7 @@ class AllDebridWalker(BaseDebridWalker):
         self._format_items(items)
 
     def _is_folder(self, list_item):
-        if list_item.get("links"):
-            return True
-        else:
-            return False
+        return bool(list_item.get("links"))
 
     def get_folder(self, list_item):
         links = self.all_debrid.magnet_status(list_item['id']).get("magnets", []).get("links", [])
@@ -240,11 +236,7 @@ class AllDebridWalker(BaseDebridWalker):
             filenames = self._get_lowest_level_filename_for_link_files(l.get("files", []))
             if not (len(filenames) == 1 and filenames[0].endswith(tuple(g.common_video_extensions))):
                 continue
-            item = {
-                "name": filenames[0],
-                "link": l.get("link"),
-                "size": l.get("size", 0)
-            }
+            item = {"name": filenames[0], "link": l.get("link"), "size": l.get("size", 0)}
             items.append(item)
 
         self._format_items(sorted(items, key=lambda x: x['name']))
@@ -252,11 +244,10 @@ class AllDebridWalker(BaseDebridWalker):
     def _get_lowest_level_filename_for_link_files(self, files_item):
         files = []
         for file in files_item if isinstance(files_item, list) else [files_item]:
-            entities = file.get('e')
-            if entities:
+            if entities := file.get("e"):
                 files.extend(self._get_lowest_level_filename_for_link_files(entities))
             else:
-                files.append(file.get('n'))
+                files.append(file.get("n"))
         return files
 
     def resolve_link(self, list_item):
@@ -264,17 +255,21 @@ class AllDebridWalker(BaseDebridWalker):
 
 
 class LocalFileWalker(BaseDebridWalker):
-    provider = 'local_downloads'
-    downloads_folder = g.DOWNLOAD_PATH
+    provider = "local_downloads"
+    downloads_folder = g.get_setting("download.location")
 
     def _get_folder_list(self, path):
         directory_listing = xbmcvfs.listdir(path)
-        contents = [tools.ensure_path_is_dir(i) for i in directory_listing[0]] + [i for i in directory_listing[1]]
-        return [{"name": i[:-1] if i.endswith(("\\", "/")) else i,
-                 "path": os.path.join(path, i),
-                 "size": xbmcvfs.Stat(os.path.join(path, i)).st_size()
-                 }
-                for i in contents]
+        contents = [tools.ensure_path_is_dir(i) for i in directory_listing[0]] + list(directory_listing[1])
+
+        return [
+            {
+                "name": i[:-1] if i.endswith(("\\", "/")) else i,
+                "path": os.path.join(path, i),
+                "size": xbmcvfs.Stat(os.path.join(path, i)).st_size(),
+            }
+            for i in contents
+        ]
 
     def get_init_list(self):
         self._format_items(self._get_folder_list(self.downloads_folder))

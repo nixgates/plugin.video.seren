@@ -5,24 +5,24 @@
 		<width>1920</width>
 		<height>1080</height>
     </coordinates>
-	
+
     <animation effect="fade" time="350">WindowOpen</animation>
-	
+
     <controls>
-        
+
 		<!-- Background -->
 		<control type="group">
 			<top>0</top>
 			<left>0</left>
 			<width>1920</width>
 			<height>1080</height>
-			
+
 			<!-- Fallback -->
 			<control type="image">
 				<texture>white.png</texture>
 				<colordiffuse>FF000000</colordiffuse>
 			</control>
-			
+
 			<!-- Fanart -->
 			<control type="image">
 				<texture background="true">$INFO[Window().Property(item.art.fanart)]</texture>
@@ -35,25 +35,25 @@
 			</control>
 		</control>
 
-		<!-- Seren Peacock -->
+		<!-- Seren Logo -->
 		<control type="image">
 			<animation effect="fade" time="350">WindowOpen</animation>
 			<centerleft>50%</centerleft>
-			<centertop>45%</centertop>
+			<bottom>80</bottom>
 			<align>center</align>
 			<aligny>center</aligny>
-			<width>100</width>
+			<width>335</width>
 			<aspectratio>keep</aspectratio>
 			<texture>$INFO[Window().Property(seren.logo)]</texture>
 			<visible>String.IsEqual(Window().Property(process_started),false) | String.IsEmpty(Window().Property(item.art.clearlogo))</visible>
 		</control>
-		
+
 		<!-- Clearlogo -->
 		<control type="image">
 			<animation effect="fade" time="350" condition="String.IsEqual(Window().Property(process_started),true) + !String.IsEmpty(Window().Property(item.art.clearlogo))">Conditional</animation>
 			<centerleft>50%</centerleft>
 			<width>335</width>
-			<centertop>50%</centertop>
+			<bottom>80</bottom>
 			<align>center</align>
 			<aligny>center</aligny>
 			<aspectratio>keep</aspectratio>
@@ -64,6 +64,7 @@
 		<!-- Notification Text -->
         <control type="label">
 			<animation effect="fade" time="350">WindowOpen</animation>
+			<animation effect="fade" time="350">VisibleChange</animation>
             <top>210</top>
 			<centerleft>50%</centerleft>
             <width>100%</width>
@@ -72,6 +73,7 @@
             <aligny>center</aligny>
             <textcolor>FFDDDDDD</textcolor>
             <label>$INFO[Window().Property(notification_text)]</label>
+			<visible>!String.IsEmpty(Window().Property(notification_text))</visible>
         </control>
     </controls>
 </window>

@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
 """
 Module to handle blocking of requests from providers
 Set PRE_TERM_BLOCK to True when you want to force providers from making requests using the requests package
 """
-from __future__ import absolute_import, division, unicode_literals
-
 import inspect
 
 import requests
@@ -15,7 +12,6 @@ PRE_TERM_BLOCK = False
 
 
 def _monkey_check(method):
-
     def do_method(*args, **kwargs):
         """
         Wrapper method
@@ -23,8 +19,10 @@ def _monkey_check(method):
         :param kwargs: kwargs
         :return: func results
         """
-        if (any([True for i in inspect.stack() if "providerModules" in i[1]]) or
-            any([True for i in inspect.stack() if "providers" in i[1]])) and PRE_TERM_BLOCK:
+        if (
+            any(True for i in inspect.stack() if "providerModules" in i[1])
+            or any(True for i in inspect.stack() if "providers" in i[1])
+        ) and PRE_TERM_BLOCK:
             raise PreemptiveCancellation('Pre-emptive termination has stopped this request')
 
         return method(*args, **kwargs)

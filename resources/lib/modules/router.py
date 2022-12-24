@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 import xbmc
 import xbmcgui
+
+from resources.lib.modules.exceptions import NoPlayableSourcesException
+from resources.lib.modules.globals import g
 
 """
     Dispatch module
 """
-from resources.lib.modules.globals import g
-from resources.lib.modules.exceptions import NoPlayableSourcesException
 
 
 def dispatch(params):
@@ -26,14 +24,14 @@ def dispatch(params):
     mediatype = params.get("mediatype")
     endpoint = params.get("endpoint")
 
-    g.log("Seren, Running Path - {}".format(g.REQUEST_PARAMS))
+    g.log(f"Seren, Running Path - {g.REQUEST_PARAMS}")
 
     if action is None:
         from resources.lib.gui import homeMenu
 
         homeMenu.Menus().home()
 
-    if action == "genericEndpoint":
+    elif action == "genericEndpoint":
         if mediatype == "movies":
             from resources.lib.gui.movieMenus import Menus
         else:
@@ -115,6 +113,7 @@ def dispatch(params):
         from resources.lib.modules.smartPlay import SmartPlay
         from resources.lib.common import tools
         from resources.lib.modules import helpers
+        from resources.lib.database.providerCache import ProviderCache
 
         item_information = tools.get_item_information(action_args)
         smart_play = SmartPlay(item_information)
@@ -123,7 +122,7 @@ def dispatch(params):
 
         try:
             # Check to confirm user has a debrid provider authenticated and enabled
-            if not g.premium_check():
+            if not g.premium_check() and ProviderCache().debrid_providers_enabed():
                 xbmcgui.Dialog().ok(
                     g.ADDON_NAME,
                     tools.create_multiline_message(
@@ -141,21 +140,18 @@ def dispatch(params):
                 xbmc.Player().play(g.PLAYLIST)
                 return
 
-            resume_time = smart_play.handle_resume_prompt(
-                resume, force_resume_off, force_resume_on, force_resume_check
-            )
+            resume_time = smart_play.handle_resume_prompt(resume, force_resume_off, force_resume_on, force_resume_check)
             background = helpers.show_persistent_window_if_required(item_information)
             # Clear out last resolved title for a show if we are doing a rescrape
             if overwrite_cache and item_information['info']['mediatype'] == g.MEDIA_EPISODE:
-                g.clear_runtime_setting(
-                    "last_resolved_release_title.{}".format(item_information['info']['trakt_show_id'])
-                )
+                g.clear_runtime_setting(f"last_resolved_release_title.{item_information['info']['trakt_show_id']}")
 
             # Get Sources
             sources_helper = helpers.SourcesHelper()
             uncached, sources_list, ii = sources_helper.get_sources(action_args, overwrite_cache=overwrite_cache)
             if background:
                 background.set_process_started()
+                background.set_text("")
 
             # Sort sources
             sources = sources_helper.sort_sources(ii, sources_list)
@@ -168,39 +164,24 @@ def dispatch(params):
             else:
                 source_select_style = "Movie"
 
-            if (
-                g.get_int_setting("general.playstyle{}".format(source_select_style))
-                == 1
-                or source_select
-            ):
+            if g.get_int_setting(f"general.playstyle{source_select_style}") == 1 or source_select:
 
                 if background:
                     background.set_text(g.get_language_string(30178))
                 from resources.lib.modules import sourceSelect
 
                 xbmc.sleep(750)
-                stream_link = sourceSelect.source_select(
-                    uncached, sources, item_information
-                )
-            else:
                 if background:
-                    background.set_text(g.get_language_string(30031))
+                    background.set_text("")
+                stream_link = sourceSelect.source_select(uncached, sources, item_information)
+            else:
                 stream_link = helpers.Resolverhelper().resolve_silent_or_visible(
                     sources, ii, pack_select, overwrite_cache=overwrite_cache
                 )
                 if stream_link is None:
                     g.close_busy_dialog()
-                    g.notification(
-                        g.ADDON_NAME, g.get_language_string(30032), time=5000
-                    )
-
-            g.show_busy_dialog()
-
-            if background:
-                try:
-                    background.close()
-                finally:
-                    del background
+                    g.close_all_dialogs()
+                    g.notification(g.ADDON_NAME, g.get_language_string(30032), time=5000)
 
             if not stream_link:
                 raise NoPlayableSourcesException
@@ -209,10 +190,13 @@ def dispatch(params):
 
             try:
                 seren_player = player.SerenPlayer()
-                seren_player.play_source(
-                    stream_link, item_information, resume_time=resume_time
-                )
+                seren_player.play_source(stream_link, item_information, resume_time=resume_time)
             finally:
+                if background:
+                    try:
+                        background.close()
+                    finally:
+                        del background
                 del seren_player
 
         except NoPlayableSourcesException:
@@ -252,16 +236,10 @@ def dispatch(params):
                 source_select_style = "Episodes"
             else:
                 source_select_style = "Movie"
-            if (
-                g.get_int_setting("general.playstyle{}".format(source_select_style))
-                == 0
-                and sources
-            ):
+            if g.get_int_setting(f"general.playstyle{source_select_style}") == 0 and sources:
                 from resources.lib.modules import resolver
 
-                helpers.Resolverhelper().resolve_silent_or_visible(
-                    sources, ii, pack_select
-                )
+                helpers.Resolverhelper().resolve_silent_or_visible(sources, ii, pack_select)
         finally:
             g.set_runtime_setting("tempSilent", False)
 
@@ -412,7 +390,7 @@ def dispatch(params):
     elif action == "resetSilent":
         g.set_runtime_setting("tempSilent", False)
         g.notification(
-            "{}: {}".format(g.ADDON_NAME, g.get_language_string(30302)),
+            f"{g.ADDON_NAME}: {g.get_language_string(30302)}",
             g.get_language_string(30033),
             time=5000,
         )
@@ -423,7 +401,7 @@ def dispatch(params):
         TorrentCache().clear_all()
 
     elif action == "openSettings":
-        xbmc.executebuiltin("Addon.OpenSettings({})".format(g.ADDON_ID))
+        xbmc.executebuiltin(f"Addon.OpenSettings({g.ADDON_ID})")
 
     elif action == "myTraktLists":
         from resources.lib.modules.listsHelper import ListsHelper
@@ -535,9 +513,7 @@ def dispatch(params):
             ProviderInstallManager,
         )
 
-        confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30166)
-        )
+        confirmation = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30166))
         if confirmation == 0:
             return
         ProviderInstallManager().install_package(1, url=url)
@@ -547,9 +523,7 @@ def dispatch(params):
             ProviderInstallManager,
         )
 
-        confirmation = xbmcgui.Dialog().yesno(
-            g.ADDON_NAME, g.get_language_string(30168).format(url)
-        )
+        confirmation = xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30168).format(url))
         if confirmation == 0:
             return
         ProviderInstallManager().uninstall_package(package=url, silent=False)
@@ -680,9 +654,7 @@ def dispatch(params):
         from resources.lib.database.skinManager import SkinManager
 
         try:
-            window = ProviderPackages(
-                *SkinManager().confirm_skin_path("provider_packages.xml")
-            )
+            window = ProviderPackages(*SkinManager().confirm_skin_path("provider_packages.xml"))
             window.doModal()
         finally:
             del window
@@ -695,9 +667,11 @@ def dispatch(params):
     elif action == "runPlayerDialogs":
         from resources.lib.modules.player import PlayerDialogs
 
-        player_dialogs = PlayerDialogs()
-        player_dialogs.display_dialog()
-        del player_dialogs
+        try:
+            player_dialogs = PlayerDialogs()
+            player_dialogs.display_dialog()
+        finally:
+            del player_dialogs
 
     elif action == "authAllDebrid":
         from resources.lib.debrid.all_debrid import AllDebrid
@@ -776,19 +750,12 @@ def dispatch(params):
 
         Menus().movie_trending_recent()
 
-    elif action == "setDownloadLocation":
-        from resources.lib.modules.download_manager import set_download_location
-
-        set_download_location()
-
     elif action == "downloadManagerView":
         from resources.lib.gui.windows.download_manager import DownloadManager
         from resources.lib.database.skinManager import SkinManager
 
         try:
-            window = DownloadManager(
-                *SkinManager().confirm_skin_path("download_manager.xml")
-            )
+            window = DownloadManager(*SkinManager().confirm_skin_path("download_manager.xml"))
             window.doModal()
         finally:
             del window
@@ -807,18 +774,22 @@ def dispatch(params):
 
     elif action == "toggleLanguageInvoker":
         from resources.lib.common.maintenance import toggle_reuselanguageinvoker
+
         toggle_reuselanguageinvoker()
 
     elif action == "runMaintenance":
         from resources.lib.common.maintenance import run_maintenance
+
         run_maintenance()
 
     elif action == "torrentCacheCleanup":
         from resources.lib.database import torrentCache
+
         torrentCache.TorrentCache().do_cleanup()
 
     elif action == "chooseTimeZone":
         from resources.lib.modules.manual_timezone import choose_timezone
+
         choose_timezone()
 
     elif action == "widgetRefresh":
@@ -841,3 +812,14 @@ def dispatch(params):
             window.doModal()
         finally:
             del window
+
+    elif action == "chooseSorting":
+        import resources.lib.gui.windows.sort_select as sort_select
+
+        try:
+            window = sort_select.SortSelect("sort_select.xml", g.ADDON_PATH)
+            window.doModal()
+        finally:
+            del window
+    else:
+        g.log(f"Unknown action requested: {action}", "error")

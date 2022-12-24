@@ -94,7 +94,7 @@ def _get_localzone(_root='/'):
                         utils.assert_tz_offset(tz)
                     return tz
 
-        except IOError:
+        except OSError:
             # File doesn't exist or is a directory
             continue
 
@@ -110,7 +110,7 @@ def _get_localzone(_root='/'):
     for filename in ('etc/sysconfig/clock', 'etc/conf.d/clock'):
         tzpath = os.path.join(_root, filename)
         try:
-            with open(tzpath, 'rt') as tzfile:
+            with open(tzpath) as tzfile:
                 data = tzfile.readlines()
 
             for line in data:
@@ -132,7 +132,7 @@ def _get_localzone(_root='/'):
                         utils.assert_tz_offset(tz)
                     return tz
 
-        except IOError:
+        except OSError:
             # File doesn't exist or is a directory
             continue
 

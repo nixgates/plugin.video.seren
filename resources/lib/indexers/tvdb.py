@@ -1,18 +1,20 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
+import contextlib
 import time
 import traceback
+from functools import cached_property
 from functools import wraps
-from math import sin, pi  # pylint: disable=no-name-in-module
+from math import pi
+from math import sin
+from urllib import parse
 
 import xbmcgui
 
+from . import valid_id_or_none
 from resources.lib.common import tools
 from resources.lib.common.thread_pool import ThreadPool
-from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
-from resources.lib.indexers.apibase import ApiBase, handle_single_item_or_list
+from resources.lib.indexers.apibase import ApiBase
+from resources.lib.indexers.apibase import handle_single_item_or_list
 from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
@@ -23,38 +25,34 @@ def tvdb_guard_response(func):
     def wrapper(*args, **kwarg):
         method_class = args[0]
         import requests
+
         try:
             response = func(*args, **kwarg)
             if response.status_code in [200, 201]:
                 return response
 
             if response.status_code == 401:
-                try:
+                with contextlib.suppress(RanOnceAlready):
                     with GlobalLock("tvdb.oauth", run_once=True, check_sum=method_class.jwToken) as lock:
                         if method_class.jwToken is not None:
                             method_class.try_refresh_token(True)
-                except RanOnceAlready:
-                    pass
                 if method_class.refresh_token is not None:
                     return func(*args, **kwarg)
 
-            g.log(
-                "TVDB returned a {} ({}): while requesting {}".format(
-                    response.status_code,
-                    TVDBAPI.http_codes[response.status_code]
-                    if not response.status_code == 404
-                    else response.json()["Error"],
-                    response.url,
-                ),
-                "warning" if not response.status_code == 404 else "debug",
+            error_message = (
+                TVDBAPI.http_codes[response.status_code] if response.status_code != 404 else response.json()['Error']
             )
+
+            g.log(
+                f"TVDB returned a {response.status_code} ({error_message}): while requesting {response.url}",
+                "warning" if response.status_code != 404 else "debug",
+            )
+
             return None
         except requests.exceptions.ConnectionError:
             return None
         except Exception:
-            xbmcgui.Dialog().notification(
-                g.ADDON_NAME, g.get_language_string(30024).format("TVDB")
-            )
+            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30024).format("TVDB"))
             if g.get_runtime_setting("run.mode") == "test":
                 raise
             else:
@@ -89,7 +87,7 @@ def tvdb_art_sorter(item):
 class TVDBAPI(ApiBase):
     baseUrl = "https://api.thetvdb.com/"
     normalization = [
-        ("imdbId", ("imdbnumber", "imdb_id"), None),
+        ("imdbId", ("imdbnumber", "imdb_id"), lambda i: valid_id_or_none(i)),
         ("id", "tvdb_id", None),
         (
             None,
@@ -109,12 +107,10 @@ class TVDBAPI(ApiBase):
             (
                 "firstAired",
                 "year",
-                lambda t: g.validate_date(t)[:4]
-                if g.validate_date(t)
-                else None,
+                lambda t: g.validate_date(t)[:4] if g.validate_date(t) else None,
             ),
             ("status", "status", None),
-            ("runtime", "runtime", lambda d: int(d) * 60),
+            ("runtime", "runtime", lambda d: int(d) * 60 if d.isdigit() else None),
             ("network", "studio", None),
             ("genre", "genre", lambda t: sorted(set(t))),
             ("seriesName", ("title", "tvshowtitle"), None),
@@ -193,7 +189,12 @@ class TVDBAPI(ApiBase):
         },
         {"id": 104, "abbreviation": "ak", "name": "Akan", "englishName": "Akan"},
         {"id": 105, "abbreviation": "am", "name": "አማርኛ", "englishName": "Amharic"},
-        {"id": 106, "abbreviation": "ar", "name": "العربية", "englishName": "Arabic",},
+        {
+            "id": 106,
+            "abbreviation": "ar",
+            "name": "العربية",
+            "englishName": "Arabic",
+        },
         {
             "id": 107,
             "abbreviation": "an",
@@ -212,7 +213,12 @@ class TVDBAPI(ApiBase):
             "name": "авар мацӀ",
             "englishName": "Avaric",
         },
-        {"id": 110, "abbreviation": "ae", "name": "avesta", "englishName": "Avestan",},
+        {
+            "id": 110,
+            "abbreviation": "ae",
+            "name": "avesta",
+            "englishName": "Avestan",
+        },
         {
             "id": 111,
             "abbreviation": "ay",
@@ -243,9 +249,24 @@ class TVDBAPI(ApiBase):
             "name": "беларуская мова",
             "englishName": "Belarusian",
         },
-        {"id": 116, "abbreviation": "bn", "name": "বাংলা", "englishName": "Bengali",},
-        {"id": 117, "abbreviation": "bh", "name": "भोजपुरी", "englishName": "Bihari",},
-        {"id": 118, "abbreviation": "bi", "name": "Bislama", "englishName": "Bislama",},
+        {
+            "id": 116,
+            "abbreviation": "bn",
+            "name": "বাংলা",
+            "englishName": "Bengali",
+        },
+        {
+            "id": 117,
+            "abbreviation": "bh",
+            "name": "भोजपुरी",
+            "englishName": "Bihari",
+        },
+        {
+            "id": 118,
+            "abbreviation": "bi",
+            "name": "Bislama",
+            "englishName": "Bislama",
+        },
         {
             "id": 119,
             "abbreviation": "bo",
@@ -270,7 +291,12 @@ class TVDBAPI(ApiBase):
             "name": "български език",
             "englishName": "Bulgarian",
         },
-        {"id": 123, "abbreviation": "ca", "name": "català", "englishName": "Catalan",},
+        {
+            "id": 123,
+            "abbreviation": "ca",
+            "name": "català",
+            "englishName": "Catalan",
+        },
         {"id": 28, "abbreviation": "cs", "name": "čeština", "englishName": "Czech"},
         {
             "id": 124,
@@ -302,28 +328,68 @@ class TVDBAPI(ApiBase):
             "name": "Kernewek",
             "englishName": "Cornish",
         },
-        {"id": 129, "abbreviation": "co", "name": "corsu", "englishName": "Corsican",},
+        {
+            "id": 129,
+            "abbreviation": "co",
+            "name": "corsu",
+            "englishName": "Corsican",
+        },
         {"id": 130, "abbreviation": "cr", "name": "ᓀᐦᐃᔭᐍᐏᐣ", "englishName": "Cree"},
-        {"id": 131, "abbreviation": "cy", "name": "Cymraeg", "englishName": "Welsh",},
+        {
+            "id": 131,
+            "abbreviation": "cy",
+            "name": "Cymraeg",
+            "englishName": "Welsh",
+        },
         {"id": 10, "abbreviation": "da", "name": "dansk", "englishName": "Danish"},
-        {"id": 14, "abbreviation": "de", "name": "Deutsch", "englishName": "German",},
-        {"id": 132, "abbreviation": "dv", "name": "ދިވެހި", "englishName": "Divehi",},
-        {"id": 133, "abbreviation": "dz", "name": "རྫོང་ཁ", "englishName": "Dzongkha",},
+        {
+            "id": 14,
+            "abbreviation": "de",
+            "name": "Deutsch",
+            "englishName": "German",
+        },
+        {
+            "id": 132,
+            "abbreviation": "dv",
+            "name": "ދިވެހި",
+            "englishName": "Divehi",
+        },
+        {
+            "id": 133,
+            "abbreviation": "dz",
+            "name": "རྫོང་ཁ",
+            "englishName": "Dzongkha",
+        },
         {
             "id": 20,
             "abbreviation": "el",
             "name": "ελληνική γλώσσα",
             "englishName": "Greek",
         },
-        {"id": 7, "abbreviation": "en", "name": "English", "englishName": "English",},
+        {
+            "id": 7,
+            "abbreviation": "en",
+            "name": "English",
+            "englishName": "English",
+        },
         {
             "id": 134,
             "abbreviation": "eo",
             "name": "Esperanto",
             "englishName": "Esperanto",
         },
-        {"id": 135, "abbreviation": "et", "name": "eesti", "englishName": "Estonian",},
-        {"id": 136, "abbreviation": "eu", "name": "euskara", "englishName": "Basque",},
+        {
+            "id": 135,
+            "abbreviation": "et",
+            "name": "eesti",
+            "englishName": "Estonian",
+        },
+        {
+            "id": 136,
+            "abbreviation": "eu",
+            "name": "euskara",
+            "englishName": "Basque",
+        },
         {"id": 137, "abbreviation": "ee", "name": "Eʋegbe", "englishName": "Ewe"},
         {
             "id": 138,
@@ -331,7 +397,12 @@ class TVDBAPI(ApiBase):
             "name": "føroyskt",
             "englishName": "Faroese",
         },
-        {"id": 139, "abbreviation": "fa", "name": "فارسی", "englishName": "Persian",},
+        {
+            "id": 139,
+            "abbreviation": "fa",
+            "name": "فارسی",
+            "englishName": "Persian",
+        },
         {
             "id": 140,
             "abbreviation": "fj",
@@ -339,24 +410,49 @@ class TVDBAPI(ApiBase):
             "englishName": "Fijian",
         },
         {"id": 11, "abbreviation": "fi", "name": "suomi", "englishName": "Finnish"},
-        {"id": 17, "abbreviation": "fr", "name": "français", "englishName": "French",},
+        {
+            "id": 17,
+            "abbreviation": "fr",
+            "name": "français",
+            "englishName": "French",
+        },
         {
             "id": 141,
             "abbreviation": "fy",
             "name": "Frysk",
             "englishName": "Western Frisian",
         },
-        {"id": 142, "abbreviation": "ff", "name": "Fulfulde", "englishName": "Fula",},
+        {
+            "id": 142,
+            "abbreviation": "ff",
+            "name": "Fulfulde",
+            "englishName": "Fula",
+        },
         {
             "id": 143,
             "abbreviation": "gd",
             "name": "Gàidhlig",
             "englishName": "Scottish Gaelic",
         },
-        {"id": 144, "abbreviation": "ga", "name": "Gaeilge", "englishName": "Irish",},
-        {"id": 145, "abbreviation": "gl", "name": "galego", "englishName": "Galician",},
+        {
+            "id": 144,
+            "abbreviation": "ga",
+            "name": "Gaeilge",
+            "englishName": "Irish",
+        },
+        {
+            "id": 145,
+            "abbreviation": "gl",
+            "name": "galego",
+            "englishName": "Galician",
+        },
         {"id": 146, "abbreviation": "gv", "name": "Gaelg", "englishName": "Manx"},
-        {"id": 147, "abbreviation": "gn", "name": "Avañe'ẽ", "englishName": "Guaraní",},
+        {
+            "id": 147,
+            "abbreviation": "gn",
+            "name": "Avañe'ẽ",
+            "englishName": "Guaraní",
+        },
         {
             "id": 148,
             "abbreviation": "gu",
@@ -390,16 +486,31 @@ class TVDBAPI(ApiBase):
             "name": "hrvatski jezik",
             "englishName": "Croatian",
         },
-        {"id": 19, "abbreviation": "hu", "name": "Magyar", "englishName": "Hungarian",},
+        {
+            "id": 19,
+            "abbreviation": "hu",
+            "name": "Magyar",
+            "englishName": "Hungarian",
+        },
         {
             "id": 154,
             "abbreviation": "hy",
             "name": "Հայերեն",
             "englishName": "Armenian",
         },
-        {"id": 155, "abbreviation": "ig", "name": "Asụsụ Igbo", "englishName": "Igbo",},
+        {
+            "id": 155,
+            "abbreviation": "ig",
+            "name": "Asụsụ Igbo",
+            "englishName": "Igbo",
+        },
         {"id": 156, "abbreviation": "io", "name": "Ido", "englishName": "Ido"},
-        {"id": 157, "abbreviation": "ii", "name": "Nuosuhxop", "englishName": "Nuosu",},
+        {
+            "id": 157,
+            "abbreviation": "ii",
+            "name": "Nuosuhxop",
+            "englishName": "Nuosu",
+        },
         {
             "id": 158,
             "abbreviation": "iu",
@@ -424,14 +535,24 @@ class TVDBAPI(ApiBase):
             "name": "Bahasa Indonesia",
             "englishName": "Indonesian",
         },
-        {"id": 162, "abbreviation": "ik", "name": "Iñupiaq", "englishName": "Inupiaq",},
+        {
+            "id": 162,
+            "abbreviation": "ik",
+            "name": "Iñupiaq",
+            "englishName": "Inupiaq",
+        },
         {
             "id": 163,
             "abbreviation": "is",
             "name": "Íslenska",
             "englishName": "Icelandic",
         },
-        {"id": 15, "abbreviation": "it", "name": "italiano", "englishName": "Italian",},
+        {
+            "id": 15,
+            "abbreviation": "it",
+            "name": "italiano",
+            "englishName": "Italian",
+        },
         {
             "id": 164,
             "abbreviation": "jv",
@@ -445,7 +566,12 @@ class TVDBAPI(ApiBase):
             "name": "kalaallisut",
             "englishName": "Kalaallisut",
         },
-        {"id": 166, "abbreviation": "kn", "name": "ಕನ್ನಡ", "englishName": "Kannada",},
+        {
+            "id": 166,
+            "abbreviation": "kn",
+            "name": "ಕನ್ನಡ",
+            "englishName": "Kannada",
+        },
         {
             "id": 167,
             "abbreviation": "ks",
@@ -458,7 +584,12 @@ class TVDBAPI(ApiBase):
             "name": "ქართული",
             "englishName": "Georgian",
         },
-        {"id": 169, "abbreviation": "kr", "name": "Kanuri", "englishName": "Kanuri",},
+        {
+            "id": 169,
+            "abbreviation": "kr",
+            "name": "Kanuri",
+            "englishName": "Kanuri",
+        },
         {
             "id": 170,
             "abbreviation": "kk",
@@ -466,7 +597,12 @@ class TVDBAPI(ApiBase):
             "englishName": "Kazakh",
         },
         {"id": 171, "abbreviation": "km", "name": "ខ្មែរ", "englishName": "Khmer"},
-        {"id": 172, "abbreviation": "ki", "name": "Gĩkũyũ", "englishName": "Kikuyu",},
+        {
+            "id": 172,
+            "abbreviation": "ki",
+            "name": "Gĩkũyũ",
+            "englishName": "Kikuyu",
+        },
         {
             "id": 173,
             "abbreviation": "rw",
@@ -479,8 +615,18 @@ class TVDBAPI(ApiBase):
             "name": "кыргыз тили",
             "englishName": "Kirghiz",
         },
-        {"id": 175, "abbreviation": "kv", "name": "коми кыв", "englishName": "Komi",},
-        {"id": 176, "abbreviation": "kg", "name": "KiKongo", "englishName": "Kongo",},
+        {
+            "id": 175,
+            "abbreviation": "kv",
+            "name": "коми кыв",
+            "englishName": "Komi",
+        },
+        {
+            "id": 176,
+            "abbreviation": "kg",
+            "name": "KiKongo",
+            "englishName": "Kongo",
+        },
         {"id": 32, "abbreviation": "ko", "name": "한국어", "englishName": "Korean"},
         {
             "id": 177,
@@ -488,7 +634,12 @@ class TVDBAPI(ApiBase):
             "name": "Kuanyama",
             "englishName": "Kwanyama",
         },
-        {"id": 178, "abbreviation": "ku", "name": "Kurdî", "englishName": "Kurdish",},
+        {
+            "id": 178,
+            "abbreviation": "ku",
+            "name": "Kurdî",
+            "englishName": "Kurdish",
+        },
         {"id": 179, "abbreviation": "lo", "name": "ພາສາລາວ", "englishName": "Lao"},
         {"id": 180, "abbreviation": "la", "name": "latine", "englishName": "Latin"},
         {
@@ -503,7 +654,12 @@ class TVDBAPI(ApiBase):
             "name": "Limburgs",
             "englishName": "Limburgish",
         },
-        {"id": 183, "abbreviation": "ln", "name": "Lingála", "englishName": "Lingala",},
+        {
+            "id": 183,
+            "abbreviation": "ln",
+            "name": "Lingála",
+            "englishName": "Lingala",
+        },
         {
             "id": 184,
             "abbreviation": "lt",
@@ -522,7 +678,12 @@ class TVDBAPI(ApiBase):
             "name": "Luba-Katanga",
             "englishName": "Luba-Katanga",
         },
-        {"id": 187, "abbreviation": "lg", "name": "Luganda", "englishName": "Luganda",},
+        {
+            "id": 187,
+            "abbreviation": "lg",
+            "name": "Luganda",
+            "englishName": "Luganda",
+        },
         {
             "id": 188,
             "abbreviation": "mh",
@@ -535,7 +696,12 @@ class TVDBAPI(ApiBase):
             "name": "മലയാളം",
             "englishName": "Malayalam",
         },
-        {"id": 190, "abbreviation": "mr", "name": "मराठी", "englishName": "Marathi",},
+        {
+            "id": 190,
+            "abbreviation": "mr",
+            "name": "मराठी",
+            "englishName": "Marathi",
+        },
         {
             "id": 191,
             "abbreviation": "mk",
@@ -548,7 +714,12 @@ class TVDBAPI(ApiBase):
             "name": "Malagasy fiteny",
             "englishName": "Malagasy",
         },
-        {"id": 193, "abbreviation": "mt", "name": "Malti", "englishName": "Maltese",},
+        {
+            "id": 193,
+            "abbreviation": "mt",
+            "name": "Malti",
+            "englishName": "Maltese",
+        },
         {
             "id": 194,
             "abbreviation": "mn",
@@ -567,7 +738,12 @@ class TVDBAPI(ApiBase):
             "name": "bahasa Melayu",
             "englishName": "Malay",
         },
-        {"id": 197, "abbreviation": "my", "name": "Burmese", "englishName": "Burmese",},
+        {
+            "id": 197,
+            "abbreviation": "my",
+            "name": "Burmese",
+            "englishName": "Burmese",
+        },
         {
             "id": 198,
             "abbreviation": "na",
@@ -592,9 +768,24 @@ class TVDBAPI(ApiBase):
             "name": "isiNdebele",
             "englishName": "North Ndebele",
         },
-        {"id": 202, "abbreviation": "ng", "name": "Owambo", "englishName": "Ndonga",},
-        {"id": 203, "abbreviation": "ne", "name": "नेपाली", "englishName": "Nepali",},
-        {"id": 13, "abbreviation": "nl", "name": "Nederlands", "englishName": "Dutch",},
+        {
+            "id": 202,
+            "abbreviation": "ng",
+            "name": "Owambo",
+            "englishName": "Ndonga",
+        },
+        {
+            "id": 203,
+            "abbreviation": "ne",
+            "name": "नेपाली",
+            "englishName": "Nepali",
+        },
+        {
+            "id": 13,
+            "abbreviation": "nl",
+            "name": "Nederlands",
+            "englishName": "Dutch",
+        },
         {
             "id": 9,
             "abbreviation": "no",
@@ -607,8 +798,18 @@ class TVDBAPI(ApiBase):
             "name": "chiCheŵa",
             "englishName": "Chichewa",
         },
-        {"id": 207, "abbreviation": "oc", "name": "occitan", "englishName": "Occitan",},
-        {"id": 208, "abbreviation": "oj", "name": "ᐊᓂᔑᓈᐯᒧᐎᓐ", "englishName": "Ojibwe",},
+        {
+            "id": 207,
+            "abbreviation": "oc",
+            "name": "occitan",
+            "englishName": "Occitan",
+        },
+        {
+            "id": 208,
+            "abbreviation": "oj",
+            "name": "ᐊᓂᔑᓈᐯᒧᐎᓐ",
+            "englishName": "Ojibwe",
+        },
         {"id": 209, "abbreviation": "or", "name": "ଓଡ଼ିଆ", "englishName": "Oriya"},
         {
             "id": 210,
@@ -622,7 +823,12 @@ class TVDBAPI(ApiBase):
             "name": "ирон æвзаг",
             "englishName": "Ossetian",
         },
-        {"id": 212, "abbreviation": "pa", "name": "ਪੰਜਾਬੀ", "englishName": "Panjabi",},
+        {
+            "id": 212,
+            "abbreviation": "pa",
+            "name": "ਪੰਜਾਬੀ",
+            "englishName": "Panjabi",
+        },
         {"id": 213, "abbreviation": "pi", "name": "पाऴि", "englishName": "Pāli"},
         {
             "id": 18,
@@ -685,7 +891,12 @@ class TVDBAPI(ApiBase):
             "name": "संस्कृतम्",
             "englishName": "Sanskrit",
         },
-        {"id": 222, "abbreviation": "si", "name": "සිංහල", "englishName": "Sinhala",},
+        {
+            "id": 222,
+            "abbreviation": "si",
+            "name": "සිංහල",
+            "englishName": "Sinhala",
+        },
         {
             "id": 30,
             "abbreviation": "sk",
@@ -710,8 +921,18 @@ class TVDBAPI(ApiBase):
             "name": "gagana fa'a Samoa",
             "englishName": "Samoan",
         },
-        {"id": 226, "abbreviation": "sn", "name": "chiShona", "englishName": "Shona",},
-        {"id": 227, "abbreviation": "sd", "name": "सिन्धी", "englishName": "Sindhi",},
+        {
+            "id": 226,
+            "abbreviation": "sn",
+            "name": "chiShona",
+            "englishName": "Shona",
+        },
+        {
+            "id": 227,
+            "abbreviation": "sd",
+            "name": "सिन्धी",
+            "englishName": "Sindhi",
+        },
         {
             "id": 228,
             "abbreviation": "so",
@@ -724,21 +945,36 @@ class TVDBAPI(ApiBase):
             "name": "Sesotho",
             "englishName": "Southern Sotho",
         },
-        {"id": 16, "abbreviation": "es", "name": "español", "englishName": "Spanish",},
+        {
+            "id": 16,
+            "abbreviation": "es",
+            "name": "español",
+            "englishName": "Spanish",
+        },
         {
             "id": 230,
             "abbreviation": "sq",
             "name": "gjuha shqipe",
             "englishName": "Albanian",
         },
-        {"id": 231, "abbreviation": "sc", "name": "sardu", "englishName": "Sardinian",},
+        {
+            "id": 231,
+            "abbreviation": "sc",
+            "name": "sardu",
+            "englishName": "Sardinian",
+        },
         {
             "id": 232,
             "abbreviation": "sr",
             "name": "српски језик",
             "englishName": "Serbian",
         },
-        {"id": 233, "abbreviation": "ss", "name": "SiSwati", "englishName": "Swati",},
+        {
+            "id": 233,
+            "abbreviation": "ss",
+            "name": "SiSwati",
+            "englishName": "Swati",
+        },
         {
             "id": 234,
             "abbreviation": "su",
@@ -751,7 +987,12 @@ class TVDBAPI(ApiBase):
             "name": "Kiswahili",
             "englishName": "Swahili",
         },
-        {"id": 8, "abbreviation": "sv", "name": "svenska", "englishName": "Swedish",},
+        {
+            "id": 8,
+            "abbreviation": "sv",
+            "name": "svenska",
+            "englishName": "Swedish",
+        },
         {
             "id": 236,
             "abbreviation": "ty",
@@ -765,7 +1006,12 @@ class TVDBAPI(ApiBase):
             "name": "татар теле",
             "englishName": "Tatar",
         },
-        {"id": 239, "abbreviation": "te", "name": "తెలుగు", "englishName": "Telugu",},
+        {
+            "id": 239,
+            "abbreviation": "te",
+            "name": "తెలుగు",
+            "englishName": "Telugu",
+        },
         {"id": 240, "abbreviation": "tg", "name": "тоҷикӣ", "englishName": "Tajik"},
         {
             "id": 241,
@@ -774,19 +1020,49 @@ class TVDBAPI(ApiBase):
             "englishName": "Tagalog",
         },
         {"id": 242, "abbreviation": "th", "name": "ไทย", "englishName": "Thai"},
-        {"id": 243, "abbreviation": "ti", "name": "ትግርኛ", "englishName": "Tigrinya",},
+        {
+            "id": 243,
+            "abbreviation": "ti",
+            "name": "ትግርኛ",
+            "englishName": "Tigrinya",
+        },
         {
             "id": 244,
             "abbreviation": "to",
             "name": "faka Tonga",
             "englishName": "Tonga",
         },
-        {"id": 245, "abbreviation": "tn", "name": "Setswana", "englishName": "Tswana",},
-        {"id": 246, "abbreviation": "ts", "name": "Xitsonga", "englishName": "Tsonga",},
-        {"id": 247, "abbreviation": "tk", "name": "Türkmen", "englishName": "Turkmen",},
-        {"id": 21, "abbreviation": "tr", "name": "Türkçe", "englishName": "Turkish",},
+        {
+            "id": 245,
+            "abbreviation": "tn",
+            "name": "Setswana",
+            "englishName": "Tswana",
+        },
+        {
+            "id": 246,
+            "abbreviation": "ts",
+            "name": "Xitsonga",
+            "englishName": "Tsonga",
+        },
+        {
+            "id": 247,
+            "abbreviation": "tk",
+            "name": "Türkmen",
+            "englishName": "Turkmen",
+        },
+        {
+            "id": 21,
+            "abbreviation": "tr",
+            "name": "Türkçe",
+            "englishName": "Turkish",
+        },
         {"id": 248, "abbreviation": "tw", "name": "Twi", "englishName": "Twi"},
-        {"id": 249, "abbreviation": "ug", "name": "Uyƣurqə", "englishName": "Uighur",},
+        {
+            "id": 249,
+            "abbreviation": "ug",
+            "name": "Uyƣurqə",
+            "englishName": "Uighur",
+        },
         {
             "id": 250,
             "abbreviation": "uk",
@@ -795,19 +1071,49 @@ class TVDBAPI(ApiBase):
         },
         {"id": 251, "abbreviation": "ur", "name": "اردو", "englishName": "Urdu"},
         {"id": 252, "abbreviation": "uz", "name": "Ozbek", "englishName": "Uzbek"},
-        {"id": 253, "abbreviation": "ve", "name": "Tshivenḓa", "englishName": "Venda",},
+        {
+            "id": 253,
+            "abbreviation": "ve",
+            "name": "Tshivenḓa",
+            "englishName": "Venda",
+        },
         {
             "id": 254,
             "abbreviation": "vi",
             "name": "Tiếng Việt",
             "englishName": "Vietnamese",
         },
-        {"id": 255, "abbreviation": "vo", "name": "Volapük", "englishName": "Volapük",},
-        {"id": 256, "abbreviation": "wa", "name": "walon", "englishName": "Walloon",},
+        {
+            "id": 255,
+            "abbreviation": "vo",
+            "name": "Volapük",
+            "englishName": "Volapük",
+        },
+        {
+            "id": 256,
+            "abbreviation": "wa",
+            "name": "walon",
+            "englishName": "Walloon",
+        },
         {"id": 257, "abbreviation": "wo", "name": "Wollof", "englishName": "Wolof"},
-        {"id": 258, "abbreviation": "xh", "name": "isiXhosa", "englishName": "Xhosa",},
-        {"id": 259, "abbreviation": "yi", "name": "ייִדיש", "englishName": "Yiddish",},
-        {"id": 260, "abbreviation": "yo", "name": "Yorùbá", "englishName": "Yoruba",},
+        {
+            "id": 258,
+            "abbreviation": "xh",
+            "name": "isiXhosa",
+            "englishName": "Xhosa",
+        },
+        {
+            "id": 259,
+            "abbreviation": "yi",
+            "name": "ייִדיש",
+            "englishName": "Yiddish",
+        },
+        {
+            "id": 260,
+            "abbreviation": "yo",
+            "name": "Yorùbá",
+            "englishName": "Yoruba",
+        },
         {
             "id": 261,
             "abbreviation": "za",
@@ -831,10 +1137,7 @@ class TVDBAPI(ApiBase):
 
         self.languages = (
             [None, self.lang_code]
-            if self.lang_code != "en"
-            and any(
-                self.lang_code == i["abbreviation"] for i in self.supported_languages
-            )
+            if self.lang_code != "en" and any(self.lang_code == i["abbreviation"] for i in self.supported_languages)
             else [None]
         )
 
@@ -862,16 +1165,21 @@ class TVDBAPI(ApiBase):
         import requests
         from requests.adapters import HTTPAdapter
         from urllib3 import Retry
+
         session = requests.Session()
         retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
         session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
         return session
 
+    @cached_property
+    def threadpool(self):
+        return ThreadPool()
+
     def _get_headers(self, lang=None):
         headers = {"content-type": "application/json"}
 
         if self.jwToken:
-            headers["Authorization"] = "Bearer {}".format(self.jwToken)
+            headers["Authorization"] = f"Bearer {self.jwToken}"
         if lang is not None:
             headers["Accept-Language"] = lang
         return headers
@@ -884,12 +1192,12 @@ class TVDBAPI(ApiBase):
                 try:
                     g.log("TVDB Token requires refreshing...")
                     response = self.session.post(
-                        tools.urljoin(self.baseUrl, "refresh_token"),
+                        parse.urljoin(self.baseUrl, "refresh_token"),
                         headers=self._get_headers(),
                     ).json()
                     if "Error" in response:
                         response = self.session.post(
-                            self.baseUrl + "login",
+                            f"{self.baseUrl}login",
                             json={"apikey": self.apiKey},
                             headers=self._get_headers(),
                         ).json()
@@ -911,13 +1219,13 @@ class TVDBAPI(ApiBase):
             g.set_setting("tvdb.jw", response["token"])
             self.jwToken = response["token"]
             self.tokenExpires = time.time() + (24 * (60 * 60))
-            g.set_setting("tvdb.expiry", g.UNICODE(self.tokenExpires))
+            g.set_setting("tvdb.expiry", str(self.tokenExpires))
 
     def init_token(self):
         try:
             with GlobalLock(self.__class__.__name__, True):
                 response = self.session.post(
-                    self.baseUrl + "login",
+                    f"{self.baseUrl}login",
                     json={"apikey": self.apiKey},
                     headers=self._get_headers(),
                 ).json()
@@ -927,10 +1235,7 @@ class TVDBAPI(ApiBase):
 
     @tvdb_guard_response
     def get(self, url, **params):
-        if "language" in params:
-            language = params.pop("language")
-        else:
-            language = None
+        language = params.pop("language") if "language" in params else None
         timeout = params.pop("timeout", 10)
         return self.session.get(
             self.baseUrl + url,
@@ -943,24 +1248,18 @@ class TVDBAPI(ApiBase):
     def _flatten(response):
         if "data" in response:
             response = response["data"]
-        if not response:
-            return []
-        return response
+        return response or []
 
     def get_json(self, url, **params):
         response = self.get(url, **params)
         if response is None:
             return None
         try:
-            return self._handle_response(
-                params.get("language"), self._flatten(response.json())
-            )
+            return self._handle_response(params.get("language"), self._flatten(response.json()))
         except (ValueError, AttributeError):
             traceback.print_exc()
             g.log(
-                "Failed to receive JSON from Tvdb response - response: {}".format(
-                    response
-                ),
+                f"Failed to receive JSON from Tvdb response - response: {response}",
                 "error",
             )
             return None
@@ -971,34 +1270,29 @@ class TVDBAPI(ApiBase):
 
     @staticmethod
     def _get_all_pages(func, url, **params):
-        if "progress" in params:
-            progress_callback = params.pop("progress")
-        else:
-            progress_callback = None
+        progress_callback = params.pop("progress") if "progress" in params else None
         response = func(url, **params)
         yield response
         if "links" not in response.headers:
             return
         for i in range(2, int(response.headers["X-Pagination-Page-Count"]) + 1):
-            if progress_callback is not None:
-                progress_callback(
+            if callable(progress_callback):
+                progress_callback(  # pylint: disable=not-callable
                     (i / (int(response.headers["X-Pagination-Page-Count"]) + 1)) * 100
                 )
-            params.update({"page": i})
+            params["page"] = i
             yield func(url, **params)
 
     @handle_single_item_or_list
     def _handle_response(self, language, item):
-        result = {}
         item = self._try_detect_type(item)
         if "mediatype" not in item:
             return item
 
-        result.update({"art": self._extract_art(item, language)})
-        result.update(
-            {"info": self._normalize_info(self.meta_objects[item["mediatype"]], item)}
-        )
-        return result
+        return {
+            "art": self._extract_art(item, language),
+            "info": self._normalize_info(self.meta_objects[item["mediatype"]], item),
+        }
 
     @handle_single_item_or_list
     def _handle_cast(self, item):
@@ -1024,35 +1318,29 @@ class TVDBAPI(ApiBase):
         if item is None:
             return result
 
-        if not isinstance(item, list):
-            if item.get("filename"):
-                result.update(
-                    {"thumb": self._get_absolute_image_path(item["filename"])}
-                )
+        if isinstance(item, dict) and item.get("filename"):
+            result["thumb"] = self._get_absolute_image_path(item["filename"])
 
         if key_name is not None and isinstance(item, list):
-            art = [
+            if art := [
                 self._get_image(i, self.art_map[key_name], language)
                 for i in item
                 if "fileName" in i
                 and i.get("keyType") == key_name
-                and (sub_key is None or i.get("subKey") == g.UNICODE(sub_key))
-            ]
-
-            if len(art) > 0:
-                result.update({self.art_map[key_name]: art})
+                and (sub_key is None or i.get("subKey") == str(sub_key))
+            ]:
+                result[self.art_map[key_name]] = art
         return result
 
     @staticmethod
     def _get_rating(image):
-        if image["ratingsInfo"]["count"]:
-            info = image["ratingsInfo"]
-            rating = info["average"]
-            if info["count"] < 5:
-                rating = 5 + (rating - 5) * sin(info["count"] / pi)
-            return rating
-        else:
+        if not image["ratingsInfo"]["count"]:
             return 5
+        info = image["ratingsInfo"]
+        rating = info["average"]
+        if info["count"] < 5:
+            rating = 5 + (rating - 5) * sin(info["count"] / pi)
+        return rating
 
     @staticmethod
     def _parse_size(image, art_type):
@@ -1068,93 +1356,72 @@ class TVDBAPI(ApiBase):
     def _get_image(self, image, art_type, language):
         return {
             "url": self._get_absolute_image_path(image["fileName"]),
-            "language": language if language else "en",
+            "language": language or "en",
             "rating": self._get_rating(image),
             "size": self._parse_size(image, art_type),
         }
 
     @wrap_tvdb_object
     def get_show(self, tvdb_id):
-        art_types = self._get_show_art_types(tvdb_id)
-        if art_types:
-            art_types = [i for i in art_types if not i.startswith("season")]
-
-        else:
-            art_types = []
-
-        thread_pool = ThreadPool()
-        thread_pool.put(self._get_series_cast, tvdb_id)
+        art_types = [i for i in self._get_show_art_types(tvdb_id) or [] if not i.startswith("season")]
+        threadpool = ThreadPool()
+        threadpool.put(self._get_series_cast, tvdb_id)
         for language in self.languages:
-            thread_pool.put(self._get_show_info, tvdb_id, language)
+            threadpool.put(self._get_show_info, tvdb_id, language)
             for art_type in art_types:
-                thread_pool.put(self._get_show_art, tvdb_id, art_type, language)
-        item = thread_pool.wait_completion()
-        if not item:
-            return None
-        return item
+                threadpool.put(self._get_show_art, tvdb_id, art_type, language)
+        item = threadpool.wait_completion()
+
+        return item or None
 
     @wrap_tvdb_object
     def get_show_art(self, tvdb_id):
-        art_types = self._get_show_art_types(tvdb_id)
-        if art_types:
-            art_types = [i for i in art_types if not i.startswith("season")]
-        else:
-            art_types = []
+        item = self.threadpool.map_results(
+            self._get_show_art,
+            (
+                (tvdb_id, art_type, language)
+                for language in self.languages
+                for art_type in self._get_show_art_types(tvdb_id) or []
+                if not art_type.startswith("season")
+            ),
+        )
 
-        thread_pool = ThreadPool()
-        for language in self.languages:
-            for art_type in art_types:
-                thread_pool.put(self._get_show_art, tvdb_id, art_type, language)
-        item = thread_pool.wait_completion()
-        if not item:
-            return None
-        return item
+        return item or None
 
     @wrap_tvdb_object
     def get_show_info(self, tvdb_id):
-        thread_pool = ThreadPool()
-        thread_pool.put(self._get_series_cast, tvdb_id)
+        threadpool = ThreadPool()
+        threadpool.put(self._get_series_cast, tvdb_id)
         for language in self.languages:
-            thread_pool.put(self._get_show_info, tvdb_id, language)
-        item = thread_pool.wait_completion()
-        if not item:
-            return None
-        return item
+            threadpool.put(self._get_show_info, tvdb_id, language)
+        item = threadpool.wait_completion()
+
+        return item or None
 
     @wrap_tvdb_object
     def get_show_rating(self, tvdb_id):
         item = self.get_json_cached(
-            "series/{}/filter".format(tvdb_id),
+            f"series/{tvdb_id}/filter",
             keys="siteRating,siteRatingCount,seriesName",
         )
 
-        if not item:
-            return None
-
-        return {"info": tools.filter_dictionary(item["info"], "rating.tvdb")}
+        return {"info": tools.filter_dictionary(item["info"], "rating.tvdb")} if item else None
 
     @wrap_tvdb_object
     def get_show_cast(self, tvdb_id):
         cast = self._get_series_cast(tvdb_id)
-        if cast.get("cast"):
-            return cast
-        else:
-            return None
+        return cast if cast.get("cast") else None
 
     @use_cache()
     def _get_show_art_types(self, tvdb_id):
-        result = self.get_json_cached("series/{}/images/query/params".format(tvdb_id))
-        return (
-            result
-            if not result
-            else sorted([i["keyType"] for i in result if "keyType" in i])
-        )
+        result = self.get_json_cached(f"series/{tvdb_id}/images/query/params")
+        return sorted([i["keyType"] for i in result if "keyType" in i]) if result else result
 
     def _get_show_art(self, tvdb_id, key_type, language):
         return {
             "art": self._extract_art(
                 self.get_json_cached(
-                    "series/{}/images/query?keyType={}".format(tvdb_id, key_type),
+                    f"series/{tvdb_id}/images/query?keyType={key_type}",
                     language=language,
                 ),
                 language,
@@ -1163,35 +1430,33 @@ class TVDBAPI(ApiBase):
         }
 
     def _get_show_info(self, tvdb_id, language):
-        return self.get_json_cached("series/{}".format(tvdb_id), language=language)
+        return self.get_json_cached(f"series/{tvdb_id}", language=language)
 
     def _get_series_cast(self, tvdb_id):
-        return {
-            "cast": self._handle_cast(self.get_json_cached("series/{}/actors".format(tvdb_id)))
-        }
+        return {"cast": self._handle_cast(self.get_json_cached(f"series/{tvdb_id}/actors"))}
 
     @wrap_tvdb_object
     def get_season_art(self, tvdb_id, season):
         art_types = self._get_show_art_types(tvdb_id)
         if not art_types:
-            return None
-        art_types = [i for i in art_types if i.startswith("season")]
-        thread_pool = ThreadPool()
-        for language in self.languages:
-            for art_type in art_types:
-                thread_pool.put(
-                    self._get_season_art, tvdb_id, art_type, season, language
-                )
-        item = thread_pool.wait_completion()
-        if not item:
-            return None
-        return item
+            return
+
+        item = self.threadpool.map_results(
+            self._get_season_art,
+            (
+                (tvdb_id, art_type, season, language)
+                for language in self.languages
+                for art_type in art_types
+                if art_type.startswith("season")
+            ),
+        )
+        return item or None
 
     def _get_season_art(self, tvdb_id, art_name, season, language):
         return {
             "art": self._extract_art(
                 self.get_json_cached(
-                    "series/{}/images/query".format(tvdb_id),
+                    f"series/{tvdb_id}/images/query",
                     keyType=art_name,
                     language=language,
                 ),
@@ -1202,42 +1467,30 @@ class TVDBAPI(ApiBase):
         }
 
     def _get_episode_info(self, tvdb_id, season, episode, language):
-        result = self.get_json_cached(
-            "series/{}/episodes/query".format(tvdb_id),
-            airedSeason=season,
-            airedEpisode=episode,
-            language=language,
-        )
-
-        if not result:
+        if result := self.get_json_cached(
+            f"series/{tvdb_id}/episodes/query", airedSeason=season, airedEpisode=episode, language=language
+        ):
+            return result[0] if isinstance(result, list) else result
+        else:
             return None
-        if isinstance(result, list):
-            return result[0]
-        return result
 
     @wrap_tvdb_object
     def get_episode(self, tvdb_id, season, episode):
-        thread_pool = ThreadPool()
-        for language in self.languages:
-            thread_pool.put(self._get_episode_info, tvdb_id, season, episode, language)
-        item = thread_pool.wait_completion()
-        if not item:
-            return None
-        return item
+        item = self.threadpool.map_results(
+            self._get_episode_info, args_iterable=((tvdb_id, season, episode, language) for language in self.languages)
+        )
+        return item or None
 
     @wrap_tvdb_object
     def get_episode_rating(self, tvdb_id, season, episode):
         item = self._get_episode_info(tvdb_id, season, episode, None)
 
-        if not item:
-            return None
-
-        return {"info": tools.filter_dictionary(item["info"], "rating.tvdb")}
+        return {"info": tools.filter_dictionary(item["info"], "rating.tvdb")} if item else None
 
     def _get_absolute_image_path(self, relative_path):
         if not relative_path:
             return None
         if self.preferred_artwork_size == 2:
             splitted_path = relative_path.split(".")
-            relative_path = "{}_t.{}".format(splitted_path[0], splitted_path[1])
+            relative_path = f"{splitted_path[0]}_t.{splitted_path[1]}"
         return "/".join([self.imageBaseUrl.strip("/"), relative_path.strip("/")])

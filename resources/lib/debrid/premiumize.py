@@ -1,13 +1,15 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
+try:
+    from json.decoder import JSONDecodeError
+except ImportError:
+    JSONDecodeError = ValueError
 
 import time
+from functools import cached_property
 
 import xbmc
 import xbmcgui
 
 from resources.lib.common import tools
-from resources.lib.common.tools import cached_property
 from resources.lib.database.cache import use_cache
 from resources.lib.database.premiumizeTransfers import PremiumizeTransfers
 from resources.lib.modules.globals import g
@@ -19,12 +21,13 @@ class Premiumize:
     """
     Wrapper to handle calls to Premiumize API
     """
+
     client_id = "662875953"
     client_secret = "xmg33m74n6t6x8phun"
 
     def __init__(self):
         self.headers = {
-            "Authorization": "Bearer {}".format(g.get_setting(PM_TOKEN_KEY)),
+            "Authorization": f"Bearer {g.get_setting(PM_TOKEN_KEY)}",
         }
         self.premiumize_transfers = PremiumizeTransfers()
 
@@ -33,6 +36,7 @@ class Premiumize:
         import requests
         from requests.adapters import HTTPAdapter
         from urllib3 import Retry
+
         session = requests.Session()
         retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
         session.mount("https://", HTTPAdapter(max_retries=retries, pool_maxsize=100))
@@ -40,10 +44,17 @@ class Premiumize:
 
     @staticmethod
     def _error_handler(request):
-        if request.json().get("status") == "error":
-            message = "Premiumize API error: {}".format(request.json().get("message"))
-            g.notification(g.ADDON_NAME, message)
-            g.log(message, "error")
+        message = None
+        try:
+            request_json = request.json()
+            message = request_json.get("message") if request_json.get("status") == "error" else None
+        except JSONDecodeError as jde:
+            message = jde
+
+        if message is not None:
+            g.notification(g.ADDON_NAME, f"Premiumize API error: {message}")
+            g.log(f"Premiumize API error: {message}", "error")
+
         return request
 
     def auth(self):
@@ -63,20 +74,16 @@ class Premiumize:
         try:
             progress_dialog = xbmcgui.DialogProgress()
             progress_dialog.create(
-                g.ADDON_NAME + ": " + g.get_language_string(30349),
+                f"{g.ADDON_NAME}: {g.get_language_string(30349)}",
                 tools.create_multiline_message(
-                    line1=g.get_language_string(30018).format(
-                        g.color_string(token["verification_uri"])
-                    ),
-                    line2=g.get_language_string(30019).format(
-                        g.color_string(token["user_code"])
-                    ),
+                    line1=g.get_language_string(30018).format(g.color_string(token["verification_uri"])),
+                    line2=g.get_language_string(30019).format(g.color_string(token["user_code"])),
                     line3=g.get_language_string(30047),
                 ),
             )
             progress_dialog.update(100)
 
-            while poll_again and not token_ttl <= 0 and not progress_dialog.iscanceled():
+            while poll_again and token_ttl > 0 and not progress_dialog.iscanceled():
                 xbmc.sleep(1000)
                 if token_ttl % interval == 0:
                     poll_again, success = self._poll_token(token["device_code"])
@@ -99,12 +106,9 @@ class Premiumize:
         }
         token = self.session.post("https://www.premiumize.me/token", data=data).json()
         if "error" in token:
-            if token["error"] == "access_denied":
-                return False, False
-            return True, False
-
+            return (False, False) if token["error"] == "access_denied" else (True, False)
         g.set_setting(PM_TOKEN_KEY, token["access_token"])
-        self.headers["Authorization"] = "Bearer {}".format(token["access_token"])
+        self.headers["Authorization"] = f"Bearer {token['access_token']}"
 
         account_info = self.account_info()
         g.set_setting("premiumize.username", account_info["customer_id"])
@@ -123,7 +127,7 @@ class Premiumize:
         if self.headers["Authorization"] == "Bearer ":
             g.log("User is not authorised to make PM requests", "warning")
             return None
-        url = "https://www.premiumize.me/api{}".format(url)
+        url = f"https://www.premiumize.me/api{url}"
         req = self.session.get(url, timeout=10, headers=self.headers)
         req = self._error_handler(req)
         return req.json()
@@ -141,7 +145,7 @@ class Premiumize:
         if self.headers["Authorization"] == "Bearer ":
             g.log("User is not authorised to make PM requests", "warning")
             return None
-        url = "https://www.premiumize.me/api{}".format(url)
+        url = f"https://www.premiumize.me/api{url}"
         req = self.session.post(url, headers=self.headers, data=data, timeout=10)
         req = self._error_handler(req)
         return req.json()
@@ -153,8 +157,7 @@ class Premiumize:
         :rtype: dict
         """
         url = "/account/info"
-        response = self.get_url(url)
-        return response
+        return self.get_url(url)
 
     def list_folder(self, folder_id):
         """
@@ -190,8 +193,7 @@ class Premiumize:
         """
         url = "/cache/check"
         post_data = {"items[]": hash_list}
-        response = self.post_url(url, post_data)
-        return response
+        return self.post_url(url, post_data)
 
     def item_details(self, item_id):
         """
@@ -268,8 +270,7 @@ class Premiumize:
         if not info:
             g.log("Failed to get used space for Premiumize account", "error")
             return 0.0
-        used_space = info["space_used"] * 1000.0  # Size returned is in TB (not TiB) we want GB
-        return used_space
+        return info["space_used"] * 1000.0
 
     def hoster_cache_check(self, source_list):
         """
@@ -300,12 +301,7 @@ class Premiumize:
         :rtype: str
         """
         direct_link = self.direct_download(source)
-        if direct_link["status"] == "success":
-            stream_link = direct_link["location"]
-        else:
-            stream_link = None
-
-        return stream_link
+        return direct_link["location"] if direct_link["status"] == "success" else None
 
     def folder_streams(self, folder_id):
         """
@@ -320,16 +316,9 @@ class Premiumize:
         files = [i for i in files if i["type"] == "file_path"]
         for i in files:
             if i["transcode_status"] == "finished":
-                return_files.append(
-                    {"name": i["name"], "link": i["stream_link"], "type": "file_path"}
-                )
-            else:
-                for extension in g.common_video_extensions:
-                    if i["link"].endswith(extension):
-                        return_files.append(
-                            {"name": i["name"], "link": i["link"], "type": "file_path"}
-                        )
-                        break
+                return_files.append({"name": i["name"], "link": i["stream_link"], "type": "file_path"})
+            elif i["link"].endswith(g.common_video_extensions):
+                return_files.append({"name": i["name"], "link": i["link"], "type": "file_path"})
         return return_files
 
     def internal_folders(self, folder_id):
@@ -341,13 +330,7 @@ class Premiumize:
         :rtype: list
         """
         folders = self.list_folder(folder_id)
-        return_folders = []
-        for i in folders:
-            if i["type"] == "folder":
-                return_folders.append(
-                    {"name": i["name"], "id": i["id"], "type": "folder"}
-                )
-        return return_folders
+        return [{"name": i["name"], "id": i["id"], "type": "folder"} for i in folders if i["type"] == "folder"]
 
     def get_hosters(self, hosters):
         """
@@ -359,9 +342,7 @@ class Premiumize:
         """
         host_list = self.update_relevant_hosters()
         if host_list is not None:
-            hosters["premium"]["premiumize"] = [
-                (i, i.split(".")[0]) for i in host_list.get("directdl", [])
-            ]
+            hosters["premium"]["premiumize"] = [(i, i.split(".")[0]) for i in host_list.get("directdl", [])]
         else:
             hosters["premium"]["premiumize"] = []
 
@@ -372,10 +353,7 @@ class Premiumize:
         :return:
         :rtype:
         """
-        return (
-            g.get_bool_setting("premiumize.enabled")
-            and g.get_setting(PM_TOKEN_KEY) is not None
-        )
+        return g.get_bool_setting("premiumize.enabled") and g.get_setting(PM_TOKEN_KEY) is not None
 
     def get_account_status(self):
         """
