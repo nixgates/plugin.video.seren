@@ -629,7 +629,9 @@ class GlobalVariables:
             return "119"
         elif self.KODI_VERSION == 20:
             return "121"
-
+        elif self.KODI_VERSION == 21:
+            return "131"
+            
         raise KeyError("Unsupported kodi version")
 
     def get_kodi_video_db_config(self):
