@@ -1,4 +1,4 @@
-Changlelog 3.0.1
+Changlelog 3.1.0
 [FEATURE] Handle Omega so users don't need to install from 3rd party
 
 Changelog 3.0.0
