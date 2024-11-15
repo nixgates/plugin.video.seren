@@ -621,16 +621,18 @@ class GlobalVariables:
             return MySqlConnection(config)
 
     def get_kodi_database_version(self):
-        if self.KODI_VERSION == 17:
-            return "107"
-        elif self.KODI_VERSION == 18:
-            return "116"
-        elif self.KODI_VERSION == 19:
-            return "119"
-        elif self.KODI_VERSION == 20:
-            return "121"
+        kodi_myvideos_version_map = {
+            17: 107,
+            18: 116,
+            19: 119,
+            20: 121,
+            21: 131,
+        }
 
-        raise KeyError("Unsupported kodi version")
+        if (db_version := kodi_myvideos_version_map.get(self.KODI_VERSION)) is None:
+            raise KeyError("Unsupported kodi version")
+
+        return db_version
 
     def get_kodi_video_db_config(self):
         result = {"type": "sqlite3", "database": f"MyVideos{self.get_kodi_database_version()}"}
@@ -1466,9 +1468,13 @@ class GlobalVariables:
 
     @staticmethod
     def wait_for_abort(timeout=1.0):
-        monitor = xbmc.Monitor()
-        abort_requested = monitor.waitForAbort(timeout)
-        del monitor
+        monitor = None
+        try:
+            monitor = xbmc.Monitor()
+            abort_requested = monitor.waitForAbort(timeout)
+        finally:
+            del monitor
+
         return abort_requested
 
     @staticmethod
