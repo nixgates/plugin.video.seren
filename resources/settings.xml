@@ -1579,7 +1579,7 @@
 						</dependency>
 					</dependencies>
 				</setting>
-				<setting id="general.speedminimum" type="number" label="30646" help="" parent="general.enablesizelimit">
+				<setting id="general.speedminimum" type="number" label="30649" help="" parent="general.enablesizelimit">
 					<level>0</level>
 					<default>0</default>
 					<constraints>
