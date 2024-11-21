@@ -104,6 +104,7 @@ INFO_STRUCT = {
         "HC",
         "SCR",
         "3D",
+        "60-FPS"
     },
 }
 
@@ -206,7 +207,8 @@ INFO_TYPES = {
         "vostfr",
         "vo stfr",
     ],
-    "3D": [" 3d"],
+    "3D": [" 3d", " half ou", " half sbs"],
+    "60-FPS": [" 60 fps", " 60fps"]
 }
 
 
