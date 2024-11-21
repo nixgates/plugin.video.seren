@@ -102,6 +102,8 @@ class SerenPlayer(xbmc.Player):
         self._handle_bookmark()
         self._add_support_for_external_trakt_scrobbling()
 
+        self.playing_next_time = max(self.playing_next_time, self.item_information["info"]["duration"] * (1 - (g.get_int_setting("playingnext.percent") / 100)))
+
         xbmcplugin.setResolvedUrl(g.PLUGIN_HANDLE, True, self._create_list_item(stream_link))
 
         self._keep_alive()
