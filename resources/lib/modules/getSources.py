@@ -1244,6 +1244,10 @@ class SourceWindowAdapter:
     def create(self):
         if self.silent:
             return
+        if self.display_style == 2:
+            self.background_dialog = xbmcgui.DialogProgressBG()
+            self.background_dialog.create("Loading","")
+            g.close_busy_dialog()
         if self.display_style == 1:
             # this one is deleted in `close()`
             self.background_dialog = xbmcgui.DialogProgressBG()
@@ -1278,13 +1282,15 @@ class SourceWindowAdapter:
             self.dialog.setProperty("runtime", str(f"{round(runtime, 2)} {g.get_language_string(30554)}"))
         elif self.display_style == 1 and self.background_dialog:
             self.background_dialog.update(progress, message=text)
+        elif self.display_style == 2 and self.background_dialog:
+            self.background_dialog.update(progress)
 
     def set_property(self, key, value):
         if self.silent:
             return
         if self.display_style == 0 and self.dialog:
             self.dialog.setProperty(key, str(value))
-        elif self.display_style == 1:
+        elif self.display_style == 1 or self.display_style == 2:
             return
 
     def set_progress(self, progress):
@@ -1292,7 +1298,7 @@ class SourceWindowAdapter:
             return
         if self.display_style == 0 and self.dialog:
             self.dialog.setProgress(progress)
-        elif self.display_style == 1 and self.background_dialog:
+        elif (self.display_style == 1 or self.display_style == 2) and self.background_dialog:
             self.background_dialog.update(progress)
 
     def close(self):
@@ -1301,6 +1307,6 @@ class SourceWindowAdapter:
         if self.display_style == 0 and self.dialog:
             self.dialog.close()
             del self.dialog
-        elif self.display_style == 1 and self.background_dialog:
+        elif (self.display_style == 1 or self.display_style == 2) and self.background_dialog:
             self.background_dialog.close()
             del self.background_dialog
