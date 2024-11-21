@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+=======
+Changelog 3.0.1
+[FEATURE] Handle Kodi database version for Omega 21
+
+>>>>>>> b4f4b63bf59b38b93bd565a8503e121f64c91e30
 Changelog 3.0.0
 [PERFORMANCE] Drop support for Python 2.x (Kodi Leia and below)
 [PERFORMANCE] Optimize codebase for Python 3.x (Kodi Matrix and above)
