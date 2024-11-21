@@ -1228,6 +1228,7 @@
 						<options>
 							<option label="30175">0</option>
 							<option label="30176">1</option>
+							<option label="30653">2</option>
 						</options>
 					</constraints>
 					<control type="spinner" format="string"/>

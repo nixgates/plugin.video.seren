@@ -3693,3 +3693,7 @@ msgstr "Auto Max Resolution"
 msgctxt "#30652"
 msgid "Minimum Percentage Left Before Showing Dialog"
 msgstr "Minimum Percentage Left Before Showing Dialog"
+
+msgctxt "#30653"
+msgid "Icon Only"
+msgstr "Icon Only"
