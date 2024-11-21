@@ -621,21 +621,6 @@ class GlobalVariables:
             return MySqlConnection(config)
 
     def get_kodi_database_version(self):
-<<<<<<< HEAD
-        if self.KODI_VERSION == 17:
-            return "107"
-        elif self.KODI_VERSION == 18:
-            return "116"
-        elif self.KODI_VERSION == 19:
-            return "119"
-        elif self.KODI_VERSION == 20:
-            return "121"
-
-        raise KeyError("Unsupported kodi version")
-
-    def get_kodi_video_db_config(self):
-        result = {"type": "sqlite3", "database": f"MyVideos{self.get_kodi_database_version()}"}
-=======
         kodi_myvideos_version_map = {
             17: 107,
             18: 116,
@@ -643,7 +628,6 @@ class GlobalVariables:
             20: 121,
             21: 131,
         }
->>>>>>> b4f4b63bf59b38b93bd565a8503e121f64c91e30
 
         if (db_version := kodi_myvideos_version_map.get(self.KODI_VERSION)) is None:
             raise KeyError("Unsupported kodi version")
