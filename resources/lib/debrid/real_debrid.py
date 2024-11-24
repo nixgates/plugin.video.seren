@@ -243,26 +243,7 @@ class RealDebrid:
             return response.json()
         except (ValueError, AttributeError):
             return response
-
-    """
-    def check_hash(self, hash_list):
-        if isinstance(hash_list, list):
-            hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
-            thread = ThreadPool()
-            for section in hash_list:
-                thread.put(self._check_hash_thread, sorted(section))
-            thread.wait_completion()
-            return self.cache_check_results
-        else:
-            hash_string = "/" + hash_list
-            return self.get_url("torrents/instantAvailability" + hash_string)
-
-    def _check_hash_thread(self, hashes):
-        hash_string = "/" + "/".join(hashes)
-        response = self.get_url("torrents/instantAvailability" + hash_string)
-        self.cache_check_results.update(response)
-    """
-
+        
     def check_hash(self, hash_list):
         if isinstance(hash_list, list):
             hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
@@ -290,7 +271,6 @@ class RealDebrid:
                 return {}
 
     def _check_hash_thread(self, hashes):
-        hash_string = "/" + "/".join(hashes)
         for i in hashes:
             magnet = 'magnet:?xt=urn:btih:' + i
             response = self.add_magnet(magnet)

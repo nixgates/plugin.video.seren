@@ -28,7 +28,7 @@ class SourceSorter:
         self.filter_set = self._get_filters()
 
         # Size filter settings
-        self.enable_size_limit = g.get_bool_setting("general.enablesizelimit")
+        self.enable_size_limit = g.get_int_setting("general.enablesizelimit")
         setting_mediatype = g.MEDIA_EPISODE if self.mediatype == g.MEDIA_EPISODE else g.MEDIA_MOVIE
         self.size_limit = g.get_int_setting(f"general.sizelimit.{setting_mediatype}") * 1024
         self.size_minimum = int(g.get_float_setting(f"general.sizeminimum.{setting_mediatype}") * 1024)
@@ -53,7 +53,6 @@ class SourceSorter:
 
     def filter_sources(self, source_list):
         # Iterate sources, yielding only those that are not filtered
-
         if self.enable_size_limit == 1 :
             duration = self.item_information["info"]["duration"] or (5400 if self.mediatype == "movie" else 2400)
             max_size = self.speed_limit * 0.125 * duration * 0.9

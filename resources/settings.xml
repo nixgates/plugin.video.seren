@@ -1228,7 +1228,7 @@
 						<options>
 							<option label="30175">0</option>
 							<option label="30176">1</option>
-							<option label="30653">2</option>
+							<option label="30652">2</option>
 						</options>
 					</constraints>
 					<control type="spinner" format="string"/>
@@ -2051,7 +2051,7 @@
 					</dependencies>
 					<control type="toggle"/>
 				</setting>
-				<setting id="playingnext.percent" type="integer" label="30652" help="" parent="smartplay.playingnextdialog">
+				<setting id="playingnext.percent" type="integer" label="30651" help="" parent="smartplay.playingnextdialog">
 					<level>0</level>
 					<default>95</default>
 					<constraints>
