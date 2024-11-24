@@ -3671,3 +3671,43 @@ msgstr "عذرا، مصادر نوع {} غير متوفرة للتنزيل"
 msgctxt "#30486"
 msgid "Seeds"
 msgstr "البذور"
+
+#: /resources/settings.xml:1491
+msgctxt "#30645"
+msgid "Use Internet Speed"
+msgstr "استخدام سرعة الإنترنت"
+
+#: /resources/settings.xml:1565
+msgctxt "#30646"
+msgid "Download Speed (Mbit/s)"
+msgstr "سرعة التنزيل (ميجابت/ثانية)"
+
+#: /resources/settings.xml:1492
+msgctxt "#30647"
+msgid "Use Max Size"
+msgstr "استخدم الحجم الأقصى"
+
+#: /resources/settings.xml:1490
+msgctxt "#30648"
+msgid "Off"
+msgstr "عن"
+
+#: /resources/settings.xml:1582
+msgctxt "#30649"
+msgid "Min Speed (Mbit/s)"
+msgstr "السرعة الدنيا (ميجابت/ثانية)"
+
+#: /resources/settings.xml:1236
+msgctxt "#30650"
+msgid "Hide Resolver Window"
+msgstr "إخفاء نافذة الحل"
+
+#: /resources/settings.xml:2054
+msgctxt "#30651"
+msgid "Minimum Percentage Left Before Showing Dialog"
+msgstr "الحد الأدنى للنسبة المتبقية قبل إظهار الحوار"
+
+#: /resources/settings.xml:1231
+msgctxt "#30652"
+msgid "Icon Only"
+msgstr "أيقونة فقط"

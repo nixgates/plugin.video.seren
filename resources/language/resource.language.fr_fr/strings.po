@@ -3709,3 +3709,43 @@ msgstr ""
 msgctxt "#30486"
 msgid "Seeds"
 msgstr "Graines"
+
+#: /resources/settings.xml:1491
+msgctxt "#30645"
+msgid "Use Internet Speed"
+msgstr "Utiliser la vitesse Internet"
+
+#: /resources/settings.xml:1565
+msgctxt "#30646"
+msgid "Download Speed (Mbit/s)"
+msgstr "Vitesse de téléchargement (Mbit/s)"
+
+#: /resources/settings.xml:1492
+msgctxt "#30647"
+msgid "Use Max Size"
+msgstr "Utiliser la taille maximale"
+
+#: /resources/settings.xml:1490
+msgctxt "#30648"
+msgid "Off"
+msgstr "Désactivé"
+
+#: /resources/settings.xml:1582
+msgctxt "#30649"
+msgid "Min Speed (Mbit/s)"
+msgstr "Vitesse minimale (Mbit/s)"
+
+#: /resources/settings.xml:1236
+msgctxt "#30650"
+msgid "Hide Resolver Window"
+msgstr "Masquer la fenêtre du résolveur"
+
+#: /resources/settings.xml:2054
+msgctxt "#30651"
+msgid "Minimum Percentage Left Before Showing Dialog"
+msgstr "Pourcentage minimum restant avant d'afficher la boîte de dialogue"
+
+#: /resources/settings.xml:1231
+msgctxt "#30652"
+msgid "Icon Only"
+msgstr "Icône uniquement"
