@@ -65,6 +65,14 @@
             <screenshot>resources/screenshots/screenshot-04.jpg</screenshot>
         </assets>
         <news>
+            Changelog 3.0.5
+            [BUG] Fix RD playback
+            [BUG] Improved 3D Filtering
+            [FEATURE] Added option to filer results by internet speed
+            [FEATURE] Added 'Cancel' button to smartplay window
+            [FEATURE] Added option to hide resolver window when attempting to play
+            [FEATURE] Added 60 FPS filter
+
             Changelog 3.0.1
             [FEATURE] Handle Kodi database version for Omega 21
 
