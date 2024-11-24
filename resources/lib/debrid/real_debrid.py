@@ -12,6 +12,7 @@ from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.exceptions import UnexpectedResponse
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
+import os
 
 RD_AUTH_KEY = "rd.auth"
 RD_STATUS_KEY = "rd.premiumstatus"
@@ -243,19 +244,83 @@ class RealDebrid:
         except (ValueError, AttributeError):
             return response
 
+    """
     def check_hash(self, hash_list):
         if isinstance(hash_list, list):
             hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
-            ThreadPool().map_results(self._check_hash_thread, ((sorted(section),) for section in hash_list))
+            thread = ThreadPool()
+            for section in hash_list:
+                thread.put(self._check_hash_thread, sorted(section))
+            thread.wait_completion()
             return self.cache_check_results
         else:
-            hash_string = f"/{hash_list}"
-            return self.get_url(f"torrents/instantAvailability{hash_string}")
+            hash_string = "/" + hash_list
+            return self.get_url("torrents/instantAvailability" + hash_string)
 
     def _check_hash_thread(self, hashes):
-        hash_string = f"/{'/'.join(hashes)}"
-        response = self.get_url(f"torrents/instantAvailability{hash_string}")
+        hash_string = "/" + "/".join(hashes)
+        response = self.get_url("torrents/instantAvailability" + hash_string)
         self.cache_check_results.update(response)
+    """
+
+    def check_hash(self, hash_list):
+        if isinstance(hash_list, list):
+            hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
+            thread = ThreadPool()
+            for section in hash_list:
+                thread.put(self._check_hash_thread, sorted(section))
+            thread.wait_completion()
+            return self.cache_check_results
+        else:
+            magnet = 'magnet:?xt=urn:btih:' + hash_list
+            response = self.add_magnet(magnet)
+            try: torr_id = response['id']
+            except: return {}
+            response = self.torrent_select_all(torr_id)
+            response = self.torrent_info(torr_id)
+            if response['status'] == 'downloaded':
+                hash_dict = {hash_list: {'rd':[]}}
+                for x in response['files']:
+                    if x['selected'] == 1:
+                        hash_dict[hash_list]['rd'].append({str(x['id']):{'filename':x['path'],'filesize':x['bytes']}})
+                response = self.delete_torrent(torr_id)
+                return hash_dict
+            else:
+                response = self.delete_torrent(torr_id)
+                return {}
+
+    def _check_hash_thread(self, hashes):
+        hash_string = "/" + "/".join(hashes)
+        for i in hashes:
+            magnet = 'magnet:?xt=urn:btih:' + i
+            response = self.add_magnet(magnet)
+            try: torr_id = response['id']
+            except: continue
+            response = self.torrent_select_all(torr_id)
+            response = self.torrent_info(torr_id)
+            if response['status'] == 'downloaded':
+                hash_dict = {i: {'rd':[]}}
+                for x in response['files']:
+                    if x['selected'] == 1:
+                        hash_dict[i]['rd'].append({str(x['id']):{'filename':x['path'],'filesize':x['bytes']}})
+                response = self.delete_torrent(torr_id)
+                self.cache_check_results.update(hash_dict)
+            else:
+                response = self.delete_torrent(torr_id)
+
+    def torrent_select_all(self, torrent_id):
+        torr_info = self.torrent_info(torrent_id)
+        file_string = ''
+        for i in torr_info['files']:
+            res = [ele for ele in self.common_video_extensions() if(ele in os.path.splitext(i['path'])[1])]
+            if res and ('Sample' in i['path'] or 'sample.' in i['path']) == False:
+                if file_string == '':
+                    file_string = file_string + str(i['id'])
+                else:
+                    file_string = file_string + ',' + str(i['id'])
+        file_id='all'
+        response = self.torrent_select(torrent_id,file_string)
+        return response
 
     def add_magnet(self, magnet):
         post_data = {"magnet": magnet}
@@ -287,6 +352,14 @@ class RealDebrid:
     def delete_torrent(self, id):
         url = f"torrents/delete/{id}"
         self.delete_url(url)
+
+    def common_video_extensions(self):
+        getSupportedMedia = '.m4v|.3g2|.3gp|.nsv|.tp|.ts|.ty|.strm|.pls|.rm|.rmvb|.mpd|.m3u|.m3u8|.ifo|.mov|.qt|.divx|.xvid|.bivx|.vob|.nrg|.img|.iso|.udf|.pva|.wmv|.asf|.asx|.ogm|.m2v|.avi|.bin|.dat|.mpg|.mpeg|.mp4|.mkv|.mk3d|.avc|.vp3|.svq3|.nuv|.viv|.dv|.fli|.flv|.001|.wpl|.xspf|.zip|.vdr|.dvr-ms|.xsp|.mts|.m2t|.m2ts|.evo|.ogv|.sdp|.avs|.rec|.url|.pxml|.vc1|.h264|.rcv|.rss|.mpls|.mpl|.webm|.bdmv|.bdm|.wtv|.trp|.f4v|.ssif|.pvr|.disc|'
+        return [
+            i
+            for i in getSupportedMedia.split("|")
+            if i not in ["", ".zip", ".rar"]
+        ]
 
     @staticmethod
     def is_streamable_storage_type(storage_variant):
