@@ -83,7 +83,7 @@ class SourceSelect(SourceWindow):
             overwrite_cache=pack_select,
         )
 
-        if self.stream_link is None:
+        if self.stream_link is None or self.stream_link == "none":
             self.setProperty("resolving", "false")
             resolver_helper.close_window()
             g.notification(g.ADDON_NAME, g.get_language_string(30032), time=2000)

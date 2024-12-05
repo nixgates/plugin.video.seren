@@ -497,18 +497,21 @@ class _RealDebridDownloader(_DebridDownloadBase):
         super().__init__(source)
         self.debrid_module = RealDebrid()
         self.available_files = []
+        self.torrent_info = []
 
     def _fetch_available_files(self):
-        availability = self.debrid_module.check_hash(self.source["hash"])
-        availability = [
-            i for i in availability[self.source["hash"]]["rd"] if self.debrid_module.is_streamable_storage_type(i)
-        ]
         try:
-            availability = sorted(availability, key=lambda k: len(k.values()))[0]
-        except IndexError as e:
+            availability = self.debrid_module.check_hash(self.source["hash"])[self.source["hash"]]
+            self.torrent_info = availability["torrent_info"]
+            availability = sorted(availability["rd"], key=lambda k: len(k.values()))
+        except Exception as e:
             raise SourceNotAvailable from e
+        self.available_files = [
+            {"path": value["filename"], "index": key} 
+            for rd_item in availability
+            for key, value in rd_item.items()
+        ]
 
-        self.available_files = [{"path": value["filename"], "index": key} for key, value in availability.items()]
         return self.available_files
 
     def _resolve_file_url(self, file):
@@ -517,10 +520,8 @@ class _RealDebridDownloader(_DebridDownloadBase):
     def _resolver_setup(self, selected_files):
         if self.source.get("type") in ["hoster", "cloud"]:
             return [(self.source.get("url", ""), self.source.get("release_tile"))]
-
-        torrent_id = self.debrid_module.add_magnet(self.source["magnet"])["id"]
-        self.debrid_module.torrent_select(torrent_id, ",".join([i["index"] for i in self.available_files]))
-        info = self.debrid_module.torrent_info(torrent_id)
+        
+        info = self.torrent_info
         remote_files = {str(i["id"]): idx for idx, i in enumerate(info["files"])}
         selected_files = [(remote_files[i[0]["index"]], i[1]) for i in selected_files]
         return [(info["links"][i[0]], i[1]) for i in selected_files]
@@ -593,7 +594,6 @@ def create_task(source):
     :param source: dict
     :return: None
     """
-
     if (source_type := source.get("type")) not in VALID_SOURCE_TYPES:
         raise InvalidSourceType(source_type)
 

@@ -28,10 +28,12 @@ class SourceSorter:
         self.filter_set = self._get_filters()
 
         # Size filter settings
-        self.enable_size_limit = g.get_bool_setting("general.enablesizelimit")
+        self.enable_size_limit = g.get_int_setting("general.enablesizelimit")
         setting_mediatype = g.MEDIA_EPISODE if self.mediatype == g.MEDIA_EPISODE else g.MEDIA_MOVIE
         self.size_limit = g.get_int_setting(f"general.sizelimit.{setting_mediatype}") * 1024
         self.size_minimum = int(g.get_float_setting(f"general.sizeminimum.{setting_mediatype}") * 1024)
+        self.speed_limit = g.get_float_setting("general.speedlimit", 10)
+        self.speed_minimum = g.get_float_setting("general.speedminimum", 0)
 
         # Sort Settings
         self.quality_priorities = {"4K": 3, "1080p": 2, "720p": 1, "SD": 0}
@@ -51,6 +53,11 @@ class SourceSorter:
 
     def filter_sources(self, source_list):
         # Iterate sources, yielding only those that are not filtered
+        if self.enable_size_limit == 1 :
+            duration = self.item_information["info"]["duration"] or (5400 if self.mediatype == "movie" else 2400)
+            max_size = self.speed_limit * 0.125 * duration * 0.9
+            min_size = self.speed_minimum * 0.125 * duration * 0.9
+            
         for source in source_list:
             # Quality filter
             if (
@@ -72,10 +79,20 @@ class SourceSorter:
             if self.disable_dv and self.disable_hdr and "HYBRID" in source['info']:
                 continue
             if self.enable_size_limit:
-                if (
+                size = source.get("size", 0)
+                if self.enable_size_limit == 1 and (
                     (
-                        isinstance(size := source.get("size", 0), (int, float))
-                        and not (self.size_minimum <= int(size) <= self.size_limit)
+                        isinstance(size, (int, float))
+                        and not max_size >= float(size) >= min_size
+                    )
+                    or isinstance(size, str)
+                    and size != "Variable"
+                ):
+                    continue
+                elif self.enable_size_limit == 2 and (
+                    (
+                        isinstance(size, (int, float))
+                        and not (self.size_minimum <= float(size) <= self.size_limit)
                     )
                     or isinstance(size, str)
                     and size != "Variable"

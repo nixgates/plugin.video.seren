@@ -1144,7 +1144,7 @@ class GlobalVariables:
 
     @cached_property
     def common_video_extensions(self):
-        return tuple({ext for ext in xbmc.getSupportedMedia("video").split("|") if ext not in {"", ".zip", ".rar"}})
+        return tuple({ext for ext in xbmc.getSupportedMedia("video").split("|") if ext not in {"", ".zip", ".rar", ".url"}})
 
     def add_directory_item(self, name, **params):
         menu_item = params.pop("menu_item", {})

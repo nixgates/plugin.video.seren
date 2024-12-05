@@ -3701,8 +3701,7 @@ msgstr "Descarga finalizada: {}"
 #: /resources/lib/gui/windows/source_select.py:56
 msgctxt "#30641"
 msgid "Sorry, {} type sources are not available for downloading"
-msgstr ""
-"Lo sentimos, los orígenes de tipo {} no están disponibles para descargar"
+msgstr "Lo sentimos, los orígenes de tipo {} no están disponibles para descargar"
 
 #: /resources/skins/Default/1080i/manual_caching.xml:125
 #: /resources/skins/Default/1080i/manual_caching.xml:238
@@ -3710,3 +3709,43 @@ msgstr ""
 msgctxt "#30486"
 msgid "Seeds"
 msgstr "Semillas"
+
+#: /resources/settings.xml:1491
+msgctxt "#30645"
+msgid "Use Internet Speed"
+msgstr "Usar velocidad de Internet"
+
+#: /resources/settings.xml:1565
+msgctxt "#30646"
+msgid "Download Speed (Mbit/s)"
+msgstr "Velocidad de descarga (Mbit/s)"
+
+#: /resources/settings.xml:1492
+msgctxt "#30647"
+msgid "Use Max Size"
+msgstr "Usar tamaño máximo"
+
+#: /resources/settings.xml:1490
+msgctxt "#30648"
+msgid "Off"
+msgstr "Apagado"
+
+#: /resources/settings.xml:1582
+msgctxt "#30649"
+msgid "Min Speed (Mbit/s)"
+msgstr "Velocidad mínima (Mbit/s)"
+
+#: /resources/settings.xml:1236
+msgctxt "#30650"
+msgid "Hide Resolver Window"
+msgstr "Ocultar ventana de resolución"
+
+#: /resources/settings.xml:2054
+msgctxt "#30651"
+msgid "Minimum Percentage Left Before Showing Dialog"
+msgstr "Porcentaje mínimo restante antes de mostrar el cuadro de diálogo"
+
+#: /resources/settings.xml:1231
+msgctxt "#30652"
+msgid "Icon Only"
+msgstr "Sólo icono"

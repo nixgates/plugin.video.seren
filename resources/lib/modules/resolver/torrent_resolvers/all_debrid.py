@@ -1,5 +1,5 @@
 from resources.lib.debrid.all_debrid import AllDebrid
-from resources.lib.modules.exceptions import UnexpectedResponse
+from resources.lib.modules.exceptions import GeneralCachingFailure
 from resources.lib.modules.globals import g
 from resources.lib.modules.resolver.torrent_resolvers.base_resolver import (
     TorrentResolverBase,
@@ -26,7 +26,8 @@ class AllDebridResolver(TorrentResolverBase):
         self.magnet_id = self.debrid_module.upload_magnet(torrent['hash'])["magnets"][0]["id"]
         status = self.debrid_module.magnet_status(self.magnet_id)["magnets"]
         if status["status"] != "Ready":
-            raise UnexpectedResponse(status)
+            self.debrid_module.delete_magnet(self.magnet_id)
+            raise GeneralCachingFailure(status)
         return status['links']
 
     def resolve_stream_url(self, file_info):

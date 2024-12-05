@@ -6,12 +6,12 @@ import xbmcgui
 
 from resources.lib.common import source_utils
 from resources.lib.common import tools
-from resources.lib.common.thread_pool import ThreadPool
 from resources.lib.database.cache import use_cache
 from resources.lib.modules.exceptions import RanOnceAlready
 from resources.lib.modules.exceptions import UnexpectedResponse
 from resources.lib.modules.global_lock import GlobalLock
 from resources.lib.modules.globals import g
+import os
 
 RD_AUTH_KEY = "rd.auth"
 RD_STATUS_KEY = "rd.premiumstatus"
@@ -242,20 +242,57 @@ class RealDebrid:
             return response.json()
         except (ValueError, AttributeError):
             return response
+        
+    def check_hash(self, hash_value):
+        magnet = f'magnet:?xt=urn:btih:{hash_value}'
+        response = self.add_magnet(magnet)
 
-    def check_hash(self, hash_list):
-        if isinstance(hash_list, list):
-            hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
-            ThreadPool().map_results(self._check_hash_thread, ((sorted(section),) for section in hash_list))
-            return self.cache_check_results
+        if 'id' not in response:
+            return {}
+
+        torrent_id = response['id']
+        self.torrent_select_all(torrent_id)
+        torrent_info = self.torrent_info(torrent_id)
+
+        if "files" in torrent_info:
+            torrent_info["files"] = [file for file in torrent_info["files"] if 'sample' not in file['path'].lower() and source_utils.is_file_ext_valid(file["path"])]
+
+        if torrent_info.get('status') == 'downloaded':
+            hash_dict = {
+                hash_value: {"torrent_id": torrent_id, "torrent_info": torrent_info, 'rd': [
+                    {str(file['id']): {'filename': file['path'], 'filesize': file['bytes']}}
+                    for file in torrent_info.get('files', []) if file.get('selected') == 1
+                ]}
+            }
+
+            if g.get_bool_setting("rd.autodelete"):
+                self.delete_torrent(torrent_id)
         else:
-            hash_string = f"/{hash_list}"
-            return self.get_url(f"torrents/instantAvailability{hash_string}")
+            self.delete_torrent(torrent_id)
+            hash_dict = {}
 
-    def _check_hash_thread(self, hashes):
-        hash_string = f"/{'/'.join(hashes)}"
-        response = self.get_url(f"torrents/instantAvailability{hash_string}")
-        self.cache_check_results.update(response)
+        return hash_dict
+
+    def torrent_select_all(self, torrent_id):
+        try:
+            torrent_info = self.torrent_info(torrent_id)
+            files = torrent_info.get('files', [])
+            
+            valid_file_ids = [
+                str(file['id']) for file in files
+                if 'sample' not in file['path'].lower() 
+                and source_utils.is_file_ext_valid(file['path'])
+            ]
+
+            if valid_file_ids:
+                file_string = ','.join(valid_file_ids)
+                return self.torrent_select(torrent_id, file_string)
+            
+            return self.torrent_select(torrent_id, 'all')
+
+        except Exception as e:
+            g.log(f"Error selecting files for torrent {torrent_id}: {e}", "error")
+            return None
 
     def add_magnet(self, magnet):
         post_data = {"magnet": magnet}

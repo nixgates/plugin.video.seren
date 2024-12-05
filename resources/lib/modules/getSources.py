@@ -1143,23 +1143,14 @@ class TorrentCacheCheck:
         self.threads.wait_completion()
 
     def _all_debrid_worker(self, torrent_list):
-
         try:
-            api = all_debrid.AllDebrid()
-
             if len(torrent_list) == 0:
                 return
-
-            cache_check = api.check_hash([i['hash'] for i in torrent_list])
-
-            if not cache_check:
-                return
-
-            for idx, i in enumerate(torrent_list):
+            
+            for i in torrent_list:
                 try:
-                    if cache_check['magnets'][idx]['instant'] is True:
-                        i['debrid_provider'] = 'all_debrid'
-                        self.store_torrent(i)
+                    i['debrid_provider'] = 'all_debrid'
+                    self.store_torrent(i)
                 except KeyError:
                     g.log(
                         "KeyError in AllDebrid Cache check worker. "
@@ -1171,21 +1162,11 @@ class TorrentCacheCheck:
             g.log_stacktrace()
 
     def _realdebrid_worker(self, torrent_list, info):
-
         try:
-            hash_list = [i['hash'] for i in torrent_list]
-            api = real_debrid.RealDebrid()
-            real_debrid_cache = api.check_hash(hash_list)
-
             for i in torrent_list:
                 with contextlib.suppress(KeyError):
-                    if 'rd' not in real_debrid_cache.get(i['hash'], {}):
-                        continue
-                    if len(real_debrid_cache[i['hash']]['rd']) >= 1:
-                        if self.scraper_class.media_type == 'episode':
-                            self._handle_episode_rd_worker(i, real_debrid_cache, info)
-                        else:
-                            self._handle_movie_rd_worker(i, real_debrid_cache)
+                    i['debrid_provider'] = 'real_debrid'
+                    self.store_torrent(i)
         except Exception:
             g.log_stacktrace()
 
@@ -1244,6 +1225,10 @@ class SourceWindowAdapter:
     def create(self):
         if self.silent:
             return
+        if self.display_style == 2:
+            self.background_dialog = xbmcgui.DialogProgressBG()
+            self.background_dialog.create("Loading","")
+            g.close_busy_dialog()
         if self.display_style == 1:
             # this one is deleted in `close()`
             self.background_dialog = xbmcgui.DialogProgressBG()
@@ -1278,13 +1263,15 @@ class SourceWindowAdapter:
             self.dialog.setProperty("runtime", str(f"{round(runtime, 2)} {g.get_language_string(30554)}"))
         elif self.display_style == 1 and self.background_dialog:
             self.background_dialog.update(progress, message=text)
+        elif self.display_style == 2 and self.background_dialog:
+            self.background_dialog.update(progress)
 
     def set_property(self, key, value):
         if self.silent:
             return
         if self.display_style == 0 and self.dialog:
             self.dialog.setProperty(key, str(value))
-        elif self.display_style == 1:
+        elif self.display_style == 1 or self.display_style == 2:
             return
 
     def set_progress(self, progress):
@@ -1292,7 +1279,7 @@ class SourceWindowAdapter:
             return
         if self.display_style == 0 and self.dialog:
             self.dialog.setProgress(progress)
-        elif self.display_style == 1 and self.background_dialog:
+        elif (self.display_style == 1 or self.display_style == 2) and self.background_dialog:
             self.background_dialog.update(progress)
 
     def close(self):
@@ -1301,6 +1288,6 @@ class SourceWindowAdapter:
         if self.display_style == 0 and self.dialog:
             self.dialog.close()
             del self.dialog
-        elif self.display_style == 1 and self.background_dialog:
+        elif (self.display_style == 1 or self.display_style == 2) and self.background_dialog:
             self.background_dialog.close()
             del self.background_dialog

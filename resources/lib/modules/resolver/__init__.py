@@ -207,7 +207,6 @@ class Resolver:
                 return None
             except Exception as e:
                 g.log(f"Failing Magnet: {source['magnet']}")
-                raise ResolverFailure(source) from e
         elif source["type"] in ["hoster", "cloud"]:
             try:
                 stream_link = api.resolve_stream_url({"link": source["url"]})

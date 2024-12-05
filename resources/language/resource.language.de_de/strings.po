@@ -3718,3 +3718,43 @@ msgstr "Leider stehen Quellen vom Typ {} nicht zum Download zur Verfügung."
 msgctxt "#30486"
 msgid "Seeds"
 msgstr "Seeds"
+
+#: /resources/settings.xml:1491
+msgctxt "#30645"
+msgid "Use Internet Speed"
+msgstr "Nutzen Sie Internetgeschwindigkeit"
+
+#: /resources/settings.xml:1565
+msgctxt "#30646"
+msgid "Download Speed (Mbit/s)"
+msgstr "Download-Geschwindigkeit (Mbit/s)"
+
+#: /resources/settings.xml:1492
+msgctxt "#30647"
+msgid "Use Max Size"
+msgstr "Verwenden Sie die maximale Größe"
+
+#: /resources/settings.xml:1490
+msgctxt "#30648"
+msgid "Off"
+msgstr "Aus"
+
+#: /resources/settings.xml:1582
+msgctxt "#30649"
+msgid "Min Speed (Mbit/s)"
+msgstr "Mindestgeschwindigkeit (Mbit/s)"
+
+#: /resources/settings.xml:1236
+msgctxt "#30650"
+msgid "Hide Resolver Window"
+msgstr "Resolver-Fenster ausblenden"
+
+#: /resources/settings.xml:2054
+msgctxt "#30651"
+msgid "Minimum Percentage Left Before Showing Dialog"
+msgstr "Mindestprozentsatz, der vor der Anzeige des Dialogs verbleibt"
+
+#: /resources/settings.xml:1231
+msgctxt "#30652"
+msgid "Icon Only"
+msgstr "Nur Symbol"

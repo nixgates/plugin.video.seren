@@ -155,9 +155,6 @@ class AllDebrid:
             g.set_setting("alldebrid.username", user_information["username"])
             g.set_setting("alldebrid.premiumstatus", self.get_account_status().title())
 
-    def check_hash(self, hash_list):
-        return self.post_json("magnet/instant", {"magnets[]": hash_list})
-
     def upload_magnet(self, magnet_hash):
         return self.get_json("magnet/upload", magnet=magnet_hash)
 

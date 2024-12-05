@@ -47,7 +47,10 @@ class ResolverWindow(SingleItemWindow):
             except Exception:
                 g.log_stacktrace()
                 continue
-        self.return_data = stream_link, release_title
+        if stream_link is None:
+            self.return_data = "none", "none"
+        else:
+            self.return_data = stream_link, release_title
 
     def get_return_data(self):
         return (None, None) if self.canceled else self.return_data

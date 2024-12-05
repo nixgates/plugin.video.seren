@@ -142,5 +142,5 @@ class SmartPlayWindow(BaseWindow):
             if control_id == 3002:
                 self.close()
             if control_id == 3003:
-                self.player.stop()
+                g.PLAYLIST.clear()
                 self.close()
