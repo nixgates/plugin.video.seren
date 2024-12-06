@@ -1198,6 +1198,16 @@ class GlobalVariables:
         ):
             params["resume"] = str(menu_item["resume_time"])
             item.setProperty("resumetime", str(menu_item["resume_time"]))
+        if (
+            "percent_played" in menu_item
+            and menu_item.get("percent_played") is not None
+            and float(menu_item.get("percent_played", 0)) > 0
+            and "resume_time" in menu_item
+            and menu_item.get("resume_time") is not None
+            and int(menu_item.get("resume_time", 0)) > 0
+        ):
+            totaltime = (float(menu_item["resume_time"]) / float(menu_item["percent_played"])) * 100
+            item.setProperty("totaltime", str(totaltime))
         if "play_count" in menu_item and menu_item.get("play_count") is not None:
             info["playcount"] = menu_item["play_count"]
         if "air_date" in menu_item and menu_item.get("air_date") is not None:
