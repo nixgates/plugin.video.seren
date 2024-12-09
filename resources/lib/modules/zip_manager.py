@@ -16,162 +16,162 @@ TEMP_FORMAT = "{}.temp"
 
 
 class ZipManager:
-    """
-    Module to handle the unpacking of zip files
-    Extend your class with this class
-    """
+	"""
+	Module to handle the unpacking of zip files
+	Extend your class with this class
+	"""
 
-    def __init__(self):
-        self._zip_file = None
-        self._file_list = []
-        self._root_directory = ''
-        self._temporary_items = []
-        self._extracted_members = []
+	def __init__(self):
+		self._zip_file = None
+		self._file_list = []
+		self._root_directory = ''
+		self._temporary_items = []
+		self._extracted_members = []
 
-    def _revert_all_changes(self):
-        for i in self._extracted_members:
-            self._destroy_file_if_exists(i)
-            self._destroy_folder_if_exists(i)
-        for temp in self._temporary_items:
-            self._restore_temp_item(temp[1])
+	def _revert_all_changes(self):
+		for i in self._extracted_members:
+			self._destroy_file_if_exists(i)
+			self._destroy_folder_if_exists(i)
+		for temp in self._temporary_items:
+			self._restore_temp_item(temp[1])
 
-    @staticmethod
-    def _get_zip_location_type():
-        return xbmcgui.Dialog().select(g.ADDON_NAME, [g.get_language_string(30304), g.get_language_string(30305)])
+	@staticmethod
+	def _get_zip_location_type():
+		return xbmcgui.Dialog().select(g.ADDON_NAME, [g.get_language_string(30304), g.get_language_string(30305)])
 
-    def _get_new_package_location(self, install_style):
-        install_style = self._get_zip_location_type() if install_style is None else int(install_style)
+	def _get_new_package_location(self, install_style):
+		install_style = self._get_zip_location_type() if install_style is None else int(install_style)
 
-        if install_style == 0:
-            zip_location = xbmcgui.Dialog().browse(
-                1,
-                g.get_language_string(30306).format("Provider"),
-                "",
-                ".zip",
-                False,
-                False,
-            )
-        elif install_style == 1:
-            zip_location = xbmc.Keyboard("", f"{g.ADDON_NAME}: {g.get_language_string(30307)}")
-            zip_location.doModal()
-            if zip_location.isConfirmed() and zip_location.getText():
-                zip_location = zip_location.getText()
-            else:
-                return
-        else:
-            return
+		if install_style == 0:
+			zip_location = xbmcgui.Dialog().browse(
+				1,
+				g.get_language_string(30306).format("Provider"),
+				"",
+				".zip",
+				False,
+				False,
+			)
+		elif install_style == 1:
+			zip_location = xbmc.Keyboard("", f"{g.ADDON_NAME}: {g.get_language_string(30307)}")
+			zip_location.doModal()
+			if zip_location.isConfirmed() and zip_location.getText():
+				zip_location = zip_location.getText()
+			else:
+				return
+		else:
+			return
 
-        return zip_location
+		return zip_location
 
-    def _get_zip_file(self, install_style=None, silent=False, url=None):
-        # This function processes any requests for zip files
+	def _get_zip_file(self, install_style=None, silent=False, url=None):
+		# This function processes any requests for zip files
 
-        if url is None:
-            zip_location = self._get_new_package_location(install_style)
-        else:
-            zip_location = url
+		if url is None:
+			zip_location = self._get_new_package_location(install_style)
+		else:
+			zip_location = url
 
-        if not zip_location:
-            return
+		if not zip_location:
+			return
 
-        if zip_location.startswith("http"):
-            import requests
+		if zip_location.startswith("http"):
+			import requests
 
-            response = requests.get(zip_location, stream=True)
-            if not response.ok and not silent:
-                raise requests.exceptions.ConnectionError
-            content = response.content
-        else:
-            f = xbmcvfs.File(zip_location)
-            content = f.readBytes()
-            f.close()
+			response = requests.get(zip_location, stream=True)
+			if not response.ok and not silent:
+				raise requests.exceptions.ConnectionError
+			content = response.content
+		else:
+			f = xbmcvfs.File(zip_location)
+			content = f.readBytes()
+			f.close()
 
-        self._zip_file = zipfile.ZipFile(BytesIO(content))
-        self._file_list = self._zip_file.namelist()
-        self._confirm_safe_zip()
-        self._root_directory = self._get_zip_root_directory()
+		self._zip_file = zipfile.ZipFile(BytesIO(content))
+		self._file_list = self._zip_file.namelist()
+		self._confirm_safe_zip()
+		self._root_directory = self._get_zip_root_directory()
 
-    def _confirm_safe_zip(self):
-        for i in self._file_list:
-            if i.startswith("/") or ".." in i:
-                raise UnsafeZipStructure("Zip contains invalid or dirty paths")
+	def _confirm_safe_zip(self):
+		for i in self._file_list:
+			if i.startswith("/") or ".." in i:
+				raise UnsafeZipStructure("Zip contains invalid or dirty paths")
 
-    def _get_zip_root_directory(self):
-        return self._file_list[0] if self._file_list[0].endswith("/") else ""
+	def _get_zip_root_directory(self):
+		return self._file_list[0] if self._file_list[0].endswith("/") else ""
 
-    def _create_temp_item(self, file_path):
-        if os.path.exists(file_path):
-            if os.path.isfile(file_path):
-                self._destroy_file_if_exists(TEMP_FORMAT.format(file_path))
-                xbmcvfs.rename(file_path, TEMP_FORMAT.format(file_path))
-            else:
-                if xbmcvfs.exists(tools.ensure_path_is_dir(TEMP_FORMAT.format(file_path))):
-                    shutil.rmtree(TEMP_FORMAT.format(file_path))
-                os.rename(tools.ensure_path_is_dir(file_path), tools.ensure_path_is_dir(TEMP_FORMAT.format(file_path)))
+	def _create_temp_item(self, file_path):
+		if os.path.exists(file_path):
+			if os.path.isfile(file_path):
+				self._destroy_file_if_exists(TEMP_FORMAT.format(file_path))
+				xbmcvfs.rename(file_path, TEMP_FORMAT.format(file_path))
+			else:
+				if xbmcvfs.exists(tools.ensure_path_is_dir(TEMP_FORMAT.format(file_path))):
+					shutil.rmtree(TEMP_FORMAT.format(file_path))
+				os.rename(tools.ensure_path_is_dir(file_path), tools.ensure_path_is_dir(TEMP_FORMAT.format(file_path)))
 
-            self._temporary_items.append(file_path)
+			self._temporary_items.append(file_path)
 
-    @staticmethod
-    def _destroy_folder_if_exists(output_path):
-        if os.path.exists(output_path) and os.path.isdir(output_path):
-            shutil.rmtree(output_path)
+	@staticmethod
+	def _destroy_folder_if_exists(output_path):
+		if os.path.exists(output_path) and os.path.isdir(output_path):
+			shutil.rmtree(output_path)
 
-    @staticmethod
-    def _destroy_file_if_exists(output_path):
-        if os.path.exists(output_path) and not os.path.isdir(output_path):
-            os.remove(output_path)
+	@staticmethod
+	def _destroy_file_if_exists(output_path):
+		if os.path.exists(output_path) and not os.path.isdir(output_path):
+			os.remove(output_path)
 
-    def _restore_temp_item(self, output_path):
-        if os.path.exists(TEMP_FORMAT.format(output_path)):
-            self._destroy_file_if_exists(output_path)
-            self._destroy_folder_if_exists(output_path)
-            xbmcvfs.rename(TEMP_FORMAT.format(output_path), output_path)
+	def _restore_temp_item(self, output_path):
+		if os.path.exists(TEMP_FORMAT.format(output_path)):
+			self._destroy_file_if_exists(output_path)
+			self._destroy_folder_if_exists(output_path)
+			xbmcvfs.rename(TEMP_FORMAT.format(output_path), output_path)
 
-    def _destroy_created_temp_items(self):
-        for i in self._temporary_items:
-            self._destroy_folder_if_exists(TEMP_FORMAT.format(i))
-            self._destroy_file_if_exists(TEMP_FORMAT.format(i))
+	def _destroy_created_temp_items(self):
+		for i in self._temporary_items:
+			self._destroy_folder_if_exists(TEMP_FORMAT.format(i))
+			self._destroy_file_if_exists(TEMP_FORMAT.format(i))
 
-    def _extract_zip_members(self, members, output_path, backup_paths=None):
-        self._create_temp_item(backup_paths or output_path)
-        try:
-            for i in members:
-                self._extract_zip_member(i, output_path)
-        except Exception as e:
-            self._revert_all_changes()
-            raise e
+	def _extract_zip_members(self, members, output_path, backup_paths=None):
+		self._create_temp_item(backup_paths or output_path)
+		try:
+			for i in members:
+				self._extract_zip_member(i, output_path)
+		except Exception as e:
+			self._revert_all_changes()
+			raise e
 
-    def _get_file_member_contents(self, member_path):
-        if member_path.endswith("/"):
-            raise OSError(member_path)
+	def _get_file_member_contents(self, member_path):
+		if member_path.endswith("/"):
+			raise OSError(member_path)
 
-        contents = self._zip_file.open(member_path)
-        contents = json.load(contents)
+		contents = self._zip_file.open(member_path)
+		contents = json.load(contents)
 
-        return contents
+		return contents
 
-    def _extract_zip_member(self, member, output_path):
-        target_path = os.path.join(output_path, member.replace(self._root_directory, ""))
-        upper_dirs = os.path.dirname(target_path)
+	def _extract_zip_member(self, member, output_path):
+		target_path = os.path.join(output_path, member.replace(self._root_directory, ""))
+		upper_dirs = os.path.dirname(target_path)
 
-        if upper_dirs and not xbmcvfs.exists(upper_dirs):
-            xbmcvfs.mkdirs(upper_dirs)
+		if upper_dirs and not xbmcvfs.exists(upper_dirs):
+			xbmcvfs.mkdirs(upper_dirs)
 
-        if member[-1] == "/":
-            self._create_folder_member(target_path)
-        else:
-            self._create_file_member(member, target_path)
+		if member[-1] == "/":
+			self._create_folder_member(target_path)
+		else:
+			self._create_file_member(member, target_path)
 
-    def _create_file_member(self, member, target_path):
-        with self._zip_file.open(member) as source, open(target_path, 'wb') as target:
-            contents = source.read()
-            contents = contents if isinstance(contents, bytes) else contents.decode('utf-8')
+	def _create_file_member(self, member, target_path):
+		with self._zip_file.open(member) as source, open(target_path, 'wb') as target:
+			contents = source.read()
+			contents = contents if isinstance(contents, bytes) else contents.decode('utf-8')
 
-            target.write(contents)
-            target.close()
-            self._extracted_members.append(target_path)
+			target.write(contents)
+			target.close()
+			self._extracted_members.append(target_path)
 
-    def _create_folder_member(self, target_path):
-        if not os.path.isdir(target_path):
-            xbmcvfs.mkdir(tools.ensure_path_is_dir(target_path))
-            self._extracted_members.append(target_path)
+	def _create_folder_member(self, target_path):
+		if not os.path.isdir(target_path):
+			xbmcvfs.mkdir(tools.ensure_path_is_dir(target_path))
+			self._extracted_members.append(target_path)

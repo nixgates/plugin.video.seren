@@ -165,6 +165,22 @@
 						<texturenofocus border="10" colordiffuse="99000000">white.png</texturenofocus>
 						<pulseonselect>no</pulseonselect>
 					</control>
+					
+					<!-- Cancel -->
+					<control type="button" id="3003">
+						<label>$ADDON[plugin.video.seren 30070]</label>
+						<height>56</height>
+						<width>auto</width>
+						<font>font12</font>
+						<textoffsetx>20</textoffsetx>
+						<textcolor>ddffffff</textcolor>
+						<focusedcolor>eeffffff</focusedcolor>
+						<selectedcolor>ddffffff</selectedcolor>
+						<align>center</align>
+						<texturefocus border="10" colordiffuse="$INFO[Window.Property(settings.color)]">white.png</texturefocus>
+						<texturenofocus border="10" colordiffuse="99000000">white.png</texturenofocus>
+						<pulseonselect>no</pulseonselect>
+					</control>
 				</control>
 			</control>
         </control>

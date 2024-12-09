@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.seren" version="3.0.1" name="Seren" provider-name="Nixgates">
+<addon id="plugin.video.seren" version="3.0.62d" name="Seren" provider-name="Nixgates">
     <requires>
         <import addon="xbmc.addon" version="17.9.910" />
         <import addon="xbmc.python" version="3.0.0" />
@@ -9,6 +9,8 @@
         <import addon="script.module.inputstreamhelper" version="0.5.10" optional="true"/>
         <import addon="script.module.unidecode" version="1.1.1"/>
         <import addon="script.module.myconnpy" version="8.0.18"/>
+        <import addon="script.module.pytz" version="2014.2"/>
+  <import addon="script.module.infotagger" version="0.0.5" />
     </requires>
     <extension point="xbmc.python.pluginsource" library="seren.py">
         <provides>video</provides>
@@ -27,7 +29,7 @@
         <website>https://github.com/nixgates/plugin.video.seren</website>
         <source>https://github.com/nixgates/plugin.video.seren</source>
         <disclaimer lang="en">
-            Last updated: November 14, 2024.
+            Last updated: November 29, 2024.
             The information contained within the Seren software (the "Service") is for general information purposes
             only.
             The author assumes no responsibility for errors, omissions in the contents on the Service, nor does it
@@ -65,6 +67,28 @@
             <screenshot>resources/screenshots/screenshot-04.jpg</screenshot>
         </assets>
         <news>
+            Changelog 3.0.62
+            [BUG] Optimised RD fix implementation
+            [BUG] Improved RD season pack handling
+            [BUG] Improved RD download handling when uncached
+            [BUG] Improved RD file selection handling when uncached
+
+            Changelog 3.0.61
+            [BUG] Fix AD not deleting magnet if not cached
+
+            Changelog 3.0.6
+            [BUG] Fix AD Playback
+            
+            Changelog 3.0.5
+            [BUG] Fix RD playback
+            [BUG] Improved 3D Filtering
+            [FEATURE] Added option to filer results by internet speed
+            [FEATURE] Added 'Cancel' button to smartplay window
+            [FEATURE] Added 'Icon Only' scraper display style option
+            [FEATURE] Added 'Minimum Percentage Left Before Showing Dialog option' for smartplay window
+            [FEATURE] Added option to hide resolver window when attempting to play
+            [FEATURE] Added 60 FPS filter
+
             Changelog 3.0.1
             [FEATURE] Handle Kodi database version for Omega 21
 

@@ -23,222 +23,243 @@ from resources.lib.modules.resolver.torrent_resolvers import RealDebridResolver
 
 
 class Resolver:
-    """
-    Handles resolving of identified sources to a playable format to supply to Player module
-    """
+	"""
+	Handles resolving of identified sources to a playable format to supply to Player module
+	"""
 
-    torrent_resolve_failure_style = None
+	torrent_resolve_failure_style = None
 
-    def __init__(self):
-        self.torrent_resolve_failure_style = g.get_int_setting('general.resolvefailurehandling')
-        sys.path.append(g.ADDON_USERDATA_PATH)
-        self.return_data = None
-        self.resolvers = {
-            "all_debrid": AllDebridResolver,
-            "premiumize": PremiumizeResolver,
-            "real_debrid": RealDebridResolver,
-        }
+	def __init__(self):
+		self.torrent_resolve_failure_style = g.get_int_setting('general.resolvefailurehandling')
+		sys.path.append(g.ADDON_USERDATA_PATH)
+		self.return_data = None
+		self.resolvers = {
+			"all_debrid": AllDebridResolver,
+			"premiumize": PremiumizeResolver,
+			"real_debrid": RealDebridResolver,
+		}
 
-    def resolve_multiple_until_valid_link(self, sources, item_information, pack_select=False, silent=False):
-        """
-        Resolves all supplied sources until an identified link is found
-        :param sources: List of sources to resolve
-        :param item_information: Metadata on item intended to be played
-        :param pack_select: Set to True to force manual file selection
-        :return: streamable URL or dictionary of adaptive source information
-        """
-        stream_link = None
-        release_title = None
+	def resolve_multiple_until_valid_link(self, sources, item_information, pack_select=False, silent=False):
+		"""
+		Resolves all supplied sources until an identified link is found
+		:param sources: List of sources to resolve
+		:param item_information: Metadata on item intended to be played
+		:param pack_select: Set to True to force manual file selection
+		:return: streamable URL or dictionary of adaptive source information
+		"""
+		stream_link = None
+		release_title = None
 
-        for source in sources:
-            try:
-                stream_link, release_title = self.resolve_single_source(source, item_information, pack_select, silent)
-                if stream_link:
-                    break
-            except Exception:
-                g.log_stacktrace()
-                continue
+		for source in sources:
+			try:
+				stream_link, release_title = self.resolve_single_source(source, item_information, pack_select, silent)
+				if stream_link:
+					break
+			except Exception:
+				g.log_stacktrace()
+				continue
 
-        return stream_link, release_title
+		return stream_link, release_title
 
-    def resolve_single_source(self, source, item_information, pack_select=False, silent=False):
-        """
-        Resolves source to a streamable object
-        :param source: Item to attempt to resolve
-        :param item_information: Metadata on item intended to be played
-        :param pack_select: Set to True to force manual file selection
-        :return: streamable URL or dictionary of adaptive source information
-        """
+	def resolve_single_source(self, source, item_information, pack_select=False, silent=False):
+		"""
+		Resolves source to a streamable object
+		:param source: Item to attempt to resolve
+		:param item_information: Metadata on item intended to be played
+		:param pack_select: Set to True to force manual file selection
+		:return: streamable URL or dictionary of adaptive source information
+		"""
 
-        stream_link = None
+		stream_link = None
 
-        try:
-            if source["type"] == "adaptive":
-                stream_link = source
-            elif source["type"] == "direct":
-                stream_link = source["url"]
-            elif source["type"] == "torrent":
-                stream_link = self._resolve_debrid_source(
-                    self.resolvers[source["debrid_provider"]],
-                    source,
-                    item_information,
-                    pack_select,
-                )
+		try:
+			if source["type"] == "adaptive":
+				stream_link = source
+			elif source["type"] == "direct":
+				stream_link = source["url"]
+			elif source["type"] == "torrent":
+				stream_link = self._resolve_debrid_source(
+					self.resolvers[source["debrid_provider"]],
+					source,
+					item_information,
+					pack_select,
+				)
 
-                if (
-                    not stream_link
-                    and self.torrent_resolve_failure_style == 1
-                    and not pack_select
-                    and not silent
-                    and xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30490))
-                ):
-                    stream_link = self._resolve_debrid_source(
-                        self.resolvers[source["debrid_provider"]],
-                        source,
-                        item_information,
-                        True,
-                    )
+				if (
+					not stream_link
+					and self.torrent_resolve_failure_style == 1
+					and not pack_select
+					and not silent
+					and xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30490))
+				):
+					stream_link = self._resolve_debrid_source(
+						self.resolvers[source["debrid_provider"]],
+						source,
+						item_information,
+						True,
+					)
 
-            elif source["type"] in ["hoster", "cloud"]:
-                stream_link = self._resolve_hoster_or_cloud(source, item_information)
+			elif source["type"] in ["hoster"]:
+				stream_link = self._resolve_hoster_or_cloud(source, item_information)
+			elif source["type"] in ["cloud"]:
+				stream_link = self._resolve_debrid_source(
+					self.resolvers[source["debrid_provider"]],
+					source,
+					item_information,
+					pack_select,
+				)
 
-            if stream_link:
-                return stream_link, source['release_title']
-            g.log(f"Failed to resolve source: {source}", "error")
-            return None, None
-        except ResolverFailure as e:
-            g.log(f'Failed to resolve source: {e}')
-            return None, None
+				if (
+					not stream_link
+					and self.torrent_resolve_failure_style == 1
+					and not pack_select
+					and not silent
+					and xbmcgui.Dialog().yesno(g.ADDON_NAME, g.get_language_string(30490))
+				):
+					stream_link = self._resolve_debrid_source(
+						self.resolvers[source["debrid_provider"]],
+						source,
+						item_information,
+						True,
+					)
 
-    @staticmethod
-    def _handle_provider_imports_resolving(source):
-        provider = source["provider_imports"]
-        provider_module = importlib.import_module(f"{provider[0]}.{provider[1]}")
-        if hasattr(provider_module, "source"):
-            provider_module = provider_module.source()
+			if stream_link:
+				return stream_link, source['release_title']
+			g.log(f"Failed to resolve source: {source}", "error")
+			return None, None
+		except ResolverFailure as e:
+			g.log(f'Failed to resolve source: {e}')
+			return None, None
 
-        source["url"] = provider_module.resolve(source["url"])
-        return source
+	@staticmethod
+	def _handle_provider_imports_resolving(source):
+		provider = source["provider_imports"]
+		provider_module = importlib.import_module(f"{provider[0]}.{provider[1]}")
+		if hasattr(provider_module, "source"):
+			provider_module = provider_module.source()
 
-    def _handle_debrid_hoster_resolving(self, source, item_information):
-        stream_link = self._resolve_debrid_source(
-            self.resolvers[source["debrid_provider"]], source, item_information, False
-        )
+		source["url"] = provider_module.resolve(source["url"])
+		return source
 
-        if not stream_link:
-            return
-        try:
-            requests.head(stream_link, timeout=3)
-            return stream_link
-        except requests.exceptions.RequestException as e:
-            g.log(e, 'error')
-            g.log("Head Request failed link likely dead, skipping", 'error')
-            return
+	def _handle_debrid_hoster_resolving(self, source, item_information):
+		stream_link = self._resolve_debrid_source(
+			self.resolvers[source["debrid_provider"]], source, item_information, False
+		)
 
-    def _resolve_hoster_or_cloud(self, source, item_information):
-        stream_link = None
+		if not stream_link:
+			return
+		try:
+			requests.head(stream_link, timeout=3)
+			return stream_link
+		except requests.exceptions.RequestException as e:
+			g.log(e, 'error')
+			g.log("Head Request failed link likely dead, skipping", 'error')
+			return
 
-        if not source.get("url", False):
-            return
+	def _resolve_hoster_or_cloud(self, source, item_information):
+		stream_link = None
 
-        if source["type"] == "cloud" and source["debrid_provider"] == "premiumize":
-            selected_file = Premiumize().item_details(source["url"])
-            return (
-                selected_file["stream_link"] if g.get_bool_setting("premiumize.transcoded") else selected_file["link"]
-            )
+		if not source.get("url", False):
+			return
 
-        if "provider_imports" in source:
-            source = self._handle_provider_imports_resolving(source)
+		if source["type"] == "cloud" and source["debrid_provider"] == "premiumize":
+			selected_file = Premiumize().item_details(source["url"])
+			return (
+				selected_file["stream_link"] if g.get_bool_setting("premiumize.transcoded") else selected_file["link"]
+			)
 
-        if "debrid_provider" in source:
-            stream_link = self._handle_debrid_hoster_resolving(source, item_information)
-        elif source["url"].startswith("http"):
-            stream_link = self._test_direct_url(source)
-        elif xbmcvfs.exists(source["url"]):
-            stream_link = source["url"]
+		if "provider_imports" in source:
+			source = self._handle_provider_imports_resolving(source)
 
-        if stream_link is None:
-            return
-        if stream_link.endswith(".rar"):
-            return
+		if "debrid_provider" in source:
+			stream_link = self._handle_debrid_hoster_resolving(source, item_information)
+		elif source["url"].startswith("http"):
+			stream_link = self._test_direct_url(source)
+		elif xbmcvfs.exists(source["url"]):
+			stream_link = source["url"]
 
-        return stream_link
+		if stream_link is None:
+			return
+		if stream_link.endswith(".rar"):
+			return
 
-    @staticmethod
-    def _test_direct_url(source):
-        try:
-            ext = source["url"].split("?")[0]
-            ext = ext.split("&")[0]
-            ext = ext.split("|")[0]
-            ext = ext.rsplit(".")[-1]
-            ext = ext.replace("/", "").lower()
-            if ext == "rar":
-                raise TypeError("Incorrect file format - rar file provided")
+		return stream_link
 
-            try:
-                headers = source["url"].rsplit("|", 1)[1]
-            except IndexError:
-                headers = ""
+	@staticmethod
+	def _test_direct_url(source):
+		try:
+			ext = source["url"].split("?")[0]
+			ext = ext.split("&")[0]
+			ext = ext.split("|")[0]
+			ext = ext.rsplit(".")[-1]
+			ext = ext.replace("/", "").lower()
+			if ext == "rar":
+				raise TypeError("Incorrect file format - rar file provided")
 
-            headers = parse.quote_plus(headers).replace("%3D", "=") if " " in headers else headers
-            headers = dict(parse.parse_qsl(headers))
+			try:
+				headers = source["url"].rsplit("|", 1)[1]
+			except IndexError:
+				headers = ""
 
-            live_check = requests.head(source["url"], headers=headers, timeout=10)
+			headers = parse.quote_plus(headers).replace("%3D", "=") if " " in headers else headers
+			headers = dict(parse.parse_qsl(headers))
 
-            if live_check.status_code != 200:
-                g.log("Head Request failed link likely dead, skipping")
-                return
+			live_check = requests.head(source["url"], headers=headers, timeout=10)
 
-            stream_link = source["url"]
-        except (IndexError, KeyError):
-            stream_link = None
-        return stream_link
+			if live_check.status_code != 200:
+				g.log("Head Request failed link likely dead, skipping")
+				return
 
-    @staticmethod
-    def _resolve_debrid_source(api, source, item_information, pack_select=False):
-        stream_link = None
-        api = api()
+			stream_link = source["url"]
+		except (IndexError, KeyError):
+			stream_link = None
+		return stream_link
 
-        if source["type"] == "torrent":
-            try:
-                stream_link = api.resolve_magnet(item_information, source, pack_select)
-            except (UnexpectedResponse, FileIdentification) as e:
-                g.log(e, "error")
-                return None
-            except Exception as e:
-                g.log(f"Failing Magnet: {source['magnet']}")
-                raise ResolverFailure(source) from e
-        elif source["type"] in ["hoster", "cloud"]:
-            try:
-                stream_link = api.resolve_stream_url({"link": source["url"]})
-            except (UnexpectedResponse, FileIdentification) as e:
-                g.log(e, "error")
-                raise ResolverFailure(source) from e
+	@staticmethod
+	def _resolve_debrid_source(api, source, item_information, pack_select=False):
+		stream_link = None
+		api = api()
 
-        return stream_link
+		if source["type"] == "torrent":
+			try:
+				stream_link = api.resolve_magnet(item_information, source, pack_select)
+			except (UnexpectedResponse, FileIdentification) as e:
+				g.log(e, "error")
+				return None
+			except Exception as e:
+				g.log(f"Failing Magnet: {source['magnet']}")
+				raise ResolverFailure(source) from e
+		elif source["type"] in ["hoster", "cloud"]:
+			try:
+				stream_link = api.resolve_stream_url({"link": source["url"]})
+			except (UnexpectedResponse, FileIdentification) as e:
+				g.log(e, "error")
+				raise ResolverFailure(source) from e
 
-    @staticmethod
-    def get_hoster_list():
-        """
-        Fetche
-        :return:
-        """
-        thread_pool = ThreadPool()
+		return stream_link
 
-        hosters = {"premium": {}, "free": []}
+	@staticmethod
+	def get_hoster_list():
+		"""
+		Fetche
+		:return:
+		"""
+		thread_pool = ThreadPool()
 
-        try:
-            if g.get_bool_setting("premiumize.enabled") and g.get_bool_setting("premiumize.hosters"):
-                thread_pool.put(Premiumize().get_hosters, hosters)
+		hosters = {"premium": {}, "free": []}
 
-            if g.get_bool_setting("realdebrid.enabled") and g.get_bool_setting("rd.hosters"):
-                thread_pool.put(RealDebrid().get_hosters, hosters)
+		try:
+			if g.get_bool_setting("premiumize.enabled") and g.get_bool_setting("premiumize.hosters"):
+				thread_pool.put(Premiumize().get_hosters, hosters)
 
-            if g.get_bool_setting("alldebrid.enabled") and g.get_bool_setting("alldebrid.hosters"):
-                thread_pool.put(AllDebrid().get_hosters, hosters)
-            thread_pool.wait_completion()
-        except ValueError:
-            g.log_stacktrace()
-            xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30485))
-            return hosters
-        return hosters
+			if g.get_bool_setting("realdebrid.enabled") and g.get_bool_setting("rd.hosters"):
+				thread_pool.put(RealDebrid().get_hosters, hosters)
+
+			if g.get_bool_setting("alldebrid.enabled") and g.get_bool_setting("alldebrid.hosters"):
+				thread_pool.put(AllDebrid().get_hosters, hosters)
+			thread_pool.wait_completion()
+		except ValueError:
+			g.log_stacktrace()
+			xbmcgui.Dialog().notification(g.ADDON_NAME, g.get_language_string(30485))
+			return hosters
+		return hosters

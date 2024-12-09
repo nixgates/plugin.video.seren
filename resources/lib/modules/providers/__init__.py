@@ -21,166 +21,166 @@ INIT_BASE64 = "aW1wb3J0IG9zCmZyb20gcmVzb3VyY2VzLmxpYi5tb2R1bGVzLmdsb2JhbHMgaW1wb
 
 
 class CustomProviders(ProviderCache):
-    def __init__(self):
-        super().__init__()
-        self.deploy_init()
-        self.providers_module = self._try_add_providers_path()
-        self.pre_update_collection = []
-        self.language = "en"
-        self.known_packages = None
-        self.known_providers = None
+	def __init__(self):
+		super().__init__()
+		self.deploy_init()
+		self.providers_module = self._try_add_providers_path()
+		self.pre_update_collection = []
+		self.language = "en"
+		self.known_packages = None
+		self.known_providers = None
 
-        self.providers_path = os.path.join(g.ADDON_USERDATA_PATH, "providers")
-        self.modules_path = os.path.join(g.ADDON_USERDATA_PATH, "providerModules")
-        self.meta_path = os.path.join(g.ADDON_USERDATA_PATH, "providerMeta")
-        self.media_path = os.path.join(g.ADDON_USERDATA_PATH, "providerMedia")
-        self.provider_types = ["torrent", "hosters", "adaptive", "direct"]
+		self.providers_path = os.path.join(g.ADDON_USERDATA_PATH, "providers")
+		self.modules_path = os.path.join(g.ADDON_USERDATA_PATH, "providerModules")
+		self.meta_path = os.path.join(g.ADDON_USERDATA_PATH, "providerMeta")
+		self.media_path = os.path.join(g.ADDON_USERDATA_PATH, "providerMedia")
+		self.provider_types = ["torrent", "hosters", "adaptive", "direct"]
 
-        try:
-            with GlobalLock(self.__class__.__name__, True):
-                self._init_providers()
-        except RanOnceAlready:
-            pass
-        self.poll_database()
-        self.provider_settings = SettingsManager()
+		try:
+			with GlobalLock(self.__class__.__name__, True):
+				self._init_providers()
+		except RanOnceAlready:
+			pass
+		self.poll_database()
+		self.provider_settings = SettingsManager()
 
-    def _init_providers(self):
-        g.log("Init provider packages")
-        self.update_known_packages()
-        self.update_known_providers()
+	def _init_providers(self):
+		g.log("Init provider packages")
+		self.update_known_packages()
+		self.update_known_providers()
 
-    def _try_add_providers_path(self):
-        try:
-            if g.ADDON_USERDATA_PATH in sys.path:
-                return reload_module(importlib.import_module("providers"))
+	def _try_add_providers_path(self):
+		try:
+			if g.ADDON_USERDATA_PATH in sys.path:
+				return reload_module(importlib.import_module("providers"))
 
-            sys.path.append(g.ADDON_USERDATA_PATH)
-            return importlib.import_module("providers")
-        except ImportError:
-            g.log("Providers folder appears to be missing")
+			sys.path.append(g.ADDON_USERDATA_PATH)
+			return importlib.import_module("providers")
+		except ImportError:
+			g.log("Providers folder appears to be missing")
 
-    def poll_database(self):
-        self.known_providers = self.get_providers()
-        self.known_packages = self.get_provider_packages()
+	def poll_database(self):
+		self.known_providers = self.get_providers()
+		self.known_packages = self.get_provider_packages()
 
-    def update_known_packages(self):
-        packages = []
-        for root, _, files in os.walk(self.meta_path):
-            for filename in files:
-                if filename.endswith(".json"):
-                    with open(os.path.join(root, filename)) as f:
-                        meta = json.load(f)
-                        try:
-                            packages.append(
-                                (
-                                    meta["name"],
-                                    meta["author"],
-                                    meta["remote_meta"],
-                                    meta["version"],
-                                    "|".join(meta.get("services", [])),
-                                )
-                            )
-                        except KeyError:
-                            continue
+	def update_known_packages(self):
+		packages = []
+		for root, _, files in os.walk(self.meta_path):
+			for filename in files:
+				if filename.endswith(".json"):
+					with open(os.path.join(root, filename)) as f:
+						meta = json.load(f)
+						try:
+							packages.append(
+								(
+									meta["name"],
+									meta["author"],
+									meta["remote_meta"],
+									meta["version"],
+									"|".join(meta.get("services", [])),
+								)
+							)
+						except KeyError:
+							continue
 
-        predicate = "','".join(p[0] for p in packages)
-        self.execute_sql(self.package_insert_query, packages)
-        self.execute_sql(f"DELETE FROM providers where package not in ('{predicate}')")
-        self.known_packages = self.get_provider_packages()
+		predicate = "','".join(p[0] for p in packages)
+		self.execute_sql(self.package_insert_query, packages)
+		self.execute_sql(f"DELETE FROM providers where package not in ('{predicate}')")
+		self.known_packages = self.get_provider_packages()
 
-    def update_known_providers(self):
-        providers = self._try_add_providers_path()
-        all_providers = providers.get_all(self.language)
-        providers = [
-            (provider[1], provider[2], "enabled", self.language, provider_type)
-            for provider_type in self.provider_types
-            for provider in all_providers.get(provider_type, [])
-            if any(provider[2] == package['pack_name'] for package in self.known_packages)
-        ]
+	def update_known_providers(self):
+		providers = self._try_add_providers_path()
+		all_providers = providers.get_all(self.language)
+		providers = [
+			(provider[1], provider[2], "enabled", self.language, provider_type)
+			for provider_type in self.provider_types
+			for provider in all_providers.get(provider_type, [])
+			if any(provider[2] == package['pack_name'] for package in self.known_packages)
+		]
 
-        self.execute_sql(self.provider_insert_query, providers)
-        providers = {
-            provider[1] for provider_type in self.provider_types for provider in all_providers.get(provider_type, [])
-        }
-        packages = {
-            provider[2] for provider_type in self.provider_types for provider in all_providers.get(provider_type, [])
-        }
-        self.execute_sql(
-            f"""
-            DELETE FROM providers
-            WHERE (NOT package IN ('{"','".join(packages)}') OR NOT provider_name IN ('{"','".join(providers)}'))
-            """
-        )
+		self.execute_sql(self.provider_insert_query, providers)
+		providers = {
+			provider[1] for provider_type in self.provider_types for provider in all_providers.get(provider_type, [])
+		}
+		packages = {
+			provider[2] for provider_type in self.provider_types for provider in all_providers.get(provider_type, [])
+		}
+		self.execute_sql(
+			f"""
+			DELETE FROM providers
+			WHERE (NOT package IN ('{"','".join(packages)}') OR NOT provider_name IN ('{"','".join(providers)}'))
+			"""
+		)
 
-    def flip_provider_status(self, package_name, provider_name, status_override=None):
-        current_status = self.get_single_provider(provider_name, package_name)["status"]
+	def flip_provider_status(self, package_name, provider_name, status_override=None):
+		current_status = self.get_single_provider(provider_name, package_name)["status"]
 
-        if status_override:
-            new_status = status_override
-        else:
-            new_status = "disabled" if current_status == "enabled" else "enabled"
-        self.adjust_provider_status(provider_name, package_name, new_status)
-        return new_status
+		if status_override:
+			new_status = status_override
+		else:
+			new_status = "disabled" if current_status == "enabled" else "enabled"
+		self.adjust_provider_status(provider_name, package_name, new_status)
+		return new_status
 
-    def get_icon(self, provider_imports):
-        if not provider_imports or len(provider_imports) != 3:
-            return None
+	def get_icon(self, provider_imports):
+		if not provider_imports or len(provider_imports) != 3:
+			return None
 
-        # provider_imports = ("providers.PACKAGE_NAME.LANGUAGE.PROVIDER_TYPE",
-        #                     "PROVIDER_NAME",
-        #                     "PACKAGE_NAME")
-        package_name = provider_imports[2]
-        package_split = provider_imports[0].split(".")
-        language = package_split[2] if len(package_split) >= 3 else None
-        provider_type = package_split[3] if len(package_split) >= 4 else None
-        provider_name = provider_imports[1]
+		# provider_imports = ("providers.PACKAGE_NAME.LANGUAGE.PROVIDER_TYPE",
+		#					 "PROVIDER_NAME",
+		#					 "PACKAGE_NAME")
+		package_name = provider_imports[2]
+		package_split = provider_imports[0].split(".")
+		language = package_split[2] if len(package_split) >= 3 else None
+		provider_type = package_split[3] if len(package_split) >= 4 else None
+		provider_name = provider_imports[1]
 
-        package_path = None
-        provider_path = None
+		package_path = None
+		provider_path = None
 
-        if None in [language, provider_type, provider_name]:
-            package_path = os.path.join(
-                g.ADDON_USERDATA_PATH,
-                "providerMedia",
-                package_name,
-                f"{package_name}.png",
-            )
-        elif provider_type == "cloud":
-            provider_path = os.path.join(
-                g.IMAGES_PATH,
-                "providerMedia",
-                f"{provider_name}.png",
-            )
-        else:
-            provider_path = os.path.join(
-                g.ADDON_USERDATA_PATH,
-                "providerMedia",
-                package_name,
-                language,
-                provider_type,
-                f"{provider_name}.png",
-            )
+		if None in [language, provider_type, provider_name]:
+			package_path = os.path.join(
+				g.ADDON_USERDATA_PATH,
+				"providerMedia",
+				package_name,
+				f"{package_name}.png",
+			)
+		elif provider_type == "cloud":
+			provider_path = os.path.join(
+				g.IMAGES_PATH,
+				"providerMedia",
+				f"{provider_name}.png",
+			)
+		else:
+			provider_path = os.path.join(
+				g.ADDON_USERDATA_PATH,
+				"providerMedia",
+				package_name,
+				language,
+				provider_type,
+				f"{provider_name}.png",
+			)
 
-        if provider_path is not None and xbmcvfs.exists(provider_path):
-            return provider_path
-        elif package_path is not None and xbmcvfs.exists(package_path):
-            return package_path
-        else:
-            return None
+		if provider_path is not None and xbmcvfs.exists(provider_path):
+			return provider_path
+		elif package_path is not None and xbmcvfs.exists(package_path):
+			return package_path
+		else:
+			return None
 
-    @staticmethod
-    def deploy_init():
-        folders = ["providerModules/", "providers/", "providerMedia/"]
-        root_init_path = os.path.join(g.ADDON_USERDATA_PATH, "__init__.py")
+	@staticmethod
+	def deploy_init():
+		folders = ["providerModules/", "providers/", "providerMedia/"]
+		root_init_path = os.path.join(g.ADDON_USERDATA_PATH, "__init__.py")
 
-        if not xbmcvfs.exists(g.ADDON_USERDATA_PATH):
-            tools.makedirs(g.ADDON_USERDATA_PATH, exist_ok=True)
-        if not xbmcvfs.exists(root_init_path):
-            xbmcvfs.File(root_init_path, "a").close()
-        for i in folders:
-            folder_path = os.path.join(g.ADDON_USERDATA_PATH, i)
-            tools.makedirs(folder_path, exist_ok=True)
-            xbmcvfs.File(os.path.join(folder_path, "__init__.py"), "a").close()
-        provider_init = xbmcvfs.File(os.path.join(g.ADDON_USERDATA_PATH, "providers", "__init__.py"), "w+")
-        provider_init.write(str(base64.b64decode(INIT_BASE64).decode("utf-8")))
-        provider_init.close()
+		if not xbmcvfs.exists(g.ADDON_USERDATA_PATH):
+			tools.makedirs(g.ADDON_USERDATA_PATH, exist_ok=True)
+		if not xbmcvfs.exists(root_init_path):
+			xbmcvfs.File(root_init_path, "a").close()
+		for i in folders:
+			folder_path = os.path.join(g.ADDON_USERDATA_PATH, i)
+			tools.makedirs(folder_path, exist_ok=True)
+			xbmcvfs.File(os.path.join(folder_path, "__init__.py"), "a").close()
+		provider_init = xbmcvfs.File(os.path.join(g.ADDON_USERDATA_PATH, "providers", "__init__.py"), "w+")
+		provider_init.write(str(base64.b64decode(INIT_BASE64).decode("utf-8")))
+		provider_init.close()

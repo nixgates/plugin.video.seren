@@ -12,22 +12,22 @@ PRE_TERM_BLOCK = False
 
 
 def _monkey_check(method):
-    def do_method(*args, **kwargs):
-        """
-        Wrapper method
-        :param args: args
-        :param kwargs: kwargs
-        :return: func results
-        """
-        if (
-            any(True for i in inspect.stack() if "providerModules" in i[1])
-            or any(True for i in inspect.stack() if "providers" in i[1])
-        ) and PRE_TERM_BLOCK:
-            raise PreemptiveCancellation('Pre-emptive termination has stopped this request')
+	def do_method(*args, **kwargs):
+		"""
+		Wrapper method
+		:param args: args
+		:param kwargs: kwargs
+		:return: func results
+		"""
+		if (
+			any(True for i in inspect.stack() if "providerModules" in i[1])
+			or any(True for i in inspect.stack() if "providers" in i[1])
+		) and PRE_TERM_BLOCK:
+			raise PreemptiveCancellation('Pre-emptive termination has stopped this request')
 
-        return method(*args, **kwargs)
+		return method(*args, **kwargs)
 
-    return do_method
+	return do_method
 
 
 # Monkey patch the common requests calls

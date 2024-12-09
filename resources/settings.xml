@@ -1228,9 +1228,15 @@
 						<options>
 							<option label="30175">0</option>
 							<option label="30176">1</option>
+							<option label="30652">2</option>
 						</options>
 					</constraints>
 					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="general.resolverHide"  type="boolean" label="30650" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
 				</setting>
 				<setting id="general.torrentCache" type="boolean" label="30111" help="">
 					<level>0</level>
@@ -1476,10 +1482,17 @@
 					</constraints>
 					<control type="spinner" format="string"/>
 				</setting>
-				<setting id="general.enablesizelimit" type="boolean" label="30118" help="">
+				<setting id="general.enablesizelimit" type="integer" label="30118" help="">
 					<level>0</level>
-					<default>true</default>
-					<control type="toggle"/>
+					<default>0</default>
+						<constraints>
+						<options>
+							<option label="30648">0</option>
+							<option label="30645">1</option>
+							<option label="30647">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string"/>
 				</setting>
 				<setting id="general.sizelimit.movie" type="integer" label="30192" help="" parent="general.enablesizelimit">
 					<level>0</level>
@@ -1491,7 +1504,7 @@
 					</constraints>
 					<dependencies>
 						<dependency type="visible">
-							<condition operator="is" setting="general.enablesizelimit">true</condition>
+							<condition operator="is" setting="general.enablesizelimit">2</condition>
 						</dependency>
 					</dependencies>
 					<control type="slider" format="integer">
@@ -1508,7 +1521,7 @@
 					</constraints>
 					<dependencies>
 						<dependency type="visible">
-							<condition operator="is" setting="general.enablesizelimit">true</condition>
+							<condition operator="is" setting="general.enablesizelimit">2</condition>
 						</dependency>
 					</dependencies>
 					<control type="slider" format="integer">
@@ -1525,7 +1538,7 @@
 					</constraints>
 					<dependencies>
 						<dependency type="visible">
-							<condition operator="is" setting="general.enablesizelimit">true</condition>
+							<condition operator="is" setting="general.enablesizelimit">2</condition>
 						</dependency>
 					</dependencies>
 					<control type="slider" format="number">
@@ -1542,12 +1555,46 @@
 					</constraints>
 					<dependencies>
 						<dependency type="visible">
-							<condition operator="is" setting="general.enablesizelimit">true</condition>
+							<condition operator="is" setting="general.enablesizelimit">2</condition>
 						</dependency>
 					</dependencies>
 					<control type="slider" format="number">
 						<popup>false</popup>
 					</control>
+				</setting>
+				<setting id="general.speedlimit" type="number" label="30646" help="" parent="general.enablesizelimit">
+					<level>0</level>
+					<default>10</default>
+					<constraints>
+						<minimum>0.0</minimum>
+						<step>0.5</step>
+						<maximum>300</maximum>
+					</constraints>
+					<control type="slider" format="number">
+						<popup>false</popup>
+					</control>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.enablesizelimit">1</condition>
+						</dependency>
+					</dependencies>
+				</setting>
+				<setting id="general.speedminimum" type="number" label="30649" help="" parent="general.enablesizelimit">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<minimum>0.0</minimum>
+						<step>0.5</step>
+						<maximum>300</maximum>
+					</constraints>
+					<control type="slider" format="number">
+						<popup>false</popup>
+					</control>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="general.enablesizelimit">1</condition>
+						</dependency>
+					</dependencies>
 				</setting>
 				<setting id="general.filters" type="string" help="">
 					<level>4</level>
@@ -2003,6 +2050,27 @@
 						</dependency>
 					</dependencies>
 					<control type="toggle"/>
+				</setting>
+				<setting id="playingnext.percent" type="integer" label="30651" help="" parent="smartplay.playingnextdialog">
+					<level>0</level>
+					<default>95</default>
+					<constraints>
+						<minimum>0</minimum>
+						<step>1</step>
+						<maximum>100</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="smartplay.playlistcreate">true</condition>
+								<condition operator="is" setting="smartplay.playingnextdialog">true</condition>
+								<condition operator="is" setting="smartplay.displaystyle">0</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="percentage">
+						<popup>false</popup>
+					</control>
 				</setting>
 				<setting id="playingnext.time" type="integer" label="30105" help="" parent="smartplay.playingnextdialog">
 					<level>0</level>
