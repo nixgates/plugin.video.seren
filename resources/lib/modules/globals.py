@@ -650,7 +650,7 @@ class GlobalVariables:
                             elif setting.tag == 'port':
                                 result["port"] = setting.text
                             elif setting.tag == 'name':
-                                result["database"] = setting.text
+                                result["database"] = f"{setting.text}{self.get_kodi_database_version()}"
                             elif setting.tag == 'user':
                                 result["user"] = setting.text
                             elif setting.tag == 'pass':
@@ -662,7 +662,7 @@ class GlobalVariables:
     def clear_kodi_bookmarks(self):
         with self.get_kodi_video_db_connection() as video_database:
             if file_ids := [
-                str(i["idFile"])
+                int(i["idFile"])
                 for i in video_database.fetchall("SELECT * FROM files WHERE strFilename LIKE '%plugin.video.seren%'")
             ]:
                 video_database.execute_sql(
