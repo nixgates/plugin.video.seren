@@ -227,7 +227,11 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
 
     def _sync_watched_movies(self):
         try:
-            trakt_watched = self.trakt_api.get_json("/sync/watched/movies", extended="full")
+            trakt_watched = list(
+                itertools.chain.from_iterable(
+                    self.trakt_api.get_all_pages_json("/sync/watched/movies", ignore_cache=True)
+                )
+            )
             if len(trakt_watched) == 0:
                 return
             self.insert_trakt_movies(trakt_watched)
@@ -304,7 +308,13 @@ class TraktSyncDatabase(trakt_sync.TraktSyncDatabase):
     def sync_watched_episodes(self):
         try:
             get = MetadataHandler.get_trakt_info
-            trakt_watched = self.trakt_api.get_json("sync/watched/shows", extended="full")
+            trakt_watched = list(
+                itertools.chain.from_iterable(
+                    self.trakt_api.get_all_pages_json(
+                        "sync/watched/shows", extended="progress", ignore_cache=True
+                    )
+                )
+            )
             if not trakt_watched:
                 return
             self.insert_trakt_shows(trakt_watched)
