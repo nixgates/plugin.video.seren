@@ -151,7 +151,10 @@ class ZipManager:
         return contents
 
     def _extract_zip_member(self, member, output_path):
-        target_path = os.path.join(output_path, member.replace(self._root_directory, ""))
+        # strip only the leading root directory - a global replace corrupts zips
+        # whose root folder shares its name with inner directories
+        relative_path = member[len(self._root_directory):] if member.startswith(self._root_directory) else member
+        target_path = os.path.join(output_path, relative_path)
         upper_dirs = os.path.dirname(target_path)
 
         if upper_dirs and not xbmcvfs.exists(upper_dirs):
